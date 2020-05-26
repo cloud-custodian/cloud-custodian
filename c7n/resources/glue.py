@@ -20,7 +20,6 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
@@ -232,15 +231,18 @@ class UpdateGlueCrawler(BaseAction):
                     'properties': {
                         'UpdateBehavior': {'type': 'string', 'enum': ['LOG', 'UPDATE_IN_DATABASE']},
                         'DeleteBehavior': {
-                            'type': 'string', 'enum': ['LOG', 'UPDATE_IN_DATABASE', 'DEPRECATE_IN_DATABASE']}
+                            'type': 'string', 'enum': [
+                                'LOG', 'UPDATE_IN_DATABASE', 'DEPRECATE_IN_DATABASE']}
                     }
                 }
             }
         })
 
     permissions = ('glue:UpdateCrawler',)
+    valid_origin_states = ('READY', 'FAILED')
 
     def process(self, crawlers):
+        crawlers = self.filter_resources(crawlers, 'State', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('glue')
         for crawler in crawlers:
             try:

@@ -3,15 +3,24 @@
     "data": {
         "Crawlers": [
             {
-                "Name": "test-filter-crawler",
-                "Role": "c7n-glue-test",
+                "Name": "glue-test",
+                "Role": "service-role/AWSGlueServiceRole-test",
                 "Targets": {
-                    "S3Targets": [],
+                    "S3Targets": [
+                        {
+                            "Path": "s3://c7n-test-glue",
+                            "Exclusions": []
+                        },
+                        {
+                            "Path": "s3://c7n-test-glue/pratyush",
+                            "Exclusions": []
+                        }
+                    ],
                     "JdbcTargets": [],
                     "DynamoDBTargets": [],
                     "CatalogTargets": []
                 },
-                "DatabaseName": "central-logs-poc",
+                "DatabaseName": "database-2",
                 "Classifiers": [],
                 "SchemaChangePolicy": {
                     "UpdateBehavior": "UPDATE_IN_DATABASE",
@@ -22,24 +31,24 @@
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
-                    "month": 3,
-                    "day": 18,
-                    "hour": 10,
-                    "minute": 55,
-                    "second": 51,
+                    "month": 5,
+                    "day": 26,
+                    "hour": 11,
+                    "minute": 13,
+                    "second": 17,
                     "microsecond": 0
                 },
                 "LastUpdated": {
                     "__class__": "datetime",
                     "year": 2020,
-                    "month": 4,
-                    "day": 30,
-                    "hour": 21,
-                    "minute": 17,
-                    "second": 32,
+                    "month": 5,
+                    "day": 26,
+                    "hour": 11,
+                    "minute": 16,
+                    "second": 44,
                     "microsecond": 0
                 },
-                "Version": 7,
+                "Version": 2,
                 "CrawlerSecurityConfiguration": "glue-test"
             }
         ],
