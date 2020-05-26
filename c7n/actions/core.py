@@ -241,10 +241,12 @@ class Action(Element):
                         "error": f.exception(),
                     }
                     if batch_size == 0:
-                        fmt = "Error processing action:{action} resource:{resource} policy:{policy} error:{error}"
+                        fmt = ("Error processing action:{action} resource:{resource}"
+                               " policy:{policy} error:{error}")
                         fmt_vars["resource"] = r[self.id_key]
                     else:
-                        fmt = "Error batch processing action:{action} count:{count} policy:{policy} error:{error}"
+                        fmt = ("Error batch processing action:{action} count:{count}"
+                               " policy:{policy} error:{error}")
                     if exception_format:
                         fmt = exception_format
                     self.log.error(fmt.format(**fmt_vars))

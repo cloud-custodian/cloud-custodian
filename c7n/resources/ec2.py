@@ -510,10 +510,14 @@ class InstanceOffHour(OffHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            return super(InstanceOffHour, self).process(
-                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
-        else:
-            return super(InstanceOffHour, self).process(resources)
+            resources, err = self.split_resources(
+                resources, 'State.Name', self.valid_origin_states
+            )
+            self.results.error(
+                err,
+                "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+            )
+        return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
@@ -523,7 +527,12 @@ class EC2NetworkLocation(net_filters.NetworkLocation):
                            'stopped')
 
     def process(self, resources, event=None):
-        resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
+        resources, err = self.split_resources(
+            resources, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
@@ -591,10 +600,14 @@ class InstanceOnHour(OnHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            return super(InstanceOnHour, self).process(
-                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
-        else:
-            return super(InstanceOnHour, self).process(resources)
+            resources, err = self.split_resources(
+                resources, 'State.Name', self.valid_origin_states
+            )
+            self.results.error(
+                err,
+                "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+            )
+        return super(InstanceOnHour, self).process(resources)
 
 
 @filters.register('ephemeral')
@@ -808,8 +821,13 @@ class SingletonFilter(Filter):
         'value': 'not-null'}).validate()
 
     def process(self, instances, event=None):
-        return super(SingletonFilter, self).process(
-            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+        return super(SingletonFilter, self).process(instances)
 
     def __call__(self, i):
         if self.in_asg(i):
@@ -1123,14 +1141,20 @@ class Start(BaseAction):
     batch_size = 10
     exception = None
 
-    def _filter_ec2_with_volumes(self, instances):
-        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
-
     def process(self, instances):
-        instances = self._filter_ec2_with_volumes(
-            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+
+        instances, err = self.split_resources(
+            instances, 'BlockDeviceMappings', exclude=(None, [])
+        )
+        self.results.error(err, "instance has no volumes")
+
         if not len(instances):
-            self.results.remaining("error", "not in a valid origin state")
             return
 
         client = utils.local_session(self.manager.session_factory).client('ec2')
@@ -1220,6 +1244,14 @@ class Resize(BaseAction):
         return perms
 
     def process(self, resources):
+        resources, err = self.split_resources(
+            resources, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err,
+            "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+
         stopped_instances = self.filter_resources(resources, 'State.Name', ('stopped',))
         running_instances = self.filter_resources(resources, 'State.Name', ('running',))
 
@@ -1331,7 +1363,18 @@ class Stop(BaseAction):
         return enabled, disabled
 
     def process(self, instances):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
+        instances, skip = self.split_resources(
+            instances, 'State.Name', exclude=('stopped',)
+        )
+        self.results.skip(skip, "instance already stopped")
+
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+
         if not len(instances):
             return
         client = utils.local_session(
@@ -1390,12 +1433,19 @@ class Reboot(BaseAction):
     batch_size = 10
     exception = None
 
-    def _filter_ec2_with_volumes(self, instances):
-        return [i for i in instances if len(i['BlockDeviceMappings']) > 0]
-
     def process(self, instances):
-        instances = self._filter_ec2_with_volumes(
-            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+
+        instances, err = self.split_resources(
+            instances, 'BlockDeviceMappings', exclude=(None, [])
+        )
+        self.results.error(err, "instance has no volumes")
+
         if not len(instances):
             return
 
@@ -1464,7 +1514,12 @@ class Terminate(BaseAction):
         return permissions
 
     def process(self, instances):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
         if not len(instances):
             return
         client = utils.local_session(
@@ -1657,9 +1712,15 @@ class AutorecoverAlarm(BaseAction):
         'value': 'empty'}).validate()
 
     def process(self, instances):
-        instances = self.filter_asg_membership.process(
-            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
+        instances = self.filter_asg_membership.process(instances)
         if not len(instances):
+            self.results.remaining("error", "instance is part of an ASG")
             return
         client = utils.local_session(
             self.manager.session_factory).client('cloudwatch')
@@ -1723,7 +1784,12 @@ class SetInstanceProfile(BaseAction):
     valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
+        instances, err = self.split_resources(
+            instances, 'State.Name', self.valid_origin_states
+        )
+        self.results.error(
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+        )
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')

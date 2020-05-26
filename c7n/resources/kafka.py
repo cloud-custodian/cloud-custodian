@@ -77,7 +77,10 @@ class SetMonitoring(Action):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kafka')
-        for r in self.filter_resources(resources, 'State', ('ACTIVE',)):
+        for r in resources:
+            if r['State'] != 'ACTIVE':
+                self.results.error(r, "state is not ACTIVE: %s" % r['State'])
+                continue
             params = dict(self.data.get('config', {}))
             params['ClusterArn'] = r['ClusterArn']
             params['CurrentVersion'] = r['CurrentVersion']

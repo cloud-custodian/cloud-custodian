@@ -255,7 +255,8 @@ class DeleteCrawler(BaseAction):
     valid_origin_states = ('READY', 'FAILED')
 
     def process(self, resources):
-        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
+        resources, err = self.split_resources(resources, 'State', self.valid_origin_states)
+        self.results.error(err, "state not in one of: %s" % ", ".join(self.valid_origin_states))
 
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:

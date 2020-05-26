@@ -19,7 +19,7 @@ from mock import MagicMock, call
 
 from c7n.actions import split_resources_by_results
 from c7n.tags import universal_retry, coalesce_copy_user_tags
-from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest

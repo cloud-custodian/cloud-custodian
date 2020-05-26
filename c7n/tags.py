@@ -549,7 +549,8 @@ class RenameTag(Action):
         for r in resources:
             tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
             if old_key not in tags.keys():
-                self.results.error(r, "resource does not have requested tag to rename")
+                self.results.error(r,
+                    "resource does not have %s tag to rename" % old_key)
                 resources.pop(res)
             res += 1
         return resources
@@ -786,6 +787,8 @@ class NormalizeTag(Action):
         for r in resources:
             tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
             if key not in tags.keys():
+                self.results.error(r,
+                    "resource does not have %s tag to normalize" % key)
                 resources.pop(res)
             res += 1
         return resources

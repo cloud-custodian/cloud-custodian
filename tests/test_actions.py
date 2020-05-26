@@ -44,9 +44,10 @@ class ActionTest(BaseTest):
             {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
             {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
         ]
-        match, nomatch = a.split_resources(resources, 'actions[].status', exclude=('error',))
+        match, nomatch = a.split_resources(
+            resources, 'actions[].status', exclude=('error',))
         assert {'W', 'X', 'Y'} == {r['app'] for r in match}
-        assert {'Z',} == {r['app'] for r in nomatch}
+        assert {'Z', } == {r['app'] for r in nomatch}
 
     def test_split_resources_multi_include_exclude(self):
         a = Action()
@@ -57,7 +58,8 @@ class ActionTest(BaseTest):
             {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
             {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
         ]
-        match, nomatch = a.split_resources(resources, 'actions[].status', allowed_values=('skip',), exclude=('error',))
+        match, nomatch = a.split_resources(
+            resources, 'actions[].status', allowed_values=('skip',), exclude=('error',))
         assert {'X', 'Y'} == {r['app'] for r in match}
         assert {'W', 'Z'} == {r['app'] for r in nomatch}
 
@@ -70,7 +72,8 @@ class ActionTest(BaseTest):
             {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
             {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
         ]
-        match, nomatch = a.split_resources(resources, 'actions[].status', allowed_values=(None,))
+        match, nomatch = a.split_resources(
+            resources, 'actions[].status', allowed_values=(None,))
         assert {'W'} == {r['app'] for r in match}
         assert {'X', 'Y', 'Z'} == {r['app'] for r in nomatch}
 
@@ -83,7 +86,8 @@ class ActionTest(BaseTest):
             {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
             {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
         ]
-        match, nomatch = a.split_resources(resources, 'actions[].status', exclude=(None,))
+        match, nomatch = a.split_resources(
+            resources, 'actions[].status', exclude=(None,))
         assert {'X', 'Y', 'Z'} == {r['app'] for r in match}
         assert {'W'} == {r['app'] for r in nomatch}
 
