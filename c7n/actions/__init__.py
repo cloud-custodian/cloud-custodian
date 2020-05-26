@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from .core import Action, EventAction, BaseAction, ActionRegistry
+from .core import Action, EventAction, BaseAction, ActionRegistry, split_resources_by_results
 from .autotag import AutoTagUser
 from .invoke import LambdaInvoke
 from .metric import PutMetric

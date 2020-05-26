@@ -549,6 +549,7 @@ class RenameTag(Action):
         for r in resources:
             tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
             if old_key not in tags.keys():
+                self.results.error(r, "resource does not have requested tag to rename")
                 resources.pop(res)
             res += 1
         return resources

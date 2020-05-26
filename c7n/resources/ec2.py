@@ -1130,6 +1130,7 @@ class Start(BaseAction):
         instances = self._filter_ec2_with_volumes(
             self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
+            self.results.remaining("error", "not in a valid origin state")
             return
 
         client = utils.local_session(self.manager.session_factory).client('ec2')
@@ -1150,6 +1151,7 @@ class Start(BaseAction):
             msg = "Could not start %d of %d instances %s" % (
                 fail_count, len(instances), utils.dumps(failures))
             self.log.warning(msg)
+            self.results.remaining("error", "not in a valid origin state")
             raise RuntimeError(msg)
 
     def process_instance_set(self, client, instances, itype, izone):
@@ -1165,10 +1167,14 @@ class Start(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     # we maxed out on our retries
+                    self.results.error(instance_ids, e)
                     return True
                 elif e.response['Error']['Code'] == 'IncorrectInstanceState':
-                    instance_ids.remove(extract_instance_id(e))
+                    i = extract_instance_id(e)
+                    instance_ids.remove(i)
+                    self.results.error(i, e)
                 else:
+                    self.results.error(instance_ids, e)
                     raise
 
 

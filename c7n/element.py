@@ -19,22 +19,65 @@ class Element:
     """Parent base class for filters and actions.
     """
 
-    def filter_resources(self, resources, key_expr, allowed_values=()):
+    def filter_resources(self, resources, key_expr, allowed_values=(), exclude=()):
         # many filters implementing a resource state transition only allow
         # a given set of starting states, this method will filter resources
         # and issue a warning log, as implicit filtering in filters means
         # our policy metrics are off, and they should be added as policy
         # filters.
         resource_count = len(resources)
-        search_expr = key_expr
-        if not search_expr.startswith('[].'):
-            search_expr = '[].' + key_expr
-        results = [r for value, r in zip(
-            jmespath.search(search_expr, resources), resources)
-            if value in allowed_values]
-        if resource_count != len(results):
-            self.log.warning(
-                "%s implicitly filtered %d of %d resources key:%s on %s",
-                self.type, len(results), resource_count, key_expr,
-                (', '.join(allowed_values)))
-        return results
+        match, nomatch = split_resources(
+            resources, key_expr, allowed_values=allowed_values, exclude=exclude
+        )
+        if resource_count != len(match):
+            msg = "%s implicitly filtered %d of %d resources key:%s" % (
+                self.type,
+                len(match),
+                resource_count,
+                key_expr,
+            )
+            if allowed_values:
+                msg += " on %s" % (
+                    ', '.join(['no value' if v is None else v for v in allowed_values])
+                )
+            if exclude:
+                msg += " excluding %s" % (
+                    ', '.join(['no value' if v is None else v for v in exclude])
+                )
+            self.log.warning(msg)
+        return match
+
+    def split_resources(self, resources, key_expr, allowed_values=(), exclude=()):
+        return split_resources(resources, key_expr, allowed_values, exclude)
+
+
+def split_resources(resources, key_expr, allowed_values=(), exclude=()):
+    search_expr = jmespath.compile(key_expr)
+    match = []
+    nomatch = []
+
+    if not isinstance(allowed_values, (list, tuple)):
+        allowed_values = (allowed_values,)
+    if not isinstance(exclude, (list, tuple)):
+        exclude = (exclude,)
+
+    # do each resource individually so resources that do not match
+    # the expression can be compared.  jmespath will drop any nulls.
+    for r in resources:
+        # handle case where expression returns no results
+        value = search_expr.search(r) or [None]
+
+        # support possibly a list of results
+        if isinstance(value, (list, tuple)):
+            value = set(value)
+        else:
+            value = set([value])
+
+        if (allowed_values and not value.intersection(allowed_values)) or (
+            exclude and value.intersection(exclude)
+        ):
+            nomatch.append(r)
+        else:
+            match.append(r)
+
+    return match, nomatch

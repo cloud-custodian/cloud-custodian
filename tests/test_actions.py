@@ -30,10 +30,62 @@ class ActionTest(BaseTest):
             {'app': 'X', 'state': {'status': 'running'}},
             {'app': 'Y', 'state': {'status': 'stopped'}},
             {'app': 'Z', 'state': {'status': 'running'}}]
-        assert {'X', 'Z'} == {r['app'] for r in a.filter_resources(
-            resources, 'state.status', ('running',))}
+        match = a.filter_resources(resources, 'state.status', ('running',))
+        assert {'X', 'Z'} == {r['app'] for r in match}
         assert log_output.getvalue().strip() == (
             'set-x implicitly filtered 2 of 3 resources key:state.status on running')
+
+    def test_split_resources_multi_value(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': [{'status': 'ok'}, {'status': 'skip'}]},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(resources, 'actions[].status', exclude=('error',))
+        assert {'W', 'X', 'Y'} == {r['app'] for r in match}
+        assert {'Z',} == {r['app'] for r in nomatch}
+
+    def test_split_resources_multi_include_exclude(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': [{'status': 'ok'}, {'status': 'skip'}]},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(resources, 'actions[].status', allowed_values=('skip',), exclude=('error',))
+        assert {'X', 'Y'} == {r['app'] for r in match}
+        assert {'W', 'Z'} == {r['app'] for r in nomatch}
+
+    def test_split_resources_multi_only_no_value(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': [{'status': 'ok'}, {'status': 'skip'}]},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(resources, 'actions[].status', allowed_values=(None,))
+        assert {'W'} == {r['app'] for r in match}
+        assert {'X', 'Y', 'Z'} == {r['app'] for r in nomatch}
+
+    def test_split_resources_multi_exclude_no_value(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': [{'status': 'ok'}, {'status': 'skip'}]},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(resources, 'actions[].status', exclude=(None,))
+        assert {'X', 'Y', 'Z'} == {r['app'] for r in match}
+        assert {'W'} == {r['app'] for r in nomatch}
 
     def test_run_api(self):
         resp = {

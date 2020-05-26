@@ -18,7 +18,7 @@ import logging
 import traceback
 from concurrent.futures import as_completed
 
-from c7n.element import Element
+from c7n.element import Element, split_resources
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
@@ -26,11 +26,11 @@ from c7n import utils
 
 
 class ActionRegistry(PluginRegistry):
-
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         # Defer to provider initialization of registry
         from .webhook import Webhook
+
         self.register('webhook', Webhook)
 
     def parse(self, data, manager):
@@ -51,8 +51,9 @@ class ActionRegistry(PluginRegistry):
         action_class = self.get(action_type)
         if action_class is None:
             raise PolicyValidationError(
-                "Invalid action type %s, valid actions %s" % (
-                    action_type, list(self.keys())))
+                "Invalid action type %s, valid actions %s"
+                % (action_type, list(self.keys()))
+            )
         # Construct a ResourceManager
         return action_class(data, manager)
 
@@ -64,16 +65,15 @@ class ActionResults:
     def __init__(self, action):
         self.action = action
         self.details = None
-        self.state = {}
         self.metrics = {i: 0 for i in self.allowed_states}
-        self.resources = []
+        self.resources = {}
 
     @property
     def id_key(self):
         return self.action.id_key
 
     def initialize(self, resources):
-        self.resources = resources
+        self.resources = {r[self.id_key]: r for r in resources}
 
     def ok(self, resources):
         self._add(resources, status="ok")
@@ -84,10 +84,8 @@ class ActionResults:
     def error(self, resources, reason):
         self._add(resources, status="error", reason=reason)
 
-    def exception(self, e):
-        self.details = {"Exception": e}
-        if self.resources:
-            self._add(self.resources, "error", e)
+    def set_details(self, details):
+        self.details = details
 
     def remaining(self, status, reason=None):
         if status not in self.allowed_states:
@@ -95,10 +93,7 @@ class ActionResults:
                 "{} is not a valid state: {}".format(status, self.allowed_states)
             )
         # rely on the fact we can only record one status per resource
-        self._add(self.resources, status=status, reason=reason)
-
-    def set_details(self, details):
-        self.details = details
+        self._add(list(self.resources), status=status, reason=reason)
 
     def _add(self, resources, status, reason=None):
         if isinstance(resources, list):
@@ -108,18 +103,37 @@ class ActionResults:
             self._set_status(resources, status, reason)
 
     def _set_status(self, resource, status, reason=None):
-        i = resource[self.id_key]
-        if i in self.state:
-            # already recorded a state, so ignore
-            return
+        if isinstance(resource, str):
+            # support passing in just a resource id
+            rid = resource
+        else:
+            # ... or a full resource
+            rid = resource[self.id_key]
 
+        # only support recording state once
+        if rid not in self.resources:
+            return
+        r = self.resources[rid]
+
+        # store something reasonable to serialize
         if isinstance(reason, Exception):
             reason = str(reason)
 
         record = {"action": self.action.name, "status": status, "reason": reason}
-        resource[self.AnnotationKey] = resource.get(self.AnnotationKey, []) + [record]
         self.metrics[status] += 1
-        self.state[i] = self.state.get(i, []) + [record]
+        r[self.AnnotationKey] = r.get(self.AnnotationKey, []) + [record]
+        # only record one result for a resource
+        del self.resources[rid]
+
+
+# by default just split by success/failure
+def split_resources_by_results(resources, allowed_values=(), exclude=("error",)):
+    return split_resources(
+        resources,
+        '"{}"[].status'.format(ActionResults.AnnotationKey),
+        allowed_values=allowed_values,
+        exclude=exclude,
+    )
 
 
 class Action(Element):
@@ -166,8 +180,8 @@ class Action(Element):
         return self.__class__.__name__.lower()
 
     def wrap_process(self, resources, event=None):
-        if self.data.get('include_failed', False) is False:
-            resources = self.remove_failed_resources(resources)
+        if not self.data.get('include_failed', False):
+            resources, failed = split_resources_by_results(resources)
         self.results.initialize(resources)
         try:
             if isinstance(self, EventAction):
@@ -178,7 +192,7 @@ class Action(Element):
             self.results.remaining("ok")
             self.results.set_details(details)
         except Exception as e:
-            # mark any remaining resources as errors
+            # remaining resources as errors
             self.results.remaining("error", e)
             self.results.set_details({"Exception": traceback.format_exc()})
         return self.results
@@ -244,25 +258,18 @@ class Action(Element):
     def _exception_hook(self, resource, e):
         return
 
-    def remove_failed_resources(self, resources):
-        good = []
-        for r in resources:
-            if "error" not in [
-                a["status"] for a in r.get(ActionResults.AnnotationKey, [])
-            ]:
-                good.append(r)
-        return good
-
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
         except ClientError as e:
-            if (e.response['Error']['Code'] == 'DryRunOperation' and
-            e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
-            'would have succeeded' in e.response['Error']['Message']):
+            if (
+                e.response['Error']['Code'] == 'DryRunOperation'
+                and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
+                and 'would have succeeded' in e.response['Error']['Message']
+            ):
                 return self.log.info(
-                    "Dry run operation %s succeeded" % (
-                        self.__class__.__name__.lower()))
+                    "Dry run operation %s succeeded" % (self.__class__.__name__.lower())
+                )
             raise
 
 

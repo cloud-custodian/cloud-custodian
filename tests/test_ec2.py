@@ -20,6 +20,7 @@ from dateutil import tz
 import jmespath
 from mock import mock
 
+from c7n.actions import split_resources_by_results
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
@@ -726,7 +727,8 @@ class TestTag(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.run()
-        self.assertEqual(len(resources), 3)
+        ok, err = split_resources_by_results(resources)
+        self.assertEqual(len(ok), 3)
 
         policy = self.load_policy(
             {
@@ -1018,12 +1020,10 @@ class TestStart(BaseTest):
         )
         output = self.capture_logging("custodian.actions", level=logging.DEBUG)
         with mock.patch.object(ec2.Start, "process_instance_set", return_value=True):
-            try:
-                policy.run()
-            except RuntimeError:
-                pass
-            else:
-                self.fail("should have raised error")
+            resources = policy.run()
+            self.assertEqual(len(resources), 2)
+            ok, err = split_resources_by_results(resources)
+            self.assertEqual(len(err), 2)
 
         log_output = output.getvalue()
         self.assertIn("Could not start 1 of 1 instances", log_output)
