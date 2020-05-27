@@ -1,7 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "LabelingJobStatus": "InProgress",
+        "LabelingJobStatus": "Stopping",
         "LabelCounters": {
             "TotalLabeled": 0,
             "HumanLabeled": 0,
@@ -26,8 +26,8 @@
             "day": 26,
             "hour": 20,
             "minute": 25,
-            "second": 4,
-            "microsecond": 853000
+            "second": 9,
+            "microsecond": 700000
         },
         "JobReferenceCode": "644160558196bDBOKx4c27ZTtXqX",
         "LabelingJobName": "test-clone-2",

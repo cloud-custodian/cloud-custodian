@@ -3,27 +3,27 @@
     "data": {
         "LabelingJobSummaryList": [
             {
-                "LabelingJobName": "test-clone",
-                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone",
+                "LabelingJobName": "test-clone-2",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-2",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
-                    "day": 24,
-                    "hour": 19,
-                    "minute": 6,
-                    "second": 8,
-                    "microsecond": 617000
+                    "day": 26,
+                    "hour": 20,
+                    "minute": 25,
+                    "second": 2,
+                    "microsecond": 792000
                 },
                 "LastModifiedTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
-                    "day": 24,
-                    "hour": 19,
-                    "minute": 6,
-                    "second": 10,
-                    "microsecond": 468000
+                    "day": 26,
+                    "hour": 20,
+                    "minute": 25,
+                    "second": 4,
+                    "microsecond": 853000
                 },
                 "LabelingJobStatus": "InProgress",
                 "LabelCounters": {
