@@ -10,10 +10,6 @@
                         {
                             "Path": "s3://c7n-test-glue",
                             "Exclusions": []
-                        },
-                        {
-                            "Path": "s3://c7n-test-glue/pratyush",
-                            "Exclusions": []
                         }
                     ],
                     "JdbcTargets": [],
@@ -23,7 +19,7 @@
                 "DatabaseName": "database-2",
                 "Classifiers": [],
                 "SchemaChangePolicy": {
-                    "UpdateBehavior": "UPDATE_IN_DATABASE",
+                    "UpdateBehavior": "LOG",
                     "DeleteBehavior": "DEPRECATE_IN_DATABASE"
                 },
                 "State": "READY",
@@ -32,23 +28,23 @@
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
-                    "day": 26,
-                    "hour": 11,
-                    "minute": 13,
-                    "second": 17,
+                    "day": 27,
+                    "hour": 12,
+                    "minute": 10,
+                    "second": 19,
                     "microsecond": 0
                 },
                 "LastUpdated": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
-                    "day": 26,
-                    "hour": 11,
-                    "minute": 13,
-                    "second": 17,
+                    "day": 27,
+                    "hour": 12,
+                    "minute": 18,
+                    "second": 29,
                     "microsecond": 0
                 },
-                "Version": 1
+                "Version": 2
             }
         ],
         "ResponseMetadata": {}
