@@ -10,7 +10,7 @@ imagesize==1.2.0
 jinja2==2.11.2
 markdown==3.0.1
 markupsafe==1.1.1
-packaging==20.3
+packaging==20.4
 pygments==2.6.1
 pyparsing==2.4.7
 pytz==2020.1

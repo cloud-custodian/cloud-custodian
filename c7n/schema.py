@@ -425,9 +425,25 @@ def process_resource(
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary(cloud_name=None, qualify_name=True):
+def resource_outline(provider=None):
+    outline = {}
+    for cname, ctype in sorted(clouds.items()):
+        if provider and provider != cname:
+            continue
+        cresources = outline[cname] = {}
+        for rname, rtype in sorted(ctype.resources.items()):
+            cresources['%s.%s' % (cname, rname)] = rinfo = {}
+            rinfo['filters'] = sorted(rtype.filter_registry.keys())
+            rinfo['actions'] = sorted(rtype.action_registry.keys())
+    return outline
+
+
+def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
     vocabulary = {}
     resources = {}
+
+    if aliases:
+        vocabulary['aliases'] = {}
 
     for cname, ctype in clouds.items():
         if cloud_name is not None and cloud_name != cname:
@@ -457,6 +473,15 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+        if aliases and resource_type.type_aliases:
+            provider = type_name.split('.', 1)[0]
+            for type_alias in resource_type.type_aliases:
+                vocabulary['aliases'][
+                    "{}.{}".format(provider, type_alias)] = vocabulary[type_name]
+                if provider == 'aws':
+                    vocabulary['aliases'][type_alias] = vocabulary[type_name]
+            vocabulary[type_name]['resource_type'] = type_name
 
     vocabulary["mode"] = {}
     for mode_name, cls in execution.items():

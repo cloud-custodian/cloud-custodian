@@ -173,7 +173,10 @@ def _schema_options(p):
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
-    p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
+    p.add_argument('--json', action="store_true",
+        help="Export custodian's jsonschema")
+    p.add_argument('--outline', action="store_true",
+        help="Print outline of all resources and their actions and filters")
     p.add_argument("-v", "--verbose", action="count", help="Verbose logging")
     p.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
