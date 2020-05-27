@@ -255,7 +255,6 @@ class UpdateGlueCrawler(BaseAction):
         modify_attrs = {}
         for k, v in config.items():
             if k == 'SchemaChangePolicy' and len(v) == 1:
-                import pdb; pdb.set_trace()
                 for attr in ('UpdateBehavior', 'DeleteBehavior'):
                     if attr not in v.keys():
                         config[k][attr] = jmespath.search(k + '.' + attr, crawler)
