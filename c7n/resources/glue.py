@@ -23,6 +23,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+import jmespath
 
 
 @resources.register('glue-connection')
@@ -224,7 +225,7 @@ class UpdateGlueCrawler(BaseAction):
                 'Configuration': {'type': 'string'},
                 'CrawlerSecurityConfiguration': {'type': 'string'},
                 'TablePrefix': {'type': 'string'},
-                'Classifier': {'type': 'array', 'items': {'type': 'string'}},
+                'Classifiers': {'type': 'array', 'items': {'type': 'string'}},
                 'SchemaChangePolicy': {
                     'type': 'object',
                     'additionalProperties': False,
@@ -240,15 +241,34 @@ class UpdateGlueCrawler(BaseAction):
 
     permissions = ('glue:UpdateCrawler',)
     valid_origin_states = ('READY', 'FAILED')
+    crawler_mapping = {'Schedule': 'Schedule.ScheduleExpression'}
 
     def process(self, crawlers):
         crawlers = self.filter_resources(crawlers, 'State', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('glue')
         for crawler in crawlers:
-            try:
-                client.update_crawler(Name=crawler['Name'], **self.data['attributes'])
-            except client.exceptions.EntityNotFoundException:
-                continue
+            self.process_resource(client, crawler)
+
+
+    def process_resource(self, client, crawler):
+        config = dict(self.data.get('attributes'))
+        modify_attrs = {}
+        for k, v in config.items():
+            if k == 'SchemaChangePolicy' and len(v) == 1:
+                import pdb; pdb.set_trace()
+                for attr in ('UpdateBehavior', 'DeleteBehavior'):
+                    if attr not in v.keys():
+                        config[k][attr] = jmespath.search(k + '.' + attr, crawler)
+            if ((k in self.crawler_mapping and
+            v != jmespath.search(self.crawler_mapping[k], crawler)) or
+            v != jmespath.search(k, crawler)):
+                modify_attrs[k] = v
+        if not modify_attrs:
+            return
+        try:
+            client.update_crawler(Name=crawler['Name'], **modify_attrs)
+        except client.exceptions.EntityNotFoundException:
+            return
 
 
 class SecurityConfigFilter(RelatedResourceFilter):
