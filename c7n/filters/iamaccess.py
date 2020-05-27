@@ -348,6 +348,7 @@ class CrossAccountAccessFilter(Filter):
 class PolicyStatementFilter(Filter):
     """  Check a resource for a set of policy statements.
     """
+    schema_alias = True
     POLICY_ELEMENTS = [
         'Sid', 'Effect', 'Principal', 'NotPrincipal', 'Action',
         'NotAction', 'Resource', 'NotResource', 'Condition']
