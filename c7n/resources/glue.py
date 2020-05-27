@@ -249,7 +249,6 @@ class UpdateGlueCrawler(BaseAction):
         for crawler in crawlers:
             self.process_resource(client, crawler)
 
-
     def process_resource(self, client, crawler):
         config = dict(self.data.get('attributes'))
         modify_attrs = {}
