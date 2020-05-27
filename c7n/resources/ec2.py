@@ -1234,8 +1234,7 @@ class Resize(BaseAction):
             resources, 'State.Name', self.valid_origin_states
         )
         self.results.error(
-            err,
-            "instance state not one of: %s" % ", ".join(self.valid_origin_states)
+            err, "instance state not one of: %s" % ", ".join(self.valid_origin_states)
         )
 
         stopped_instances = self.filter_resources(resources, 'State.Name', ('stopped',))
