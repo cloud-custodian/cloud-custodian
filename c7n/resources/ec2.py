@@ -510,13 +510,7 @@ class InstanceOffHour(OffHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            resources, err = self.split_resources(
-                resources, 'State.Name', self.valid_origin_states
-            )
-            self.results.error(
-                err,
-                "instance state not one of: %s" % ", ".join(self.valid_origin_states)
-            )
+            resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         return super(InstanceOffHour, self).process(resources)
 
 
@@ -527,12 +521,7 @@ class EC2NetworkLocation(net_filters.NetworkLocation):
                            'stopped')
 
     def process(self, resources, event=None):
-        resources, err = self.split_resources(
-            resources, 'State.Name', self.valid_origin_states
-        )
-        self.results.error(
-            err, "state not one of: %s" % ", ".join(self.valid_origin_states)
-        )
+        resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
@@ -600,13 +589,7 @@ class InstanceOnHour(OnHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            resources, err = self.split_resources(
-                resources, 'State.Name', self.valid_origin_states
-            )
-            self.results.error(
-                err,
-                "instance state not one of: %s" % ", ".join(self.valid_origin_states)
-            )
+            resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         return super(InstanceOnHour, self).process(resources)
 
 
@@ -821,12 +804,7 @@ class SingletonFilter(Filter):
         'value': 'not-null'}).validate()
 
     def process(self, instances, event=None):
-        instances, err = self.split_resources(
-            instances, 'State.Name', self.valid_origin_states
-        )
-        self.results.error(
-            err, "state not one of: %s" % ", ".join(self.valid_origin_states)
-        )
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         return super(SingletonFilter, self).process(instances)
 
     def __call__(self, i):
@@ -1142,6 +1120,10 @@ class Start(BaseAction):
     exception = None
 
     def process(self, instances):
+        instances, skip = self.split_resources(
+            instances, 'State.Name', exclude=('running',))
+        self.results.skip(skip, "already running")
+
         instances, err = self.split_resources(
             instances, 'State.Name', self.valid_origin_states
         )
@@ -1150,7 +1132,7 @@ class Start(BaseAction):
         )
 
         instances, err = self.split_resources(
-            instances, 'BlockDeviceMappings', exclude=(None, [])
+            instances, 'length(BlockDeviceMappings)', exclude=(None, 0)
         )
         self.results.error(err, "instance has no volumes")
 
@@ -1442,7 +1424,7 @@ class Reboot(BaseAction):
         )
 
         instances, err = self.split_resources(
-            instances, 'BlockDeviceMappings', exclude=(None, [])
+            instances, 'length(BlockDeviceMappings)', exclude=(None, 0)
         )
         self.results.error(err, "instance has no volumes")
 

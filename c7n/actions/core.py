@@ -195,6 +195,7 @@ class Action(Element):
             # remaining resources as errors
             self.results.remaining("error", e)
             self.results.set_details({"Exception": traceback.format_exc()})
+            self.log.error("Error processing action:%s %s" % (self.name, traceback.format_exc()))
         return self.results
 
     def process(self, resources):

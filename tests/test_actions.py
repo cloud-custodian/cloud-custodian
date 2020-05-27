@@ -91,6 +91,34 @@ class ActionTest(BaseTest):
         assert {'X', 'Y', 'Z'} == {r['app'] for r in match}
         assert {'W'} == {r['app'] for r in nomatch}
 
+    def test_split_resources_multi_complex_value(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': []},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(
+            resources, 'actions[]', allowed_values=({'status': 'skip'},))
+        assert {'Y'} == {r['app'] for r in match}
+        assert {'W', 'X', 'Z'} == {r['app'] for r in nomatch}
+
+    def test_split_resources_multi_length(self):
+        a = Action()
+        a.type = 'set-x'
+        resources = [
+            {'app': 'W'},
+            {'app': 'X', 'actions': []},
+            {'app': 'Y', 'actions': [{'status': 'skip'}, {'status': 'ok'}]},
+            {'app': 'Z', 'actions': [{'status': 'ok'}, {'status': 'error'}]},
+        ]
+        match, nomatch = a.split_resources(
+            resources, 'length(actions)', allowed_values=(2,))
+        assert {'Y', 'Z'} == {r['app'] for r in match}
+        assert {'W', 'X'} == {r['app'] for r in nomatch}
+
     def test_run_api(self):
         resp = {
             "Error": {"Code": "DryRunOperation", "Message": "would have succeeded"},

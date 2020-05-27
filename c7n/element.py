@@ -53,7 +53,7 @@ class Element:
 
 def split_resources(resources, key_expr, allowed_values=(), exclude=()):
     search_expr = jmespath.compile(key_expr)
-    match = []
+    matched = []
     nomatch = []
 
     if not isinstance(allowed_values, (list, tuple)):
@@ -64,20 +64,34 @@ def split_resources(resources, key_expr, allowed_values=(), exclude=()):
     # do each resource individually so resources that do not match
     # the expression can be compared.  jmespath will drop any nulls.
     for r in resources:
-        # handle case where expression returns no results
-        value = search_expr.search(r) or [None]
+        try:
+            value = search_expr.search(r)
+        except jmespath.exceptions.JMESPathTypeError:
+            # in cases like:
+            # jmespath.exceptions.JMESPathTypeError: In function length(), invalid type for value: None, expected one of: ['string', 'array', 'object'], received: "null"
+            # just assign a value of None as the query is invalid for this resource
+            value = None
 
-        # support possibly a list of results
-        if isinstance(value, (list, tuple)):
-            value = set(value)
+        # support a list of results, any of which can match
+        if not isinstance(value, (list, tuple)):
+            value = [value]
+
+        match = True
+        if allowed_values:
+            match = False
+            for i in allowed_values:
+                if i in value:
+                    match = True
+                    break
+        if exclude:
+            for i in exclude:
+                if i in value:
+                    match = False
+                    break
+
+        if match:
+            matched.append(r)
         else:
-            value = set([value])
-
-        if (allowed_values and not value.intersection(allowed_values)) or (
-            exclude and value.intersection(exclude)
-        ):
             nomatch.append(r)
-        else:
-            match.append(r)
 
-    return match, nomatch
+    return matched, nomatch
