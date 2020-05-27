@@ -510,8 +510,10 @@ class InstanceOffHour(OffHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
-        return super(InstanceOffHour, self).process(resources)
+            return super(InstanceOffHour, self).process(
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
+        else:
+            return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
@@ -589,8 +591,10 @@ class InstanceOnHour(OnHour):
 
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
-            resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
-        return super(InstanceOnHour, self).process(resources)
+            return super(InstanceOnHour, self).process(
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
+        else:
+            return super(InstanceOnHour, self).process(resources)
 
 
 @filters.register('ephemeral')
@@ -804,8 +808,8 @@ class SingletonFilter(Filter):
         'value': 'not-null'}).validate()
 
     def process(self, instances, event=None):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
-        return super(SingletonFilter, self).process(instances)
+        return super(SingletonFilter, self).process(
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
 
     def __call__(self, i):
         if self.in_asg(i):
