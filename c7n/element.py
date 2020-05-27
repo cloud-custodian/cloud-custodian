@@ -68,7 +68,9 @@ def split_resources(resources, key_expr, allowed_values=(), exclude=()):
             value = search_expr.search(r)
         except jmespath.exceptions.JMESPathTypeError:
             # in cases like:
-            # jmespath.exceptions.JMESPathTypeError: In function length(), invalid type for value: None, expected one of: ['string', 'array', 'object'], received: "null"
+            #   jmespath.exceptions.JMESPathTypeError: In function length(),
+            #   invalid type for value: None, expected one of:
+            #   ['string', 'array', 'object'], received: "null"
             # just assign a value of None as the query is invalid for this resource
             value = None
 
