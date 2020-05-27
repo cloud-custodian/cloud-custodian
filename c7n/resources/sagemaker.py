@@ -15,7 +15,7 @@
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -140,12 +140,6 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
-class DescribeJob(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('sagemaker-labeling-job')
 class SagemakerLabelingJob(QueryResourceManager):
 
@@ -161,9 +155,9 @@ class SagemakerLabelingJob(QueryResourceManager):
         universal_taggable = object()
         permission_augment = ('sagemaker:DescribeLabelingJob', 'sagemaker:ListTags')
 
-    source_mapping = {
-        'describe': DescribeJob
-    }
+    def augment(self, resources):
+        return universal_augment(
+            self, super().augment(resources))
 
 
 class QueryFilter:

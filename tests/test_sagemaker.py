@@ -547,7 +547,10 @@ class TestSagemakerLabelingJob(BaseTest):
             {
                 "name": "stop-labeling-job",
                 "resource": "sagemaker-labeling-job",
-                "filters": [{"LabelingJobName": "test-clone-2"}],
+                "filters": [
+                    {"LabelingJobName": "test-clone-2"},
+                    {"LabelingJobStatus": "InProgress"}
+                ],
                 "actions": [{"type": "stop"}],
             },
             session_factory=session_factory,
