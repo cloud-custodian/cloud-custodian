@@ -26,7 +26,7 @@ from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker, PolicyStatementFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
 from c7n.resources.aws import shape_validate
@@ -1374,7 +1374,7 @@ class LambdaCrossAccount(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FunctionName"], name)      
+        self.assertEqual(resources[0]["FunctionName"], name)
 
 
 class ECRCrossAccount(BaseTest):
@@ -1518,7 +1518,8 @@ class SQSCrossAccount(BaseTest):
         assert(
             "\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}"
             in resources[0]["Policy"]
-        )        
+        )
+
 
 class SNSCrossAccount(BaseTest):
 

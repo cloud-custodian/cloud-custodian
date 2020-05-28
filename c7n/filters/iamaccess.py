@@ -437,4 +437,3 @@ class PolicyStatementFilter(Filter):
                 else:
                     return v in stmt[k]
             return v == stmt[k]
-
