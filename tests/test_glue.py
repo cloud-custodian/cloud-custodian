@@ -555,7 +555,7 @@ class TestGlueDataCatalog(BaseTest):
                     {
                         "Sid": "CrossAccount",
                         "Effect": "Allow",
-                        "Principal": {"AWS": "arn:aws:iam::872247246277:root"},
+                        "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
                         "Action": "glue:GetDatabase",
                         "Resource": "arn:aws:glue:us-east-1:644160558196:catalog"
                     },
