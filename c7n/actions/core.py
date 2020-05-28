@@ -155,7 +155,7 @@ class Action(Element):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
-        self._client = None
+        self.client = None
 
         # let each action determine if they support the new results output
         if self.per_resource_results:
@@ -175,9 +175,13 @@ class Action(Element):
 
     @property
     def client(self):
-        if not self._client:
-            self._client = self.get_client()
-        return self._client
+        if not self.__client:
+            self.__client = self.get_client()
+        return self.__client
+
+    @client.setter
+    def client(self, client):
+        self.__client = client
 
     @property
     def name(self):
