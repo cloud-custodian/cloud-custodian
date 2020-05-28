@@ -18,7 +18,7 @@ from c7n.filters import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 
 from .securityhub import PostFinding
@@ -34,6 +34,7 @@ class DescribeDomain(DescribeSource):
     def augment(self, domains):
         client = local_session(self.manager.session_factory).client('es')
         model = self.manager.get_model()
+        results = []
 
         def _augment(resource_set):
             resources = self.manager.retry(
@@ -45,7 +46,10 @@ class DescribeDomain(DescribeSource):
                     client.list_tags, ARN=rarn).get('TagList', [])
             return resources
 
-        return _augment(domains)
+        for resource_set in chunks(domains, 5):
+            results.extend(_augment(resource_set))
+
+        return results
 
 
 @resources.register('elasticsearch')

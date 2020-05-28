@@ -819,6 +819,28 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n-asg-np-missing")
 
+    def test_asg_propagate_tag_no_instances(self):
+        factory = self.replay_flight_data("test_asg_propagate_tag_no_instances")
+        p = self.load_policy(
+            {
+                "name": "asg-tag",
+                "resource": "asg",
+                "filters": [{"tag:Platform": "ubuntu"}],
+                "actions": [
+                    {
+                        "type": "propagate-tags",
+                        "trim": True,
+                        "tags": ["CustomerId", "Platform"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
+
     def test_asg_filter_capacity_delta_match(self):
         factory = self.replay_flight_data("test_asg_filter_capacity_delta_match")
         p = self.load_policy(
