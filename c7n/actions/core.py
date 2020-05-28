@@ -99,7 +99,7 @@ class ActionResults:
         self._add(list(self.resources), status=status, reason=reason)
 
     def _add(self, resources, status, reason=None):
-        if isinstance(resources, list):
+        if isinstance(resources, (list, set, tuple)):
             for r in resources:
                 self._set_status(r, status, reason)
         else:

@@ -1703,9 +1703,15 @@ class AutorecoverAlarm(BaseAction):
         self.results.error(
             err, "state not one of: %s" % ", ".join(self.valid_origin_states)
         )
+        before = [i[self.id_key] for i in instances]
         instances = self.filter_asg_membership.process(instances)
+
+        self.results.error(
+            set(before) - set([i[self.id_key] for i in instances]),
+            "instance is part of an ASG"
+        )
+
         if not len(instances):
-            self.results.remaining("error", "instance is part of an ASG")
             return
         client = utils.local_session(
             self.manager.session_factory).client('cloudwatch')
