@@ -16,6 +16,7 @@ Query capability built on skew metamodel
 
 tags_spec -> s3, elb, rds
 """
+from concurrent.futures import as_completed
 import functools
 import itertools
 import json
@@ -353,6 +354,35 @@ class ConfigSource:
             item_config = item['configuration']
         return camelResource(item_config)
 
+    def get_listed_resources(self, client):
+        # fallback for when config decides to arbitrarily break select
+        # resource for a given resource type.
+        paginator = client.get_paginator('list_discovered_resources')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        pages = paginator.paginate(
+            resourceType=self.manager.get_model().config_type)
+        results = []
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            ridents = pages.build_full_result()
+            resource_ids = [
+                r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
+            self.manager.log.debug(
+                "querying %d %s resources",
+                len(resource_ids),
+                self.manager.__class__.__name__.lower())
+
+            for resource_set in chunks(resource_ids, 50):
+                futures = []
+                futures.append(w.submit(self.get_resources, resource_set))
+                for f in as_completed(futures):
+                    if f.exception():
+                        self.manager.log.error(
+                            "Exception getting resources from config \n %s" % (
+                                f.exception()))
+                    results.extend(f.result())
+        return results
+
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
         query = self.get_query_params(query)
@@ -367,6 +397,12 @@ class ConfigSource:
         for page in pager.paginate(Expression=query['expr']):
             results.extend([
                 self.load_resource(json.loads(r)) for r in page['Results']])
+
+        # Config arbitrarily breaks which resource types its supports for query/select
+        # on any given day, if we don't have a user defined query, then fallback
+        # to iteration mode.
+        if not results and query == self.get_query_params({}):
+            results = self.get_listed_resources(client)
         return results
 
     def augment(self, resources):
