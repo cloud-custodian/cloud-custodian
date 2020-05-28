@@ -169,7 +169,7 @@ class DateTimeEncoder(json.JSONEncoder):
         try:
             return json.JSONEncoder.default(self, obj)
         except TypeError:
-            if getattr(obj, '__dict__'):
+            if hasattr(obj, '__dict__'):
                 return obj.__dict__
             raise
 
