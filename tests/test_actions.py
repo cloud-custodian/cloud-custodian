@@ -147,6 +147,7 @@ class ActionRegistryTest(BaseTest):
             PolicyValidationError, ActionRegistry("test.actions").factory, "foo", None
         )
 
+
 class ActionResultsTest(BaseTest):
 
     def test_results_no_id_key(self):
