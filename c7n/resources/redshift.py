@@ -137,10 +137,9 @@ class Pause(BaseAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
+        resources, err = self.split_resources(resources, 'ClusterStatus', self.valid_origin_status)
+        self.results.error(err, "status not one of: %s" % self.valid_origin_status)
         for r in resources:
-            if r['ClusterStatus'] not in self.valid_origin_status:
-                self.results.error(r, "status not one of: %s" % self.valid_origin_status)
-                continue
             try:
                 client.pause_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -160,10 +159,9 @@ class Resume(BaseAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
+        resources, err = self.split_resources(resources, 'ClusterStatus', self.valid_origin_status)
+        self.results.error(err, "status not one of: %s" % self.valid_origin_status)
         for r in resources:
-            if r['ClusterStatus'] not in self.valid_origin_status:
-                self.results.error(r, "status not one of: %s" % self.valid_origin_status)
-                continue
             try:
                 client.resume_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
