@@ -45,7 +45,6 @@ class Distribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        config_type = "AWS::CloudFront::Distribution"
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
