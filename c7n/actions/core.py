@@ -165,7 +165,7 @@ class Action(Element):
         self.manager = manager
         self.log_dir = log_dir
         self.client = None
-        self.id_key = manager.get_model().id if manager else None
+        self.id_key = getattr(manager.get_model(), 'id', None) if manager else None
         self.results = ActionResults(self)
 
     def get_permissions(self):
