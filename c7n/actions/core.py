@@ -74,7 +74,9 @@ class ActionResults:
 
     def initialize(self, resources):
         if self.id_key:
-            self.resources = {r[self.id_key]: r for r in resources if r.get(self.id_key)}
+            # if we're initializing and our model has an id key
+            # then all resources should include it.
+            self.resources = {r[self.id_key]: r for r in resources}
 
     def ok(self, resources):
         self._add(resources, status="ok")
