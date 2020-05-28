@@ -519,7 +519,9 @@ class LambdaMode(ServerlessExecutionMode):
                         " ok:%d skip:%d error:%d"
                         " execution_time:%0.2f" % (
                             self.policy.name, action.name, len(resources),
-                            results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
+                            results.metrics["ok"],
+                            results.metrics["skip"],
+                            results.metrics["error"],
                             time.time() - s))
                     if results.details:
                         self.policy._write_file(
