@@ -26,7 +26,7 @@ from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker, PolicyStatementFilter
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
 from c7n.resources.aws import shape_validate
@@ -1374,7 +1374,7 @@ class LambdaCrossAccount(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FunctionName"], name)
+        self.assertEqual(resources[0]["FunctionName"], name)      
 
 
 class ECRCrossAccount(BaseTest):
@@ -1450,6 +1450,75 @@ class SQSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["QueueUrl"], url)
 
+    def test_sqs_has_statements(self):
+
+        session_factory = self.replay_flight_data("test_cross_account_sqs")
+        client = session_factory().client("sqs")
+        queue_name = "c7n-cross-check"
+        url = client.create_queue(QueueName=queue_name)["QueueUrl"]
+        self.addCleanup(client.delete_queue, QueueUrl=url)
+        account_id = url.split("/")[3]
+        arn = "arn:aws:sqs:%s:%s:%s" % (
+            os.environ.get("AWS_DEFAULT_REGION", "us-east-1"), account_id, queue_name
+        )
+
+        policy = {
+            "Id": "Foo",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "SQS:SendMessage",
+                    "Effect": "Allow",
+                    "Resource": arn,
+                    "Principal": "*",
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:PrincipalOrgID": "o-4amkskbcf1"
+                        }
+                    }
+                }
+            ],
+        }
+
+        client.set_queue_attributes(
+            QueueUrl=url, Attributes={"Policy": json.dumps(policy)}
+        )
+
+        p = self.load_policy(
+            {
+                "name": "sqs-has_statements",
+                "resource": "aws.sqs",
+                "filters": [
+                    {"QueueArn": "arn:aws:sqs:us-west-2:644160558196:c7n-cross-check"},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": "SQS:SendMessage",
+                                "Condition": {
+                                    "StringNotEquals": {
+                                        "aws:PrincipalOrgID": "o-4amkskbcf1"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:SendMessage\""
+            in resources[0]["Policy"]
+        )
+        assert(
+            "\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}"
+            in resources[0]["Policy"]
+        )        
 
 class SNSCrossAccount(BaseTest):
 
@@ -1637,6 +1706,39 @@ class CrossAccountChecker(TestCase):
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_multiple_conditions(self):
+        policies = load_data("iam/s3-conditions.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"},
+                "allowed_vpc": {"vpc-12345678"},
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_everyone_only(self):
+        policies = load_data("iam/s3-principal.json")
+        checker = PolicyChecker({"everyone_only": True})
+        for p, expected in zip(policies, [True, True, False, False, False, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_org_id(self):
+        policies = load_data("iam/s3-orgid.json")
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+
+class PolicyStatementFilterTests(TestCase):
 
     def test_s3_policies_multiple_conditions(self):
         policies = load_data("iam/s3-conditions.json")

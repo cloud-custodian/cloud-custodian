@@ -3,7 +3,7 @@
     "data": {
         "Attributes": {
             "ApproximateNumberOfMessagesNotVisible": "0", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Foo\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:SendMessage\",\"Resource\":\"arn:aws:sqs:us-west-2:644160558196:c7n-cross-check\"}]}", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Foo\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:SendMessage\",\"Resource\":\"arn:aws:sqs:us-west-2:644160558196:c7n-cross-check\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}}]}", 
             "MessageRetentionPeriod": "345600", 
             "ApproximateNumberOfMessagesDelayed": "0", 
             "MaximumMessageSize": "262144", 
