@@ -73,7 +73,8 @@ class ActionResults:
         return self.action.id_key
 
     def initialize(self, resources):
-        self.resources = {r[self.id_key]: r for r in resources}
+        if self.id_key:
+            self.resources = {r[self.id_key]: r for r in resources if r.get(self.id_key)}
 
     def ok(self, resources):
         self._add(resources, status="ok")
@@ -103,16 +104,22 @@ class ActionResults:
             self._set_status(resources, status, reason)
 
     def _set_status(self, resource, status, reason=None):
+        # if this resource doesn't support this, then
+        # these are just big no-ops
+        if not self.id_key:
+            return
+
         if isinstance(resource, str):
             # support passing in just a resource id
             rid = resource
         else:
             # ... or a full resource
-            rid = resource[self.id_key]
+            rid = resource.get(self.id_key)
 
         # only support recording state once
-        if rid not in self.resources:
+        if not rid or rid not in self.resources:
             return
+
         r = self.resources[rid]
 
         # store something reasonable to serialize
@@ -156,11 +163,8 @@ class Action(Element):
         self.manager = manager
         self.log_dir = log_dir
         self.client = None
-
-        # let each action determine if they support the new results output
-        if self.per_resource_results:
-            self.id_key = manager.get_model().id if manager else 'id'
-            self.results = ActionResults(self)
+        self.id_key = manager.get_model().id if manager else None
+        self.results = ActionResults(self)
 
     def get_permissions(self):
         return self.permissions
