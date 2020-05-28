@@ -316,28 +316,47 @@ class PullMode(PolicyExecutionMode):
                 self.policy.log.debug("dryrun: skipping actions")
                 return resources
 
-            at = time.time()
             for a in self.policy.resource_manager.actions:
-                s = time.time()
-                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
-                    results = a.wrap_process(resources)
-                self.policy.log.info(
-                    "policy:%s action:%s resources:%d"
-                    " ok:%d skip:%d error:%d"
-                    " execution_time:%0.2f" % (
-                        self.policy.name, a.name, len(resources),
-                        results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
-                        time.time() - s))
-                if results.details:
-                    self.policy._write_file(
-                        "action-%s" % a.name, utils.dumps(results.details))
+                if getattr(a, 'per_resource_results', False):
+                    self._run_action_with_results(a, resources)
+                else:
+                    self._run_action(a, resources)
+
             # now re-write the resources file since it might have action
             # annotations added
+            at = time.time()
             self.policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
+
+    def _run_action(self, a, resources):
+        s = time.time()
+        with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+            results = a.process(resources)
+        self.policy.log.info(
+            "policy:%s action:%s resources:%d execution_time:%0.2f" % (
+                self.policy.name, a.name, len(resources),
+                time.time() - s))
+        if results:
+            self.policy._write_file(
+                "action-%s" % a.name, utils.dumps(results))
+
+    def _run_action_with_results(self, a, resources):
+        s = time.time()
+        with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+            results = a.wrap_process(resources)
+        self.policy.log.info(
+            "policy:%s action:%s resources:%d"
+            " ok:%d skip:%d error:%d"
+            " execution_time:%0.2f" % (
+                self.policy.name, a.name, len(resources),
+                results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
+                time.time() - s))
+        if results.details:
+            self.policy._write_file(
+                "action-%s" % a.name, utils.dumps(results.details))
 
 
 class LambdaMode(ServerlessExecutionMode):
@@ -490,20 +509,34 @@ class LambdaMode(ServerlessExecutionMode):
                 self.policy.log.info(
                     "policy:%s invoking action:%s resources:%d",
                     self.policy.name, action.name, len(resources))
-                if isinstance(action, EventAction):
-                    results = action.wrap_process(resources, event)
+                if getattr(action, "per_resource_results", False):
+                    if isinstance(action, EventAction):
+                        results = action.wrap_process(resources, event)
+                    else:
+                        results = action.wrap_process(resources)
+                    self.policy.log.info(
+                        "policy:%s action:%s resources:%d"
+                        " ok:%d skip:%d error:%d"
+                        " execution_time:%0.2f" % (
+                            self.policy.name, action.name, len(resources),
+                            results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
+                            time.time() - s))
+                    if results.details:
+                        self.policy._write_file(
+                            "action-%s" % action.name, utils.dumps(results.details))
                 else:
-                    results = action.wrap_process(resources)
-                self.policy.log.info(
-                    "policy:%s action:%s resources:%d"
-                    " ok:%d skip:%d error:%d"
-                    " execution_time:%0.2f" % (
-                        self.policy.name, action.name, len(resources),
-                        results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
-                        time.time() - s))
-                if results.details:
-                    self.policy._write_file(
-                        "action-%s" % action.name, utils.dumps(results.details))
+                    if isinstance(action, EventAction):
+                        results = action.process(resources, event)
+                    else:
+                        results = action.process(resources)
+                    self.policy.log.info(
+                        "policy:%s action:%s resources:%d"
+                        " execution_time:%0.2f" % (
+                            self.policy.name, action.name, len(resources),
+                            time.time() - s))
+                    if results:
+                        self.policy._write_file(
+                            "action-%s" % action.name, utils.dumps(results))
         return resources
 
     def provision(self):

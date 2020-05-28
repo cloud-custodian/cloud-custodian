@@ -149,14 +149,18 @@ class Action(Element):
     schema_alias = None
     batch_size = 0
     concurrency = 2
+    per_resource_results = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
-        self.id_key = manager.get_model().id if manager else 'id'
-        self.results = ActionResults(self)
         self._client = None
+
+        # let each action determine if they support the new results output
+        if self.per_resource_results:
+            self.id_key = manager.get_model().id if manager else 'id'
+            self.results = ActionResults(self)
 
     def get_permissions(self):
         return self.permissions

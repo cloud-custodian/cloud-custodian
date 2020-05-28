@@ -24,7 +24,7 @@ log = logging.getLogger('custodian.k8s.actions')
 
 
 class Action(BaseAction):
-    pass
+    per_resource_results = False
 
 
 class MethodAction(Action):

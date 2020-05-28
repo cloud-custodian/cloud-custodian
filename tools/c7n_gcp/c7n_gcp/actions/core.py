@@ -19,7 +19,7 @@ from c7n.utils import local_session, chunks
 
 
 class Action(BaseAction):
-    pass
+    per_resource_results = False
 
 
 class MethodAction(Action):
