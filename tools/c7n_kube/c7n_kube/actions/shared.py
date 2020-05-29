@@ -14,9 +14,10 @@
 
 from c7n_kube.actions.core import DeleteResource, PatchResource
 from c7n_kube.actions.labels import LabelAction
+from c7n_kube.actions.replicas import ReplicaAction
 from c7n_kube.provider import resources as kube_resources
 
-SHARED_ACTIONS = (DeleteResource, LabelAction, PatchResource)
+SHARED_ACTIONS = (DeleteResource, LabelAction, PatchResource, ReplicaAction)
 
 
 for action in SHARED_ACTIONS:
