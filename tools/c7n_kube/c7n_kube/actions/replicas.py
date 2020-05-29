@@ -21,7 +21,7 @@ log = logging.getLogger('custodian.k8s.replicas')
 
 class ReplicaAction(PatchAction):
     """
-    Labels a resource
+    Scale a resource
 
     .. code-block:: yaml
 
