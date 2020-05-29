@@ -3103,7 +3103,7 @@ class KMSKeyResolverMixin:
     """Builds a dictionary of region specific ARNs"""
 
     def __init__(self, data, manager=None):
-        # required for chaining inits when inheriting multiple class
+        # required for chaining inits when inheriting multiple classes
         super(KMSKeyResolverMixin, self).__init__(data, manager)
         self.arns = dict()
         self.data = data

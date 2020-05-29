@@ -16,21 +16,19 @@ Actions to take on resources
 """
 import logging
 import traceback
-from concurrent.futures import as_completed
 
 from c7n.element import Element, split_resources
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
-from c7n import utils
 
 
 class ActionRegistry(PluginRegistry):
+
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         # Defer to provider initialization of registry
         from .webhook import Webhook
-
         self.register('webhook', Webhook)
 
     def parse(self, data, manager):
@@ -43,7 +41,8 @@ class ActionRegistry(PluginRegistry):
         if isinstance(data, dict):
             action_type = data.get('type')
             if action_type is None:
-                raise PolicyValidationError("Invalid action type found in %s" % (data))
+                raise PolicyValidationError(
+                    "Invalid action type found in %s" % (data))
         else:
             action_type = data
             data = {}
@@ -51,9 +50,8 @@ class ActionRegistry(PluginRegistry):
         action_class = self.get(action_type)
         if action_class is None:
             raise PolicyValidationError(
-                "Invalid action type %s, valid actions %s"
-                % (action_type, list(self.keys()))
-            )
+                "Invalid action type %s, valid actions %s" % (
+                    action_type, list(self.keys())))
         # Construct a ResourceManager
         return action_class(data, manager)
 
@@ -156,37 +154,19 @@ class Action(Element):
     permissions = ()
     schema = {'type': 'object'}
     schema_alias = None
-    batch_size = 0
-    concurrency = 2
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
-        self.client = None
         self.id_key = getattr(manager.get_model(), 'id', None) if manager else None
         self.results = ActionResults(self)
 
     def get_permissions(self):
         return self.permissions
 
-    def get_client(self, service=None, **kwargs):
-        return utils.local_session(self.manager.session_factory).client(
-            service or self.manager.resource_type.service, **kwargs
-        )
-
     def validate(self):
         return self
-
-    @property
-    def client(self):
-        if not self.__client:
-            self.__client = self.get_client()
-        return self.__client
-
-    @client.setter
-    def client(self, client):
-        self.__client = client
 
     @property
     def name(self):
@@ -212,80 +192,19 @@ class Action(Element):
         return self.results
 
     def process(self, resources):
-        raise NotImplementedError("Base action class does not implement behavior")
-
-    # generic function for multi-worker execution
-    def _process_with_futures(
-        self,
-        helper,
-        resources,
-        *args,
-        max_workers=None,
-        batch_size=None,
-        exception_format=None,
-        **kwargs
-    ):
-
-        # select setting based on arg, data, class default
-        batch_size = batch_size or self.data.get('batch_size', self.batch_size)
-        concurrency = max_workers or self.concurrency
-
-        results = []
-        if not resources:
-            return results
-
-        with self.executor_factory(concurrency) as w:
-            futures = {}
-            if batch_size > 0:
-                # this is a list of resources passed to the helper
-                for rs in utils.chunks(resources, size=batch_size):
-                    futures[w.submit(helper, rs, *args, **kwargs)] = rs
-            else:
-                # a single resource passed to the helper
-                for r in resources:
-                    futures[w.submit(helper, r, *args, **kwargs)] = r
-
-            for f in as_completed(futures):
-                if f.exception():
-                    r = futures[f]
-                    fmt_vars = {
-                        "action": self.name,
-                        "count": len(r) if batch_size > 1 else 1,
-                        "policy": self.manager.data.get('name'),
-                        "error": f.exception(),
-                    }
-                    if batch_size == 0:
-                        fmt = ("Error processing action:{action} resource:{resource}"
-                               " policy:{policy} error:{error}")
-                        fmt_vars["resource"] = r[self.id_key]
-                    else:
-                        fmt = ("Error batch processing action:{action} count:{count}"
-                               " policy:{policy} error:{error}")
-                    if exception_format:
-                        fmt = exception_format
-                    self.log.error(fmt.format(**fmt_vars))
-                    self.results.error(r, f.exception())
-                    self._exception_hook(r, f.exception())
-                result = f.result()
-                if result:
-                    results.append(result)
-        return results
-
-    def _exception_hook(self, resource, e):
-        return
+        raise NotImplementedError(
+            "Base action class does not implement behavior")
 
     def _run_api(self, cmd, *args, **kw):
         try:
             return cmd(*args, **kw)
         except ClientError as e:
-            if (
-                e.response['Error']['Code'] == 'DryRunOperation'
-                and e.response['ResponseMetadata']['HTTPStatusCode'] == 412
-                and 'would have succeeded' in e.response['Error']['Message']
-            ):
+            if (e.response['Error']['Code'] == 'DryRunOperation' and
+            e.response['ResponseMetadata']['HTTPStatusCode'] == 412 and
+            'would have succeeded' in e.response['Error']['Message']):
                 return self.log.info(
-                    "Dry run operation %s succeeded" % (self.__class__.__name__.lower())
-                )
+                    "Dry run operation %s succeeded" % (
+                        self.__class__.__name__.lower()))
             raise
 
 
