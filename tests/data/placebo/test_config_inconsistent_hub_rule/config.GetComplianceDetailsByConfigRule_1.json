@@ -1,0 +1,128 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvaluationResultIdentifier": {
+                    "EvaluationResultQualifier": {
+                        "ConfigRuleName": "securityhub-cloud-trail-encryption-enabled-dadfg6",
+                        "ResourceType": "AWS::CloudTrail::Trail",
+                        "ResourceId": "S3-DataEvents"
+                    },
+                    "OrderingTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 5,
+                        "day": 27,
+                        "hour": 4,
+                        "minute": 15,
+                        "second": 11,
+                        "microsecond": 900000
+                    }
+                },
+                "ComplianceType": "NON_COMPLIANT",
+                "ResultRecordedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 613000
+                },
+                "ConfigRuleInvokedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 376000
+                }
+            },
+            {
+                "EvaluationResultIdentifier": {
+                    "EvaluationResultQualifier": {
+                        "ConfigRuleName": "securityhub-cloud-trail-encryption-enabled-dadfg6",
+                        "ResourceType": "AWS::CloudTrail::Trail",
+                        "ResourceId": "arn:aws:cloudtrail:us-east-1:644160558196:trail/orgTrail"
+                    },
+                    "OrderingTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 5,
+                        "day": 27,
+                        "hour": 4,
+                        "minute": 15,
+                        "second": 11,
+                        "microsecond": 900000
+                    }
+                },
+                "ComplianceType": "NON_COMPLIANT",
+                "ResultRecordedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 619000
+                },
+                "ConfigRuleInvokedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 376000
+                }
+            },
+            {
+                "EvaluationResultIdentifier": {
+                    "EvaluationResultQualifier": {
+                        "ConfigRuleName": "securityhub-cloud-trail-encryption-enabled-dadfg6",
+                        "ResourceType": "AWS::CloudTrail::Trail",
+                        "ResourceId": "skunk-trails"
+                    },
+                    "OrderingTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 5,
+                        "day": 27,
+                        "hour": 4,
+                        "minute": 15,
+                        "second": 11,
+                        "microsecond": 900000
+                    }
+                },
+                "ComplianceType": "NON_COMPLIANT",
+                "ResultRecordedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 624000
+                },
+                "ConfigRuleInvokedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 15,
+                    "second": 25,
+                    "microsecond": 376000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
