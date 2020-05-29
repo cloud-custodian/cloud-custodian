@@ -248,6 +248,27 @@ class PolicyExecutionMode:
             values[m] = results['Datapoints']
         return values
 
+    def run_actions(self, resources, event=None):
+        for action in self.policy.resource_manager.actions:
+            s = time.time()
+            self.policy.log.info(
+                "policy:%s invoking action:%s resources:%d",
+                self.policy.name, action.name, len(resources))
+            with self.policy.ctx.tracer.subsegment('action:%s' % action.type):
+                results = action.wrap_process(resources, event)
+            self.policy.log.info(
+                "policy:%s action:%s resources:%d"
+                " ok:%d skip:%d error:%d"
+                " execution_time:%0.2f" % (
+                    self.policy.name, action.name, len(resources),
+                    results.metrics["ok"],
+                    results.metrics["skip"],
+                    results.metrics["error"],
+                    time.time() - s))
+            if results.details:
+                self.policy._write_file(
+                    "action-%s" % action.name, utils.dumps(results.details))
+
 
 class ServerlessExecutionMode(PolicyExecutionMode):
     def run(self, event=None, lambda_context=None):
@@ -316,47 +337,16 @@ class PullMode(PolicyExecutionMode):
                 self.policy.log.debug("dryrun: skipping actions")
                 return resources
 
-            for a in self.policy.resource_manager.actions:
-                if getattr(a, 'per_resource_results', False):
-                    self._run_action_with_results(a, resources)
-                else:
-                    self._run_action(a, resources)
+            at = time.time()
+            self.run_actions(resources)
 
             # now re-write the resources file since it might have action
             # annotations added
-            at = time.time()
             self.policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
             self.policy.ctx.metrics.put_metric(
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
-
-    def _run_action(self, a, resources):
-        s = time.time()
-        with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
-            results = a.process(resources)
-        self.policy.log.info(
-            "policy:%s action:%s resources:%d execution_time:%0.2f" % (
-                self.policy.name, a.name, len(resources),
-                time.time() - s))
-        if results:
-            self.policy._write_file(
-                "action-%s" % a.name, utils.dumps(results))
-
-    def _run_action_with_results(self, a, resources):
-        s = time.time()
-        with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
-            results = a.wrap_process(resources)
-        self.policy.log.info(
-            "policy:%s action:%s resources:%d"
-            " ok:%d skip:%d error:%d"
-            " execution_time:%0.2f" % (
-                self.policy.name, a.name, len(resources),
-                results.metrics["ok"], results.metrics["skip"], results.metrics["error"],
-                time.time() - s))
-        if results.details:
-            self.policy._write_file(
-                "action-%s" % a.name, utils.dumps(results.details))
 
 
 class LambdaMode(ServerlessExecutionMode):
@@ -491,7 +481,6 @@ class LambdaMode(ServerlessExecutionMode):
             root.handlers = [logging.NullHandler()]
 
     def run_resource_set(self, event, resources):
-        from c7n.actions import EventAction
         with self.policy.ctx:
             self.policy.ctx.metrics.put_metric(
                 'ResourceCount', len(resources), 'Count', Scope="Policy",
@@ -504,41 +493,7 @@ class LambdaMode(ServerlessExecutionMode):
             self.policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
 
-            for action in self.policy.resource_manager.actions:
-                s = time.time()
-                self.policy.log.info(
-                    "policy:%s invoking action:%s resources:%d",
-                    self.policy.name, action.name, len(resources))
-                if getattr(action, "per_resource_results", False):
-                    if isinstance(action, EventAction):
-                        results = action.wrap_process(resources, event)
-                    else:
-                        results = action.wrap_process(resources)
-                    self.policy.log.info(
-                        "policy:%s action:%s resources:%d"
-                        " ok:%d skip:%d error:%d"
-                        " execution_time:%0.2f" % (
-                            self.policy.name, action.name, len(resources),
-                            results.metrics["ok"],
-                            results.metrics["skip"],
-                            results.metrics["error"],
-                            time.time() - s))
-                    if results.details:
-                        self.policy._write_file(
-                            "action-%s" % action.name, utils.dumps(results.details))
-                else:
-                    if isinstance(action, EventAction):
-                        results = action.process(resources, event)
-                    else:
-                        results = action.process(resources)
-                    self.policy.log.info(
-                        "policy:%s action:%s resources:%d"
-                        " execution_time:%0.2f" % (
-                            self.policy.name, action.name, len(resources),
-                            time.time() - s))
-                    if results:
-                        self.policy._write_file(
-                            "action-%s" % action.name, utils.dumps(results))
+            self.run_actions(resources, event)
         return resources
 
     def provision(self):

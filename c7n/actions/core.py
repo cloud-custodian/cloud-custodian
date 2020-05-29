@@ -158,7 +158,6 @@ class Action(Element):
     schema_alias = None
     batch_size = 0
     concurrency = 2
-    per_resource_results = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}

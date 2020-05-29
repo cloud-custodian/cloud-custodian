@@ -30,7 +30,6 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
     max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
     chunk_size = constants.DEFAULT_CHUNK_SIZE
     log = logging.getLogger('custodian.azure.AzureBaseAction')
-    per_resource_results = False
 
     def process(self, resources, event=None):
         self.session = self.manager.get_session()
