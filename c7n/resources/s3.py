@@ -97,9 +97,6 @@ class DescribeS3(query.DescribeSource):
             results = list(filter(None, results))
             return results
 
-    def get_resources(self, bucket_names):
-        return [{'Name': b} for b in bucket_names]
-
 
 class ConfigS3(query.ConfigSource):
 

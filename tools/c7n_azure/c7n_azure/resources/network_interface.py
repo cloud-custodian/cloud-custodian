@@ -80,6 +80,7 @@ class EffectiveRouteTableFilter(ValueFilter):
     """
     schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
     schema_alias = False
+
     def process(self, resources, event=None):
 
         resources, _ = ThreadHelper.execute_in_parallel(

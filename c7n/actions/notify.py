@@ -22,6 +22,7 @@ from c7n import utils
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources as aws_resources
 from c7n.resolver import ValuesFrom
+from c7n.version import version
 
 
 class BaseNotify(EventAction):
@@ -178,6 +179,7 @@ class Notify(BaseNotify):
             'event': event,
             'account_id': self.manager.config.account_id,
             'account': alias,
+            'version': version,
             'region': self.manager.config.region,
             'execution_id': self.manager.ctx.execution_id,
             'execution_start': self.manager.ctx.start_time,

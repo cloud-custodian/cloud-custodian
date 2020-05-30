@@ -867,6 +867,27 @@ class NetworkAddrTest(BaseTest):
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
 
+    def test_elasticip_error(self):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client('ec2').release_address.side_effect = BotoClientError(
+            {'Error': {'Code': 'xyz'}},
+            operation_name='release_address')
+
+        p = self.load_policy(
+            {
+                "name": "release-network-addr",
+                "resource": "network-addr",
+                "actions": [{"type": "release", "force": False}],
+            },
+            session_factory=mock_factory,
+        )
+        with self.assertRaises(BotoClientError):
+            p.resource_manager.actions[0].process([{
+                'PublicIp': "52.207.185.218",
+                'Domain': 'Vpc',
+                'AllocationId': 'eipalloc-bbaf95b2'}])
+
     def test_elasticip_alias(self):
         try:
             self.load_policy({'name': 'eip', 'resource': 'aws.elastic-ip'}, validate=True)

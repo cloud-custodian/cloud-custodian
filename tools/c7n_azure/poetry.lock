@@ -470,7 +470,7 @@ description = "Microsoft Azure EventHub Management Client Library for Python"
 name = "azure-mgmt-eventhub"
 optional = false
 python-versions = "*"
-version = "3.0.0"
+version = "3.1.0"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
@@ -789,10 +789,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.13.2"
+version = "1.13.18"
 
 [package.dependencies]
-botocore = ">=1.16.2,<1.17.0"
+botocore = ">=1.16.18,<1.17.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -802,7 +802,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.16.2"
+version = "1.16.18"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -820,7 +820,7 @@ develop = true
 name = "c7n"
 optional = false
 python-versions = "^3.6"
-version = "0.9.1"
+version = "0.9.3"
 
 [package.dependencies]
 argcomplete = "^1.11.1"
@@ -964,8 +964,8 @@ category = "main"
 description = "JSON Matching Expressions"
 name = "jmespath"
 optional = false
-python-versions = "*"
-version = "0.9.5"
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.10.0"
 
 [[package]]
 category = "main"
@@ -1028,7 +1028,7 @@ description = "AutoRest swagger generator Python client runtime."
 name = "msrest"
 optional = false
 python-versions = "*"
-version = "0.6.13"
+version = "0.6.14"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
@@ -1058,7 +1058,7 @@ marker = "python_version >= \"3.6\""
 name = "multidict"
 optional = false
 python-versions = ">=3.5"
-version = "4.7.5"
+version = "4.7.6"
 
 [[package]]
 category = "main"
@@ -1160,8 +1160,8 @@ category = "main"
 description = "Python binding to the Networking and Cryptography (NaCl) library"
 name = "pynacl"
 optional = false
-python-versions = "*"
-version = "1.3.0"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.4.0"
 
 [package.dependencies]
 cffi = ">=1.4.1"
@@ -1293,7 +1293,7 @@ description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "1.14.0"
+version = "1.15.0"
 
 [[package]]
 category = "main"
@@ -1312,7 +1312,7 @@ description = "tzinfo object for the local timezone"
 name = "tzlocal"
 optional = false
 python-versions = "*"
-version = "2.0.0"
+version = "2.1"
 
 [package.dependencies]
 pytz = "*"
@@ -1547,8 +1547,8 @@ azure-mgmt-eventgrid = [
     {file = "azure_mgmt_eventgrid-2.2.0-py2.py3-none-any.whl", hash = "sha256:e370cb7402206ba6f5cb611130835ecf6d4ca52c647766afdfae9e928dfea7e0"},
 ]
 azure-mgmt-eventhub = [
-    {file = "azure-mgmt-eventhub-3.0.0.zip", hash = "sha256:b7e77677d7cd8e075c4b4dd3c2c85d44f6adacd948ec49926e54b7119e8e8615"},
-    {file = "azure_mgmt_eventhub-3.0.0-py2.py3-none-any.whl", hash = "sha256:d28dda9b032bcf3960fd3b4bc78885f27eee07fc207dbd5726d5709118d4f9bd"},
+    {file = "azure-mgmt-eventhub-3.1.0.zip", hash = "sha256:c823a0ed879230a3ec9f15c32c9788610af1db56e6aeae6b2725476ddbe0d138"},
+    {file = "azure_mgmt_eventhub-3.1.0-py2.py3-none-any.whl", hash = "sha256:780ccb3e3f04cb2df812eabb9b5268c8c6185654250a0714d3eec6be8cb9ced5"},
 ]
 azure-mgmt-hdinsight = [
     {file = "azure-mgmt-hdinsight-1.4.0.zip", hash = "sha256:9bf9cf9213acf028a0332fd4ee9f15ed90cad7b06c79ccb1f42afff08f74b57e"},
@@ -1665,12 +1665,12 @@ bcrypt = [
     {file = "bcrypt-3.1.7.tar.gz", hash = "sha256:0b0069c752ec14172c5f78208f1863d7ad6755a6fae6fe76ec2c80d13be41e42"},
 ]
 boto3 = [
-    {file = "boto3-1.13.2-py2.py3-none-any.whl", hash = "sha256:fc8511eda662d7b4b10bce55153cf65b89c41d86b65162bc0d15b89547d3d837"},
-    {file = "boto3-1.13.2.tar.gz", hash = "sha256:91b34fac764c908f2e9553607fb0f2c56adc6b9df76e1f313dc190af512849c8"},
+    {file = "boto3-1.13.18-py2.py3-none-any.whl", hash = "sha256:1bdab4f87ff39d5aab59b0aae69965bf604fa5608984c673877f4c62c1f16240"},
+    {file = "boto3-1.13.18.tar.gz", hash = "sha256:2b4924ccc1603d562969b9f3c8c74ff4a1f3bdbafe857c990422c73d8e2e229e"},
 ]
 botocore = [
-    {file = "botocore-1.16.2-py2.py3-none-any.whl", hash = "sha256:8ef5b178b76920f6f11169ad69ff30e297044aab4c34d1e92f26221faaa033ed"},
-    {file = "botocore-1.16.2.tar.gz", hash = "sha256:102534a1d98a70bf6ecacf51c3cef2ef09587039aef064ad076bd2e36dd4c441"},
+    {file = "botocore-1.16.18-py2.py3-none-any.whl", hash = "sha256:e65eb27cae262a510e335bc0c0e286e9e42381b1da0aafaa79fa13c1d8d74a95"},
+    {file = "botocore-1.16.18.tar.gz", hash = "sha256:93574cf95a64c71d35c12c93a23f6214cf2f4b461be3bda3a436381cbe126a84"},
 ]
 c7n = []
 certifi = [
@@ -1765,8 +1765,8 @@ isodate = [
     {file = "isodate-0.6.0.tar.gz", hash = "sha256:2e364a3d5759479cdb2d37cce6b9376ea504db2ff90252a2e5b7cc89cc9ff2d8"},
 ]
 jmespath = [
-    {file = "jmespath-0.9.5-py2.py3-none-any.whl", hash = "sha256:695cb76fa78a10663425d5b73ddc5714eb711157e52704d69be03b1a02ba4fec"},
-    {file = "jmespath-0.9.5.tar.gz", hash = "sha256:cca55c8d153173e21baa59983015ad0daf603f9cb799904ff057bfb8ff8dc2d9"},
+    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
+    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 jsonpickle = [
     {file = "jsonpickle-1.4.1-py2.py3-none-any.whl", hash = "sha256:8919c166bac0574e3d74425c7559434062002d9dfc0ac2afa6dc746ba4a19439"},
@@ -1781,31 +1781,31 @@ knack = [
     {file = "knack-0.6.3.tar.gz", hash = "sha256:b1ac92669641b902e1aef97138666a21b8852f65d83cbde03eb9ddebf82ce121"},
 ]
 msrest = [
-    {file = "msrest-0.6.13-py2.py3-none-any.whl", hash = "sha256:22349c718f632e37beee0dd10f7ea41984ded136db2199a9d3c6f1f3942868e9"},
-    {file = "msrest-0.6.13.tar.gz", hash = "sha256:9050fbbb95dd9e8f4008d7227e4dc5662e8b605c89e5621b0dd09ac7f04cf01d"},
+    {file = "msrest-0.6.14-py2.py3-none-any.whl", hash = "sha256:f54a60084969656faa2755bfa5f614951b07a870e97dfc8f0b0b8ea94a63b5b5"},
+    {file = "msrest-0.6.14.tar.gz", hash = "sha256:f52f880a2145c075f436083ee9a274ddc54c62181e4c41c9ac11520fbae547e5"},
 ]
 msrestazure = [
     {file = "msrestazure-0.6.3-py2.py3-none-any.whl", hash = "sha256:0ae7f903ff81631512beef39602c4104a8fe04cb7d166f28a1ec43c0f0985749"},
     {file = "msrestazure-0.6.3.tar.gz", hash = "sha256:0ec9db93eeea6a6cf1240624a04f49cd8bbb26b98d84a63a8220cfda858c2a96"},
 ]
 multidict = [
-    {file = "multidict-4.7.5-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:fc3b4adc2ee8474cb3cd2a155305d5f8eda0a9c91320f83e55748e1fcb68f8e3"},
-    {file = "multidict-4.7.5-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:42f56542166040b4474c0c608ed051732033cd821126493cf25b6c276df7dd35"},
-    {file = "multidict-4.7.5-cp35-cp35m-win32.whl", hash = "sha256:7774e9f6c9af3f12f296131453f7b81dabb7ebdb948483362f5afcaac8a826f1"},
-    {file = "multidict-4.7.5-cp35-cp35m-win_amd64.whl", hash = "sha256:c2c37185fb0af79d5c117b8d2764f4321eeb12ba8c141a95d0aa8c2c1d0a11dd"},
-    {file = "multidict-4.7.5-cp36-cp36m-macosx_10_13_x86_64.whl", hash = "sha256:e439c9a10a95cb32abd708bb8be83b2134fa93790a4fb0535ca36db3dda94d20"},
-    {file = "multidict-4.7.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:85cb26c38c96f76b7ff38b86c9d560dea10cf3459bb5f4caf72fc1bb932c7136"},
-    {file = "multidict-4.7.5-cp36-cp36m-win32.whl", hash = "sha256:620b37c3fea181dab09267cd5a84b0f23fa043beb8bc50d8474dd9694de1fa6e"},
-    {file = "multidict-4.7.5-cp36-cp36m-win_amd64.whl", hash = "sha256:6e6fef114741c4d7ca46da8449038ec8b1e880bbe68674c01ceeb1ac8a648e78"},
-    {file = "multidict-4.7.5-cp37-cp37m-macosx_10_13_x86_64.whl", hash = "sha256:a326f4240123a2ac66bb163eeba99578e9d63a8654a59f4688a79198f9aa10f8"},
-    {file = "multidict-4.7.5-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:dc561313279f9d05a3d0ffa89cd15ae477528ea37aa9795c4654588a3287a9ab"},
-    {file = "multidict-4.7.5-cp37-cp37m-win32.whl", hash = "sha256:4b7df040fb5fe826d689204f9b544af469593fb3ff3a069a6ad3409f742f5928"},
-    {file = "multidict-4.7.5-cp37-cp37m-win_amd64.whl", hash = "sha256:317f96bc0950d249e96d8d29ab556d01dd38888fbe68324f46fd834b430169f1"},
-    {file = "multidict-4.7.5-cp38-cp38-macosx_10_13_x86_64.whl", hash = "sha256:b51249fdd2923739cd3efc95a3d6c363b67bbf779208e9f37fd5e68540d1a4d4"},
-    {file = "multidict-4.7.5-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:ae402f43604e3b2bc41e8ea8b8526c7fa7139ed76b0d64fc48e28125925275b2"},
-    {file = "multidict-4.7.5-cp38-cp38-win32.whl", hash = "sha256:bb519becc46275c594410c6c28a8a0adc66fe24fef154a9addea54c1adb006f5"},
-    {file = "multidict-4.7.5-cp38-cp38-win_amd64.whl", hash = "sha256:544fae9261232a97102e27a926019100a9db75bec7b37feedd74b3aa82f29969"},
-    {file = "multidict-4.7.5.tar.gz", hash = "sha256:aee283c49601fa4c13adc64c09c978838a7e812f85377ae130a24d7198c0331e"},
+    {file = "multidict-4.7.6-cp35-cp35m-macosx_10_14_x86_64.whl", hash = "sha256:275ca32383bc5d1894b6975bb4ca6a7ff16ab76fa622967625baeebcf8079000"},
+    {file = "multidict-4.7.6-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:1ece5a3369835c20ed57adadc663400b5525904e53bae59ec854a5d36b39b21a"},
+    {file = "multidict-4.7.6-cp35-cp35m-win32.whl", hash = "sha256:5141c13374e6b25fe6bf092052ab55c0c03d21bd66c94a0e3ae371d3e4d865a5"},
+    {file = "multidict-4.7.6-cp35-cp35m-win_amd64.whl", hash = "sha256:9456e90649005ad40558f4cf51dbb842e32807df75146c6d940b6f5abb4a78f3"},
+    {file = "multidict-4.7.6-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:e0d072ae0f2a179c375f67e3da300b47e1a83293c554450b29c900e50afaae87"},
+    {file = "multidict-4.7.6-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:3750f2205b800aac4bb03b5ae48025a64e474d2c6cc79547988ba1d4122a09e2"},
+    {file = "multidict-4.7.6-cp36-cp36m-win32.whl", hash = "sha256:f07acae137b71af3bb548bd8da720956a3bc9f9a0b87733e0899226a2317aeb7"},
+    {file = "multidict-4.7.6-cp36-cp36m-win_amd64.whl", hash = "sha256:6513728873f4326999429a8b00fc7ceddb2509b01d5fd3f3be7881a257b8d463"},
+    {file = "multidict-4.7.6-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:feed85993dbdb1dbc29102f50bca65bdc68f2c0c8d352468c25b54874f23c39d"},
+    {file = "multidict-4.7.6-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:fcfbb44c59af3f8ea984de67ec7c306f618a3ec771c2843804069917a8f2e255"},
+    {file = "multidict-4.7.6-cp37-cp37m-win32.whl", hash = "sha256:4538273208e7294b2659b1602490f4ed3ab1c8cf9dbdd817e0e9db8e64be2507"},
+    {file = "multidict-4.7.6-cp37-cp37m-win_amd64.whl", hash = "sha256:d14842362ed4cf63751648e7672f7174c9818459d169231d03c56e84daf90b7c"},
+    {file = "multidict-4.7.6-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:c026fe9a05130e44157b98fea3ab12969e5b60691a276150db9eda71710cd10b"},
+    {file = "multidict-4.7.6-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:51a4d210404ac61d32dada00a50ea7ba412e6ea945bbe992e4d7a595276d2ec7"},
+    {file = "multidict-4.7.6-cp38-cp38-win32.whl", hash = "sha256:5cf311a0f5ef80fe73e4f4c0f0998ec08f954a6ec72b746f3c179e37de1d210d"},
+    {file = "multidict-4.7.6-cp38-cp38-win_amd64.whl", hash = "sha256:7388d2ef3c55a8ba80da62ecfafa06a1c097c18032a501ffd4cabbc52d7f2b19"},
+    {file = "multidict-4.7.6.tar.gz", hash = "sha256:fbb77a75e529021e7c4a8d4e823d88ef4d23674a202be4f5addffc72cbb91430"},
 ]
 netaddr = [
     {file = "netaddr-0.7.19-py2.py3-none-any.whl", hash = "sha256:56b3558bd71f3f6999e4c52e349f38660e54a7a8a9943335f73dfc96883e08ca"},
@@ -1840,27 +1840,22 @@ pyjwt = [
     {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
 ]
 pynacl = [
-    {file = "PyNaCl-1.3.0-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:2424c8b9f41aa65bbdbd7a64e73a7450ebb4aa9ddedc6a081e7afcc4c97f7621"},
-    {file = "PyNaCl-1.3.0-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:30f36a9c70450c7878053fa1344aca0145fd47d845270b43a7ee9192a051bf39"},
-    {file = "PyNaCl-1.3.0-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:05c26f93964373fc0abe332676cb6735f0ecad27711035b9472751faa8521255"},
-    {file = "PyNaCl-1.3.0-cp27-cp27m-win32.whl", hash = "sha256:a14e499c0f5955dcc3991f785f3f8e2130ed504fa3a7f44009ff458ad6bdd17f"},
-    {file = "PyNaCl-1.3.0-cp27-cp27m-win_amd64.whl", hash = "sha256:f67814c38162f4deb31f68d590771a29d5ae3b1bd64b75cf232308e5c74777e0"},
-    {file = "PyNaCl-1.3.0-cp27-cp27mu-manylinux1_i686.whl", hash = "sha256:e2da3c13307eac601f3de04887624939aca8ee3c9488a0bb0eca4fb9401fc6b1"},
-    {file = "PyNaCl-1.3.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:0d0a8171a68edf51add1e73d2159c4bc19fc0718e79dec51166e940856c2f28e"},
-    {file = "PyNaCl-1.3.0-cp34-abi3-macosx_10_6_intel.whl", hash = "sha256:4943decfc5b905748f0756fdd99d4f9498d7064815c4cf3643820c9028b711d1"},
-    {file = "PyNaCl-1.3.0-cp34-abi3-manylinux1_i686.whl", hash = "sha256:5bd61e9b44c543016ce1f6aef48606280e45f892a928ca7068fba30021e9b786"},
-    {file = "PyNaCl-1.3.0-cp34-abi3-manylinux1_x86_64.whl", hash = "sha256:aabb0c5232910a20eec8563503c153a8e78bbf5459490c49ab31f6adf3f3a415"},
-    {file = "PyNaCl-1.3.0-cp34-cp34m-win32.whl", hash = "sha256:7d3ce02c0784b7cbcc771a2da6ea51f87e8716004512493a2b69016326301c3b"},
-    {file = "PyNaCl-1.3.0-cp34-cp34m-win_amd64.whl", hash = "sha256:1c780712b206317a746ace34c209b8c29dbfd841dfbc02aa27f2084dd3db77ae"},
-    {file = "PyNaCl-1.3.0-cp35-cp35m-win32.whl", hash = "sha256:37aa336a317209f1bb099ad177fef0da45be36a2aa664507c5d72015f956c310"},
-    {file = "PyNaCl-1.3.0-cp35-cp35m-win_amd64.whl", hash = "sha256:57ef38a65056e7800859e5ba9e6091053cd06e1038983016effaffe0efcd594a"},
-    {file = "PyNaCl-1.3.0-cp36-cp36m-win32.whl", hash = "sha256:a39f54ccbcd2757d1d63b0ec00a00980c0b382c62865b61a505163943624ab20"},
-    {file = "PyNaCl-1.3.0-cp36-cp36m-win_amd64.whl", hash = "sha256:6482d3017a0c0327a49dddc8bd1074cc730d45db2ccb09c3bac1f8f32d1eb61b"},
-    {file = "PyNaCl-1.3.0-cp37-cp37m-win32.whl", hash = "sha256:2d23c04e8d709444220557ae48ed01f3f1086439f12dbf11976e849a4926db56"},
-    {file = "PyNaCl-1.3.0-cp37-cp37m-win_amd64.whl", hash = "sha256:bd4ecb473a96ad0f90c20acba4f0bf0df91a4e03a1f4dd6a4bdc9ca75aa3a715"},
-    {file = "PyNaCl-1.3.0-cp38-cp38-win32.whl", hash = "sha256:53126cd91356342dcae7e209f840212a58dcf1177ad52c1d938d428eebc9fee5"},
-    {file = "PyNaCl-1.3.0-cp38-cp38-win_amd64.whl", hash = "sha256:bf459128feb543cfca16a95f8da31e2e65e4c5257d2f3dfa8c0c1031139c9c92"},
-    {file = "PyNaCl-1.3.0.tar.gz", hash = "sha256:0c6100edd16fefd1557da078c7a31e7b7d7a52ce39fdca2bec29d4f7b6e7600c"},
+    {file = "PyNaCl-1.4.0-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:ea6841bc3a76fa4942ce00f3bda7d436fda21e2d91602b9e21b7ca9ecab8f3ff"},
+    {file = "PyNaCl-1.4.0-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:d452a6746f0a7e11121e64625109bc4468fc3100452817001dbe018bb8b08514"},
+    {file = "PyNaCl-1.4.0-cp27-cp27m-win32.whl", hash = "sha256:2fe0fc5a2480361dcaf4e6e7cea00e078fcda07ba45f811b167e3f99e8cff574"},
+    {file = "PyNaCl-1.4.0-cp27-cp27m-win_amd64.whl", hash = "sha256:f8851ab9041756003119368c1e6cd0b9c631f46d686b3904b18c0139f4419f80"},
+    {file = "PyNaCl-1.4.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:7757ae33dae81c300487591c68790dfb5145c7d03324000433d9a2c141f82af7"},
+    {file = "PyNaCl-1.4.0-cp35-abi3-macosx_10_10_x86_64.whl", hash = "sha256:757250ddb3bff1eecd7e41e65f7f833a8405fede0194319f87899690624f2122"},
+    {file = "PyNaCl-1.4.0-cp35-abi3-manylinux1_x86_64.whl", hash = "sha256:30f9b96db44e09b3304f9ea95079b1b7316b2b4f3744fe3aaecccd95d547063d"},
+    {file = "PyNaCl-1.4.0-cp35-cp35m-win32.whl", hash = "sha256:06cbb4d9b2c4bd3c8dc0d267416aaed79906e7b33f114ddbf0911969794b1cc4"},
+    {file = "PyNaCl-1.4.0-cp35-cp35m-win_amd64.whl", hash = "sha256:511d269ee845037b95c9781aa702f90ccc36036f95d0f31373a6a79bd8242e25"},
+    {file = "PyNaCl-1.4.0-cp36-cp36m-win32.whl", hash = "sha256:11335f09060af52c97137d4ac54285bcb7df0cef29014a1a4efe64ac065434c4"},
+    {file = "PyNaCl-1.4.0-cp36-cp36m-win_amd64.whl", hash = "sha256:cd401ccbc2a249a47a3a1724c2918fcd04be1f7b54eb2a5a71ff915db0ac51c6"},
+    {file = "PyNaCl-1.4.0-cp37-cp37m-win32.whl", hash = "sha256:8122ba5f2a2169ca5da936b2e5a511740ffb73979381b4229d9188f6dcb22f1f"},
+    {file = "PyNaCl-1.4.0-cp37-cp37m-win_amd64.whl", hash = "sha256:537a7ccbea22905a0ab36ea58577b39d1fa9b1884869d173b5cf111f006f689f"},
+    {file = "PyNaCl-1.4.0-cp38-cp38-win32.whl", hash = "sha256:9c4a7ea4fb81536c1b1f5cc44d54a296f96ae78c1ebd2311bd0b60be45a48d96"},
+    {file = "PyNaCl-1.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:7c6092102219f59ff29788860ccb021e80fffd953920c4a8653889c029b2d420"},
+    {file = "PyNaCl-1.4.0.tar.gz", hash = "sha256:54e9a2c849c742006516ad56a88f5c74bf2ce92c9f67435187c3c5953b346505"},
 ]
 pyopenssl = [
     {file = "pyOpenSSL-19.1.0-py2.py3-none-any.whl", hash = "sha256:621880965a720b8ece2f1b2f54ea2071966ab00e2970ad2ce11d596102063504"},
@@ -1923,16 +1918,16 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 six = [
-    {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
-    {file = "six-1.14.0.tar.gz", hash = "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"},
+    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
+    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tabulate = [
     {file = "tabulate-0.8.7-py3-none-any.whl", hash = "sha256:ac64cb76d53b1231d364babcd72abbb16855adac7de6665122f97b593f1eb2ba"},
     {file = "tabulate-0.8.7.tar.gz", hash = "sha256:db2723a20d04bcda8522165c73eea7c300eda74e0ce852d9022e0159d7895007"},
 ]
 tzlocal = [
-    {file = "tzlocal-2.0.0-py2.py3-none-any.whl", hash = "sha256:11c9f16e0a633b4b60e1eede97d8a46340d042e67b670b290ca526576e039048"},
-    {file = "tzlocal-2.0.0.tar.gz", hash = "sha256:949b9dd5ba4be17190a80c0268167d7e6c92c62b30026cf9764caf3e308e5590"},
+    {file = "tzlocal-2.1-py2.py3-none-any.whl", hash = "sha256:e2cb6c6b5b604af38597403e9852872d7f534962ae2954c7f35efcb1ccacf4a4"},
+    {file = "tzlocal-2.1.tar.gz", hash = "sha256:643c97c5294aedc737780a49d9df30889321cbe1204eac2c2ec6134035a92e44"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},

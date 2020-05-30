@@ -27,10 +27,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.13.2"
+version = "1.13.18"
 
 [package.dependencies]
-botocore = ">=1.16.2,<1.17.0"
+botocore = ">=1.16.18,<1.17.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -40,7 +40,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.16.2"
+version = "1.16.18"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -163,8 +163,8 @@ category = "main"
 description = "JSON Matching Expressions"
 name = "jmespath"
 optional = false
-python-versions = "*"
-version = "0.9.5"
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.10.0"
 
 [[package]]
 category = "main"
@@ -232,7 +232,7 @@ description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
 python-versions = ">=3.5"
-version = "8.2.0"
+version = "8.3.0"
 
 [[package]]
 category = "dev"
@@ -240,7 +240,7 @@ description = "Core utilities for Python packages"
 name = "packaging"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "20.3"
+version = "20.4"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
@@ -356,7 +356,7 @@ description = "Python client for Redis key-value store"
 name = "redis"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "3.5.0"
+version = "3.5.2"
 
 [package.extras]
 hiredis = ["hiredis (>=0.1.3)"]
@@ -396,7 +396,7 @@ description = "Twilio SendGrid library for Python"
 name = "sendgrid"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "6.3.0"
+version = "6.3.1"
 
 [package.dependencies]
 python-http-client = ">=3.2.1"
@@ -407,7 +407,7 @@ description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "1.14.0"
+version = "1.15.0"
 
 [[package]]
 category = "dev"
@@ -416,14 +416,6 @@ name = "sortedcontainers"
 optional = false
 python-versions = "*"
 version = "2.1.0"
-
-[[package]]
-category = "main"
-description = "The Splunk Software Development Kit for Python."
-name = "splunk-sdk"
-optional = false
-python-versions = "*"
-version = "1.6.12"
 
 [[package]]
 category = "main"
@@ -459,7 +451,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "e074b9762446f9fb837c6c3651df313386783751591c019851d899ebfb682dca"
+content-hash = "ada358158de8d1ea8ef245204f06bdd74fa58dad189d0f1fde86006010ea2d2b"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -472,12 +464,12 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.13.2-py2.py3-none-any.whl", hash = "sha256:fc8511eda662d7b4b10bce55153cf65b89c41d86b65162bc0d15b89547d3d837"},
-    {file = "boto3-1.13.2.tar.gz", hash = "sha256:91b34fac764c908f2e9553607fb0f2c56adc6b9df76e1f313dc190af512849c8"},
+    {file = "boto3-1.13.18-py2.py3-none-any.whl", hash = "sha256:1bdab4f87ff39d5aab59b0aae69965bf604fa5608984c673877f4c62c1f16240"},
+    {file = "boto3-1.13.18.tar.gz", hash = "sha256:2b4924ccc1603d562969b9f3c8c74ff4a1f3bdbafe857c990422c73d8e2e229e"},
 ]
 botocore = [
-    {file = "botocore-1.16.2-py2.py3-none-any.whl", hash = "sha256:8ef5b178b76920f6f11169ad69ff30e297044aab4c34d1e92f26221faaa033ed"},
-    {file = "botocore-1.16.2.tar.gz", hash = "sha256:102534a1d98a70bf6ecacf51c3cef2ef09587039aef064ad076bd2e36dd4c441"},
+    {file = "botocore-1.16.18-py2.py3-none-any.whl", hash = "sha256:e65eb27cae262a510e335bc0c0e286e9e42381b1da0aafaa79fa13c1d8d74a95"},
+    {file = "botocore-1.16.18.tar.gz", hash = "sha256:93574cf95a64c71d35c12c93a23f6214cf2f4b461be3bda3a436381cbe126a84"},
 ]
 certifi = [
     {file = "certifi-2020.4.5.1-py2.py3-none-any.whl", hash = "sha256:1d987a998c75633c40847cc966fcf5904906c920a7f17ef374f5aa4282abd304"},
@@ -521,8 +513,8 @@ jinja2 = [
     {file = "Jinja2-2.11.2.tar.gz", hash = "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0"},
 ]
 jmespath = [
-    {file = "jmespath-0.9.5-py2.py3-none-any.whl", hash = "sha256:695cb76fa78a10663425d5b73ddc5714eb711157e52704d69be03b1a02ba4fec"},
-    {file = "jmespath-0.9.5.tar.gz", hash = "sha256:cca55c8d153173e21baa59983015ad0daf603f9cb799904ff057bfb8ff8dc2d9"},
+    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
+    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 jsonpatch = [
     {file = "jsonpatch-1.25-py2.py3-none-any.whl", hash = "sha256:cc3a7241010a1fd3f50145a3b33be2c03c1e679faa19934b628bb07d0f64819e"},
@@ -580,12 +572,12 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
 more-itertools = [
-    {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},
-    {file = "more_itertools-8.2.0-py3-none-any.whl", hash = "sha256:5dd8bcf33e5f9513ffa06d5ad33d78f31e1931ac9a18f33d37e77a180d393a7c"},
+    {file = "more-itertools-8.3.0.tar.gz", hash = "sha256:558bb897a2232f5e4f8e2399089e35aecb746e1f9191b6584a151647e89267be"},
+    {file = "more_itertools-8.3.0-py3-none-any.whl", hash = "sha256:7818f596b1e87be009031c7653d01acc46ed422e6656b394b0f765ce66ed4982"},
 ]
 packaging = [
-    {file = "packaging-20.3-py2.py3-none-any.whl", hash = "sha256:82f77b9bee21c1bafbf35a84905d604d5d1223801d639cf3ed140bd651c08752"},
-    {file = "packaging-20.3.tar.gz", hash = "sha256:3c292b474fda1671ec57d46d739d072bfd495a4f51ad01a055121d81e952b7a3"},
+    {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
+    {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
 ]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
@@ -642,8 +634,8 @@ pyyaml = [
     {file = "PyYAML-5.3.1.tar.gz", hash = "sha256:b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"},
 ]
 redis = [
-    {file = "redis-3.5.0-py2.py3-none-any.whl", hash = "sha256:174101a3ce04560d716616290bb40e0a2af45d5844c8bd474c23fc5c52e7a46a"},
-    {file = "redis-3.5.0.tar.gz", hash = "sha256:7378105cd8ea20c4edc49f028581e830c01ad5f00be851def0f4bc616a83cd89"},
+    {file = "redis-3.5.2-py2.py3-none-any.whl", hash = "sha256:2ef11f489003f151777c064c5dbc6653dfb9f3eade159bcadc524619fddc2242"},
+    {file = "redis-3.5.2.tar.gz", hash = "sha256:6d65e84bc58091140081ee9d9c187aab0480097750fac44239307a3bdf0b1251"},
 ]
 requests = [
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
@@ -654,20 +646,16 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 sendgrid = [
-    {file = "sendgrid-6.3.0-py3-none-any.whl", hash = "sha256:37d8215974ec3c79085fc455332961bb788eb5d899adde1469640b605a940ec4"},
-    {file = "sendgrid-6.3.0-py3.6.egg", hash = "sha256:a74a70faf8d84be4ca07924bf229ca0e28f5607e0b10cb0adffce23e03bb9ccb"},
-    {file = "sendgrid-6.3.0.tar.gz", hash = "sha256:692c0ac35a6afed093e66e883b86dc7ec60b6b774bf5ef931d42efd19443a1fc"},
+    {file = "sendgrid-6.3.1-py3-none-any.whl", hash = "sha256:838e1f7b0f84d56714be6a18ef66fbcf8fba0bda782eee35c47c04d7a16efde8"},
+    {file = "sendgrid-6.3.1.tar.gz", hash = "sha256:38c0853494c7bfbef64f33934c25bf98bb7648cf0e66a0cfb22410927e4ef4c7"},
 ]
 six = [
-    {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
-    {file = "six-1.14.0.tar.gz", hash = "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"},
+    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
+    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 sortedcontainers = [
     {file = "sortedcontainers-2.1.0-py2.py3-none-any.whl", hash = "sha256:d9e96492dd51fae31e60837736b38fe42a187b5404c16606ff7ee7cd582d4c60"},
     {file = "sortedcontainers-2.1.0.tar.gz", hash = "sha256:974e9a32f56b17c1bac2aebd9dcf197f3eb9cd30553c5852a3187ad162e1a03a"},
-]
-splunk-sdk = [
-    {file = "splunk-sdk-1.6.12.tar.gz", hash = "sha256:eb6446227447fe10f4c0a0d830efd91ab57e3cb815f4675a42d522241e9ef3ae"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .common import BaseTest
+from unittest.mock import MagicMock
 import time
 
 
@@ -325,6 +326,98 @@ class TestRedshift(BaseTest):
         self.assertEqual(
             resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
+
+    def test_redshift_set_attributes(self):
+        factory = self.replay_flight_data("test_redshift_set_attributes")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-allow-version-upgrade",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AllowVersionUpgrade",
+                        "value": False,
+                    }
+                ],
+                "actions": [{
+                    "type": "set-attributes",
+                    "attributes": {
+                        "AllowVersionUpgrade": True,
+                        "MaintenanceTrackName": "current"
+                    }
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        cluster = client.describe_clusters(ClusterIdentifier="test")["Clusters"][0]
+        self.assertEqual(
+            cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
+        )
+        self.assertTrue(cluster['AllowVersionUpgrade'])
+        self.assertEqual(cluster["MaintenanceTrackName"], "current")
+
+    def test_redshift_set_attributes_no_change(self):
+        factory = self.replay_flight_data("test_redshift_set_attributes")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-allow-version-upgrade",
+                "resource": "redshift",
+                "actions": [{
+                    "type": "set-attributes",
+                    "attributes": {
+                        "PubliclyAccessible": False,
+                    }
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        cluster = client.describe_clusters(ClusterIdentifier="test")["Clusters"][0]
+        self.assertEqual(
+            cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
+        )
+        self.assertFalse(cluster['PubliclyAccessible'])
+
+    def test_redshift_set_attributes_error(self):
+        factory = self.replay_flight_data("test_redshift_set_attributes")
+
+        client = factory().client("redshift")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'redshift').exceptions.ClusterNotFoundFault = (
+                client.exceptions.ClusterNotFoundFault)
+
+        mock_factory().client('redshift').modify_cluster.side_effect = (
+            client.exceptions.ClusterNotFoundFault(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='modify_cluster'))
+        p = self.load_policy(
+            {
+                "name": "redshift-allow-version-upgrade",
+                "resource": "redshift",
+                "actions": [{
+                    "type": "set-attributes",
+                    "attributes": {
+                        "AllowVersionUpgrade": True,
+                    }
+                }]
+            },
+            session_factory=mock_factory,
+        )
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'Id': 'abc'}])
+        except client.exceptions.ClusterNotFoundFault:
+            self.fail('should not raise')
+        mock_factory().client('redshift').modify_cluster.assert_called_once()
 
 
 class TestRedshiftSnapshot(BaseTest):

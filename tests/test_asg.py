@@ -199,6 +199,22 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_image_age_filter_deleted_config(self):
+        factory = self.replay_flight_data("test_asg_image_age_filter_deleted_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-age-filter",
+                "resource": "asg",
+                "filters": [
+                    {"tag:Env": "present"},
+                    {"type": "image-age", "days": 5000, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('Env' in resources[0].get('Tags')[1].values())
+
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
         p = self.load_policy(
@@ -802,6 +818,28 @@ class AutoScalingTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n-asg-np-missing")
+
+    def test_asg_propagate_tag_no_instances(self):
+        factory = self.replay_flight_data("test_asg_propagate_tag_no_instances")
+        p = self.load_policy(
+            {
+                "name": "asg-tag",
+                "resource": "asg",
+                "filters": [{"tag:Platform": "ubuntu"}],
+                "actions": [
+                    {
+                        "type": "propagate-tags",
+                        "trim": True,
+                        "tags": ["CustomerId", "Platform"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
 
     def test_asg_filter_capacity_delta_match(self):
         factory = self.replay_flight_data("test_asg_filter_capacity_delta_match")

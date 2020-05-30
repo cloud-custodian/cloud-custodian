@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import itertools
+import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -30,6 +31,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
+from .aws import shape_validate
 
 
 @resources.register('redshift')
@@ -589,6 +591,81 @@ class RedshiftSetPublicAccess(BaseAction):
                         "Exception setting Redshift public access on %s  \n %s",
                         futures[f]['ClusterIdentifier'], f.exception())
         return clusters
+
+
+@Redshift.action_registry.register('set-attributes')
+class RedshiftSetAttributes(BaseAction):
+    """
+    Action to modify Redshift clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: redshift-modify-cluster
+                  resource: redshift
+                  filters:
+                    - type: value
+                      key: AllowVersionUpgrade
+                      value: false
+                  actions:
+                    - type: set-attributes
+                      attributes:
+                        AllowVersionUpgrade: true
+    """
+
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
+    permissions = ('redshift:ModifyCluster',)
+    cluster_mapping = {
+        'ElasticIp': 'ElasticIpStatus.ElasticIp',
+        'ClusterSecurityGroups': 'ClusterSecurityGroups[].ClusterSecurityGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].ClusterSecurityGroupName',
+        'HsmClientCertificateIdentifier': 'HsmStatus.HsmClientCertificateIdentifier',
+        'HsmConfigurationIdentifier': 'HsmStatus.HsmConfigurationIdentifier'
+    }
+
+    shape = 'ModifyClusterMessage'
+
+    def validate(self):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('ClusterIdentifier'):
+            raise PolicyValidationError('ClusterIdentifier field cannot be updated')
+        attrs["ClusterIdentifier"] = ""
+        return shape_validate(attrs, self.shape, 'redshift')
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for cluster in clusters:
+            self.process_cluster(client, cluster)
+
+    def process_cluster(self, client, cluster):
+        try:
+            config = dict(self.data.get('attributes'))
+            modify = {}
+            for k, v in config.items():
+                if ((k in self.cluster_mapping and
+                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
+                    modify[k] = v
+            if not modify:
+                return
+
+            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
+                                          .get('ClusterIdentifier')
+                                          or cluster.get('ClusterIdentifier'))
+            client.modify_cluster(**modify)
+        except (client.exceptions.ClusterNotFoundFault):
+            return
+        except ClientError as e:
+            self.log.warning(
+                "Exception trying to modify cluster: %s error: %s",
+                cluster['ClusterIdentifier'], e)
+            raise
 
 
 @Redshift.action_registry.register('mark-for-op')

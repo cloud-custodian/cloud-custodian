@@ -43,10 +43,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.13.2"
+version = "1.13.18"
 
 [package.dependencies]
-botocore = ">=1.16.2,<1.17.0"
+botocore = ">=1.16.18,<1.17.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -56,7 +56,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.16.2"
+version = "1.16.18"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -74,7 +74,7 @@ develop = true
 name = "c7n"
 optional = false
 python-versions = "^3.6"
-version = "0.9.1"
+version = "0.9.3"
 
 [package.dependencies]
 argcomplete = "^1.11.1"
@@ -159,7 +159,7 @@ description = "Google API Client Library for Python"
 name = "google-api-python-client"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-version = "1.8.2"
+version = "1.8.4"
 
 [package.dependencies]
 google-api-core = ">=1.13.0,<2dev"
@@ -175,7 +175,7 @@ description = "Google Authentication Library"
 name = "google-auth"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-version = "1.14.1"
+version = "1.15.0"
 
 [package.dependencies]
 cachetools = ">=2.0.0,<5.0"
@@ -261,7 +261,7 @@ description = "A comprehensive HTTP client library."
 name = "httplib2"
 optional = false
 python-versions = "*"
-version = "0.17.3"
+version = "0.18.1"
 
 [[package]]
 category = "main"
@@ -291,8 +291,8 @@ category = "dev"
 description = "JSON Matching Expressions"
 name = "jmespath"
 optional = false
-python-versions = "*"
-version = "0.9.5"
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.10.0"
 
 [[package]]
 category = "dev"
@@ -322,7 +322,7 @@ description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
 python-versions = ">=3.5"
-version = "8.2.0"
+version = "8.3.0"
 
 [[package]]
 category = "dev"
@@ -330,7 +330,7 @@ description = "Core utilities for Python packages"
 name = "packaging"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "20.3"
+version = "20.4"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
@@ -358,7 +358,7 @@ description = "Protocol Buffers"
 name = "protobuf"
 optional = false
 python-versions = "*"
-version = "3.11.3"
+version = "3.12.2"
 
 [package.dependencies]
 setuptools = "*"
@@ -531,7 +531,7 @@ description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "1.14.0"
+version = "1.15.0"
 
 [[package]]
 category = "dev"
@@ -603,12 +603,12 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.13.2-py2.py3-none-any.whl", hash = "sha256:fc8511eda662d7b4b10bce55153cf65b89c41d86b65162bc0d15b89547d3d837"},
-    {file = "boto3-1.13.2.tar.gz", hash = "sha256:91b34fac764c908f2e9553607fb0f2c56adc6b9df76e1f313dc190af512849c8"},
+    {file = "boto3-1.13.18-py2.py3-none-any.whl", hash = "sha256:1bdab4f87ff39d5aab59b0aae69965bf604fa5608984c673877f4c62c1f16240"},
+    {file = "boto3-1.13.18.tar.gz", hash = "sha256:2b4924ccc1603d562969b9f3c8c74ff4a1f3bdbafe857c990422c73d8e2e229e"},
 ]
 botocore = [
-    {file = "botocore-1.16.2-py2.py3-none-any.whl", hash = "sha256:8ef5b178b76920f6f11169ad69ff30e297044aab4c34d1e92f26221faaa033ed"},
-    {file = "botocore-1.16.2.tar.gz", hash = "sha256:102534a1d98a70bf6ecacf51c3cef2ef09587039aef064ad076bd2e36dd4c441"},
+    {file = "botocore-1.16.18-py2.py3-none-any.whl", hash = "sha256:e65eb27cae262a510e335bc0c0e286e9e42381b1da0aafaa79fa13c1d8d74a95"},
+    {file = "botocore-1.16.18.tar.gz", hash = "sha256:93574cf95a64c71d35c12c93a23f6214cf2f4b461be3bda3a436381cbe126a84"},
 ]
 c7n = []
 cachetools = [
@@ -637,12 +637,12 @@ google-api-core = [
     {file = "google_api_core-1.17.0-py2.py3-none-any.whl", hash = "sha256:c0e430658ed6be902d7ba7095fb0a9cac810270d71bf7ac4484e76c300407aae"},
 ]
 google-api-python-client = [
-    {file = "google-api-python-client-1.8.2.tar.gz", hash = "sha256:bf482c13fb41a6d01770f9d62be6b33fdcd41d68c97f2beb9be02297bdd9e725"},
-    {file = "google_api_python_client-1.8.2-py3-none-any.whl", hash = "sha256:8dd35a3704650c2db44e6cf52abdaf9de71f409c93c56bbe48a321ab5e14ebad"},
+    {file = "google-api-python-client-1.8.4.tar.gz", hash = "sha256:bbe212611fdc05364f3d20271cae53971bf4d485056e6c0d40748eddeeda9a19"},
+    {file = "google_api_python_client-1.8.4-py3-none-any.whl", hash = "sha256:e7980ba66288f815b41f10c4561b37f45cd568d302b0d801709e51f75b21f61b"},
 ]
 google-auth = [
-    {file = "google-auth-1.14.1.tar.gz", hash = "sha256:e63b2210e03c4ed829063b72c4af0c4b867c2788efb3210b6b9439b488bd3afd"},
-    {file = "google_auth-1.14.1-py2.py3-none-any.whl", hash = "sha256:0c41a453b9a8e77975bfa436b8daedac00aed1c545d84410daff8272fff40fbb"},
+    {file = "google-auth-1.15.0.tar.gz", hash = "sha256:fbf25fee328c0828ef293459d9c649ef84ee44c0b932bb999d19df0ead1b40cf"},
+    {file = "google_auth-1.15.0-py2.py3-none-any.whl", hash = "sha256:73b141d122942afe12e8bfdcb6900d5df35c27d39700f078363ba0b1298ad33b"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.0.3.tar.gz", hash = "sha256:098fade613c25b4527b2c08fa42d11f3c2037dda8995d86de0745228e965d445"},
@@ -664,8 +664,8 @@ googleapis-common-protos = [
     {file = "googleapis-common-protos-1.51.0.tar.gz", hash = "sha256:013c91704279119150e44ef770086fdbba158c1f978a6402167d47d5409e226e"},
 ]
 httplib2 = [
-    {file = "httplib2-0.17.3-py3-none-any.whl", hash = "sha256:6d9722decd2deacd486ef10c5dd5e2f120ca3ba8736842b90509afcdc16488b1"},
-    {file = "httplib2-0.17.3.tar.gz", hash = "sha256:39dd15a333f67bfb70798faa9de8a6e99c819da6ad82b77f9a259a5c7b1225a2"},
+    {file = "httplib2-0.18.1-py3-none-any.whl", hash = "sha256:ca2914b015b6247791c4866782fa6042f495b94401a0f0bd3e1d6e0ba2236782"},
+    {file = "httplib2-0.18.1.tar.gz", hash = "sha256:8af66c1c52c7ffe1aa5dc4bcd7c769885254b0756e6e69f953c7f0ab49a70ba3"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -676,45 +676,44 @@ importlib-metadata = [
     {file = "importlib_metadata-1.6.0.tar.gz", hash = "sha256:34513a8a0c4962bc66d35b359558fd8a5e10cd472d37aec5f66858addef32c1e"},
 ]
 jmespath = [
-    {file = "jmespath-0.9.5-py2.py3-none-any.whl", hash = "sha256:695cb76fa78a10663425d5b73ddc5714eb711157e52704d69be03b1a02ba4fec"},
-    {file = "jmespath-0.9.5.tar.gz", hash = "sha256:cca55c8d153173e21baa59983015ad0daf603f9cb799904ff057bfb8ff8dc2d9"},
+    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
+    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 jsonschema = [
     {file = "jsonschema-3.2.0-py2.py3-none-any.whl", hash = "sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163"},
     {file = "jsonschema-3.2.0.tar.gz", hash = "sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"},
 ]
 more-itertools = [
-    {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},
-    {file = "more_itertools-8.2.0-py3-none-any.whl", hash = "sha256:5dd8bcf33e5f9513ffa06d5ad33d78f31e1931ac9a18f33d37e77a180d393a7c"},
+    {file = "more-itertools-8.3.0.tar.gz", hash = "sha256:558bb897a2232f5e4f8e2399089e35aecb746e1f9191b6584a151647e89267be"},
+    {file = "more_itertools-8.3.0-py3-none-any.whl", hash = "sha256:7818f596b1e87be009031c7653d01acc46ed422e6656b394b0f765ce66ed4982"},
 ]
 packaging = [
-    {file = "packaging-20.3-py2.py3-none-any.whl", hash = "sha256:82f77b9bee21c1bafbf35a84905d604d5d1223801d639cf3ed140bd651c08752"},
-    {file = "packaging-20.3.tar.gz", hash = "sha256:3c292b474fda1671ec57d46d739d072bfd495a4f51ad01a055121d81e952b7a3"},
+    {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
+    {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
 ]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
 ]
 protobuf = [
-    {file = "protobuf-3.11.3-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:ef2c2e56aaf9ee914d3dccc3408d42661aaf7d9bb78eaa8f17b2e6282f214481"},
-    {file = "protobuf-3.11.3-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:dd9aa4401c36785ea1b6fff0552c674bdd1b641319cb07ed1fe2392388e9b0d7"},
-    {file = "protobuf-3.11.3-cp35-cp35m-macosx_10_9_intel.whl", hash = "sha256:310a7aca6e7f257510d0c750364774034272538d51796ca31d42c3925d12a52a"},
-    {file = "protobuf-3.11.3-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:e512b7f3a4dd780f59f1bf22c302740e27b10b5c97e858a6061772668cd6f961"},
-    {file = "protobuf-3.11.3-cp35-cp35m-win32.whl", hash = "sha256:fdfb6ad138dbbf92b5dbea3576d7c8ba7463173f7d2cb0ca1bd336ec88ddbd80"},
-    {file = "protobuf-3.11.3-cp35-cp35m-win_amd64.whl", hash = "sha256:e2f8a75261c26b2f5f3442b0525d50fd79a71aeca04b5ec270fc123536188306"},
-    {file = "protobuf-3.11.3-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:c40973a0aee65422d8cb4e7d7cbded95dfeee0199caab54d5ab25b63bce8135a"},
-    {file = "protobuf-3.11.3-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:adf0e4d57b33881d0c63bb11e7f9038f98ee0c3e334c221f0858f826e8fb0151"},
-    {file = "protobuf-3.11.3-cp36-cp36m-win32.whl", hash = "sha256:0bae429443cc4748be2aadfdaf9633297cfaeb24a9a02d0ab15849175ce90fab"},
-    {file = "protobuf-3.11.3-cp36-cp36m-win_amd64.whl", hash = "sha256:e11df1ac6905e81b815ab6fd518e79be0a58b5dc427a2cf7208980f30694b956"},
-    {file = "protobuf-3.11.3-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:7774bbbaac81d3ba86de646c39f154afc8156717972bf0450c9dbfa1dc8dbea2"},
-    {file = "protobuf-3.11.3-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:8eb9c93798b904f141d9de36a0ba9f9b73cc382869e67c9e642c0aba53b0fc07"},
-    {file = "protobuf-3.11.3-cp37-cp37m-win32.whl", hash = "sha256:fac513a9dc2a74b99abd2e17109b53945e364649ca03d9f7a0b96aa8d1807d0a"},
-    {file = "protobuf-3.11.3-cp37-cp37m-win_amd64.whl", hash = "sha256:82d7ac987715d8d1eb4068bf997f3053468e0ce0287e2729c30601feb6602fee"},
-    {file = "protobuf-3.11.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:73152776dc75f335c476d11d52ec6f0f6925774802cd48d6189f4d5d7fe753f4"},
-    {file = "protobuf-3.11.3-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:52e586072612c1eec18e1174f8e3bb19d08f075fc2e3f91d3b16c919078469d0"},
-    {file = "protobuf-3.11.3-py2.7.egg", hash = "sha256:2affcaba328c4662f3bc3c0e9576ea107906b2c2b6422344cdad961734ff6b93"},
-    {file = "protobuf-3.11.3-py2.py3-none-any.whl", hash = "sha256:24e3b6ad259544d717902777b33966a1a069208c885576254c112663e6a5bb0f"},
-    {file = "protobuf-3.11.3.tar.gz", hash = "sha256:c77c974d1dadf246d789f6dad1c24426137c9091e930dbf50e0a29c1fcf00b1f"},
+    {file = "protobuf-3.12.2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:e1464a4a2cf12f58f662c8e6421772c07947266293fb701cb39cd9c1e183f63c"},
+    {file = "protobuf-3.12.2-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:6f349adabf1c004aba53f7b4633459f8ca8a09654bf7e69b509c95a454755776"},
+    {file = "protobuf-3.12.2-cp35-cp35m-macosx_10_9_intel.whl", hash = "sha256:be04fe14ceed7f8641e30f36077c1a654ff6f17d0c7a5283b699d057d150d82a"},
+    {file = "protobuf-3.12.2-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:f4b73736108a416c76c17a8a09bc73af3d91edaa26c682aaa460ef91a47168d3"},
+    {file = "protobuf-3.12.2-cp35-cp35m-win32.whl", hash = "sha256:5524c7020eb1fb7319472cb75c4c3206ef18b34d6034d2ee420a60f99cddeb07"},
+    {file = "protobuf-3.12.2-cp35-cp35m-win_amd64.whl", hash = "sha256:bff02030bab8b969f4de597543e55bd05e968567acb25c0a87495a31eb09e925"},
+    {file = "protobuf-3.12.2-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:c9ca9f76805e5a637605f171f6c4772fc4a81eced4e2f708f79c75166a2c99ea"},
+    {file = "protobuf-3.12.2-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:304e08440c4a41a0f3592d2a38934aad6919d692bb0edfb355548786728f9a5e"},
+    {file = "protobuf-3.12.2-cp36-cp36m-win32.whl", hash = "sha256:b5a114ea9b7fc90c2cc4867a866512672a47f66b154c6d7ee7e48ddb68b68122"},
+    {file = "protobuf-3.12.2-cp36-cp36m-win_amd64.whl", hash = "sha256:85b94d2653b0fdf6d879e39d51018bf5ccd86c81c04e18a98e9888694b98226f"},
+    {file = "protobuf-3.12.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:a7ab28a8f1f043c58d157bceb64f80e4d2f7f1b934bc7ff5e7f7a55a337ea8b0"},
+    {file = "protobuf-3.12.2-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:eafe9fa19fcefef424ee089fb01ac7177ff3691af7cc2ae8791ae523eb6ca907"},
+    {file = "protobuf-3.12.2-cp37-cp37m-win32.whl", hash = "sha256:612bc97e42b22af10ba25e4140963fbaa4c5181487d163f4eb55b0b15b3dfcd2"},
+    {file = "protobuf-3.12.2-cp37-cp37m-win_amd64.whl", hash = "sha256:e72736dd822748b0721f41f9aaaf6a5b6d5cfc78f6c8690263aef8bba4457f0e"},
+    {file = "protobuf-3.12.2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:87535dc2d2ef007b9d44e309d2b8ea27a03d2fa09556a72364d706fcb7090828"},
+    {file = "protobuf-3.12.2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:50b5fee674878b14baea73b4568dc478c46a31dd50157a5b5d2f71138243b1a9"},
+    {file = "protobuf-3.12.2-py2.py3-none-any.whl", hash = "sha256:a96f8fc625e9ff568838e556f6f6ae8eca8b4837cdfb3f90efcb7c00e342a2eb"},
+    {file = "protobuf-3.12.2.tar.gz", hash = "sha256:49ef8ab4c27812a89a76fa894fe7a08f42f2147078392c0dee51d4a444ef6df5"},
 ]
 py = [
     {file = "py-1.8.1-py2.py3-none-any.whl", hash = "sha256:c20fdd83a5dbc0af9efd622bee9a5564e278f6380fffcacc43ba6f43db2813b0"},
@@ -802,8 +801,8 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 six = [
-    {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
-    {file = "six-1.14.0.tar.gz", hash = "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"},
+    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
+    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tabulate = [
     {file = "tabulate-0.8.7-py3-none-any.whl", hash = "sha256:ac64cb76d53b1231d364babcd72abbb16855adac7de6665122f97b593f1eb2ba"},

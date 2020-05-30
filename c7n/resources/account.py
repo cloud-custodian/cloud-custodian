@@ -1495,7 +1495,7 @@ class SetS3PublicBlock(BaseAction):
         config.pop('type')
         if config.pop('state', None) is False and config:
             raise PolicyValidationError(
-                "%s cant set state false with controls specified".format(
+                "{} cant set state false with controls specified".format(
                     self.type))
 
     def process(self, resources):

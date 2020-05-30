@@ -258,22 +258,25 @@ class Host:
             except yaml.YAMLError as exc:
                 log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
                 os.unlink(path)
-                return
+                return path
 
-        removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
-        log.info('Removing policies %s' % removed)
+        try:
+            removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
+            log.info('Removing policies %s' % removed)
 
-        # update periodic
-        periodic_names = \
-            [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('schedule')]
-        periodic_to_remove = \
-            [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
+            # update periodic
+            periodic_names = \
+                [p['name'] for p in policy_config.get('policies', [])
+                 if p.get('mode', {}).get('schedule')]
+            periodic_to_remove = \
+                [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
 
-        for name in periodic_to_remove:
-            self.scheduler.remove_job(job_id=name)
+            for name in periodic_to_remove:
+                self.scheduler.remove_job(job_id=name)
+        except (AttributeError, KeyError) as exc:
+            log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
 
         os.unlink(path)
-
         return path
 
     def update_periodic(self, policy):
