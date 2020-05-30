@@ -1029,6 +1029,19 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_snapshot_age_filter_hours(self):
+        factory = self.replay_flight_data("test_rds_snapshot_age_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-age-filter-hours",
+                "resource": "rds-snapshot",
+                "filters": [{"type": "age", "hours": 5}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_snapshot_trim(self):
         factory = self.replay_flight_data("test_rds_snapshot_delete")
         p = self.load_policy(
