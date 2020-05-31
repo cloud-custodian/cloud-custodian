@@ -26,7 +26,7 @@ from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker, HasStatementChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
 from c7n.resources.aws import shape_validate
@@ -1739,35 +1739,62 @@ class CrossAccountChecker(TestCase):
             self.assertEqual(bool(violations), expected)
 
 
-class PolicyStatementFilterTests(TestCase):
+class HasStatementCheckerTests(TestCase):
 
     def test_s3_policies_multiple_conditions(self):
         policies = load_data("iam/s3-conditions.json")
-        checker = PolicyChecker(
+        checker = HasStatementChecker(
             {
-                "allowed_accounts": {"123456789012"},
-                "allowed_vpc": {"vpc-12345678"},
+                "statements": [
+                    {
+                        "Condition": {
+                            "ArnLike": {
+                                "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+                            },
+                            "StringEquals": {
+                                "aws:sourceVpc": "vpc-55252554"
+                            }
+                        }
+                    }
+                ]
             }
         )
         for p, expected in zip(policies, [False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
-    def test_s3_everyone_only(self):
+    def test_s3_principal_star(self):
         policies = load_data("iam/s3-principal.json")
-        checker = PolicyChecker({"everyone_only": True})
-        for p, expected in zip(policies, [True, True, False, False, False, False]):
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Principal": "*",
+                        "PartialMatch": "Principal"
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [True, True, False, True, True, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
     def test_s3_principal_org_id(self):
         policies = load_data("iam/s3-orgid.json")
-        checker = PolicyChecker(
+        checker = HasStatementChecker(
             {
-                "allowed_orgid": {"o-goodorg"}
+                "statements": [
+                    {
+                        "Condition": {
+                            "StringEquals": {
+                                "aws:PrincipalOrgID": "o-goodorg"
+                            }
+                        }
+                    }
+                ]
             }
         )
-        for p, expected in zip(policies, [False, True]):
+        for p, expected in zip(policies, [True, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 

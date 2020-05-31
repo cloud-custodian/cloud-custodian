@@ -345,6 +345,64 @@ class CrossAccountAccessFilter(Filter):
             return True
 
 
+class HasStatementChecker:
+    def __init__(self, checker_config):
+        self.checker_config = checker_config
+
+    @property
+    def statements(self):
+        return self.checker_config.get('statements', [])
+
+    @property
+    def statement_ids(self):
+        return self.checker_config.get('statement_ids', [])
+
+    def get_required_statements(self):
+        return format_string_values(list(self.statements))
+
+    def check(self, policy_text):
+        if isinstance(policy_text, str):
+            policy = json.loads(policy_text)
+        else:
+            policy = policy_text
+
+        statements = policy.get('Statement', [])
+        required = list(self.statement_ids)
+        for s in list(statements):
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
+
+        required_statements = self.get_required_statements()
+        for required_statement in required_statements:
+            partial_match_elements = required_statement.pop('PartialMatch', [])
+            if isinstance(partial_match_elements, str):
+                # Make list if string to prevent mismatches like Action in NotAction below
+                partial_match_elements = [partial_match_elements]
+            for statement in statements:
+                match_count = sum(
+                    1 for k, v in required_statement.items() if self.match(
+                        k, v, statement, partial_match_elements))
+                if match_count == len(required_statement):
+                    required_statements.remove(required_statement)
+                    break
+
+        if (self.statement_ids and not required) or \
+           (self.statements and not required_statements):
+            return True
+        return False
+
+    def match(self, k, v, stmt, partial_match_elements):
+        if k in stmt:
+            if k in partial_match_elements:
+                if isinstance(v, list):
+                    return set(v).issubset(stmt[k])
+                elif isinstance(v, dict):
+                    return merge_dict(stmt[k], v) == stmt[k]
+                else:
+                    return v in stmt[k]
+            return v == stmt[k]
+
+
 class PolicyStatementFilter(Filter):
     """  Check a resource for a set of policy statements.
     """
@@ -386,54 +444,18 @@ class PolicyStatementFilter(Filter):
                 'required': ['Effect']
             }
         })
+
     policy_attribute = 'Policy'
-
-    def process(self, resources, event=None):
-        return list(filter(None, map(self.process_resource, resources)))
-
     get_policy = CrossAccountAccessFilter.get_resource_policy
 
-    def get_required_statements(self, r):
-        return format_string_values(list(self.data.get('statements', [])))
+    def process(self, resources, event=None):
+        self.checker = HasStatementChecker(self.data)
+        return list(filter(None, map(self.process_resource, resources)))
 
     def process_resource(self, r):
         p = self.get_policy(r)
         if p is None or not p:
             return None
-        p = json.loads(p)
-
-        required = list(self.data.get('statement_ids', []))
-        statements = p.get('Statement', [])
-        for s in list(statements):
-            if s.get('Sid') in required:
-                required.remove(s['Sid'])
-
-        required_statements = self.get_required_statements(r)
-        for required_statement in required_statements:
-            partial_match_elements = required_statement.pop('PartialMatch', [])
-            if isinstance(partial_match_elements, str):
-                # Make list if string to prevent mismatches like Action in NotAction below
-                partial_match_elements = [partial_match_elements]
-            for statement in statements:
-                match_count = sum(
-                    1 for k, v in required_statement.items() if self.match(
-                        k, v, statement, partial_match_elements))
-                if match_count == len(required_statement):
-                    required_statements.remove(required_statement)
-                    break
-
-        if (self.data.get('statement_ids', []) and not required) or \
-           (self.data.get('statements', []) and not required_statements):
+        if self.checker.check(p):
             return r
         return None
-
-    def match(self, k, v, stmt, partial_match_elements):
-        if k in stmt:
-            if k in partial_match_elements:
-                if isinstance(v, list):
-                    return set(v).issubset(stmt[k])
-                elif isinstance(v, dict):
-                    return merge_dict(stmt[k], v) == stmt[k]
-                else:
-                    return v in stmt[k]
-            return v == stmt[k]
