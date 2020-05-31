@@ -357,7 +357,11 @@ class HasStatementChecker:
     def statement_ids(self):
         return self.checker_config.get('statement_ids', [])
 
-    def check(self, policy_text, required_statements):
+    @property
+    def required_statements(self):
+        return format_string_values(list(self.statements))
+
+    def check(self, policy_text, required_statements=None):
         if isinstance(policy_text, str):
             policy = json.loads(policy_text)
         else:
@@ -368,7 +372,8 @@ class HasStatementChecker:
         for s in list(statements):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
-
+        if not required_statements:
+            required_statements = self.required_statements
         for required_statement in required_statements:
             partial_match_elements = required_statement.pop('PartialMatch', [])
             if isinstance(partial_match_elements, str):

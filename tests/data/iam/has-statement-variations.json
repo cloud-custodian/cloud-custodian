@@ -1,0 +1,34 @@
+[
+  {
+    "Version": "2008-10-17",
+    "Statement": [
+      {
+        "Sid": "Statement1",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": [
+            "arn:aws:iam::644160558196:user/magikarp@pokemon.com",
+            "arn:aws:iam::644160558196:user/pikachu@pokemon.com"
+          ]
+        },
+        "Action": "sns:Subscribe",
+        "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
+        "Condition": { "StringEquals": { "sns:Protocol": ["https", "email"] } }
+      }
+    ]
+  },
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Deny",
+        "Principal": "*",
+        "Action": "glue:*",
+        "Resource": "arn:aws:glue:us-east-1:644160558196:*",
+        "Condition": {
+          "StringNotEquals": { "aws:PrincipalOrgId": "o-4amkskbcf1" }
+        }
+      }
+    ]
+  }
+]

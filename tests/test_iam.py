@@ -1798,6 +1798,49 @@ class HasStatementCheckerTests(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_has_statement_variations(self):
+        policies = load_data("iam/has-statement-variations.json")
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "sns:Subscribe",
+                        "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
+                        "Condition": {
+                            "StringEquals": {
+                                "sns:Protocol": [
+                                    "https"
+                                ]
+                            }
+                        },
+                        "PartialMatch": [
+                            "Condition"
+                        ]
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [True, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker.checker_config['statements'] = [
+            {
+                "Effect": "Deny",
+                "Action": "glue:*",
+                "Principal": "*",
+                "Resource": "arn:aws:glue:us-east-1:644160558196:*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "aws:PrincipalOrgId": 'o-4amkskbcf1'
+                    }
+                }
+            }
+        ]
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):

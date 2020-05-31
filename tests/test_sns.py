@@ -717,52 +717,6 @@ class TestSNS(BaseTest):
             'SNS:SetTopicAttributes' in policy['Statement'][0]['Action']
         )
 
-    def test_sns_has_statements_partial_principal(self):
-        session_factory = self.replay_flight_data("test_sns_has_statements_partial_principal")
-        p = self.load_policy(
-            {
-                "name": "sns-has_statements",
-                "resource": "aws.sns",
-                "filters": [
-                    {"TopicArn": "arn:aws:sns:us-east-1:644160558196:test123"},
-                    {
-                        "type": "has-statement",
-                        "statements": [
-                            {
-                                "Effect": "Allow",
-                                "Action": "sns:Subscribe",
-                                "Principal": {
-                                    "AWS": "*"
-                                },
-                                "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
-                                "Condition": {
-                                    "StringEquals": {
-                                        "sns:Protocol": [
-                                            "https"
-                                        ]
-                                    }
-                                },
-                                "PartialMatch": [
-                                    "Principal",
-                                    "Condition"
-                                ]
-                            }
-                        ]
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        policy = json.loads(resources[0]["Policy"])
-        assert(
-            'https' in policy['Statement'][0]['Condition']['StringEquals']['sns:Protocol']
-        )
-        assert(
-            '*' in policy['Statement'][0]['Principal']['AWS']
-        )
-
     def test_sns_post_finding(self):
         factory = self.replay_flight_data('test_sns_post_finding')
         p = self.load_policy({
