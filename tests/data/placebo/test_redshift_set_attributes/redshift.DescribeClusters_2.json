@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterIdentifier": "test",
+                "MaintenanceTrackName": "current",
+                "AllowVersionUpgrade": true,
+                "PubliclyAccessible": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

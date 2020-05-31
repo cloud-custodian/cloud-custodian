@@ -31,6 +31,7 @@ class ProjectRole(QueryResourceManager):
         scope_template = 'projects/{}'
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
+        asset_type = "iam.googleapis.com/Role"
 
         @staticmethod
         def get(client, resource_info):
@@ -55,6 +56,7 @@ class ServiceAccount(QueryResourceManager):
         id = "name"
         name = 'email'
         default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
+        asset_type = "iam.googleapis.com/ServiceAccount"
 
         @staticmethod
         def get(client, resource_info):
@@ -78,6 +80,7 @@ class Role(QueryResourceManager):
         scope = "global"
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
+        asset_type = "iam.googleapis.com/Role"
 
         @staticmethod
         def get(client, resource_info):

@@ -34,6 +34,19 @@ class ConfigRecorderTest(BaseTest):
 
 class ConfigComplianceTest(BaseTest):
 
+    def test_config_with_inconsistent_hub_rule(self):
+        factory = self.replay_flight_data('test_config_inconsistent_hub_rule')
+        p = self.load_policy({
+            'name': 'compliance',
+            'resource': 'aws.cloudtrail',
+            'filters': [
+                {'type': 'config-compliance',
+                 'states': ['NON_COMPLIANT'],
+                 'rules': ['securityhub-cloud-trail-encryption-enabled-dadfg6']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
     def test_compliance(self):
         factory = self.replay_flight_data('test_config_compliance')
         p = self.load_policy({

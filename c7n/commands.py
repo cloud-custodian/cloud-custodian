@@ -14,6 +14,7 @@
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
+import json
 import itertools
 import logging
 import os
@@ -317,6 +318,17 @@ def logs(options, policies):
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
     from c7n import schema
+
+    if options.outline:
+        provider = options.resource and options.resource.lower().split('.')[0] or None
+        load_available()
+        outline = schema.resource_outline(provider)
+        if options.json:
+            print(json.dumps(outline, indent=2))
+            return
+        print(yaml_dump(outline))
+        return
+
     if options.json:
         schema.json_dump(options.resource)
         return
@@ -367,14 +379,14 @@ def schema_cmd(options):
         components[0] = '%s.%s' % (cloud_provider, components[0])
         load_resources((components[0],))
         resource_mapping = schema.resource_vocabulary(
-            cloud_provider)
+            cloud_provider, aliases=True)
     elif components[0] == 'mode':
         load_available(resources=False)
         resource_mapping = schema.resource_vocabulary()
     else:  # compatibility, aws is default for provider
         components[0] = 'aws.%s' % components[0]
         load_resources((components[0],))
-        resource_mapping = schema.resource_vocabulary('aws')
+        resource_mapping = schema.resource_vocabulary('aws', aliases=True)
 
     #
     # Handle mode
@@ -401,18 +413,21 @@ def schema_cmd(options):
     # Handle resource
     #
     resource = components[0]
-    if resource not in resource_mapping:
+    resource_info = resource_mapping.get(resource, resource_mapping['aliases'].get(resource))
+    if resource_info is None:
         log.error('{} is not a valid resource'.format(resource))
         sys.exit(1)
 
     if len(components) == 1:
         docstring = ElementSchema.doc(
-            resource_mapping[resource]['classes']['resource'])
-        del(resource_mapping[resource]['classes'])
+            resource_info['classes']['resource'])
+        resource_info.pop('classes', None)
+        # de-alias to preferred resource name
+        resource = resource_info.pop('resource_type', resource)
         if docstring:
             print("\nHelp\n----\n")
             print(docstring + '\n')
-        output = {resource: resource_mapping[resource]}
+        output = {resource: resource_info}
         print(yaml_dump(output))
         return
 
@@ -426,9 +441,9 @@ def schema_cmd(options):
 
     if len(components) == 2:
         output = "No {} available for resource {}.".format(category, resource)
-        if category in resource_mapping[resource]:
+        if category in resource_info:
             output = {resource: {
-                category: resource_mapping[resource][category]}}
+                category: resource_info[category]}}
         print(yaml_dump(output))
         return
 
@@ -436,12 +451,12 @@ def schema_cmd(options):
     # Handle item
     #
     item = components[2]
-    if item not in resource_mapping[resource][category]:
+    if item not in resource_info[category]:
         log.error('{} is not in the {} list for resource {}'.format(item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
-        cls = resource_mapping[resource]['classes'][category][item]
+        cls = resource_info['classes'][category][item]
         _print_cls_schema(cls)
 
         return

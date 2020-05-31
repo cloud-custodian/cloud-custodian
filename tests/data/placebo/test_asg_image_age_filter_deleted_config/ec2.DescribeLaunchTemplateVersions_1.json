@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidLaunchTemplateId.NotFound",
+            "Message": "The specified launch template, with template ID lt-0877401c93c294001, does not exist."
+        },
+        "ResponseMetadata": {}
+    }
+}

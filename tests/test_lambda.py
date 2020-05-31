@@ -218,6 +218,7 @@ class LambdaTest(BaseTest):
                     'S3ObjectVersion': 'Nupr9wOmyG9eZbta8NGFUV9lslQ5NI7m'},
                 'Handler': 'custodian_policy.run',
                 'LastModified': '2019-07-29T22:37:20.844+0000',
+                'MemorySize': 512,
                 'RevisionId': '8bbaf510-0ae1-40a5-8980-084bebd3f9c6',
                 'Role': 'arn:aws:iam::644160558196:role/CloudCustodianRole',
                 'Runtime': 'python3.7',

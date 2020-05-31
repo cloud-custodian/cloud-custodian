@@ -1,0 +1,81 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-26-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-21-05-59",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-25-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-24-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-23-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:verify",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-27-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-22-05-58",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

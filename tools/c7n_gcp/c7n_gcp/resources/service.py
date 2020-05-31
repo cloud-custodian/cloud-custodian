@@ -33,6 +33,7 @@ class Service(QueryResourceManager):
         scope_template = 'project:{}'
         name = id = 'serviceName'
         default_report_fields = [name, "producerProjectId"]
+        asset_type = 'serviceusage.googleapis.com/Service'
 
         @staticmethod
         def get(client, resource_info):

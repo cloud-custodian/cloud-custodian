@@ -1272,6 +1272,7 @@ class S3Test(BaseTest):
             tags, {
                 'Application': 'test', 'Env': 'Dev', 'Owner': 'nicholase',
                 'Retention': '2', 'Retention2': '3', 'test': 'test'})
+        self.assertTrue("CreationDate" in resources[0])
 
     def test_multipart_large_file(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)

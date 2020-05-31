@@ -128,6 +128,7 @@ def setup_defaults(config):
     config.setdefault('ldap_bind_dn', None)
     config.setdefault('ldap_bind_user', None)
     config.setdefault('ldap_bind_password', None)
+    config.setdefault('endpoint_url', None)
     config.setdefault('datadog_api_key', None)
     config.setdefault('slack_token', None)
     config.setdefault('slack_webhook', None)

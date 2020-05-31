@@ -371,6 +371,30 @@ class RDSClusterTest(BaseTest):
 
 class RDSClusterSnapshotTest(BaseTest):
 
+    def test_rdscluster_snapshot_config(self):
+        session_factory = self.replay_flight_data("test_rdscluster_snapshot_config")
+        p = self.load_policy(
+            {"name": "rdscluster-snapshot-simple",
+             "source": "config",
+             "resource": "rds-cluster-snapshot"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        p2 = self.load_policy(
+            {"name": "rdscluster-snapshot-descr",
+             "resource": "rds-cluster-snapshot"},
+            session_factory=session_factory)
+        rm = p2.resource_manager
+        resources2 = rm.get_resources([resources[-1][rm.resource_type.id]])
+        self.maxDiff = None
+        # placebo mangles the utc tz with its own class, also our account rewriter
+        # mangles the timestamp string :-(
+        for k in ('ClusterCreateTime', 'SnapshotCreateTime'):
+            for r in (resources[-1], resources2[0]):
+                r.pop(k)
+        self.assertEqual(resources[-1], resources2[0])
+
     def test_rdscluster_snapshot_simple(self):
         session_factory = self.replay_flight_data("test_rdscluster_snapshot_simple")
         p = self.load_policy(

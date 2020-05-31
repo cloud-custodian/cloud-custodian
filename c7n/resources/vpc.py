@@ -2013,7 +2013,7 @@ class AddressRelease(BaseAction):
                 client.release_address(AllocationId=r['AllocationId'])
             except ClientError as e:
                 # If its already been released, ignore, else raise.
-                if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
+                if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
 
 
