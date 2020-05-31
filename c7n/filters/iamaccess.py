@@ -357,10 +357,7 @@ class HasStatementChecker:
     def statement_ids(self):
         return self.checker_config.get('statement_ids', [])
 
-    def get_required_statements(self):
-        return format_string_values(list(self.statements))
-
-    def check(self, policy_text):
+    def check(self, policy_text, required_statements):
         if isinstance(policy_text, str):
             policy = json.loads(policy_text)
         else:
@@ -372,7 +369,6 @@ class HasStatementChecker:
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
 
-        required_statements = self.get_required_statements()
         for required_statement in required_statements:
             partial_match_elements = required_statement.pop('PartialMatch', [])
             if isinstance(partial_match_elements, str):
@@ -448,6 +444,9 @@ class PolicyStatementFilter(Filter):
     policy_attribute = 'Policy'
     get_policy = CrossAccountAccessFilter.get_resource_policy
 
+    def get_required_statements(self, r=None):
+        return format_string_values(list(self.data.get('statements', [])))
+
     def process(self, resources, event=None):
         self.checker = HasStatementChecker(self.data)
         return list(filter(None, map(self.process_resource, resources)))
@@ -456,6 +455,5 @@ class PolicyStatementFilter(Filter):
         p = self.get_policy(r)
         if p is None or not p:
             return None
-        if self.checker.check(p):
+        if self.checker.check(p, self.get_required_statements(r)):
             return r
-        return None
