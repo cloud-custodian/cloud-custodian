@@ -663,16 +663,24 @@ def merge_dict(a, b):
     """Perform a merge of dictionaries a and b
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of a list or scalar will use the value from a
+    Any leaf elements in the form of scalar will use the value from a
+    If there is a scalar and list for the same key, the scalar will be appended to the list
     """
-    d = {}
-    for k, v in a.items():
-        if k not in b:
-            d[k] = v
-        elif isinstance(v, dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(v, b[k])
+    d = a.copy()
     for k, v in b.items():
-        if k not in d:
+        if not d.get(k):
+            d[k] = v
+        elif isinstance(d[k], dict) and isinstance(b[k], dict):
+            d[k] = merge_dict(d[k], b[k])
+        elif isinstance(v, list):
+            for val in v:
+                if val not in d[k]:
+                    d[k].append(val)
+        elif k in d and not isinstance(v, type(d[k])):
+            if isinstance(v, str) and isinstance(d[k], list):
+                if v not in d[k]:
+                    d[k].append(v)
+        else:
             d[k] = v
     return d
 
@@ -682,23 +690,3 @@ def select_keys(d, keys):
     for k in keys:
         result[k] = d.get(k)
     return result
-
-
-def dict_merge(d1, d2):
-    d3 = d1.copy()
-    for k, v in d2.items():
-        if not d3.get(k):
-            d3[k] = v
-        elif isinstance(d3[k], dict) and isinstance(d2[k], dict):
-            d3[k] = dict_merge(d3[k], d2[k])
-        elif isinstance(v, list):
-            for val in v:
-                if val not in d3[k]:
-                    d3[k].append(val)
-        elif k in d3 and not isinstance(v, type(d3[k])):
-            if isinstance(v, str) and isinstance(d3[k], list):
-                if v not in d3[k]:
-                    d3[k].append(v)
-        else:
-            d3[k] = v
-    return d3

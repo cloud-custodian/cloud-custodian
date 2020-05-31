@@ -40,7 +40,7 @@ import json
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema, format_string_values, dict_merge
+from c7n.utils import type_schema, format_string_values, merge_dict
 
 log = logging.getLogger('custodian.iamaccess')
 
@@ -433,7 +433,7 @@ class PolicyStatementFilter(Filter):
                 if isinstance(v, list):
                     return set(v).issubset(stmt[k])
                 elif isinstance(v, dict):
-                    return dict_merge(stmt[k], v) == stmt[k]
+                    return merge_dict(stmt[k], v) == stmt[k]
                 else:
                     return v in stmt[k]
             return v == stmt[k]
