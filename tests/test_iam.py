@@ -1451,39 +1451,7 @@ class SQSCrossAccount(BaseTest):
         self.assertEqual(resources[0]["QueueUrl"], url)
 
     def test_sqs_has_statements(self):
-
         session_factory = self.replay_flight_data("test_cross_account_sqs")
-        client = session_factory().client("sqs")
-        queue_name = "c7n-cross-check"
-        url = client.create_queue(QueueName=queue_name)["QueueUrl"]
-        self.addCleanup(client.delete_queue, QueueUrl=url)
-        account_id = url.split("/")[3]
-        arn = "arn:aws:sqs:%s:%s:%s" % (
-            os.environ.get("AWS_DEFAULT_REGION", "us-east-1"), account_id, queue_name
-        )
-
-        policy = {
-            "Id": "Foo",
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Action": "SQS:SendMessage",
-                    "Effect": "Allow",
-                    "Resource": arn,
-                    "Principal": "*",
-                    "Condition": {
-                        "StringNotEquals": {
-                            "aws:PrincipalOrgID": "o-4amkskbcf1"
-                        }
-                    }
-                }
-            ],
-        }
-
-        client.set_queue_attributes(
-            QueueUrl=url, Attributes={"Policy": json.dumps(policy)}
-        )
-
         p = self.load_policy(
             {
                 "name": "sqs-has_statements",
