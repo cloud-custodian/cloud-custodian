@@ -1621,6 +1621,45 @@ class SNSCrossAccount(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_sns_has_statements(self):
+        self.patch(SNS, "executor_factory", MainThreadExecutor)
+
+        session_factory = self.replay_flight_data(
+            "test_cross_account_sns_endpoint_condition"
+        )
+        p = self.load_policy(
+            {
+                "name": "sns-cross",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Condition": {
+                                    "StringEquals": {"AWS:SourceOwner": "644160558196"},
+                                },
+                                "PartialMatch": "Condition"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Effect\":\"Allow\",\"Principal\":\"*\""
+            in resources[0]["Policy"]
+        )
+        assert(
+            "{\"AWS:SourceOwner\":\"644160558196\"}"
+            in resources[0]["Policy"]
+        )
+
 
 class CrossAccountChecker(TestCase):
 

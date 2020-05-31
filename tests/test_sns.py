@@ -683,40 +683,6 @@ class TestSNS(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "custodian_cleanup")
 
-    def test_sns_has_required_statements(self):
-        session = self.replay_flight_data("test_sns_has_required_statements")
-        p = self.load_policy(
-            {
-                "name": "sns-has_statements",
-                "resource": "aws.sns",
-                "filters": [
-                    {"TopicArn": "arn:aws:sns:us-east-1:644160558196:test"},
-                    {
-                        "type": "has-statement",
-                        "statements": [
-                            {
-                                'Effect': 'Allow',
-                                'Action': 'SNS:SetTopicAttributes',
-                                'PartialMatch': [
-                                    'Action'
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            session_factory=session,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        policy = json.loads(resources[0]["Policy"])
-        assert(
-            policy['Statement'][0]['Effect'] == "Allow"
-        )
-        assert(
-            'SNS:SetTopicAttributes' in policy['Statement'][0]['Action']
-        )
-
     def test_sns_post_finding(self):
         factory = self.replay_flight_data('test_sns_post_finding')
         p = self.load_policy({
