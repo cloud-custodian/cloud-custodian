@@ -386,12 +386,12 @@ class PolicyStatementFilter(Filter):
                 'required': ['Effect']
             }
         })
+    policy_attribute = 'Policy'
 
     def process(self, resources, event=None):
         return list(filter(None, map(self.process_resource, resources)))
 
-    def get_policy(self, r):
-        return r.get('Policy')
+    get_policy = CrossAccountAccessFilter.get_resource_policy
 
     def get_required_statements(self, r):
         return format_string_values(list(self.data.get('statements', [])))
