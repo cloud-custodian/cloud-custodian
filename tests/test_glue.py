@@ -538,7 +538,7 @@ class TestGlueDataCatalog(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_glue_catalog_has_statements_fuzzy(self):
-        session_factory = self.replay_flight_data("test_glue_catalog_has_statements_fuzzy")
+        session_factory = self.replay_flight_data("test_glue_catalog_cross_account")
         p = self.load_policy(
             {
                 "name": "glue-catalog-has-statements",
@@ -548,16 +548,11 @@ class TestGlueDataCatalog(BaseTest):
                         "type": "has-statement",
                         "statements": [
                             {
-                                "Effect": "Deny",
-                                "Action": "glue:*",
-                                "Principal": "*",
-                                "Resource": "arn:aws:glue:us-east-1:644160558196:*",
-                                "Condition": {
-                                    "StringNotEquals": {
-                                        "aws:PrincipalOrgId": 'o-4amkskbcf1'
-                                    }
-                                },
-                                "PartialMatch": "Condition"
+                                "Effect": "Allow",
+                                "Action": "glue:CreateTable",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123123456789:root"
+                                }
                             }
                         ]
                     }
@@ -568,12 +563,6 @@ class TestGlueDataCatalog(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn(
-            ('\"Condition\" : {\n      \"StringNotEquals\" : '
-                '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'),
-            resources[0]["c7n:AccessPolicy"], 'missing condition element, did not partial match')
-        self.assertIn(
-            ('\"Condition\" : {\n      \"StringNotEquals\" : '
-             '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'
-             '      },\n      \"DateGreaterThan\" : {\n        \"aws:CurrentTime\" : '
-             '\"2019-07-16T12:00:00Z\"\n'),
-            resources[0]["c7n:AccessPolicy"], 'missing condition element, did not partial match')
+            ('\"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : '
+             '\"arn:aws:iam::123123456789:root\"\n    },\n    \"Action\" : \"glue:CreateTable\"'),
+            resources[0]["c7n:AccessPolicy"])

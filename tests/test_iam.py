@@ -1622,8 +1622,6 @@ class SNSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_sns_has_statements(self):
-        self.patch(SNS, "executor_factory", MainThreadExecutor)
-
         session_factory = self.replay_flight_data(
             "test_cross_account_sns_endpoint_condition"
         )
