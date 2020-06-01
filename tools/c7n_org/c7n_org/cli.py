@@ -548,9 +548,8 @@ def run_account(account, region, policies_config, output_path,
     policies = PolicyCollection.from_data(policies_config, config)
     provider = clouds[config['provider']]()
     p_options = provider.initialize(config)
-    policies = provider.initialize_policies(
-                        PolicyCollection(policies, p_options),
-                        p_options)
+    policies = provider.initialize_policies(PolicyCollection(policies, p_options),
+            p_options)
 
     policy_counts = {}
     success = True
