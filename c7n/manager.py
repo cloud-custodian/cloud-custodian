@@ -122,7 +122,7 @@ class ResourceManager:
 
             if event and event.get('debug', False):
                 self.log.debug(
-                    "applied filter %s %d->%d", f, rcount, len(resources))
+                    "applied filter %s %d->%d", f.data, rcount, len(resources))
         self.log.debug("Filtered from %d to %d %s" % (
             original, len(resources), self.__class__.__name__.lower()))
         return resources
