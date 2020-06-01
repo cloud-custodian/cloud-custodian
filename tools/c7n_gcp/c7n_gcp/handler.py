@@ -18,8 +18,7 @@ import os
 import uuid
 
 from c7n.config import Config
-from c7n.policy import PolicyCollection
-
+from c7n.loader import PolicyLoader
 # Load resource plugins
 from c7n_gcp.entry import initialize_gcp
 
@@ -48,11 +47,13 @@ def run(event, context=None):
 
     # merge all our options in
     options = Config.empty(**options_overrides)
+    loader = PolicyLoader(options)
 
-    policies = PolicyCollection.from_data(policy_config, options)
+    policies = loader.load_data(policy_config, 'config.json', validate=False)
     if policies:
         for p in policies:
             log.info("running policy %s", p.name)
+            p.validate()
             p.push(event, context)
     return True
 

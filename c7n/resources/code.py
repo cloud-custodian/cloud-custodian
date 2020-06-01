@@ -37,7 +37,7 @@ class CodeRepository(QueryResourceManager):
         arn = "Arn"
         date = 'creationDate'
         cfn_type = 'AWS::CodeCommit::Repository'
-        universal_tagging = object()
+        universal_taggable = object()
 
     def get_resources(self, ids, cache=True):
         return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
@@ -215,7 +215,7 @@ class CodeDeployPipeline(QueryResourceManager):
         # Note this is purposeful, codepipeline don't have a separate type specifier.
         arn_type = ""
         cfn_type = config_type = "AWS::CodePipeline::Pipeline"
-        universal_tagging = object()
+        universal_taggable = object()
 
     source_mapping = {
         'describe': DescribePipeline,

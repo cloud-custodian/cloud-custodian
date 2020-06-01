@@ -257,6 +257,7 @@ and here is a description of the options:
 |:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
 |           | `from_address`  | string           | default from address                                                                                                                                                                |
+|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                                                                                                                                                                |
 |           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
 
 #### Standard Lambda Function Config
@@ -443,7 +444,7 @@ The optional `owner_absent_contact` list specifies email addresses to notify onl
 the `resource-owner` special option was unable to find any matching owner contact
 tags.
 
-In addition, you may choose to use a custom tag instead of the default `OwnerContact`.  In order to configure this, the mailer.yaml must be modified to include the contact_tags and the custom tag.  The `resource-owner` will now email the custom tag instead of `OwnerContact`. 
+In addition, you may choose to use a custom tag instead of the default `OwnerContact`.  In order to configure this, the mailer.yaml must be modified to include the contact_tags and the custom tag.  The `resource-owner` will now email the custom tag instead of `OwnerContact`.
 
 ```yaml
 contact_tags:
@@ -532,7 +533,7 @@ to:
 ```
 
 This will find the email address associated with the resource's `OwnerEmail` tag, and send an email to the specified address.
-If no tag is found, or the associated email address is invalid, no email will be sent. 
+If no tag is found, or the associated email address is invalid, no email will be sent.
 
 #### Deploying Azure Functions
 
@@ -629,21 +630,21 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
   receive mail, and print the rendered message body template to STDOUT.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.
-  
+
 #### Testing Templates for Azure
 
 The ``c7n-mailer-replay`` entrypoint can be used to test templates for Azure with either of the arguments:
-* ``-T`` | ``--template-print`` 
-* ``-d`` | ``--dry-run`` 
-  
+* ``-T`` | ``--template-print``
+* ``-d`` | ``--dry-run``
+
 Running ``c7n-mailer-replay`` without either of these arguments will throw an error as it will attempt
-to authorize with AWS. 
+to authorize with AWS.
 
 The following is an example for retrieving a sample message to test against templates:
 
 * Run a policy with the notify action, providing the name of the template to test, to populate the queue.
 
-* Using the azure cli, save the message locally: 
+* Using the azure cli, save the message locally:
 ```
 $ az storage message get --queue-name <queuename> --account-name <storageaccountname> --query '[].content' > test_message.gz
 ```

@@ -528,7 +528,7 @@ class ContainerInstance(query.ChildResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'containerInstance'
+        id = name = 'containerInstanceArn'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         arn = "containerInstanceArn"

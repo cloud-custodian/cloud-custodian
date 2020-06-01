@@ -276,17 +276,21 @@ def run(options, policies):
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
+    errored_policies = []
     for policy in policies:
         try:
             policy()
         except Exception:
             exit_code = 2
+            errored_policies.append(policy.name)
             if options.debug:
                 raise
             log.exception(
                 "Error while executing policy %s, continuing" % (
                     policy.name))
     if exit_code != 0:
+        log.error("The following policies had errors while executing\n - %s" % (
+            "\n - ".join(errored_policies)))
         sys.exit(exit_code)
 
 
