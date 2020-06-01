@@ -298,7 +298,7 @@ class LambdaPostFinding(PostFinding):
              'Handler',
              'KMSKeyArn',
              'LastModified',
-             'MemorySize'
+             'MemorySize',
              'MasterArn',
              'RevisionId',
              'Role',
