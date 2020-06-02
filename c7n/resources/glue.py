@@ -18,6 +18,7 @@ from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
@@ -660,12 +661,17 @@ class RemovePolicyStatement(RemovePolicyBase):
     permissions = ('glue:PutResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
 
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, GlueCatalogCrossAccount):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
     def process(self, resources):
         resource = resources[0]
         client = local_session(self.manager.session_factory).client('glue')
-        p = resource.get(self.policy_annotation)
-        if p is None:
-            return
         p = json.loads(resource[self.policy_annotation])
         statements, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
@@ -675,4 +681,3 @@ class RemovePolicyStatement(RemovePolicyBase):
             client.put_resource_policy(PolicyInJson=json.dumps(p))
         else:
             client.delete_resource_policy()
-        return [{'Name': resource['CatalogId'], 'State': 'PolicyRemoved', 'Statements': found}]

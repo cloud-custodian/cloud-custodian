@@ -14,6 +14,7 @@
 from .common import BaseTest
 import time
 import json
+from c7n.exceptions import PolicyValidationError
 
 
 class TestGlueConnections(BaseTest):
@@ -575,3 +576,14 @@ class TestGlueDataCatalog(BaseTest):
         data = json.loads(client.get_resource_policy().get("PolicyInJson"))
         self.assertEqual(len(data.get('Statement')), 1)
         self.assertEqual([s['Sid'] for s in data.get('Statement')], ["SpecificAllow"])
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "glue-catalog-remove-matched",
+                "resource": "glue-catalog",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )
