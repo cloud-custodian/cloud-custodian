@@ -672,12 +672,13 @@ class RemovePolicyStatement(RemovePolicyBase):
     def process(self, resources):
         resource = resources[0]
         client = local_session(self.manager.session_factory).client('glue')
-        p = json.loads(resource[self.policy_annotation])
-        statements, found = self.process_policy(
-            p, resource, CrossAccountAccessFilter.annotation_key)
-        if not found:
-            return
-        if statements:
-            client.put_resource_policy(PolicyInJson=json.dumps(p))
-        else:
-            client.delete_resource_policy()
+        if resource.get(self.policy_annotation):
+            p = json.loads(resource[self.policy_annotation])
+            statements, found = self.process_policy(
+                p, resource, CrossAccountAccessFilter.annotation_key)
+            if not found:
+                return
+            if statements:
+                client.put_resource_policy(PolicyInJson=json.dumps(p))
+            else:
+                client.delete_resource_policy()
