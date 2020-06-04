@@ -651,14 +651,14 @@ class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from Glue Data Catalog
     :example:
     .. code-block:: yaml
-           policies:
-              - name: remove-glue-catalog-cross-account
-                resource: aws.glue-catalog
-                filters:
-                  - type: cross-account
-                actions:
-                  - type: remove-statements
-                    statement_ids: matched
+      policies:
+        - name: remove-glue-catalog-cross-account
+          resource: aws.glue-catalog
+          filters:
+            - type: cross-account
+          actions:
+            - type: remove-statements
+              statement_ids: matched
     """
     permissions = ('glue:PutResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
@@ -694,19 +694,19 @@ class HasStatementFilter(PolicyStatementFilter):
 
     .. code-block:: yaml
 
-        policies:
-          - name: glue-explicit-deny
-            resource: aws.glue-catalog
-            filters:
-              - type: has-statement
-                statements:
-                  - Effect: Deny
-                    Action: 'glue:*'
-                    Principal: '*'
-                    Resource: 'arn:aws:glue:{region}:{account_id}:*'
-                    Condition:
-                      StringNotEquals:
-                        "aws:PrincipalOrgId": 'o-yourorgid'
+      policies:
+        - name: glue-explicit-deny
+          resource: aws.glue-catalog
+          filters:
+            - type: has-statement
+              statements:
+                - Effect: Deny
+                  Action: 'glue:*'
+                  Principal: '*'
+                  Resource: 'arn:aws:glue:{region}:{account_id}:*'
+                  Condition:
+                    StringNotEquals:
+                      "aws:PrincipalOrgId": 'o-yourorgid'
     """
     permissions = GlueCatalogCrossAccount.permissions
     policy_annotation = GlueCatalogCrossAccount.policy_annotation
