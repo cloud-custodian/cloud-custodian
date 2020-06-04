@@ -653,15 +653,15 @@ class RemovePolicyStatement(RemovePolicyBase):
     :example:
 
     .. code-block:: yaml
-      policies:
-        - name: remove-glue-catalog-cross-account
-          resource: aws.glue-catalog
-          filters:
-            - type: cross-account
-          actions:
-            - type: remove-statements
-              statement_ids: matched
 
+           policies:
+              - name: remove-glue-catalog-cross-account
+                resource: aws.glue-catalog
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
     """
     permissions = ('glue:PutResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
