@@ -647,11 +647,11 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
 
 
 @GlueDataCatalog.action_registry.register('remove-statements')
-class RemovePolicyStatement(RemovePolicyBase):   
+class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from Glue Data Catalog
-    
+
     :example:
-    
+
     .. code-block:: yaml
       policies:
         - name: remove-glue-catalog-cross-account
@@ -661,7 +661,7 @@ class RemovePolicyStatement(RemovePolicyBase):
           actions:
             - type: remove-statements
               statement_ids: matched
-    
+
     """
     permissions = ('glue:PutResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
