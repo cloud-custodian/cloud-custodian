@@ -44,7 +44,7 @@ class Function(QueryResourceManager):
             return client.execute_command(
                 'get', {'name': (
                     'projects/{project_id}/locations/'
-                    '{location_id}/functions/{function_name}').format(
+                    '{region}/functions/{function_name}').format(
                         **resource_info)})
 
 
