@@ -645,7 +645,7 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
 
 
 @GlueDataCatalog.filter_registry.register('has-statement')
-class HasStatementFilter(PolicyStatementFilter, GlueCatalogCrossAccount):
+class HasStatementFilter(PolicyStatementFilter):
     """Find catalogs with set of policy statements.
 
     :example:
@@ -666,6 +666,8 @@ class HasStatementFilter(PolicyStatementFilter, GlueCatalogCrossAccount):
                       StringNotEquals:
                         "aws:PrincipalOrgId": 'o-yourorgid'
     """
+    permissions = GlueCatalogCrossAccount.permissions
+    policy_annotation = GlueCatalogCrossAccount.policy_annotation
 
     def get_policy(self, r):
-        return self.get_resource_policy(r)
+        return GlueCatalogCrossAccount.get_resource_policy(self, r)
