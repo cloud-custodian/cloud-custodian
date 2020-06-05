@@ -1,0 +1,46 @@
+{
+    "version": "0",
+    "id": "4186524f-f288-ecb2-0052-9c149bfbbbe2",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.glue",
+    "account": "644160558196",
+    "time": "2020-06-04T15:18:28Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+      "eventVersion": "1.05",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAZL6XWCR2NXJCMOAER",
+        "arn": "arn:aws:iam::644160558196:user/john.hillegass@capitalone.com",
+        "accountId": "644160558196",
+        "accessKeyId": "ASIAIDK75QI52GMORQJA",
+        "userName": "john.hillegass@capitalone.com",
+        "sessionContext": {
+          "sessionIssuer": {},
+          "webIdFederationData": {},
+          "attributes": {
+            "mfaAuthenticated": "false",
+            "creationDate": "2020-06-04T15:06:07Z"
+          }
+        }
+      },
+      "eventTime": "2020-06-04T15:18:28Z",
+      "eventSource": "glue.amazonaws.com",
+      "eventName": "PutResourcePolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "67.166.173.46",
+      "userAgent": "console.amazonaws.com",
+      "requestParameters": {
+        "policyHashCondition": "hfAqfsBoPt7ZUGlZjU5mMQ==",
+        "policyInJson": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"glue:*\",\n    \"Resource\" : \"arn:aws:glue:us-east-1:644160558196:catalog\",\n    \"Condition\": {\n        \"StringEquals\": {\n            \"aws:PrincipalOrgID\": \"o-4amkskbcf3\"\n        }        \n    }\n  } ]\n}"
+      },
+      "responseElements": {
+        "policyHash": "MWcicwcDIUY9TfNUssrjiw=="
+      },
+      "requestID": "562ac246-0da8-4eb7-8821-7053b5ecf789",
+      "eventID": "1f5ed731-9b01-4a5c-a1db-57f55e636789",
+      "eventType": "AwsApiCall"
+    },
+    "debug": true
+  }
