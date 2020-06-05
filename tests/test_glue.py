@@ -589,8 +589,8 @@ class TestGlueDataCatalog(BaseTest):
             }
         )
 
-    def test_catalog_cloudtrail_event(self):
-        session_factory = self.replay_flight_data("test_catalog_cloudtrail_event")
+    def test_catalog_change_encryption_event(self):
+        session_factory = self.replay_flight_data("test_catalog_change_encryption_event")
         session = session_factory()
         client = session.client("glue")
         before_cat_setting = client.get_data_catalog_encryption_settings()
@@ -608,13 +608,16 @@ class TestGlueDataCatalog(BaseTest):
                     "events": [
                         {
                             "source": "glue.amazonaws.com",
-                            "event": "PutResourcePolicy",
-                            "ids": "awsRegion"
+                            "event": "PutDataCatalogEncryptionSettings",
+                            "ids": "userIdentity.accountId"
                         }
                     ],
                 },
-                "filters": [
-                    {"type": "cross-account"}
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+                    'value': 'alias/skunk/trails',
+                    'op': 'ne'},
                 ],
                 "actions": [
                     {
@@ -629,9 +632,56 @@ class TestGlueDataCatalog(BaseTest):
             },
             session_factory=session_factory,
         )
-        p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
+        p.push(event_data("event-cloud-trail-catalog-set-encryption.json"), None)
         after_cat_setting = client.get_data_catalog_encryption_settings()
         self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
             'EncryptionAtRest').get('CatalogEncryptionMode'), 'SSE-KMS')
         self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
             'EncryptionAtRest').get('SseAwsKmsKeyId'), "alias/aws/glue")
+
+    # def test_catalog_change_rbp_event(self):
+    #     session_factory = self.replay_flight_data("test_catalog_change_rbp_event")
+    #     session = session_factory()
+    #     client = session.client("glue")
+    #     before_cat_setting = client.get_data_catalog_encryption_settings()
+    #     self.assertEqual(before_cat_setting.get('DataCatalogEncryptionSettings').get(
+    #         'EncryptionAtRest').get('CatalogEncryptionMode'), 'DISABLED')
+    #     self.assertEqual(before_cat_setting.get('DataCatalogEncryptionSettings').get(
+    #         'EncryptionAtRest').get('SseAwsKmsKeyId'), None)
+    #     p = self.load_policy(
+    #         {
+    #             "name": "net-change-rbp-cross-account",
+    #             "resource": "glue-catalog",
+    #             "mode": {
+    #                 "type": "cloudtrail",
+    #                 "role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+    #                 "events": [
+    #                     {
+    #                         "source": "glue.amazonaws.com",
+    #                         "event": "PutResourcePolicy",
+    #                         "ids": "awsRegion"
+    #                     }
+    #                 ],
+    #             },
+    #             "filters": [
+    #                 {"type": "cross-account"}
+    #             ],
+    #             "actions": [
+    #                 {
+    #                     "type": "set-encryption",
+    #                     "attributes": {
+    #                         "EncryptionAtRest": {
+    #                             "CatalogEncryptionMode": "SSE-KMS"
+    #                         }
+    #                     }
+    #                 }
+    #             ],
+    #         },
+    #         session_factory=session_factory,
+    #     )
+    #     p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
+    #     after_cat_setting = client.get_data_catalog_encryption_settings()
+    #     self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
+    #         'EncryptionAtRest').get('CatalogEncryptionMode'), 'SSE-KMS')
+    #     self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
+    #         'EncryptionAtRest').get('SseAwsKmsKeyId'), "alias/aws/glue")
