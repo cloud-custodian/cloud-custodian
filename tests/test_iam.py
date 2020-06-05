@@ -1582,6 +1582,33 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_principal_org_id(self):
+        statements = [
+            {'Actions': ['Deploy', 'UnshareApplication'],
+             'Principal': ['*'],
+             'StatementId': 'cab89702-05f0-4751-818e-ced6e98ef5f9',
+             'Effect': 'Allow',
+             'Condition': {
+                 'StringEquals': {
+                     'aws:PrincipalOrgID': ['o-4pmkskbcf9']}}},
+            {'Actions': ['Deploy'],
+             'Principal': ['619193117841'],
+             'StatementId': 'b364d84f-62d2-411c-9787-3636b2b1975c',
+             'Effect': 'Allow'}
+        ]
+
+        checker = PolicyChecker({
+            'allowed_orgid': ['o-4pmkskbcf9']})
+
+        for statement, expected in zip(statements, [False, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({})
+        for statement, expected in zip(statements, [True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
     def test_s3_policies(self):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker(
