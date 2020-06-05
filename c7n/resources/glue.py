@@ -528,6 +528,9 @@ class GlueDataCatalog(ResourceManager):
     def resources(self):
         return self.filter_resources(self._get_catalog_encryption_settings())
 
+    def get_resources(self, resource_ids):
+        return [{'CatalogId': self.config.account_id}]
+
 
 @GlueDataCatalog.action_registry.register('set-encryption')
 class GlueDataCatalogEncryption(BaseAction):
