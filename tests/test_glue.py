@@ -594,10 +594,16 @@ class TestGlueDataCatalog(BaseTest):
         session = session_factory()
         client = session.client("glue")
         before_cat_setting = client.get_data_catalog_encryption_settings()
-        self.assertEqual(before_cat_setting.get('DataCatalogEncryptionSettings').get(
-            'EncryptionAtRest').get('CatalogEncryptionMode'), 'DISABLED')
-        self.assertEqual(before_cat_setting.get('DataCatalogEncryptionSettings').get(
-            'EncryptionAtRest').get('SseAwsKmsKeyId'), None)
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode',
+            before_cat_setting,
+            'DISABLED'
+        )
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            before_cat_setting,
+            None
+        )
         p = self.load_policy(
             {
                 "name": "net-change-rbp-cross-account",
@@ -634,10 +640,16 @@ class TestGlueDataCatalog(BaseTest):
         )
         p.push(event_data("event-cloud-trail-catalog-set-encryption.json"), None)
         after_cat_setting = client.get_data_catalog_encryption_settings()
-        self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
-            'EncryptionAtRest').get('CatalogEncryptionMode'), 'SSE-KMS')
-        self.assertEqual(after_cat_setting.get('DataCatalogEncryptionSettings').get(
-            'EncryptionAtRest').get('SseAwsKmsKeyId'), "alias/aws/glue")
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode',
+            after_cat_setting,
+            'SSE-KMS'
+        )
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            after_cat_setting,
+            'alias/aws/glue'
+        )
 
     def test_catalog_change_rbp_event(self):
         session_factory = self.replay_flight_data("test_catalog_change_rbp_event")
