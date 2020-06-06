@@ -13,6 +13,8 @@
 # limitations under the License.
 from .common import BaseTest
 import time
+import json
+from c7n.exceptions import PolicyValidationError
 
 
 class TestGlueConnections(BaseTest):
@@ -536,3 +538,52 @@ class TestGlueDataCatalog(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_catalog_remove_matched(self):
+        session_factory = self.replay_flight_data("test_catalog_remove_matched")
+        client = session_factory().client("glue")
+        client.put_resource_policy(PolicyInJson=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                        "Action": "glue:GetDatabase",
+                        "Resource": "arn:aws:glue:us-east-1:644160558196:catalog"
+                    },
+                    {
+                        "Sid": "CrossAccount",
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
+                        "Action": "glue:GetDatabase",
+                        "Resource": "arn:aws:glue:us-east-1:644160558196:catalog"
+                    },
+                ]
+            }))
+        p = self.load_policy(
+            {
+                "name": "glue-catalog-rm-matched",
+                "resource": "glue-catalog",
+                "filters": [{"type": "cross-account"}],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = json.loads(client.get_resource_policy().get("PolicyInJson"))
+        self.assertEqual(len(data.get('Statement')), 1)
+        self.assertEqual([s['Sid'] for s in data.get('Statement')], ["SpecificAllow"])
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "glue-catalog-remove-matched",
+                "resource": "glue-catalog",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )

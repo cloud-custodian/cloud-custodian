@@ -16,9 +16,9 @@ pyparsing==2.4.7
 pytz==2020.1
 recommonmark==0.6.0
 requests==2.23.0
-six==1.14.0
+six==1.15.0
 snowballstemmer==2.0.0
-sphinx==3.0.3
+sphinx==3.0.4
 sphinx-markdown-tables==0.0.12
 sphinx-rtd-theme==0.4.3
 sphinxcontrib-applehelp==1.0.2

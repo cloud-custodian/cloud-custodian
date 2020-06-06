@@ -151,8 +151,23 @@ class IsWafEnabled(Filter):
         return results
 
 
+class BaseDistributionConfig(ValueFilter):
+    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:distribution-config'
+    annotate = False
+
+    def process(self, resources, event=None):
+
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super(BaseDistributionConfig, self).__call__(r[self.annotation_key])
+
+
 @Distribution.filter_registry.register('distribution-config')
-class DistributionConfig(ValueFilter):
+class DistributionConfig(BaseDistributionConfig):
     """Check for Cloudfront distribution config values
 
     :example:
@@ -165,22 +180,11 @@ class DistributionConfig(ValueFilter):
                 filters:
                   - type: distribution-config
                     key: Logging.Enabled
-                    value: true
+                    value: False
    """
-
-    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
-    schema_alias = False
     permissions = ('cloudfront:GetDistributionConfig',)
-    annotation_key = 'c7n:distribution-config'
-    annotate = False
-
-    def process(self, resources, event=None):
-
-        self.augment([r for r in resources if self.annotation_key not in r])
-        return super().process(resources, event)
 
     def augment(self, resources):
-
         client = local_session(self.manager.session_factory).client(
             'cloudfront', region_name=self.manager.config.region)
 
@@ -196,8 +200,41 @@ class DistributionConfig(ValueFilter):
                     r['ARN'], e)
                 raise e
 
-    def __call__(self, r):
-        return super(DistributionConfig, self).__call__(r[self.annotation_key])
+
+@StreamingDistribution.filter_registry.register('distribution-config')
+class StreamingDistributionConfig(BaseDistributionConfig):
+    """Check for Cloudfront streaming distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: streaming-distribution-logging-enabled
+                resource: streaming-distribution
+                filters:
+                  - type: distribution-config
+                    key: Logging.Enabled
+                    value: true
+   """
+    permissions = ('cloudfront:GetStreamingDistributionConfig',)
+
+    def augment(self, resources):
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_streaming_distribution_config(Id=r['Id']) \
+                    .get('StreamingDistributionConfig')
+            except (client.exceptions.NoSuchStreamingDistribution):
+                r[self.annotation_key] = {}
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Streaming Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
 
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
@@ -512,8 +549,38 @@ class DistributionSSLAction(BaseAction):
             return
 
 
+class BaseUpdateAction(BaseAction):
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+    schema_alias = False
+
+    def validate(self, config_name, shape):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('CallerReference'):
+            raise PolicyValidationError('CallerReference field cannot be updated')
+
+        # Set default values for required fields if they are not present
+        attrs["CallerReference"] = ""
+        config = self.validation_config
+        updatedConfig = {**config, **attrs}
+
+        request = {
+            config_name: updatedConfig,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        return shape_validate(request, shape, 'cloudfront')
+
+    def process(self, distributions):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
+
+
 @Distribution.action_registry.register('set-attributes')
-class DistributionUpdateAction(BaseAction):
+class DistributionUpdateAction(BaseUpdateAction):
     """Action to update the attributes of a distribution
 
     :example:
@@ -538,70 +605,46 @@ class DistributionUpdateAction(BaseAction):
                     Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
                     Prefix: ''
     """
-    schema = type_schema('set-attributes',
-                        attributes={"type": "object"},
-                        required=('attributes',))
-
     permissions = ("cloudfront:UpdateDistribution",
                    "cloudfront:GetDistributionConfig",)
     shape = 'UpdateDistributionRequest'
+    validation_config = {
+        'Origins': {
+            'Quantity': 0,
+            'Items': [{
+                'Id': '',
+                'DomainName': ''
+            }]
+        },
+        'DefaultCacheBehavior': {
+            'TargetOriginId': '',
+            'ForwardedValues': {
+                'QueryString': True,
+                'Cookies': {
+                    'Forward': ''
+                }
+            },
+            'TrustedSigners': {
+                'Enabled': True,
+                'Quantity': 0
+            },
+            'ViewerProtocolPolicy': '',
+            'MinTTL': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
 
     def validate(self):
-        attrs = dict(self.data.get('attributes'))
-        if attrs.get('CallerReference'):
-            raise PolicyValidationError('CallerReference field cannot be updated')
-
-        # Set default values for required fields if they are not present
-        attrs["CallerReference"] = ""
-        self.set_required_update_fields(attrs)
-        request = {
-            "DistributionConfig": attrs,
-            "Id": "sample_id",
-            "IfMatch": "sample_string",
-        }
-        return shape_validate(request, self.shape, 'cloudfront')
-
-    def set_required_update_fields(self, config):
-        if 'Origins' not in config:
-            config["Origins"] = {
-                "Quantity": 0,
-                "Items": [
-                    {
-                        "Id": "",
-                        "DomainName": ""
-                    }
-                ],
-            }
-        if 'DefaultCacheBehavior' not in config:
-            config["DefaultCacheBehavior"] = {
-                "TargetOriginId": "",
-                "ForwardedValues": {
-                    "QueryString": True,
-                    "Cookies": {
-                        "Forward": ""
-                    }
-                },
-                "TrustedSigners": {
-                    "Enabled": True,
-                    "Quantity": 0,
-                },
-                "ViewerProtocolPolicy": "",
-                "MinTTL": 0
-            }
-
-    def process(self, distributions):
-        client = local_session(self.manager.session_factory).client(
-            self.manager.get_model().service)
-        for d in distributions:
-            self.process_distribution(client, d)
+        return super().validate('DistributionConfig', self.shape)
 
     def process_distribution(self, client, distribution):
         try:
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
-            config = res['DistributionConfig']
+            default_config = self.validation_config
+            config = {**default_config, **res['DistributionConfig']}
             updatedConfig = {**config, **self.data['attributes']}
-            self.set_required_update_fields(updatedConfig)
             if config == updatedConfig:
                 return
             res = client.update_distribution(
@@ -609,10 +652,75 @@ class DistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 DistributionConfig=updatedConfig
             )
-        except (client.exceptions.NoSuchResource, client.exceptions.NoSuchDistribution):
+        except (client.exceptions.NoSuchDistribution):
             pass
         except Exception as e:
             self.log.warning(
                 "Exception trying to update Distribution: %s error: %s",
                 distribution['ARN'], e)
+            raise e
+
+
+@StreamingDistribution.action_registry.register('set-attributes')
+class StreamingDistributionUpdateAction(BaseUpdateAction):
+    """Action to update the attributes of a distribution
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: enforce-streaming-distribution-logging
+          resource: streaming-distribution
+          filters:
+            - type: value
+              key: "Logging.Enabled"
+              value: false
+          actions:
+            - type: set-attributes
+              attributes:
+                Logging:
+                    Enabled: true
+                    Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
+                    Prefix: ''
+    """
+    permissions = ("cloudfront:UpdateStreamingDistribution",
+                   "cloudfront:GetStreamingDistributionConfig",)
+    shape = 'UpdateStreamingDistributionRequest'
+    validation_config = {
+        'S3Origin': {
+            'DomainName': 'domain_name',
+            'OriginAccessIdentity': 'origin_access_identity'
+        },
+        'TrustedSigners': {
+            'Enabled': False,
+            'Quantity': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
+
+    def validate(self):
+        return super().validate('StreamingDistributionConfig', self.shape)
+
+    def process_distribution(self, client, streaming_distribution):
+        try:
+            res = client.get_streaming_distribution_config(
+                Id=streaming_distribution[self.manager.get_model().id])
+            default_config = self.validation_config
+            config = {**default_config, **res['StreamingDistributionConfig']}
+            updatedConfig = {**config, **self.data['attributes']}
+            if config == updatedConfig:
+                return
+            res = client.update_streaming_distribution(
+                Id=streaming_distribution[self.manager.get_model().id],
+                IfMatch=res['ETag'],
+                StreamingDistributionConfig=updatedConfig
+            )
+        except (client.exceptions.NoSuchStreamingDistribution):
+            pass
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update Streaming Distribution: %s error: %s",
+                streaming_distribution['ARN'], e)
             raise e

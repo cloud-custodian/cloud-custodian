@@ -130,9 +130,9 @@ class PolicyLoader:
         if missing:
             self._handle_missing_resources(policy_data, missing)
 
-        if validate is not False or (
+        if schema and (validate is not False or (
                 validate is None and
-                self.default_schema_validate):
+                self.default_schema_validate)):
             errors = self.validator.validate(policy_data, tuple(rtypes))
             if errors:
                 raise PolicyValidationError(

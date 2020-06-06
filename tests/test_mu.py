@@ -229,6 +229,35 @@ class PolicyLambdaProvision(BaseTest):
              'source': ['aws.health']}
         )
 
+    def test_cloudtrail_delay(self):
+        p = self.load_policy({
+            'name': 'aws-account',
+            'resource': 'aws.account',
+            'mode': {
+                'type': 'cloudtrail',
+                'delay': 32,
+                'role': 'CustodianRole',
+                'events': ['RunInstances']}})
+        from c7n import policy
+
+        class time:
+
+            invokes = []
+
+            @classmethod
+            def sleep(cls, duration):
+                cls.invokes.append(duration)
+
+        self.patch(policy, 'time', time)
+        trail_mode = p.get_execution_mode()
+        results = trail_mode.run({
+            'detail': {
+                'eventSource': 'ec2.amazonaws.com',
+                'eventName': 'RunInstances'}},
+            None)
+        self.assertEqual(len(results), 0)
+        self.assertEqual(time.invokes, [32])
+
     def test_user_pattern_merge(self):
         p = self.load_policy({
             'name': 'ec2-retire',
