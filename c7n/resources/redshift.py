@@ -1002,4 +1002,4 @@ class ReservedNode(QueryResourceManager):
         filter_name = 'ReservedNodes'
         filter_type = 'list'
         arn_type = "reserved-nodes"
-        permissions_enum = ('rds:DescribeReservedNodes',)
+        permissions_enum = ('redshift:DescribeReservedNodes',)
