@@ -206,8 +206,13 @@ class PolicyMetaLint(BaseTest):
             if rtype is not None:
                 resource_cfn_types.add(rtype)
         cfn_types = set(load_data('cfn-types.json'))
+        missing = set()
         for rtype in resource_cfn_types:
-            assert rtype in cfn_types, "invalid cfn %s" % rtype
+            if rtype not in cfn_types:
+                missing.add(rtype)
+        if missing:
+            raise AssertionError("Bad cfn types:\n %s" % (
+                "\n".join(sorted(missing))))
 
     def test_securityhub_resource_support(self):
         session = fake_session()._session

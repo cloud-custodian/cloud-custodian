@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
-from c7n.actions import BaseAction, ActionRegistry
+from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
@@ -637,3 +639,46 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
             policy = {}
         r[self.policy_annotation] = policy
         return policy
+
+
+@GlueDataCatalog.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from Glue Data Catalog
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: remove-glue-catalog-cross-account
+                resource: aws.glue-catalog
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+    permissions = ('glue:PutResourcePolicy',)
+    policy_annotation = "c7n:AccessPolicy"
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, GlueCatalogCrossAccount):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        resource = resources[0]
+        client = local_session(self.manager.session_factory).client('glue')
+        if resource.get(self.policy_annotation):
+            p = json.loads(resource[self.policy_annotation])
+            statements, found = self.process_policy(
+                p, resource, CrossAccountAccessFilter.annotation_key)
+            if not found:
+                return
+            if statements:
+                client.put_resource_policy(PolicyInJson=json.dumps(p))
+            else:
+                client.delete_resource_policy()
