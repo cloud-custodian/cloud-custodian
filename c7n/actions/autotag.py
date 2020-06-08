@@ -93,12 +93,10 @@ class AutoTagUser(EventAction):
 
     def process(self, resources, event):
         if event is None:
-            self.results.skip(resources, "no event")
             return
         event = event['detail']
         utype = event['userIdentity']['type']
         if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser', 'FederatedUser']):
-            self.results.skip(resources, "event user-type invalid")
             return
 
         user = None
@@ -111,14 +109,11 @@ class AutoTagUser(EventAction):
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):
-                self.results.skip(resources, "event user is an instance role")
                 return
             # lambda function (old style)
             elif user.startswith('awslambda'):
-                self.results.skip(resources, "event user is an aws lambda role")
                 return
         if user is None:
-            self.results.skip(resources, "event user unknown")
             return
         # if the auto-tag-user policy set update to False (or it's unset) then we
         # will skip writing their UserName tag and not overwrite pre-existing values
@@ -148,8 +143,6 @@ class AutoTagUser(EventAction):
             new_tags[principal_id_key] = principal_id_value
         for key, value in new_tags.items():
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
-        self.results.ok(untagged_resources)
-        self.results.remaining("skip", "already tagged and update not requested")
         return new_tags
 
     @classmethod

@@ -474,10 +474,8 @@ class StartNotebookInstance(BaseAction):
     valid_origin_states = ('Stopped',)
 
     def process(self, resources):
-        resources, err = self.split_resources(
-            resources, 'NotebookInstanceStatus', self.valid_origin_states)
-        self.results.error(err,
-            "status not one of: %s" % ", ".join(self.valid_origin_status))
+        resources = self.filter_resources(resources, 'NotebookInstanceStatus',
+                                          self.valid_origin_states)
         if not len(resources):
             return
 
@@ -512,10 +510,8 @@ class StopNotebookInstance(BaseAction):
     valid_origin_states = ('InService',)
 
     def process(self, resources):
-        resources, err = self.split_resources(
-            resources, 'NotebookInstanceStatus', self.valid_origin_states)
-        self.results.error(err,
-            "status not one of: %s" % ", ".join(self.valid_origin_status))
+        resources = self.filter_resources(resources, 'NotebookInstanceStatus',
+                                          self.valid_origin_states)
         if not len(resources):
             return
 
@@ -550,10 +546,8 @@ class DeleteNotebookInstance(BaseAction):
     valid_origin_states = ('Stopped', 'Failed',)
 
     def process(self, resources):
-        resources, err = self.split_resources(
-            resources, 'NotebookInstanceStatus', self.valid_origin_states)
-        self.results.error(err,
-            "status not one of: %s" % ", ".join(self.valid_origin_status))
+        resources = self.filter_resources(resources, 'NotebookInstanceStatus',
+                                          self.valid_origin_states)
         if not len(resources):
             return
 

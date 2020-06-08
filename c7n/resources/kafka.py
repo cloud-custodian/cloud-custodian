@@ -67,7 +67,6 @@ class SetMonitoring(Action):
 
     shape = 'UpdateMonitoringRequest'
     permissions = ('kafka:UpdateClusterConfiguration',)
-    valid_origin_states = ('ACTIVE',)
 
     def validate(self):
         attrs = dict(self.data.get('config', {}))
@@ -78,9 +77,7 @@ class SetMonitoring(Action):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kafka')
-        resources, err = self.split_resources(resources, 'State', self.valid_origin_states)
-        self.results.error(err, "state not one of: %s" % ", ".join(self.valid_origin_states))
-        for r in resources:
+        for r in self.filter_resources(resources, 'State', ('ACTIVE',)):
             params = dict(self.data.get('config', {}))
             params['ClusterArn'] = r['ClusterArn']
             params['CurrentVersion'] = r['CurrentVersion']

@@ -125,7 +125,6 @@ class Notify(BaseNotify):
             {'required': ['type', 'transport', 'to_from']}],
         'properties': {
             'type': {'enum': ['notify']},
-            'include_failed': {'type': 'boolean'},
             'to': {'type': 'array', 'items': {'type': 'string'}},
             'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
             'to_from': ValuesFrom.schema,
@@ -190,7 +189,6 @@ class Notify(BaseNotify):
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = self.prepare_resources(batch)
             receipt = self.send_data_message(message)
-            self.results.ok(batch)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))

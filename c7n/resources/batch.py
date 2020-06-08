@@ -102,10 +102,7 @@ class UpdateComputeEnvironment(BaseAction):
     valid_origin_status = ('VALID', 'INVALID')
 
     def process(self, resources):
-        resources, err = self.split_resources(
-            resources, 'status', self.valid_origin_status)
-        self.results.error(err,
-            "status is not one of: %s" % ", ".join(self.valid_origin_states))
+        resources = self.filter_resources(resources, 'status', self.valid_origin_status)
         client = local_session(self.manager.session_factory).client('batch')
         params = dict(self.data)
         params.pop('type')
@@ -140,23 +137,10 @@ class DeleteComputeEnvironment(BaseAction):
             computeEnvironment=r['computeEnvironmentName'])
 
     def process(self, resources):
-        # filter out already deleted ones and mark as skipped
-        resources, skip = self.split_resources(
-            resources, 'status', exclude=('DELETED', 'DELETING'))
-        self.results.skip(skip, "already deleted")
-
-        # filter out those not in the correct state
-        resources, err = self.split_resources(
-            resources, 'state', self.valid_origin_states)
-        self.results.error(err,
-            "state is not one of: %s" % ", ".join(self.valid_origin_states))
-
-        # filter out those not with the correct status
-        resources, err = self.split_resources(
-            resources, 'status', self.valid_origin_status)
-        self.results.error(err,
-            "status is not one of: %s" % ", ".join(self.valid_origin_status))
-
+        resources = self.filter_resources(
+            self.filter_resources(
+                resources, 'state', self.valid_origin_states),
+            'status', self.valid_origin_status)
         client = local_session(self.manager.session_factory).client('batch')
         for e in resources:
             self.delete_environment(client, e)
@@ -188,9 +172,7 @@ class DefinitionDeregister(BaseAction):
                                      r['revision']))
 
     def process(self, resources):
-        resources, skip = self.split_resources(
-            resources, 'status', self.valid_origin_states)
-        self.results.skip(skip, "job definition is already deregistered")
+        resources = self.filter_resources(resources, 'status', self.valid_origin_states)
         self.client = local_session(
             self.manager.session_factory).client('batch')
         with self.executor_factory(max_workers=2) as w:

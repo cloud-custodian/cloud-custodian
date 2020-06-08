@@ -102,7 +102,6 @@ class PutMetric(BaseAction):
         'additionalProperties': False,
         'properties': {
             'type': {'enum': ['put-metric', ]},
-            'include_failed': {'type': 'boolean'},
             'key': {'type': 'string'},  # jmes path
             'namespace': {'type': 'string'},
             'metric_name': {'type': 'string'},
@@ -172,7 +171,6 @@ class PutMetric(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('cloudwatch')
         client.put_metric_data(Namespace=ns, MetricData=metrics_data)
-        self.results.ok(resources)
 
         return resources
 

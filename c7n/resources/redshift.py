@@ -132,14 +132,10 @@ class Pause(BaseAction):
     schema = type_schema('pause')
     permissions = ('redshift:PauseCluster',)
 
-    valid_origin_status = ('available',)
-
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        resources, err = self.split_resources(resources, 'ClusterStatus', self.valid_origin_status)
-        self.results.error(err, "status not one of: %s" % self.valid_origin_status)
-        for r in resources:
+        for r in self.filter_resources(resources, 'ClusterStatus', ('available',)):
             try:
                 client.pause_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -154,14 +150,10 @@ class Resume(BaseAction):
     schema = type_schema('resume')
     permissions = ('redshift:ResumeCluster',)
 
-    valid_origin_status = ('paused',)
-
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        resources, err = self.split_resources(resources, 'ClusterStatus', self.valid_origin_status)
-        self.results.error(err, "status not one of: %s" % self.valid_origin_status)
-        for r in resources:
+        for r in self.filter_resources(resources, 'ClusterStatus', ('paused',)):
             try:
                 client.resume_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])

@@ -174,8 +174,8 @@ class TableContinuousBackupAction(BaseAction):
     permissions = ('dynamodb:UpdateContinuousBackups',)
 
     def process(self, resources):
-        resources, err = self.split_resources(resources, 'TableStatus', self.valid_status)
-        self.results.error(err, "status not one of: %s" % ", ".join(self.valid_status))
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
         client = local_session(self.manager.session_factory).client('dynamodb')
@@ -216,8 +216,8 @@ class DeleteTable(BaseAction):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        resources, err = self.split_resources(resources, 'TableStatus', self.valid_status)
-        self.results.error(err, "status not one of: %s" % ", ".join(self.valid_status))
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -262,8 +262,8 @@ class SetStream(BaseAction):
     permissions = ("dynamodb:UpdateTable",)
 
     def process(self, tables):
-        tables, err = self.split_resources(tables, 'TableStatus', self.valid_status)
-        self.results.error(err, "status not one of: %s" % ", ".join(self.valid_status))
+        tables = self.filter_resources(
+            tables, 'TableStatus', self.valid_status)
         if not len(tables):
             return
 
@@ -324,8 +324,8 @@ class CreateBackup(BaseAction):
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, resources):
-        resources, err = self.split_resources(resources, 'TableStatus', self.valid_status)
-        self.results.error(err, "status not one of: %s" % ", ".join(self.valid_status))
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -388,8 +388,8 @@ class DeleteBackup(BaseAction):
     permissions = ('dynamodb:DeleteBackup',)
 
     def process(self, backups):
-        backups, err = self.split_resources(backups, 'BackupStatus', self.valid_status)
-        self.results.error(err, "status not one of: %s" % ", ".join(self.valid_status))
+        backups = self.filter_resources(
+            backups, 'BackupStatus', self.valid_status)
         if not len(backups):
             return
 
