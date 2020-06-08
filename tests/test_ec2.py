@@ -728,7 +728,7 @@ class TestTag(BaseTest):
         )
         resources = policy.run()
         ok, err = split_resources_by_results(resources)
-        self.assertEqual(len(ok), 3)
+        self.assertEqual(len(ok), 4)
 
         policy = self.load_policy(
             {
