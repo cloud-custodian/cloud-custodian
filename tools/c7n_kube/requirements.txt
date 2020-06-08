@@ -1,7 +1,7 @@
 cachetools==4.1.0
-certifi==2020.4.5.1
+certifi==2020.4.5.2
 chardet==3.0.4
-google-auth==1.15.0
+google-auth==1.16.1
 idna==2.9
 kubernetes==10.0.1
 oauthlib==3.1.0
