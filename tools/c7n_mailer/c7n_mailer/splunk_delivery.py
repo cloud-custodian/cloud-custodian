@@ -28,7 +28,7 @@ class SplunkHecDelivery:
     Delivery class to send c7n message from SQS to Splunk HTTP Event Collector
     """
 
-    def __init__(self, config, session, logger):
+    def __init__(self, config, session, logger, sourcetype='_json'):
         """
         Initialize SplunkHecDelivery HEC sender.
 
@@ -40,6 +40,7 @@ class SplunkHecDelivery:
         self.config = config
         self.logger = logger
         self.session = session
+        self.sourcetype = sourcetype
 
     def get_splunk_payloads(self, msg, msg_timestamp):
         """
@@ -65,7 +66,7 @@ class SplunkHecDelivery:
                     'source': '%s-cloud-custodian' % event.get(
                         'account', 'unknown'
                     ),
-                    'sourcetype': '_json',
+                    'sourcetype': self.sourcetype,
                     'index': index,
                     'event': event
                 })

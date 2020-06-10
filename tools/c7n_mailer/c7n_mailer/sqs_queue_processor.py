@@ -82,6 +82,7 @@ class MailerSqsQueueProcessor:
         self.max_num_processes = max_num_processes
         self.receive_queue = self.config['queue_url']
         self.endpoint_url = self.config.get('endpoint_url', None)
+        self.splunk_sourcetype = self.config.get('splunk_sourcetype', '_json')
         if self.config.get('debug', False):
             self.logger.debug('debug logging is turned on from mailer config file.')
             logger.setLevel(logging.DEBUG)
@@ -204,7 +205,10 @@ class MailerSqsQueueProcessor:
             for e in sqs_message.get('action', ()).get('to')
         ):
             from .splunk_delivery import SplunkHecDelivery
-            splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)
+            splunk_delivery = SplunkHecDelivery(self.config,
+                                                self.session,
+                                                self.logger,
+                                                self.splunk_sourcetype)
             splunk_messages = splunk_delivery.get_splunk_payloads(
                 sqs_message, encoded_sqs_message['Attributes']['SentTimestamp']
             )
