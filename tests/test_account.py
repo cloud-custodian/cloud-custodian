@@ -1166,3 +1166,29 @@ class AccountDataEvents(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_securityhub(self):
+        session_factory = self.replay_flight_data("test_enable_securityhub")
+        p = self.load_policy(
+            {
+                'name': 'enable-sechub',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'sechub-enabled',
+                    'state': False
+                }],
+                'actions': [
+                    {
+                        'type': 'set-sechub',
+                        'state': True,
+                        'EnableDefaultStandards': False,
+                    }
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("securityhub")
+        response = client.describe_hub()
+        self.assertEqual(response.get(
+            'HubArn'), 'arn:aws:securityhub:us-west-1:644160558196:hub/default')
