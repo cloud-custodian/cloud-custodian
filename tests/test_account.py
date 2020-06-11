@@ -1174,21 +1174,10 @@ class AccountDataEvents(BaseTest):
                 'name': 'enable-sechub',
                 'resource': 'account',
                 'filters': [{
-                    'type': 'sechub-enabled',
-                    'state': False
+                    'type': 'securityhub',
+                    'enabled': True
                 }],
-                'actions': [
-                    {
-                        'type': 'set-sechub',
-                        'state': True,
-                        'EnableDefaultStandards': False,
-                    }
-                ],
             },
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client("securityhub")
-        response = client.describe_hub()
-        self.assertEqual(response.get(
-            'HubArn'), 'arn:aws:securityhub:us-west-1:644160558196:hub/default')

@@ -1,8 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {},
-        "HubArn": "arn:aws:securityhub:us-west-1:644160558196:hub/default",
-        "SubscribedAt": "2020-06-10T20:37:17.951Z"
-    }
-}

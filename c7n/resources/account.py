@@ -1733,7 +1733,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
         )
 
 
-@filters.register('sechub-enabled')
+@filters.register('securityhub')
 class SecHubEnabled(Filter):
     """Filter an account depending on whether security hub is enabled or not.
 
@@ -1745,21 +1745,22 @@ class SecHubEnabled(Filter):
          - name: check-securityhub-status
            resource: aws.account
            filters:
-            - type: sechub-enabled
-              state: true
+            - type: securityhub
+              enabled: true
 
     """
 
     permissions = ('securityhub:DescribeHub',)
 
-    schema = type_schema('sechub-enabled', state={'type': 'boolean'})
+    schema = type_schema('securityhub', enabled={'type': 'boolean'})
 
     def process(self, resources, event=None):
-        state = self.data.get('state', True)
+        state = self.data.get('enabled', True)
         client = local_session(self.manager.session_factory).client('securityhub')
         try:
-            sechub = client.describe_hub()
+            sechub = self.manager.retry(client.describe_hub)
         except ClientError as e:
+            # Exception denotes securityhub disabled in this region
             if e.response['Error']['Code'] == 'InvalidAccessException':
                 sechub = None
             else:
@@ -1767,40 +1768,3 @@ class SecHubEnabled(Filter):
         if state == bool(sechub):
             return resources
         return []
-
-
-@actions.register('set-sechub')
-class SetSechub(BaseAction):
-    """Enable security hub on an account
-
-    :example:
-
-    .. code-block:: yaml
-
-       policies:
-         - name: enable-securityhub
-           resource: aws.account
-           filters:
-            - type: sechub-enabled
-              state: false
-           actions:
-            - type: set-sechub
-              state: true
-
-    """
-    permissions = ('securityhub:EnableSecurityHub', 'securityhub:DisableSecurityHub')
-
-    schema = type_schema(
-        'set-sechub',
-        state={'type': 'boolean'},
-        EnableDefaultStandards={'type': 'boolean'},
-        required=('state',))
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('securityhub')
-        state = self.data.get('state')
-        if state:
-            client.enable_security_hub(
-                EnableDefaultStandards=self.data.get('EnableDefaultStandards', False))
-        else:
-            client.disable_security_hub()
