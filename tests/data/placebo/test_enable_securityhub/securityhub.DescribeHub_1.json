@@ -1,8 +1,12 @@
 {
-    "status_code": 200,
+    "status_code": 401,
     "data": {
+        "Error": {
+            "Message": "AccountId: 644160558196 is not enabled for securityhub. Currentstate: false",
+            "Code": "InvalidAccessException"
+        },
         "ResponseMetadata": {},
-        "HubArn": "arn:aws:securityhub:us-east-1:644160558196:hub/default",
-        "SubscribedAt": "2018-11-28T22:14:06.771Z"
+        "Message": "AccountId: 644160558196 is not enabled for securityhub. Currentstate: false",
+        "Code": "InvalidAccessException"
     }
 }

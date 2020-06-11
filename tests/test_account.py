@@ -1175,7 +1175,7 @@ class AccountDataEvents(BaseTest):
                 'resource': 'account',
                 'filters': [{
                     'type': 'securityhub',
-                    'enabled': True
+                    'enabled': False
                 }],
             },
             session_factory=session_factory)
