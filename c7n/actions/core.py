@@ -173,9 +173,9 @@ class Action(Element):
         return self.__class__.__name__.lower()
 
     def wrap_process(self, resources, event=None):
-        if not self.data.get('include_failed', False):
-            resources, failed = split_resources_by_results(resources)
         self.results.initialize(resources)
+        resources, skipped = split_resources_by_results(resources)
+        self.results.skip(skipped, "previously failed")
         try:
             if isinstance(self, EventAction):
                 details = self.process(resources, event=event)
