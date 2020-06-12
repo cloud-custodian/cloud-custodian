@@ -1757,14 +1757,8 @@ class SecHubEnabled(Filter):
     def process(self, resources, event=None):
         state = self.data.get('enabled', True)
         client = local_session(self.manager.session_factory).client('securityhub')
-        try:
-            sechub = self.manager.retry(client.describe_hub)
-        except ClientError as e:
-            # Exception denotes securityhub disabled in this region
-            if e.response['Error']['Code'] == 'InvalidAccessException':
-                sechub = None
-            else:
-                raise
+        sechub = self.manager.retry(client.describe_hub, ignore_err_codes=(
+            'InvalidAccessException',))
         if state == bool(sechub):
             return resources
         return []
