@@ -867,6 +867,15 @@ class NetworkAddrTest(BaseTest):
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
 
+    def test_elastic_ip_get_resources(self):
+        factory = self.replay_flight_data('test_elasticip_get_resources')
+        p = self.load_policy({
+            'name': 'get-addresses',
+            'resource': 'network-addr'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['eipalloc-0da931198e499fdb0'])
+        self.assertJmes('[0].PrivateIpAddress', resources, '192.168.0.99')
+
     def test_elasticip_error(self):
         mock_factory = MagicMock()
         mock_factory.region = 'us-east-1'

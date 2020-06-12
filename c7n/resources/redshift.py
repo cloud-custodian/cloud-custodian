@@ -988,3 +988,18 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                             ', '.join(
                                 [s['SnapshotIdentifier'] for s in futures[f]]),
                             f.exception()))
+
+
+@resources.register('redshift-reserved')
+class ReservedNode(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'redshift'
+        name = id = 'ReservedNodeId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_nodes', 'ReservedNodes', None)
+        filter_name = 'ReservedNodes'
+        filter_type = 'list'
+        arn_type = "reserved-nodes"
+        permissions_enum = ('redshift:DescribeReservedNodes',)

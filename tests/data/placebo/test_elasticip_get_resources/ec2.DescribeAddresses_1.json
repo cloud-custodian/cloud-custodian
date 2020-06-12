@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "PublicIp": "35.169.63.252",
+                "AllocationId": "eipalloc-0da931198e499fdb0",
+                "AssociationId": "eipassoc-05295c02799cae7b0",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-09b519cf4ed8bff24",
+                "NetworkInterfaceOwnerId": "644160558196",
+                "PrivateIpAddress": "192.168.0.99",
+                "Tags": [
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "DontTurnOff",
+                        "Value": "CloudCustodian"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "NATIP"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-sanjay-cluster"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-sanjay-cluster/ad933be0-88bf-11ea-8212-1208f0f76cbf"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.18.0"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "sanjay"
+                    }
+                ],
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

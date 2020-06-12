@@ -5,9 +5,9 @@ atomicwrites==1.4.0; sys_platform == "win32"
 attrs==19.3.0
 aws-xray-sdk==2.5.0
 bleach==3.1.5
-boto3==1.13.18
-botocore==1.16.18
-certifi==2020.4.5.1
+boto3==1.13.24
+botocore==1.16.24
+certifi==2020.4.5.2
 cffi==1.14.0; sys_platform == "linux"
 chardet==3.0.4
 colorama==0.4.3; sys_platform == "win32" or platform_system == "Windows"
@@ -20,7 +20,7 @@ filelock==3.0.12
 flake8==3.8.2
 future==0.18.2
 idna==2.9
-importlib-metadata==1.6.0
+importlib-metadata==1.6.1
 importlib-resources==1.5.0; python_version < "3.7"
 jeepney==0.4.3; sys_platform == "linux"
 jmespath==0.10.0
@@ -62,13 +62,13 @@ six==1.15.0
 tabulate==0.8.7
 termcolor==1.1.0
 toml==0.10.1
-tox==3.15.1
-tqdm==4.46.0
+tox==3.15.2
+tqdm==4.46.1
 twine==3.1.1
 urllib3==1.25.9
 vcrpy==4.0.2
 virtualenv==20.0.21
-wcwidth==0.1.9
+wcwidth==0.2.4
 webencodings==0.5.1
 wrapt==1.12.1
 yarl==1.4.2; python_version >= "3.6"

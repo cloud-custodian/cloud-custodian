@@ -130,6 +130,7 @@ ResourceMap = {
     "aws.redshift": "c7n.resources.redshift.Redshift",
     "aws.redshift-snapshot": "c7n.resources.redshift.RedshiftSnapshot",
     "aws.redshift-subnet-group": "c7n.resources.redshift.RedshiftSubnetGroup",
+    "aws.redshift-reserved": "c7n.resources.redshift.ReservedNode",
     "aws.rest-account": "c7n.resources.apigw.RestAccount",
     "aws.rest-api": "c7n.resources.apigw.RestApi",
     "aws.rest-resource": "c7n.resources.apigw.RestResource",
