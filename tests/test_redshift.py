@@ -742,3 +742,18 @@ class TestRedshiftLogging(BaseTest):
         result.pop('ResponseMetadata')
 
         self.assertFalse(result["LoggingEnabled"])
+
+
+class TestReservedNode(BaseTest):
+    def test_redshift_reserved_node_query(self):
+        session_factory = self.replay_flight_data("test_redshift_reserved_node_query")
+        p = self.load_policy(
+            {
+                "name": "redshift-reserved",
+                "resource": "aws.redshift-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ReservedNodeId"], "1ba8e2e3-bc01-4d65-b35d-a4a3e931547e")
