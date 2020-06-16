@@ -1615,9 +1615,8 @@ class ModifyDb(BaseAction):
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
         for r in resources:
-            param = {}
-            for update in self.data.get('update'):
-                param[update['property']] = update['value']
+            param = {
+                update['property']: update['value'] for update in self.data.get('update')}
             if not param:
                 continue
             param['ApplyImmediately'] = self.data.get('immediate', False)
