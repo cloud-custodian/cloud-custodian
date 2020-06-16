@@ -35,6 +35,26 @@ class KMSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_kms_key_alias_augment(self):
+        session_factory = self.replay_flight_data("test_kms_key_alias")
+        p = self.load_policy(
+            {
+                "name": "kms-key-alias-filter",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AliasName",
+                        "value": "alias/aws/dms",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_key_rotation(self):
         session_factory = self.replay_flight_data("test_key_rotation")
         p = self.load_policy(

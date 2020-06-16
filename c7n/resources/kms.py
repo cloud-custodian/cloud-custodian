@@ -63,12 +63,17 @@ class DescribeKey(DescribeSource):
         return super().get_resources(ids, cache)
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('kms')
+        aliases = KeyAlias(self.manager.ctx, {}).resources()
+        alias_map = {a['TargetKeyId']: a['AliasName'] for a in aliases}
 
+        client = local_session(self.manager.session_factory).client('kms')
         for r in resources:
             try:
-                key_id = r.get('KeyArn', r.get('KeyId'))
-                info = client.describe_key(KeyId=key_id)['KeyMetadata']
+                key_id = r.get('KeyId')
+                key_arn = r.get('KeyArn', key_id)
+                info = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                if key_id in alias_map:
+                    info['AliasName'] = alias_map[key_id]
                 r.update(info)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
