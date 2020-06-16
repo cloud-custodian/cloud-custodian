@@ -1609,6 +1609,7 @@ class ModifyDb(BaseAction):
                 raise PolicyValidationError(
                     "A MonitoringRoleARN value is required \
                     if you specify a MonitoringInterval value other than 0")
+        update_dict['DBInstanceIdentifier'] = 'PolicyValidation'
         return shape_validate(update_dict, self.shape, 'rds')
 
     def process(self, resources):
