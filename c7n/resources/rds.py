@@ -1617,8 +1617,7 @@ class ModifyDb(BaseAction):
         for r in resources:
             param = {}
             for update in self.data.get('update'):
-                if r.get(update['property'], None) != update['value']:
-                    param[update['property']] = update['value']
+                param[update['property']] = update['value']
             if not param:
                 continue
             param['ApplyImmediately'] = self.data.get('immediate', False)
