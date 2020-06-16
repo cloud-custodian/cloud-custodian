@@ -71,6 +71,7 @@ from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import OtherResourcePostFinding
+from .aws import shape_validate
 
 log = logging.getLogger('custodian.rds')
 
@@ -1590,44 +1591,7 @@ class ModifyDb(BaseAction):
             'items': {
                 'type': 'object',
                 'properties': {
-                    'property': {'type': 'string', 'enum': [
-                        'AllocatedStorage',
-                        'DBInstanceClass',
-                        'DBSubnetGroupName',
-                        'DBSecurityGroups',
-                        'VpcSecurityGroupIds',
-                        'MasterUserPassword',
-                        'DBParameterGroupName',
-                        'BackupRetentionPeriod',
-                        'PreferredBackupWindow',
-                        'PreferredMaintenanceWindow',
-                        'MultiAZ',
-                        'EngineVersion',
-                        'AllowMajorVersionUpgrade',
-                        'AutoMinorVersionUpgrade',
-                        'LicenseModel',
-                        'Iops',
-                        'OptionGroupName',
-                        'NewDBInstanceIdentifier',
-                        'StorageType',
-                        'TdeCredentialArn',
-                        'TdeCredentialPassword',
-                        'CACertificateIdentifier',
-                        'Domain',
-                        'CopyTagsToSnapshot',
-                        'MonitoringInterval',
-                        'MonitoringRoleARN',
-                        'DBPortNumber',
-                        'PubliclyAccessible',
-                        'DomainIAMRoleName',
-                        'PromotionTier',
-                        'EnableIAMDatabaseAuthentication',
-                        'EnablePerformanceInsights',
-                        'PerformanceInsightsKMSKeyId',
-                        'PerformanceInsightsRetentionPeriod',
-                        'CloudwatchLogsExportConfiguration',
-                        'UseDefaultProcessorFeatures',
-                        'DeletionProtection']},
+                    'property': {'type': 'string'},
                     'value': {}
                 },
             },
@@ -1635,6 +1599,7 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
+    shape = 'ModifyDBInstanceMessage'    
 
     def validate(self):
         if self.data.get('update'):
@@ -1644,15 +1609,14 @@ class ModifyDb(BaseAction):
                 raise PolicyValidationError(
                     "A MonitoringRoleARN value is required \
                     if you specify a MonitoringInterval value other than 0")
-        return self
+        return shape_validate(update_dict, self.shape, 'rds')
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
-
         for r in resources:
             param = {}
             for update in self.data.get('update'):
-                if r[update['property']] != update['value']:
+                if r.get(update['property'], None) != update['value']:
                     param[update['property']] = update['value']
             if not param:
                 continue
