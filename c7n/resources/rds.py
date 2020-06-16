@@ -1599,7 +1599,7 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
-    shape = 'ModifyDBInstanceMessage'    
+    shape = 'ModifyDBInstanceMessage'
 
     def validate(self):
         if self.data.get('update'):
