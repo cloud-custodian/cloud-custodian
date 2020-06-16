@@ -829,8 +829,6 @@ class RDSTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        if self.recording:
-            time.sleep(60)
         client = session_factory().client("rds")
         db_info = client.describe_db_instances(DBInstanceIdentifier="database-4")
         self.assertTrue(db_info["DBInstances"][0]["PerformanceInsightsEnabled"])
