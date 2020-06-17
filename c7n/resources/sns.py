@@ -490,20 +490,24 @@ class SNSSubscription(QueryResourceManager):
 
 @SNSSubscription.action_registry.register('delete')
 class SubscriptionDeleteAction(BaseAction):
-    """Action to delete a subscription
-    :example:
-    .. code-block:: yaml
-            policies:
-              - name: external-owner-delete
-                resource: sns-subscription
-                filters:
-                  - type: value
-                    key: "Owner"
-                    value: "123456789099"
-                    op: ne
-                actions:
-                  - type: delete
     """
+    Action to delete a subscription
+
+    :example:
+
+    .. code-block:: yaml
+        policies:
+            - name: external-owner-delete
+            resource: sns-subscription
+            filters:
+                - type: value
+                key: "Owner"
+                value: "123456789099"
+                op: ne
+            actions:
+                - type: delete
+    """
+
     schema = type_schema('delete')
     permissions = ("sns:Unsubscribe",)
 
