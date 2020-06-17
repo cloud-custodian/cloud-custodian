@@ -478,7 +478,7 @@ class SNSSubscription(QueryResourceManager):
         enum_spec = ('list_subscriptions', 'Subscriptions', None)
         id = name = dimension = 'SubscriptionArn'
         arn = 'SubscriptionArn'
-        cfn_type = config_type = 'AWS::SNS::Subscription'
+        cfn_type = 'AWS::SNS::Subscription'
         default_report_fields = (
             'SubscriptionArn',
             'Owner',
