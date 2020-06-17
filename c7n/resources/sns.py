@@ -496,16 +496,17 @@ class SubscriptionDeleteAction(BaseAction):
     :example:
 
     .. code-block:: yaml
+
         policies:
-            - name: external-owner-delete
+          - name: external-owner-delete
             resource: sns-subscription
             filters:
-                - type: value
+              - type: value
                 key: "Owner"
                 value: "123456789099"
                 op: ne
             actions:
-                - type: delete
+              - type: delete
     """
 
     schema = type_schema('delete')
