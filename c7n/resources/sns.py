@@ -528,8 +528,3 @@ class SubscriptionDeleteAction(BaseAction):
             )
         except client.exceptions.NotFoundException:
             return
-        except Exception as e:
-            self.log.warning(
-                "Exception trying to delete Subscription: %s error: %s",
-                subscription['SubscriptionArn'], e)
-            return
