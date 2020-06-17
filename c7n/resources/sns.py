@@ -503,7 +503,7 @@ class SubscriptionDeleteAction(BaseAction):
             filters:
               - type: value
                 key: "Owner"
-                value: "123456789099"
+                value: "{account_id}"
                 op: ne
             actions:
               - type: delete
