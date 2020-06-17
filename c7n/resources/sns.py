@@ -521,10 +521,10 @@ class SubscriptionDeleteAction(BaseAction):
 
     def process_subscription(self, client, subscription):
         try:
-            if subscription['SubscriptionArn'] == 'PendingConfirmation':
-                return
-            client.unsubscribe(
-                SubscriptionArn=subscription['SubscriptionArn']
-            )
+            # Can't delete a pending subscription
+            if subscription['SubscriptionArn'] != 'PendingConfirmation':
+                client.unsubscribe(
+                    SubscriptionArn=subscription['SubscriptionArn']
+                )
         except client.exceptions.NotFoundException:
             return
