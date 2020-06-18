@@ -44,8 +44,10 @@ class KMSTest(BaseTest):
                 "filters": [
                     {
                         "type": "value",
-                        "key": "AliasName",
+                        "key": "AliasNames",
+                        "op": "in",
                         "value": "alias/aws/dms",
+                        "value_type": "swap"
                     }
                 ],
             },
