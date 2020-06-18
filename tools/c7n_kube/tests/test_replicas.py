@@ -36,12 +36,11 @@ class TestReplicaAction(KubeTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertTrue(resources)
         client = factory().client(group='Apps', version='V1')
-        resources = client.list_namespace().to_dict()['items']
-        test_namespace = [r for r in resources if r['metadata']['name'] == 'nginx']
-        self.assertEqual(len(test_namespace), 1)
-        replicas = test_namespace[0]['spec']['replicas']
+        resources = client.list_deployment_for_all_namespaces().to_dict()['items']
+        test_item = [r for r in resources if r['metadata']['name'] == 'nginx']
+        self.assertEqual(len(test_item), 1)
+        replicas = test_item[0]['spec']['replicas']
         self.assertEqual(replicas, 0)
 
     def test_replica_action_upscale(self):
@@ -51,7 +50,6 @@ class TestReplicaAction(KubeTest):
                 'name': 'replica-upscale',
                 'resource': 'k8s.deployment',
                 'filters': [
-                    {'spec.replicas': 1},
                     {'metadata.name': 'nginx'}
                 ],
                 'actions': [
@@ -64,10 +62,10 @@ class TestReplicaAction(KubeTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertTrue(resources)
         client = factory().client(group='Apps', version='V1')
-        resources = client.list_namespace().to_dict()['items']
-        test_namespace = [r for r in resources if r['metadata']['name'] == 'nginx']
-        self.assertEqual(len(test_namespace), 1)
-        replicas = test_namespace[0]['spec']['replicas']
+        resources = client.list_deployment_for_all_namespaces().to_dict()['items']
+        test_item = [r for r in resources if r['metadata']['name'] == 'nginx']
+        self.assertEqual(len(test_item), 1)
+        replicas = test_item[0]['spec']['replicas']
+        print(replicas)
         self.assertEqual(replicas, 3)
