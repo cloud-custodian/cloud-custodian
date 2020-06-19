@@ -717,4 +717,3 @@ class TestGlueDataCatalog(BaseTest):
         p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
         after_cat_setting = client.get_resource_policy()
         assert('o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson'))
-
