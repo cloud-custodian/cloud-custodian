@@ -30,5 +30,6 @@ from .iamaccess import (
     PolicyChecker, 
     PolicyStatementFilter
 )
+from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase

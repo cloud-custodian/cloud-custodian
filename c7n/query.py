@@ -500,7 +500,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             if augment:
                 with self.ctx.tracer.subsegment('resource-augment'):
                     resources = self.augment(resources)
-            self._cache.save(cache_key, resources)
+                # Don't pollute cache with unaugmented resources.
+                self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):

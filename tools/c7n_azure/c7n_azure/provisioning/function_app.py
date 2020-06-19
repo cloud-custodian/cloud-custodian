@@ -30,7 +30,11 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
 
     def _provision(self, params):
         site_config = SiteConfig(app_settings=[])
-        functionapp_def = Site(location=params['location'], site_config=site_config)
+        functionapp_def = Site(
+            https_only=True,
+            client_cert_enabled=True,
+            location=params['location'],
+            site_config=site_config)
 
         # common function app settings
         functionapp_def.server_farm_id = params['app_service_plan_id']

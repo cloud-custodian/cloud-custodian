@@ -249,7 +249,7 @@ class PolicyChecker:
 
     def handle_aws_principalorgid(self, s, c):
         if not self.allowed_orgid:
-            return False
+            return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
 

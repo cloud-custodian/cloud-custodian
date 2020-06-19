@@ -1,4 +1,4 @@
-adal==1.2.3
+adal==1.2.4
 antlr4-python3-runtime==4.8; python_version >= "3.0"
 applicationinsights==0.11.9
 apscheduler==3.6.3
@@ -32,7 +32,7 @@ azure-mgmt-datalake-store==0.5.0
 azure-mgmt-dns==3.0.0
 azure-mgmt-eventgrid==2.2.0
 azure-mgmt-eventhub==3.1.0
-azure-mgmt-hdinsight==1.4.0
+azure-mgmt-hdinsight==1.5.0
 azure-mgmt-iothub==0.10.0
 azure-mgmt-keyvault==1.1.0
 azure-mgmt-logic==3.0.0
@@ -56,7 +56,7 @@ azure-storage-common==2.1.0
 azure-storage-file==2.1.0
 azure-storage-queue==2.1.0
 bcrypt==3.1.7
-certifi==2020.4.5.1
+certifi==2020.4.5.2
 cffi==1.14.0
 chardet==3.0.4
 click==7.1.2
@@ -65,12 +65,12 @@ cryptography==2.9.2
 distlib==0.3.0
 humanfriendly==4.18
 idna==2.9
-importlib-metadata==1.6.0
+importlib-metadata==1.6.1
 isodate==0.6.0
 jmespath==0.10.0
 jsonpickle==1.4.1
 knack==0.6.3
-msrest==0.6.14
+msrest==0.6.15
 msrestazure==0.6.3
 netaddr==0.7.19
 oauthlib==3.1.0
