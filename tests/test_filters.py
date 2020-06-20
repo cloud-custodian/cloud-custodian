@@ -1065,5 +1065,192 @@ class TestMissingMetrics(BaseTest):
         )
 
 
+class TestReduceFilter(BaseFilterTest):
+
+    def instances(self):
+        return [
+            dict(InstanceId="A", Group="A", Foo="a", Bar="1"),
+            dict(InstanceId="B", Group="B", Foo="c", Bar="2"),
+            dict(InstanceId="C", Group="C", Foo="d"),
+            dict(InstanceId="D", Group="A", Foo="b"),
+            dict(InstanceId="E", Group="B", Foo="e", Bar="3"),
+            dict(InstanceId="F", Group="C", Foo="f"),
+        ]
+
+    def test_limit_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": "1",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 1)
+        self.assertEqual(rs[0]['InstanceId'], resources[0]['InstanceId'])
+
+    def test_limit_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+
+    def test_limit_no_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 0,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_negative_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": -2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": "50%",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B', 'C'])
+
+    def test_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort_by": "Foo",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['a', 'b', 'c', 'd', 'e', 'f'])
+
+    def test_sort_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort_by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['f', 'e', 'd', 'c', 'b', 'a'])
+
+    def test_group_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group_by": "Group",
+                "sort_by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'C', 'E', 'B', 'D', 'A'])
+        ['D', 'A', 'E', 'B', 'F', 'C']
+
+    def test_group_sort_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group_by": "Group",
+                "sort_by": "Foo",
+                "order": "desc",
+                "limit": "1",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'E', 'D'])
+
+    def test_randomize(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "randomize",
+            }
+        )
+        rs1 = f.process(resources)
+        rs2 = f.process(resources)
+        self.assertEqual(len(rs1), len(resources))
+        self.assertEqual(len(rs2), len(resources))
+        self.assertNotEqual(
+            [r['InstanceId'] for r in rs1],
+            [r['InstanceId'] for r in rs2]
+        )
+
+    def test_reverse(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "reverse",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            [r['InstanceId'] for r in resources[::-1]]
+        )
+
+    def test_group_invalid(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group_by": "Bar",
+                "limit": "1",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['A', 'B', 'C', 'E']
+        )
+
+    def test_sort_invalid(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort_by": "Bar",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['A', 'B', 'E', 'C', 'D', 'F']
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

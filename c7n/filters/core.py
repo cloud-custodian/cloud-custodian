@@ -27,6 +27,7 @@ import os
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 from distutils import version
+from random import sample
 import jmespath
 
 from c7n.element import Element
@@ -123,6 +124,7 @@ class FilterRegistry(PluginRegistry):
         self.register('and', And)
         self.register('not', Not)
         self.register('event', EventFilter)
+        self.register('reduce', ReduceFilter)
 
     def parse(self, data, manager):
         results = []
@@ -816,3 +818,117 @@ class ValueRegex:
         if capture is None:  # regex didn't capture anything
             return None
         return capture.group(1)
+
+
+class ReduceFilter(ValueFilter):
+    """Generic reduce filter to group, sort, and limit your resources.
+
+    This example will select the longest running instance from each ASG,
+    hen randomly choose 10% of those, maxing at 15 total instances.
+
+    resource: ec2
+    filters:
+      - "tag:aws:autoscaling:groupName": present
+      - type: reduce
+        group_by: "tag:aws:autoscaling:groupName"
+        sort_by: "LaunchTime"
+        order: asc
+        limit: 1
+      - type: reduce
+        order: randomize
+        limit: 10%
+      - type: reduce
+        limit: 15
+    """
+    annotate = False
+
+    schema = {
+        'type': 'object',
+        # Doesn't mix well with inherits that extend
+        'additionalProperties': False,
+        'required': ['type'],
+        'properties': {
+            # Doesn't mix well as enum with inherits that extend
+            'type': {'enum': ['reduce']},
+            'group': {'type': 'string'},
+            'sort_by': {'type': 'string'},
+            'order': {'enum': ['asc', 'desc', 'reverse', 'randomize']},
+            'limit': {'oneOf': [{'type': 'string'}, {'type': 'number'}]},
+        }
+    }
+    schema_alias = True
+
+    def __call__(self, r):
+        return self.process(r)
+
+    def validate(self):
+        val = self.data.get('limit')
+        if val and not (isinstance(val, int) or regex_match(val, r'^\d+%?$')):
+            raise PolicyValidationError(
+                "`limit` must be an integer or percentage in reduce filter %s" % self.data)
+        return self
+
+    @property
+    def reorder(self):
+        return 'sort_by' in self.data or 'order' in self.data
+
+    def process(self, resources, event=None):
+        groups = self.group(resources, self.data.get('group_by'))
+
+        # specified either of the sorting options, so sort
+        if self.reorder:
+            groups = self.sort_groups(groups, self.data.get('sort_by'))
+
+        # now apply any limits
+        return list(filter(None, self.limit(groups, self.data.get('limit'))))
+
+    def group(self, resources, expr):
+        groups = {}
+        for i in resources:
+            v = 'default'
+            if expr:
+                try:
+                    v = str(self.get_resource_value(expr, i))
+                except ValueError:
+                    pass
+            if v not in groups:
+                groups[v] = []
+            groups[v].append(i)
+        return groups
+
+    def sort_groups(self, groups, expr):
+        for g in groups:
+            groups[g] = self.order(
+                groups[g],
+                key=lambda r: str(self.get_resource_value(expr, r)),
+            )
+        return groups
+
+    def limit(self, groups, limit):
+        results = []
+
+        for g in self.order(list(groups)):
+            count = 0
+            if limit:
+                if isinstance(limit, str) and limit.endswith('%'):
+                    # percentage
+                    count = int(int(limit.replace('%', '')) / 100 * len(groups[g]))
+                else:
+                    # absolute count
+                    count = int(limit)
+            if count > 0:
+                results.extend(groups[g][0:count])
+            else:
+                results.extend(groups[g])
+        return results
+
+    def order(self, items, key=None):
+        if not self.reorder:
+            return items
+        order = self.data.get('order', 'asc')
+        if order == "randomize":
+            return sample(items, k=len(items))
+        elif order == "reverse":
+            return items[::-1]
+        else:
+            return sorted(items, key=key, reverse=(order == 'desc'))

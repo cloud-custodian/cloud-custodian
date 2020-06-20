@@ -282,8 +282,10 @@ There are several ways to get a list of possible keys for each resource.
 
 Event Filter
 -------------
-  Filter against a CloudWatch event JSON associated to a resource type. The list of possible keys are now from the cloudtrail
-  event and not the describe resource call as is the case in the ValueFilter
+
+Filter against a CloudWatch event JSON associated to a resource type. The
+list of possible keys are now from the cloudtrail event and not the
+describe resource call as is the case in the ValueFilter
 
   .. code-block:: yaml
 
@@ -300,3 +302,83 @@ Event Filter
        actions:
          - type: terminate
            force: true
+
+
+Reduce Filter
+-------------
+
+Filter that lets you group, sort, and limit the number of resources to act
+on.  This can be used simply to limit the number of instances to act on or
+more selectively choose instances for some chaos engineering.  You could
+also use this to simply sort your resources to make sure certain ones are
+acted on first, if that's important to you.
+
+This works using these simple steps:
+
+    1. Group resources
+    2. Sort each group of resources
+    3. Limit the number of resources in each group
+    4. Combine the resulting resources
+
+- Grouping resources:
+
+  This is controlled by the ``group_by`` attribute.  This is a JMESPath
+  expression that determines the group name.  If ``group_by`` is not
+  specified, all resources are part of a single group.
+
+- Sorting resources:
+
+  This is controlled by the use of ``sort_by`` and the ``order`` attributes.
+  ``sort_by`` is a JMESPath expression, who's value is used to sort the
+  resource within each groups.  ``order`` controls how to sort the records
+  within each group.
+
+  - ``asc`` (default) - sort in ascending order based on ``sort_by``
+  - ``desc`` - sort in descending order based on ``sort_by``
+  - ``reverse`` - reverse the order of resources (ignores ``sort_by``)
+  - ``randomize`` - randomize the order of resources (ignores ``sort_by``)
+
+  Note: if no ``sort_by`` or ``order`` attribute is specified, no sorting
+  is done.
+
+- Limiting resources:
+
+  The ``limit`` attribute limits the number of resources in each group.
+  This can either be a count (``15``) or a percentage (``15%``).  Since
+  this is per-group, if you have 20 resources in one group and 5 in
+  another and specify ``10%``, you'll get 2 resources from the first group
+  and 0 resources from the second.
+
+- Combining resource groups:
+
+  Once the groups have been modified, we now need to combine them back to
+  one set of resources.  Since the groups are determined by a JMESPath
+  expression, we sort the groups first based on the ``order`` attribute
+  the same way we sort within a group.  After the groups are sorted, it's
+  a simple concatenation.
+
+**Example:**
+
+This example will select the longest running instance from each ASG, then
+randomly choose 10% of those, making sure to not affect more than 15
+instances, then terminate them.
+
+  .. code-block:: yaml
+
+    - name: chaos-engineering
+      resource: ec2
+      filters:
+        - "State.Name": "running"
+        - "tag:aws:autoscaling:groupName": present
+        - type: reduce
+          group_by: "tag:aws:autoscaling:groupName"
+          sort_by: "LaunchTime"
+          order: asc
+          limit: 1
+        - type: reduce
+          order: randomize
+          limit: 10%
+        - type: reduce
+          limit: 15
+      actions:
+        - terminate
