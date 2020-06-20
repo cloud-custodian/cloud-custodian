@@ -1077,19 +1077,7 @@ class TestReduceFilter(BaseFilterTest):
             dict(InstanceId="F", Group="C", Foo="f"),
         ]
 
-    def test_limit_string(self):
-        resources = self.instances()
-        f = filters.factory(
-            {
-                "type": "reduce",
-                "limit": "1",
-            }
-        )
-        rs = f.process(resources)
-        self.assertEqual(len(rs), 1)
-        self.assertEqual(rs[0]['InstanceId'], resources[0]['InstanceId'])
-
-    def test_limit_number(self):
+    def test_limit(self):
         resources = self.instances()
         f = filters.factory(
             {
@@ -1127,12 +1115,25 @@ class TestReduceFilter(BaseFilterTest):
         f = filters.factory(
             {
                 "type": "reduce",
-                "limit": "50%",
+                "limit-percent": 50,
             }
         )
         rs = f.process(resources)
         self.assertEqual(len(rs), 3)
         self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B', 'C'])
+
+    def test_limit_percent_and_count(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+                "limit-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B'])
 
     def test_sort(self):
         resources = self.instances()
@@ -1182,7 +1183,7 @@ class TestReduceFilter(BaseFilterTest):
                 "group_by": "Group",
                 "sort_by": "Foo",
                 "order": "desc",
-                "limit": "1",
+                "limit": 1,
             }
         )
         rs = f.process(resources)
@@ -1227,7 +1228,7 @@ class TestReduceFilter(BaseFilterTest):
             {
                 "type": "reduce",
                 "group_by": "Bar",
-                "limit": "1",
+                "limit": 1,
             }
         )
         rs = f.process(resources)

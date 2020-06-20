@@ -343,11 +343,12 @@ This works using these simple steps:
 
 - Limiting resources:
 
-  The ``limit`` attribute limits the number of resources in each group.
-  This can either be a count (``15``) or a percentage (``15%``).  Since
-  this is per-group, if you have 20 resources in one group and 5 in
-  another and specify ``10%``, you'll get 2 resources from the first group
-  and 0 resources from the second.
+  - ``limit`` - limit the group size to this absolute count
+  - ``limit-percent`` - reduce the group size to this percentage
+
+  Since these are per-group, if you have 20 resources in one group and 5
+  in another and specify ``limit-percent=10``, you'll get 2 resources from
+  the first group and 0 resources from the second.
 
 - Combining resource groups:
 
@@ -361,7 +362,7 @@ This works using these simple steps:
 
 This example will select the longest running instance from each ASG, then
 randomly choose 10% of those, making sure to not affect more than 15
-instances, then terminate them.
+instances total, then terminate them.
 
   .. code-block:: yaml
 
@@ -377,8 +378,7 @@ instances, then terminate them.
           limit: 1
         - type: reduce
           order: randomize
-          limit: 10%
-        - type: reduce
           limit: 15
+          limit-percent: 10%
       actions:
         - terminate

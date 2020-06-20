@@ -836,8 +836,7 @@ class ReduceFilter(ValueFilter):
         limit: 1
       - type: reduce
         order: randomize
-        limit: 10%
-      - type: reduce
+        limit-percent: 10
         limit: 15
     """
     annotate = False
@@ -850,10 +849,11 @@ class ReduceFilter(ValueFilter):
         'properties': {
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['reduce']},
-            'group': {'type': 'string'},
+            'group_by': {'type': 'string'},
             'sort_by': {'type': 'string'},
             'order': {'enum': ['asc', 'desc', 'reverse', 'randomize']},
-            'limit': {'oneOf': [{'type': 'string'}, {'type': 'number'}]},
+            'limit': {'type': 'number', 'minimum': 0},
+            'limit-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
         }
     }
     schema_alias = True
@@ -861,31 +861,25 @@ class ReduceFilter(ValueFilter):
     def __call__(self, r):
         return self.process(r)
 
-    def validate(self):
-        val = self.data.get('limit')
-        if val and not (isinstance(val, int) or regex_match(val, r'^\d+%?$')):
-            raise PolicyValidationError(
-                "`limit` must be an integer or percentage in reduce filter %s" % self.data)
-        return self
-
     @property
     def reorder(self):
         return 'sort_by' in self.data or 'order' in self.data
 
     def process(self, resources, event=None):
-        groups = self.group(resources, self.data.get('group_by'))
+        groups = self.group(resources)
 
         # specified either of the sorting options, so sort
         if self.reorder:
-            groups = self.sort_groups(groups, self.data.get('sort_by'))
+            groups = self.sort_groups(groups)
 
-        # now apply any limits
-        return list(filter(None, self.limit(groups, self.data.get('limit'))))
+        # now apply any limits to the groups and concatenate
+        return list(filter(None, self.limit(groups)))
 
-    def group(self, resources, expr):
+    def group(self, resources):
+        expr = self.data.get('group_by')
         groups = {}
         for i in resources:
-            v = 'default'
+            v = str(None)
             if expr:
                 try:
                     v = str(self.get_resource_value(expr, i))
@@ -896,7 +890,8 @@ class ReduceFilter(ValueFilter):
             groups[v].append(i)
         return groups
 
-    def sort_groups(self, groups, expr):
+    def sort_groups(self, groups):
+        expr = self.data.get('sort_by')
         for g in groups:
             groups[g] = self.order(
                 groups[g],
@@ -904,22 +899,18 @@ class ReduceFilter(ValueFilter):
             )
         return groups
 
-    def limit(self, groups, limit):
+    def limit(self, groups):
         results = []
 
+        max = self.data.get('limit', 0)
+        pct = self.data.get('limit-percent', 0)
         for g in self.order(list(groups)):
-            count = 0
-            if limit:
-                if isinstance(limit, str) and limit.endswith('%'):
-                    # percentage
-                    count = int(int(limit.replace('%', '')) / 100 * len(groups[g]))
-                else:
-                    # absolute count
-                    count = int(limit)
-            if count > 0:
-                results.extend(groups[g][0:count])
-            else:
-                results.extend(groups[g])
+            count = len(groups[g])
+            if pct > 0:
+                count = int(pct / 100 * len(groups[g]))
+            if max > 0 and max < count:
+                count = max
+            results.extend(groups[g][0:count])
         return results
 
     def order(self, items, key=None):
