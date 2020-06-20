@@ -22,7 +22,9 @@ from .core import (
     Not,
     ValueFilter,
     AgeFilter,
-    EventFilter,)
+    EventFilter,
+    ReduceFilter,
+)
 from .config import ConfigCompliance
 from .health import HealthEventFilter
 from .iamaccess import CrossAccountAccessFilter, PolicyChecker
