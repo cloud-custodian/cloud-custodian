@@ -826,7 +826,6 @@ class ReduceFilter(ValueFilter):
     This example will select the longest running instance from each ASG,
     hen randomly choose 10% of those, maxing at 15 total instances.
 
-    resource: ec2
     filters:
       - "tag:aws:autoscaling:groupName": present
       - type: reduce
@@ -836,8 +835,8 @@ class ReduceFilter(ValueFilter):
         limit: 1
       - type: reduce
         order: randomize
-        limit-percent: 10
         limit: 15
+        limit-percent: 10
     """
     annotate = False
 
