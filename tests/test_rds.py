@@ -794,6 +794,50 @@ class RDSTest(BaseTest):
         db_info = client.describe_db_instances(DBInstanceIdentifier="database-2")
         self.assertIn('error', db_info["DBInstances"][0]["EnabledCloudwatchLogsExports"])
 
+    def test_rds_modify_db_validation_monitoring_error(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                'name': 'enable-monitoring',
+                'resource': 'rds',
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'MonitoringInterval',
+                                "value": 60
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ]})
+        self.assertIn((
+            'A MonitoringRoleARN value is required'),
+            str(err.exception))
+
+    def test_rds_modify_db_validation_cloudwatch_error(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                'name': 'enable-cloudwatch',
+                'resource': 'rds',
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'CloudwatchLogsExportConfiguration',
+                                "value": [
+                                    "error"
+                                ]
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ]})
+        self.assertIn((
+            'EnableLogTypes or DisableLogTypes input list is required'),
+            str(err.exception))
+
     def test_rds_modify_db_enable_perfinsights(self):
         session_factory = self.replay_flight_data("test_rds_modify_db_enable_perfinsights")
         p = self.load_policy(

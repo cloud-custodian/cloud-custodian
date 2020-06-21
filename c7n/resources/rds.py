@@ -1663,8 +1663,8 @@ class ModifyDb(BaseAction):
                     k not in update_dict.get('CloudwatchLogsExportConfiguration')
                     for k in ('EnableLogTypes', 'DisableLogTypes'))):
                 raise PolicyValidationError(
-                    "A EnableLogTypes or DisableLogTypes input list\
-                    is required for setting CloudwatchLogsExportConfiguration")
+                    "A EnableLogTypes or DisableLogTypes input list is required\
+                    for setting CloudwatchLogsExportConfiguration")
         return self
 
     def process(self, resources):
