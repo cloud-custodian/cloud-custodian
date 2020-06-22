@@ -382,7 +382,7 @@ instances total, then terminate them.
         - type: reduce
           order: randomize
           limit: 15
-          limit-percent: 10%
+          limit-percent: 10
       actions:
         - terminate
 
