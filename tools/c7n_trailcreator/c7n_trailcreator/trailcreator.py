@@ -763,7 +763,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
-    load_resources()
+    load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(
