@@ -3079,19 +3079,9 @@ class Lifecycle(BucketActionBase):
 
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
         config = (bucket.get('Lifecycle') or {}).get('Rules', [])
-        for rule in self.data['rules']:
-            for index, existing_rule in enumerate(config):
-                if rule['ID'] == existing_rule['ID']:
-                    if rule['Status'] == 'absent':
-                        config[index] = None
-                    else:
-                        config[index] = rule
-                    break
-            else:
-                if rule['Status'] != 'absent':
-                    config.append(rule)
-
-        config = list(filter(None, config))
+        existing = {rule['ID']: rule for rule in config}
+        existing.update({rule['ID']: rule for rule in self.data["rules"]})  # Update/Add
+        config = [rule for rule in existing.values() if rule['Status'] != 'absent']  # Delete
 
         try:
             s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
