@@ -307,11 +307,12 @@ describe resource call as is the case in the ValueFilter
 Reduce Filter
 -------------
 
-Filter that lets you group, sort, and limit the number of resources to act
-on.  This can be used simply to limit the number of instances to act on or
-more selectively choose instances for some chaos engineering.  You could
-also use this to simply sort your resources to make sure certain ones are
-acted on first, if that's important to you.
+The ``reduce`` filter lets you group, sort, and limit the number of
+resources to act on.  Maybe you want to delete AMIs, but want to do it in
+small batches where you act on the oldest AMIs first.  Or maybe you want
+to do some chaos engineering and randomly select ec2 instances part of
+ASGs, but want to make sure no more than one instance per ASG is affected.
+This filter lets you do that.
 
 This works using these simple steps:
 
@@ -324,14 +325,16 @@ This works using these simple steps:
 
   This is controlled by the ``group_by`` attribute.  This is a JMESPath
   expression that determines the group name.  If ``group_by`` is not
-  specified, all resources are part of a single group.
+  specified, it's the same as if the expression had a ``none`` result.
+  They'll all get put into a ``None`` group.
 
 - Sorting resources:
 
-  This is controlled by the use of ``sort_by`` and the ``order`` attributes.
-  ``sort_by`` is a JMESPath expression, who's value is used to sort the
-  resource within each groups.  ``order`` controls how to sort the records
-  within each group.
+  This is controlled by the use of ``sort_by`` and the ``order``
+  attributes.  ``sort_by`` is a JMESPath expression, who's value is used
+  to sort the resource within each groups.  The result will be converted
+  to a string for the sort comparison.  ``order`` controls how to sort the
+  records within each group.
 
   - ``asc`` (default) - sort in ascending order based on ``sort_by``
   - ``desc`` - sort in descending order based on ``sort_by``
@@ -356,9 +359,9 @@ This works using these simple steps:
   one set of resources.  Since the groups are determined by a JMESPath
   expression, we sort the groups first based on the ``order`` attribute
   the same way we sort within a group.  After the groups are sorted, it's
-  a simple concatenation.
+  a simple concatenation of resources.
 
-**Example:**
+**Examples:**
 
 This example will select the longest running instance from each ASG, then
 randomly choose 10% of those, making sure to not affect more than 15
@@ -382,3 +385,21 @@ instances total, then terminate them.
           limit-percent: 10%
       actions:
         - terminate
+
+This example will delete old AMIs, but make sure to only do the top 10
+based on age.
+
+  .. code-block:: yaml
+
+    - name: limited-ami-expiration
+      resource: ami
+      filters:
+        - type: image-age
+          days: 180
+          op: ge
+        - type: reduce
+          sort_by: "CreationDate"
+          order: asc
+          limit: 10
+      actions:
+        - deregister
