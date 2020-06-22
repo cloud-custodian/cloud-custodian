@@ -294,16 +294,15 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     log.info("Athena query:%s", query_id)
 
     while True:
-        qexec = athena.get_query_execution(
-            QueryExecutionId=query_id).get('QueryExecution')
+        qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
             stats['QueryExecutionTime'] = qexec['Statistics'].get(
-                    'EngineExecutionTimeInMillis',
-                    qexec['Statistics'].get(
-                        'TotalExecutionTimeInMillis',
-                        1000
-                        )
-                    )/1000.0
+                'EngineExecutionTimeInMillis',
+                qexec['Statistics'].get(
+                    'TotalExecutionTimeInMillis',
+                    1000
+                )
+            ) / 1000.0
             stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
