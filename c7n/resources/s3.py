@@ -3091,13 +3091,11 @@ class Lifecycle(BucketActionBase):
                 if rule['Status'] != 'absent':
                     config.append(rule)
 
-        # The extra `list` conversion is required for python3
         config = list(filter(None, config))
 
         try:
-            if not config:
-                s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
-            else:
+            s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
+            if config:
                 s3.put_bucket_lifecycle_configuration(
                     Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
         except ClientError as e:
