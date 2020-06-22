@@ -27,9 +27,11 @@ import zipfile
 
 import mock
 
+from c7n.config import Config
 from c7n.mu import (
     custodian_archive,
     generate_requirements,
+    get_exec_options,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -45,6 +47,18 @@ from .data import helloworld
 
 
 ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+def test_get_exec_options():
+
+    assert get_exec_options(Config().empty()) == {'tracer': 'default'}
+    assert get_exec_options(Config().empty(output_dir='/tmp/xyz')) == {
+        'tracer': 'default'}
+    assert get_exec_options(
+        Config().empty(log_group='gcp', output_dir='gs://mybucket/myprefix')) == {
+            'tracer': 'default',
+            'output_dir': 'gs://mybucket/myprefix',
+            'log_group': 'gcp'}
 
 
 def test_generate_requirements():

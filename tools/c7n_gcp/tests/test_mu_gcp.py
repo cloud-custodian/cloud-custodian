@@ -105,6 +105,23 @@ class FunctionTest(BaseTest):
         self.assertRaises(NotImplementedError, exec_mode.provision)
         self.assertEqual(None, exec_mode.validate())
 
+    def test_policy_context_deps(self):
+        p = self.load_policy({
+            'name': 'check',
+            'resource': 'gcp.instance',
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours'}},
+            output_dir='gs://somebucket/some-prefix',
+            log_group='gcp',
+            config={'metrics': 'gcp'})
+        pf = mu.PolicyFunction(p, archive=True)
+        self.assertEqual(
+            pf.get_output_deps(),
+            ['google-cloud-monitoring',
+             'google-cloud-storage',
+             'google-cloud-logging'])
+
     def test_periodic_validate_tz(self):
         self.assertRaises(
             PolicyValidationError,
