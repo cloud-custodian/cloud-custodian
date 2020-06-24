@@ -71,6 +71,7 @@ class Notify(BaseNotify):
         }
     }
     schema_alias = True
+    permissions = ('pubsub.topics.publish',)
 
     def process(self, resources, event=None):
         session = utils.local_session(self.manager.session_factory)

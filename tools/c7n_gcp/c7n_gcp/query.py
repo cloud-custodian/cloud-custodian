@@ -86,7 +86,17 @@ class DescribeSource:
         return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
-        return ()
+        m = self.manager.resource_type
+        if m.permissions:
+            return m.permissions
+        method = m.enum_spec[0]
+        if method == 'aggregatedList':
+            method = 'list'
+        component = m.component
+        if '.' in component:
+            component = component.split('.')[-1]
+        return ("%s.%s.%s" % (
+            m.perm_service or m.service, component, method),)
 
     def augment(self, resources):
         return resources
@@ -156,7 +166,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):
-        return ()
+        return self.source.get_permissions()
 
     def get_source(self, source_type):
         return sources.get(source_type)(self)
@@ -320,6 +330,8 @@ class TypeInfo(metaclass=TypeMeta):
     get = None
     # for get methods that require the full event payload
     get_requires_event = False
+    perm_service = None
+    permissions = ()
 
     labels = False
     labels_op = 'setLabels'

@@ -35,6 +35,7 @@ class DataSet(QueryResourceManager):
             id, name, "description",
             "creationTime", "lastModifiedTime"]
         asset_type = "bigquery.googleapis.com/Dataset"
+        permissions = ('bigquery.datasets.get',)
 
         @staticmethod
         def get(client, event):
@@ -85,21 +86,6 @@ class BigQueryJob(QueryResourceManager):
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })
-
-
-@resources.register('bq-project')
-class BigQueryProject(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/projects
-    """
-    class resource_type(TypeInfo):
-        service = 'bigquery'
-        version = 'v2'
-        component = 'projects'
-        enum_spec = ('list', 'projects[]', None)
-        scope = 'global'
-        id = 'id'
-        name = "friendlyName"
-        default_report_fields = [id, name]
 
 
 @resources.register('bq-table')
