@@ -542,10 +542,8 @@ class NetworkLocationTest(BaseTest):
                 "name": "compare",
                 "resource": "aws.app-elb",
                 "filters": [
-                    {"type": "network-location", 
-                    "key": "tag:NetworkLocation", 
-                    "compare": ["subnet","security-group"]
-                    }
+                    {"type": "network-location", "key": "tag:NetworkLocation",
+                     "compare": ["subnet", "security-group"]}
                 ],
             },
             session_factory=self.factory,
@@ -555,7 +553,10 @@ class NetworkLocationTest(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["c7n:NetworkLocation"],
-            [{'reason': 'LocationMismatch', 'security-groups': {}, 'subnets': {'subnet-914763e7': 'Public', 'subnet-efbcccb7': 'Public'}}],
+            [
+                {'reason': 'LocationMismatch', 'security-groups': {},
+                 'subnets': {'subnet-914763e7': 'Public', 'subnet-efbcccb7': 'Public'}}
+            ],
         )
 
     @functional

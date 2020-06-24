@@ -220,7 +220,6 @@ class NetworkLocation(Filter):
                     'reason': 'SubnetLocationCardinality',
                     'subnets': subnet_values})
 
-
         if 'security-group' in self.compare:
             sg_values = {
                 rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
@@ -236,7 +235,6 @@ class NetworkLocation(Filter):
                 evaluation.append({
                     'reason': 'SecurityGroupLocationCardinality',
                     'security-groups': sg_values})
-
 
         if ('subnet' in self.compare and
                 'security-group' in self.compare and
