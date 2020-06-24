@@ -45,7 +45,7 @@ class ConfigCompliance(Filter):
                - custodian-ec2-tags-required
 
     Also note, custodian has direct support for deploying policies as config
-    rules see https://bit.ly/2mblVpq
+    rules see https://cloudcustodian.io/docs/policy/lambda.html#config-rules
     """
     permissions = ('config:DescribeComplianceByConfigRule',)
     schema = type_schema(
