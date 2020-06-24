@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import base64
 from collections import namedtuple
 import json
 import logging
 import hashlib
 
 from c7n_gcp.client import errors
-from c7n.mu import custodian_archive as base_archive
+from c7n.mu import generate_requirements, get_exec_options, custodian_archive as base_archive
 from c7n.utils import local_session
 
 from googleapiclient.errors import HttpError
@@ -27,7 +26,14 @@ from googleapiclient.errors import HttpError
 log = logging.getLogger('c7n_gcp.mu')
 
 
-def custodian_archive(packages=None):
+OUTPUT_PACKAGE_MAP = {
+    'metrics.gcp': 'google-cloud-monitoring',
+    'log.gcp': 'google-cloud-logging',
+    'blob.gs': 'google-cloud-storage',
+}
+
+
+def custodian_archive(packages=None, deps=()):
     if not packages:
         packages = []
     packages.append('c7n_gcp')
@@ -37,18 +43,20 @@ def custodian_archive(packages=None):
     # but for pure python packages, if we have a local install and its
     # relatively small, it might be faster to just upload.
     #
+    # note we pin requirements to the same versions installed locally.
     requirements = set()
-    requirements.add('jmespath')
-    requirements.add('retrying')
-    requirements.add('python-dateutil')
-    requirements.add('ratelimiter>=1.2.0.post0')
-    requirements.add('google-auth>=1.4.1')
-    requirements.add('google-auth-httplib2>=0.0.3')
-    requirements.add('google-api-python-client>=1.7.3')
-
+    requirements.update((
+        'jmespath',
+        'retrying',
+        'python-dateutil',
+        'ratelimiter',
+        'google-auth',
+        'google-auth-httplib2',
+        'google-api-python-client'))
+    requirements.update(deps)
     archive.add_contents(
         'requirements.txt',
-        '\n'.join(sorted(requirements)))
+        generate_requirements(requirements, include_self=True))
     return archive
 
 
@@ -316,8 +324,26 @@ class PolicyFunction(CloudFunction):
     def __init__(self, policy, archive=None, events=()):
         self.policy = policy
         self.func_data = self.policy.data['mode']
-        self.archive = archive or custodian_archive()
+        self.archive = archive or custodian_archive(
+            deps=self.get_output_deps())
         self._events = events
+
+    def get_output_deps(self):
+        deps = []
+        self.policy.ctx.initialize()
+
+        outputs = (
+            ('metrics', self.policy.ctx.metrics),
+            ('blob', self.policy.ctx.output),
+            ('log', self.policy.ctx.logs)
+        )
+        for (output_type, instance) in outputs:
+            if not instance:
+                continue
+            if f"{output_type}.{instance.type}" not in OUTPUT_PACKAGE_MAP:
+                continue
+            deps.append(OUTPUT_PACKAGE_MAP[f"{output_type}.{instance.type}"])
+        return deps
 
     @property
     def name(self):
@@ -330,8 +356,10 @@ class PolicyFunction(CloudFunction):
     def get_archive(self):
         self.archive.add_contents('main.py', PolicyHandlerTemplate)
         self.archive.add_contents(
-            'config.json', json.dumps(
-                {'policies': [self.policy.data]}, indent=2))
+            'config.json', json.dumps({
+                'execution-options': get_exec_options(self.policy.options),
+                'policies': [self.policy.data]},
+                indent=2))
         self.archive.close()
         return self.archive
 

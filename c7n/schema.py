@@ -154,13 +154,13 @@ def generate(resource_types=()):
         'string_dict': {
             "type": "object",
             "patternProperties": {
-                "*": {"type": "string"},
+                "": {"type": "string"},
             },
         },
         'basic_dict': {
             "type": "object",
             "patternProperties": {
-                "*": {
+                "": {
                     'oneOf': [
                         {"type": "string"},
                         {"type": "boolean"},
