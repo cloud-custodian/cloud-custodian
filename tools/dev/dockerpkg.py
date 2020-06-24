@@ -349,7 +349,7 @@ def retry(retry_count, exceptions, func, *args, **kw):
     attempts = 1
     while attempts <= retry_count:
         try:
-            func(*args, **kw)
+            return func(*args, **kw)
         except exceptions:
             log.warn('retrying on %s' % func)
             attempts += 1
@@ -484,7 +484,7 @@ def push_image(client, image_id, image_refs):
     if "HUB_TOKEN" in os.environ and "HUB_USER" in os.environ:
         log.info("docker hub login %s" % os.environ["HUB_USER"])
         result = client.login(os.environ["HUB_USER"], os.environ["HUB_TOKEN"])
-        if result["Status"] != "Login Succeeded":
+        if result.get("Status", "") != "Login Succeeded":
             raise RuntimeError("Docker Login failed %s" % (result,))
 
     for (repo, tag) in image_refs:
