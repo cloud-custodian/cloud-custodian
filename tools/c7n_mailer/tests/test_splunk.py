@@ -103,7 +103,6 @@ class TestGetSplunkPayloads(DeliveryTester):
         assert mock_gse.mock_calls == [call(msg)]
         assert mock_sifm.mock_calls == [call(msg)]
 
-
     @patch(
         '%s.get_splunk_events' % pb,
         return_value=[
