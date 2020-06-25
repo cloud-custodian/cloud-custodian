@@ -446,7 +446,7 @@ class ServerCertificate(QueryResourceManager):
 class AccessAnalyzer(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'access-analyzer'
+        service = 'accessanalyzer'
         arn_type = 'access-analyzer'
         enum_spec = ('list_analyzers', 'analyzers', None)
         id = name = 'name'
