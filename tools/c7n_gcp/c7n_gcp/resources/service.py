@@ -62,6 +62,7 @@ class Disable(MethodAction):
 
     schema = type_schema('disable')
     method_spec = {'op': 'disable'}
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         session = local_session(self.manager.session_factory)

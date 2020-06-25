@@ -709,3 +709,33 @@ class TestSNS(BaseTest):
         shape_validate(
             rfinding['Details']['AwsSnsTopic'],
             'AwsSnsTopicDetails', 'securityhub')
+
+
+class TestSubscription(BaseTest):
+
+    def test_subscription_delete(self):
+        factory = self.replay_flight_data("test_subscription_delete")
+
+        p = self.load_policy(
+            {
+                "name": "external-owner-delete",
+                "resource": "sns-subscription",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Owner",
+                        "value": "123456789099",
+                        "op": "ne",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["Owner"], "123456789099")
+        client = factory().client("sns")
+        subs = client.list_subscriptions()
+        for s in subs.get("Subscriptions", []):
+            self.assertTrue("123456789099" == s.get("Owner"))

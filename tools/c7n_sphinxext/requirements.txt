@@ -1,6 +1,6 @@
 alabaster==0.7.12
 babel==2.8.0
-certifi==2020.4.5.2
+certifi==2020.6.20
 chardet==3.0.4
 colorama==0.4.3; sys_platform == "win32"
 commonmark==0.9.1
@@ -15,7 +15,7 @@ pygments==2.6.1
 pyparsing==2.4.7
 pytz==2020.1
 recommonmark==0.6.0
-requests==2.23.0
+requests==2.24.0
 six==1.15.0
 snowballstemmer==2.0.0
 sphinx==3.0.4

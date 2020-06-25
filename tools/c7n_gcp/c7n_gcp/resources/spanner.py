@@ -32,7 +32,6 @@ class SpannerInstance(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "displayName", "nodeCount", "state", "config"]
-
         labels = True
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
@@ -106,6 +105,7 @@ class SpannerInstancePatch(MethodAction):
     schema = type_schema('set', required=['nodeCount'],
                          **{'nodeCount': {'type': 'number'}})
     method_spec = {'op': 'patch'}
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         result = {'name': resource['name'],
@@ -187,6 +187,7 @@ class SpannerDatabaseInstanceDropDatabase(MethodAction):
     """
     schema = type_schema('dropDatabase', **{'type': {'enum': ['delete']}})
     method_spec = {'op': 'dropDatabase'}
+    method_perm = 'drop'
 
     def get_resource_params(self, model, resource):
         return {'database': resource['name']}

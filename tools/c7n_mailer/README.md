@@ -358,6 +358,7 @@ The following configuration items are *all* optional. The ones marked "Required 
 |                      | `splunk_actions_list`   | boolean          | If true, add an `actions` list to the top-level message sent to Splunk, containing the names of all non-notify actions taken       |
 |                      | `splunk_max_attempts`   | integer          | Maximum number of times to try POSTing data to Splunk HEC (default 4)                                                              |
 |                      | `splunk_hec_max_length` | integer          | Maximum data length that Splunk HEC accepts; an error will be logged for any message sent over this length                         |
+|                      | `splunk_hec_sourcetype` | string       | Configure sourcetype of the payload sent to Splunk HEC. (default is '_json')                         |
 
 #### SDK Config
 
