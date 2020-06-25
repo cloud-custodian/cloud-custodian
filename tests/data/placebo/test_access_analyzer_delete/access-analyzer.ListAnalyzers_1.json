@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "analyzers": [
+            {
+                "arn": "arn:aws:access-analyzer:us-west-2:0123456789012:analyzer/test-analyzer",
+                "name": "test-analyzer",
+                "tags": {
+                    "Env": "Dev",
+                    "maid_status": "Resource does not meet policy: delete@2020/06/27"
+                }
+            }
+        ]
+    }
+}

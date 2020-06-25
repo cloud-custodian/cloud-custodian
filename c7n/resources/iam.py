@@ -442,6 +442,110 @@ class ServerCertificate(QueryResourceManager):
         global_resource = True
 
 
+@resources.register('access-analyzer')
+class AccessAnalyzer(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'accessanalyzer'
+        arn_type = 'access-analyzer'
+        enum_spec = ('list_analyzers', 'analyzers', None)
+        id = name = 'name'
+        arn = 'arn'
+        date = 'createdAt'
+        cfn_type = config_type = "AWS::AccessAnalyzer::Analyzer"
+
+
+@AccessAnalyzer.filter_registry.register('marked-for-op')
+class MarkedForOp(TagActionFilter):
+
+    permissions = ('access-analyzer:ListAnalyzers',)
+
+
+@AccessAnalyzer.action_registry.register('delete')
+class AccessAnalyzerDelete(BaseAction):
+    """Delete an access analyzer
+    """
+
+    schema = type_schema('delete')
+    permissions = ("access-analyzer:DeleteAnalyzer",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('accessanalyzer')
+        for r in resources:
+            self.manager.retry(
+                client.delete_analyzer, analyzerName=r['name'],
+                ignore_err_codes=('NotFoundException',))
+
+
+@AccessAnalyzer.action_registry.register('tag')
+class TagAccessAnalyzer(Tag):
+    """Action to create tag(s) on an iam access analyzer
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: tag-access-analyzer
+                resource: access-analyzer
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('access-analyzer:TagResource',)
+
+    def process_resource_set(self, client, access_analyzers, new_tags):
+        for r in access_analyzers:
+            self.manager.retry(
+                client.tag_resource, resourceArn=r['arn'],
+                tags={t['Key']: t['Value'] for t in new_tags},
+                ignore_err_codes=('NotFoundException',))
+
+
+@AccessAnalyzer.action_registry.register('remove-tag')
+class UntagAccessAnalyzer(RemoveTag):
+    """Action to remove tag(s) on iam access-analyzer
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: access-analyzer-remove-tag
+                resource: access-analyzer
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+
+    permissions = ('access-analyzer:UntagResource',)
+
+    def process_resource_set(self, client, access_analyzers, tags):
+        for r in access_analyzers:
+            self.manager.retry(
+                client.untag_resource, resourceArn=r['arn'], tagKeys=tags,
+                ignore_err_codes=('NotFoundException',))
+
+
+@AccessAnalyzer.action_registry.register('mark-for-op')
+class MarkForOpAccessAnalyzer(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: access-analyzer-delete-account-type
+                resource: access-analyzer
+                filters:
+                  - "tag:custodian_cleanup": absent
+                actions:
+                  - type: mark-for-op
+                    tag: custodian_cleanup
+                    msg: "Account level access analyzers not permitted"
+                    op: delete
+                    days: 7
+    """
+
+
 @User.filter_registry.register('usage')
 @Role.filter_registry.register('usage')
 @Group.filter_registry.register('usage')

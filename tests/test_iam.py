@@ -1857,3 +1857,56 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestAccessAnalyzer(BaseTest):
+
+    def test_delete_access_analyzer(self):
+        factory = self.replay_flight_data("test_access_analyzer_delete")
+        p = self.load_policy(
+            {
+                "name": "access-analyzer-delete",
+                "resource": "access-analyzer",
+                'filters': [{'name': 'test-analyzer'}],
+                "actions": ["delete"],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("accessanalyzer", region_name='us-west-2')
+        analyzers = client.list_analyzers()["analyzers"]
+        self.assertFalse(analyzers)
+
+    def test_access_analyzer_tag_untag_markforop(self):
+        factory = self.replay_flight_data("test_access_analyzer_tag_untag_markforop")
+        p = self.load_policy(
+            {
+                "name": "mark-unused-access-analyzer-delete",
+                "resource": "access-analyzer",
+                'filters': [{'name': 'test-analyzer'}],
+                "actions": [
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['OutdatedTag']},
+                    {'type': 'mark-for-op',
+                     'op': 'delete',
+                     'days': 2}]},
+            config={'region': 'us-west-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = factory().client("accessanalyzer", region_name='us-west-2')
+        if self.recording:
+            time.sleep(1)
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
+        self.assertEqual(
+            resources[0]['tags'],
+            {'OutdatedTag': 'present'})
+        self.assertEqual(
+            tags,
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2020/06/27'})

@@ -1,4 +1,5 @@
 ResourceMap = {
+    "aws.access-analyzer": "c7n.resources.iam.AccessAnalyzer",
     "aws.account": "c7n.resources.account.Account",
     "aws.acm-certificate": "c7n.resources.acm.Certificate",
     "aws.alarm": "c7n.resources.cw.Alarm",

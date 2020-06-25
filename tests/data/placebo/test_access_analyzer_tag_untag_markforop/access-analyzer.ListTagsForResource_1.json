@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": {
+            "Env": "Dev",
+            "maid_status": "Resource does not meet policy: delete@2020/06/27"
+        }
+    }
+}
