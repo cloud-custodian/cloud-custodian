@@ -889,7 +889,7 @@ class ReduceFilter(ValueFilter):
                 ]
             },
             'order': {'enum': ['asc', 'desc', 'reverse', 'randomize']},
-            'null_order': {'enum': ['first', 'last']},
+            'null-order': {'enum': ['first', 'last']},
             'limit': {'type': 'number', 'minimum': 0},
             'limit-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
         },
@@ -983,7 +983,7 @@ class ReduceFilter(ValueFilter):
 
     def null_sort_value(self, config):
         vtype = config.get('value_type', 'string')
-        placement = self.data.get('null_order', 'last')
+        placement = self.data.get('null-order', 'last')
 
         if (placement == 'last' and self.order == 'desc') or (
             placement != 'last' and self.order != 'desc'

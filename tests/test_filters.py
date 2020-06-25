@@ -1354,7 +1354,7 @@ class TestReduceFilter(BaseFilterTest):
                     "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
                 },
                 "order": "desc",
-                "null_order": "first",
+                "null-order": "first",
                 "limit": 1
             }
         )

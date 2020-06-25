@@ -314,7 +314,7 @@ to do some chaos engineering and randomly select ec2 instances part of
 ASGs, but want to make sure no more than one instance per ASG is affected.
 This filter lets you do that.
 
-This works using these this process:
+This works using this process:
 
     1. Group resources
     2. Sort each group of resources
@@ -335,7 +335,9 @@ Sorting resources
 Sorting of individual resources within a group is controlled by a
 combination of the ``sort-by`` and ``order`` attributes.  ``sort-by``
 determines which value to use to sort and ``order`` controls how they are
-sorted.
+sorted.  For any resources with a null value, those are by default sorted
+last.  You can optionally sort those first with the ``null-order``
+attribute.
 
 Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
 done.
@@ -388,7 +390,7 @@ Attributes
   - ``reverse`` - reverse the order of resources (ignores ``key``)
   - ``randomize`` - randomize the order of resources (ignores ``key``)
 
-- ``null_order`` - when sorting, where to put resources that have a null value
+- ``null-order`` - when sorting, where to put resources that have a null value
 
   - ``last`` (default) - at the end of the list
   - ``first`` - at the start of the list
