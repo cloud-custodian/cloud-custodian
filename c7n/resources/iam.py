@@ -452,6 +452,7 @@ class AccessAnalyzer(QueryResourceManager):
         id = name = 'name'
         arn = 'arn'
         date = 'createdAt'
+        permission_prefix = 'access-analyzer'
         cfn_type = "AWS::AccessAnalyzer::Analyzer"
 
 
