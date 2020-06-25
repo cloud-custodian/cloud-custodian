@@ -446,13 +446,13 @@ class ServerCertificate(QueryResourceManager):
 class AccessAnalyzer(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'accessanalyzer'
+        service = 'access-analyzer'
         arn_type = 'access-analyzer'
         enum_spec = ('list_analyzers', 'analyzers', None)
         id = name = 'name'
         arn = 'arn'
         date = 'createdAt'
-        cfn_type = config_type = "AWS::AccessAnalyzer::Analyzer"
+        cfn_type = "AWS::AccessAnalyzer::Analyzer"
 
 
 @AccessAnalyzer.filter_registry.register('marked-for-op')
