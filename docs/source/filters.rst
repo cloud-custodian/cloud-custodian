@@ -314,7 +314,7 @@ to do some chaos engineering and randomly select ec2 instances part of
 ASGs, but want to make sure no more than one instance per ASG is affected.
 This filter lets you do that.
 
-This works using these simple steps:
+This works using these this process:
 
     1. Group resources
     2. Sort each group of resources
@@ -324,43 +324,43 @@ This works using these simple steps:
 Grouping resources
 ~~~~~~~~~~~~~~~~~~
 
-  Resources are grouped based on the value extracted as defined by the
-  ``group-by`` attribute.  All resources not able to extract a value are
-  placed in a group by themselves.  This is also the case when
-  ``group-by`` is not specified.
+Resources are grouped based on the value extracted as defined by the
+``group-by`` attribute.  All resources not able to extract a value are
+placed in a group by themselves.  This is also the case when ``group-by``
+is not specified.
 
 Sorting resources
 ~~~~~~~~~~~~~~~~~
 
-  Sorting of individual resources within a group is controlled by a
-  combination of the ``sort-by`` and ``order`` attributes.  ``sort-by``
-  determines which value to use to sort and ``order`` controls how they
-  are sorted.
+Sorting of individual resources within a group is controlled by a
+combination of the ``sort-by`` and ``order`` attributes.  ``sort-by``
+determines which value to use to sort and ``order`` controls how they are
+sorted.
 
-  Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
-  done.
+Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
+done.
 
 Limiting resources
 ~~~~~~~~~~~~~~~~~~
 
-  Once groups have been sorted, we can then apply a limit to each group.
-  This is done using the ``limit`` and ``limit-percent`` attributes.
-  ``limit-percent`` is applied first to reduce the number of resources to
-  this percentage of the original.  ``limit`` is then applied to allow for
-  an absolute count.  Resources are kept from the beginning of the list.
+Once groups have been sorted, we can then apply a limit to each group.
+This is done using the ``limit`` and ``limit-percent`` attributes.
+``limit-percent`` is applied first to reduce the number of resources to
+this percentage of the original.  ``limit`` is then applied to allow for
+an absolute count.  Resources are kept from the beginning of the list.
 
-  Since these are per-group, if you have 20 resources in one group and 5
-  in another and specify ``limit-percent = 10``, you'll get 2 resources from
-  the first group and 0 resources from the second.
+Since these are per-group, if you have 20 resources in one group and 5 in
+another and specify ``limit-percent = 10``, you'll get 2 resources from
+the first group and 0 resources from the second.
 
 Combining resource groups
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  Once the groups have been modified, we now need to combine them back to
-  one set of resources.  Since the groups are determined by a JMESPath
-  expression, we sort the groups first based on the ``order`` attribute
-  the same way we sort within a group.  After the groups are sorted, it's
-  a simple concatenation of resources.
+Once the groups have been modified, we now need to combine them back to
+one set of resources.  Since the groups are determined by a JMESPath
+expression, we sort the groups first based on the ``order`` attribute the
+same way we sort within a group.  After the groups are sorted, it's a
+simple concatenation of resources.
 
 Attributes
 ~~~~~~~~~~
@@ -372,7 +372,7 @@ Attributes
   Note: For simplicity, you can specify these as just a single string
   which is treated as the ``key``.
 
-  - ``key`` - The JMESPath expression to use as the group name
+  - ``key`` - The JMESPath expression to extract a value
   - ``value_regex`` - A regular expression with a single capture group that
     extracts a portion of the result of the ``key`` expression.
   - ``value_type`` - parse the value as one of the following:
@@ -381,22 +381,24 @@ Attributes
     - ``number``
     - ``date``
 
-- ``limit`` - limit the group size to this absolute count
-- ``limit-percent`` - reduce the group size to this percentage
-- ``order`` controls how to sort the records within each group.
+- ``order`` controls how to sorting is done
 
-  - ``asc`` (default) - sort in ascending order based on ``sort-by``
-  - ``desc`` - sort in descending order based on ``sort-by``
-  - ``reverse`` - reverse the order of resources (ignores ``sort-by``)
-  - ``randomize`` - randomize the order of resources (ignores ``sort-by``)
+  - ``asc`` (default) - sort in ascending order based on ``key``
+  - ``desc`` - sort in descending order based on ``key``
+  - ``reverse`` - reverse the order of resources (ignores ``key``)
+  - ``randomize`` - randomize the order of resources (ignores ``key``)
 
 - ``null_order`` - when sorting, where to put resources that have a null value
 
   - ``last`` (default) - at the end of the list
   - ``first`` - at the start of the list
 
+- ``limit`` - select the first N resources within each group
+- ``limit-percent`` - select the first N percentage of resources within
+  each group
 
-**Examples:**
+Examples
+~~~~~~~~
 
 This example will select the longest running instance from each ASG, then
 randomly choose 10% of those, making sure to not affect more than 15
@@ -405,7 +407,7 @@ instances total, then terminate them.
   .. code-block:: yaml
 
     - name: chaos-engineering
-      resource: ec2
+      resource: aws.ec2
       filters:
         - "State.Name": "running"
         - "tag:aws:autoscaling:groupName": present
@@ -427,7 +429,7 @@ based on age.
   .. code-block:: yaml
 
     - name: limited-ami-expiration
-      resource: ami
+      resource: aws.ami
       filters:
         - type: image-age
           days: 180
@@ -446,7 +448,7 @@ different date formats or are not text-sortable.
   .. code-block:: yaml
 
     - name: ami-expiration-by-expire-date
-      resource: ami
+      resource: aws.ami
       filters:
         - type: value
           key: "tag:expire-after"
