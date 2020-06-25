@@ -321,45 +321,80 @@ This works using these simple steps:
     3. Limit the number of resources in each group
     4. Combine the resulting resources
 
-- Grouping resources:
+Grouping resources
+~~~~~~~~~~~~~~~~~~
 
-  This is controlled by the ``group_by`` attribute.  This is a JMESPath
-  expression that determines the group name.  If ``group_by`` is not
-  specified, it's the same as if the expression had a ``none`` result.
-  They'll all get put into a ``None`` group.
+  Resources are grouped based on the value extracted as defined by the
+  ``group-by`` attribute.  All resources not able to extract a value are
+  placed in a group by themselves.  This is also the case when
+  ``group-by`` is not specified.
 
-- Sorting resources:
+Sorting resources
+~~~~~~~~~~~~~~~~~
 
-  This is controlled by the use of ``sort_by`` and the ``order``
-  attributes.  ``sort_by`` is a JMESPath expression, who's value is used
-  to sort the resource within each groups.  The result will be converted
-  to a string for the sort comparison.  ``order`` controls how to sort the
-  records within each group.
+  Sorting of individual resources within a group is controlled by a
+  combination of the ``sort-by`` and ``order`` attributes.  ``sort-by``
+  determines which value to use to sort and ``order`` controls how they
+  are sorted.
 
-  - ``asc`` (default) - sort in ascending order based on ``sort_by``
-  - ``desc`` - sort in descending order based on ``sort_by``
-  - ``reverse`` - reverse the order of resources (ignores ``sort_by``)
-  - ``randomize`` - randomize the order of resources (ignores ``sort_by``)
+  Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
+  done.
 
-  Note: if no ``sort_by`` or ``order`` attribute is specified, no sorting
-  is done.
+Limiting resources
+~~~~~~~~~~~~~~~~~~
 
-- Limiting resources:
-
-  - ``limit`` - limit the group size to this absolute count
-  - ``limit-percent`` - reduce the group size to this percentage
+  Once groups have been sorted, we can then apply a limit to each group.
+  This is done using the ``limit`` and ``limit-percent`` attributes.
+  ``limit-percent`` is applied first to reduce the number of resources to
+  this percentage of the original.  ``limit`` is then applied to allow for
+  an absolute count.  Resources are kept from the beginning of the list.
 
   Since these are per-group, if you have 20 resources in one group and 5
-  in another and specify ``limit-percent=10``, you'll get 2 resources from
+  in another and specify ``limit-percent = 10``, you'll get 2 resources from
   the first group and 0 resources from the second.
 
-- Combining resource groups:
+Combining resource groups
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Once the groups have been modified, we now need to combine them back to
   one set of resources.  Since the groups are determined by a JMESPath
   expression, we sort the groups first based on the ``order`` attribute
   the same way we sort within a group.  After the groups are sorted, it's
   a simple concatenation of resources.
+
+Attributes
+~~~~~~~~~~
+
+- ``group-by``, ``sort-by``
+
+  These are both defined the same way...
+
+  Note: For simplicity, you can specify these as just a single string
+  which is treated as the ``key``.
+
+  - ``key`` - The JMESPath expression to use as the group name
+  - ``value_regex`` - A regular expression with a single capture group that
+    extracts a portion of the result of the ``key`` expression.
+  - ``value_type`` - parse the value as one of the following:
+
+    - ``string`` (default)
+    - ``number``
+    - ``date``
+
+- ``limit`` - limit the group size to this absolute count
+- ``limit-percent`` - reduce the group size to this percentage
+- ``order`` controls how to sort the records within each group.
+
+  - ``asc`` (default) - sort in ascending order based on ``sort-by``
+  - ``desc`` - sort in descending order based on ``sort-by``
+  - ``reverse`` - reverse the order of resources (ignores ``sort-by``)
+  - ``randomize`` - randomize the order of resources (ignores ``sort-by``)
+
+- ``null_order`` - when sorting, where to put resources that have a null value
+
+  - ``last`` (default) - at the end of the list
+  - ``first`` - at the start of the list
+
 
 **Examples:**
 
@@ -375,8 +410,8 @@ instances total, then terminate them.
         - "State.Name": "running"
         - "tag:aws:autoscaling:groupName": present
         - type: reduce
-          group_by: "tag:aws:autoscaling:groupName"
-          sort_by: "LaunchTime"
+          group-by: "tag:aws:autoscaling:groupName"
+          sort-by: "LaunchTime"
           order: asc
           limit: 1
         - type: reduce
@@ -398,7 +433,30 @@ based on age.
           days: 180
           op: ge
         - type: reduce
-          sort_by: "CreationDate"
+          sort-by: "CreationDate"
+          order: asc
+          limit: 10
+      actions:
+        - deregister
+
+This example simply sorts the resources by when they are marked for
+expiration.  We use a ``date`` type because the tags might be in
+different date formats or are not text-sortable.
+
+  .. code-block:: yaml
+
+    - name: ami-expiration-by-expire-date
+      resource: ami
+      filters:
+        - type: value
+          key: "tag:expire-after"
+          value_type: age
+          op: gt
+          value: 0
+        - type: reduce
+          sort-by:
+            key: "tag:expire-after"
+            value_type: date
           order: asc
           limit: 10
       actions:

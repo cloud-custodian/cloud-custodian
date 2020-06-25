@@ -488,11 +488,11 @@ class ValueFilter(Filter):
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
         if 'value_regex' in self.data:
-            return self._validate_value_regex()
+            return self._validate_value_regex(self.data['value_regex'])
 
         return self
 
-    def _validate_value_regex(self):
+    def _validate_value_regex(self, regex):
         """Specific validation for `value_regex` type
 
         The `value_regex` type works a little differently.  In
@@ -502,7 +502,7 @@ class ValueFilter(Filter):
         """
         # Sanity check that we can compile
         try:
-            pattern = re.compile(self.data['value_regex'])
+            pattern = re.compile(regex)
             if pattern.groups != 1:
                 raise PolicyValidationError(
                     "value_regex must have a single capturing group: %s" %
@@ -824,19 +824,37 @@ class ReduceFilter(ValueFilter):
     """Generic reduce filter to group, sort, and limit your resources.
 
     This example will select the longest running instance from each ASG,
-    hen randomly choose 10% of those, maxing at 15 total instances.
+    then randomly choose 10% of those, maxing at 15 total instances.
 
-    filters:
-      - "tag:aws:autoscaling:groupName": present
-      - type: reduce
-        group_by: "tag:aws:autoscaling:groupName"
-        sort_by: "LaunchTime"
-        order: asc
-        limit: 1
-      - type: reduce
-        order: randomize
-        limit: 15
-        limit-percent: 10
+    :example:
+
+    .. code-block:: yaml
+
+      - name: oldest-instance-by-asg
+        resource: ec2
+        filters:
+          - "tag:aws:autoscaling:groupName": present
+          - type: reduce
+            group-by: "tag:aws:autoscaling:groupName"
+            sort-by: "LaunchTime"
+            order: asc
+            limit: 1
+
+    Or you might want to randomly select a 10 percent of your resources,
+    but no more than 15.
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: random-selection
+        resource: ec2
+        filters:
+          - type: reduce
+            order: randomize
+            limit: 15
+            limit-percent: 10
+
     """
     annotate = False
 
@@ -848,77 +866,163 @@ class ReduceFilter(ValueFilter):
         'properties': {
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['reduce']},
-            'group_by': {'type': 'string'},
-            'sort_by': {'type': 'string'},
+            'group-by': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {
+                        'type': 'object',
+                        'key': {'type': 'string'},
+                        'value_type': {'enum': ['string', 'number', 'date']},
+                        'value_regex': 'string',
+                    },
+                ]
+            },
+            'sort-by': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {
+                        'type': 'object',
+                        'key': {'type': 'string'},
+                        'value_type': {'enum': ['string', 'number', 'date']},
+                        'value_regex': 'string',
+                    },
+                ]
+            },
             'order': {'enum': ['asc', 'desc', 'reverse', 'randomize']},
+            'null_order': {'enum': ['first', 'last']},
             'limit': {'type': 'number', 'minimum': 0},
             'limit-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
-        }
+        },
     }
     schema_alias = True
+
+    def __init__(self, data, manager):
+        super(ReduceFilter, self).__init__(data, manager)
+        self.order = self.data.get('order', 'asc')
+        self.group_by = self.get_sort_config('group-by')
+        self.sort_by = self.get_sort_config('sort-by')
 
     def __call__(self, r):
         return self.process(r)
 
-    @property
-    def reorder(self):
-        return 'sort_by' in self.data or 'order' in self.data
+    def validate(self):
+        # make sure the regexes compile
+        if 'value_regex' in self.group_by:
+            self._validate_value_regex(self.group_by['value_regex'])
+        if 'value_regex' in self.sort_by:
+            self._validate_value_regex(self.sort_by['value_regex'])
+        return self
 
     def process(self, resources, event=None):
         groups = self.group(resources)
 
         # specified either of the sorting options, so sort
-        if self.reorder:
+        if 'sort-by' in self.data or 'order' in self.data:
             groups = self.sort_groups(groups)
 
         # now apply any limits to the groups and concatenate
         return list(filter(None, self.limit(groups)))
 
     def group(self, resources):
-        expr = self.data.get('group_by')
         groups = {}
-        for i in resources:
-            v = str(None)
-            if expr:
-                try:
-                    v = str(self.get_resource_value(expr, i))
-                except ValueError:
-                    pass
-            if v not in groups:
-                groups[v] = []
-            groups[v].append(i)
+        for r in resources:
+            v = self._value_to_sort(self.group_by, r)
+            vstr = str(v)
+            if vstr not in groups:
+                groups[vstr] = {'sortkey': v, 'resources': []}
+            groups[vstr]['resources'].append(r)
         return groups
 
+    def get_sort_config(self, key):
+        # allow `foo: bar` but convert to
+        # `foo: {'key': bar}`
+        d = self.data.get(key, {})
+        if isinstance(d, str):
+            d = {'key': d}
+        d['null_sort_value'] = self.null_sort_value(d)
+        return d
+
     def sort_groups(self, groups):
-        expr = self.data.get('sort_by')
         for g in groups:
-            groups[g] = self.order(
-                groups[g],
-                key=lambda r: str(self.get_resource_value(expr, r)),
+            groups[g]['resources'] = self.reorder(
+                groups[g]['resources'],
+                key=lambda r: self._value_to_sort(self.sort_by, r),
             )
         return groups
+
+    def _value_to_sort(self, config, r):
+        expr = config.get('key')
+        vtype = config.get('value_type', 'string')
+        vregex = config.get('value_regex')
+        v = None
+
+        try:
+            # extract value based on jmespath
+            if expr:
+                v = self.get_resource_value(expr, r)
+
+            # try to extract via regex
+            if vregex and v:
+                regex = ValueRegex(vregex)
+                v = regex.get_resource_value(v)
+
+            if v is not None:
+                # now convert to expected type
+                if vtype == 'number':
+                    v = float(v)
+                elif vtype == 'date':
+                    v = parse_date(v)
+                else:
+                    v = str(v)
+        except (AttributeError, ValueError):
+            v = None
+
+        if v is None:
+            v = config.get('null_sort_value')
+        return v
+
+    def null_sort_value(self, config):
+        vtype = config.get('value_type', 'string')
+        placement = self.data.get('null_order', 'last')
+
+        if (placement == 'last' and self.order == 'desc') or (
+            placement != 'last' and self.order != 'desc'
+        ):
+            # return a value that will sort first
+            if vtype == 'number':
+                return float('-inf')
+            elif vtype == 'date':
+                return datetime.datetime.min.replace(tzinfo=tzutc())
+            return ''
+        else:
+            # return a value that will sort last
+            if vtype == 'number':
+                return float('inf')
+            elif vtype == 'date':
+                return datetime.datetime.max.replace(tzinfo=tzutc())
+            return '\uffff'
 
     def limit(self, groups):
         results = []
 
         max = self.data.get('limit', 0)
         pct = self.data.get('limit-percent', 0)
-        for g in self.order(list(groups)):
-            count = len(groups[g])
+        ordered = list(groups)
+        if 'group-by' in self.data or 'order' in self.data:
+            ordered = self.reorder(ordered, key=lambda r: groups[r]['sortkey'])
+        for g in ordered:
+            count = len(groups[g]['resources'])
             if pct > 0:
-                count = int(pct / 100 * len(groups[g]))
+                count = int(pct / 100 * len(groups[g]['resources']))
             if max > 0 and max < count:
                 count = max
-            results.extend(groups[g][0:count])
+            results.extend(groups[g]['resources'][0:count])
         return results
 
-    def order(self, items, key=None):
-        if not self.reorder:
-            return items
-        order = self.data.get('order', 'asc')
-        if order == "randomize":
+    def reorder(self, items, key=None):
+        if self.order == 'randomize':
             return sample(items, k=len(items))
-        elif order == "reverse":
+        elif self.order == 'reverse':
             return items[::-1]
         else:
-            return sorted(items, key=key, reverse=(order == 'desc'))
+            return sorted(items, key=key, reverse=(self.order == 'desc'))

@@ -1069,11 +1069,11 @@ class TestReduceFilter(BaseFilterTest):
 
     def instances(self):
         return [
-            dict(InstanceId="A", Group="A", Foo="a", Bar="1"),
-            dict(InstanceId="B", Group="B", Foo="c", Bar="2"),
-            dict(InstanceId="C", Group="C", Foo="d"),
-            dict(InstanceId="D", Group="A", Foo="b"),
-            dict(InstanceId="E", Group="B", Foo="e", Bar="3"),
+            dict(InstanceId="A", Group="A", Foo="a", Bar="3", Date="2011/05/06"),
+            dict(InstanceId="B", Group="B", Foo="c", Bar="1", Date="2020/01/01"),
+            dict(InstanceId="C", Group="C", Foo="d", Date="2015-05-25T01:02:03"),
+            dict(InstanceId="D", Group="A", Foo="b", Date="1592870000"),  # 2020-06-22 23:53:20 UTC
+            dict(InstanceId="E", Group="B", Foo="e", Bar="23", Date="invalid"),
             dict(InstanceId="F", Group="C", Foo="f"),
         ]
 
@@ -1140,7 +1140,7 @@ class TestReduceFilter(BaseFilterTest):
         f = filters.factory(
             {
                 "type": "reduce",
-                "sort_by": "Foo",
+                "sort-by": "Foo",
             }
         )
         rs = f.process(resources)
@@ -1152,7 +1152,7 @@ class TestReduceFilter(BaseFilterTest):
         f = filters.factory(
             {
                 "type": "reduce",
-                "sort_by": "Foo",
+                "sort-by": "Foo",
                 "order": "desc",
             }
         )
@@ -1165,8 +1165,8 @@ class TestReduceFilter(BaseFilterTest):
         f = filters.factory(
             {
                 "type": "reduce",
-                "group_by": "Group",
-                "sort_by": "Foo",
+                "group-by": "Group",
+                "sort-by": "Foo",
                 "order": "desc",
             }
         )
@@ -1180,8 +1180,8 @@ class TestReduceFilter(BaseFilterTest):
         f = filters.factory(
             {
                 "type": "reduce",
-                "group_by": "Group",
-                "sort_by": "Foo",
+                "group-by": "Group",
+                "sort-by": "Foo",
                 "order": "desc",
                 "limit": 1,
             }
@@ -1222,12 +1222,60 @@ class TestReduceFilter(BaseFilterTest):
             [r['InstanceId'] for r in resources[::-1]]
         )
 
-    def test_group_invalid(self):
+    def test_sort_string(self):
         resources = self.instances()
         f = filters.factory(
             {
                 "type": "reduce",
-                "group_by": "Bar",
+                "sort-by": "Bar",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'E', 'A', 'C', 'D', 'F']
+        )
+
+    def test_sort_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'A', 'E', 'C', 'D', 'F']
+        )
+
+    def test_sort_date(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Date",
+                    "value_type": "date"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['A', 'C', 'B', 'D', 'E', 'F']
+        )
+
+    def test_group_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Bar",
                 "limit": 1,
             }
         )
@@ -1235,21 +1283,85 @@ class TestReduceFilter(BaseFilterTest):
         self.assertEqual(len(rs), 4)
         self.assertEqual(
             [r['InstanceId'] for r in rs],
-            ['A', 'B', 'C', 'E']
+            ['B', 'E', 'A', 'C']
         )
 
-    def test_sort_invalid(self):
+    def test_group_number(self):
         resources = self.instances()
         f = filters.factory(
             {
                 "type": "reduce",
-                "sort_by": "Bar",
+                "group-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                },
+                "limit": 1
             }
         )
         rs = f.process(resources)
         self.assertEqual(
             [r['InstanceId'] for r in rs],
-            ['A', 'B', 'E', 'C', 'D', 'F']
+            ['B', 'A', 'E', 'C']
+        )
+
+    def test_group_regex_date_asc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+                },
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['C', 'A']
+        )
+
+    def test_group_regex_date_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'C', 'A', 'D']
+        )
+
+    def test_group_regex_date_desc_null_first(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "null_order": "first",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['D', 'B', 'C', 'A']
         )
 
 
