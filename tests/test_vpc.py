@@ -534,7 +534,6 @@ class NetworkLocationTest(BaseTest):
                 "reason": "SecurityGroupMismatch"}],
         )
 
-    @functional
     def test_network_compare_location_resource_missing(self):
         self.factory = self.replay_flight_data("test_network_compare_location_resource_missing")
         p = self.load_policy(
