@@ -3084,8 +3084,9 @@ class Lifecycle(BucketActionBase):
         config = [rule for rule in existing.values() if rule['Status'] != 'absent']  # Delete
 
         try:
-            s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
-            if config:
+            if not config:
+                s3.delete_bucket_lifecycle(Bucket=bucket['Name'])
+            else:
                 s3.put_bucket_lifecycle_configuration(
                     Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
         except ClientError as e:
