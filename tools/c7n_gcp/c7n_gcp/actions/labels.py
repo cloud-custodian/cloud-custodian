@@ -28,6 +28,7 @@ from c7n_gcp.provider import resources as gcp_resources
 class BaseLabelAction(MethodAction):
 
     method_spec = {}
+    method_perm = 'update'
 
     def get_labels_to_add(self, resource):
         return None
