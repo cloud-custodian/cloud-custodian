@@ -614,3 +614,28 @@ class TestElbIsNotLoggingFilter(BaseTest):
         self.assertGreater(
             len(resources), 0, "Should find elb not logging " "to otherbucket"
         )
+
+class TestElbIsConnectionDrainingFilter(BaseTest):
+    """ replicate
+        - name: elb-is-connection-draining-test
+          resource: elb
+          filters:
+            - type: is-connection-draining
+    """
+
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data("test_elb_is_connection_draining_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-logging-to-bucket-test",
+                "resource": "elb",
+                "filters": [{"type": "is-connection-draining "}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertGreater(
+            len(resources), 0, "Test should find elbs connection draining "
+        )

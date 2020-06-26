@@ -692,7 +692,7 @@ class SSLPolicyFilter(Filter):
 
 @filters.register('healthcheck-protocol-mismatch')
 class HealthCheckProtocolMismatch(Filter):
-    """Filters ELB that have a healtch check protocol mismatch
+    """Filters ELB that have a health check protocol mismatch
 
     The mismatch occurs if the ELB has a different protocol to check than
     the associated instances allow to determine health status.
@@ -851,4 +851,32 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                 (bucket_prefix and bucket_prefix != elb['Attributes'][
                     'AccessLog'].get(
                     'S3BucketPrefix', None))
+                ]
+
+class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
+    """Matches ELBs that have connection draining enabled
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+            - name: elb-is-connection-draining-test
+              resource: elb
+              filters:
+                - type: is-connection-draining
+
+    """
+
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('is-connection-draining',
+                         bucket={'type': 'string'},
+                         prefix={'type': 'string'}
+                         )
+
+    def process(self, resources, event=None):
+        self.initialize(resources)
+
+        return [elb for elb in resources
+                if elb['Attributes']['ConnectionDraining']['Enabled']
                 ]
