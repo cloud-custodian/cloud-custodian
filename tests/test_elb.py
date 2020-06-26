@@ -630,7 +630,7 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
             {
                 "name": "elb-is-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "is-connection-draining "}],
+                "filters": [{"type": "is-connection-draining"}],
             },
             session_factory=session_factory,
         )
@@ -656,7 +656,7 @@ class TestElbIsNotConnectionDrainingFilter(BaseTest):
             {
                 "name": "elb-is-not-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "is-not-connection-draining "}],
+                "filters": [{"type": "is-not-connection-draining"}],
             },
             session_factory=session_factory,
         )
