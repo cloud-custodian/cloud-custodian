@@ -623,11 +623,11 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
             - type: is-connection-draining
     """
 
-    def test_is_logging_to_bucket(self):
+    def test_is_connection_draining(self):
         session_factory = self.replay_flight_data("test_elb_is_connection_draining_filter")
         policy = self.load_policy(
             {
-                "name": "elb-is-logging-to-bucket-test",
+                "name": "elb-is-connection-draining-test",
                 "resource": "elb",
                 "filters": [{"type": "is-connection-draining "}],
             },
@@ -638,4 +638,29 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
 
         self.assertGreater(
             len(resources), 0, "Test should find elbs connection draining "
+        )
+
+class TestElbIsNotConnectionDrainingFilter(BaseTest):
+    """ replicate
+        - name: elb-is-not-connection-draining-test
+          resource: elb
+          filters:
+            - type: is-not-connection-draining
+    """
+
+    def test_is_not_connection_draining(self):
+        session_factory = self.replay_flight_data("test_elb_is_connection_draining_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-not-connection-draining-test",
+                "resource": "elb",
+                "filters": [{"type": "is-not-connection-draining "}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 0, "Test should find no elbs without connection draining "
         )

@@ -880,3 +880,31 @@ class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
         return [elb for elb in resources
                 if elb['Attributes']['ConnectionDraining']['Enabled']
                 ]
+
+class IsNotConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
+    """Matches ELBs that have connection draining disabled
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+            - name: elb-is-not-connection-draining-test
+              resource: elb
+              filters:
+                - type: is-not-connection-draining
+
+    """
+
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('is-connection-draining',
+                         bucket={'type': 'string'},
+                         prefix={'type': 'string'}
+                         )
+
+    def process(self, resources, event=None):
+        self.initialize(resources)
+
+        return [elb for elb in resources
+                if not elb['Attributes']['ConnectionDraining']['Enabled']
+                ]
