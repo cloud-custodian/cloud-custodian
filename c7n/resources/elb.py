@@ -897,7 +897,7 @@ class IsNotConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
     """
 
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('is-connection-draining',
+    schema = type_schema('is-not-connection-draining',
                          bucket={'type': 'string'},
                          prefix={'type': 'string'}
                          )
