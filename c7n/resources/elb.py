@@ -869,9 +869,7 @@ class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
     """
 
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('is-connection-draining',
-                         bucket={'type': 'string'},
-                         prefix={'type': 'string'}
+    schema = type_schema('is-connection-draining'
                          )
 
     def process(self, resources, event=None):
@@ -897,9 +895,7 @@ class IsNotConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
     """
 
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('is-not-connection-draining',
-                         bucket={'type': 'string'},
-                         prefix={'type': 'string'}
+    schema = type_schema('is-not-connection-draining'
                          )
 
     def process(self, resources, event=None):
