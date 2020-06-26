@@ -853,6 +853,8 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                     'S3BucketPrefix', None))
                 ]
 
+
+@filters.register('is-connection-draining')
 class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
     """Matches ELBs that have connection draining enabled
 
@@ -879,6 +881,8 @@ class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
                 if elb['Attributes']['ConnectionDraining']['Enabled']
                 ]
 
+
+@filters.register('is-not-connection-draining')
 class IsNotConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
     """Matches ELBs that have connection draining disabled
 

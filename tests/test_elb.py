@@ -615,6 +615,7 @@ class TestElbIsNotLoggingFilter(BaseTest):
             len(resources), 0, "Should find elb not logging " "to otherbucket"
         )
 
+
 class TestElbIsConnectionDrainingFilter(BaseTest):
     """ replicate
         - name: elb-is-connection-draining-test
@@ -639,6 +640,7 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
         self.assertGreater(
             len(resources), 0, "Test should find elbs connection draining "
         )
+
 
 class TestElbIsNotConnectionDrainingFilter(BaseTest):
     """ replicate
