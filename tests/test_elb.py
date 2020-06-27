@@ -633,7 +633,13 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
             {
                 "name": "elb-is-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "attributes", "key": "ConnectionDraining.Enabled", "value": "true"}],
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "ConnectionDraining.Enabled",
+                            "value": "true"
+                            }
+                    ],
             },
             session_factory=session_factory,
         )
@@ -662,7 +668,13 @@ class TestElbIsNotConnectionDrainingFilter(BaseTest):
             {
                 "name": "elb-is-not-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "attributes", "key": "ConnectionDraining.Enabled", "value": "false"}],
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "ConnectionDraining.Enabled",
+                        "value": "false"
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -681,7 +693,13 @@ class TestElbIsCrossZoneLoadBalancing(BaseTest):
             {
                 "name": "elb-is-cross-zone-load-balancing-test",
                 "resource": "elb",
-                "filters": [{"type": "attributes", "key": "CrossZoneLoadBalancing.Enabled", "value": "true"}],
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "CrossZoneLoadBalancing.Enabled",
+                        "value": "true"
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -700,7 +718,13 @@ class TestElbIsNotCrossZoneLoadBalancing(BaseTest):
             {
                 "name": "elb-is-not-cross-zone-load-balancing-test",
                 "resource": "elb",
-                "filters": [{"type": "attributes", "key": "CrossZoneLoadBalancing.Enabled", "value": "false"}],
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "CrossZoneLoadBalancing.Enabled",
+                        "value": "false"
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -721,11 +745,11 @@ class TestElbIdleTimeout(BaseTest):
                 "resource": "elb",
                 "filters": [
                     {
-                            "type": "attributes",
-                            "key": "ConnectionSettings.IdleTimeout",
-                            "value": "30",
-                            "op": "gt"
-                        }
+                        "type": "attributes",
+                        "key": "ConnectionSettings.IdleTimeout",
+                        "value": "30",
+                        "op": "gt"
+                    }
                 ],
             },
             session_factory=session_factory,
