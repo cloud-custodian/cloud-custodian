@@ -248,6 +248,43 @@ class Filter(Element):
             return
 
 
+class BaseValueFilter(Filter):
+    expr = None
+
+    def __init__(self, data, manager=None):
+        super(BaseValueFilter, self).__init__(data, manager)
+        self.expr = {}
+
+    def get_resource_value(self, k, i, regex=None):
+        r = None
+        if k.startswith('tag:'):
+            tk = k.split(':', 1)[1]
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
+        elif k in i:
+            r = i.get(k)
+        elif k not in self.expr:
+            self.expr[k] = jmespath.compile(k)
+            r = self.expr[k].search(i)
+        else:
+            r = self.expr[k].search(i)
+
+        if regex:
+            r = ValueRegex(regex).get_resource_value(r)
+        return r
+
+
 def intersect_list(a, b):
     if b is None:
         return a
@@ -397,10 +434,9 @@ class ComparableVersion(version.LooseVersion):
             return False
 
 
-class ValueFilter(Filter):
+class ValueFilter(BaseValueFilter):
     """Generic value filter using jmespath
     """
-    expr = None
     op = v = vtype = None
 
     schema = {
@@ -423,10 +459,6 @@ class ValueFilter(Filter):
     schema_alias = True
     annotate = True
     required_keys = {'value', 'key'}
-
-    def __init__(self, data, manager=None):
-        super(ValueFilter, self).__init__(data, manager)
-        self.expr = {}
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
@@ -532,34 +564,7 @@ class ValueFilter(Filter):
         return super(ValueFilter, self).process(resources, event)
 
     def get_resource_value(self, k, i):
-        if k.startswith('tag:'):
-            tk = k.split(':', 1)[1]
-            r = None
-            if 'Tags' in i:
-                for t in i.get("Tags", []):
-                    if t.get('Key') == tk:
-                        r = t.get('Value')
-                        break
-            # GCP schema: 'labels': {'key': 'value'}
-            elif 'labels' in i:
-                r = i.get('labels', {}).get(tk, None)
-            # GCP has a secondary form of labels called tags
-            # as labels without values.
-            # Azure schema: 'tags': {'key': 'value'}
-            elif 'tags' in i:
-                r = i.get('tags', {}).get(tk, None)
-        elif k in i:
-            r = i.get(k)
-        elif k not in self.expr:
-            self.expr[k] = jmespath.compile(k)
-            r = self.expr[k].search(i)
-        else:
-            r = self.expr[k].search(i)
-
-        if 'value_regex' in self.data:
-            regex = ValueRegex(self.data['value_regex'])
-            r = regex.get_resource_value(r)
-        return r
+        return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
@@ -820,7 +825,7 @@ class ValueRegex:
         return capture.group(1)
 
 
-class ReduceFilter(ValueFilter):
+class ReduceFilter(BaseValueFilter):
     """Generic reduce filter to group, sort, and limit your resources.
 
     This example will select the longest running instance from each ASG,
@@ -902,9 +907,6 @@ class ReduceFilter(ValueFilter):
         self.group_by = self.get_sort_config('group-by')
         self.sort_by = self.get_sort_config('sort-by')
 
-    def __call__(self, r):
-        return self.process(r)
-
     def validate(self):
         # make sure the regexes compile
         if 'value_regex' in self.group_by:
@@ -959,12 +961,7 @@ class ReduceFilter(ValueFilter):
         try:
             # extract value based on jmespath
             if expr:
-                v = self.get_resource_value(expr, r)
-
-            # try to extract via regex
-            if vregex and v:
-                regex = ValueRegex(vregex)
-                v = regex.get_resource_value(v)
+                v = self.get_resource_value(expr, r, vregex)
 
             if v is not None:
                 # now convert to expected type
