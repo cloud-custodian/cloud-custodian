@@ -854,57 +854,31 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                 ]
 
 
-@filters.register('is-connection-draining')
-class IsConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
-    """Matches ELBs that have connection draining enabled
-
+@filters.register('attributes')
+class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
+    """Value Filter that allows filtering on ELB attributes
     :example:
-
     .. code-block:: yaml
-
             policies:
-            - name: elb-is-connection-draining-test
+            - name: elb-is-connection-draining
               resource: elb
               filters:
-                - type: is-connection-draining
-
+                - type: attributes
+                  key: ConnectionDraining.Enabled
+                  value: true
+                  op: eq
     """
-
+    annotate = False  # no annotation from value filter
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('is-connection-draining'
-                         )
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
         self.initialize(resources)
 
-        return [elb for elb in resources
-                if elb['Attributes']['ConnectionDraining']['Enabled']
-                ]
-
-
-@filters.register('is-not-connection-draining')
-class IsNotConnectionDrainingFilter(Filter, ELBAttributeFilterBase):
-    """Matches ELBs that have connection draining disabled
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-            - name: elb-is-not-connection-draining-test
-              resource: elb
-              filters:
-                - type: is-not-connection-draining
-
-    """
-
-    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('is-not-connection-draining'
-                         )
-
-    def process(self, resources, event=None):
-        self.initialize(resources)
-
-        return [elb for elb in resources
-                if not elb['Attributes']['ConnectionDraining']['Enabled']
-                ]
+    def __call__(self, r):
+        return super().__call__(r['Attributes'])

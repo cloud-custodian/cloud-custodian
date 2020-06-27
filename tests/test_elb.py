@@ -621,24 +621,27 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
         - name: elb-is-connection-draining-test
           resource: elb
           filters:
-            - type: is-connection-draining
+            - type: attributes
+              key: ConnectionDraining.Enabled
+              value: true
+              op: eq
     """
 
     def test_is_connection_draining(self):
-        session_factory = self.replay_flight_data("test_elb_is_connection_draining_filter")
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
         policy = self.load_policy(
             {
                 "name": "elb-is-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "is-connection-draining"}],
+                "filters": [{"type": "attributes", "key": "ConnectionDraining.Enabled", "value": "true"}],
             },
             session_factory=session_factory,
         )
 
         resources = policy.run()
 
-        self.assertGreater(
-            len(resources), 0, "Test should find elbs connection draining "
+        self.assertEqual(
+            len(resources), 1, "Test should find one elb connection draining"
         )
 
 
@@ -647,16 +650,19 @@ class TestElbIsNotConnectionDrainingFilter(BaseTest):
         - name: elb-is-not-connection-draining-test
           resource: elb
           filters:
-            - type: is-not-connection-draining
+            - type: attributes
+              key: ConnectionDraining.Enabled
+              value: true
+              op: eq
     """
 
     def test_is_not_connection_draining(self):
-        session_factory = self.replay_flight_data("test_elb_is_connection_draining_filter")
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
         policy = self.load_policy(
             {
                 "name": "elb-is-not-connection-draining-test",
                 "resource": "elb",
-                "filters": [{"type": "is-not-connection-draining"}],
+                "filters": [{"type": "attributes", "key": "ConnectionDraining.Enabled", "value": "false"}],
             },
             session_factory=session_factory,
         )
@@ -665,4 +671,61 @@ class TestElbIsNotConnectionDrainingFilter(BaseTest):
 
         self.assertEqual(
             len(resources), 0, "Test should find no elbs without connection draining "
+        )
+
+
+class TestElbIsCrossZoneLoadBalancing(BaseTest):
+    def test_is_cross_zone_load_balancing(self):
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-cross-zone-load-balancing-test",
+                "resource": "elb",
+                "filters": [{"type": "attributes", "key": "CrossZoneLoadBalancing.Enabled", "value": "true"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find one elb cross zone load balancing"
+        )
+
+
+class TestElbIsNotCrossZoneLoadBalancing(BaseTest):
+    def test_is_not_cross_zone_load_balancing(self):
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-not-cross-zone-load-balancing-test",
+                "resource": "elb",
+                "filters": [{"type": "attributes", "key": "CrossZoneLoadBalancing.Enabled", "value": "false"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 0, "Test should find no elbs not cross zone load balancing"
+        )
+
+
+class TestElbIdleTimeout(BasesTest):
+    def test_idle_time_greater_than_30(self)
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-idle-timeout-greater-than-30",
+                "resource": "elb",
+                "filters": [{"type": "attributes", "key": "ConnectionSettings.IdleTimeout", "value": "30", "op": "gt"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find 1 elb with idle timeout > 30 seconds"
         )
