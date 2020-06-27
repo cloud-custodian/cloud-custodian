@@ -638,8 +638,8 @@ class TestElbIsConnectionDrainingFilter(BaseTest):
                             "type": "attributes",
                             "key": "ConnectionDraining.Enabled",
                             "value": "true"
-                            }
-                    ],
+                        }
+                ],
             },
             session_factory=session_factory,
         )
