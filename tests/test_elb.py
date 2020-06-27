@@ -712,14 +712,21 @@ class TestElbIsNotCrossZoneLoadBalancing(BaseTest):
         )
 
 
-class TestElbIdleTimeout(BasesTest):
-    def test_idle_time_greater_than_30(self)
+class TestElbIdleTimeout(BaseTest):
+    def test_idle_time_greater_than_30(self):
         session_factory = self.replay_flight_data("test_elb_attribute_filter")
         policy = self.load_policy(
             {
                 "name": "elb-idle-timeout-greater-than-30",
                 "resource": "elb",
-                "filters": [{"type": "attributes", "key": "ConnectionSettings.IdleTimeout", "value": "30", "op": "gt"}],
+                "filters": [
+                    {
+                            "type": "attributes",
+                            "key": "ConnectionSettings.IdleTimeout",
+                            "value": "30",
+                            "op": "gt"
+                        }
+                ],
             },
             session_factory=session_factory,
         )
