@@ -870,7 +870,7 @@ class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
     """
     annotate = False  # no annotation from value filter
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema = type_schema('attributes', inherit=ValueFilter.schema)
     schema_alias = False
 
     def process(self, resources, event=None):
