@@ -322,7 +322,7 @@ class SetS3Logging(BaseAction):
               - name: elbv2-test
                 resource: app-elb
                 filters:
-                  - type: is-logging
+                  - type: is-not-logging
                 actions:
                   - type: set-s3-logging
                     bucket: elbv2logtest
