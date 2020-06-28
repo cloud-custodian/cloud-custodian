@@ -860,17 +860,17 @@ class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
     :example:
     .. code-block:: yaml
             policies:
-            - name: elb-is-connection-draining
-              resource: elb
-              filters:
-                - type: attributes
-                  key: ConnectionDraining.Enabled
-                  value: true
-                  op: eq
+                - name: elb-is-connection-draining
+                  resource: elb
+                  filters:
+                    - type: attributes
+                      key: ConnectionDraining.Enabled
+                      value: true
+                      op: eq
     """
     annotate = False  # no annotation from value filter
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
-    schema = type_schema('attributes', inherit=ValueFilter.schema)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
     schema_alias = False
 
     def process(self, resources, event=None):
