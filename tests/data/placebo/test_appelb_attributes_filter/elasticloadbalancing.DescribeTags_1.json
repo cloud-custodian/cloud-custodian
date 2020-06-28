@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fae221d1-8653-11e6-9612-e99914e6ef67", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fae221d1-8653-11e6-9612-e99914e6ef67", 
+                "date": "Thu, 29 Sep 2016 14:49:52 GMT", 
+                "content-length": "877", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177", 
+                "Tags": [
+                    {
+                        "Value": "VALUE2", 
+                        "Key": "KEY2"
+                    }, 
+                    {
+                        "Value": "VALUE1", 
+                        "Key": "KEY1"
+                    }
+                ]
+            }, 
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb", 
+                "Tags": []
+            }
+        ]
+    }
+}
