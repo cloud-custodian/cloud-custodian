@@ -857,8 +857,11 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
 @filters.register('attributes')
 class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
     """Value Filter that allows filtering on ELB attributes
+
     :example:
+
     .. code-block:: yaml
+
             policies:
                 - name: elb-is-connection-draining
                   resource: elb
@@ -867,6 +870,7 @@ class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
                       key: ConnectionDraining.Enabled
                       value: true
                       op: eq
+
     """
     annotate = False  # no annotation from value filter
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
