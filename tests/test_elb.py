@@ -686,7 +686,7 @@ class TestElbAttributeFilter(BaseTest):
 
     def test_is_cross_zone_load_balancing(self):
         """ replicate
-            - name: elb-is-not-connection-draining-test
+            - name: elb-is-cross-zone-load-balancing-test
               resource: elb
               filters:
                 - type: attributes
@@ -712,14 +712,19 @@ class TestElbAttributeFilter(BaseTest):
         )
 
         resources = policy.run()
-        print(resources)
+
         self.assertEqual(
             len(resources), 1, "Test should find one elb cross zone load balancing"
         )
 
+        self.assertEqual(
+            resources[0]['Attributes']['CrossZoneLoadBalancing']['Enabled'], True
+        )
+
+
     def test_is_not_cross_zone_load_balancing(self):
         """ replicate
-            - name: elb-is-not-connection-draining-test
+            - name: elb-is-not-cross-zone-load-balancing
               resource: elb
               filters:
                 - type: attributes
@@ -782,6 +787,11 @@ class TestElbAttributeFilter(BaseTest):
         self.assertEqual(
             len(resources), 1, "Test should find 1 elb with idle timeout > 30 seconds"
         )
+
+        self.assertGreater(
+            resources[0]['Attributes']['ConnectionSettings']['IdleTimeout'], 30
+        )
+
 
     def test_idle_time_less_than_30(self):
         """ replicate
