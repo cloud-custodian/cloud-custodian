@@ -651,6 +651,10 @@ class TestElbAttributeFilter(BaseTest):
             len(resources), 1, "Test should find one elb connection draining"
         )
 
+        self.assertEqual(
+            resources[0]['Attributes']['ConnectionDraining']['Enabled'], True
+        )
+
     def test_is_not_connection_draining(self):
         """ replicate
             - name: elb-is-not-connection-draining-test
@@ -721,7 +725,6 @@ class TestElbAttributeFilter(BaseTest):
             resources[0]['Attributes']['CrossZoneLoadBalancing']['Enabled'], True
         )
 
-
     def test_is_not_cross_zone_load_balancing(self):
         """ replicate
             - name: elb-is-not-cross-zone-load-balancing
@@ -791,7 +794,6 @@ class TestElbAttributeFilter(BaseTest):
         self.assertGreater(
             resources[0]['Attributes']['ConnectionSettings']['IdleTimeout'], 30
         )
-
 
     def test_idle_time_less_than_30(self):
         """ replicate
