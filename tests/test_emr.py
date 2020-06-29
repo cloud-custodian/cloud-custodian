@@ -157,6 +157,25 @@ class TestEMR(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertFalse("test_tag" in old_tags)
 
+    def test_emr_sg(self):
+        session_factory = self.replay_flight_data("test_emr_sg")
+        p = self.load_policy(
+            {
+                "name": "emr-sg-tag",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:NetworkLocation",
+                        "value": "CustFacing,EntFacing"
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 
