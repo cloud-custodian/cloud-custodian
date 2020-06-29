@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ProductSubscriptions": [
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/aws/access-analyzer",
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/aws/firewall-manager",
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/aws/guardduty",
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/aws/macie",
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/aws/securityhub",
+            "arn:aws:securityhub:us-east-1:644160558196:product-subscription/cloud-custodian/cloud-custodian"
+        ]
+    }
+}

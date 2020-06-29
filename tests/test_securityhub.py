@@ -624,3 +624,57 @@ class SecurityHubTest(BaseTest):
                 "Tags": {
                     "workload-type": "other"}
             })
+
+class SecurityHubResourceTest(BaseTest):
+
+    def test_valid_master(self):
+        session_factory = self.replay_flight_data(
+            'test_securityhub_valid_master')
+        p = self.load_policy({
+            'name': 'valid-master',
+            'resource': 'aws.security-hub',
+            'filters': [{
+                'type': 'valid-master',
+                'accounts':['519413311747']
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_invalid_master(self):
+        session_factory = self.replay_flight_data(
+            'test_securityhub_valid_master')
+        p = self.load_policy({
+            'name': 'valid-master',
+            'resource': 'aws.security-hub',
+            'filters': [{
+                'type': 'valid-master',
+                'accounts':['12345678']
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_enabled_products(self):
+        session_factory = self.replay_flight_data(
+            'test_securityhub_enabled_products')
+        p = self.load_policy({
+            'name': 'enabled-products',
+            'resource': 'aws.security-hub',
+            'filters': [{
+                'type': 'enabled-products',
+                'products':['aws/guardduty','cloud-custodian/cloud-custodian']
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_not_enabled_products(self):
+        session_factory = self.replay_flight_data(
+            'test_securityhub_enabled_products')
+        p = self.load_policy({
+            'name': 'enabled-products',
+            'resource': 'aws.security-hub',
+            'filters': [{
+                'type': 'enabled-products',
+                'products':['aws/guardduty','aws/detective']
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

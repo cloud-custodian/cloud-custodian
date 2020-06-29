@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Master": {
+            "AccountId": "519413311747",
+            "InvitationId": "e6b4f9ecc1cc37ea35814559a2a3f09b",
+            "InvitedAt": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 4,
+                "day": 6,
+                "hour": 18,
+                "minute": 11,
+                "second": 52,
+                "microsecond": 344000
+            },
+            "MemberStatus": "Associated"
+        }
+    }
+}
