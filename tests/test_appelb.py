@@ -690,6 +690,10 @@ class TestAppElbAttributesFilter(BaseTest):
             len(resources), 1, "Test should find 1 net lb with cross zone load balancing disabled"
         )
 
+        self.assertEqual(
+            resources[0]['Attributes']['load_balancing.cross_zone_enabled'], False
+        )
+
     def test_alb_http2_is__enabled(self):
         session_factory = self.replay_flight_data("test_appelb_attributes_filter")
         policy = self.load_policy(
@@ -712,6 +716,10 @@ class TestAppElbAttributesFilter(BaseTest):
 
         self.assertEqual(
             len(resources), 1, "Test should find 1 app lb with http2 enabled"
+        )
+
+        self.assertEqual(
+            resources[0]['Attributes']['routing.http2.enabled'], True
         )
 
     def test_alb_http2_is_not_enabled(self):
@@ -760,6 +768,10 @@ class TestAppElbAttributesFilter(BaseTest):
 
         self.assertEqual(
             len(resources), 1, "Test should find 1 app lb with idle timeout < 60s"
+        )
+
+        self.assertLess(
+            resources[0]['Attributes']['idle_timeout.timeout_seconds'], 60
         )
 
 
