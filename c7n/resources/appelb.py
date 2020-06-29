@@ -647,11 +647,11 @@ class CheckAttributes(ValueFilter, AppELBAttributeFilterBase):
     .. code-block:: yaml
 
             policies:
-                - name: alb-cross-zone-load-balancing
+                - name: alb-http2-enabled
                   resource: app-elb
                   filters:
                     - type: attributes
-                      key: ConnectionDraining.Enabled
+                      key: routing.http2.enabled
                       value: true
                       op: eq
     """
