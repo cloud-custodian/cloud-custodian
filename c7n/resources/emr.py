@@ -316,6 +316,9 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
         return list(sg_ids)
 
 
+filters.register('network-location', net_filters.NetworkLocation)
+
+
 @resources.register('emr-security-configuration')
 class EMRSecurityConfiguration(QueryResourceManager):
     """Resource manager for EMR Security Configuration
