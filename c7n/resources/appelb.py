@@ -648,7 +648,7 @@ class CheckAttributes(ValueFilter, AppELBAttributeFilterBase):
 
             policies:
                 - name: alb-cross-zone-load-balancing
-                  resource: appelb
+                  resource: app-elb
                   filters:
                     - type: attributes
                       key: ConnectionDraining.Enabled
