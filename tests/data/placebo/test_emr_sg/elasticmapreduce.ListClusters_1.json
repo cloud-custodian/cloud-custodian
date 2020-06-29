@@ -8,7 +8,7 @@
                 "Status": {
                     "State": "WAITING",
                     "StateChangeReason": {
-                        "Message": "Cluster ready after last step completed."
+                        "Message": "Cluster ready after last step completed"
                     },
                     "Timeline": {
                         "CreationDateTime": {
