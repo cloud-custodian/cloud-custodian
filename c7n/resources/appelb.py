@@ -656,7 +656,7 @@ class CheckAttributes(ValueFilter, AppELBAttributeFilterBase):
                       op: eq
     """
     annotate: False  # no annotation from value Filter
-    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes")
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
     schema = type_schema('attributes', rinherit=ValueFilter.schema)
     schema_alias = False
 
