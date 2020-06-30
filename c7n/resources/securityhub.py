@@ -22,11 +22,10 @@ import logging
 
 from c7n.actions import Action, ActionRegistry
 from c7n.filters import Filter, FilterRegistry
-from c7n.filters.missing import Missing
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.manager import resources,ResourceManager
+from c7n.manager import resources, ResourceManager
 from c7n.utils import (
     local_session, type_schema,
     chunks, dumps, filter_empty, get_partition
@@ -88,14 +87,18 @@ class SecurityHubFindingFilter(Filter):
             return
         resource_class.filter_registry.register('finding', klass)
 
-filters.register('missing', Missing)
 
-def get_security_hub(session_factory, config):
-    session = local_session(session_factory)
-    client = session.client('securityhub')
-    hub = client.describe_hub()
+def get_security_hub(session_factory, retry):
+
+    client = local_session(session_factory).client('securityhub')
+    hub = retry(client.describe_hub, ignore_err_codes=(
+        'InvalidAccessException',))
+    if not hub:
+        return []
+
     hub.pop('ResponseMetadata')
-    return hub
+    return [hub]
+
 
 @resources.register('security-hub')
 class SecurityHubMember(ResourceManager):
@@ -106,9 +109,8 @@ class SecurityHubMember(ResourceManager):
 
     class resource_type(TypeInfo):
         service = 'securityhub'
-        global_resource = True
-        id='HubArn'
-        filter_name='security-hub'
+        id = 'HubArn'
+        filter_name = 'security-hub'
 
     @classmethod
     def get_permissions(cls):
@@ -125,65 +127,69 @@ class SecurityHubMember(ResourceManager):
         return self.resource_type
 
     def resources(self):
-        return self.filter_resources([get_security_hub(self.session_factory, self.config)])
+        return self.filter_resources(get_security_hub(self.session_factory, self.retry))
 
     def get_resources(self, resource_ids):
-        return [get_security_hub(self.session_factory, self.config)]
+        return get_security_hub(self.session_factory, self.retry)
+
 
 @filters.register('valid-master')
 class SecurityHubValidMasterFilter(Filter):
     """Filter SecurityHub by checking if it has a valid master account
-        
+
     :example:
-    
+
     .. code-block:: yaml
             policies:
             - name: security-hub-valid-master
                 resource: security-hub
                 filters:
                 - type: valid-master
-                  accounts: 
+                  accounts:
                     - 123456789
     """
-    schema = type_schema('valid-master',accounts={'type':'array', 'items': {'type': 'string'}})
-    permissions = ("securityhub:GetMasterAccount",)
+    schema = type_schema('valid-master', accounts={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ("securityhub:GetMasterAccount")
 
     def process(self, balancers, event=None):
         client = local_session(self.manager.session_factory).client('securityhub')
         master_account_resp = client.get_master_account()
-        master_account_id = master_account_resp.get('Master',{}).get("AccountId")
+        master_account_id = master_account_resp.get('Master', {}).get("AccountId")
         if master_account_id in self.data["accounts"]:
             return balancers
         else:
             return []
 
+
 @filters.register('enabled-products')
-class SecurityHubEnabledIntegrationsFilter(Filter):
+class SecurityHubEnabledProductsFilter(Filter):
     """Filter SecurityHub by checking if it has certain products for import enabled
 
     Products come in the form 'provider/product'.
     For example 'aws/guardduty' and 'cloud-custodian/cloud-custodian'
-        
+
     :example:
-    
+
     .. code-block:: yaml
             policies:
             - name: security-hub-enabled-products
                 resource: security-hub
                 filters:
                 - type: enabled-products
-                  products: 
-                    - 123456789
-                    - 123456789
+                  products:
+                    - aws/guardduty
+                    - cloud-custodian/cloud-custodian
     """
-    schema = type_schema('enabled-products',products={'type':'array', 'items': {'type': 'string'}})
+    schema = type_schema('enabled-products',
+        products={'type': 'array', 'items': {'type': 'string'}})
     permissions = ("securityhub:ListEnabledProductsForImport",)
 
     def process(self, balancers, event=None):
         client = local_session(self.manager.session_factory).client('securityhub')
         resp = client.list_enabled_products_for_import()
-        product_subscriptions = resp.get('ProductSubscriptions',[])
-        product_subscriptions = [s.split('subscription/')[1] for s in product_subscriptions]
+        product_subscriptions = resp.get('ProductSubscriptions', [])
+        product_subscriptions = [
+            s.split(':product-subscription/')[1] for s in product_subscriptions]
         for p in self.data["products"]:
             if p not in product_subscriptions:
                 return []
@@ -226,7 +232,7 @@ class SecurityHub(LambdaMode):
     """
 
     schema = type_schema(
-        'hub-finding', aliases=('hub-action',),
+        'hub-finding', aliases=('hub-action'),
         rinherit=LambdaMode.schema)
 
     ActionFinding = 'Security Hub Findings - Custom Action'

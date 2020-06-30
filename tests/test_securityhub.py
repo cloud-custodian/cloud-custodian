@@ -625,6 +625,7 @@ class SecurityHubTest(BaseTest):
                     "workload-type": "other"}
             })
 
+
 class SecurityHubResourceTest(BaseTest):
 
     def test_valid_master(self):
@@ -635,7 +636,7 @@ class SecurityHubResourceTest(BaseTest):
             'resource': 'aws.security-hub',
             'filters': [{
                 'type': 'valid-master',
-                'accounts':['519413311747']
+                'accounts': ['111111111']
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -648,7 +649,7 @@ class SecurityHubResourceTest(BaseTest):
             'resource': 'aws.security-hub',
             'filters': [{
                 'type': 'valid-master',
-                'accounts':['12345678']
+                'accounts': ['12345678']
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
@@ -661,7 +662,7 @@ class SecurityHubResourceTest(BaseTest):
             'resource': 'aws.security-hub',
             'filters': [{
                 'type': 'enabled-products',
-                'products':['aws/guardduty','cloud-custodian/cloud-custodian']
+                'products': ['aws/guardduty', 'cloud-custodian/cloud-custodian']
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -674,7 +675,7 @@ class SecurityHubResourceTest(BaseTest):
             'resource': 'aws.security-hub',
             'filters': [{
                 'type': 'enabled-products',
-                'products':['aws/guardduty','aws/detective']
+                'products': ['aws/guardduty', 'aws/detective']
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
