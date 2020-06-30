@@ -626,7 +626,7 @@ class SecurityHubTest(BaseTest):
             })
 
 
-class SecurityHubResourceTest(BaseTest):
+class SecurityHubMemberTest(BaseTest):
 
     def test_valid_master(self):
         session_factory = self.replay_flight_data(

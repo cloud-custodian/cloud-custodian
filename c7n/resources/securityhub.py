@@ -111,8 +111,7 @@ class SecurityHubMember(QueryResourceManager):
         id = name = 'HubArn'
         arn_type = 'hub'
         cfn_type = 'AWS::SecurityHub::Hub'
-
-    permissions = ('securityhub:DescribeHub',)
+        enum_spec = ("describe_hub", None, None)
 
     def resources(self):
         return self.filter_resources(get_security_hub(self.session_factory, self.retry))
