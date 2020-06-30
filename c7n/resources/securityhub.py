@@ -232,7 +232,7 @@ class SecurityHub(LambdaMode):
     """
 
     schema = type_schema(
-        'hub-finding', aliases=('hub-action'),
+        'hub-finding', aliases=('hub-action',),
         rinherit=LambdaMode.schema)
 
     ActionFinding = 'Security Hub Findings - Custom Action'
