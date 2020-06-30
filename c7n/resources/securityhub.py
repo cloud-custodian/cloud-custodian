@@ -109,8 +109,9 @@ class SecurityHubMember(ResourceManager):
 
     class resource_type(TypeInfo):
         service = 'securityhub'
-        id = 'HubArn'
-        filter_name = 'security-hub'
+        id = name = 'HubArn'
+        arn_type = 'HubArn'
+        cfn_type = 'AWS::SecurityHub::Hub'
 
     @classmethod
     def get_permissions(cls):
@@ -140,6 +141,7 @@ class SecurityHubValidMasterFilter(Filter):
     :example:
 
     .. code-block:: yaml
+
             policies:
             - name: security-hub-valid-master
                 resource: security-hub
@@ -149,7 +151,7 @@ class SecurityHubValidMasterFilter(Filter):
                     - 123456789
     """
     schema = type_schema('valid-master', accounts={'type': 'array', 'items': {'type': 'string'}})
-    permissions = ("securityhub:GetMasterAccount")
+    permissions = ("securityhub:GetMasterAccount",)
 
     def process(self, balancers, event=None):
         client = local_session(self.manager.session_factory).client('securityhub')
@@ -171,6 +173,7 @@ class SecurityHubEnabledProductsFilter(Filter):
     :example:
 
     .. code-block:: yaml
+
             policies:
             - name: security-hub-enabled-products
                 resource: security-hub
