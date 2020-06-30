@@ -640,7 +640,7 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
 
 @AppELB.filter_registry.register('attributes')
 class CheckAttributes(ValueFilter, AppELBAttributeFilterBase):
-    """ Value filter that allowed filtering on ELBv2 attributes
+    """ Value filter that allows filtering on ELBv2 attributes
 
     :example:
 
