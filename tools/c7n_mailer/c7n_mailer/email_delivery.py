@@ -40,11 +40,11 @@ class EmailDelivery:
         return None
 
     def get_valid_emails_from_list(self, targets):
-        emails = []
+        emails = set()
         for target in targets:
             for email in target.split(':'):
                 if is_email(target):
-                    emails.append(target)
+                    emails.add(target)
         return emails
 
     def get_event_owner_email(self, targets, event):
