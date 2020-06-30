@@ -18,12 +18,17 @@ import os
 import time
 
 import distutils.util
+import jmespath
 import requests
-from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
-                                 FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE,
-                                 FUNCTION_HOST_CONFIG,
-                                 FUNCTION_EXTENSION_BUNDLE_CONFIG)
+from c7n_azure.constants import (
+    AUTH_TYPE_MSI,
+    AUTH_TYPE_UAI,
+    AUTH_TYPE_EMBED,
+    ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
+    FUNCTION_EVENT_TRIGGER_MODE,
+    FUNCTION_TIME_TRIGGER_MODE,
+    FUNCTION_HOST_CONFIG,
+    FUNCTION_EXTENSION_BUNDLE_CONFIG)
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -65,7 +70,8 @@ class FunctionPackage:
         if not self.enable_ssl_cert:
             self.log.warning('SSL Certificate Validation is disabled')
 
-    def _add_functions_required_files(self, policy, requirements, queue_name=None):
+    def _add_functions_required_files(
+            self, policy_data, requirements, queue_name=None):
         s = local_session(Session)
 
         self.pkg.add_contents(dest='requirements.txt',
@@ -73,24 +79,34 @@ class FunctionPackage:
 
         for target_sub_id in self.target_sub_ids:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
-            # generate and add auth
-            self.pkg.add_contents(dest=name + '/auth.json',
-                                  contents=s.get_functions_auth_string(target_sub_id))
+            # generate and add auth if using embedded service principal
+            identity = jmespath.search(
+                'mode."provision-options".identity', policy_data) or {
+                    'type': AUTH_TYPE_EMBED}
+            if identity['type'] == AUTH_TYPE_EMBED:
+                auth_contents = s.get_functions_auth_string(target_sub_id)
+            elif identity['type'] == AUTH_TYPE_MSI:
+                auth_contents = json.dumps({
+                    'use_msi': True, 'subscription_id': target_sub_id})
+            elif identity['type'] == AUTH_TYPE_UAI:
+                auth_contents = json.dumps({
+                    'use_msi': True, 'subscription_id': target_sub_id,
+                    'client_id': identity['client_id']})
 
+            self.pkg.add_contents(dest=name + '/auth.json', contents=auth_contents)
             self.pkg.add_file(self.function_path,
                               dest=name + '/function.py')
 
             self.pkg.add_contents(dest=name + '/__init__.py', contents='')
 
-            if policy:
-                config_contents = self.get_function_config(policy, queue_name)
-                policy_contents = self._get_policy(policy)
-                self.pkg.add_contents(dest=name + '/function.json',
-                                      contents=config_contents)
-
-                self.pkg.add_contents(dest=name + '/config.json',
-                                      contents=policy_contents)
-                self._add_host_config(policy['mode']['type'])
+            if policy_data:
+                self.pkg.add_contents(
+                    dest=name + '/function.json',
+                    contents=self.get_function_config(policy_data, queue_name))
+                self.pkg.add_contents(
+                    dest=name + '/config.json',
+                    contents=json.dumps({'policies': [policy_data]}, indent=2))
+                self._add_host_config(policy_data['mode']['type'])
             else:
                 self._add_host_config(None)
 
@@ -128,12 +144,6 @@ class FunctionPackage:
                            % mode_type)
 
         return json.dumps(config, indent=2)
-
-    def _get_policy(self, policy):
-        return json.dumps({'policies': [policy]}, indent=2)
-
-    def _update_perms_package(self):
-        os.chmod(self.pkg.path, 0o0644)
 
     @property
     def cache_folder(self):
@@ -175,9 +185,9 @@ class FunctionPackage:
 
     def publish(self, deployment_creds):
         self.close()
-
         # update perms of the package
-        self._update_perms_package()
+        os.chmod(self.pkg.path, 0o0644)
+
         zip_api_url = '%s/api/zipdeploy?isAsync=true&synctriggers=true' % deployment_creds.scm_uri
         headers = {'content-type': 'application/octet-stream'}
         self.log.info("Publishing Function package from %s" % self.pkg.path)

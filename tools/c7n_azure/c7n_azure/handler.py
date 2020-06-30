@@ -43,7 +43,6 @@ def run(event, context, subscription_id=None):
     options_overrides = \
         policy_config['policies'][0].get('mode', {}).get('execution-options', {})
 
-    # setup our auth file location on disk
     options_overrides['authorization_file'] = context['auth_file']
 
     # if output_dir specified use that, otherwise make a temp directory
@@ -59,8 +58,8 @@ def run(event, context, subscription_id=None):
     load_resources(StructureParser().get_resource_types(policy_config))
 
     options = Azure().initialize(options)
-
     policies = PolicyCollection.from_data(policy_config, options)
+
     if policies:
         for p in policies:
             try:

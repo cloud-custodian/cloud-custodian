@@ -22,16 +22,18 @@ import sys
 import types
 from collections import namedtuple
 
-import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
 from azure.keyvault import KeyVaultAuthentication, AccessToken
-from c7n_azure import constants
-from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             ManagedGroupHelper, get_keyvault_secret)
+import jwt
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_active_directory import MSIAuthentication
 from requests import HTTPError
+
+from c7n_azure import constants
+from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
+                             ManagedGroupHelper, get_keyvault_secret)
+
 
 try:
     from azure.cli.core._profile import Profile
@@ -261,13 +263,10 @@ class Session:
             ), data.get('subscription', None))
 
     def get_functions_auth_string(self, target_subscription_id):
-        """
-        Build auth json string for deploying
-        Azure Functions.  Look for dedicated
-        Functions environment variables or
-        fall back to normal Service Principal
-        variables.
+        """Build auth json string for deploying Azure Functions.
 
+        Look for dedicated Functions environment variables or fall
+        back to normal Service Principal variables.
         """
 
         self._initialize_session()
