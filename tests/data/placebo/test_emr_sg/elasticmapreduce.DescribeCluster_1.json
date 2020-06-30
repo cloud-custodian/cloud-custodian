@@ -63,9 +63,9 @@
                     "Version": "3.7.2"
                 }
             ],
-            "Tags": [],         
+            "Tags": [],
             "ServiceRole": "EMR_DefaultRole",
-            "NormalizedInstanceHours": 106000,
+            "NormalizedInstanceHours": 106352,
             "MasterPublicDnsName": "ip-X-X-X-X.ec2.internal",
             "Configurations": [],
             "SecurityConfiguration": "Encrypted",
@@ -75,7 +75,7 @@
             "EbsRootVolumeSize": 20,
             "RepoUpgradeOnBoot": "SECURITY",
             "KerberosAttributes": {},
-            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:644160558196:cluster/j-2OMWOHFEP8XA",
+            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:644160558196:cluster/j-2OMWOHFEP8XA9",
             "StepConcurrencyLevel": 1
         },
         "ResponseMetadata": {}

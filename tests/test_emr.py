@@ -175,6 +175,7 @@ class TestEMR(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "pratyush-emr-test")
 
 
 class TestEMRQueryFilter(unittest.TestCase):

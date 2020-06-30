@@ -33,7 +33,7 @@
                         }
                     }
                 },
-                "NormalizedInstanceHours": 106000,
+                "NormalizedInstanceHours": 106352,
                 "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:644160558196:cluster/j-2OMWOHFEP8XA9"
             }
         ],
