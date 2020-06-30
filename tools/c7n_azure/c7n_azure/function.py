@@ -29,7 +29,7 @@ from azure.functions import QueueMessage
 max_dequeue_count = 3
 
 def main(input):
-    logging.info("Running Azure Cloud Custodian Policy")
+    logging.info("Running Azure Cloud Custodian Policy %s", input)
 
     context = {
         'config_file': join(function_directory, 'config.json'),

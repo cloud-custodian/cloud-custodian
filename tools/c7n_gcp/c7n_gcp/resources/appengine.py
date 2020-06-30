@@ -34,6 +34,7 @@ class AppEngineApp(QueryResourceManager):
         default_report_fields = [
             'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
         asset_type = "appengine.googleapis.com/Application"
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -69,6 +70,7 @@ class AppEngineCertificate(ChildResourceManager):
             }
         }
         default_report_fields = ['displayName', 'expireTime']
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -98,6 +100,7 @@ class AppEngineDomain(ChildResourceManager):
                 ('id', 'appsId')
             }
         }
+        permissions = ('appengine.applications.get',)
 
 
 @resources.register('app-engine-domain-mapping')
@@ -124,6 +127,7 @@ class AppEngineDomainMapping(ChildResourceManager):
                 ('id', 'appsId')
             }
         }
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -156,6 +160,7 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
             }
         }
         default_report_fields = ['priority', 'action', 'sourceRange', 'description']
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):

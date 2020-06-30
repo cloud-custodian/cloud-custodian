@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nicnoc/d1c62a508f72274f",
+                "DNSName": "nicnoc-d1c62a508f72274f.elb.us-east-1.amazonaws.com",
+                "CanonicalHostedZoneId": "Z26RNL4JYFTOTI",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 18,
+                    "hour": 11,
+                    "minute": 1,
+                    "second": 21,
+                    "microsecond": 41000
+                },
+                "LoadBalancerName": "nicnoc",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-d2d616b5",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "network",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-efbcccb7",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-914763e7",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "IpAddressType": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

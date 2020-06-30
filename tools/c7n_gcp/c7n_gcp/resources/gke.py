@@ -85,6 +85,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         parent_spec = {'resource': 'gke-cluster'}
         asset_type = 'container.googleapis.com/NodePool'
         default_report_fields = ['name', 'status', 'version']
+        permissions = ('container.nodes.list',)
 
         @staticmethod
         def get(client, resource_info):

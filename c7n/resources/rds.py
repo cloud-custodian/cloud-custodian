@@ -1626,8 +1626,11 @@ class ModifyDb(BaseAction):
                         'PerformanceInsightsKMSKeyId',
                         'PerformanceInsightsRetentionPeriod',
                         'CloudwatchLogsExportConfiguration',
+                        'ProcessorFeatures',
                         'UseDefaultProcessorFeatures',
-                        'DeletionProtection']},
+                        'DeletionProtection',
+                        'MaxAllocatedStorage',
+                        'CertificateRotationRestart']},
                     'value': {}
                 },
             },
@@ -1635,6 +1638,17 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
+    conversion_map = {
+        'DBSubnetGroupName': 'DBSubnetGroup.DBSubnetGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].VpcSecurityGroupId',
+        'DBParameterGroupName': 'DBParameterGroups[].DBParameterGroupName',
+        'OptionGroupName': 'OptionGroupMemberships[].OptionGroupName',
+        'NewDBInstanceIdentifier': 'DBInstanceIdentifier',
+        'Domain': 'DomainMemberships[].DomainName',
+        'DBPortNumber': 'Endpoint.Port',
+        'EnablePerformanceInsights': 'PerformanceInsightsEnabled',
+        'CloudwatchLogsExportConfiguration': 'EnabledCloudwatchLogsExports'
+    }
 
     def validate(self):
         if self.data.get('update'):
@@ -1644,16 +1658,25 @@ class ModifyDb(BaseAction):
                 raise PolicyValidationError(
                     "A MonitoringRoleARN value is required \
                     if you specify a MonitoringInterval value other than 0")
+            if ('CloudwatchLogsExportConfiguration' in update_dict
+                and all(
+                    k not in update_dict.get('CloudwatchLogsExportConfiguration')
+                    for k in ('EnableLogTypes', 'DisableLogTypes'))):
+                raise PolicyValidationError(
+                    "A EnableLogTypes or DisableLogTypes input list is required\
+                    for setting CloudwatchLogsExportConfiguration")
         return self
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
-
         for r in resources:
-            param = {}
-            for update in self.data.get('update'):
-                if r[update['property']] != update['value']:
-                    param[update['property']] = update['value']
+            param = {
+                u['property']: u['value'] for u in self.data.get('update')
+                if r.get(
+                    u['property'],
+                    jmespath.search(
+                        self.conversion_map.get(u['property'], 'None'), r))
+                    != u['value']}
             if not param:
                 continue
             param['ApplyImmediately'] = self.data.get('immediate', False)

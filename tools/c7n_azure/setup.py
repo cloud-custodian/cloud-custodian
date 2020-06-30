@@ -63,8 +63,8 @@ install_requires = \
  'azure-storage-blob>=2.1,<2.2',
  'azure-storage-file>=2.1.0,<3.0.0',
  'azure-storage-queue>=2.1,<2.2',
- 'boto3 (>=1.13.24,<2.0.0)',
- 'botocore (>=1.16.24,<2.0.0)',
+ 'boto3 (>=1.14.8,<2.0.0)',
+ 'botocore (>=1.17.8,<2.0.0)',
  'c7n (>=0.9.3,<0.10.0)',
  'click>=7.0,<8.0',
  'distlib>=0.3.0,<0.4.0',
@@ -89,7 +89,7 @@ extras_require = \
 
 setup_kwargs = {
     'name': 'c7n-azure',
-    'version': '0.7.2',
+    'version': '0.7.3',
     'description': 'Cloud Custodian - Azure Support',
     'long_description': '\n# Cloud Custodian - Azure Support\n\nThis a plugin to Cloud Custodian that adds Azure support.\n\n## Install Cloud Custodian and Azure Plugin\n\nThe Azure provider must be installed as a separate package in addition to c7n. \n\n    $ git clone https://github.com/cloud-custodian/cloud-custodian.git\n    $ virtualenv custodian\n    $ source custodian/bin/activate\n    (custodian) $ pip install -e cloud-custodian/.\n    (custodian) $ pip install -e cloud-custodian/tools/c7n_azure/.\n\n\n## Write your first policy\n\nA policy specifies the following items:\n\n- The type of resource to run the policy against\n- Filters to narrow down the set of resources\n- Actions to take on the filtered set of resources\n\nFor this tutorial we will add a tag to all virtual machines with the name "Hello" and the value "World".\n\nCreate a file named ``custodian.yml`` with this content:\n\n    policies:\n        - name: my-first-policy\n          description: |\n            Adds a tag to all virtual machines\n          resource: azure.vm\n          actions:\n            - type: tag\n              tag: Hello\n              value: World\n\n## Run your policy\n\nFirst, choose one of the supported authentication mechanisms and either log in to Azure CLI or set\nenvironment variables as documented in [Authentication](https://cloudcustodian.io/docs/azure/authentication.html#azure-authentication).\n\n    custodian run --output-dir=. custodian.yml\n\n\nIf successful, you should see output similar to the following on the command line\n\n    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm\n    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:azure.vm has count:1 time:1.38\n    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67\n\n\nYou should also find a new ``my-first-policy`` directory with a log and other\nfiles (subsequent runs will append to the log by default rather than\noverwriting it). \n\n## Links\n- [Getting Started](https://cloudcustodian.io/docs/azure/gettingstarted.html)\n- [Example Scenarios](https://cloudcustodian.io/docs/azure/examples/index.html)\n- [Example Policies](https://cloudcustodian.io/docs/azure/policy/index.html)\n\n\n\n\n',
     'long_description_content_type': 'text/markdown',

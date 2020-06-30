@@ -154,6 +154,7 @@ ResourceMap = {
     "aws.snowball": "c7n.resources.snowball.Snowball",
     "aws.snowball-cluster": "c7n.resources.snowball.SnowballCluster",
     "aws.sns": "c7n.resources.sns.SNS",
+    "aws.sns-subscription": "c7n.resources.sns.SNSSubscription",
     "aws.sqs": "c7n.resources.sqs.SQS",
     "aws.ssm-activation": "c7n.resources.ssm.SSMActivation",
     "aws.ssm-managed-instance": "c7n.resources.ssm.ManagedInstance",
