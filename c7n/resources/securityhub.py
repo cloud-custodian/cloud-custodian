@@ -25,7 +25,7 @@ from c7n.filters import Filter, FilterRegistry
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.manager import resources, ResourceManager
+from c7n.manager import resources
 from c7n.utils import (
     local_session, type_schema,
     chunks, dumps, filter_empty, get_partition
@@ -101,11 +101,10 @@ def get_security_hub(session_factory, retry):
 
 
 @resources.register('security-hub')
-class SecurityHubMember(ResourceManager):
+class SecurityHubMember(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    retry = staticmethod(QueryResourceManager.retry)
 
     class resource_type(TypeInfo):
         service = 'securityhub'
@@ -113,19 +112,7 @@ class SecurityHubMember(ResourceManager):
         arn_type = 'hub'
         cfn_type = 'AWS::SecurityHub::Hub'
 
-    @classmethod
-    def get_permissions(cls):
-        return ('securityhub:DescribeHub',)
-
-    @classmethod
-    def has_arn(cls):
-        return True
-
-    def get_arns(self, resources):
-        return [r["HubArn"] for r in resources]
-
-    def get_model(self):
-        return self.resource_type
+    permissions = ('securityhub:DescribeHub',)
 
     def resources(self):
         return self.filter_resources(get_security_hub(self.session_factory, self.retry))
@@ -144,11 +131,11 @@ class SecurityHubValidMasterFilter(Filter):
 
             policies:
             - name: security-hub-valid-master
-                resource: security-hub
-                filters:
+              resource: security-hub
+              filters:
                 - type: valid-master
                   accounts:
-                    - 123456789
+                    - "123456789"
     """
     schema = type_schema('valid-master', accounts={'type': 'array', 'items': {'type': 'string'}})
     permissions = ("securityhub:GetMasterAccount",)
@@ -176,12 +163,12 @@ class SecurityHubEnabledProductsFilter(Filter):
 
             policies:
             - name: security-hub-enabled-products
-                resource: security-hub
-                filters:
+              resource: security-hub
+              filters:
                 - type: enabled-products
                   products:
-                    - aws/guardduty
-                    - cloud-custodian/cloud-custodian
+                    - "aws/guardduty"
+                    - "cloud-custodian/cloud-custodian"
     """
     schema = type_schema('enabled-products',
         products={'type': 'array', 'items': {'type': 'string'}})
