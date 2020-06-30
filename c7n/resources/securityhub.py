@@ -21,7 +21,7 @@ import hashlib
 import logging
 
 from c7n.actions import Action, ActionRegistry
-from c7n.filters import Filter, FilterRegistry
+from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.query import QueryResourceManager, TypeInfo
@@ -120,8 +120,8 @@ class SecurityHubMember(QueryResourceManager):
         return get_security_hub(self.session_factory, self.retry)
 
 
-@filters.register('valid-master')
-class SecurityHubValidMasterFilter(Filter):
+@filters.register('master')
+class SecurityHubMasterFilter(ValueFilter):
     """Filter SecurityHub by checking if it has a valid master account
 
     :example:
@@ -129,28 +129,28 @@ class SecurityHubValidMasterFilter(Filter):
     .. code-block:: yaml
 
         policies:
-          - name: security-hub-valid-master
+          - name: security-hub-master
             resource: security-hub
             filters:
-              - type: valid-master
-                accounts:
-                  - "123456789"
+              - type: master
+                key: AccountId
+                value: "123456789"
     """
-    schema = type_schema('valid-master', accounts={'type': 'array', 'items': {'type': 'string'}})
+    schema = type_schema('master', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("securityhub:GetMasterAccount",)
 
-    def process(self, balancers, event=None):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('securityhub')
         master_account_resp = client.get_master_account()
-        master_account_id = master_account_resp.get('Master', {}).get("AccountId")
-        if master_account_id in self.data["accounts"]:
-            return balancers
-        else:
-            return []
+        master_account = master_account_resp.get('Master', {})
+        if self.match(master_account):
+            return resources
+        return []
 
 
-@filters.register('enabled-products')
-class SecurityHubEnabledProductsFilter(Filter):
+@filters.register('products')
+class SecurityHubProductsFilter(Filter):
     """Filter SecurityHub by checking if it has certain products for import enabled
 
     Products come in the form 'provider/product'.
@@ -161,15 +161,15 @@ class SecurityHubEnabledProductsFilter(Filter):
     .. code-block:: yaml
 
         policies:
-          - name: security-hub-enabled-products
+          - name: security-hub-products
             resource: security-hub
             filters:
-              - type: enabled-products
+              - type: products
                 products:
                   - "aws/guardduty"
                   - "cloud-custodian/cloud-custodian"
     """
-    schema = type_schema('enabled-products',
+    schema = type_schema('products',
         products={'type': 'array', 'items': {'type': 'string'}})
     permissions = ("securityhub:ListEnabledProductsForImport",)
 

@@ -632,11 +632,12 @@ class SecurityHubMemberTest(BaseTest):
         session_factory = self.replay_flight_data(
             'test_securityhub_valid_master')
         p = self.load_policy({
-            'name': 'valid-master',
+            'name': 'master',
             'resource': 'aws.security-hub',
             'filters': [{
-                'type': 'valid-master',
-                'accounts': ['111111111']
+                'type': 'master',
+                'key': 'AccountId',
+                'value': '111111111'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -645,11 +646,12 @@ class SecurityHubMemberTest(BaseTest):
         session_factory = self.replay_flight_data(
             'test_securityhub_valid_master')
         p = self.load_policy({
-            'name': 'valid-master',
+            'name': 'master',
             'resource': 'aws.security-hub',
             'filters': [{
-                'type': 'valid-master',
-                'accounts': ['12345678']
+                'type': 'master',
+                'key': 'AccountId',
+                'value': '12345678'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
@@ -658,10 +660,10 @@ class SecurityHubMemberTest(BaseTest):
         session_factory = self.replay_flight_data(
             'test_securityhub_enabled_products')
         p = self.load_policy({
-            'name': 'enabled-products',
+            'name': 'products',
             'resource': 'aws.security-hub',
             'filters': [{
-                'type': 'enabled-products',
+                'type': 'products',
                 'products': ['aws/guardduty', 'cloud-custodian/cloud-custodian']
             }]}, session_factory=session_factory)
         resources = p.run()
@@ -671,10 +673,10 @@ class SecurityHubMemberTest(BaseTest):
         session_factory = self.replay_flight_data(
             'test_securityhub_enabled_products')
         p = self.load_policy({
-            'name': 'enabled-products',
+            'name': 'products',
             'resource': 'aws.security-hub',
             'filters': [{
-                'type': 'enabled-products',
+                'type': 'products',
                 'products': ['aws/guardduty', 'aws/detective']
             }]}, session_factory=session_factory)
         resources = p.run()
