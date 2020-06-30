@@ -110,7 +110,7 @@ class SecurityHubMember(ResourceManager):
     class resource_type(TypeInfo):
         service = 'securityhub'
         id = name = 'HubArn'
-        arn_type = 'HubArn'
+        arn_type = 'hub'
         cfn_type = 'AWS::SecurityHub::Hub'
 
     @classmethod
