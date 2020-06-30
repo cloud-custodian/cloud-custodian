@@ -129,13 +129,13 @@ class SecurityHubValidMasterFilter(Filter):
 
     .. code-block:: yaml
 
-            policies:
-            - name: security-hub-valid-master
-              resource: security-hub
-              filters:
-                - type: valid-master
-                  accounts:
-                    - "123456789"
+        policies:
+          - name: security-hub-valid-master
+            resource: security-hub
+            filters:
+              - type: valid-master
+                accounts:
+                  - "123456789"
     """
     schema = type_schema('valid-master', accounts={'type': 'array', 'items': {'type': 'string'}})
     permissions = ("securityhub:GetMasterAccount",)
@@ -161,14 +161,14 @@ class SecurityHubEnabledProductsFilter(Filter):
 
     .. code-block:: yaml
 
-            policies:
-            - name: security-hub-enabled-products
-              resource: security-hub
-              filters:
-                - type: enabled-products
-                  products:
-                    - "aws/guardduty"
-                    - "cloud-custodian/cloud-custodian"
+        policies:
+          - name: security-hub-enabled-products
+            resource: security-hub
+            filters:
+              - type: enabled-products
+                products:
+                  - "aws/guardduty"
+                  - "cloud-custodian/cloud-custodian"
     """
     schema = type_schema('enabled-products',
         products={'type': 'array', 'items': {'type': 'string'}})
