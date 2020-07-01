@@ -484,7 +484,7 @@ class TaskDefinition(query.QueryResourceManager):
         results = []
         client = local_session(self.session_factory).client('ecs')
         for task_def_set in resources:
-            response = query.QueryResourceManager.retry(
+            response = super().retry(
                 client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
