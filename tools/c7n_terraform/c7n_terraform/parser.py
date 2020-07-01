@@ -1,3 +1,16 @@
+# Copyright 2020 Cloud Custodian Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from collections.abc import Iterable
 import json
 import logging
@@ -7,7 +20,6 @@ import re
 
 import hcl2
 
-from typing import List, Dict, Any
 
 TF_JSON_SUFFIX = ".tf.json"
 TF_HCL_SUFFIX = ".tf"
@@ -165,7 +177,7 @@ class HclLocator:
         return {
             "start": start_line,
             "end": end_line,
-            "lines": self.file_cache[path][start_line - 1 : end_line - 1],
+            "lines": self.file_cache[path][start_line - 1:end_line - 1],
         }
 
     def _block_header_position(self, path, data_key):
@@ -185,16 +197,16 @@ class HclLocator:
         return {
             "start": start_line,
             "end": end_line,
-            "lines": self.file_cache[path][start_line - 1 : end_line - 1],
+            "lines": self.file_cache[path][start_line - 1:end_line - 1],
         }
 
     def _get_end_line(self, start_line, cache_idx, lines):
         end_line = start_line
         idx = 1
         s, e = "{", "}"
-        if not s in lines[cache_idx][1]:
+        if s not in lines[cache_idx][1]:
             s, e = "(", ")"
-        for lineno, l in lines[cache_idx + 1 :]:
+        for lineno, l in lines[cache_idx + 1:]:
             if s in l:
                 idx += 1
             if e in l:
@@ -416,6 +428,9 @@ def infer_type(value, default="unknown"):
 
 
 class Parser:
+
+    log = logging.getLogger("c7n_terraform.hcl.parser")
+
     def __init__(self):
         self.seen_dirs = set()
         self.errors = {}
@@ -455,7 +470,7 @@ class Parser:
                     self.tf_resources[f] = tf_data = self._parse_hcl_file(f)
                     modules.update(self._resolve_modules(f.parent, tf_data))
                 except Exception as e:
-                    log.info(f"error parsing {f}", exc_info=e)
+                    self.log.info(f"error parsing {f}", exc_info=e)
                     self.errors[str(f)] = e
         for m in modules:
             if m not in self.seen_dirs:
