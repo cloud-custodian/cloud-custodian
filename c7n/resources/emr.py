@@ -14,6 +14,7 @@
 import logging
 import time
 import json
+import jmespath
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -24,6 +25,7 @@ from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
+import c7n.filters.vpc as net_filters
 
 filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
@@ -284,6 +286,37 @@ class QueryFilter:
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Ec2InstanceAttributes.RequestedEc2SubnetIds[]"
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('Ec2InstanceAttributes.EmrManagedMasterSecurityGroup',
+                'Ec2InstanceAttributes.EmrManagedSlaveSecurityGroup',
+                'Ec2InstanceAttributes.ServiceAccessSecurityGroup',
+                'Ec2InstanceAttributes.AdditionalMasterSecurityGroups[]',
+                'Ec2InstanceAttributes.AdditionalSlaveSecurityGroups[]')
+
+    def get_related_ids(self, resources):
+        sg_ids = set()
+        for r in resources:
+            for exp in self.expressions:
+                ids = jmespath.search(exp, r)
+                if isinstance(ids, list):
+                    sg_ids.update(tuple(ids))
+                elif isinstance(ids, str):
+                    sg_ids.add(ids)
+        return list(sg_ids)
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @resources.register('emr-security-configuration')
