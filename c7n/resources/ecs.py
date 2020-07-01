@@ -483,9 +483,8 @@ class TaskDefinition(query.QueryResourceManager):
     def augment(self, resources):
         results = []
         client = local_session(self.session_factory).client('ecs')
-        retry = get_retry(('ThrottlingException',))
         for task_def_set in resources:
-            response = retry(
+            response = query.QueryResourceManager.retry(
                 client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
