@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "c7n_terraform"
+version = "0.1.0"
+description = "Cloud Custodian Provider for evaluating Terraform"
+authors = ["Kapil Thangavelu <kapilt@gmail.com>"]
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+rich = "^1.1.9"
+click = "^7.1.2"
+python-hcl2 = "^0.2.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
