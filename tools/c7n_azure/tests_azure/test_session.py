@@ -141,7 +141,7 @@ class SessionTest(BaseTest):
                             }, clear=True):
                 s = Session()
 
-                self.assertIs(type(s.get_credentials()), MSIAuthentication)
+                self.assertTrue(isinstance(s.get_credentials(), MSIAuthentication))
                 self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     def test_initialize_msi_auth_user(self):

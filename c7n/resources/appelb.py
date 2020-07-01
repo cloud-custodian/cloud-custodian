@@ -322,9 +322,7 @@ class SetS3Logging(BaseAction):
               - name: elbv2-test
                 resource: app-elb
                 filters:
-                  - type: value
-                    key: Attributes."access_logs.s3.enabled"
-                    value: False
+                  - type: is-not-logging
                 actions:
                   - type: set-s3-logging
                     bucket: elbv2logtest
@@ -638,6 +636,39 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
                     'access_logs.s3.bucket', None)) or
                 (bucket_prefix and bucket_prefix != alb['Attributes'].get(
                     'access_logs.s3.prefix', None))]
+
+
+@AppELB.filter_registry.register('attributes')
+class CheckAttributes(ValueFilter, AppELBAttributeFilterBase):
+    """ Value filter that allows filtering on ELBv2 attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: alb-http2-enabled
+                  resource: app-elb
+                  filters:
+                    - type: attributes
+                      key: routing.http2.enabled
+                      value: true
+                      op: eq
+    """
+    annotate: False  # no annotation from value Filter
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        self.initialize(resources)
+
+    def __call__(self, r):
+        return super().__call__(r['Attributes'])
 
 
 class AppELBTargetGroupFilterBase:

@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from azure.mgmt.web.models import (Site, SiteConfig)
+from azure.mgmt.web.models import (
+    Site,
+    SiteConfig,
+    ManagedServiceIdentity,
+    ManagedServiceIdentityUserAssignedIdentitiesValue as UserAssignedIdentity)
+
 from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.utils import azure_name_value_pair
@@ -26,7 +31,17 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         self.type = "Function Application"
 
     def _get(self, params):
-        return self.client.web_apps.get(params['resource_group_name'], params['name'])
+        return self.client.web_apps.get(
+            params['resource_group_name'], params['name'])
+
+    def _get_identity(self, params):
+        if 'identity' not in params:
+            return None
+        identity = ManagedServiceIdentity(type=params['identity']['type'])
+        if 'id' in params['identity']:
+            identity.user_assigned_identities = {
+                params['identity']['id']: UserAssignedIdentity()}
+        return identity
 
     def _provision(self, params):
         site_config = SiteConfig(app_settings=[])
@@ -39,6 +54,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         # common function app settings
         functionapp_def.server_farm_id = params['app_service_plan_id']
         functionapp_def.reserved = True  # This implies Linux for auto-created app plans
+        functionapp_def.identity = self._get_identity(params)
 
         # consumption app plan
         if params['is_consumption_plan']:
