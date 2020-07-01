@@ -483,18 +483,12 @@ class TaskDefinition(query.QueryResourceManager):
     def augment(self, resources):
         results = []
         client = local_session(self.session_factory).client('ecs')
-        retry = get_retry(('Throttling',))
+        retry = get_retry(('ThrottlingException',))
         for task_def_set in resources:
-            try:
-                response = retry(
-                    client.describe_task_definition,
-                    taskDefinition=task_def_set,
-                    include=['TAGS'])
-            except ClientError as e:
-                # No error code for not found.
-                if e.response['Error'][
-                        'Message'] != "The specified task definition does not exist.":
-                    raise
+            response = retry(
+                client.describe_task_definition,
+                taskDefinition=task_def_set,
+                include=['TAGS'])
             r = response['taskDefinition']
             r['tags'] = response.get('tags', [])
             results.append(r)
