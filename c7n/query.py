@@ -426,6 +426,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
+            'ThrottledException',
             'Throttling',
             'Client.RequestLimitExceeded')))
 
