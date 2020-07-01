@@ -508,16 +508,15 @@ class AppELBListenerFilterBase:
     """ Mixin base class for filters that query LB listeners.
     """
     permissions = ("elasticloadbalancing:DescribeListeners",)
+    retry = staticmethod(QueryResourceManager.retry)
 
     def initialize(self, albs):
         client = local_session(self.manager.session_factory).client('elbv2')
         self.listener_map = defaultdict(list)
         for alb in albs:
-            try:
-                results = client.describe_listeners(
-                    LoadBalancerArn=alb['LoadBalancerArn'])
-            except client.exceptions.LoadBalancerNotFoundException:
-                continue
+            results = self.retry(client.describe_listeners,
+                    LoadBalancerArn=alb['LoadBalancerArn'], ignore_err_codes=(
+                        'LoadBalancerNotFoundException',))
             self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
 
 
