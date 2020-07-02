@@ -173,7 +173,7 @@ class SecurityHubProductsFilter(Filter):
         products={'type': 'array', 'items': {'type': 'string'}})
     permissions = ("securityhub:ListEnabledProductsForImport",)
 
-    def process(self, balancers, event=None):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('securityhub')
         resp = client.list_enabled_products_for_import()
         product_subscriptions = resp.get('ProductSubscriptions', [])
@@ -182,7 +182,7 @@ class SecurityHubProductsFilter(Filter):
         for p in self.data["products"]:
             if p not in product_subscriptions:
                 return []
-        return balancers
+        return resources
 
 
 @execution.register('hub-finding')
