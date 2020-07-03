@@ -1135,6 +1135,43 @@ class TestReduceFilter(BaseFilterTest):
         self.assertEqual(len(rs), 2)
         self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B'])
 
+    def test_discard(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+
+    def test_discard_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "discard-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['D', 'E', 'F'])
+
+    def test_discard_and_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['C', 'D'])
+
     def test_sort(self):
         resources = self.instances()
         f = filters.factory(

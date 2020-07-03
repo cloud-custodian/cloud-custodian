@@ -318,7 +318,7 @@ This works using this process:
 
     1. Group resources
     2. Sort each group of resources
-    3. Limit the number of resources in each group
+    3. Selecting a number of resources in each group
     4. Combine the resulting resources
 
 Grouping resources
@@ -342,18 +342,54 @@ attribute.
 Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
 done.
 
-Limiting resources
+Selecting resources
 ~~~~~~~~~~~~~~~~~~
 
-Once groups have been sorted, we can then apply a limit to each group.
-This is done using the ``limit`` and ``limit-percent`` attributes.
+Once groups have been sorted, we can then apply rules to select a specific
+number of resources in each group.  We first ``discard`` some resources
+and then ``limit`` the remaining set to a maximum count.
+
+When the ``discard`` or ``discard-percent`` attributes are specified, we
+take the ordered resources in each group and discard the first
+``discard-percent`` of them or ``discard`` absolute count, whichever is
+larger.
+
+After discarding resources, we then limit the remaining set.
 ``limit-percent`` is applied first to reduce the number of resources to
 this percentage of the original.  ``limit`` is then applied to allow for
 an absolute count.  Resources are kept from the beginning of the list.
 
-Since these are per-group, if you have 20 resources in one group and 5 in
-another and specify ``limit-percent = 10``, you'll get 2 resources from
-the first group and 0 resources from the second.
+To explain this with an example, suppose you have 50 resources in a group
+with all of these set:
+
+  .. code-block:: yaml
+
+    discard: 5
+    discard-percent: 20
+    limit: 10
+    limit-percent: 30
+
+This would first discard the first 10 resources because 20 percent of 50
+is 10, which is greater than 5.  You now have 40 resources left in the
+group and the limit settings are applied.  30% of 40 is 12, but ``limit``
+is set to 10, which is lower, so the first 10 of the remaining are kept.
+If they were numbered #1-50, you'd have discarded 1-10, kept 11-20, and
+dropped the remaining 21-50.
+
+If you had the following settings:
+
+  .. code-block:: yaml
+
+    discard-percent: 25
+    limit-percent: 50
+
+We'd discard the first 25% of 50 (12), then of the remaining 38 resources,
+we'd keep 50% of those (19).  You'd end up with resources 13-31.
+
+Now, some of these could eliminate all resources from a group.  If you
+have 20 resources in one group and 5 in another and specify
+``limit-percent = 10``, you'll get 2 resources from the first group and 0
+resources from the second.
 
 Combining resource groups
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -395,9 +431,10 @@ Attributes
   - ``last`` (default) - at the end of the list
   - ``first`` - at the start of the list
 
+- ``discard`` - discard the first N resources within each group
+- ``discard-percent`` - discard the first N percentage of resources within each group
 - ``limit`` - select the first N resources within each group
-- ``limit-percent`` - select the first N percentage of resources within
-  each group
+- ``limit-percent`` - select the first N percentage of resources within each group
 
 Examples
 ~~~~~~~~

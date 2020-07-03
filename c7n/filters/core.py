@@ -897,6 +897,8 @@ class ReduceFilter(BaseValueFilter):
             'null-order': {'enum': ['first', 'last']},
             'limit': {'type': 'number', 'minimum': 0},
             'limit-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
+            'discard': {'type': 'number', 'minimum': 0},
+            'discard-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
         },
     }
     schema_alias = True
@@ -1004,10 +1006,21 @@ class ReduceFilter(BaseValueFilter):
 
         max = self.data.get('limit', 0)
         pct = self.data.get('limit-percent', 0)
+        drop = self.data.get('discard', 0)
+        droppct = self.data.get('discard-percent', 0)
         ordered = list(groups)
         if 'group-by' in self.data or 'order' in self.data:
             ordered = self.reorder(ordered, key=lambda r: groups[r]['sortkey'])
         for g in ordered:
+            # discard X first
+            if droppct > 0:
+                n = int(droppct / 100 * len(groups[g]['resources']))
+                if n > drop:
+                    drop = n
+            if drop > 0:
+                groups[g]['resources'] = groups[g]['resources'][drop:]
+
+            # then limit the remaining
             count = len(groups[g]['resources'])
             if pct > 0:
                 count = int(pct / 100 * len(groups[g]['resources']))
