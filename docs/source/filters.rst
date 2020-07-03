@@ -343,7 +343,7 @@ Note: if neither ``sort-by`` or ``order`` are specified, no sorting is
 done.
 
 Selecting resources
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Once groups have been sorted, we can then apply rules to select a specific
 number of resources in each group.  We first ``discard`` some resources
@@ -433,8 +433,10 @@ Attributes
 
 - ``discard`` - discard the first N resources within each group
 - ``discard-percent`` - discard the first N percentage of resources within each group
-- ``limit`` - select the first N resources within each group
+- ``limit`` - select the first N resources within each group (after
+  discards)
 - ``limit-percent`` - select the first N percentage of resources within each group
+  (after discards)
 
 Examples
 ~~~~~~~~
