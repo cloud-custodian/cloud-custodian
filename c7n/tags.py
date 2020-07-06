@@ -606,8 +606,8 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
-        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        days={'type': 'integer', 'minimum': 0},
+        hours={'type': 'integer', 'minimum': 0},
         tz={'type': 'string'},
         op={'type': 'string'})
     schema_alias = True

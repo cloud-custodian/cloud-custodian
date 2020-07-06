@@ -38,6 +38,7 @@ class SqlInstance(QueryResourceManager):
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
         asset_type = "sqladmin.googleapis.com/Instance"
+        perm_service = 'cloudsql'
 
         @staticmethod
         def get(client, resource_info):
@@ -69,6 +70,7 @@ class SqlInstanceStop(MethodAction):
     schema = type_schema('stop')
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         project, instance = self.path_param_re.match(
@@ -94,6 +96,7 @@ class SqlUser(ChildResourceManager):
             ]
         }
         default_report_fields = ["name", "project", "instance"]
+        perm_service = 'cloudsql'
 
 
 class SqlInstanceChildWithSelfLink(ChildResourceManager):
@@ -130,6 +133,7 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
                 ('name', 'instance')
             ]
         }
+        perm_service = 'cloudsql'
 
         @staticmethod
         def get(client, event):
@@ -176,6 +180,7 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
                 ('name', 'instance')
             ]
         }
+        perm_service = 'cloudsql'
 
         @staticmethod
         def get(client, event):

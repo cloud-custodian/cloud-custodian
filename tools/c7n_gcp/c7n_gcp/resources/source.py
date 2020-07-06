@@ -30,5 +30,5 @@ class SourceRepository(QueryResourceManager):
         scope_key = 'name'
         scope_template = "projects/{}-"
         name = id = 'name'
-
+        perm_service = 'source'
         default_report_fields = ["name", "size", "url"]

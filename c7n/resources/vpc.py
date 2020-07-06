@@ -2182,7 +2182,6 @@ class KeyPair(query.QueryResourceManager):
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         name = id = 'KeyName'
         filter_name = 'KeyNames'
-        taggable = False
 
 
 @KeyPair.filter_registry.register('unused')

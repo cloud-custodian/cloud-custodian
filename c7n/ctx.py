@@ -41,6 +41,7 @@ class ExecutionContext:
         self.start_time = None
         self.execution_id = None
         self.output = None
+        self.logs = None
         self.api_stats = None
         self.sys_stats = None
 

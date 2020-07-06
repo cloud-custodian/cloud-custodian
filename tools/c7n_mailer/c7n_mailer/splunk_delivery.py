@@ -57,6 +57,7 @@ class SplunkHecDelivery:
         payloads = []
         events = self.get_splunk_events(msg)
         indices = self._splunk_indices_for_message(msg)
+        sourcetype = self.config.get('splunk_hec_sourcetype', '_json')
         for event in events:
             for index in indices:
                 payloads.append({
@@ -65,7 +66,7 @@ class SplunkHecDelivery:
                     'source': '%s-cloud-custodian' % event.get(
                         'account', 'unknown'
                     ),
-                    'sourcetype': '_json',
+                    'sourcetype': sourcetype,
                     'index': index,
                     'event': event
                 })

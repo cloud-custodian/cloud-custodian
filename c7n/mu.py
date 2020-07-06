@@ -34,9 +34,12 @@ import zipfile
 # that support service side building.
 # Its also used for release engineering on our pypi uploads
 try:
-    import importlib_metadata as pkgmd
-except (ImportError, FileNotFoundError):
-    pkgmd = None
+    from importlib import metadata as pkgmd
+except ImportError:
+    try:
+        import importlib_metadata as pkgmd
+    except (ImportError, FileNotFoundError):
+        pkgmd = None
 
 
 # Static event mapping to help simplify cwe rules creation
@@ -265,6 +268,19 @@ class PythonPackageArchive:
     def get_filenames(self):
         """Return a list of filenames in the archive."""
         return [n.filename for n in self.get_reader().filelist]
+
+
+def get_exec_options(options):
+    """preserve cli output options into serverless environment.
+    """
+    d = {}
+    for k in ('log_group', 'tracer', 'output_dir', 'metrics_enabled'):
+        if options[k]:
+            d[k] = options[k]
+    # ignore local fs/dir output paths
+    if 'output_dir' in d and '://' not in d['output_dir']:
+        d.pop('output_dir')
+    return d
 
 
 def checksum(fh, hasher, blocksize=65536):
@@ -902,7 +918,7 @@ class PolicyLambda(AbstractLambdaFunction):
     def get_archive(self):
         self.archive.add_contents(
             'config.json', json.dumps(
-                {'execution-options': dict(self.policy.options),
+                {'execution-options': get_exec_options(self.policy.options),
                  'policies': [self.policy.data]}, indent=2))
         self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
         self.archive.close()

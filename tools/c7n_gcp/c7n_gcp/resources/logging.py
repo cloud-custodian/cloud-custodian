@@ -74,6 +74,7 @@ class LogProjectMetric(QueryResourceManager):
         default_report_fields = [
             "name", "description", "createTime", "filter"]
         asset_type = "logging.googleapis.com/LogMetric"
+        permissions = ('logging.logMetrics.list',)
 
         @staticmethod
         def get(client, resource_info):

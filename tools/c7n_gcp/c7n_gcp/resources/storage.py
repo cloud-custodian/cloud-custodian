@@ -64,6 +64,7 @@ class BucketLevelAccess(MethodAction):
 
     schema = type_schema('set-uniform-access', state={'type': 'boolean'})
     method_spec = {'op': 'patch'}
+    method_perm = 'update'
 
     # the google docs and example on this api appear to broken.
     # https://cloud.google.com/storage/docs/using-uniform-bucket-level-access#rest-apis

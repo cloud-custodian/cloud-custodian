@@ -534,6 +534,30 @@ class NetworkLocationTest(BaseTest):
                 "reason": "SecurityGroupMismatch"}],
         )
 
+    def test_network_compare_location_resource_missing(self):
+        self.factory = self.replay_flight_data("test_network_compare_location_resource_missing")
+        p = self.load_policy(
+            {
+                "name": "compare",
+                "resource": "aws.app-elb",
+                "filters": [
+                    {"type": "network-location", "key": "tag:NetworkLocation",
+                     "compare": ["subnet", "security-group"]}
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["c7n:NetworkLocation"],
+            [
+                {'reason': 'LocationMismatch', 'security-groups': {},
+                 'subnets': {'subnet-914763e7': 'Public', 'subnet-efbcccb7': 'Public'}}
+            ],
+        )
+
     @functional
     def test_network_location_triple_intersect(self):
         self.factory = self.replay_flight_data("test_network_location_intersection")

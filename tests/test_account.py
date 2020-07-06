@@ -1166,3 +1166,18 @@ class AccountDataEvents(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_securityhub(self):
+        session_factory = self.replay_flight_data("test_enable_securityhub")
+        p = self.load_policy(
+            {
+                'name': 'enable-sechub',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'securityhub',
+                    'enabled': False
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

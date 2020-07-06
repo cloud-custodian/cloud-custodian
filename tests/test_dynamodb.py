@@ -211,7 +211,7 @@ class DynamodbTest(BaseTest):
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "days": 0,
+                        "days": 1,
                         "op": "delete",
                         "tag": "test_tag",
                     }
