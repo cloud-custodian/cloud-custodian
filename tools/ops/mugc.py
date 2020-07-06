@@ -34,10 +34,24 @@ from botocore.exceptions import ClientError
 log = logging.getLogger('mugc')
 
 
+def filter_policies_on_tags(policies, tags, config):
+    filtered_policies = PolicyCollection([], config)
+    for p in policies:
+        if tags:
+            found = set()
+            for t in tags:
+                if t in p.tags:
+                    found.add(t)
+            if found == set(tags):
+                filtered_policies += PolicyCollection([p], config)
+    return filtered_policies
+
+
 def load_policies(options, config):
     policies = PolicyCollection([], config)
     for f in options.config_files:
-        policies += policy_load(config, f).filter(options.policy_filter)
+        policies += filter_policies_on_tags(policy_load(config, f).filter(options.policy_filter),
+                    options.policy_tags, config)
     return policies
 
 
@@ -174,6 +188,9 @@ def setup_parser():
     parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     parser.add_argument(
+        "-l", "--policytags", dest="policy_tags", action="append",
+        nargs="*", default=[], help="Policy tag filter")
+    parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
     parser.add_argument(
@@ -206,6 +223,7 @@ def main():
     files.extend(itertools.chain(*options.config_files))
     files.extend(options.configs)
     options.config_files = files
+    options.policy_tags = list(itertools.chain(*options.policy_tags))
 
     if not files:
         parser.print_help()
