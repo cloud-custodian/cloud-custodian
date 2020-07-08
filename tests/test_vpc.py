@@ -276,6 +276,7 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-0bc8bcfcc74fa2db9" in resources[0]["c7n:matched-vpc-endpoint"])
 
 
 class NetworkLocationTest(BaseTest):
