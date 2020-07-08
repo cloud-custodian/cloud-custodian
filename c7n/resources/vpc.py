@@ -2180,6 +2180,7 @@ class VPCEndpointFilter(RelatedResourceFilter):
     :example:
 
     .. code-block:: yaml
+    
             policies:
               - name: s3-vpc-endpoint-enabled
                 resource: vpc
