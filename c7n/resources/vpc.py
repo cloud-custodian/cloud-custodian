@@ -2198,8 +2198,7 @@ class VPCEndpointFilter(RelatedResourceFilter):
         rinherit=ValueFilter.schema)
 
     def get_related_ids(self, resources):
-        vpc_set = set(jmespath.search(
-            "[].%s" % self.RelatedIdsExpression, resources))
+        vpc_set = super().get_related_ids(resources)
         resource_manager = self.get_resource_manager()
         model = resource_manager.get_model()
 
