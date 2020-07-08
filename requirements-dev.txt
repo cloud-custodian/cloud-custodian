@@ -8,6 +8,7 @@
 -r tools/c7n_openstack/requirements.txt
 -r tools/c7n_mailer/requirements.txt
 -r tools/c7n_org/requirements.txt
+-r tools/c7n_terraform/requirements.txt
 
 # Setup source directories as editable/development distributions
 -e .
