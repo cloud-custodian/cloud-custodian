@@ -2173,6 +2173,38 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@Vpc.filter_registry.register("vpc-endpoint")
+class VPCEndpointFilter(RelatedResourceFilter):
+    """Filters vpc's based on their vpc-endpoints
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+              - name: s3-vpc-endpoint-enabled
+                resource: vpc
+                filters:
+                  - type: vpc-endpoint
+                    key: ServiceName
+                    value: com.amazonaws.us-east-1.s3
+    """
+    RelatedResource = "c7n.resources.vpc.VpcEndpoint"
+    RelatedIdsExpression = "VpcId"
+    AnnotationKey = "matched-vpc-endpoint"
+
+    schema = type_schema(
+        'vpc-endpoint',
+        rinherit=ValueFilter.schema)
+
+    def get_related_ids(self, resources):
+        vpc_set = set(jmespath.search(
+            "[].%s" % self.RelatedIdsExpression, resources))
+        resource_manager = self.get_resource_manager()
+        model = resource_manager.get_model()
+
+        return {r[model.id] for r in resource_manager.resources() if r["VpcId"] in vpc_set}
+
+
 @resources.register('key-pair')
 class KeyPair(query.QueryResourceManager):
 

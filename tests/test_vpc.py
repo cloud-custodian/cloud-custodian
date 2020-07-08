@@ -258,6 +258,25 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_vpc_endpoint_filter(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_filter")
+        p = self.load_policy(
+            {
+                "name": "vpc-endpoint-filter",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "vpc-endpoint",
+                        "key": "ServiceName",
+                        "value": "com.amazonaws.us-east-1.s3",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class NetworkLocationTest(BaseTest):
 
