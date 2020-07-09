@@ -276,7 +276,27 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue("vpce-0bc8bcfcc74fa2db9" in resources[0]["c7n:matched-vpc-endpoint"])
+        self.assertTrue("vpc-072f438c953672ace" in resources[0]["c7n:matched-vpc-endpoint"])
+
+    def test_subnet_endpoint_filter(self):
+        factory = self.replay_flight_data("test_subnet_endpoint_filter")
+        p = self.load_policy(
+            {
+                "name": "subnet-endpoint-filter",
+                "resource": "subnet",
+                "filters": [
+                    {
+                        "type": "vpc-endpoint",
+                        "key": "ServiceName",
+                        "value": "com.amazonaws.us-east-1.athena",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
 
 
 class NetworkLocationTest(BaseTest):
