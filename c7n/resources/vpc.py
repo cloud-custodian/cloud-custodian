@@ -2254,7 +2254,7 @@ class SubnetEndpointFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: s3-vpc-endpoint-enabled
+              - name: athena-endpoint-enabled
                 resource: subnet
                 filters:
                   - type: vpc-endpoint
