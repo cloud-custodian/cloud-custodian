@@ -22,9 +22,7 @@ import itertools
 import logging
 import os
 import operator
-import shutil
 import sys
-import tempfile
 import time
 import threading
 import traceback
@@ -32,6 +30,7 @@ import traceback
 import boto3
 
 from botocore.validate import ParamValidator
+from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
@@ -53,7 +52,7 @@ from c7n.output import (
 from c7n.output import (
     Metrics,
     DeltaStats,
-    DirectoryOutput,
+    BlobOutput,
     LogOutput,
 )
 
@@ -493,7 +492,7 @@ class ApiStats(DeltaStats):
 
 
 @blob_outputs.register('s3')
-class S3Output(DirectoryOutput):
+class S3Output(BlobOutput):
     """
     Usage:
 
@@ -507,56 +506,17 @@ class S3Output(DirectoryOutput):
     permissions = ('S3:PutObject',)
 
     def __init__(self, ctx, config):
-        self.ctx = ctx
-        self.config = config
-        self.output_path = self.get_output_path(self.config['url'])
-        self.s3_path, self.bucket, self.key_prefix = utils.parse_s3(
-            self.output_path)
-        self.root_dir = tempfile.mkdtemp()
-        self.transfer = None
-
-    def __repr__(self):
-        return "<%s to bucket:%s prefix:%s>" % (
-            self.__class__.__name__,
-            self.bucket,
-            self.key_prefix)
-
-    def get_output_path(self, output_url):
-        if '{' not in output_url:
-            date_path = datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
-            return self.join(
-                output_url, self.ctx.policy.name, date_path)
-        return output_url.format(**self.get_output_vars())
-
-    @staticmethod
-    def join(*parts):
-        return "/".join([s.strip('/') for s in parts])
-
-    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        from boto3.s3.transfer import S3Transfer
-        if exc_type is not None:
-            log.exception("Error while executing policy")
-        log.debug("Uploading policy logs")
-        self.compress()
+        super().__init__(ctx, config)
+        # can't use a local session as we dont want an unassumed session cached.
         self.transfer = S3Transfer(
             self.ctx.session_factory(assume=False).client('s3'))
-        self.upload()
-        shutil.rmtree(self.root_dir)
-        log.debug("Policy Logs uploaded")
 
-    def upload(self):
-        for root, dirs, files in os.walk(self.root_dir):
-            for f in files:
-                key = "%s%s" % (
-                    self.key_prefix,
-                    "%s/%s" % (
-                        root[len(self.root_dir):], f))
-                key = key.strip('/')
-                self.transfer.upload_file(
-                    os.path.join(root, f), self.bucket, key,
-                    extra_args={
-                        'ACL': 'bucket-owner-full-control',
-                        'ServerSideEncryption': 'AES256'})
+    def upload_file(self, path, key):
+        self.transfer.upload_file(
+            path, self.bucket, key,
+            extra_args={
+                'ACL': 'bucket-owner-full-control',
+                'ServerSideEncryption': 'AES256'})
 
 
 @clouds.register('aws')

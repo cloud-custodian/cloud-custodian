@@ -204,7 +204,7 @@ class NetworkLocation(Filter):
         sg_space = set()
         subnet_space = set()
 
-        if 'subnet' in self.compare and resource_subnets:
+        if 'subnet' in self.compare:
             subnet_values = {
                 rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
                 for rsub in resource_subnets}
@@ -220,7 +220,7 @@ class NetworkLocation(Filter):
                     'reason': 'SubnetLocationCardinality',
                     'subnets': subnet_values})
 
-        if 'security-group' in self.compare and resource_sgs:
+        if 'security-group' in self.compare:
             sg_values = {
                 rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
                 for rsg in resource_sgs}

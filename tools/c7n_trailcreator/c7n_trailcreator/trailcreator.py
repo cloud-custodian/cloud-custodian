@@ -296,10 +296,14 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     while True:
         qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
-            stats['QueryExecutionTime'] = qexec['Statistics'][
-                'EngineExecutionTimeInMillis'] / 1000.0
-            stats['DataScannedInBytes'] = qexec['Statistics'][
-                'DataScannedInBytes']
+            stats['QueryExecutionTime'] = qexec['Statistics'].get(
+                'EngineExecutionTimeInMillis',
+                qexec['Statistics'].get(
+                    'TotalExecutionTimeInMillis',
+                    1000
+                )
+            ) / 1000.0
+            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
                 format_bytes(
@@ -763,7 +767,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
-    load_resources()
+    load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(

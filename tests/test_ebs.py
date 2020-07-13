@@ -18,6 +18,7 @@ import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n.resources.aws import shape_validate
 from c7n.resources.ebs import (
     CopyInstanceTags,
     EncryptInstanceVolumes,
@@ -449,6 +450,42 @@ class CopyInstanceTagsTest(BaseTest):
 
         tags = {t["Key"]: t["Value"] for t in results}
         self.assertEqual(tags["Name"], "CompileLambda")
+
+
+class VolumePostFindingTest(BaseTest):
+
+    def test_volume_post_finding(self):
+        factory = self.replay_flight_data('test_ebs_snapshot')
+        p = self.load_policy({
+            'name': 'vol-finding',
+            'resource': 'aws.ebs',
+            'actions': [{
+                'type': 'post-finding',
+                'types': [
+                    'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsEc2Volume': {
+                    'Attachments': [{'AttachTime': '2017-03-28T14:55:28+00:00',
+                                     'DeleteOnTermination': True,
+                                     'InstanceId': 'i-0a0b51bcf11a8cdfb',
+                                     'Status': 'attached'}],
+                    'CreateTime': '2017-03-28T14:55:28.486000+00:00',
+                    'Size': 8,
+                    'SnapshotId': 'snap-037f1f9e6c8ea4d65'}},
+             'Id': 'arn:aws:ec2:us-east-1:644160558196:volume/vol-01adbb6a4f175941d',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Type': 'AwsEc2Volume'})
+        shape_validate(
+            rfinding['Details']['AwsEc2Volume'],
+            'AwsEc2VolumeDetails', 'securityhub')
 
 
 class VolumeSnapshotTest(BaseTest):

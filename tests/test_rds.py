@@ -744,10 +744,138 @@ class RDSTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
         client = session_factory().client("rds")
         db_info = client.describe_db_instances(DBInstanceIdentifier="testtest")
         self.assertFalse(db_info["DBInstances"][0]["DeletionProtection"])
+
+    def test_rds_modify_db_enable_cloudwatch(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db_enable_cloudwatch")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-enable-cloudwatch",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBInstanceIdentifier",
+                        "value": "database-2"
+                    },
+                    {
+                        "type": "value",
+                        "key": "EnabledCloudwatchLogsExports[]",
+                        "value": [
+                            "error"
+                        ],
+                        "op": "ni"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'CloudwatchLogsExportConfiguration',
+                                "value": {
+                                    'EnableLogTypes': [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="database-2")
+        self.assertIn('error', db_info["DBInstances"][0]["EnabledCloudwatchLogsExports"])
+
+    def test_rds_modify_db_validation_monitoring_error(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                'name': 'enable-monitoring',
+                'resource': 'rds',
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'MonitoringInterval',
+                                "value": 60
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ]})
+        self.assertIn((
+            'A MonitoringRoleARN value is required'),
+            str(err.exception))
+
+    def test_rds_modify_db_validation_cloudwatch_error(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                'name': 'enable-cloudwatch',
+                'resource': 'rds',
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'CloudwatchLogsExportConfiguration',
+                                "value": [
+                                    "error"
+                                ]
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ]})
+        self.assertIn((
+            'EnableLogTypes or DisableLogTypes input list is required'),
+            str(err.exception))
+
+    def test_rds_modify_db_enable_perfinsights(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db_enable_perfinsights")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-enable-perfinsights",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBInstanceIdentifier",
+                        "value": "database-4"
+                    },
+                    {
+                        "type": "value",
+                        "key": "PerformanceInsightsEnabled",
+                        "value": False
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": "EnablePerformanceInsights",
+                                "value": True
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="database-4")
+        self.assertTrue(db_info["DBInstances"][0]["PerformanceInsightsEnabled"])
 
 
 class RDSSnapshotTest(BaseTest):

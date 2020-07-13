@@ -43,6 +43,9 @@ class MethodAction(Action):
     # error codes that can be safely ignored
     ignore_error_codes = ()
 
+    permissions = ()
+    method_perm = None
+
     def validate(self):
         if not self.method_spec:
             raise NotImplementedError("subclass must define method_spec")
@@ -89,6 +92,21 @@ class MethodAction(Action):
             if e.resp.status in self.ignore_error_codes:
                 return e
             raise
+
+    def get_permissions(self):
+        if self.permissions:
+            return self.permissions
+        m = self.manager.resource_type
+        method = self.method_perm
+        if not method and 'op' not in self.method_spec:
+            return ()
+        if not method:
+            method = self.method_spec['op']
+        component = m.component
+        if '.' in component:
+            component = component.split('.')[-1]
+        return ("{}.{}.{}".format(
+            m.perm_service or m.service, component, method),)
 
     def get_operation_name(self, model, resource):
         return self.method_spec['op']
