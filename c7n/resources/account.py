@@ -669,8 +669,7 @@ class ServiceLimit(Filter):
                 exceeded.extend(matched)
         if exceeded:
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
-            return resources
-        return []
+        return resources
 
     def process_check(self, client, check, resources, event=None):
         region = self.manager.config.region
