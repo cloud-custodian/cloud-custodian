@@ -67,5 +67,4 @@ class TestReplicaAction(KubeTest):
         test_item = [r for r in resources if r['metadata']['name'] == 'nginx']
         self.assertEqual(len(test_item), 1)
         replicas = test_item[0]['spec']['replicas']
-        print(replicas)
         self.assertEqual(replicas, 3)
