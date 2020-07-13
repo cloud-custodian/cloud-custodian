@@ -86,7 +86,8 @@ class SubnetFilter(net_filters.SubnetFilter):
         for r in resources:
             group_ids.update(
                 [s['SubnetIdentifier'] for s in
-                 self.groups[r['DBSubnetGroup']]['Subnets']])
+                 self.groups[r['DBSubnetGroup']]['Subnets']
+                 if r['DBSubnetGroup'] in self.groups])
         return group_ids
 
     def process(self, resources, event=None):
