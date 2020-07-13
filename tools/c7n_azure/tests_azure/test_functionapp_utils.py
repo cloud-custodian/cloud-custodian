@@ -68,8 +68,8 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'location': 'westus2'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name='custodian-test-app')
+            function_app={'resource_group_name': CONST_GROUP_NAME,
+                          'name': 'custodian-test-app'})
 
         app = FunctionAppUtilities.deploy_function_app(parameters)
         self.assertIsNotNone(app)
@@ -93,8 +93,9 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'something wrong'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=self.dedicated_function_name)
+            function_app={
+                'name': self.dedicated_function_name,
+                'resource_group_name': CONST_GROUP_NAME})
 
         FunctionAppUtilities.deploy_function_app(parameters)
         self.assertEqual(parameters.service_plan['sku_tier'], 'Basic')
@@ -127,8 +128,9 @@ class FunctionAppUtilsTest(BaseTest):
             service_plan={
                 'sku_tier': 'dynamic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name='cloud-custodian-test')
+            function_app={
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test'})
 
         self.assertTrue(FunctionAppUtilities.is_consumption_plan(params))
 
@@ -156,8 +158,8 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'dynamic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=function_app_name)
+            function_app={'resource_group_name': CONST_GROUP_NAME,
+                          'name': function_app_name})
 
         package = FunctionPackage("TestPolicy")
         package.pkg = AzurePythonPackageArchive()
@@ -192,8 +194,9 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'Basic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=self.dedicated_function_name)
+            function_app={
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': self.dedicated_function_name})
 
         package = FunctionPackage("TestPolicy")
         package.pkg = AzurePythonPackageArchive()

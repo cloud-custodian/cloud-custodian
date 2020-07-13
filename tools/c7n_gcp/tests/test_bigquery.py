@@ -69,20 +69,6 @@ class BigQueryJobTest(BaseTest):
         self.assertEqual(job[0]['id'], "{}:{}.{}".format(project_id, location, job_id))
 
 
-class BigQueryProjectTest(BaseTest):
-
-    def test_query(self):
-        factory = self.replay_flight_data('bq-project-query')
-        p = self.load_policy({
-            'name': 'bq-get',
-            'resource': 'gcp.bq-project'},
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['friendlyName'], 'test project')
-        self.assertEqual(resources[0]['id'], 'cloud-custodian')
-
-
 class BigQueryTableTest(BaseTest):
 
     def test_query(self):

@@ -27,9 +27,8 @@ from .securityhub import PostFinding
 class DescribeDomain(DescribeSource):
 
     def get_resources(self, resource_ids):
-        client = local_session(self.manager.session_factory).client('es')
-        return client.describe_elasticsearch_domains(
-            DomainNames=resource_ids)['DomainStatusList']
+        # augment will turn these into resource dictionaries
+        return resource_ids
 
     def augment(self, domains):
         client = local_session(self.manager.session_factory).client('es')

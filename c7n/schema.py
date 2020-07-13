@@ -30,7 +30,7 @@ import json
 import inspect
 import logging
 
-from jsonschema import Draft4Validator as JsonSchemaValidator
+from jsonschema import Draft7Validator as JsonSchemaValidator
 from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
@@ -151,6 +151,24 @@ def generate(resource_types=()):
     resource_defs = {}
     definitions = {
         'resources': resource_defs,
+        'string_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {"type": "string"},
+            },
+        },
+        'basic_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {
+                    'oneOf': [
+                        {"type": "string"},
+                        {"type": "boolean"},
+                        {"type": "number"},
+                    ],
+                }
+            },
+        },
         'iam-statement': {
             'additionalProperties': False,
             'type': 'object',
@@ -244,7 +262,7 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config',
+                'source': {'enum': ['describe', 'config', 'inventory',
                                     'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',

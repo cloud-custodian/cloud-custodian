@@ -32,6 +32,7 @@ class DataflowJob(QueryResourceManager):
         get_requires_event = True
         default_report_fields = [
             'name', 'currentState', 'createTime', 'location']
+        permissions = ('dataflow.jobs.list',)
 
         @staticmethod
         def get(client, event):

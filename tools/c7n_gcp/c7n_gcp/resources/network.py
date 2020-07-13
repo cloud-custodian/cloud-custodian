@@ -92,6 +92,7 @@ class SetFlowLog(SubnetAction):
         'set-flow-log',
         state={'type': 'boolean', 'default': True})
     method_spec = {'op': 'patch'}
+    method_perm = 'update'
 
     def get_resource_params(self, m, r):
         params = super(SetFlowLog, self).get_resource_params(m, r)

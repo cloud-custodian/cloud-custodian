@@ -468,3 +468,60 @@ class DeleteTopic(BaseAction):
                 client.delete_topic(TopicArn=r['TopicArn'])
             except client.exceptions.NotFoundException:
                 continue
+
+
+@resources.register('sns-subscription')
+class SNSSubscription(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sns'
+        enum_spec = ('list_subscriptions', 'Subscriptions', None)
+        id = name = dimension = 'SubscriptionArn'
+        arn = 'SubscriptionArn'
+        cfn_type = 'AWS::SNS::Subscription'
+        default_report_fields = (
+            'SubscriptionArn',
+            'Owner',
+            'Protocol',
+            'Endpoint',
+            'TopicArn'
+        )
+
+
+@SNSSubscription.action_registry.register('delete')
+class SubscriptionDeleteAction(BaseAction):
+    """
+    Action to delete a subscription
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: external-owner-delete
+            resource: sns-subscription
+            filters:
+              - type: value
+                key: "Owner"
+                value: "{account_id}"
+                op: ne
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("sns:Unsubscribe",)
+
+    def process(self, subscriptions):
+        client = local_session(
+            self.manager.session_factory).client(self.manager.get_model().service)
+
+        for s in subscriptions:
+            self.process_subscription(client, s)
+
+    def process_subscription(self, client, subscription):
+        # Can't delete a pending subscription
+        if subscription['SubscriptionArn'] != 'PendingConfirmation':
+            self.manager.retry(
+                client.unsubscribe, SubscriptionArn=subscription['SubscriptionArn'],
+                ignore_err_codes=('NotFoundException',))

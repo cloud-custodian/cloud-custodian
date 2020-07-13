@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstance": {
+            "DBInstanceIdentifier": "database-4",
+            "Engine": "postgres",
+            "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:database-4"
+        },
+        "ResponseMetadata": {}
+    }
+}

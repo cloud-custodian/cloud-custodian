@@ -47,6 +47,20 @@ class SSMParameter(QueryResourceManager):
     augment = universal_augment
 
 
+@SSMParameter.action_registry.register('delete')
+class DeleteParameter(Action):
+
+    schema = type_schema('delete')
+    permissions = ("ssm:DeleteParameter",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            self.manager.retry(
+                client.delete_parameter, Name=r['Name'],
+                ignore_err_codes=('ParameterNotFound',))
+
+
 @resources.register('ssm-managed-instance')
 class ManagedInstance(QueryResourceManager):
 
