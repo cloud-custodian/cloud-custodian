@@ -448,7 +448,7 @@ class AccountTests(BaseTest):
         # use this to prevent attempts at refreshing check
         with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
             resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
     def test_account_virtual_mfa(self):
         # only warns when the default threshold goes to warning or above
