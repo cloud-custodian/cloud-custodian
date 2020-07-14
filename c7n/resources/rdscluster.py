@@ -95,6 +95,7 @@ class SubnetFilter(net_filters.SubnetFilter):
             self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
 
+
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
