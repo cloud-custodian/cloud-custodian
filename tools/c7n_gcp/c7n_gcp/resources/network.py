@@ -28,7 +28,7 @@ class Network(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'networks'
-        scope_template = "projects/{}/global/networks"
+        scope_template = "{}"
         name = id = "name"
         default_report_fields = [
             "name", "description", "creationTimestamp",
