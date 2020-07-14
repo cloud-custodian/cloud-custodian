@@ -86,8 +86,7 @@ class SubnetFilter(net_filters.SubnetFilter):
         for r in resources:
             group_ids.update(
                 [s['SubnetIdentifier'] for s in
-                 self.groups[r['DBSubnetGroup']]['Subnets']
-                 if r['DBSubnetGroup'] in self.groups])
+                 self.groups[r['DBSubnetGroup']]['Subnets']])
         return group_ids
 
     def process(self, resources, event=None):
@@ -95,7 +94,6 @@ class SubnetFilter(net_filters.SubnetFilter):
             r['DBSubnetGroupName']: r for r in
             self.manager.get_resource_manager('rds-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
-
 
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
