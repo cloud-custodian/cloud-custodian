@@ -662,12 +662,10 @@ class TestPolicy(BaseTest):
                      'topic': 'arn:::::',
                  },
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
-                {'type':'webhook',
-                 'url':"test.com",
-                 'headers':{
-                     'auth':'{C7N_VAR_token}'
-                 }
-                }
+                {'type': 'webhook',
+                 'url': "test.com",
+                 'headers': {
+                     'auth': '{C7N_VAR_token}'}}
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
         ivalue = 'bad monkey 12312311 zanzibar %s' % (
@@ -680,7 +678,7 @@ class TestPolicy(BaseTest):
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
         self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam::{account_id}:role/BarFoo')
         self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
-        self.assertEqual(p.data['actions'][2]['headers']['auth'],'token')
+        self.assertEqual(p.data['actions'][2]['headers']['auth'], 'token')
 
     def test_child_resource_trail_validation(self):
         self.assertRaises(

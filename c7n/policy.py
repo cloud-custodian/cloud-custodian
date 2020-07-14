@@ -1103,7 +1103,7 @@ class Policy:
             'LoadBalancerName': '{LoadBalancerName}'
         })
 
-        c7n_env_vars = {k:os.environ[k] for k in os.environ if k.startswith('C7N_VAR_')}
+        c7n_env_vars = {k: os.environ[k] for k in os.environ if k.startswith('C7N_VAR_')}
         variables.update(c7n_env_vars)
 
         return variables
