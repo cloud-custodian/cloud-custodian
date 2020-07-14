@@ -1102,6 +1102,10 @@ class Policy:
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
         })
+
+        c7n_env_vars = {k:os.environ[k] for k in os.environ if k.startswith('C7N_VAR_')}
+        variables.update(c7n_env_vars)
+
         return variables
 
     def expand_variables(self, variables):
