@@ -159,7 +159,7 @@ class LogGroup(QueryResourceManager):
         id = 'arn'
         filter_name = 'logGroupNamePrefix'
         filter_type = 'scalar'
-        dimension = 'LogGroupName'
+        dimension = 'logGroupName'
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
