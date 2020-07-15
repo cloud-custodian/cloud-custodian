@@ -436,25 +436,23 @@ class KmsFilter(KmsRelatedFilter):
     schema = type_schema(
         'kms-key',
         key_type={'type': 'string', 'enum': [
-            's3', 'cloudwatch', 'job-bookmarks']},
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
         rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
 
     RelatedIdsExpression = ''
-    key_type = ''
 
     def __init__(self, data, manager=None):
         super(KmsFilter, self).__init__(data, manager)
-        self.key_type = self.data.get('key_type', '')
-        if self.key_type == 's3':
-            self.RelatedIdsExpression = 'EncryptionConfiguration.S3Encryption[].KmsKeyArn'
-        elif self.key_type == 'cloudwatch':
-            self.RelatedIdsExpression = 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn'
-        elif self.key_type == 'job-bookmarks':
-            self.RelatedIdsExpression = 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn'
-        else:
-            self.RelatedIdsExpression = 'EncryptionConfiguration.*[][].KmsKeyArn'
+        key_type_to_related_ids = {
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+            'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
+        }
+        key_type = self.data.get('key_type', 'all')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
