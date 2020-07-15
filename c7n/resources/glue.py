@@ -444,7 +444,7 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = ''
 
     def __init__(self, data, manager=None):
-        super(KmsFilter, self).__init__(data, manager)
+        super().__init__(data, manager)
         key_type_to_related_ids = {
             's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
             'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
