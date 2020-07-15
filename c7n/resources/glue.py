@@ -421,15 +421,17 @@ class S3KmsFilter(KmsRelatedFilter):
     of the kms key by using 'c7n:AliasName'
 
     :example:
+
         .. code-block:: yaml
+
             policies:
-                - name: glue-security-configuration-kms-key-s3
-                  resource: aws.glue-security-configuration
-                  filters:
-                    - type: kms-key-s3
-                      key: c7n:AliasName
-                      value: "^(alias/aws/)"
-                      op: regex
+              - name: glue-security-configuration-kms-key-s3
+                resource: glue-security-configuration
+                filters:
+                  - type: kms-key-s3
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
     """
     RelatedIdsExpression = 'EncryptionConfiguration.S3Encryption[].KmsKeyArn'
 
@@ -441,15 +443,17 @@ class CloudwatchKmsFilter(KmsRelatedFilter):
     of the kms key by using 'c7n:AliasName'
 
     :example:
+
         .. code-block:: yaml
+
             policies:
-                - name: glue-security-configuration-kms-key-cloudwatch
-                  resource: aws.glue-security-configuration
-                  filters:
-                    - type: kms-key-cloudwatch
-                      key: c7n:AliasName
-                      value: "^(alias/aws/)"
-                      op: regex
+              - name: glue-security-configuration-kms-key-cloudwatch
+                resource: glue-security-configuration
+                filters:
+                  - type: kms-key-cloudwatch
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
     """
     RelatedIdsExpression = 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn'
 
@@ -459,16 +463,19 @@ class JobBookmarksKmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
+
     :example:
+
         .. code-block:: yaml
+
             policies:
-                - name: glue-security-configuration-kms-key-job-bookmarks
-                  resource: aws.glue-security-configuration
-                  filters:
-                    - type: kms-key-job-bookmarks
-                      key: c7n:AliasName
-                      value: "^(alias/aws/)"
-                      op: regex
+              - name: glue-security-configuration-kms-key-job-bookmarks
+                resource: glue-security-configuration
+                filters:
+                  - type: kms-key-job-bookmarks
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
     """
     RelatedIdsExpression = 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn'
 
