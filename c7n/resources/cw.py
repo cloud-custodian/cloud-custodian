@@ -159,7 +159,7 @@ class LogGroup(QueryResourceManager):
         id = 'arn'
         filter_name = 'logGroupNamePrefix'
         filter_type = 'scalar'
-        dimension = 'logGroupName'
+        dimension = 'LogGroupName'
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
@@ -174,6 +174,13 @@ class LogGroup(QueryResourceManager):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
         return [r['arn'][:-2] for r in resources]
+
+
+@LogGroup.filter_registry.register('metrics')
+class LogGroupMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
 
 @LogGroup.action_registry.register('retention')
