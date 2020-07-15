@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/glue_sc_cloudwatch",
+                "AliasArn": "arn:aws:kms:us-east-1:0123456789012:alias/glue_sc_cloudwatch",
+                "TargetKeyId": "82645407-2faa-4d93-be71-7d6a8d59a5fc"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

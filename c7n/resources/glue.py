@@ -25,6 +25,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('glue-connection')
@@ -411,6 +412,65 @@ class GlueSecurityConfiguration(QueryResourceManager):
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
         cfn_type = 'AWS::Glue::SecurityConfiguration'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key-s3')
+class S3KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+        .. code-block:: yaml
+            policies:
+                - name: glue-security-configuration-kms-key-s3
+                  resource: aws.glue-security-configuration
+                  filters:
+                    - type: kms-key-s3
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'EncryptionConfiguration.S3Encryption[].KmsKeyArn'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key-cloudwatch')
+class CloudwatchKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+        .. code-block:: yaml
+            policies:
+                - name: glue-security-configuration-kms-key-cloudwatch
+                  resource: aws.glue-security-configuration
+                  filters:
+                    - type: kms-key-cloudwatch
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key-job-bookmarks')
+class JobBookmarksKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+    :example:
+        .. code-block:: yaml
+            policies:
+                - name: glue-security-configuration-kms-key-job-bookmarks
+                  resource: aws.glue-security-configuration
+                  filters:
+                    - type: kms-key-job-bookmarks
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn'
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
