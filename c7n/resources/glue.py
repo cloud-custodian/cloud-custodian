@@ -414,8 +414,8 @@ class GlueSecurityConfiguration(QueryResourceManager):
         cfn_type = 'AWS::Glue::SecurityConfiguration'
 
 
-@GlueSecurityConfiguration.filter_registry.register('kms-key-s3')
-class S3KmsFilter(KmsRelatedFilter):
+@GlueSecurityConfiguration.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
@@ -425,59 +425,36 @@ class S3KmsFilter(KmsRelatedFilter):
     .. code-block:: yaml
 
         policies:
-          - name: glue-security-configuration-kms-key-s3
+          - name: glue-security-configuration-kms-key
             resource: glue-security-configuration
             filters:
-              - type: kms-key-s3
+              - type: kms-key
                 key: c7n:AliasName
                 value: "^(alias/aws/)"
                 op: regex
     """
-    RelatedIdsExpression = 'EncryptionConfiguration.S3Encryption[].KmsKeyArn'
+    schema = type_schema(
+        'kms-key',
+        key_type={'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks']},
+        rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
 
+    RelatedIdsExpression = ''
+    key_type = ''
 
-@GlueSecurityConfiguration.filter_registry.register('kms-key-cloudwatch')
-class CloudwatchKmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: glue-security-configuration-kms-key-cloudwatch
-            resource: glue-security-configuration
-            filters:
-              - type: kms-key-cloudwatch
-                key: c7n:AliasName
-                value: "^(alias/aws/)"
-                op: regex
-    """
-    RelatedIdsExpression = 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn'
-
-
-@GlueSecurityConfiguration.filter_registry.register('kms-key-job-bookmarks')
-class JobBookmarksKmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: glue-security-configuration-kms-key-job-bookmarks
-            resource: glue-security-configuration
-            filters:
-              - type: kms-key-job-bookmarks
-                key: c7n:AliasName
-                value: "^(alias/aws/)"
-                op: regex
-    """
-    RelatedIdsExpression = 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn'
+    def __init__(self, data, manager=None):
+        super(KmsFilter, self).__init__(data, manager)
+        self.key_type = self.data.get('key_type', '')
+        if self.key_type == 's3':
+            self.RelatedIdsExpression = 'EncryptionConfiguration.S3Encryption[].KmsKeyArn'
+        elif self.key_type == 'cloudwatch':
+            self.RelatedIdsExpression = 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn'
+        elif self.key_type == 'job-bookmarks':
+            self.RelatedIdsExpression = 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn'
+        else:
+            self.RelatedIdsExpression = 'EncryptionConfiguration.*[][].KmsKeyArn'
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')

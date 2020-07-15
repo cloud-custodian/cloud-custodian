@@ -447,42 +447,19 @@ class TestGlueSecurityConfiguration(BaseTest):
         self.assertFalse("test" in [t.get("Name")
             for t in security_configrations.get("SecurityConfigurations", [])])
 
-    def test_s3_kms_alias(self):
-        factory = self.replay_flight_data("test_glue_security_configuration_s3_kms_key_filter")
+    def test_kms_alias(self):
+        factory = self.replay_flight_data("test_glue_security_configuration_kms_key_filter")
         p = self.load_policy(
             {
                 "name": "glue-security-configuration-s3-kms-alias",
                 "resource": "glue-security-configuration",
                 "filters": [
                     {
-                        "type": "kms-key-s3",
-                        "key": "c7n:AliasName",
-                        "value": "^(alias/aws/)",
-                        "op": "regex"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['EncryptionConfiguration']['S3Encryption'][0]['KmsKeyArn'],
-            'arn:aws:kms:us-east-1:0123456789012:key/d1305425-4cde-46ee-be31-e2043dd4df39')
-
-    def test_cloudwatch_kms_alias(self):
-        factory = self.replay_flight_data(
-            "test_glue_security_configuration_cloudwatch_kms_key_filter")
-        p = self.load_policy(
-            {
-                "name": "glue-security-configuration-cloudwatch-kms-alias",
-                "resource": "glue-security-configuration",
-                "filters": [
-                    {
-                        "type": "kms-key-cloudwatch",
+                        "type": "kms-key",
                         "key": "c7n:AliasName",
                         "value": "^(alias/)",
-                        "op": "regex"
+                        "op": "regex",
+                        "key_type": "cloudwatch"
                     }
                 ]
             },
@@ -493,30 +470,6 @@ class TestGlueSecurityConfiguration(BaseTest):
         self.assertEqual(
             resources[0]['EncryptionConfiguration']['CloudWatchEncryption']['KmsKeyArn'],
             'arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8')
-
-    def test_job_bookmarks_kms_alias(self):
-        factory = self.replay_flight_data(
-            "test_glue_security_configuration_job_bookmarks_kms_key_filter")
-        p = self.load_policy(
-            {
-                "name": "glue-security-configuration-job-bookmarks-kms-alias",
-                "resource": "glue-security-configuration",
-                "filters": [
-                    {
-                        "type": "kms-key-job-bookmarks",
-                        "key": "c7n:AliasName",
-                        "value": "^(alias/)",
-                        "op": "regex"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['EncryptionConfiguration']['JobBookmarksEncryption']['KmsKeyArn'],
-            'arn:aws:kms:us-east-1:0123456789012:key/ec3b9189-1247-4ecc-8bfd-c492f07621db')
 
 
 class TestGlueTriggers(BaseTest):
