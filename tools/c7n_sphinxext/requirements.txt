@@ -5,7 +5,7 @@ chardet==3.0.4
 colorama==0.4.3; sys_platform == "win32"
 commonmark==0.9.1
 docutils==0.15.2
-idna==2.9
+idna==2.10
 imagesize==1.2.0
 jinja2==2.11.2
 markdown==3.0.1

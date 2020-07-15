@@ -18,6 +18,17 @@ from c7n.resources.aws import shape_validate
 
 class ElasticSearch(BaseTest):
 
+    def test_get_resources(self):
+        factory = self.replay_flight_data('test_elasticsearch_get')
+        p = self.load_policy({
+            'name': 'es-get',
+            'resource': 'aws.elasticsearch'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['devx'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'], 'devx')
+
     def test_resource_manager(self):
         factory = self.replay_flight_data("test_elasticsearch_query")
         p = self.load_policy(

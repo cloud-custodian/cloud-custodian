@@ -1,13 +1,13 @@
 attrs==19.3.0
-boto3==1.14.8
-botocore==1.17.8
+boto3==1.14.16
+botocore==1.17.16
 certifi==2020.6.20
 chardet==3.0.4
 datadog==0.34.1
 decorator==4.4.2
 docutils==0.15.2
-idna==2.9
-importlib-metadata==1.6.1
+idna==2.10
+importlib-metadata==1.7.0
 jinja2==2.11.2
 jmespath==0.10.0
 jsonpatch==1.26
@@ -23,7 +23,8 @@ pyyaml==5.3.1
 redis==3.5.3
 requests==2.24.0
 s3transfer==0.3.3
-sendgrid==6.3.1
+sendgrid==6.4.1
 six==1.15.0
+starkbank-ecdsa==1.0.0
 urllib3==1.25.9
 zipp==3.1.0

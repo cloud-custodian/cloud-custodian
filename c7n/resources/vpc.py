@@ -26,7 +26,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
@@ -432,12 +432,30 @@ class DhcpOptionsFilter(Filter):
 
 
 @Vpc.action_registry.register('post-finding')
-class VpcPostFinding(OtherResourcePostFinding):
+class VpcPostFinding(PostFinding):
+
+    resource_type = "AwsEc2Vpc"
 
     def format_resource(self, r):
-        fr = super(VpcPostFinding, self).format_resource(r)
-        fr['Type'] = 'AwsEc2Vpc'
-        return fr
+        envelope, payload = self.format_envelope(r)
+        # more inane sechub formatting deltas
+        detail = {
+            'DhcpOptionsId': r.get('DhcpOptionsId'),
+            'State': r['State']}
+
+        for assoc in r.get('CidrBlockAssociationSet', ()):
+            detail.setdefault('CidrBlockAssociationSet', []).append(dict(
+                AssociationId=assoc['AssociationId'],
+                CidrBlock=assoc['CidrBlock'],
+                CidrBlockState=assoc['CidrBlockState']['State']))
+
+        for assoc in r.get('Ipv6CidrBlockAssociationSet', ()):
+            detail.setdefault('Ipv6CidrBlockAssociationSet', []).append(dict(
+                AssociationId=assoc['AssociationId'],
+                Ipv6CidrBlock=assoc['Ipv6CidrBlock'],
+                CidrBlockState=assoc['Ipv6CidrBlockState']['State']))
+        payload.update(self.filter_empty(detail))
+        return envelope
 
 
 @resources.register('subnet')

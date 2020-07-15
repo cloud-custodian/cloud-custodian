@@ -17,6 +17,7 @@ from dateutil import tz as tzutil
 from .common import BaseTest
 
 from c7n.resources.asg import LaunchInfo
+from c7n.resources.aws import shape_validate
 
 
 class LaunchConfigTest(BaseTest):
@@ -322,6 +323,43 @@ class AutoScalingTest(BaseTest):
             t["Key"]: (t["Value"], t["PropagateAtLaunch"]) for t in result["Tags"]
         }
         self.assertFalse("CustomerId" in tag_map)
+
+    def test_asg_post_finding_format(self):
+        factory = self.replay_flight_data('test_asg_mark_for_op')
+        p = self.load_policy({
+            'name': 'asg-post',
+            'resource': 'aws.asg',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory)
+
+        resources = p.resource_manager.resources()
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsAutoScalingAutoScalingGroup': {
+                    'CreatedTime': '2016-05-16T18:31:32.276000+00:00',
+                    'HealthCheckGracePeriod': 300,
+                    'HealthCheckType': 'EC2',
+                    'LaunchConfigurationName': 'CustodianASGTestCopyCopy',
+                    'LoadBalancerNames': []}},
+             'Id': 'arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG',  # noqa
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'Platform': 'ubuntu',
+                      'custodian_action': (
+                          'AutoScaleGroup does not meet org tag policy: '
+                          'suspend@2016/05/21')},
+             'Type': 'AwsAutoScalingAutoScalingGroup'})
+
+        shape_validate(
+            rfinding['Details']['AwsAutoScalingAutoScalingGroup'],
+            'AwsAutoScalingAutoScalingGroupDetails', 'securityhub')
 
     def test_asg_mark_for_op(self):
         factory = self.replay_flight_data("test_asg_mark_for_op")

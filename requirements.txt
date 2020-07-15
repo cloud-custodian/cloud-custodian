@@ -5,23 +5,23 @@ atomicwrites==1.4.0; sys_platform == "win32"
 attrs==19.3.0
 aws-xray-sdk==2.6.0
 bleach==3.1.5
-boto3==1.14.8
-botocore==1.17.8
+boto3==1.14.16
+botocore==1.17.16
 certifi==2020.6.20
 cffi==1.14.0; sys_platform == "linux"
 chardet==3.0.4
-colorama==0.4.3; sys_platform == "win32" or platform_system == "Windows"
-coverage==5.1
+colorama==0.4.3
+coverage==5.2
 cryptography==2.9.2; sys_platform == "linux"
-distlib==0.3.0
+distlib==0.3.1
 docutils==0.15.2
 execnet==1.7.1
 filelock==3.0.12
 flake8==3.8.3
 future==0.18.2
-idna==2.9
-importlib-metadata==1.6.1
-importlib-resources==2.0.1; python_version < "3.7"
+idna==2.10
+importlib-metadata==1.7.0
+importlib-resources==3.0.0; python_version < "3.7"
 jeepney==0.4.3; sys_platform == "linux"
 jmespath==0.10.0
 jsonpatch==1.26
@@ -38,7 +38,7 @@ pkginfo==1.5.0.1
 placebo==0.9.0
 pluggy==0.13.1
 psutil==5.7.0
-py==1.8.2
+py==1.9.0
 pycodestyle==2.6.0
 pycparser==2.20; sys_platform == "linux"
 pyflakes==2.2.0
@@ -47,7 +47,7 @@ pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==5.3.5
 pytest-cov==2.10.0
-pytest-forked==1.1.3
+pytest-forked==1.2.0
 pytest-sugar==0.9.3
 pytest-xdist==1.32.0
 python-dateutil==2.8.1
@@ -56,19 +56,20 @@ pyyaml==5.3.1
 readme-renderer==26.0
 requests==2.24.0
 requests-toolbelt==0.9.1
+rfc3986==1.4.0
 s3transfer==0.3.3
 secretstorage==3.1.2; sys_platform == "linux"
 six==1.15.0
 tabulate==0.8.7
 termcolor==1.1.0
 toml==0.10.1
-tox==3.15.2
-tqdm==4.46.1
-twine==3.1.1
+tox==3.16.1
+tqdm==4.47.0
+twine==3.2.0
 urllib3==1.25.9
 vcrpy==4.0.2
-virtualenv==20.0.24
-wcwidth==0.2.4
+virtualenv==20.0.25
+wcwidth==0.2.5
 webencodings==0.5.1
 wrapt==1.12.1
 yarl==1.4.2; python_version >= "3.6"

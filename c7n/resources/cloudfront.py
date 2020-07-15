@@ -661,6 +661,10 @@ class DistributionUpdateAction(BaseUpdateAction):
             raise e
 
 
+StreamingDistribution.filter_registry.register('shield-enabled', IsShieldProtected)
+StreamingDistribution.action_registry.register('set-shield', SetShieldProtection)
+
+
 @StreamingDistribution.action_registry.register('set-attributes')
 class StreamingDistributionUpdateAction(BaseUpdateAction):
     """Action to update the attributes of a distribution
