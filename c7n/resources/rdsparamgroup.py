@@ -20,6 +20,7 @@ from c7n.filters import FilterRegistry
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import (type_schema, local_session, chunks)
+from c7n.tags import universal_augment
 
 log = logging.getLogger('custodian.rds-param-group')
 
@@ -38,9 +39,13 @@ class RDSParamGroup(QueryResourceManager):
         arn_type = 'pg'
         enum_spec = ('describe_db_parameter_groups', 'DBParameterGroups', None)
         name = id = 'DBParameterGroupName'
+        arn = 'DBParameterGroupArn'
         dimension = 'DBParameterGroupName'
         permissions_enum = ('rds:DescribeDBParameterGroups',)
         cfn_type = 'AWS::RDS::DBParameterGroup'
+        universal_taggable = object()
+
+    augment = universal_augment
 
     filter_registry = pg_filters
     action_registry = pg_actions
@@ -59,11 +64,15 @@ class RDSClusterParamGroup(QueryResourceManager):
 
         service = 'rds'
         arn_type = 'cluster-pg'
+        arn = 'DBClusterParameterGroupArn'
         enum_spec = ('describe_db_cluster_parameter_groups', 'DBClusterParameterGroups', None)
         name = id = 'DBClusterParameterGroupName'
         dimension = 'DBClusterParameterGroupName'
         permissions_enum = ('rds:DescribeDBClusterParameterGroups',)
         cfn_type = 'AWS::RDS::DBClusterParameterGroup'
+        universal_taggable = object()
+
+    augment = universal_augment
 
     filter_registry = pg_cluster_filters
     action_registry = pg_cluster_actions
