@@ -994,20 +994,19 @@ class TestPolicy(BaseTest):
         policy = self.load_policy(
             {
                 "name": "combined-resource-tagging",
-                "resource": ["ebs","ec2"],
+                "resource": ["ebs", "ec2"],
                 "tags": ["abc"],
                 "filters": [
                     {
-                        "tag:App":"absent"
+                        "tag:App": "absent"
                     }
                 ],
                 "actions": [{"type": "tag", "key": "App", "value:": "Tag"}],
             }
         )
         policy.validate()
-        self.assertEqual(policy.data["name"],'combined-resource-tagging[ebs]')
-        self.assertEqual(policy.data["resource"],'ebs')
-
+        self.assertEqual(policy.data["name"], 'combined-resource-tagging[ebs]')
+        self.assertEqual(policy.data["resource"], 'ebs')
 
 
 class PolicyConditionsTest(BaseTest):
