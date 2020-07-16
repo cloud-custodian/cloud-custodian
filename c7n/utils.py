@@ -695,7 +695,7 @@ def split_policies(policy_list):
             for r in p["resource"]:
                 resource_policy= copy.copy(p)
                 resource_policy.update({
-                    "name": "{}[{}]".format(p["name"],r),
+                    "name": "{}[{}]".format(p["name"],r.replace(".","-")),
                     "resource":r
                 })
                 policies.append(resource_policy)
