@@ -959,7 +959,7 @@ class RDSSubscriptionDelete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('rds:DeleteEventSubscriptions',)
+    permissions = ('rds:DeleteEventSubscription',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
