@@ -684,3 +684,21 @@ def select_keys(d, keys):
     for k in keys:
         result[k] = d.get(k)
     return result
+
+def split_policies(policy_list):
+    """splits policies that contain a list of resources 
+    into individual policies for each resource
+    """
+    policies = []
+    for p in policy_list:
+        if isinstance(p["resource"],list):
+            for r in p["resource"]:
+                resource_policy= copy.copy(p)
+                resource_policy.update({
+                    "name": "{}[{}]".format(p["name"],r),
+                    "resource":r
+                })
+                policies.append(resource_policy)
+        else:
+            policies.append(p)
+    return policies  

@@ -70,3 +70,14 @@ class CommandsValidateTest(BaseTest):
         )
         # if there are only good policy, it should exit none
         self.assertIsNone(validate_yaml_policies(yaml_validate_options))
+
+    def test_multiple_resource(self):
+        yaml_validate_options = argparse.Namespace(
+            command="c7n.commands.validate",
+            config=None,
+            configs=[
+                "tests/data/test_policies/multi-resource.yml"],
+            debug=False,
+            subparser="validate",
+            verbose=False)
+        self.assertIsNone(validate_yaml_policies(yaml_validate_options))

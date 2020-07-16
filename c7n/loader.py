@@ -29,7 +29,7 @@ except ImportError:
     # serverless execution doesn't use jsonschema
     schema = None
 from c7n.structure import StructureParser
-from c7n.utils import load_file
+from c7n.utils import load_file, split_policies
 
 
 class SchemaValidator:
@@ -119,6 +119,7 @@ class PolicyLoader:
     def load_data(self, policy_data, file_uri, validate=None,
                   session_factory=None, config=None):
         self.structure.validate(policy_data)
+        policy_data["policies"] = split_policies(policy_data["policies"])
 
         # Use passed in policy exec configuration or default on loader
         config = config or self.policy_config
