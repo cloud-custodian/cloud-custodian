@@ -1001,7 +1001,7 @@ class TestPolicy(BaseTest):
                         "tag:App": "absent"
                     }
                 ],
-                "actions": [{"type": "tag", "key": "App", "value:": "Tag"}],
+                "actions": [{"type": "tag", "key": "App", "value": "Tag"}],
             }
         )
         policy.validate()
