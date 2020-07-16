@@ -935,9 +935,9 @@ class RDSSubscription(QueryResourceManager):
         date = "SubscriptionCreateTime"
         permissions_enum = ('rds:DescribeEventSubscriptions',)
         universal_taggable = object()
-    
+
     augment = universal_augment
-        
+
 
 @RDSSubscription.action_registry.register('delete')
 class RDSSubscriptionDelete(BaseAction):
@@ -964,9 +964,10 @@ class RDSSubscriptionDelete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
         for r in resources:
-            self.manager.retry(client.delete_event_subscription,
-                SubscriptionName=r['CustSubscriptionId'], ignore_err_codes=(
-                'SubscriptionNotFoundFault', 'InvalidEventSubscriptionStateFault'))
+            self.manager.retry(
+                client.delete_event_subscription, SubscriptionName=r['CustSubscriptionId'],
+                ignore_err_codes=('SubscriptionNotFoundFault',
+                'InvalidEventSubscriptionStateFault'))
 
 
 class DescribeRDSSnapshot(DescribeSource):
