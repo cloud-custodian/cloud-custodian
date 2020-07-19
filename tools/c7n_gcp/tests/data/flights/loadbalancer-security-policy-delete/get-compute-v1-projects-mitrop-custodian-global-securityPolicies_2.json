@@ -1,0 +1,23 @@
+{
+  "body": {
+    "kind": "compute#securityPolicyList", 
+    "id": "projects/mitrop-custodian/global/securityPolicies"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "104", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/securityPolicies?filter=name+%3D+test-policy&alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "1pF9-Uuc-VC0-U23e2KnYPBZvoc=/o8NjldE3q2IFFwgqffOTF11N8nQ=", 
+    "cache-control": "private", 
+    "date": "Wed, 24 Jul 2019 12:13:30 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

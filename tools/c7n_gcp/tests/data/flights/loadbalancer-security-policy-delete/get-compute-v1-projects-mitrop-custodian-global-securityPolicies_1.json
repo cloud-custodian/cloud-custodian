@@ -1,0 +1,51 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#securityPolicy", 
+        "description": "", 
+        "rules": [
+          {
+            "kind": "compute#securityPolicyRule", 
+            "description": "Default rule, higher priority overrides it", 
+            "priority": 2147483647, 
+            "action": "deny(403)", 
+            "preview": false, 
+            "match": {
+              "config": {
+                "srcIpRanges": [
+                  "*"
+                ]
+              }, 
+              "versionedExpr": "SRC_IPS_V1"
+            }
+          }
+        ], 
+        "fingerprint": "Z24gwNyGiDY=", 
+        "creationTimestamp": "2019-07-24T05:13:01.504-07:00", 
+        "id": "3190174424025658786", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/securityPolicies/test-policy", 
+        "name": "test-policy"
+      }
+    ], 
+    "kind": "compute#securityPolicyList", 
+    "id": "projects/mitrop-custodian/global/securityPolicies"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "921", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/securityPolicies?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "CXIqos5e5a090wyoB1lyJdqs9Zs=/iA-C-XdSyt7N5CakCj2oLwlGTlg=", 
+    "cache-control": "private", 
+    "date": "Wed, 24 Jul 2019 12:13:24 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.90",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0,gzip(gfe)"
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.securityPolicies.insert",
+    "resourceName": "projects/cloud-custodian/global/securityPolicies/custodian-policy",
+    "request": {
+      "@type": "type.googleapis.com/compute.securityPolicies.insert"
+    }
+  },
+  "insertId": "lx87dgccpc",
+  "resource": {
+    "type": "network_security_policy",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "policy_name": "custodian-policy"
+    }
+  },
+  "timestamp": "2019-06-10T10:57:35.441Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1560164254035-58af60c272ca4-13cbcc67-cf2532c9",
+    "producer": "compute.googleapis.com",
+    "last": true
+  },
+  "receiveTimestamp": "2019-06-10T10:57:35.767352814Z"
+}

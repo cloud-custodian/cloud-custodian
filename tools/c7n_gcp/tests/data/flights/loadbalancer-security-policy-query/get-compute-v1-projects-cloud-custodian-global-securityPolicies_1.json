@@ -1,0 +1,52 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#securityPolicy", 
+        "description": "", 
+        "rules": [
+          {
+            "kind": "compute#securityPolicyRule", 
+            "description": "default rule", 
+            "priority": 2147483647, 
+            "action": "allow", 
+            "preview": false, 
+            "match": {
+              "config": {
+                "srcIpRanges": [
+                  "*"
+                ]
+              }, 
+              "versionedExpr": "SRC_IPS_V1"
+            }
+          }
+        ], 
+        "fingerprint": "FINvklB-_14=", 
+        "creationTimestamp": "2019-06-10T03:57:34.426-07:00", 
+        "id": "6573393147442989425", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies/custodian-policy", 
+        "name": "custodian-policy"
+      }
+    ], 
+    "kind": "compute#securityPolicyList", 
+    "id": "projects/cloud-custodian/global/securityPolicies"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "791", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 10 Jun 2019 10:57:48 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 10 Jun 2019 10:57:48 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"PeQw31vIyhRsGLdaDBrnw-R1GNc=/c8dugSi_JHBb02hjaAfNsQRe1mQ=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

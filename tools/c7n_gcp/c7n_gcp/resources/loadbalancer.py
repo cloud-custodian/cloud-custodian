@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import re
+
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -518,3 +521,50 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
                 'address': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+
+@resources.register('loadbalancer-security-policy')
+class LoadBalancingSecurityPolicy(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/securityPolicies"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'securityPolicies'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'securityPolicy': resource_info['policy_name']})
+
+
+@LoadBalancingSecurityPolicy.action_registry.register('delete')
+class LoadBalancingSecurityPolicyDelete(MethodAction):
+    """
+    `Deletes <https://cloud.google.com/compute/docs/reference/rest/v1/securityPolicies/delete>`_
+    a security policy
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: security-policy-delete
+            description: Deletes a security policy
+            resource: gcp.loadbalancer-security-policy
+            filters:
+              - type: value
+                key: name
+                value: test-policy
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile('.*?/projects/(.*?)/global/securityPolicies/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, policy = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'securityPolicy': policy}
