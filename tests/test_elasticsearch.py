@@ -281,4 +281,7 @@ class TestReservedInstances(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["ReservedElasticsearchInstanceId"], "036381d0-4fa5-4484-bd1a-efc1b43af0bf")
+        self.assertEqual(
+            resources[0]["ReservedElasticsearchInstanceId"],
+            "036381d0-4fa5-4484-bd1a-efc1b43af0bf"
+        )
