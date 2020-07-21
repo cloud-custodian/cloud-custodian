@@ -268,6 +268,7 @@ class ElasticSearch(BaseTest):
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
         )
 
+
 class TestReservedInstances(BaseTest):
     def test_elasticsearch_reserved_node_query(self):
         session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")

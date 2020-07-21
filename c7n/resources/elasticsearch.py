@@ -247,10 +247,12 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+
+
 @resources.register('elasticsearch-reserved')
 class ReservedInstances(QueryResourceManager):
 
-    class resource_type(query.TypeInfo):
+    class resource_type(TypeInfo):
         service = 'elasticsearch'
         name = id = 'ReservedElasticsearchInstanceId'
         date = 'StartTime'
