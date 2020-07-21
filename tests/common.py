@@ -37,7 +37,7 @@ skip_if_not_validating = unittest.skipIf(
 
 # Set this so that if we run nose directly the tests will not fail
 if "AWS_DEFAULT_REGION" not in os.environ:
-    os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
 class BaseTest(TestUtils, PillTest):
@@ -52,7 +52,7 @@ class BaseTest(TestUtils, PillTest):
         if 'account_id' not in kw:
             kw['account_id'] = self.account_id
         if 'region' not in kw:
-            kw['region'] = 'eu-west-2'
+            kw['region'] = 'us-east-1'
         return super(BaseTest, self)._get_policy_config(**kw)
 
 
