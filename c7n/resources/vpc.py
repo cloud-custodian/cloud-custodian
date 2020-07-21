@@ -1119,7 +1119,9 @@ class SGPermission(Filter):
             match_range = {cidr_type: match_range}
 
         match_ranges = [match_range]
-        if match_range.get("value") and isinstance(match_range["value"], list) and match_range["value_type"] == 'cidr':
+        if match_range.get("value") and isinstance(match_range["value"], list) \
+       and match_range["value_type"] == 'cidr':
+
             match_ranges = [{**match_range, 'value': v} for v in match_range["value"]]
 
         findings = []
