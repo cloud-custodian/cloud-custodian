@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReservedDBInstances": [
+            {
+                "ReservedDBInstanceId": "ri-2019-05-06-14-19-06-332",
+                "ReservedDBInstancesOfferingId": "03563adc-1d96-4d2b-b171-3192b150aca8",
+                "DBInstanceClass": "db.t2.micro",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 19,
+                    "second": 11,
+                    "microsecond": 531000
+                },
+                "Duration": 31536000,
+                "FixedPrice": 102.0,
+                "UsagePrice": 0.0,
+                "CurrencyCode": "USD",
+                "DBInstanceCount": 1,
+                "ProductDescription": "mysql",
+                "OfferingType": "All Upfront",
+                "MultiAZ": false,
+                "State": "active",
+                "RecurringCharges": [],
+                "ReservedDBInstanceArn": "arn:aws:rds:us-east-1:644160558196:ri:ri-2019-05-06-14-19-06-332"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9dc0340f-201a-4be0-a4db-93a959b7b2b9",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9dc0340f-201a-4be0-a4db-93a959b7b2b9",
+                "content-type": "text/xml",
+                "content-length": "1296",
+                "date": "Mon, 06 May 2019 14:46:52 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
