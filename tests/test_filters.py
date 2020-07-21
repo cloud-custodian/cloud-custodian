@@ -194,11 +194,6 @@ class TestValueFilter(unittest.TestCase):
         value = "10.10.10.10"
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
-        vf.vtype = "cidr"
-        sentinel = "10.0.0.0/16"
-        value = ["10.10.10.10", "10.10.10.0"]
-        res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual((str(res[0]), [str(r) for r in res[1]]), (sentinel, value))
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
         res = vf.process_value_type(sentinel, value, resource)
