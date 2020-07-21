@@ -270,6 +270,7 @@ class ElasticSearch(BaseTest):
 
 
 class TestReservedInstances(BaseTest):
+
     def test_elasticsearch_reserved_node_query(self):
         session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")
         p = self.load_policy(

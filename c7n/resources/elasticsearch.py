@@ -253,12 +253,12 @@ class ElasticSearchMarkForOp(TagDelayedAction):
 class ReservedInstances(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'elasticsearch'
+        service = 'es'
         name = id = 'ReservedElasticsearchInstanceId'
         date = 'StartTime'
         enum_spec = (
             'describe_reserved_elasticsearch_instances', 'ReservedElasticsearchInstances', None)
         filter_name = 'ReservedElasticsearchInstances'
         filter_type = 'list'
-        arn_type = "reserved-elasticsearch-instances"
+        arn_type = "reserved-instances"
         permissions_enum = ('es:DescribeReservedElasticsearchInstances',)
