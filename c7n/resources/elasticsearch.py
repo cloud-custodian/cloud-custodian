@@ -247,3 +247,16 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+@resources.register('elasticsearch-reserved')
+class ReservedInstances(QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'elasticsearch'
+        name = id = 'ReservedElasticsearchInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_elasticsearch_instances', 'ReservedElasticsearchInstances', None)
+        filter_name = 'ReservedElasticsearchInstances'
+        filter_type = 'list'
+        arn_type = "reserved-elasticsearch-instances"
+        permissions_enum = ('es:DescribeReservedElasticsearchInstances',)
