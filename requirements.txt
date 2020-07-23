@@ -5,8 +5,8 @@ atomicwrites==1.4.0; sys_platform == "win32"
 attrs==19.3.0
 aws-xray-sdk==2.6.0
 bleach==3.1.5
-boto3==1.14.26
-botocore==1.17.26
+boto3==1.14.27
+botocore==1.17.27
 certifi==2020.6.20
 cffi==1.14.0; sys_platform == "linux"
 chardet==3.0.4
