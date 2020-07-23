@@ -26,8 +26,8 @@ class StructureParser:
     allowed_file_keys = {'vars', 'policies'}
     required_policy_keys = {'name', 'resource'}
     allowed_policy_keys = {'name', 'resource', 'title', 'description', 'mode',
-         'tags', 'max-resources', 'source', 'query',
-         'filters', 'actions', 'source', 'tags', 'conditions',
+         'tags', 'max-resources', 'metadata', 'query',
+         'filters', 'actions', 'source', 'conditions',
          # legacy keys subject to deprecation.
          'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'}

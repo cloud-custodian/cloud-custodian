@@ -61,7 +61,7 @@ Then run the following command, substituting your username:
 
 .. code-block:: bash
 
-    gcloud auth application-default login <your_user_name>
+    gcloud auth application-default login
 
 Executing the command will open a browser window with prompts to finish configuring
 your credentials. For more information on this command,
@@ -105,7 +105,6 @@ Filename: ``custodian.yml``
           - type: value
             key: name
             value: test
-            op: in
         actions:
           - type: stop
 
@@ -119,7 +118,7 @@ Next, run the following command to execute the policy with Custodian:
 
 .. code-block:: bash
 
-    custodian run --output-dir=. custodian.yml
+    GOOGLE_CLOUD_PROJECT="project-id" custodian run --output-dir=. custodian.yml
 
 If successful, you should see output similar to the following on the command line::
 

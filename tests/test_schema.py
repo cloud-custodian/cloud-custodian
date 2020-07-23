@@ -306,6 +306,14 @@ class SchemaTest(BaseTest):
         validator = self.get_validator(data)
         self.assertEqual(list(validator.iter_errors(data)), [])
 
+    def test_metadata(self):
+        data = {
+            "policies": [{"name": "test", "resource": "ec2", "metadata": {"createdBy": "Totoro"}}],
+        }
+        load_resources(('aws.ec2',))
+        validator = self.get_validator(data)
+        self.assertEqual(list(validator.iter_errors(data)), [])
+
     def test_semantic_error_on_value_derived(self):
         data = {
             "policies": [

@@ -1633,3 +1633,23 @@ class TestReservedRDSInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ReservedDBInstanceId"], "ri-2019-05-06-14-19-06-332")
+
+
+class RDSEventSubscription(BaseTest):
+    def test_rds_event_subscription_delete(self):
+        session_factory = self.replay_flight_data("test_rds_event_subscription_delete")
+        p = self.load_policy(
+            {
+                "name": "rds-event-subscription-delete",
+                "resource": "aws.rds-subscription",
+                "filters": [{"type": "value", "key": "tag:name", "value": "pratyush"}],
+                "actions": [{"type": "delete"}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["CustSubscriptionId"], "c7n-test-pratyush")
+        client = session_factory().client("rds")
+        response = client.describe_event_subscriptions()
+        self.assertEqual(len(response.get('EventSubscriptionsList')), 0)

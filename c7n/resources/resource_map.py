@@ -53,6 +53,7 @@ ResourceMap = {
         "c7n.resources.elasticbeanstalk.ElasticBeanstalkEnvironment"),
     "aws.elasticache-group": "c7n.resources.elasticache.ElastiCacheReplicationGroup",
     "aws.elasticsearch": "c7n.resources.elasticsearch.ElasticSearchDomain",
+    "aws.elasticsearch-reserved": "c7n.resources.elasticsearch.ReservedInstances",
     "aws.elb": "c7n.resources.elb.ELB",
     "aws.emr": "c7n.resources.emr.EMRCluster",
     "aws.emr-security-configuration": "c7n.resources.emr.EMRSecurityConfiguration",

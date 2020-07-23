@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 import mock
+import os
 import shutil
 import tempfile
 
@@ -991,6 +992,24 @@ class TestPolicy(BaseTest):
 
 
 class PolicyConditionsTest(BaseTest):
+
+    def test_value_from(self):
+        tmp_dir = self.change_cwd()
+        p = self.load_policy({
+            'name': 'fx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account_id',
+                'op': 'in',
+                'value_from': {
+                    'url': 'file:///{}/accounts.txt'.format(tmp_dir),
+                    'type': 'txt'}
+            }]
+        })
+        with open(os.path.join(tmp_dir, 'accounts.txt'), 'w') as fh:
+            fh.write(p.ctx.options.account_id)
+        self.assertTrue(p.is_runnable())
 
     def test_env_var_extension(self):
         p = self.load_policy({

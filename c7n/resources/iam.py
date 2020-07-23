@@ -120,6 +120,10 @@ class Role(QueryResourceManager):
     }
 
 
+Role.action_registry.register('mark-for-op', TagDelayedAction)
+Role.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @Role.action_registry.register('post-finding')
 class RolePostFinding(OtherResourcePostFinding):
 

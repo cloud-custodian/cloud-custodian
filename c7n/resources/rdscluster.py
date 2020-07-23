@@ -401,7 +401,7 @@ class RDSClusterSnapshot(QueryResourceManager):
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        universal_tagging = object()
+        universal_taggable = object()
         config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 

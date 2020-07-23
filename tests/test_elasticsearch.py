@@ -267,3 +267,22 @@ class ElasticSearch(BaseTest):
             sorted(result[0]["VPCOptions"]["SecurityGroupIds"]),
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
         )
+
+
+class TestReservedInstances(BaseTest):
+
+    def test_elasticsearch_reserved_node_query(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-reserved",
+                "resource": "aws.elasticsearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedElasticsearchInstanceId"],
+            "036381d0-4fa5-4484-bd1a-efc1b43af0bf"
+        )
