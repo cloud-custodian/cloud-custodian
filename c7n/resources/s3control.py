@@ -1,4 +1,3 @@
-
 from c7n.actions import Action
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -33,10 +32,8 @@ class S3AccessPoint(QueryResourceManager):
         id = name = 'PolicyId'
         enum_spec = (
             'list_access_points', 'AccessPointList', None)
-        filter_name = 'PolicyIds'
-        filter_type = 'list'
         arn = 'AccessPointArn'
-        arn_service =  's3'
+        arn_service = 's3'
         arn_type = 'accesspoint'
         cfn_type = 'AWS::S3::AccessPoint'
 
