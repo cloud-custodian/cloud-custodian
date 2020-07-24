@@ -459,7 +459,7 @@ class TestGlueSecurityConfiguration(BaseTest):
                         "key": "c7n:AliasName",
                         "value": "^(alias/)",
                         "op": "regex",
-                        "key_type": "cloudwatch"
+                        "key-type": "cloudwatch"
                     }
                 ]
             },

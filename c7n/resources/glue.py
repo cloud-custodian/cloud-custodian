@@ -417,7 +417,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
 @GlueSecurityConfiguration.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     """
-    Filter a resource by its associcated kms key and optionally the aliasname
+    Filter a resource by its associcated kms key and optionally the alias name
     of the kms key by using 'c7n:AliasName'
 
     :example:
@@ -435,11 +435,11 @@ class KmsFilter(KmsRelatedFilter):
     """
     schema = type_schema(
         'kms-key',
-        key_type={'type': 'string', 'enum': [
-            's3', 'cloudwatch', 'job-bookmarks', 'all']},
         rinherit=ValueFilter.schema,
-        **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
+        **{'key-type': {'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
 
     RelatedIdsExpression = ''
 
