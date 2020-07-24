@@ -710,6 +710,18 @@ class TestSNS(BaseTest):
             rfinding['Details']['AwsSnsTopic'],
             'AwsSnsTopicDetails', 'securityhub')
 
+    def test_sns_config(self):
+        session_factory = self.replay_flight_data("test_sns_config")
+        p = self.load_policy(
+            {"name": "sns-config",
+             "source": "config",
+             "resource": "sns"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['Tags'][0]['Value'], 'false')
+
 
 class TestSubscription(BaseTest):
 
