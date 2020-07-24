@@ -279,7 +279,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::ServiceCatalog::CloudFormationProduct',
             'AWS::ServiceCatalog::Portfolio',
             'AWS::SSM::FileData',
-            'AWS::SNS::Topic',
             'AWS::SecretsManager::Secret'}
 
         resource_map = {}
@@ -300,8 +299,6 @@ class PolicyMetaLint(BaseTest):
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
         bad_types = resource_config_types.difference(config_types)
-        # TODO: remove once botocore is updated https://github.com/boto/botocore/issues/2111
-        bad_types.remove('AWS::SNS::Topic')
         if bad_types:
             raise AssertionError(
                 "Invalid config types \n %s" % ('\n'.join(bad_types)))
