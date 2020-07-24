@@ -27,10 +27,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.14.16"
+version = "1.14.27"
 
 [package.dependencies]
-botocore = ">=1.17.16,<1.18.0"
+botocore = ">=1.17.27,<1.18.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -40,7 +40,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.17.16"
+version = "1.17.27"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -396,7 +396,7 @@ description = "Twilio SendGrid library for Python"
 name = "sendgrid"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "6.4.1"
+version = "6.4.4"
 
 [package.dependencies]
 python-http-client = ">=3.2.1"
@@ -432,7 +432,7 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
-version = "1.25.9"
+version = "1.25.10"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
@@ -473,12 +473,12 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.14.16-py2.py3-none-any.whl", hash = "sha256:c2a223f4b48782e8b160b2130265e2a66081df111f630a5a384d6909e29a5aa9"},
-    {file = "boto3-1.14.16.tar.gz", hash = "sha256:ce5a4ab6af9e993d1864209cbbb6f4812f65fbc57ad6b95e5967d8bf38b1dcfb"},
+    {file = "boto3-1.14.27-py2.py3-none-any.whl", hash = "sha256:65c131b72c2a75e3cc6044e5fd6426719051b9b1f28bd026b4a5490648d13019"},
+    {file = "boto3-1.14.27.tar.gz", hash = "sha256:e1e09587763671cc07c9e6d349d93bf53a140f83947cb6cf1ec4cb9f07b0ff95"},
 ]
 botocore = [
-    {file = "botocore-1.17.16-py2.py3-none-any.whl", hash = "sha256:99d995ef99cf77458a661f3fc64e0c3a4ce77ca30facfdf0472f44b2953dd856"},
-    {file = "botocore-1.17.16.tar.gz", hash = "sha256:fe0c4f7cd6b67eff3b7cb8dff6709a65d6fca10b7b7449a493b2036915e98b4c"},
+    {file = "botocore-1.17.27-py2.py3-none-any.whl", hash = "sha256:acd955f0315b5d17e3e8ddc2ef74d7f03c4ef37f0ceb042058637f7edfbbad4e"},
+    {file = "botocore-1.17.27.tar.gz", hash = "sha256:994a9f50e0e770c0f9ea74659f501848f7d12b22186026c219cde8a481ede298"},
 ]
 certifi = [
     {file = "certifi-2020.6.20-py2.py3-none-any.whl", hash = "sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41"},
@@ -655,8 +655,8 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 sendgrid = [
-    {file = "sendgrid-6.4.1-py3-none-any.whl", hash = "sha256:dd0eddf079be040172a4d0afdf9b9becb4e53210ead015a0e6b2d680eea92ac0"},
-    {file = "sendgrid-6.4.1.tar.gz", hash = "sha256:54e51ca9afbfe1a4706864f42eb1a12d597e375249d80a8ce679e7a4fa91e776"},
+    {file = "sendgrid-6.4.4-py3-none-any.whl", hash = "sha256:9d218bba09c811d8791b7b8116402b2869d7b065c96313e7bb8362fcb880cdae"},
+    {file = "sendgrid-6.4.4.tar.gz", hash = "sha256:c265d97825a3fd67852d6a8cf1e622691c798edaa50fdd4afa97af00a15615ef"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
@@ -670,8 +670,8 @@ starkbank-ecdsa = [
     {file = "starkbank-ecdsa-1.0.0.tar.gz", hash = "sha256:cd17ec9fa7ad8ae3fc81a63ddb7e0d7fb798a048e40c1a9c55afd1a207d1eff9"},
 ]
 urllib3 = [
-    {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
-    {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
+    {file = "urllib3-1.25.10-py2.py3-none-any.whl", hash = "sha256:e7983572181f5e1522d9c98453462384ee92a0be7fac5f1413a1e35c56cc0461"},
+    {file = "urllib3-1.25.10.tar.gz", hash = "sha256:91056c15fa70756691db97756772bb1eb9678fa585d9184f24534b100dc60f4a"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

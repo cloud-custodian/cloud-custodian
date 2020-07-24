@@ -62,7 +62,7 @@ description = "Bash tab completion for argparse"
 name = "argcomplete"
 optional = false
 python-versions = "*"
-version = "1.11.1"
+version = "1.12.0"
 
 [package.dependencies]
 [package.dependencies.importlib-metadata]
@@ -159,7 +159,7 @@ description = "Azure Cosmos Python SDK"
 name = "azure-cosmos"
 optional = false
 python-versions = "*"
-version = "3.1.2"
+version = "3.2.0"
 
 [package.dependencies]
 requests = ">=2.10.0"
@@ -198,7 +198,7 @@ marker = "python_version >= \"3\" and python_version < \"4\""
 name = "azure-functions"
 optional = false
 python-versions = "*"
-version = "1.2.1"
+version = "1.3.0"
 
 [package.extras]
 dev = ["flake8 (>=3.7.9,<3.8.0)", "mypy", "pytest", "requests (>=2.0.0,<3.0.0)", "coverage"]
@@ -483,7 +483,7 @@ description = "Microsoft Azure HDInsight Management Client Library for Python"
 name = "azure-mgmt-hdinsight"
 optional = false
 python-versions = "*"
-version = "1.5.1"
+version = "1.6.0"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
@@ -789,10 +789,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.14.16"
+version = "1.14.27"
 
 [package.dependencies]
-botocore = ">=1.17.16,<1.18.0"
+botocore = ">=1.17.27,<1.18.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -802,7 +802,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.17.16"
+version = "1.17.27"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -885,17 +885,18 @@ description = "cryptography is a package which provides cryptographic recipes an
 name = "cryptography"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
-version = "2.9.2"
+version = "3.0"
 
 [package.dependencies]
 cffi = ">=1.8,<1.11.3 || >1.11.3"
 six = ">=1.4.1"
 
 [package.extras]
-docs = ["sphinx (>=1.6.5,<1.8.0 || >1.8.0)", "sphinx-rtd-theme"]
+docs = ["sphinx (>=1.6.5,<1.8.0 || >1.8.0,<3.1.0 || >3.1.0,<3.1.1 || >3.1.1)", "sphinx-rtd-theme"]
 docstest = ["doc8", "pyenchant (>=1.6.11)", "twine (>=1.12.0)", "sphinxcontrib-spelling (>=4.0.1)"]
 idna = ["idna (>=2.1)"]
-pep8test = ["flake8", "flake8-import-order", "pep8-naming"]
+pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
+ssh = ["bcrypt (>=3.1.5)"]
 test = ["pytest (>=3.6.0,<3.9.0 || >3.9.0,<3.9.1 || >3.9.1,<3.9.2 || >3.9.2)", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,<3.79.2 || >3.79.2)"]
 
 [[package]]
@@ -1140,14 +1141,14 @@ description = "Wraps the portalocker recipe for easy usage"
 name = "portalocker"
 optional = false
 python-versions = "*"
-version = "1.7.0"
+version = "1.7.1"
 
 [package.dependencies]
 pywin32 = "!=226"
 
 [package.extras]
 docs = ["sphinx (>=1.7.1)"]
-tests = ["flake8 (>=3.5.0)", "pytest (>=3.4.0)", "pytest-cache (>=1.0)", "pytest-cov (>=2.5.1)", "pytest-flakes (>=2.0.0)", "pytest-pep8 (>=1.0.6)", "sphinx (>=1.7.1)"]
+tests = ["pytest (>=4.6.9)", "pytest-cov (>=2.8.1)", "sphinx (>=1.8.5)", "pytest-flake8 (>=1.0.5)"]
 
 [[package]]
 category = "main"
@@ -1346,7 +1347,7 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
-version = "1.25.9"
+version = "1.25.10"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
@@ -1448,8 +1449,8 @@ apscheduler = [
     {file = "APScheduler-3.6.3.tar.gz", hash = "sha256:3bb5229eed6fbbdafc13ce962712ae66e175aa214c69bed35a06bffcf0c5e244"},
 ]
 argcomplete = [
-    {file = "argcomplete-1.11.1-py2.py3-none-any.whl", hash = "sha256:890bdd1fcbb973ed73db241763e78b6d958580e588c2910b508c770a59ef37d7"},
-    {file = "argcomplete-1.11.1.tar.gz", hash = "sha256:5ae7b601be17bf38a749ec06aa07fb04e7b6b5fc17906948dc1866e7facf3740"},
+    {file = "argcomplete-1.12.0-py2.py3-none-any.whl", hash = "sha256:91dc7f9c7f6281d5a0dce5e73d2e33283aaef083495c13974a7dd197a1cdc949"},
+    {file = "argcomplete-1.12.0.tar.gz", hash = "sha256:2fbe5ed09fd2c1d727d4199feca96569a5b50d44c71b16da9c742201f7cc295c"},
 ]
 attrs = [
     {file = "attrs-19.3.0-py2.py3-none-any.whl", hash = "sha256:08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c"},
@@ -1472,9 +1473,8 @@ azure-common = [
     {file = "azure_common-1.1.25-py2.py3-none-any.whl", hash = "sha256:fd02e4256dc9cdd2d4422bc795bdca2ef302f7a86148b154fbf4ea1f09da400a"},
 ]
 azure-cosmos = [
-    {file = "azure-cosmos-3.1.2.tar.gz", hash = "sha256:7f8ac99e4e40c398089fc383bfadcdc83376f72b88532b0cac0b420357cd08c7"},
-    {file = "azure_cosmos-3.1.2-py2-none-any.whl", hash = "sha256:4905cb00a834e86338bc611e2f278bb12834812801c6a420b973c5f821ce283c"},
-    {file = "azure_cosmos-3.1.2-py3-none-any.whl", hash = "sha256:bac7de8fa84a3e34b6814cdadbb5ce99653874c27180f5fa596363a8dc1945db"},
+    {file = "azure-cosmos-3.2.0.tar.gz", hash = "sha256:4f77cc558fecffac04377ba758ac4e23f076dc1c54e2cf2515f85bc15cbde5c6"},
+    {file = "azure_cosmos-3.2.0-py2.py3-none-any.whl", hash = "sha256:313e766bcf5a1779802c274dec94d5b9cc0e4d0d269489c56606fd2464070fad"},
 ]
 azure-cosmosdb-nspkg = [
     {file = "azure-cosmosdb-nspkg-2.0.2.tar.gz", hash = "sha256:acf691e692818d9a65c653c7a3485eb8e35c0bdc496bba652e5ea3905ba09cd8"},
@@ -1485,8 +1485,8 @@ azure-cosmosdb-table = [
     {file = "azure_cosmosdb_table-1.0.6-py2.py3-none-any.whl", hash = "sha256:ee525233d6c8c016526593bf28f8a374275cfe204a00c41134b83a1736f7b5f7"},
 ]
 azure-functions = [
-    {file = "azure-functions-1.2.1.tar.gz", hash = "sha256:517452cce8c489c2787d02d5440997f7e6e0bb56be5afac27d391c3f26180938"},
-    {file = "azure_functions-1.2.1-py3-none-any.whl", hash = "sha256:aaa6fc16382f14a41250571b4caf92ea7e649a2aa389cfbf86d23e3a17e1d96b"},
+    {file = "azure-functions-1.3.0.tar.gz", hash = "sha256:d4b447e8cc4783af6928d59c9b555e668a9e4ff3fdc6d7c7bf006a24ea69dd37"},
+    {file = "azure_functions-1.3.0-py3-none-any.whl", hash = "sha256:190c1aee707738b24d7e4272591ffa7c84701f4bce5a09831b5cd0d503596afd"},
 ]
 azure-graphrbac = [
     {file = "azure-graphrbac-0.61.1.zip", hash = "sha256:53e98ae2ca7c19b349e9e9bb1b6a824aeae8dcfcbe17190d20fe69c0f185b2e2"},
@@ -1574,8 +1574,8 @@ azure-mgmt-eventhub = [
     {file = "azure_mgmt_eventhub-3.1.0-py2.py3-none-any.whl", hash = "sha256:780ccb3e3f04cb2df812eabb9b5268c8c6185654250a0714d3eec6be8cb9ced5"},
 ]
 azure-mgmt-hdinsight = [
-    {file = "azure-mgmt-hdinsight-1.5.1.zip", hash = "sha256:76b94f3e43fdc6698023d79be731937dc645dc3178dc134854768528ecc0aea3"},
-    {file = "azure_mgmt_hdinsight-1.5.1-py2.py3-none-any.whl", hash = "sha256:53134d367ff7e9529ddc9f9cf00cdbece8be55103a24d37607ed8f53391cec9f"},
+    {file = "azure-mgmt-hdinsight-1.6.0.zip", hash = "sha256:b1d06279307c41da5e0a5c9722aa6b36ce3b2c212534a54767210639451b9800"},
+    {file = "azure_mgmt_hdinsight-1.6.0-py2.py3-none-any.whl", hash = "sha256:de2aff12cf18fa86e5193f4ae9c21eedfd332295372f9ee7ef8e6d1dc7cd432d"},
 ]
 azure-mgmt-iothub = [
     {file = "azure-mgmt-iothub-0.10.0.zip", hash = "sha256:20baa63aa746382aefd99c75f82dd6345704562fa15c403b1231fd201c2fbaf6"},
@@ -1688,12 +1688,12 @@ bcrypt = [
     {file = "bcrypt-3.1.7.tar.gz", hash = "sha256:0b0069c752ec14172c5f78208f1863d7ad6755a6fae6fe76ec2c80d13be41e42"},
 ]
 boto3 = [
-    {file = "boto3-1.14.16-py2.py3-none-any.whl", hash = "sha256:c2a223f4b48782e8b160b2130265e2a66081df111f630a5a384d6909e29a5aa9"},
-    {file = "boto3-1.14.16.tar.gz", hash = "sha256:ce5a4ab6af9e993d1864209cbbb6f4812f65fbc57ad6b95e5967d8bf38b1dcfb"},
+    {file = "boto3-1.14.27-py2.py3-none-any.whl", hash = "sha256:65c131b72c2a75e3cc6044e5fd6426719051b9b1f28bd026b4a5490648d13019"},
+    {file = "boto3-1.14.27.tar.gz", hash = "sha256:e1e09587763671cc07c9e6d349d93bf53a140f83947cb6cf1ec4cb9f07b0ff95"},
 ]
 botocore = [
-    {file = "botocore-1.17.16-py2.py3-none-any.whl", hash = "sha256:99d995ef99cf77458a661f3fc64e0c3a4ce77ca30facfdf0472f44b2953dd856"},
-    {file = "botocore-1.17.16.tar.gz", hash = "sha256:fe0c4f7cd6b67eff3b7cb8dff6709a65d6fca10b7b7449a493b2036915e98b4c"},
+    {file = "botocore-1.17.27-py2.py3-none-any.whl", hash = "sha256:acd955f0315b5d17e3e8ddc2ef74d7f03c4ef37f0ceb042058637f7edfbbad4e"},
+    {file = "botocore-1.17.27.tar.gz", hash = "sha256:994a9f50e0e770c0f9ea74659f501848f7d12b22186026c219cde8a481ede298"},
 ]
 c7n = []
 certifi = [
@@ -1743,25 +1743,25 @@ colorama = [
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
 cryptography = [
-    {file = "cryptography-2.9.2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:daf54a4b07d67ad437ff239c8a4080cfd1cc7213df57d33c97de7b4738048d5e"},
-    {file = "cryptography-2.9.2-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:3b3eba865ea2754738616f87292b7f29448aec342a7c720956f8083d252bf28b"},
-    {file = "cryptography-2.9.2-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:c447cf087cf2dbddc1add6987bbe2f767ed5317adb2d08af940db517dd704365"},
-    {file = "cryptography-2.9.2-cp27-cp27m-win32.whl", hash = "sha256:f118a95c7480f5be0df8afeb9a11bd199aa20afab7a96bcf20409b411a3a85f0"},
-    {file = "cryptography-2.9.2-cp27-cp27m-win_amd64.whl", hash = "sha256:c4fd17d92e9d55b84707f4fd09992081ba872d1a0c610c109c18e062e06a2e55"},
-    {file = "cryptography-2.9.2-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:d0d5aeaedd29be304848f1c5059074a740fa9f6f26b84c5b63e8b29e73dfc270"},
-    {file = "cryptography-2.9.2-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:1e4014639d3d73fbc5ceff206049c5a9a849cefd106a49fa7aaaa25cc0ce35cf"},
-    {file = "cryptography-2.9.2-cp35-abi3-macosx_10_9_x86_64.whl", hash = "sha256:96c080ae7118c10fcbe6229ab43eb8b090fccd31a09ef55f83f690d1ef619a1d"},
-    {file = "cryptography-2.9.2-cp35-abi3-manylinux1_x86_64.whl", hash = "sha256:e993468c859d084d5579e2ebee101de8f5a27ce8e2159959b6673b418fd8c785"},
-    {file = "cryptography-2.9.2-cp35-abi3-manylinux2010_x86_64.whl", hash = "sha256:88c881dd5a147e08d1bdcf2315c04972381d026cdb803325c03fe2b4a8ed858b"},
-    {file = "cryptography-2.9.2-cp35-cp35m-win32.whl", hash = "sha256:651448cd2e3a6bc2bb76c3663785133c40d5e1a8c1a9c5429e4354201c6024ae"},
-    {file = "cryptography-2.9.2-cp35-cp35m-win_amd64.whl", hash = "sha256:726086c17f94747cedbee6efa77e99ae170caebeb1116353c6cf0ab67ea6829b"},
-    {file = "cryptography-2.9.2-cp36-cp36m-win32.whl", hash = "sha256:091d31c42f444c6f519485ed528d8b451d1a0c7bf30e8ca583a0cac44b8a0df6"},
-    {file = "cryptography-2.9.2-cp36-cp36m-win_amd64.whl", hash = "sha256:bb1f0281887d89617b4c68e8db9a2c42b9efebf2702a3c5bf70599421a8623e3"},
-    {file = "cryptography-2.9.2-cp37-cp37m-win32.whl", hash = "sha256:18452582a3c85b96014b45686af264563e3e5d99d226589f057ace56196ec78b"},
-    {file = "cryptography-2.9.2-cp37-cp37m-win_amd64.whl", hash = "sha256:22e91636a51170df0ae4dcbd250d318fd28c9f491c4e50b625a49964b24fe46e"},
-    {file = "cryptography-2.9.2-cp38-cp38-win32.whl", hash = "sha256:844a76bc04472e5135b909da6aed84360f522ff5dfa47f93e3dd2a0b84a89fa0"},
-    {file = "cryptography-2.9.2-cp38-cp38-win_amd64.whl", hash = "sha256:1dfa985f62b137909496e7fc182dac687206d8d089dd03eaeb28ae16eec8e7d5"},
-    {file = "cryptography-2.9.2.tar.gz", hash = "sha256:a0c30272fb4ddda5f5ffc1089d7405b7a71b0b0f51993cb4e5dbb4590b2fc229"},
+    {file = "cryptography-3.0-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:ab49edd5bea8d8b39a44b3db618e4783ef84c19c8b47286bf05dfdb3efb01c83"},
+    {file = "cryptography-3.0-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:124af7255ffc8e964d9ff26971b3a6153e1a8a220b9a685dc407976ecb27a06a"},
+    {file = "cryptography-3.0-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:51e40123083d2f946794f9fe4adeeee2922b581fa3602128ce85ff813d85b81f"},
+    {file = "cryptography-3.0-cp27-cp27m-win32.whl", hash = "sha256:dea0ba7fe6f9461d244679efa968d215ea1f989b9c1957d7f10c21e5c7c09ad6"},
+    {file = "cryptography-3.0-cp27-cp27m-win_amd64.whl", hash = "sha256:8ecf9400d0893836ff41b6f977a33972145a855b6efeb605b49ee273c5e6469f"},
+    {file = "cryptography-3.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:0c608ff4d4adad9e39b5057de43657515c7da1ccb1807c3a27d4cf31fc923b4b"},
+    {file = "cryptography-3.0-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:bec7568c6970b865f2bcebbe84d547c52bb2abadf74cefce396ba07571109c67"},
+    {file = "cryptography-3.0-cp35-abi3-macosx_10_10_x86_64.whl", hash = "sha256:0cbfed8ea74631fe4de00630f4bb592dad564d57f73150d6f6796a24e76c76cd"},
+    {file = "cryptography-3.0-cp35-abi3-manylinux1_x86_64.whl", hash = "sha256:a09fd9c1cca9a46b6ad4bea0a1f86ab1de3c0c932364dbcf9a6c2a5eeb44fa77"},
+    {file = "cryptography-3.0-cp35-abi3-manylinux2010_x86_64.whl", hash = "sha256:ce82cc06588e5cbc2a7df3c8a9c778f2cb722f56835a23a68b5a7264726bb00c"},
+    {file = "cryptography-3.0-cp35-cp35m-win32.whl", hash = "sha256:9367d00e14dee8d02134c6c9524bb4bd39d4c162456343d07191e2a0b5ec8b3b"},
+    {file = "cryptography-3.0-cp35-cp35m-win_amd64.whl", hash = "sha256:384d7c681b1ab904fff3400a6909261cae1d0939cc483a68bdedab282fb89a07"},
+    {file = "cryptography-3.0-cp36-cp36m-win32.whl", hash = "sha256:4d355f2aee4a29063c10164b032d9fa8a82e2c30768737a2fd56d256146ad559"},
+    {file = "cryptography-3.0-cp36-cp36m-win_amd64.whl", hash = "sha256:45741f5499150593178fc98d2c1a9c6722df88b99c821ad6ae298eff0ba1ae71"},
+    {file = "cryptography-3.0-cp37-cp37m-win32.whl", hash = "sha256:8ecef21ac982aa78309bb6f092d1677812927e8b5ef204a10c326fc29f1367e2"},
+    {file = "cryptography-3.0-cp37-cp37m-win_amd64.whl", hash = "sha256:4b9303507254ccb1181d1803a2080a798910ba89b1a3c9f53639885c90f7a756"},
+    {file = "cryptography-3.0-cp38-cp38-win32.whl", hash = "sha256:8713ddb888119b0d2a1462357d5946b8911be01ddbf31451e1d07eaa5077a261"},
+    {file = "cryptography-3.0-cp38-cp38-win_amd64.whl", hash = "sha256:bea0b0468f89cdea625bb3f692cd7a4222d80a6bdafd6fb923963f2b9da0e15f"},
+    {file = "cryptography-3.0.tar.gz", hash = "sha256:8e924dbc025206e97756e8903039662aa58aa9ba357d8e1d8fc29e3092322053"},
 ]
 distlib = [
     {file = "distlib-0.3.1-py2.py3-none-any.whl", hash = "sha256:8c09de2c67b3e7deef7184574fc060ab8a793e7adbb183d942c389c8b13c52fb"},
@@ -1852,8 +1852,8 @@ paramiko = [
     {file = "paramiko-2.7.1.tar.gz", hash = "sha256:920492895db8013f6cc0179293147f830b8c7b21fdfc839b6bad760c27459d9f"},
 ]
 portalocker = [
-    {file = "portalocker-1.7.0-py2.py3-none-any.whl", hash = "sha256:874d6063c6ceb185fe4771da41b01872d2c56d292db746698f8ad7bf1833c905"},
-    {file = "portalocker-1.7.0.tar.gz", hash = "sha256:091364838ed6fbb68ea291c28982d1e56125c0d9e3fad5a4ac001db54dd862dc"},
+    {file = "portalocker-1.7.1-py2.py3-none-any.whl", hash = "sha256:34cb36c618d88bcd9079beb36dcdc1848a3e3d92ac4eac59055bdeafc39f9d4a"},
+    {file = "portalocker-1.7.1.tar.gz", hash = "sha256:6d6f5de5a3e68c4dd65a98ec1babb26d28ccc5e770e07b672d65d5a35e4b2d8a"},
 ]
 pycparser = [
     {file = "pycparser-2.20-py2.py3-none-any.whl", hash = "sha256:7582ad22678f0fcd81102833f60ef8d0e57288b6b5fb00323d101be910e35705"},
@@ -1958,8 +1958,8 @@ tzlocal = [
     {file = "tzlocal-2.1.tar.gz", hash = "sha256:643c97c5294aedc737780a49d9df30889321cbe1204eac2c2ec6134035a92e44"},
 ]
 urllib3 = [
-    {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
-    {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
+    {file = "urllib3-1.25.10-py2.py3-none-any.whl", hash = "sha256:e7983572181f5e1522d9c98453462384ee92a0be7fac5f1413a1e35c56cc0461"},
+    {file = "urllib3-1.25.10.tar.gz", hash = "sha256:91056c15fa70756691db97756772bb1eb9678fa585d9184f24534b100dc60f4a"},
 ]
 vcrpy = [
     {file = "vcrpy-4.0.2-py2.py3-none-any.whl", hash = "sha256:c4ddf1b92c8a431901c56a1738a2c797d965165a96348a26f4b2bbc5fa6d36d9"},

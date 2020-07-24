@@ -1060,7 +1060,7 @@ class CopyRelatedResourceTag(Tag):
 
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
-                    if resource_tags.get(k) != v}
+                    if resource_tags.get(k) != v and not k.startswith('aws:')}
         else:
             tags = {k: v for k, v in related_tags.items()
                     if k in tag_keys and resource_tags.get(k) != v}

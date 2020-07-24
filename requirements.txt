@@ -1,18 +1,18 @@
 apipkg==1.5
 appdirs==1.4.4
-argcomplete==1.11.1
+argcomplete==1.12.0
 atomicwrites==1.4.0; sys_platform == "win32"
 attrs==19.3.0
 aws-xray-sdk==2.6.0
 bleach==3.1.5
-boto3==1.14.16
-botocore==1.17.16
+boto3==1.14.27
+botocore==1.17.27
 certifi==2020.6.20
 cffi==1.14.0; sys_platform == "linux"
 chardet==3.0.4
 colorama==0.4.3
 coverage==5.2
-cryptography==2.9.2; sys_platform == "linux"
+cryptography==3.0; sys_platform == "linux"
 distlib==0.3.1
 docutils==0.15.2
 execnet==1.7.1
@@ -37,7 +37,7 @@ packaging==20.4
 pkginfo==1.5.0.1
 placebo==0.9.0
 pluggy==0.13.1
-psutil==5.7.0
+psutil==5.7.2
 py==1.9.0
 pycodestyle==2.6.0
 pycparser==2.20; sys_platform == "linux"
@@ -48,8 +48,8 @@ pyrsistent==0.16.0
 pytest==5.3.5
 pytest-cov==2.10.0
 pytest-forked==1.2.0
-pytest-sugar==0.9.3
-pytest-xdist==1.32.0
+pytest-sugar==0.9.4
+pytest-xdist==1.33.0
 python-dateutil==2.8.1
 pywin32-ctypes==0.2.0; sys_platform == "win32"
 pyyaml==5.3.1
@@ -63,12 +63,12 @@ six==1.15.0
 tabulate==0.8.7
 termcolor==1.1.0
 toml==0.10.1
-tox==3.16.1
-tqdm==4.47.0
+tox==3.18.0
+tqdm==4.48.0
 twine==3.2.0
-urllib3==1.25.9
+urllib3==1.25.10
 vcrpy==4.0.2
-virtualenv==20.0.25
+virtualenv==20.0.27
 wcwidth==0.2.5
 webencodings==0.5.1
 wrapt==1.12.1

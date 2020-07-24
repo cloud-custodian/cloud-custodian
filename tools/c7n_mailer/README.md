@@ -145,6 +145,7 @@ policies:
     actions:
       - type: notify
         slack_template: slack
+        slack_msg_color: danger
         to:
           - slack://owners
           - slack://foo@bar.com
@@ -160,6 +161,16 @@ policies:
 Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
+
+The unique template field `slack_msg_color` can be used to specify a color
+border for the slack message. This accepts the Slack presets of `danger` (red),
+`warning` (yellow) and `good` (green). It can also accept a HTML hex code. See
+the [Slack documentation](https://api.slack.com/reference/messaging/attachments#fields)
+for details.
+
+Note: if you are using a hex color code it will need to be wrapped in quotes
+like so: `slack_msg_color: '#4287f51'`. Otherwise the YAML interpreter will consider it a
+[comment](https://yaml.org/spec/1.2/spec.html#id2780069).
 
 Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 

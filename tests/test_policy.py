@@ -277,7 +277,10 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio'}
+            'AWS::ServiceCatalog::Portfolio',
+            'AWS::SSM::FileData',
+            'AWS::SNS::Topic',
+            'AWS::SecretsManager::Secret'}
 
         resource_map = {}
         for k, v in manager.resources.items():

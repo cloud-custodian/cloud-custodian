@@ -1,6 +1,6 @@
 attrs==19.3.0
-boto3==1.14.16
-botocore==1.17.16
+boto3==1.14.27
+botocore==1.17.27
 certifi==2020.6.20
 chardet==3.0.4
 datadog==0.34.1
@@ -23,8 +23,8 @@ pyyaml==5.3.1
 redis==3.5.3
 requests==2.24.0
 s3transfer==0.3.3
-sendgrid==6.4.1
+sendgrid==6.4.4
 six==1.15.0
 starkbank-ecdsa==1.0.0
-urllib3==1.25.9
+urllib3==1.25.10
 zipp==3.1.0
