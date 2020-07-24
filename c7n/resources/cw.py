@@ -110,6 +110,7 @@ class EventRuleTarget(ChildResourceManager):
         arn_type = 'event-rule-target'
         enum_spec = ('list_targets_by_rule', 'Targets', None)
         parent_spec = ('event-rule', 'Rule', True)
+        supports_trailevents = True
         name = id = 'Id'
 
 
