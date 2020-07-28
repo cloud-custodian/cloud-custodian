@@ -476,7 +476,7 @@ class TestElastiCacheReplicationGroup(BaseTest):
                 "name": "replication-group-enc-delete",
                 "resource": "elasticache-group",
                 "filters": [{"type": "value", "key": "AtRestEncryptionEnabled", "value": False}],
-                "actions": [{"type": "delete", "snapshot": True,}],
+                "actions": [{"type": "delete", "snapshot": True}],
             },
             session_factory=session_factory,)
         resources = p.run()

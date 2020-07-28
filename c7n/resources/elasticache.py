@@ -480,6 +480,7 @@ class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
 
+
 @ElastiCacheReplicationGroup.action_registry.register('delete')
 class DeleteReplicationGroup(BaseAction):
     """Action to delete a cache replication group
@@ -504,7 +505,9 @@ class DeleteReplicationGroup(BaseAction):
     """
     schema = type_schema(
         'delete', **{'snapshot': {'type': 'boolean'}})
+
     valid_origin_states = ('available',)
+
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('elasticache')
