@@ -468,3 +468,20 @@ class TestElastiCacheReplicationGroup(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
+
+    def test_elasticache_replication_group_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_replication_group_delete")
+        p = self.load_policy(
+            {
+                "name": "replication-group-enc-delete",
+                "resource": "elasticache-group",
+                "filters": [{"type": "value", "key": "AtRestEncryptionEnabled", "value": False}],
+                "actions": [{"type": "delete", "snapshot": True,}],
+            },
+            session_factory=session_factory,)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-delete')
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-delete')
+        self.assertEqual(response.get('ReplicationGroups')[0].get('Status'), 'deleting')

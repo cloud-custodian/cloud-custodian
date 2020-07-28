@@ -22,6 +22,7 @@ from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
 from c7n.filters import FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
@@ -472,3 +473,46 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
         cfn_type = 'AWS::ElastiCache::ReplicationGroup'
 
     permissions = ('elasticache:DescribeReplicationGroups',)
+
+
+@ElastiCacheReplicationGroup.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsKeyId'
+
+@ElastiCacheReplicationGroup.action_registry.register('delete')
+class DeleteReplicationGroup(BaseAction):
+    """Action to delete a cache replication group
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-delete-replication-group
+                resource: replication-group
+                filters:
+                  - type: value
+                    value_type: age
+                    key: CacheClusterCreateTime
+                    op: ge
+                    value: 90
+                actions:
+                  - type: delete
+                    snapshot: false
+
+    """
+    schema = type_schema(
+        'delete', **{'snapshot': {'type': 'boolean'}})
+    valid_origin_states = ('available',)
+    def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for r in resources:
+            params = {'ReplicationGroupId': r['ReplicationGroupId']}
+            if self.data.get('snapshot', False):
+                params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
+            self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
+                'ReplicationGroupNotFoundFault',
+                'InvalidParameterValueException', 'InvalidParameterCombinationException'
+                'SnapshotFeatureNotSupportedFault'))

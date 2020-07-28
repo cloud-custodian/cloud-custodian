@@ -15,6 +15,7 @@ import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
@@ -96,6 +97,12 @@ class Delete(Action):
                 StreamName=r['StreamName'])
 
 
+@KinesisStream.filter_registry.register('kms-key')
+class KmsFilterDataStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KeyId'
+
+
 class DescribeDeliveryStream(DescribeSource):
 
     def augment(self, resources):
@@ -122,6 +129,12 @@ class DeliveryStream(QueryResourceManager):
         'describe': DescribeDeliveryStream,
         'config': ConfigSource
     }
+
+
+@DeliveryStream.filter_registry.register('kms-key')
+class KmsFilterDeliveryStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'DeliveryStreamEncryptionConfiguration.KeyARN'
 
 
 @DeliveryStream.action_registry.register('delete')
