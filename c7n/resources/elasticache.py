@@ -491,16 +491,14 @@ class DeleteReplicationGroup(BaseAction):
 
             policies:
               - name: elasticache-delete-replication-group
-                resource: replication-group
+                resource: elasticache-group
                 filters:
                   - type: value
-                    value_type: age
-                    key: CacheClusterCreateTime
-                    op: ge
-                    value: 90
+                    key: AtRestEncryptionEnabled
+                    value: False
                 actions:
                   - type: delete
-                    snapshot: false
+                    snapshot: False
 
     """
     schema = type_schema(
