@@ -507,6 +507,7 @@ class DeleteReplicationGroup(BaseAction):
         'delete', **{'snapshot': {'type': 'boolean'}})
 
     valid_origin_states = ('available',)
+    permissions = ('elasticache:DeleteReplicationGroup',)
 
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
