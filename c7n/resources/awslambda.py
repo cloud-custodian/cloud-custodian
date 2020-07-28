@@ -20,7 +20,7 @@ from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -281,6 +281,35 @@ class KmsFilter(KmsRelatedFilter):
                       op: regex
     """
     RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.filter_registry.register('lambda-edge')
+class LambdaEdgeFilter(Filter):
+    """
+    Filters lambda@edge resources'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-edge
+                  resource: aws.lambda
+                  filters:
+                    - type: lambda-edge
+                      state: True
+    """
+
+    schema = type_schema('lambda-edge',
+        **{'state': {'type': 'boolean'}})
+
+    def process(self, resources, event=None):
+        resources = self.manager.get_resource_manager('lambda').resources()
+        results = []
+        for r in resources:
+            if r.get('MasterArn', ''):
+                results.append(r)
+        return results
 
 
 @AWSLambda.action_registry.register('post-finding')
