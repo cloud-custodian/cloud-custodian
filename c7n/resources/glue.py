@@ -25,6 +25,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+import jmespath
 
 
 @resources.register('glue-connection')
@@ -189,6 +190,83 @@ class GlueCrawler(QueryResourceManager):
         cfn_type = 'AWS::Glue::Crawler'
 
     augment = universal_augment
+
+
+@GlueCrawler.action_registry.register('update-crawler')
+class UpdateGlueCrawler(BaseAction):
+    """Updates glue crawlers based on specified parameter
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: glue-crawler-update
+                resource: aws.glue-crawler
+                filters:
+                  - type: value
+                    key: CrawlerSecurityConfiguration
+                    value: null
+                actions:
+                  - type: update-crawler
+                    attributes:
+                        CrawlerSecurityConfiguration: glue-approved
+
+    """
+
+    schema = type_schema(
+        'update-crawler',
+        required=['attributes'],
+        attributes={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'Role': {'type': 'string'},
+                'DatabaseName': {'type': 'string'},
+                'Schedule': {'type': 'string'},
+                'Configuration': {'type': 'string'},
+                'CrawlerSecurityConfiguration': {'type': 'string'},
+                'TablePrefix': {'type': 'string'},
+                'Classifiers': {'type': 'array', 'items': {'type': 'string'}},
+                'SchemaChangePolicy': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'UpdateBehavior': {'type': 'string', 'enum': ['LOG', 'UPDATE_IN_DATABASE']},
+                        'DeleteBehavior': {
+                            'type': 'string', 'enum': [
+                                'LOG', 'UPDATE_IN_DATABASE', 'DEPRECATE_IN_DATABASE']}
+                    }
+                }
+            }
+        })
+
+    permissions = ('glue:UpdateCrawler',)
+    valid_origin_states = ('READY', 'FAILED')
+    crawler_mapping = {'Schedule': 'Schedule.ScheduleExpression'}
+
+    def process(self, crawlers):
+        crawlers = self.filter_resources(crawlers, 'State', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('glue')
+        for crawler in crawlers:
+            if self.get_delta(crawler):
+                try:
+                    client.update_crawler(Name=crawler['Name'], **self.get_delta(crawler))
+                except client.exceptions.EntityNotFoundException:
+                    continue
+
+    def get_delta(self, crawler):
+        config = dict(self.data.get('attributes'))
+        modify_attrs = {}
+        for k, v in config.items():
+            if k == "SchemaChangePolicy" and (len(v) != len(crawler.get(k))):
+                missing_keys = crawler.get(k).keys() - v.keys()
+                config[k].update({key: crawler.get(k).get((key), {}) for key in missing_keys})
+            if ((k in self.crawler_mapping and
+            v != jmespath.search(self.crawler_mapping[k], crawler)) or
+            v != jmespath.search(k, crawler)):
+                modify_attrs[k] = v
+        return modify_attrs
 
 
 class SecurityConfigFilter(RelatedResourceFilter):

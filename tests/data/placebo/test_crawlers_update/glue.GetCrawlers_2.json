@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "Crawlers": [
+            {
+                "Name": "glue-test",
+                "Role": "service-role/AWSGlueServiceRole-test",
+                "Targets": {
+                    "S3Targets": [
+                        {
+                            "Path": "s3://c7n-test-glue",
+                            "Exclusions": []
+                        }
+                    ],
+                    "JdbcTargets": [],
+                    "DynamoDBTargets": [],
+                    "CatalogTargets": []
+                },
+                "DatabaseName": "database-2",
+                "Classifiers": [],
+                "SchemaChangePolicy": {
+                    "UpdateBehavior": "LOG",
+                    "DeleteBehavior": "DEPRECATE_IN_DATABASE"
+                },
+                "State": "READY",
+                "CrawlElapsedTime": 0,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 12,
+                    "minute": 10,
+                    "second": 19,
+                    "microsecond": 0
+                },
+                "LastUpdated": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 27,
+                    "hour": 13,
+                    "minute": 42,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "Version": 3,
+                "CrawlerSecurityConfiguration": "glue-test"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

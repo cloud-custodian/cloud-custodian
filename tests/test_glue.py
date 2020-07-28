@@ -346,6 +346,29 @@ class TestGlueCrawlers(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test-filter-crawler')
 
+    def test_crawlers_update(self):
+        session_factory = self.replay_flight_data("test_crawlers_update")
+        p = self.load_policy(
+            {
+                "name": "glue-crawler-update",
+                "resource": "glue-crawler",
+                "filters": [{"type": "value", "key": "CrawlerSecurityConfiguration",
+                    "value": "glue-test", "op": "ne"}],
+                "actions": [{
+                    "type": "update-crawler",
+                    "attributes": {
+                        "CrawlerSecurityConfiguration": "glue-test"}
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        response = client.get_crawlers().get('Crawlers')
+        self.assertEqual(len(response), 1)
+        self.assertTrue(response[0].get('CrawlerSecurityConfiguration'), 'glue-test')
+
 
 class TestGlueTables(BaseTest):
     def test_tables_delete(self):
