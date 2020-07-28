@@ -282,9 +282,9 @@ class RestStage(query.ChildResourceManager):
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
 
-    child_source = 'describe-rest-stage'
+    child_source = 'describe'
     source_mapping = {
-        'describe-rest-stage': DescribeRestStage,
+        'describe': DescribeRestStage,
         'config': query.ConfigSource
     }
 

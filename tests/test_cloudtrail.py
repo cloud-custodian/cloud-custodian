@@ -18,6 +18,17 @@ from .common import BaseTest
 
 class CloudTrail(BaseTest):
 
+    def test_trail_tag_augment(self):
+        factory = self.replay_flight_data('test_trail_tag_augment')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'aws.cloudtrail',
+            'filters': [{'tag:App': 'c7n'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'skunk-trails')
+
     def test_trail_status(self):
         factory = self.replay_flight_data('test_cloudtrail_status')
         p = self.load_policy({

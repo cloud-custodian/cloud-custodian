@@ -443,7 +443,7 @@ class PolicyMetaLint(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in list(v.filter_registry.items()):
-                if n in ("and", "or", "not", "missing"):
+                if n in ("and", "or", "not", "missing", "reduce"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()

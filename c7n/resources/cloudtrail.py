@@ -40,6 +40,7 @@ class CloudTrail(QueryResourceManager):
         enum_spec = ('describe_trails', 'trailList', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
+        arn_type = 'trail'
         arn = id = 'TrailARN'
         name = 'Name'
         cfn_type = config_type = "AWS::CloudTrail::Trail"

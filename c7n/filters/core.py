@@ -27,6 +27,7 @@ import os
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 from distutils import version
+from random import sample
 import jmespath
 
 from c7n.element import Element
@@ -123,6 +124,7 @@ class FilterRegistry(PluginRegistry):
         self.register('and', And)
         self.register('not', Not)
         self.register('event', EventFilter)
+        self.register('reduce', ReduceFilter)
 
     def parse(self, data, manager):
         results = []
@@ -244,6 +246,43 @@ class Filter(Element):
 
         if not values and block_op != 'or':
             return
+
+
+class BaseValueFilter(Filter):
+    expr = None
+
+    def __init__(self, data, manager=None):
+        super(BaseValueFilter, self).__init__(data, manager)
+        self.expr = {}
+
+    def get_resource_value(self, k, i, regex=None):
+        r = None
+        if k.startswith('tag:'):
+            tk = k.split(':', 1)[1]
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
+        elif k in i:
+            r = i.get(k)
+        elif k not in self.expr:
+            self.expr[k] = jmespath.compile(k)
+            r = self.expr[k].search(i)
+        else:
+            r = self.expr[k].search(i)
+
+        if regex:
+            r = ValueRegex(regex).get_resource_value(r)
+        return r
 
 
 def intersect_list(a, b):
@@ -395,10 +434,9 @@ class ComparableVersion(version.LooseVersion):
             return False
 
 
-class ValueFilter(Filter):
+class ValueFilter(BaseValueFilter):
     """Generic value filter using jmespath
     """
-    expr = None
     op = v = vtype = None
 
     schema = {
@@ -421,10 +459,6 @@ class ValueFilter(Filter):
     schema_alias = True
     annotate = True
     required_keys = {'value', 'key'}
-
-    def __init__(self, data, manager=None):
-        super(ValueFilter, self).__init__(data, manager)
-        self.expr = {}
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
@@ -486,11 +520,11 @@ class ValueFilter(Filter):
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
         if 'value_regex' in self.data:
-            return self._validate_value_regex()
+            return self._validate_value_regex(self.data['value_regex'])
 
         return self
 
-    def _validate_value_regex(self):
+    def _validate_value_regex(self, regex):
         """Specific validation for `value_regex` type
 
         The `value_regex` type works a little differently.  In
@@ -500,7 +534,7 @@ class ValueFilter(Filter):
         """
         # Sanity check that we can compile
         try:
-            pattern = re.compile(self.data['value_regex'])
+            pattern = re.compile(regex)
             if pattern.groups != 1:
                 raise PolicyValidationError(
                     "value_regex must have a single capturing group: %s" %
@@ -530,34 +564,7 @@ class ValueFilter(Filter):
         return super(ValueFilter, self).process(resources, event)
 
     def get_resource_value(self, k, i):
-        if k.startswith('tag:'):
-            tk = k.split(':', 1)[1]
-            r = None
-            if 'Tags' in i:
-                for t in i.get("Tags", []):
-                    if t.get('Key') == tk:
-                        r = t.get('Value')
-                        break
-            # GCP schema: 'labels': {'key': 'value'}
-            elif 'labels' in i:
-                r = i.get('labels', {}).get(tk, None)
-            # GCP has a secondary form of labels called tags
-            # as labels without values.
-            # Azure schema: 'tags': {'key': 'value'}
-            elif 'tags' in i:
-                r = i.get('tags', {}).get(tk, None)
-        elif k in i:
-            r = i.get(k)
-        elif k not in self.expr:
-            self.expr[k] = jmespath.compile(k)
-            r = self.expr[k].search(i)
-        else:
-            r = self.expr[k].search(i)
-
-        if 'value_regex' in self.data:
-            regex = ValueRegex(self.data['value_regex'])
-            r = regex.get_resource_value(r)
-        return r
+        return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
@@ -816,3 +823,216 @@ class ValueRegex:
         if capture is None:  # regex didn't capture anything
             return None
         return capture.group(1)
+
+
+class ReduceFilter(BaseValueFilter):
+    """Generic reduce filter to group, sort, and limit your resources.
+
+    This example will select the longest running instance from each ASG,
+    then randomly choose 10% of those, maxing at 15 total instances.
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: oldest-instance-by-asg
+        resource: ec2
+        filters:
+          - "tag:aws:autoscaling:groupName": present
+          - type: reduce
+            group-by: "tag:aws:autoscaling:groupName"
+            sort-by: "LaunchTime"
+            order: asc
+            limit: 1
+
+    Or you might want to randomly select a 10 percent of your resources,
+    but no more than 15.
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: random-selection
+        resource: ec2
+        filters:
+          - type: reduce
+            order: randomize
+            limit: 15
+            limit-percent: 10
+
+    """
+    annotate = False
+
+    schema = {
+        'type': 'object',
+        # Doesn't mix well with inherits that extend
+        'additionalProperties': False,
+        'required': ['type'],
+        'properties': {
+            # Doesn't mix well as enum with inherits that extend
+            'type': {'enum': ['reduce']},
+            'group-by': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {
+                        'type': 'object',
+                        'key': {'type': 'string'},
+                        'value_type': {'enum': ['string', 'number', 'date']},
+                        'value_regex': 'string',
+                    },
+                ]
+            },
+            'sort-by': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {
+                        'type': 'object',
+                        'key': {'type': 'string'},
+                        'value_type': {'enum': ['string', 'number', 'date']},
+                        'value_regex': 'string',
+                    },
+                ]
+            },
+            'order': {'enum': ['asc', 'desc', 'reverse', 'randomize']},
+            'null-order': {'enum': ['first', 'last']},
+            'limit': {'type': 'number', 'minimum': 0},
+            'limit-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
+            'discard': {'type': 'number', 'minimum': 0},
+            'discard-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
+        },
+    }
+    schema_alias = True
+
+    def __init__(self, data, manager):
+        super(ReduceFilter, self).__init__(data, manager)
+        self.order = self.data.get('order', 'asc')
+        self.group_by = self.get_sort_config('group-by')
+        self.sort_by = self.get_sort_config('sort-by')
+
+    def validate(self):
+        # make sure the regexes compile
+        if 'value_regex' in self.group_by:
+            self._validate_value_regex(self.group_by['value_regex'])
+        if 'value_regex' in self.sort_by:
+            self._validate_value_regex(self.sort_by['value_regex'])
+        return self
+
+    def process(self, resources, event=None):
+        groups = self.group(resources)
+
+        # specified either of the sorting options, so sort
+        if 'sort-by' in self.data or 'order' in self.data:
+            groups = self.sort_groups(groups)
+
+        # now apply any limits to the groups and concatenate
+        return list(filter(None, self.limit(groups)))
+
+    def group(self, resources):
+        groups = {}
+        for r in resources:
+            v = self._value_to_sort(self.group_by, r)
+            vstr = str(v)
+            if vstr not in groups:
+                groups[vstr] = {'sortkey': v, 'resources': []}
+            groups[vstr]['resources'].append(r)
+        return groups
+
+    def get_sort_config(self, key):
+        # allow `foo: bar` but convert to
+        # `foo: {'key': bar}`
+        d = self.data.get(key, {})
+        if isinstance(d, str):
+            d = {'key': d}
+        d['null_sort_value'] = self.null_sort_value(d)
+        return d
+
+    def sort_groups(self, groups):
+        for g in groups:
+            groups[g]['resources'] = self.reorder(
+                groups[g]['resources'],
+                key=lambda r: self._value_to_sort(self.sort_by, r),
+            )
+        return groups
+
+    def _value_to_sort(self, config, r):
+        expr = config.get('key')
+        vtype = config.get('value_type', 'string')
+        vregex = config.get('value_regex')
+        v = None
+
+        try:
+            # extract value based on jmespath
+            if expr:
+                v = self.get_resource_value(expr, r, vregex)
+
+            if v is not None:
+                # now convert to expected type
+                if vtype == 'number':
+                    v = float(v)
+                elif vtype == 'date':
+                    v = parse_date(v)
+                else:
+                    v = str(v)
+        except (AttributeError, ValueError):
+            v = None
+
+        if v is None:
+            v = config.get('null_sort_value')
+        return v
+
+    def null_sort_value(self, config):
+        vtype = config.get('value_type', 'string')
+        placement = self.data.get('null-order', 'last')
+
+        if (placement == 'last' and self.order == 'desc') or (
+            placement != 'last' and self.order != 'desc'
+        ):
+            # return a value that will sort first
+            if vtype == 'number':
+                return float('-inf')
+            elif vtype == 'date':
+                return datetime.datetime.min.replace(tzinfo=tzutc())
+            return ''
+        else:
+            # return a value that will sort last
+            if vtype == 'number':
+                return float('inf')
+            elif vtype == 'date':
+                return datetime.datetime.max.replace(tzinfo=tzutc())
+            return '\uffff'
+
+    def limit(self, groups):
+        results = []
+
+        max = self.data.get('limit', 0)
+        pct = self.data.get('limit-percent', 0)
+        drop = self.data.get('discard', 0)
+        droppct = self.data.get('discard-percent', 0)
+        ordered = list(groups)
+        if 'group-by' in self.data or 'order' in self.data:
+            ordered = self.reorder(ordered, key=lambda r: groups[r]['sortkey'])
+        for g in ordered:
+            # discard X first
+            if droppct > 0:
+                n = int(droppct / 100 * len(groups[g]['resources']))
+                if n > drop:
+                    drop = n
+            if drop > 0:
+                groups[g]['resources'] = groups[g]['resources'][drop:]
+
+            # then limit the remaining
+            count = len(groups[g]['resources'])
+            if pct > 0:
+                count = int(pct / 100 * len(groups[g]['resources']))
+            if max > 0 and max < count:
+                count = max
+            results.extend(groups[g]['resources'][0:count])
+        return results
+
+    def reorder(self, items, key=None):
+        if self.order == 'randomize':
+            return sample(items, k=len(items))
+        elif self.order == 'reverse':
+            return items[::-1]
+        else:
+            return sorted(items, key=key, reverse=(self.order == 'desc'))

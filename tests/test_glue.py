@@ -447,6 +447,30 @@ class TestGlueSecurityConfiguration(BaseTest):
         self.assertFalse("test" in [t.get("Name")
             for t in security_configrations.get("SecurityConfigurations", [])])
 
+    def test_kms_alias(self):
+        factory = self.replay_flight_data("test_glue_security_configuration_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-configuration-s3-kms-alias",
+                "resource": "glue-security-configuration",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/)",
+                        "op": "regex",
+                        "key-type": "cloudwatch"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['EncryptionConfiguration']['CloudWatchEncryption']['KmsKeyArn'],
+            'arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8')
+
 
 class TestGlueTriggers(BaseTest):
 

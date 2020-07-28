@@ -25,6 +25,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('glue-connection')
@@ -411,6 +412,47 @@ class GlueSecurityConfiguration(QueryResourceManager):
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
         cfn_type = 'AWS::Glue::SecurityConfiguration'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-security-configuration-kms-key
+            resource: glue-security-configuration
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/)"
+                op: regex
+    """
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+            'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
+        }
+        key_type = self.data.get('key_type', 'all')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')

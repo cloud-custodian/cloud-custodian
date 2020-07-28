@@ -37,7 +37,14 @@ from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
-from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
+from c7n.filters.core import (
+    ValueFilter,
+    EventFilter,
+    AgeFilter,
+    ReduceFilter,
+    OPERATORS,
+    VALUE_TYPES,
+)
 from c7n.structure import StructureParser # noqa
 
 
@@ -202,6 +209,7 @@ def generate(resource_types=()):
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
             'age': AgeFilter.schema,
+            'reduce': ReduceFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
