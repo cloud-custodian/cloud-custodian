@@ -19,7 +19,7 @@ from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
-from c7n.utils import get_retry, local_session
+from c7n.utils import get_retry, local_session, type_schema
 
 
 @resources.register('glacier')
@@ -157,3 +157,27 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['VaultName'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@Glacier.action_registry.register('delete')
+class GlacierVaultDelete(RemovePolicyBase):
+    """Action to delete glacier vaults
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: glacier-cross-account
+                resource: glacier
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('glacier:DeleteVault',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glacier')
+        for r in resources:
+            self.manager.retry(client.delete_vault, vaultName=r['VaultName'], ignore_err_codes=(
+                'ResourceNotFoundException',))
