@@ -162,11 +162,14 @@ class RemovePolicyStatement(RemovePolicyBase):
 @Glacier.action_registry.register('delete')
 class GlacierVaultDelete(RemovePolicyBase):
     """Action to delete glacier vaults
+
     :example:
+
     .. code-block:: yaml
+
             policies:
-              - name: glacier-cross-account
-                resource: glacier
+              - name: glacier-vault-delete
+                resource: aws.glacier
                 filters:
                   - type: cross-account
                 actions:
