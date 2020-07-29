@@ -9,7 +9,7 @@
 
 - Todd Stansell (@tjstansell)
 - John Hillegass (@JohnHillegass)
-- Sonny Shi (@thisishi)
+- Sonny Shi (@thisisshi)
 - David Filliatrault (@FireballDWF)
 - Jamison Roberts (@jtroberts83)
 
