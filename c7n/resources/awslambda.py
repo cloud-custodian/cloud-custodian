@@ -283,35 +283,6 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
-@AWSLambda.filter_registry.register('lambda-edge')
-class LambdaEdgeFilter(Filter):
-    """
-    Filters lambda@edge resources'
-
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: lambda-edge
-                  resource: aws.lambda
-                  filters:
-                    - type: lambda-edge
-                      state: True
-    """
-
-    schema = type_schema('lambda-edge',
-        **{'state': {'type': 'boolean'}})
-
-    def process(self, resources, event=None):
-        resources = self.manager.get_resource_manager('lambda').resources()
-        results = []
-        for r in resources:
-            if r.get('MasterArn', ''):
-                results.append(r)
-        return results
-
-
 @AWSLambda.action_registry.register('post-finding')
 class LambdaPostFinding(PostFinding):
 
@@ -684,3 +655,59 @@ class LayerPostFinding(PostFinding):
         payload.update(self.filter_empty(
             select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
         return envelope
+
+
+@AWSLambda.action_registry.register('lambda-edge')
+class LambdaEdgeVersions(BaseAction):
+    """
+    Return lambda@edge versions'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-edge
+                  resource: aws.lambda
+                  actions:
+                    - type: lambda-edge
+                      state: True
+    """
+
+    schema = type_schema('lambda-edge',
+        **{'state': {'type': 'boolean'}})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('cloudfront')
+        edge_arns = []
+        results = []
+        try:
+            distributions = self.manager.retry(
+                client.list_distributions, MaxItems='1')
+            for d in distributions['DistributionList']['Items']:
+                functions = d['DefaultCacheBehavior']['LambdaFunctionAssociations']['Items']
+                for function in functions:
+                    edge_arns.append(function['LambdaFunctionARN'])
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to list distributions, error: %s", e)
+            raise e
+
+        client = local_session(self.manager.session_factory).client('lambda')
+        for r in resources:
+            try:
+                response = client.list_versions_by_function(FunctionName=r['FunctionName'])
+                for version in response['Versions']:
+                    if version['FunctionArn'] in edge_arns and self.data.get('state'):
+                        results.append(version)
+                    if version['FunctionArn'] not in edge_arns and not self.data.get('state'):
+                        results.append(version)
+            except (client.exceptions.ResourceNotFoundException):
+                pass
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to list versions for function: %s error: %s",
+                    version['FunctionARN'], e)
+                raise e
+        print(results)
+        return results

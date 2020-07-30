@@ -346,6 +346,23 @@ class LambdaTest(BaseTest):
             {r["c7n:EventSources"][0] for r in resources}, {"iot.amazonaws.com"}
         )
 
+    def test_lambda_edge(self):
+        factory = self.record_flight_data("test_aws_lambda_edge_action")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge",
+                "resource": "lambda",
+                "actions": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["FunctionArn"] for r in resources}, {"iot.amazonaws.com"}
+        )
+
     def test_sg_filter(self):
         factory = self.replay_flight_data("test_aws_lambda_sg")
 
