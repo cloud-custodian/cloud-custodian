@@ -407,7 +407,7 @@ class HasStatementChecker:
 
 
 class PolicyStatementFilter(Filter):
-    """  Check a resource for a set of policy statements.
+    """Check a resource for a set of policy statements.
     """
     schema_alias = True
     POLICY_ELEMENTS = [
