@@ -101,6 +101,7 @@ ResourceMap = {
     "aws.kms-key": "c7n.resources.kms.Key",
     "aws.lambda": "c7n.resources.awslambda.AWSLambda",
     "aws.lambda-layer": "c7n.resources.awslambda.LambdaLayerVersion",
+    "aws.lambda-version": "c7n.resources.awslambda.LambdaVersion",
     "aws.launch-config": "c7n.resources.asg.LaunchConfig",
     "aws.launch-template-version": "c7n.resources.ec2.LaunchTemplate",
     "aws.lightsail-db": "c7n.resources.lightsail.Database",

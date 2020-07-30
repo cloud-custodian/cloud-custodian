@@ -657,8 +657,21 @@ class LayerPostFinding(PostFinding):
         return envelope
 
 
-@AWSLambda.action_registry.register('lambda-edge')
-class LambdaEdgeVersions(BaseAction):
+@resources.register('lambda-version')
+class LambdaVersion(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        arn_type = 'function'
+        arn_separator = ":"
+        id = name = 'FunctionName'
+        parent_spec = ('lambda', 'FunctionName', None)
+        enum_spec = ('list_versions_by_function', 'Versions', None)
+        date = 'LastModified'
+
+
+@LambdaVersion.filter_registry.register('lambda-edge')
+class LambdaVersionEdgeFilter(Filter):
     """
     Return lambda@edge versions'
 
@@ -667,17 +680,18 @@ class LambdaEdgeVersions(BaseAction):
         .. code-block:: yaml
 
             policies:
-                - name: lambda-edge
-                  resource: aws.lambda
-                  actions:
+                - name: lambda-version-edge-filter
+                  resource: lambda-version
+                  filters:
                     - type: lambda-edge
                       state: True
     """
+    permissions = ('cloudfront:ListDistributions',)
 
     schema = type_schema('lambda-edge',
         **{'state': {'type': 'boolean'}})
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('cloudfront')
         edge_arns = []
         results = []
@@ -696,18 +710,15 @@ class LambdaEdgeVersions(BaseAction):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
             try:
-                response = client.list_versions_by_function(FunctionName=r['FunctionName'])
-                for version in response['Versions']:
-                    if version['FunctionArn'] in edge_arns and self.data.get('state'):
-                        results.append(version)
-                    if version['FunctionArn'] not in edge_arns and not self.data.get('state'):
-                        results.append(version)
+                if r['FunctionArn'] in edge_arns and self.data.get('state'):
+                    results.append(r)
+                if r['FunctionArn'] not in edge_arns and not self.data.get('state'):
+                    results.append(r)
             except (client.exceptions.ResourceNotFoundException):
                 pass
             except Exception as e:
                 self.log.warning(
                     "Exception trying to list versions for function: %s error: %s",
-                    version['FunctionARN'], e)
+                    r['FunctionARN'], e)
                 raise e
-        print(results)
         return results

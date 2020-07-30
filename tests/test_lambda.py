@@ -347,12 +347,12 @@ class LambdaTest(BaseTest):
         )
 
     def test_lambda_edge(self):
-        factory = self.record_flight_data("test_aws_lambda_edge_action")
+        factory = self.replay_flight_data("test_aws_lambda_version_edge_filter")
         p = self.load_policy(
             {
-                "name": "lambda-edge",
-                "resource": "lambda",
-                "actions": [{"type": "lambda-edge",
+                "name": "lambda-version-edge-filter",
+                "resource": "lambda-version",
+                "filters": [{"type": "lambda-edge",
                             "state": True}],
             },
             session_factory=factory,
@@ -360,7 +360,8 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            {r["FunctionArn"] for r in resources}, {"iot.amazonaws.com"}
+            {r["FunctionArn"] for r in resources},
+            {"arn:aws:lambda:us-east-1:0123456789012:function:test-python:2"}
         )
 
     def test_sg_filter(self):

@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DistributionList": {
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Id": "E255OUCHPNS4CY",
+                    "ARN": "arn:aws:cloudfront::0123456789012:distribution/E255OUCHPNS4CY",
+                    "DefaultCacheBehavior": {
+                        "LambdaFunctionAssociations": {
+                            "Quantity": 1,
+                            "Items": [
+                                {
+                                    "LambdaFunctionARN": "arn:aws:lambda:us-east-1:0123456789012:function:test-python:2",
+                                    "EventType": "origin-request",
+                                    "IncludeBody": false
+                                }
+                            ]
+                        }
+                    },
+                    "WebACLId": ""
+                }
+            ]
+        }
+    }
+}
