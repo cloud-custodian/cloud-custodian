@@ -663,7 +663,7 @@ def merge_dict_list(dict_iter):
 
 def merge_dict(a, b):
     """Perform a merge of dictionaries A and B
-    
+
     Any subdictionaries will be recursively merged.
     Any leaf elements in the form of scalar will use the value from A
     If there is a scalar and list for the same key, the scalar will be appended to the list
