@@ -78,6 +78,13 @@ class PatchAction(MethodAction):
 class PatchResource(PatchAction):
     """
     Patches a resource
+
+    Example for resource k8s.deployment:
+
+    - type: patch
+      options:
+        spec:
+          replicas: 0
     """
     schema = type_schema(
         'patch',
