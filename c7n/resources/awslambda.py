@@ -696,29 +696,19 @@ class LambdaVersionEdgeFilter(Filter):
         edge_arns = []
         results = []
         try:
-            distributions = self.manager.retry(
-                client.list_distributions, MaxItems='1')
+            distributions = self.manager.retry(client.list_distributions)
             for d in distributions['DistributionList']['Items']:
-                functions = d['DefaultCacheBehavior']['LambdaFunctionAssociations']['Items']
-                for function in functions:
+                for function in d['DefaultCacheBehavior']['LambdaFunctionAssociations']['Items']:
                     edge_arns.append(function['LambdaFunctionARN'])
         except Exception as e:
-            self.log.warning(
+            self.log.exception(
                 "Exception trying to list distributions, error: %s", e)
             raise e
 
-        client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
-            try:
-                if r['FunctionArn'] in edge_arns and self.data.get('state'):
-                    results.append(r)
-                if r['FunctionArn'] not in edge_arns and not self.data.get('state'):
-                    results.append(r)
-            except (client.exceptions.ResourceNotFoundException):
-                pass
-            except Exception as e:
-                self.log.warning(
-                    "Exception trying to list versions for function: %s error: %s",
-                    r['FunctionARN'], e)
-                raise e
+            if r['FunctionArn'] in edge_arns and self.data.get('state'):
+                results.append(r)
+            if r['FunctionArn'] not in edge_arns and not self.data.get('state'):
+                results.append(r)
+
         return results
