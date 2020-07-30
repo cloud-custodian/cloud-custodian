@@ -26,7 +26,7 @@ from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker, HasStatementChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
 from c7n.resources.aws import shape_validate
@@ -1450,6 +1450,44 @@ class SQSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["QueueUrl"], url)
 
+    def test_sqs_has_statements(self):
+        session_factory = self.replay_flight_data("test_cross_account_sqs")
+        p = self.load_policy(
+            {
+                "name": "sqs-has_statements",
+                "resource": "aws.sqs",
+                "filters": [
+                    {"QueueArn": "arn:aws:sqs:us-west-2:644160558196:c7n-cross-check"},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": "SQS:SendMessage",
+                                "Condition": {
+                                    "StringNotEquals": {
+                                        "aws:PrincipalOrgID": "o-4amkskbcf1"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:SendMessage\""
+            in resources[0]["Policy"]
+        )
+        assert(
+            "\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}"
+            in resources[0]["Policy"]
+        )
+
 
 class SNSCrossAccount(BaseTest):
 
@@ -1691,6 +1729,109 @@ class CrossAccountChecker(TestCase):
                 "allowed_orgid": {"o-goodorg"}
             }
         )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+
+class HasStatementCheckerTests(TestCase):
+
+    def test_s3_policies_multiple_conditions(self):
+        policies = load_data("iam/s3-conditions.json")
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Condition": {
+                            "ArnLike": {
+                                "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+                            },
+                            "StringEquals": {
+                                "aws:sourceVpc": "vpc-55252554"
+                            }
+                        }
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_star(self):
+        policies = load_data("iam/s3-principal.json")
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Principal": "*",
+                        "PartialMatch": "Principal"
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [True, True, False, True, True, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_org_id(self):
+        policies = load_data("iam/s3-orgid.json")
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Condition": {
+                            "StringEquals": {
+                                "aws:PrincipalOrgID": "o-goodorg"
+                            }
+                        }
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [True, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_has_statement_variations(self):
+        policies = load_data("iam/has-statement-variations.json")
+        checker = HasStatementChecker(
+            {
+                "statements": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "sns:Subscribe",
+                        "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
+                        "Condition": {
+                            "StringEquals": {
+                                "sns:Protocol": [
+                                    "https"
+                                ]
+                            }
+                        },
+                        "PartialMatch": [
+                            "Condition"
+                        ]
+                    }
+                ]
+            }
+        )
+        for p, expected in zip(policies, [True, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker.checker_config['statements'] = [
+            {
+                "Effect": "Deny",
+                "Action": "glue:*",
+                "Principal": "*",
+                "Resource": "arn:aws:glue:us-east-1:644160558196:*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "aws:PrincipalOrgId": 'o-4amkskbcf1'
+                    }
+                }
+            }
+        ]
         for p, expected in zip(policies, [False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

@@ -27,7 +27,11 @@ from .core import (
 )
 from .config import ConfigCompliance
 from .health import HealthEventFilter
-from .iamaccess import CrossAccountAccessFilter, PolicyChecker
+from .iamaccess import (
+    CrossAccountAccessFilter, 
+    PolicyChecker, 
+    PolicyStatementFilter
+)
 from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase

@@ -40,7 +40,7 @@ import json
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
+from c7n.utils import type_schema, format_string_values, merge_dict
 
 log = logging.getLogger('custodian.iamaccess')
 
@@ -343,3 +343,126 @@ class CrossAccountAccessFilter(Filter):
         if violations:
             r[self.annotation_key] = violations
             return True
+
+
+class HasStatementChecker:
+    """
+        Checks the policy document for the presence of required `statements` or `statement_ids`
+        which are input through the PolicyStatementFilter class implementation
+    """
+    def __init__(self, checker_config):
+        self.checker_config = checker_config
+
+    @property
+    def statements(self):
+        return self.checker_config.get('statements', [])
+
+    @property
+    def statement_ids(self):
+        return self.checker_config.get('statement_ids', [])
+
+    @property
+    def required_statements(self):
+        return format_string_values(list(self.statements))
+
+    def check(self, policy_text, required_statements=None):
+        if isinstance(policy_text, str):
+            policy = json.loads(policy_text)
+        else:
+            policy = policy_text
+
+        statements = policy.get('Statement', [])
+        required = list(self.statement_ids)
+        for s in list(statements):
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
+        if not required_statements:
+            required_statements = self.required_statements
+        for required_statement in required_statements:
+            partial_match_elements = required_statement.pop('PartialMatch', [])
+            if isinstance(partial_match_elements, str):
+                # Make list if string to prevent mismatches like Action in NotAction below
+                partial_match_elements = [partial_match_elements]
+            for statement in statements:
+                match_count = sum(
+                    1 for k, v in required_statement.items() if self.match(
+                        k, v, statement, partial_match_elements))
+                if match_count == len(required_statement):
+                    required_statements.remove(required_statement)
+                    break
+
+        return (
+            (self.statement_ids and not required) or
+            (self.statements and not required_statements)
+        )
+
+    def match(self, k, v, stmt, partial_match_elements):
+        if k in stmt:
+            if k in partial_match_elements:
+                if isinstance(v, list):
+                    return set(v).issubset(stmt[k])
+                elif isinstance(v, dict):
+                    return merge_dict(stmt[k], v) == stmt[k]
+                else:
+                    return v in stmt[k]
+            return v == stmt[k]
+
+
+class PolicyStatementFilter(Filter):
+    """  Check a resource for a set of policy statements.
+    """
+    schema_alias = True
+    POLICY_ELEMENTS = [
+        'Sid', 'Effect', 'Principal', 'NotPrincipal', 'Action',
+        'NotAction', 'Resource', 'NotResource', 'Condition']
+    schema = type_schema(
+        'has-statement',
+        statement_ids={'type': 'array', 'items': {'type': 'string'}},
+        statements={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'Sid': {'type': 'string'},
+                    'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                    'Principal': {'anyOf': [
+                        {'type': 'string'},
+                        {'type': 'object'}, {'type': 'array'}]},
+                    'NotPrincipal': {
+                        'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                    'Action': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotAction': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'Resource': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'NotResource': {
+                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                    'Condition': {'type': 'object'},
+                    'PartialMatch': {
+                        'anyOf': [
+                            {'type': 'string', "enum": POLICY_ELEMENTS},
+                            {'type': 'array', 'items': [
+                                {"type": "string", "enum": POLICY_ELEMENTS}]}]
+                    }
+                },
+                'required': ['Effect']
+            }
+        })
+
+    policy_attribute = 'Policy'
+    get_policy = CrossAccountAccessFilter.get_resource_policy
+
+    def get_required_statements(self, r=None):
+        return format_string_values(list(self.data.get('statements', [])))
+
+    def process(self, resources, event=None):
+        self.checker = HasStatementChecker(self.data)
+        return list(filter(None, map(self.process_resource, resources)))
+
+    def process_resource(self, r):
+        p = self.get_policy(r)
+        if p is None or not p:
+            return None
+        if self.checker.check(p, self.get_required_statements(r)):
+            return r

@@ -16,7 +16,7 @@ from botocore.exceptions import ClientError
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
-from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters import CrossAccountAccessFilter, MetricsFilter, PolicyStatementFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.utils import local_session
@@ -394,3 +394,27 @@ class SetRetentionPeriod(BaseAction):
                 QueueUrl=q['QueueUrl'],
                 Attributes={
                     'MessageRetentionPeriod': period})
+
+
+@SQS.filter_registry.register('has-statement')
+class SQSHasStatement(PolicyStatementFilter):
+    """Find queues with set of policy statements.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: sqs-bucket-has-statement
+                resource: aws.sqs
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - DeleteQueue
+            policies:
+              - name: sqs-public-policy
+                resource: aws.sqs
+                filters:
+                  - type: has-statement
+                    statements:
+                      - Effect: Allow
+                        Action: 'sqs:*'
+                        Principal: '*'
+    """
