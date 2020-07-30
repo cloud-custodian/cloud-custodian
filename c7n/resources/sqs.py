@@ -401,20 +401,20 @@ class SQSHasStatement(PolicyStatementFilter):
     """Find queues with set of policy statements.
     :example:
     .. code-block:: yaml
-            policies:
-              - name: sqs-bucket-has-statement
-                resource: aws.sqs
-                filters:
-                  - type: has-statement
-                    statement_ids:
-                      - DeleteQueue
-            policies:
-              - name: sqs-public-policy
-                resource: aws.sqs
-                filters:
-                  - type: has-statement
-                    statements:
-                      - Effect: Allow
-                        Action: 'sqs:*'
-                        Principal: '*'
+        policies:
+            - name: sqs-bucket-has-statement
+              resource: aws.sqs
+              filters:
+                - type: has-statement
+                  statement_ids:
+                    - DeleteQueue
+        policies:
+            - name: sqs-public-policy
+              resource: aws.sqs
+              filters:
+                - type: has-statement
+                  statements:
+                    - Effect: Allow
+                      Action: 'sqs:*'
+                      Principal: '*'
     """
