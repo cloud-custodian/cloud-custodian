@@ -347,8 +347,8 @@ class CrossAccountAccessFilter(Filter):
 
 class HasStatementChecker:
     """
-        Checks the policy document for the presence of required `statements` or `statement_ids`
-        which are input through the PolicyStatementFilter class implementation
+    Checks the policy document for the presence of required `statements` or `statement_ids`
+    which are input through the PolicyStatementFilter class implementation
     """
     def __init__(self, checker_config):
         self.checker_config = checker_config
