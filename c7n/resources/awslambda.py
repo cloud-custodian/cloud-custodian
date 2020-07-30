@@ -701,14 +701,12 @@ class LambdaVersionEdgeFilter(Filter):
                 for function in d['DefaultCacheBehavior']['LambdaFunctionAssociations']['Items']:
                     edge_arns.append(function['LambdaFunctionARN'])
         except Exception as e:
-            self.log.exception(
-                "Exception trying to list distributions, error: %s", e)
+            self.log.exception("Exception trying to list distributions, error: %s", e)
             raise e
 
         for r in resources:
-            if r['FunctionArn'] in edge_arns and self.data.get('state'):
-                results.append(r)
-            if r['FunctionArn'] not in edge_arns and not self.data.get('state'):
+            if (r['FunctionArn'] in edge_arns and self.data.get('state')) or \
+               (r['FunctionArn'] not in edge_arns and not self.data.get('state')):
                 results.append(r)
 
         return results
