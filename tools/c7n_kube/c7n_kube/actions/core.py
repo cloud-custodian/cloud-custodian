@@ -79,12 +79,17 @@ class PatchResource(PatchAction):
     """
     Patches a resource
 
-    Example for resource k8s.deployment:
-
-    - type: patch
-      options:
-        spec:
-          replicas: 0
+    .. code-block:: yaml
+      policies:
+        - name: scale-resource
+          resource: k8s.deployment # k8s.{resource}
+          filters:
+            - 'metadata.name': 'test-{resource}'
+          actions:
+            - type: patch
+              options:
+                spec:
+                  replicas: 0
     """
     schema = type_schema(
         'patch',
