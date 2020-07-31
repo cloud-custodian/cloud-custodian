@@ -399,8 +399,11 @@ class SetRetentionPeriod(BaseAction):
 @SQS.filter_registry.register('has-statement')
 class SQSHasStatement(PolicyStatementFilter):
     """Find queues with set of policy statements.
+
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: sqs-bucket-has-statement
               resource: aws.sqs
@@ -408,7 +411,6 @@ class SQSHasStatement(PolicyStatementFilter):
                 - type: has-statement
                   statement_ids:
                     - DeleteQueue
-        policies:
             - name: sqs-public-policy
               resource: aws.sqs
               filters:
