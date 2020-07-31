@@ -30,14 +30,21 @@ import json
 import inspect
 import logging
 
-from jsonschema import Draft4Validator as JsonSchemaValidator
+from jsonschema import Draft7Validator as JsonSchemaValidator
 from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
-from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
+from c7n.filters.core import (
+    ValueFilter,
+    EventFilter,
+    AgeFilter,
+    ReduceFilter,
+    OPERATORS,
+    VALUE_TYPES,
+)
 from c7n.structure import StructureParser # noqa
 
 
@@ -151,6 +158,24 @@ def generate(resource_types=()):
     resource_defs = {}
     definitions = {
         'resources': resource_defs,
+        'string_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {"type": "string"},
+            },
+        },
+        'basic_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {
+                    'oneOf': [
+                        {"type": "string"},
+                        {"type": "boolean"},
+                        {"type": "number"},
+                    ],
+                }
+            },
+        },
         'iam-statement': {
             'additionalProperties': False,
             'type': 'object',
@@ -184,6 +209,7 @@ def generate(resource_types=()):
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
             'age': AgeFilter.schema,
+            'reduce': ReduceFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
@@ -243,8 +269,9 @@ def generate(resource_types=()):
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'metadata': {'$ref': '#/definitions/basic_dict'},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config',
+                'source': {'enum': ['describe', 'config', 'inventory',
                                     'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',
@@ -425,9 +452,25 @@ def process_resource(
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary(cloud_name=None, qualify_name=True):
+def resource_outline(provider=None):
+    outline = {}
+    for cname, ctype in sorted(clouds.items()):
+        if provider and provider != cname:
+            continue
+        cresources = outline[cname] = {}
+        for rname, rtype in sorted(ctype.resources.items()):
+            cresources['%s.%s' % (cname, rname)] = rinfo = {}
+            rinfo['filters'] = sorted(rtype.filter_registry.keys())
+            rinfo['actions'] = sorted(rtype.action_registry.keys())
+    return outline
+
+
+def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
     vocabulary = {}
     resources = {}
+
+    if aliases:
+        vocabulary['aliases'] = {}
 
     for cname, ctype in clouds.items():
         if cloud_name is not None and cloud_name != cname:
@@ -457,6 +500,15 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+        if aliases and resource_type.type_aliases:
+            provider = type_name.split('.', 1)[0]
+            for type_alias in resource_type.type_aliases:
+                vocabulary['aliases'][
+                    "{}.{}".format(provider, type_alias)] = vocabulary[type_name]
+                if provider == 'aws':
+                    vocabulary['aliases'][type_alias] = vocabulary[type_name]
+            vocabulary[type_name]['resource_type'] = type_name
 
     vocabulary["mode"] = {}
     for mode_name, cls in execution.items():

@@ -28,6 +28,7 @@ from c7n_gcp.provider import resources as gcp_resources
 class BaseLabelAction(MethodAction):
 
     method_spec = {}
+    method_perm = 'update'
 
     def get_labels_to_add(self, resource):
         return None
@@ -160,8 +161,8 @@ class LabelDelayedAction(BaseLabelAction):
         'mark-for-op',
         label={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
-        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
+        hours={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'}
     )

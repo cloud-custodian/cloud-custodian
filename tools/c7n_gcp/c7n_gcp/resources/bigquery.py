@@ -34,6 +34,8 @@ class DataSet(QueryResourceManager):
         default_report_fields = [
             id, name, "description",
             "creationTime", "lastModifiedTime"]
+        asset_type = "bigquery.googleapis.com/Dataset"
+        permissions = ('bigquery.datasets.get',)
 
         @staticmethod
         def get(client, event):
@@ -86,21 +88,6 @@ class BigQueryJob(QueryResourceManager):
             })
 
 
-@resources.register('bq-project')
-class BigQueryProject(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/projects
-    """
-    class resource_type(TypeInfo):
-        service = 'bigquery'
-        version = 'v2'
-        component = 'projects'
-        enum_spec = ('list', 'projects[]', None)
-        scope = 'global'
-        id = 'id'
-        name = "friendlyName"
-        default_report_fields = [id, name]
-
-
 @resources.register('bq-table')
 class BigQueryTable(ChildResourceManager):
     """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables
@@ -126,6 +113,7 @@ class BigQueryTable(ChildResourceManager):
                 ('tableReference.datasetId', 'datasetId'),
             ]
         }
+        asset_type = "bigquery.googleapis.com/Table"
 
         @staticmethod
         def get(client, event):

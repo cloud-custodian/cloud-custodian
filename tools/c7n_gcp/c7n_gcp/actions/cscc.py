@@ -69,6 +69,16 @@ class PostFinding(MethodAction):
 
     _source = None
 
+    # security center permission model is pretty obtuse to correct
+    permissions = (
+        'securitycenter.findings.list',
+        'securitycenter.findings.update',
+        'resourcemanager.organizations.get',
+        'securitycenter.assetsecuritymarks.update',
+        'securitycenter.sources.update',
+        'securitycenter.sources.list'
+    )
+
     def validate(self):
         if not any([self.data.get(k) for k in ('source', 'org-domain', 'org-id')]):
             raise PolicyValidationError(

@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
 import mock
+import os
 import shutil
 import tempfile
 
@@ -25,7 +27,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
-from c7n.policy import ConfigPollRuleMode
+from c7n.policy import ConfigPollRuleMode, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
@@ -205,8 +207,13 @@ class PolicyMetaLint(BaseTest):
             if rtype is not None:
                 resource_cfn_types.add(rtype)
         cfn_types = set(load_data('cfn-types.json'))
+        missing = set()
         for rtype in resource_cfn_types:
-            assert rtype in cfn_types, "invalid cfn %s" % rtype
+            if rtype not in cfn_types:
+                missing.add(rtype)
+        if missing:
+            raise AssertionError("Bad cfn types:\n %s" % (
+                "\n".join(sorted(missing))))
 
     def test_securityhub_resource_support(self):
         session = fake_session()._session
@@ -270,7 +277,9 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio'}
+            'AWS::ServiceCatalog::Portfolio',
+            'AWS::SSM::FileData',
+            'AWS::SecretsManager::Secret'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -434,7 +443,7 @@ class PolicyMetaLint(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in list(v.filter_registry.items()):
-                if n in ("and", "or", "not", "missing"):
+                if n in ("and", "or", "not", "missing", "reduce"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -986,6 +995,24 @@ class TestPolicy(BaseTest):
 
 class PolicyConditionsTest(BaseTest):
 
+    def test_value_from(self):
+        tmp_dir = self.change_cwd()
+        p = self.load_policy({
+            'name': 'fx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account_id',
+                'op': 'in',
+                'value_from': {
+                    'url': 'file:///{}/accounts.txt'.format(tmp_dir),
+                    'type': 'txt'}
+            }]
+        })
+        with open(os.path.join(tmp_dir, 'accounts.txt'), 'w') as fh:
+            fh.write(p.ctx.options.account_id)
+        self.assertTrue(p.is_runnable())
+
     def test_env_var_extension(self):
         p = self.load_policy({
             'name': 'profx',
@@ -1045,6 +1072,45 @@ class PolicyConditionsTest(BaseTest):
                 'not': [
                     {'region': 'us-east-1'}]}]})
         self.assertFalse(p.is_runnable())
+
+    def test_dryrun_event_filter(self):
+        pdata = {
+            'name': 'manga',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'role': 'something'
+            },
+            'filters': [{
+                'not': [
+                    {'type': 'event'}
+                ]
+            }]
+        }
+        self.patch(PullMode, 'run', lambda self: [True])
+        p = self.load_policy(
+            deepcopy(pdata), config={'dryrun': True})
+        results = p.run()
+        self.assertEqual(results, [True])
+        self.assertTrue(p.is_runnable())
+        self.assertEqual(pdata, p.data)
+
+    def test_boolean_not_event(self):
+        # event is bound to execution evaluation, when
+        # evaluating conditions for provisioning we
+        # strip any event filters.
+        pdata = {
+            'name': 'manga',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'or': [
+                    {'not': [
+                        {'type': 'event'}]}]}]}
+        p = self.load_policy(pdata)
+        p._trim_runtime_filters()
+        self.assertTrue(p.is_runnable())
+        self.assertFalse(p.conditions.filters)
+        self.assertEqual(p.data, pdata)
 
 
 class PolicyExecutionModeTest(BaseTest):

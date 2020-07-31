@@ -30,6 +30,9 @@ class Organization(QueryResourceManager):
         name = 'displayName'
         default_report_fields = [
             "name", "displayName", "creationTime", "lifecycleState"]
+        asset_type = "cloudresourcemanager.googleapis.com/Organization"
+        perm_service = 'resourcemanager'
+        permissions = ('resourcemanager.organizations.get',)
 
 
 @Organization.action_registry.register('set-iam-policy')
@@ -56,6 +59,8 @@ class Folder(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
+        asset_type = "cloudresourcemanager.googleapis.com/Folder"
+        perm_service = 'resourcemanager'
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -77,6 +82,8 @@ class Project(QueryResourceManager):
         name = id = 'projectId'
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
+        asset_type = "cloudresourcemanager.googleapis.com/Project"
+        perm_service = 'resourcemanager'
 
 
 @Project.action_registry.register('set-iam-policy')

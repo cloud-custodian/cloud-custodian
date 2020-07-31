@@ -18,8 +18,7 @@ import os
 import uuid
 
 from c7n.config import Config
-from c7n.policy import PolicyCollection
-
+from c7n.loader import PolicyLoader
 # Load resource plugins
 from c7n_gcp.entry import initialize_gcp
 
@@ -39,20 +38,20 @@ def run(event, context=None):
         log.error('Invalid policy config')
         return False
 
-    options_overrides = \
-        policy_config['policies'][0].get('mode', {}).get('execution-options', {})
-
+    # setup execution options
+    options = Config.empty(**policy_config.pop('execution-options', {}))
+    options.update(
+        policy_config['policies'][0].get('mode', {}).get('execution-options', {}))
     # if output_dir specified use that, otherwise make a temp directory
-    if 'output_dir' not in options_overrides:
-        options_overrides['output_dir'] = get_tmp_output_dir()
+    if not options.output_dir:
+        options['output_dir'] = get_tmp_output_dir()
 
-    # merge all our options in
-    options = Config.empty(**options_overrides)
-
-    policies = PolicyCollection.from_data(policy_config, options)
+    loader = PolicyLoader(options)
+    policies = loader.load_data(policy_config, 'config.json', validate=False)
     if policies:
         for p in policies:
             log.info("running policy %s", p.name)
+            p.validate()
             p.push(event, context)
     return True
 

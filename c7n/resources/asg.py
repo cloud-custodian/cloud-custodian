@@ -29,8 +29,10 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
+from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
-from c7n.utils import local_session, type_schema, chunks, get_retry
+from c7n.utils import (
+    local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -574,6 +576,8 @@ class ImageAgeFilter(AgeFilter):
 
     def get_resource_date(self, asg):
         cfg = self.launch_info.get(asg)
+        if cfg is None:
+            cfg = {}
         ami = self.images.get(cfg.get('ImageId'), {})
         return parse(ami.get(
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
@@ -727,6 +731,26 @@ class PropagatedTagFilter(Filter):
                 if not match and not all(k in tags for k in keys):
                     results.append(asg)
         return results
+
+
+@ASG.action_registry.register('post-finding')
+class AsgPostFinding(PostFinding):
+
+    resource_type = 'AwsAutoScalingAutoScalingGroup'
+    launch_info = LaunchInfo(None)
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        details = select_keys(r, [
+            'CreatedTime', 'HealthCheckType', 'HealthCheckGracePeriod', 'LoadBalancerNames'])
+        lid = self.launch_info.get_launch_id(r)
+        if isinstance(lid, tuple):
+            lid = "%s:%s" % lid
+        details['CreatedTime'] = details['CreatedTime'].isoformat()
+        # let's arbitrarily cut off key information per security hub's restrictions...
+        details['LaunchConfigurationName'] = lid[:32]
+        payload.update(details)
+        return envelope
 
 
 @ASG.action_registry.register('tag-trim')
@@ -1213,7 +1237,7 @@ class PropagateTags(Action):
         if self.data.get('trim', False):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
-        if not self.manager.config.dryrun:
+        if not self.manager.config.dryrun and instances:
             client.create_tags(
                 Resources=instance_ids,
                 Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])

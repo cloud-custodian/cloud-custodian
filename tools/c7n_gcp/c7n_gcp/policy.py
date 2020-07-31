@@ -28,14 +28,15 @@ class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
         'gcp',
-        **{'execution-options': {'type': 'object'},
+        **{'execution-options': {'$ref': '#/definitions/basic_dict'},
            'timeout': {'type': 'string'},
            'memory-size': {'type': 'integer'},
-           'labels': {'type': 'object'},
+           'labels': {'$ref': '#/definitions/string_dict'},
            'network': {'type': 'string'},
            'max-instances': {'type': 'integer'},
            'service-account': {'type': 'string'},
-           'environment': {'type': 'object'}})
+           'environment': {'$ref': '#/definitions/string_dict'}}
+    )
 
     def __init__(self, policy):
         self.policy = policy

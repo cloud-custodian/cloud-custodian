@@ -271,7 +271,7 @@ class RedPill(pill.Pill):
             response_data['ResponseMetadata'] = {}
 
         response_data = json.dumps(response_data, default=serialize)
-        response_data = re.sub("\d{12}", ACCOUNT_ID, response_data)  # noqa
+        response_data = re.sub(r"\d{12}", ACCOUNT_ID, response_data)  # noqa
         response_data = json.loads(response_data, object_hook=deserialize)
 
         super(RedPill, self).save_response(service, operation, response_data,

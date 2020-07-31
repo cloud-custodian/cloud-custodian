@@ -81,6 +81,7 @@ class MailerSqsQueueProcessor:
         self.session = session
         self.max_num_processes = max_num_processes
         self.receive_queue = self.config['queue_url']
+        self.endpoint_url = self.config.get('endpoint_url', None)
         if self.config.get('debug', False):
             self.logger.debug('debug logging is turned on from mailer config file.')
             logger.setLevel(logging.DEBUG)
@@ -103,7 +104,7 @@ class MailerSqsQueueProcessor:
     """
     def run(self, parallel=False):
         self.logger.info("Downloading messages from the SQS queue.")
-        aws_sqs = self.session.client('sqs')
+        aws_sqs = self.session.client('sqs', endpoint_url=self.endpoint_url)
         sqs_messages = MailerSqsQueueIterator(aws_sqs, self.receive_queue, self.logger)
 
         sqs_messages.msg_attributes = ['mtype', 'recipient']

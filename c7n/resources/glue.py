@@ -11,18 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
-from c7n.actions import BaseAction, ActionRegistry
+from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('glue-connection')
@@ -411,6 +414,47 @@ class GlueSecurityConfiguration(QueryResourceManager):
         cfn_type = 'AWS::Glue::SecurityConfiguration'
 
 
+@GlueSecurityConfiguration.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-security-configuration-kms-key
+            resource: glue-security-configuration
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/)"
+                op: regex
+    """
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+            'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
+        }
+        key_type = self.data.get('key_type', 'all')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
+
+
 @GlueSecurityConfiguration.action_registry.register('delete')
 class DeleteSecurityConfiguration(BaseAction):
 
@@ -526,6 +570,9 @@ class GlueDataCatalog(ResourceManager):
     def resources(self):
         return self.filter_resources(self._get_catalog_encryption_settings())
 
+    def get_resources(self, resource_ids):
+        return [{'CatalogId': self.config.account_id}]
+
 
 @GlueDataCatalog.action_registry.register('set-encryption')
 class GlueDataCatalogEncryption(BaseAction):
@@ -637,3 +684,46 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
             policy = {}
         r[self.policy_annotation] = policy
         return policy
+
+
+@GlueDataCatalog.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from Glue Data Catalog
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: remove-glue-catalog-cross-account
+                resource: aws.glue-catalog
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+    permissions = ('glue:PutResourcePolicy',)
+    policy_annotation = "c7n:AccessPolicy"
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, GlueCatalogCrossAccount):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        resource = resources[0]
+        client = local_session(self.manager.session_factory).client('glue')
+        if resource.get(self.policy_annotation):
+            p = json.loads(resource[self.policy_annotation])
+            statements, found = self.process_policy(
+                p, resource, CrossAccountAccessFilter.annotation_key)
+            if not found:
+                return
+            if statements:
+                client.put_resource_policy(PolicyInJson=json.dumps(p))
+            else:
+                client.delete_resource_policy()

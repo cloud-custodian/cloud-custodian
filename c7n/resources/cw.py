@@ -176,6 +176,13 @@ class LogGroup(QueryResourceManager):
         return [r['arn'][:-2] for r in resources]
 
 
+@LogGroup.filter_registry.register('metrics')
+class LogGroupMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
+
+
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
     """Action to set the retention period (in days) for CloudWatch log groups

@@ -484,7 +484,8 @@ class TaskDefinition(query.QueryResourceManager):
         results = []
         client = local_session(self.session_factory).client('ecs')
         for task_def_set in resources:
-            response = client.describe_task_definition(
+            response = self.retry(
+                client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
             r = response['taskDefinition']
@@ -528,7 +529,7 @@ class ContainerInstance(query.ChildResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'containerInstance'
+        id = name = 'containerInstanceArn'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         arn = "containerInstanceArn"

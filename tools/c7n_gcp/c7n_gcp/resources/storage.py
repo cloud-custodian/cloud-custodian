@@ -29,6 +29,7 @@ class Bucket(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "timeCreated", "location", "storageClass"]
+        asset_type = "storage.googleapis.com/Bucket"
 
         @staticmethod
         def get(client, resource_info):
@@ -63,6 +64,7 @@ class BucketLevelAccess(MethodAction):
 
     schema = type_schema('set-uniform-access', state={'type': 'boolean'})
     method_spec = {'op': 'patch'}
+    method_perm = 'update'
 
     # the google docs and example on this api appear to broken.
     # https://cloud.google.com/storage/docs/using-uniform-bucket-level-access#rest-apis

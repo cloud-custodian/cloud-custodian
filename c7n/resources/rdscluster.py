@@ -14,6 +14,8 @@
 import logging
 
 from concurrent.futures import as_completed
+from datetime import datetime
+from dateutil.tz import tzutc
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter, CrossAccountAccessFilter
@@ -360,6 +362,31 @@ class DescribeClusterSnapshot(DescribeSource):
         return tags.universal_augment(self.manager, resources)
 
 
+class ConfigClusterSnapshot(ConfigSource):
+
+    def load_resource(self, item):
+
+        resource = super(ConfigClusterSnapshot, self).load_resource(item)
+        # db cluster snapshots are particularly mangled on keys
+        for k, v in list(resource.items()):
+            if k.startswith('Dbcl'):
+                resource.pop(k)
+                k = 'DBCl%s' % k[4:]
+                resource[k] = v
+            elif k.startswith('Iamd'):
+                resource.pop(k)
+                k = 'IAMD%s' % k[4:]
+                resource[k] = v
+        resource['Tags'] = [{'Key': k, 'Value': v} for k, v in item['tags'].items()]
+
+        utc = tzutc()
+        resource['SnapshotCreateTime'] = datetime.fromtimestamp(
+            resource['SnapshotCreateTime'] / 1000, tz=utc)
+        resource['ClusterCreateTime'] = datetime.fromtimestamp(
+            resource['ClusterCreateTime'] / 1000, tz=utc)
+        return resource
+
+
 @resources.register('rds-cluster-snapshot')
 class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
@@ -374,13 +401,13 @@ class RDSClusterSnapshot(QueryResourceManager):
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        universal_tagging = object()
+        universal_taggable = object()
         config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
     source_mapping = {
         'describe': DescribeClusterSnapshot,
-        'config': ConfigSource
+        'config': ConfigClusterSnapshot
     }
 
 

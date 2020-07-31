@@ -103,6 +103,59 @@ class TestGetSplunkPayloads(DeliveryTester):
         assert mock_gse.mock_calls == [call(msg)]
         assert mock_sifm.mock_calls == [call(msg)]
 
+    @patch(
+        '%s.get_splunk_events' % pb,
+        return_value=[
+            {'account': 'A', 'resource': 1},
+            {'resource': 2}
+        ]
+    )
+    @patch(
+        '%s._splunk_indices_for_message' % pb,
+        return_value=['indexA', 'indexB']
+    )
+    def test_sourcetype(self, mock_gse, mock_sifm):
+        self.config['splunk_hec_sourcetype'] = 'custom-sourcetype'
+        msg = {'some': 'message'}
+        ts = 1557493290000
+        result = self.cls.get_splunk_payloads(msg, ts)
+        assert result == [
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'A-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexA',
+                'event': {'account': 'A', 'resource': 1}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'A-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexB',
+                'event': {'account': 'A', 'resource': 1}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'unknown-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexA',
+                'event': {'resource': 2}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'unknown-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexB',
+                'event': {'resource': 2}
+            }
+        ]
+        assert mock_gse.mock_calls == [call(msg)]
+        assert mock_sifm.mock_calls == [call(msg)]
+
 
 class TestGetSplunkEvents(DeliveryTester):
 

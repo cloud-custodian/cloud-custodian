@@ -606,8 +606,8 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
-        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        days={'type': 'number', 'minimum': 0},
+        hours={'type': 'number', 'minimum': 0},
         tz={'type': 'string'},
         op={'type': 'string'})
     schema_alias = True
@@ -1060,7 +1060,7 @@ class CopyRelatedResourceTag(Tag):
 
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
-                    if resource_tags.get(k) != v}
+                    if resource_tags.get(k) != v and not k.startswith('aws:')}
         else:
             tags = {k: v for k, v in related_tags.items()
                     if k in tag_keys and resource_tags.get(k) != v}

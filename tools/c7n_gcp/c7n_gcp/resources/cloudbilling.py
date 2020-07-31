@@ -29,6 +29,8 @@ class CloudBillingAccount(QueryResourceManager):
         scope = None
         name = id = 'name'
         default_report_fields = ['id', 'displayName']
+        asset_type = "cloudbilling.googleapis.com/BillingAccount"
+        permissions = ('billing.accounts.list',)
 
         @staticmethod
         def get(client, event):

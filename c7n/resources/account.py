@@ -1495,7 +1495,7 @@ class SetS3PublicBlock(BaseAction):
         config.pop('type')
         if config.pop('state', None) is False and config:
             raise PolicyValidationError(
-                "%s cant set state false with controls specified".format(
+                "{} cant set state false with controls specified".format(
                     self.type))
 
     def process(self, resources):
@@ -1731,3 +1731,34 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
         client.put_block_public_access_configuration(
             BlockPublicAccessConfiguration=updatedConfig
         )
+
+
+@filters.register('securityhub')
+class SecHubEnabled(Filter):
+    """Filter an account depending on whether security hub is enabled or not.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-securityhub-status
+           resource: aws.account
+           filters:
+            - type: securityhub
+              enabled: true
+
+    """
+
+    permissions = ('securityhub:DescribeHub',)
+
+    schema = type_schema('securityhub', enabled={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        state = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('securityhub')
+        sechub = self.manager.retry(client.describe_hub, ignore_err_codes=(
+            'InvalidAccessException',))
+        if state == bool(sechub):
+            return resources
+        return []
