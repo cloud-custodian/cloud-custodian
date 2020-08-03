@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import base64
 import itertools
 import operator
@@ -1054,6 +1044,86 @@ class MonitorInstances(BaseAction):
         except ClientError as e:
             if e.response['Error']['Code'] != 'InvalidInstanceId.NotFound':
                 raise
+
+
+@EC2.action_registry.register('set-metadata-access')
+class SetMetadataServerAccess(BaseAction):
+    """Set instance metadata server access for an instance.
+
+    :example:
+
+    Require instances to use IMDSv2
+
+    .. code-block:: yaml
+
+       policies:
+         - name: ec2-require-imdsv2
+           resource: ec2
+           filters:
+             - MetadataOptions.HttpsToken: optional
+           actions:
+             - type: set-metadata-access
+               tokens: required
+
+    :example:
+
+    Disable metadata server access
+
+    .. code-block: yaml
+
+       policies:
+         - name: ec2-disable-imds
+           resource: ec2
+           filters:
+             - MetadataOptions.HttpEndpoint: enabled
+           actions:
+             - type: set-metadata-access
+               endpoint: disabled
+
+    Reference: https://amzn.to/2XOuxpQ
+    """
+
+    AllowedValues = {
+        'HttpEndpoint': ['enabled', 'disabled'],
+        'HttpTokens': ['required', 'optional'],
+        'HttpPutResponseHopLimit': list(range(1, 65))
+    }
+
+    schema = type_schema(
+        'set-metadata-access',
+        anyOf=[{'required': ['endpoint']},
+               {'required': ['tokens']},
+               {'required': ['hop-limit']}],
+        **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
+           'tokens': {'enum': AllowedValues['HttpTokens']},
+           'hop-limit': {'type': 'integer', 'minimum': 1, 'maximum': 64}}
+    )
+    permissions = ('ec2:ModifyInstanceMetadataOptions',)
+
+    def get_params(self):
+        return filter_empty({
+            'HttpEndpoint': self.data.get('endpoint'),
+            'HttpTokens': self.data.get('tokens'),
+            'HttpPutResponseHopLimit': self.data.get('hop-limit')})
+
+    def process(self, resources):
+        params = self.get_params()
+        for k, v in params.items():
+            allowed_values = list(self.AllowedValues[k])
+            allowed_values.remove(v)
+            resources = self.filter_resources(
+                resources, 'MetadataOptions.%s' % k, allowed_values)
+
+        if not resources:
+            return
+
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            self.manager.retry(
+                client.modify_instance_metadata_options,
+                ignore_err_codes=('InvalidInstanceId.NotFound',),
+                InstanceId=r['InstanceId'],
+                **params)
 
 
 @EC2.action_registry.register("post-finding")

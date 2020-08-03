@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS Account as a custodian resource.
 """
 import json
@@ -1731,3 +1721,34 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
         client.put_block_public_access_configuration(
             BlockPublicAccessConfiguration=updatedConfig
         )
+
+
+@filters.register('securityhub')
+class SecHubEnabled(Filter):
+    """Filter an account depending on whether security hub is enabled or not.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-securityhub-status
+           resource: aws.account
+           filters:
+            - type: securityhub
+              enabled: true
+
+    """
+
+    permissions = ('securityhub:DescribeHub',)
+
+    schema = type_schema('securityhub', enabled={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        state = self.data.get('enabled', True)
+        client = local_session(self.manager.session_factory).client('securityhub')
+        sechub = self.manager.retry(client.describe_hub, ignore_err_codes=(
+            'InvalidAccessException',))
+        if state == bool(sechub):
+            return resources
+        return []

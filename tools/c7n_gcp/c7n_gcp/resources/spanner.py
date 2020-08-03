@@ -1,16 +1,6 @@
 # Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.provider import resources
@@ -32,7 +22,6 @@ class SpannerInstance(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "displayName", "nodeCount", "state", "config"]
-
         labels = True
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
@@ -106,6 +95,7 @@ class SpannerInstancePatch(MethodAction):
     schema = type_schema('set', required=['nodeCount'],
                          **{'nodeCount': {'type': 'number'}})
     method_spec = {'op': 'patch'}
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         result = {'name': resource['name'],
@@ -187,6 +177,7 @@ class SpannerDatabaseInstanceDropDatabase(MethodAction):
     """
     schema = type_schema('dropDatabase', **{'type': {'enum': ['delete']}})
     method_spec = {'op': 'dropDatabase'}
+    method_perm = 'drop'
 
     def get_resource_params(self, model, resource):
         return {'database': resource['name']}

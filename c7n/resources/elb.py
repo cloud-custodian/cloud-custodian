@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Elastic Load Balancers
 """
@@ -692,7 +682,7 @@ class SSLPolicyFilter(Filter):
 
 @filters.register('healthcheck-protocol-mismatch')
 class HealthCheckProtocolMismatch(Filter):
-    """Filters ELB that have a healtch check protocol mismatch
+    """Filters ELB that have a health check protocol mismatch
 
     The mismatch occurs if the ELB has a different protocol to check than
     the associated instances allow to determine health status.
@@ -852,3 +842,37 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                     'AccessLog'].get(
                     'S3BucketPrefix', None))
                 ]
+
+
+@filters.register('attributes')
+class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
+    """Value Filter that allows filtering on ELB attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: elb-is-connection-draining
+                  resource: elb
+                  filters:
+                    - type: attributes
+                      key: ConnectionDraining.Enabled
+                      value: true
+                      op: eq
+
+    """
+    annotate = False  # no annotation from value filter
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        self.initialize(resources)
+
+    def __call__(self, r):
+        return super().__call__(r['Attributes'])

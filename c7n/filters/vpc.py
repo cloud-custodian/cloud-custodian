@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
@@ -204,7 +194,7 @@ class NetworkLocation(Filter):
         sg_space = set()
         subnet_space = set()
 
-        if 'subnet' in self.compare and resource_subnets:
+        if 'subnet' in self.compare:
             subnet_values = {
                 rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
                 for rsub in resource_subnets}
@@ -220,7 +210,7 @@ class NetworkLocation(Filter):
                     'reason': 'SubnetLocationCardinality',
                     'subnets': subnet_values})
 
-        if 'security-group' in self.compare and resource_sgs:
+        if 'security-group' in self.compare:
             sg_values = {
                 rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
                 for rsg in resource_sgs}

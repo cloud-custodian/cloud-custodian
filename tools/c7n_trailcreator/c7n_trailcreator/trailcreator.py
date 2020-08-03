@@ -1,16 +1,6 @@
 # Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS AutoTag Resource Creators
 
 See readme for details
@@ -296,10 +286,14 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     while True:
         qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
-            stats['QueryExecutionTime'] = qexec['Statistics'][
-                'EngineExecutionTimeInMillis'] / 1000.0
-            stats['DataScannedInBytes'] = qexec['Statistics'][
-                'DataScannedInBytes']
+            stats['QueryExecutionTime'] = qexec['Statistics'].get(
+                'EngineExecutionTimeInMillis',
+                qexec['Statistics'].get(
+                    'TotalExecutionTimeInMillis',
+                    1000
+                )
+            ) / 1000.0
+            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
                 format_bytes(
@@ -763,7 +757,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
-    load_resources()
+    load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(

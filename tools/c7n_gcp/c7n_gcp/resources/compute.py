@@ -1,16 +1,6 @@
 # Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
@@ -131,6 +121,9 @@ class DetachDisks(MethodAction):
     """
     schema = type_schema('detach-disks')
     attr_filter = ('status', ('TERMINATED',))
+    method_spec = {'op': 'detachDisk'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
 
     def validate(self):
         pass
@@ -141,9 +134,9 @@ class DetachDisks(MethodAction):
 
     def process_resource(self, client, resource):
         op_name = 'detachDisk'
-        path_param_re = re.compile(
-            '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-        project, zone, instance = path_param_re.match(resource['selfLink']).groups()
+
+        project, zone, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
 
         base_params = {'project': project, 'zone': zone, 'instance': instance}
         for disk in resource.get('disks', []):
@@ -478,6 +471,7 @@ class AutoscalerSet(MethodAction):
                          })
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/autoscalers/(.*)')
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         project, zone, autoscaler = self.path_param_re.match(resource['selfLink']).groups()

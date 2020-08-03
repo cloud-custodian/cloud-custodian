@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 import json
@@ -63,12 +53,20 @@ class DescribeKey(DescribeSource):
         return super().get_resources(ids, cache)
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('kms')
+        aliases = KeyAlias(self.manager.ctx, {}).resources()
+        alias_map = {}
+        for a in aliases:
+            key_id = a['TargetKeyId']
+            alias_map[key_id] = alias_map.get(key_id, []) + [a['AliasName']]
 
+        client = local_session(self.manager.session_factory).client('kms')
         for r in resources:
             try:
-                key_id = r.get('KeyArn', r.get('KeyId'))
-                info = client.describe_key(KeyId=key_id)['KeyMetadata']
+                key_id = r.get('KeyId')
+                key_arn = r.get('KeyArn', key_id)
+                info = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                if key_id in alias_map:
+                    info['AliasNames'] = alias_map[key_id]
                 r.update(info)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':

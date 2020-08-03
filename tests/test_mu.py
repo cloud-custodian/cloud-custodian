@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import importlib
 import json
 import logging
@@ -27,9 +17,11 @@ import zipfile
 
 import mock
 
+from c7n.config import Config
 from c7n.mu import (
     custodian_archive,
     generate_requirements,
+    get_exec_options,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -45,6 +37,18 @@ from .data import helloworld
 
 
 ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+def test_get_exec_options():
+
+    assert get_exec_options(Config().empty()) == {'tracer': 'default'}
+    assert get_exec_options(Config().empty(output_dir='/tmp/xyz')) == {
+        'tracer': 'default'}
+    assert get_exec_options(
+        Config().empty(log_group='gcp', output_dir='gs://mybucket/myprefix')) == {
+            'tracer': 'default',
+            'output_dir': 'gs://mybucket/myprefix',
+            'log_group': 'gcp'}
 
 
 def test_generate_requirements():
@@ -228,6 +232,35 @@ class PolicyLambdaProvision(BaseTest):
                 'eventTypeCode': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED']},
              'source': ['aws.health']}
         )
+
+    def test_cloudtrail_delay(self):
+        p = self.load_policy({
+            'name': 'aws-account',
+            'resource': 'aws.account',
+            'mode': {
+                'type': 'cloudtrail',
+                'delay': 32,
+                'role': 'CustodianRole',
+                'events': ['RunInstances']}})
+        from c7n import policy
+
+        class time:
+
+            invokes = []
+
+            @classmethod
+            def sleep(cls, duration):
+                cls.invokes.append(duration)
+
+        self.patch(policy, 'time', time)
+        trail_mode = p.get_execution_mode()
+        results = trail_mode.run({
+            'detail': {
+                'eventSource': 'ec2.amazonaws.com',
+                'eventName': 'RunInstances'}},
+            None)
+        self.assertEqual(len(results), 0)
+        self.assertEqual(time.invokes, [32])
 
     def test_user_pattern_merge(self):
         p = self.load_policy({

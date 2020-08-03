@@ -1,22 +1,23 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 from c7n.resources.aws import shape_validate
 
 
 class ElasticSearch(BaseTest):
+
+    def test_get_resources(self):
+        factory = self.replay_flight_data('test_elasticsearch_get')
+        p = self.load_policy({
+            'name': 'es-get',
+            'resource': 'aws.elasticsearch'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['devx'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'], 'devx')
 
     def test_resource_manager(self):
         factory = self.replay_flight_data("test_elasticsearch_query")
@@ -255,4 +256,23 @@ class ElasticSearch(BaseTest):
         self.assertEqual(
             sorted(result[0]["VPCOptions"]["SecurityGroupIds"]),
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
+        )
+
+
+class TestReservedInstances(BaseTest):
+
+    def test_elasticsearch_reserved_node_query(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-reserved",
+                "resource": "aws.elasticsearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedElasticsearchInstanceId"],
+            "036381d0-4fa5-4484-bd1a-efc1b43af0bf"
         )

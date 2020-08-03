@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
@@ -1164,5 +1154,20 @@ class AccountDataEvents(BaseTest):
             },
             session_factory=session_factory,
         )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_enable_securityhub(self):
+        session_factory = self.replay_flight_data("test_enable_securityhub")
+        p = self.load_policy(
+            {
+                'name': 'enable-sechub',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'securityhub',
+                    'enabled': False
+                }],
+            },
+            session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

@@ -1,16 +1,6 @@
 # Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional
 from botocore.exceptions import ClientError
 
@@ -653,3 +643,35 @@ class QueueTests(BaseTest):
             'AwsSqsQueueDetails',
             'securityhub',
         )
+
+    def test_sqs_access_analyzer_parameterized(self):
+        factory = self.replay_flight_data('test_sqs_analyzer_finding')
+        p = self.load_policy({
+            'name': 'check-sqs',
+            'resource': 'aws.sqs',
+            'filters': [
+                {'QueueUrl': 'https://queue.amazonaws.com/644160558196/public-test'},
+                {'type': 'iam-analyzer',
+                 'key': 'analyzedAt',
+                 'value_type': 'age',
+                 'value': 5,
+                 'op': 'gt'},
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:AccessAnalysis', resources[0])
+
+    def test_sqs_access_analyzer(self):
+        factory = self.replay_flight_data('test_sqs_analyzer_finding')
+        p = self.load_policy({
+            'name': 'check-sqs',
+            'resource': 'aws.sqs',
+            'filters': [
+                {'QueueUrl': 'https://queue.amazonaws.com/644160558196/public-test'},
+                {'type': 'iam-analyzer'}
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n:AccessAnalysis', resources[0])

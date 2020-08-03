@@ -139,6 +139,7 @@ CONFIG_SCHEMA = {
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},
+        'splunk_hec_sourcetype': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},

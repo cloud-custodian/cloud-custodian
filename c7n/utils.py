@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 from datetime import datetime, timedelta
 import json
@@ -346,7 +336,7 @@ def snapshot_identifier(prefix, db_identifier):
 retry_log = logging.getLogger('c7n.retry')
 
 
-def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
+def get_retry(retry_codes=(), max_attempts=8, min_delay=1, log_retries=False):
     """Decorator for retry boto3 api call on transient errors.
 
     https://www.awsarchitectureblog.com/2015/03/backoff.html
@@ -366,13 +356,15 @@ def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
     """
     max_delay = max(min_delay, 2) ** max_attempts
 
-    def _retry(func, *args, **kw):
+    def _retry(func, *args, ignore_err_codes=(), **kw):
         for idx, delay in enumerate(
                 backoff_delays(min_delay, max_delay, jitter=True)):
             try:
                 return func(*args, **kw)
             except ClientError as e:
-                if e.response['Error']['Code'] not in codes:
+                if e.response['Error']['Code'] in ignore_err_codes:
+                    return
+                elif e.response['Error']['Code'] not in retry_codes:
                     raise
                 elif idx == max_attempts - 1:
                     raise

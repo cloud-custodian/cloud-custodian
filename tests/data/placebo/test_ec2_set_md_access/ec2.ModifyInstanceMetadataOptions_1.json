@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceId": "i-009cd50243eefcb38",
+        "InstanceMetadataOptions": {
+            "State": "pending",
+            "HttpTokens": "required",
+            "HttpPutResponseHopLimit": 1,
+            "HttpEndpoint": "enabled"
+        },
+        "ResponseMetadata": {}
+    }
+}

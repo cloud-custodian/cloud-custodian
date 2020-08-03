@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
@@ -18,7 +8,7 @@ from c7n.filters import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 
 from .securityhub import PostFinding
@@ -27,13 +17,13 @@ from .securityhub import PostFinding
 class DescribeDomain(DescribeSource):
 
     def get_resources(self, resource_ids):
-        client = local_session(self.manager.session_factory).client('es')
-        return client.describe_elasticsearch_domains(
-            DomainNames=resource_ids)['DomainStatusList']
+        # augment will turn these into resource dictionaries
+        return resource_ids
 
     def augment(self, domains):
         client = local_session(self.manager.session_factory).client('es')
         model = self.manager.get_model()
+        results = []
 
         def _augment(resource_set):
             resources = self.manager.retry(
@@ -45,7 +35,10 @@ class DescribeDomain(DescribeSource):
                     client.list_tags, ARN=rarn).get('TagList', [])
             return resources
 
-        return _augment(domains)
+        for resource_set in chunks(domains, 5):
+            results.extend(_augment(resource_set))
+
+        return results
 
 
 @resources.register('elasticsearch')
@@ -244,3 +237,18 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+
+
+@resources.register('elasticsearch-reserved')
+class ReservedInstances(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'es'
+        name = id = 'ReservedElasticsearchInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_elasticsearch_instances', 'ReservedElasticsearchInstances', None)
+        filter_name = 'ReservedElasticsearchInstances'
+        filter_type = 'list'
+        arn_type = "reserved-instances"
+        permissions_enum = ('es:DescribeReservedElasticsearchInstances',)

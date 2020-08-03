@@ -1,22 +1,13 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
 from .common import BaseTest, functional, event_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
+from c7n.resources.aws import shape_validate
 
 
 class VpcTest(BaseTest):
@@ -90,23 +81,25 @@ class VpcTest(BaseTest):
         resources = p.resource_manager.resources()
         post_finding = p.resource_manager.actions[0]
         formatted = post_finding.format_resource(resources[0])
-        formatted['Details']['Other'].pop('Tags')
-        formatted['Details']['Other'].pop('CidrBlockAssociationSet')
+        self.maxDiff = None
         self.assertEqual(
             formatted,
-            {'Details': {'Other': {'CidrBlock': '10.0.42.0/24',
-                                   'DhcpOptionsId': 'dopt-24ff1940',
-                                   'InstanceTenancy': 'default',
-                                   'IsDefault': 'False',
-                                   'OwnerId': '644160558196',
-                                   'State': 'available',
-                                   'VpcId': 'vpc-f1516b97',
-                                   'c7n:resource-type': 'vpc'}},
+            {'Details': {
+                'AwsEc2Vpc': {
+                    'DhcpOptionsId': 'dopt-24ff1940',
+                    'State': 'available',
+                    'CidrBlockAssociationSet': [{
+                        'AssociationId': 'vpc-cidr-assoc-98ba93f0',
+                        'CidrBlock': '10.0.42.0/24',
+                        'CidrBlockState': 'associated'}]}},
              'Id': 'arn:aws:ec2:us-east-1:644160558196:vpc/vpc-f1516b97',
              'Partition': 'aws',
              'Region': 'us-east-1',
              'Tags': {'Name': 'FancyTestVPC', 'tagfancykey': 'tagfanncyvalue'},
              'Type': 'AwsEc2Vpc'})
+        shape_validate(
+            formatted['Details']['AwsEc2Vpc'],
+            'AwsEc2VpcDetails', 'securityhub')
 
     def test_flow_logs_s3_destination(self):
         factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
@@ -534,6 +527,30 @@ class NetworkLocationTest(BaseTest):
                 "reason": "SecurityGroupMismatch"}],
         )
 
+    def test_network_compare_location_resource_missing(self):
+        self.factory = self.replay_flight_data("test_network_compare_location_resource_missing")
+        p = self.load_policy(
+            {
+                "name": "compare",
+                "resource": "aws.app-elb",
+                "filters": [
+                    {"type": "network-location", "key": "tag:NetworkLocation",
+                     "compare": ["subnet", "security-group"]}
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["c7n:NetworkLocation"],
+            [
+                {'reason': 'LocationMismatch', 'security-groups': {},
+                 'subnets': {'subnet-914763e7': 'Public', 'subnet-efbcccb7': 'Public'}}
+            ],
+        )
+
     @functional
     def test_network_location_triple_intersect(self):
         self.factory = self.replay_flight_data("test_network_location_intersection")
@@ -866,6 +883,15 @@ class NetworkAddrTest(BaseTest):
         network_addr = ec2.allocate_address(Domain="vpc")
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
+
+    def test_elastic_ip_get_resources(self):
+        factory = self.replay_flight_data('test_elasticip_get_resources')
+        p = self.load_policy({
+            'name': 'get-addresses',
+            'resource': 'network-addr'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['eipalloc-0da931198e499fdb0'])
+        self.assertJmes('[0].PrivateIpAddress', resources, '192.168.0.99')
 
     def test_elasticip_error(self):
         mock_factory = MagicMock()
@@ -2564,7 +2590,8 @@ class EndpointTest(BaseTest):
                 'name': 'vpc-endpoint-cross-account',
                 'resource': 'vpc-endpoint',
                 'filters': [
-                    {'type': 'cross-account'}
+                    {'type': 'cross-account',
+                     'whitelist_orgids': ['o-4amkskbcf1']}
                 ]
             },
             session_factory=session_factory

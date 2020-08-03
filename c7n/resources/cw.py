@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -174,6 +164,13 @@ class LogGroup(QueryResourceManager):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
         return [r['arn'][:-2] for r in resources]
+
+
+@LogGroup.filter_registry.register('metrics')
+class LogGroupMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
 
 @LogGroup.action_registry.register('retention')

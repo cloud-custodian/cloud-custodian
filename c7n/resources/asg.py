@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.client import ClientError
 
 from collections import Counter
@@ -29,8 +19,10 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
+from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
-from c7n.utils import local_session, type_schema, chunks, get_retry
+from c7n.utils import (
+    local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -731,6 +723,26 @@ class PropagatedTagFilter(Filter):
         return results
 
 
+@ASG.action_registry.register('post-finding')
+class AsgPostFinding(PostFinding):
+
+    resource_type = 'AwsAutoScalingAutoScalingGroup'
+    launch_info = LaunchInfo(None)
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        details = select_keys(r, [
+            'CreatedTime', 'HealthCheckType', 'HealthCheckGracePeriod', 'LoadBalancerNames'])
+        lid = self.launch_info.get_launch_id(r)
+        if isinstance(lid, tuple):
+            lid = "%s:%s" % lid
+        details['CreatedTime'] = details['CreatedTime'].isoformat()
+        # let's arbitrarily cut off key information per security hub's restrictions...
+        details['LaunchConfigurationName'] = lid[:32]
+        payload.update(details)
+        return envelope
+
+
 @ASG.action_registry.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
@@ -1215,7 +1227,7 @@ class PropagateTags(Action):
         if self.data.get('trim', False):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
-        if not self.manager.config.dryrun:
+        if not self.manager.config.dryrun and instances:
             client.create_tags(
                 Resources=instance_ids,
                 Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])

@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import re
 
@@ -29,12 +19,11 @@ class FunctionAppUtilities:
 
     class FunctionAppInfrastructureParameters:
         def __init__(self, app_insights, service_plan, storage_account,
-                     function_app_resource_group_name, function_app_name):
+                     function_app):
             self.app_insights = app_insights
             self.service_plan = service_plan
             self.storage_account = storage_account
-            self.function_app_resource_group_name = function_app_resource_group_name
-            self.function_app_name = function_app_name
+            self.function_app = function_app
 
     @staticmethod
     def get_storage_account_connection_string(id):
@@ -57,9 +46,7 @@ class FunctionAppUtilities:
     @staticmethod
     def deploy_function_app(parameters):
         function_app_unit = FunctionAppDeploymentUnit()
-        function_app_params = \
-            {'name': parameters.function_app_name,
-             'resource_group_name': parameters.function_app_resource_group_name}
+        function_app_params = dict(parameters.function_app)
         function_app = function_app_unit.get(function_app_params)
 
         if function_app:
@@ -117,8 +104,8 @@ class FunctionAppUtilities:
         cls.log.info('Publishing Function application')
 
         publish_creds = web_client.web_apps.list_publishing_credentials(
-            function_params.function_app_resource_group_name,
-            function_params.function_app_name).result()
+            function_params.function_app['resource_group_name'],
+            function_params.function_app['name']).result()
 
         if package.wait_for_status(publish_creds):
             package.publish(publish_creds)

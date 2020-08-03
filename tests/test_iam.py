@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import datetime
 import os
@@ -1581,6 +1571,33 @@ class CrossAccountChecker(TestCase):
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+    def test_principal_org_id(self):
+        statements = [
+            {'Actions': ['Deploy', 'UnshareApplication'],
+             'Principal': ['*'],
+             'StatementId': 'cab89702-05f0-4751-818e-ced6e98ef5f9',
+             'Effect': 'Allow',
+             'Condition': {
+                 'StringEquals': {
+                     'aws:PrincipalOrgID': ['o-4pmkskbcf9']}}},
+            {'Actions': ['Deploy'],
+             'Principal': ['619193117841'],
+             'StatementId': 'b364d84f-62d2-411c-9787-3636b2b1975c',
+             'Effect': 'Allow'}
+        ]
+
+        checker = PolicyChecker({
+            'allowed_orgid': ['o-4pmkskbcf9']})
+
+        for statement, expected in zip(statements, [False, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({})
+        for statement, expected in zip(statements, [True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
 
     def test_s3_policies(self):
         policies = load_data("iam/s3-policies.json")

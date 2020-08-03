@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import itertools
 import operator
 import zlib
@@ -26,7 +16,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
@@ -432,12 +422,30 @@ class DhcpOptionsFilter(Filter):
 
 
 @Vpc.action_registry.register('post-finding')
-class VpcPostFinding(OtherResourcePostFinding):
+class VpcPostFinding(PostFinding):
+
+    resource_type = "AwsEc2Vpc"
 
     def format_resource(self, r):
-        fr = super(VpcPostFinding, self).format_resource(r)
-        fr['Type'] = 'AwsEc2Vpc'
-        return fr
+        envelope, payload = self.format_envelope(r)
+        # more inane sechub formatting deltas
+        detail = {
+            'DhcpOptionsId': r.get('DhcpOptionsId'),
+            'State': r['State']}
+
+        for assoc in r.get('CidrBlockAssociationSet', ()):
+            detail.setdefault('CidrBlockAssociationSet', []).append(dict(
+                AssociationId=assoc['AssociationId'],
+                CidrBlock=assoc['CidrBlock'],
+                CidrBlockState=assoc['CidrBlockState']['State']))
+
+        for assoc in r.get('Ipv6CidrBlockAssociationSet', ()):
+            detail.setdefault('Ipv6CidrBlockAssociationSet', []).append(dict(
+                AssociationId=assoc['AssociationId'],
+                Ipv6CidrBlock=assoc['Ipv6CidrBlock'],
+                CidrBlockState=assoc['Ipv6CidrBlockState']['State']))
+        payload.update(self.filter_empty(detail))
+        return envelope
 
 
 @resources.register('subnet')
@@ -1948,7 +1956,7 @@ class NetworkAddress(query.QueryResourceManager):
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
-        filter_name = 'AllocationId'
+        filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
 
@@ -2182,7 +2190,6 @@ class KeyPair(query.QueryResourceManager):
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         name = id = 'KeyName'
         filter_name = 'KeyNames'
-        taggable = False
 
 
 @KeyPair.filter_registry.register('unused')
