@@ -80,6 +80,7 @@ class PatchResource(PatchAction):
     Patches a resource
 
     .. code-block:: yaml
+
       policies:
         - name: scale-resource
           resource: k8s.deployment # k8s.{resource}
