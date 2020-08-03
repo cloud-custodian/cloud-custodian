@@ -2374,19 +2374,17 @@ class SecurityGroupTest(BaseTest):
                         "type": "ingress",
                         "Cidr": {
                             "value": ["10.0.0.0/16", "172.0.0.0/16"],
-                            "op": "in", "value_type": "cidr"
+                            "op": "not-in-list-item", "value_type": "cidr"
                         },
                     }
-                ],
+                ]
             },
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
-            ["CidrIp"], "172.0.0.0/32")
-        self.assertEqual(resources[1]["MatchedIpPermissions"][0]['IpRanges'][0]
-            ["CidrIp"], "10.0.0.0/32")
+            ["CidrIp"], "192.0.0.0/32")
 
         p = self.load_policy(
             {
@@ -2396,8 +2394,8 @@ class SecurityGroupTest(BaseTest):
                     {
                         "type": "ingress",
                         "Cidr": {
-                            "value": ["1.0.0.0/16", "172.0.0.0/16"],
-                            "op": "ni", "value_type": "cidr"
+                            "value": ["192.0.0.0/16", "172.0.0.0/16"],
+                            "op": "in-list-item", "value_type": "cidr"
                         },
                     }
                 ],
@@ -2405,9 +2403,11 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
-                ["CidrIp"], "10.0.0.0/32")
+                ["CidrIp"], "172.0.0.0/32")
+        self.assertEqual(resources[1]["MatchedIpPermissions"][0]['IpRanges'][0]
+                ["CidrIp"], "192.0.0.0/32")
 
     @functional
     def test_cidr_size_egress(self):

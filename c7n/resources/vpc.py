@@ -1118,29 +1118,16 @@ class SGPermission(Filter):
         else:
             match_range = {cidr_type: match_range}
 
-        match_ranges = [match_range]
-        if match_range.get("value") and isinstance(match_range["value"], list) \
-       and match_range["value_type"] == 'cidr':
+        vf = ValueFilter(match_range, self.manager)
+        vf.annotate = False
 
-            match_ranges = [{**match_range, 'value': v} for v in match_range["value"]]
-
-        findings = []
-        for mr in match_ranges:
-            vf = ValueFilter(mr, self.manager)
-            vf.annotate = False
-
-            for ip_range in ip_perms:
-                found = vf(ip_range)
-                if found:
-                    break
-                else:
-                    found = False
-            findings.append(found)
-
-        if match_range.get("op") == "ni":
-            return all(findings)
-
-        return any(findings)
+        for ip_range in ip_perms:
+            found = vf(ip_range)
+            if found:
+                break
+            else:
+                found = False
+        return found
 
     def process_cidrs(self, perm):
         found_v6 = found_v4 = None
