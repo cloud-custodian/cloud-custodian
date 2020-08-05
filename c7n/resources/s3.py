@@ -851,7 +851,11 @@ class HasStatementFilter(BucketFilterBase):
             for statement in statements:
                 found = 0
                 for key, value in required_statement.items():
-                    if key in statement and value == statement[key]:
+                    if value == "absent" and key not in statement:
+                        found += 1
+                    elif value == "present" and key in statement:
+                        found += 1
+                    elif key in statement and value == statement[key]:
                         found += 1
                 if found and found == len(required_statement):
                     required_statements.remove(required_statement)
