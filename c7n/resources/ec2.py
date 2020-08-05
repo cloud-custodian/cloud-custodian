@@ -1360,7 +1360,7 @@ class Stop(BaseAction):
     Note when using hiberate, instances not configured for hiberation
     will just be stopped.
     """
-    valid_origin_states = ('running',)
+    valid_origin_states = ('running', 'pending')
 
     schema = type_schema(
         'stop',
