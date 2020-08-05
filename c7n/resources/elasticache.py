@@ -515,6 +515,4 @@ class DeleteReplicationGroup(BaseAction):
             if self.data.get('snapshot', False):
                 params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
             self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
-                'ReplicationGroupNotFoundFault',
-                'InvalidParameterValueException', 'InvalidParameterCombinationException'
-                'SnapshotFeatureNotSupportedFault'))
+                'ReplicationGroupNotFoundFault',))
