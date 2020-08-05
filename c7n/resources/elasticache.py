@@ -481,7 +481,7 @@ class DeleteReplicationGroup(BaseAction):
 
             policies:
               - name: elasticache-delete-replication-group
-                resource: elasticache-group
+                resource: aws.elasticache-group
                 filters:
                   - type: value
                     key: AtRestEncryptionEnabled
