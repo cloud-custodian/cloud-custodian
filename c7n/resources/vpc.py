@@ -22,7 +22,7 @@ from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
-from c7n.filters.related import RelatedResourceFilter
+from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
@@ -32,7 +32,6 @@ from c7n.utils import (
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
-from c7n.filters.core import OPERATORS
 
 
 @resources.register('vpc')
@@ -2175,7 +2174,7 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 
 
 @Vpc.filter_registry.register("vpc-endpoint")
-class VPCEndpointFilter(RelatedResourceFilter):
+class VPCEndpointFilter(RelatedResourceByIdFilter):
     """Filters vpcs based on their vpc-endpoints
 
     :example:
@@ -2198,55 +2197,9 @@ class VPCEndpointFilter(RelatedResourceFilter):
         'vpc-endpoint',
         rinherit=ValueFilter.schema)
 
-    def get_related(self, resources):
-        resource_manager = self.get_resource_manager()
-        related_ids = self.get_related_ids(resources)
-
-        related = {}
-        for r in resource_manager.resources():
-            matched_vpc = set([r["VpcId"]]) & related_ids
-            if matched_vpc:
-                for vpc in matched_vpc:
-                    related_resources = related.get(vpc, [])
-                    related_resources.append(r)
-                    related[vpc] = related_resources
-        return related
-
-    def process_resource(self, resource, related):
-        related_ids = self.get_related_ids([resource])
-        op = self.data.get('operator', 'or')
-        found = []
-
-        if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
-
-        if self.data.get('value_type') == 'resource_count':
-            count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
-            if count_matches:
-                self._add_annotations(related_ids, resource)
-            return count_matches
-
-        for rid in related_ids:
-            robjs = related.get(rid, [None])
-            for robj in robjs:
-                if robj is None:
-                    continue
-                if self.match(robj):
-                    found.append(rid)
-
-        if found:
-            self._add_annotations(found, resource)
-
-        if op == 'or' and found:
-            return True
-        elif op == 'and' and len(found) == len(related_ids):
-            return True
-        return False
-
 
 @Subnet.filter_registry.register("vpc-endpoint")
-class SubnetEndpointFilter(RelatedResourceFilter):
+class SubnetEndpointFilter(RelatedResourceByIdFilter):
     """Filters subnets based on their vpc-endpoints
 
     :example:
@@ -2263,57 +2216,12 @@ class SubnetEndpointFilter(RelatedResourceFilter):
     """
     RelatedResource = "c7n.resources.vpc.VpcEndpoint"
     RelatedIdsExpression = "SubnetId"
+    RelatedResourceByIdExpression = "SubnetIds"
     AnnotationKey = "matched-vpc-endpoint"
 
     schema = type_schema(
         'vpc-endpoint',
         rinherit=ValueFilter.schema)
-
-    def get_related(self, resources):
-        resource_manager = self.get_resource_manager()
-        related_ids = self.get_related_ids(resources)
-
-        related = {}
-        for r in resource_manager.resources():
-            matched_subnets = set(r["SubnetIds"]) & related_ids
-            if matched_subnets:
-                for subnet in matched_subnets:
-                    related_resources = related.get(subnet, [])
-                    related_resources.append(r)
-                    related[subnet] = related_resources
-        return related
-
-    def process_resource(self, resource, related):
-        related_ids = self.get_related_ids([resource])
-        op = self.data.get('operator', 'or')
-        found = []
-
-        if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
-
-        if self.data.get('value_type') == 'resource_count':
-            count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
-            if count_matches:
-                self._add_annotations(related_ids, resource)
-            return count_matches
-
-        for rid in related_ids:
-            robjs = related.get(rid, [None])
-            for robj in robjs:
-                if robj is None:
-                    continue
-                if self.match(robj):
-                    found.append(rid)
-
-        if found:
-            self._add_annotations(found, resource)
-
-        if op == 'or' and found:
-            return True
-        elif op == 'and' and len(found) == len(related_ids):
-            return True
-        return False
 
 
 @resources.register('key-pair')
