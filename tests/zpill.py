@@ -355,7 +355,7 @@ class PillTest(CustodianTestCore):
             if not os.path.exists(test_dir):
                 raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         if not zdata:
             pill = placebo.attach(session, test_dir)
             # pill = BluePill()
