@@ -6,7 +6,7 @@
             {
                 "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/c7n-test-delete",
                 "VaultName": "c7n-test-delete",
-                "CreationDate": "2020-07-29T20:42:58.201Z",
+                "CreationDate": "2020-08-05T01:45:58.156Z",
                 "NumberOfArchives": 0,
                 "SizeInBytes": 0
             },

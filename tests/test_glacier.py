@@ -274,6 +274,6 @@ class GlacierVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client("glacier")
-        response = client.list_vaults()
-        self.assertEqual(response.get(
-            'VaultList')[0]['VaultName'], 'test-glacier-vault-non-empty-delete')
+        with self.assertRaises(ClientError) as e:
+            client.describe_vault(vaultName='c7n-test-delete')
+        self.assertEqual(e.exception.response['Error']['Code'], 'ResourceNotFoundException')
