@@ -33,17 +33,8 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian was originally developed at CapitalOne (by @kapilt et
-al). Since its inception, Cloud Custodian has grown beyond its original maintainers,
-and now Capital One represents
-one of many contributors to this project. Like many opensource
-projects, development is lead by a community of hundreds of
-contributors and several cloud providers have dedicated teams working
-on Custodian.
-
-"[Engineering the Next Generation of Cloud
-Governance](https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60)"
-by \@drewfirment
+Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+of contributors.
 
 Features
 --------
