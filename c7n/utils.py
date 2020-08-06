@@ -402,7 +402,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 def parse_cidr(value):
     """Process cidr ranges."""
     if isinstance(value, list):
-        return IPv4NetworkList([parse_cidr(item) for item in value])
+        return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
         klass = ipaddress.ip_address
@@ -441,14 +441,18 @@ class IPv4Network(ipaddress.IPv4Network):
             return self._is_subnet_of(other, self)
 
 
-class IPv4NetworkList:
+class IPv4List:
     def __init__(self, IPV4_list):
         self.IPV4_list = IPV4_list
 
     def __contains__(self, other):
         if other is None:
             return False
-        return any([other in y_elem for y_elem in self.IPV4_list])
+        in_networks = any([other in y_elem for y_elem in self.IPV4_list
+          if isinstance(y_elem, IPv4Network)])
+        in_addresses = any([other == y_elem for y_elem in self.IPV4_list
+          if isinstance(y_elem, ipaddress.IPv4Address)])
+        return any([in_networks, in_addresses])
 
 
 def reformat_schema(model):
