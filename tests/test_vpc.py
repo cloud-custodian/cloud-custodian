@@ -2374,7 +2374,7 @@ class SecurityGroupTest(BaseTest):
                         "type": "ingress",
                         "Cidr": {
                             "value": ["10.0.0.0/16", "172.0.0.0/16"],
-                            "op": "not-in-list-item", "value_type": "cidr"
+                            "op": "not-in-each", "value_type": "cidr"
                         },
                     }
                 ]
@@ -2395,7 +2395,7 @@ class SecurityGroupTest(BaseTest):
                         "type": "ingress",
                         "Cidr": {
                             "value": ["192.0.0.0/16", "172.0.0.0/16"],
-                            "op": "in-list-item", "value_type": "cidr"
+                            "op": "in-each", "value_type": "cidr"
                         },
                     }
                 ],
