@@ -955,17 +955,6 @@ class TestNotInList(unittest.TestCase):
         self.assertEqual(f(instance(Thing="Foo")), False)
 
 
-class ContainsValue:
-
-    def __init__(self, value):
-        self.value = value
-
-    def __contains__(self, other):
-        if other == self.value:
-            return True
-        return False
-
-
 class TestContains(unittest.TestCase):
 
     def test_contains(self):
