@@ -76,18 +76,6 @@ def operator_ni(x, y):
     return x not in y
 
 
-def not_in_each(x, y):
-    if not isinstance(y, list):
-        y = [y]
-    return all([x not in y_elem for y_elem in y])
-
-
-def in_each(x, y):
-    if not isinstance(y, list):
-        y = [y]
-    return any([x in y_elem for y_elem in y])
-
-
 def difference(x, y):
     return bool(set(x).difference(y))
 
@@ -115,8 +103,6 @@ OPERATORS = {
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
-    'not-in-each': not_in_each,
-    'in-each': in_each,
     'contains': operator.contains,
     'difference': difference,
     'intersect': intersect}

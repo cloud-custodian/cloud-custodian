@@ -966,37 +966,6 @@ class ContainsValue:
         return False
 
 
-class TestNotInEach(unittest.TestCase):
-
-    def test_ni_list_item(self):
-        f = filters.factory(
-            {
-                "type": "value",
-                "key": "Thing",
-                "value": [ContainsValue('this'), ContainsValue("also_this")],
-                "op": "not-in-each",
-            }
-        )
-        self.assertEqual(f(instance(Thing='not_this')), True)
-        self.assertEqual(f(instance(Thing='this')), False)
-
-
-class TestInEach(unittest.TestCase):
-
-    def test_ni_list_item(self):
-        f = filters.factory(
-            {
-                "type": "value",
-                "key": "Thing",
-                "value": [ContainsValue('this'), ContainsValue("also_this")],
-                "op": "in-each",
-            }
-        )
-        self.assertEqual(f(instance(Thing='this')), True)
-        self.assertEqual(f(instance(Thing='also_this')), True)
-        self.assertEqual(f(instance(Thing='not_this')), False)
-
-
 class TestContains(unittest.TestCase):
 
     def test_contains(self):
