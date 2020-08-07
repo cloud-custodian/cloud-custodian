@@ -52,7 +52,7 @@ class AccessAnalyzer(ValueFilter):
             client, analyzer_arn,
             [r for r in resources if self.analysis_annotation not in r])
         for r in resources:
-            findings = r[self.analysis_annotation]
+            findings = r.get(self.analysis_annotation, [])
             if not findings:
                 continue
             elif not len(self.data) > 1:
