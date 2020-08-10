@@ -442,15 +442,15 @@ class IPv4Network(ipaddress.IPv4Network):
 
 
 class IPv4List:
-    def __init__(self, IPV4_list):
-        self.IPV4_list = IPV4_list
+    def __init__(self, ipv4_list):
+        self.ipv4_list = ipv4_list
 
     def __contains__(self, other):
         if other is None:
             return False
-        in_networks = any([other in y_elem for y_elem in self.IPV4_list
+        in_networks = any([other in y_elem for y_elem in self.ipv4_list
           if isinstance(y_elem, IPv4Network)])
-        in_addresses = any([other == y_elem for y_elem in self.IPV4_list
+        in_addresses = any([other == y_elem for y_elem in self.ipv4_list
           if isinstance(y_elem, ipaddress.IPv4Address)])
         return any([in_networks, in_addresses])
 
