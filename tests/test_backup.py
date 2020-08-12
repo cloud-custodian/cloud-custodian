@@ -113,4 +113,5 @@ class BackupVaultTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('BackupVaultName'), 'test_backup_vault_policy_statement_filter')
+        self.assertEqual(resources[0].get(
+            'BackupVaultName'), 'test_backup_vault_policy_statement_filter')

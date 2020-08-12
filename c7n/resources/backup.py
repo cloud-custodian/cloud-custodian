@@ -106,7 +106,8 @@ class BackupVaultCrossAccount(CrossAccountAccessFilter):
         for r in resources:
             if self.policy_attribute not in r:
                 get_policy = self.manager.retry(client.get_backup_vault_access_policy,
-                    BackupVaultName=r['BackupVaultName'], ignore_err_codes=('ResourceNotFoundException',))
+                    BackupVaultName=r['BackupVaultName'], ignore_err_codes=(
+                        'ResourceNotFoundException',))
                 if get_policy:
                     policy = get_policy.get('Policy')
                 r[self.policy_attribute] = policy
