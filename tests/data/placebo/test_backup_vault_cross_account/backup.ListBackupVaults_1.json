@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BackupVaultList": [
+            {
+                "BackupVaultName": "Default",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 8,
+                    "minute": 59,
+                    "second": 50,
+                    "microsecond": 374000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "CreatorRequestId": "Default",
+                "NumberOfRecoveryPoints": 1
+            },
+            {
+                "BackupVaultName": "test_backup_vault_policy_statement_filter",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:test_backup_vault_policy_statement_filter",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 1,
+                    "microsecond": 491000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "NumberOfRecoveryPoints": 0
+            }
+        ]
+    }
+}

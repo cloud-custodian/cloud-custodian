@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session
@@ -79,3 +80,34 @@ class BackupVault(QueryResourceManager):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'EncryptionKeyArn'
+
+
+@BackupVault.filter_registry.register('cross-account')
+class BackupVaultCrossAccount(CrossAccountAccessFilter):
+    """Filter backup vault if it has cross account permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: backup-vault-cross-account
+          resource: aws.backup-vault
+          filters:
+            - type: cross-account
+
+    """
+    permissions = ('glue:GetResourcePolicy',)
+    policy_annotation = "c7n:Policy"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('backup')
+        policy = {}
+        for r in resources:
+            if self.policy_attribute not in r:
+                get_policy = self.manager.retry(client.get_backup_vault_access_policy,
+                    BackupVaultName=r['BackupVaultName'], ignore_err_codes=('ResourceNotFoundException',))
+                if get_policy:
+                    policy = get_policy.get('Policy')
+                r[self.policy_attribute] = policy
+        return super().process(resources, event)

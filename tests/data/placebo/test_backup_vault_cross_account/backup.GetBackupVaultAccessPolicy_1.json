@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BackupVaultName": "Default",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowBackupDeletion\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:role/c7n-pratyush-test\"},\"Action\":[\"backup:DeleteBackupVault\",\"backup:DeleteBackupVaultAccessPolicy\",\"backup:DeleteBackupVaultNotifications\"],\"Resource\":\"*\"}]}"
+    }
+}

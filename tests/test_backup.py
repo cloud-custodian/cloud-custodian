@@ -100,3 +100,17 @@ class BackupVaultTest(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/backup')
+
+    def test_backup_vault_cross_account(self):
+        factory = self.replay_flight_data("test_backup_vault_cross_account")
+        p = self.load_policy(
+            {
+                "name": "backup-vault-cross-account",
+                "resource": "backup-vault",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('BackupVaultName'), 'test_backup_vault_policy_statement_filter')
