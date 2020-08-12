@@ -97,7 +97,7 @@ class BackupVaultCrossAccount(CrossAccountAccessFilter):
             - type: cross-account
 
     """
-    permissions = ('glue:GetResourcePolicy',)
+    permissions = ('backup:GetBackupVaultAccessPolicy',)
     policy_annotation = "c7n:Policy"
 
     def process(self, resources, event=None):
