@@ -10,7 +10,7 @@
 - Todd Stansell (@tjstansell)
 - John Hillegass (@JohnHillegass)
 - Sonny Shi (@thisisshi)
-- David Filliatrault (@FireballDWF)
+- David Filiatrault (@FireballDWF)
 - Jamison Roberts (@jtroberts83)
 
 ## Gcp Provider Maintainers
