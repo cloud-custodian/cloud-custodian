@@ -347,11 +347,11 @@ class LambdaTest(BaseTest):
         )
 
     def test_lambda_edge(self):
-        factory = self.replay_flight_data("test_aws_lambda_version_edge_filter")
+        factory = self.replay_flight_data("test_aws_lambda_edge_filter")
         p = self.load_policy(
             {
-                "name": "lambda-version-edge-filter",
-                "resource": "lambda-version",
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
                 "filters": [{"type": "lambda-edge",
                             "state": True}],
             },
@@ -361,7 +361,7 @@ class LambdaTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             {r["FunctionArn"] for r in resources},
-            {"arn:aws:lambda:us-east-1:0123456789012:function:test-python:2"}
+            {"arn:aws:lambda:us-east-1:0123456789012:function:test-python"}
         )
 
     def test_sg_filter(self):

@@ -657,20 +657,7 @@ class LayerPostFinding(PostFinding):
         return envelope
 
 
-@resources.register('lambda-version')
-class LambdaVersion(query.ChildResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'lambda'
-        arn_type = 'function'
-        arn_separator = ":"
-        id = name = 'FunctionName'
-        parent_spec = ('lambda', 'FunctionName', None)
-        enum_spec = ('list_versions_by_function', 'Versions', None)
-        date = 'LastModified'
-
-
-@LambdaVersion.filter_registry.register('lambda-edge')
+@AWSLambda.filter_registry.register('lambda-edge')
 class LambdaVersionEdgeFilter(Filter):
     """
     Return lambda@edge versions'
@@ -680,8 +667,8 @@ class LambdaVersionEdgeFilter(Filter):
         .. code-block:: yaml
 
             policies:
-                - name: lambda-version-edge-filter
-                  resource: lambda-version
+                - name: lambda-edge-filter
+                  resource: lambda
                   filters:
                     - type: lambda-edge
                       state: True
@@ -699,7 +686,9 @@ class LambdaVersionEdgeFilter(Filter):
             distributions = self.manager.retry(client.list_distributions)
             for d in distributions['DistributionList']['Items']:
                 for function in d['DefaultCacheBehavior']['LambdaFunctionAssociations']['Items']:
-                    edge_arns.append(function['LambdaFunctionARN'])
+                    # Get rid of the version part of the lambda ARN
+                    lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
+                    edge_arns.append(lambda_edge_arn)
         except ClientError as e:
             self.log.exception(
                 "Exception trying to list distributions, error: %s", e)
