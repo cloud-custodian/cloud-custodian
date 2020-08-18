@@ -17,7 +17,7 @@
                     "second": 58,
                     "microsecond": 0
                 },
-                "CreatedBy": "arn:aws:sts::644160558196:assumed-role/MyDevRole/Bob",
+                "CreatedBy": "arn:aws:sts::123456789012:assumed-role/MyDevRole/Bob",
                 "DefaultVersion": true,
                 "LaunchTemplateData": {
                     "ImageId": "ami-02354e95b39ca8dec",

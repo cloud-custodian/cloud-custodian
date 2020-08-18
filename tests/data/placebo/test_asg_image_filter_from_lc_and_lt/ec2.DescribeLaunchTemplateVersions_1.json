@@ -3,8 +3,8 @@
     "data": {
         "LaunchTemplateVersions": [
             {
-                "LaunchTemplateId": "lt-1234567890abcdef1",
-                "LaunchTemplateName": "custodian-test-lt-1",
+                "LaunchTemplateId": "lt-234567890abcdef11",
+                "LaunchTemplateName": "custodian-test-lt-2",
                 "VersionNumber": 1,
                 "VersionDescription": "TestVersion1",
                 "CreateTime": {
@@ -12,31 +12,17 @@
                     "year": 2020,
                     "month": 8,
                     "day": 16,
-                    "hour": 20,
-                    "minute": 56,
-                    "second": 30,
+                    "hour": 21,
+                    "minute": 46,
+                    "second": 58,
                     "microsecond": 0
                 },
                 "CreatedBy": "arn:aws:sts::123456789012:assumed-role/MyDevRole/Bob",
                 "DefaultVersion": true,
                 "LaunchTemplateData": {
-                    "ImageId": "ami-05dd97e95ca0b2ca1",
-                    "InstanceType": "t3.small",
-                    "TagSpecifications": [
-                        {
-                            "ResourceType": "instance",
-                            "Tags": [
-                                {
-                                    "Key": "Application",
-                                    "Value": "CC Test LC"
-                                },
-                                {
-                                    "Key": "Name",
-                                    "Value": "cc-test-instance"
-                                }
-                            ]
-                        }
-                    ],
+                    "ImageId": "ami-02354e95b39ca8dec",
+                    "InstanceType": "t2.micro",
+                    "TagSpecifications": [],
                     "SecurityGroupIds": [
                         "sg-58b94e0b"
                     ]
