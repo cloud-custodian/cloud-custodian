@@ -15,11 +15,11 @@ from c7n.resources.aws import shape_validate
 class TestSqs:
 
     @functional
-    @terraform('aws_sqs', teardown=teardown.IGNORE)
-    def test_sqs_delete(self, test, aws_sqs):
+    @terraform('sqs_delete', teardown=teardown.IGNORE)
+    def test_sqs_delete(self, test, sqs_delete):
         session_factory = test.replay_flight_data("test_sqs_delete", region='us-east-2')
         client = session_factory().client("sqs")
-        queue_arn = aws_sqs["aws_sqs_queue.test_sqs.arn"]
+        queue_arn = sqs_delete["aws_sqs_queue.test_sqs.arn"]
 
         p = test.load_policy(
             {
@@ -45,13 +45,13 @@ class TestSqs:
             time.sleep(2)
 
     @functional
-    @terraform('aws_sqs_kms')
-    def test_sqs_set_encryption(self, test, aws_sqs_kms):
+    @terraform('sqs_set_encryption')
+    def test_sqs_set_encryption(self, test, sqs_set_encryption):
         session_factory = test.replay_flight_data("test_sqs_set_encryption", region='us-west-2')
 
-        key_id = aws_sqs_kms["aws_kms_key.test_key.key_id"]
-        queue_arn = aws_sqs_kms["aws_sqs_queue.test_sqs.arn"]
-        alias_name = aws_sqs_kms["aws_kms_alias.test_key_alias.name"]
+        key_id = sqs_set_encryption["aws_kms_key.test_key.key_id"]
+        queue_arn = sqs_set_encryption["aws_sqs_queue.test_sqs.arn"]
+        alias_name = sqs_set_encryption["aws_kms_alias.test_key_alias.name"]
 
         client = session_factory().client("sqs")
 
@@ -77,14 +77,14 @@ class TestSqs:
         test.assertEqual(check_master_key, key_id)
 
     @functional
-    @terraform('aws_sqs')
-    def test_sqs_remove_matched(self, test, aws_sqs):
+    @terraform('sqs_remove_matched')
+    def test_sqs_remove_matched(self, test, sqs_remove_matched):
         session_factory = test.replay_flight_data("test_sqs_remove_matched", region="us-east-2")
-        queue_arn = aws_sqs['aws_sqs_queue.test_sqs.arn']
+        queue_arn = sqs_remove_matched['aws_sqs_queue.test_sqs.arn']
         client = session_factory().client("sqs")
 
         if test.recording:
-            time.sleep(30)
+            time.sleep(45)
 
         p = test.load_policy(
             {
