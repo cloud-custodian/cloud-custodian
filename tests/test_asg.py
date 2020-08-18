@@ -216,7 +216,7 @@ class AutoScalingTest(BaseTest):
                     {
                         "type": "image",
                         "key": "Description",
-                        "value": ".*Ubuntu1804.*",
+                        "value": ".*CentOS7.*",
                         "op": "regex"
                     }
                 ],
@@ -236,7 +236,7 @@ class AutoScalingTest(BaseTest):
                     {
                         "type": "image",
                         "key": "Description",
-                        "value": ".*CentOS7.*",
+                        "value": ".*Ubuntu1804.*",
                         "op": "regex"
                     }
                 ],
@@ -244,7 +244,7 @@ class AutoScalingTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_asg_image_filter_from_lc_and_lt(self):
         factory = self.replay_flight_data("test_asg_image_filter_from_lc_and_lt")
@@ -264,7 +264,7 @@ class AutoScalingTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 2)
 
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
