@@ -107,8 +107,8 @@ class DirectoryRemoveTag(RemoveTag):
                 continue
 
 
-@Directory.filter_registry.register('marked-for-op', TagActionFilter)
-@Directory.action_registry.register('mark-for-op', TagDelayedAction)
+Directory.filter_registry.register('marked-for-op', TagActionFilter)
+Directory.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @resources.register('cloud-directory')
