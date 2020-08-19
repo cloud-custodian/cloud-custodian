@@ -1408,6 +1408,10 @@ class FilterPublicBlock(Filter):
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchBucket':
+                    time.sleep(10)
+                    config = s3.get_public_access_block(
+                        Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
                 if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
                     raise
             bucket[self.annotation_key] = config
