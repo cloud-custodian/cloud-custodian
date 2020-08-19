@@ -84,7 +84,7 @@ class TestSqs:
         client = session_factory().client("sqs")
 
         if test.recording:
-            time.sleep(45)
+            time.sleep(60)
 
         p = test.load_policy(
             {
