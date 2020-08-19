@@ -27,6 +27,7 @@ class CloudFormation(QueryResourceManager):
         name = 'StackName'
         date = 'CreationTime'
         cfn_type = config_type = 'AWS::CloudFormation::Stack'
+        universal_taggable = object()
 
 
 @CloudFormation.action_registry.register('delete')
