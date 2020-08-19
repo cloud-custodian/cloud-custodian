@@ -1412,7 +1412,7 @@ class FilterPublicBlock(Filter):
                     time.sleep(10)
                     config = s3.get_public_access_block(
                         Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                elif e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
                     raise
             bucket[self.annotation_key] = config
         return self.matches_filter(config)
