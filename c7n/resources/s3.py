@@ -1393,7 +1393,7 @@ class FilterPublicBlock(Filter):
 
     def process(self, buckets, event=None):
         results = []
-        with self.executor_factory(max_workers=2) as w:
+        with self.executor_factory(max_workers=1) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for f in as_completed(futures):
                 if f.result():
