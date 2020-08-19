@@ -8,7 +8,7 @@ from azure.mgmt.web.models import (
     ManagedServiceIdentity,
     ManagedServiceIdentityUserAssignedIdentitiesValue as UserAssignedIdentity)
 
-from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
+from c7n_azure.constants import (AUTH_TYPE_EMBED, FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.utils import azure_name_value_pair
 
@@ -26,7 +26,9 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
 
     def _get_identity(self, params):
         if 'identity' not in params:
-            return None
+            return
+        if params['identity']['type'] == AUTH_TYPE_EMBED:
+            return
         identity = ManagedServiceIdentity(type=params['identity']['type'])
         if 'id' in params['identity']:
             identity.user_assigned_identities = {

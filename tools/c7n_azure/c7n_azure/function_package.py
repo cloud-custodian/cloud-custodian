@@ -61,7 +61,7 @@ class FunctionPackage:
             self.log.warning('SSL Certificate Validation is disabled')
 
     def _add_functions_required_files(
-            self, policy_data, requirements, queue_name=None):
+            self, policy_data, requirements, queue_name=None, identity=None):
         s = local_session(Session)
 
         self.pkg.add_contents(dest='requirements.txt',
@@ -70,9 +70,11 @@ class FunctionPackage:
         for target_sub_id in self.target_sub_ids:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth if using embedded service principal
-            identity = jmespath.search(
-                'mode."provision-options".identity', policy_data) or {
-                    'type': AUTH_TYPE_EMBED}
+            identity = (identity
+                or jmespath.search(
+                    'mode."provision-options".identity', policy_data)
+                or {'type': AUTH_TYPE_EMBED})
+
             if identity['type'] == AUTH_TYPE_EMBED:
                 auth_contents = s.get_functions_auth_string(target_sub_id)
             elif identity['type'] == AUTH_TYPE_MSI:
@@ -143,14 +145,14 @@ class FunctionPackage:
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, requirements, queue_name=None):
+    def build(self, policy, modules, requirements, queue_name=None, identity=None):
         self.pkg = AzurePythonPackageArchive()
 
         self.pkg.add_modules(None,
                              [m.replace('-', '_') for m in modules])
 
         # add config and policy
-        self._add_functions_required_files(policy, requirements, queue_name)
+        self._add_functions_required_files(policy, requirements, queue_name, identity)
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):

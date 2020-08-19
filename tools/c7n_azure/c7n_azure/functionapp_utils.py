@@ -4,14 +4,14 @@
 import logging
 import re
 
+from c7n_azure.session import Session
+from c7n_azure.utils import ResourceIdParser, StringUtils
+from c7n.utils import local_session
+
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
-from c7n_azure.session import Session
-from c7n_azure.utils import ResourceIdParser, StringUtils
-
-from c7n.utils import local_session
 
 
 class FunctionAppUtilities:

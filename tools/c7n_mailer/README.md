@@ -565,6 +565,40 @@ function_properties:
     name: 'testmailer1'
 ```
 
+#### Configuring Function Identity
+
+You can configure the service principal used for api calls made by the
+mailer azure function by specifying an identity configuration under
+function properties. Mailer supports User Assigned Identities, System
+Managed Identities, defaulting to an embedding of the cli user's
+service principals credentials.
+
+When specifying a user assigned identity, unlike in a custodian
+function policy where simply providing an name is sufficient, the
+uuid/id and client id of the identity must be provided. You can
+retrieve this information on the cli using the `az identity list`.
+
+```yaml
+
+function_properties:
+  identity:
+    type: UserAssigned
+    id: "/subscriptions/333fd504-7f11-2270-88c8-7325a27f7222/resourcegroups/c7n/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mailer"
+    client_id: "b9cb06fa-dfb8-4342-add3-aab5acb2abbc"
+```
+
+A system managed identity can also be used, and the Azure platform will
+create an identity when the function is provisoned, however the function's identity
+then needs to be retrieved and mapped to rbac permissions post provisioning, this
+user management activity must be performed manually.
+
+```yaml
+
+function_properties:
+  identity:
+    type: SystemAssigned
+```
+
 ## Writing an email template
 
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).

@@ -6,11 +6,12 @@ import json
 import logging
 import os
 
-
+import jmespath
 from c7n_mailer.deploy import CORE_DEPS
 
 try:
     from c7n.mu import generate_requirements
+    from c7n_azure.constants import AUTH_TYPE_EMBED
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
     from c7n_azure.policy import AzureFunctionMode
@@ -49,9 +50,11 @@ def build_function_package(config, function_name, sub_id):
         target_sub_ids=[sub_id],
         cache_override_path=cache_override_path)
 
+    identity = jmespath.search('function_properties.identity', config)
     package.build(None,
                   modules=['c7n', 'c7n_azure', 'c7n_mailer'],
-                  requirements=get_mailer_requirements())
+                  requirements=get_mailer_requirements(),
+                  identity=identity)
 
     package.pkg.add_contents(
         function_path + '/function.json',
@@ -123,14 +126,15 @@ def provision(config):
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
-        function_app_resource_group_name=service_plan['resource_group_name'],
-        function_app_name=function_app_name)
+        function_app={'resource_group_name': service_plan['resource_group_name'],
+                      'identity': {'type': AUTH_TYPE_EMBED},
+                      'name': function_app_name})
 
     FunctionAppUtilities.deploy_function_app(params)
 
     log.info("Building function package for %s" % function_app_name)
     package = build_function_package(config, function_name, sub_id)
 
-    log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
+    log.info("Function package built, size is %0.2f MB" % (package.pkg.size / (1024 * 1024.0)))
 
     FunctionAppUtilities.publish_functions_package(params, package)
