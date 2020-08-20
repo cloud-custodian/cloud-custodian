@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "LMbJWOhEdTMbVrWIwPXS_KXyb044qbZEVFZv8s8rU2SRgeU",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "LMbJWOhEdTMbVrWIwPXS_KXyb044qbZEVFZv8s8rU2SRgeU",
+                "date": "Fri, 12 May 2017 01:10:36 GMT",
+                "content-length": "87",
+                "content-type": "application/json"
+            }
+        },
+        "Tags": {
+            "abc": "xyz",
+            "maid_status": "Resource does not meet policy: notify@2017/05/16"
+        }
+    }
+}

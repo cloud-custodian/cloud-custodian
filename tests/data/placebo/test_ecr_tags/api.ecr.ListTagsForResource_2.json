@@ -7,7 +7,7 @@
                 "Value": "Dev"
             },
             {
-                "Key": "maid_status",
+                "Key": "c7n_status",
                 "Value": "Resource does not meet policy: post-finding@2019/02/07"
             }
         ],

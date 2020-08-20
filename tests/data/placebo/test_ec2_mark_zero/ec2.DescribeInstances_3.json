@@ -123,7 +123,7 @@
                             }, 
                             {
                                 "Value": "Resource does not meet policy: terminate@2017/11/24", 
-                                "Key": "maid_status"
+                                "Key": "c7n_status"
                             }
                         ], 
                         "AmiLaunchIndex": 0

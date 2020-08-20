@@ -3149,6 +3149,30 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.get_bucket_tagging(Bucket=bname)
         tag_map = {t["Key"]: t["Value"] for t in tags.get("TagSet", {})}
+        self.assertTrue("c7n_status" in tag_map)
+        self.assertTrue("delete" in tag_map.get("c7n_status"))
+
+    def test_s3_mark_for_op_deprecated(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_tagging", "Tags", [], "TagSet")]
+        )
+        session_factory = self.replay_flight_data("test_s3_mark_for_op_deprecated")
+        session = session_factory()
+        client = session.client("s3")
+        bname = "custodian-mark-test"
+        p = self.load_policy(
+            {
+                "name": "s3-mark",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": [{"type": "mark-for-op", "days": 3, "op": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.get_bucket_tagging(Bucket=bname)
+        tag_map = {t["Key"]: t["Value"] for t in tags.get("TagSet", {})}
         self.assertTrue("maid_status" in tag_map)
         self.assertTrue("delete" in tag_map.get("maid_status"))
 
@@ -3158,6 +3182,32 @@ class S3Test(BaseTest):
         )
         self.patch(s3.RemoveTag, "executor_factory", MainThreadExecutor)
         session_factory = self.replay_flight_data("test_s3_remove_tag")
+        session = session_factory()
+        client = session.client("s3")
+        bname = "custodian-mark-test"
+        p = self.load_policy(
+            {
+                "name": "s3-unmark",
+                "resource": "s3",
+                "filters": [{"Name": bname}],
+                "actions": ["unmark"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.get_bucket_tagging(Bucket=bname)
+        tag_map = {t["Key"]: t["Value"] for t in tags.get("TagSet", {})}
+        self.assertTrue("c7n_status" not in tag_map)
+        old_tags = {t["Key"]: t["Value"] for t in resources[0]["Tags"]}
+        self.assertTrue("c7n_status" in old_tags)
+
+    def test_s3_remove_tag_deprecated(self):
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_tagging", "Tags", [], "TagSet")]
+        )
+        self.patch(s3.RemoveTag, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_s3_remove_tag_deprecated")
         session = session_factory()
         client = session.client("s3")
         bname = "custodian-mark-test"

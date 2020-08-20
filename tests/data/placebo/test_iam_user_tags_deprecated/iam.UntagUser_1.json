@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "a5b3d8f1-1f5c-11e9-9372-a1bb4211d6be",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a5b3d8f1-1f5c-11e9-9372-a1bb4211d6be",
+                "content-type": "text/xml",
+                "content-length": "198",
+                "date": "Wed, 23 Jan 2019 22:17:18 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

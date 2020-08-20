@@ -4,7 +4,7 @@
         "TaggedResources": [
             {
                 "Tag": {
-                    "Key": "maid_status",
+                    "Key": "c7n_status",
                     "Value": "Resource does not meet policy: delete@2019/11/26"
                 },
                 "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n-test-pratyush/c7n-test-snapshot",

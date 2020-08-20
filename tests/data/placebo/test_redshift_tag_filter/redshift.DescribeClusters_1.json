@@ -23,7 +23,7 @@
                     }, 
                     {
                         "Value": "Resource does not meet policy: delete@2016/10/30", 
-                        "Key": "maid_status"
+                        "Key": "c7n_status"
                     }
                 ], 
                 "AutomatedSnapshotRetentionPeriod": 1, 

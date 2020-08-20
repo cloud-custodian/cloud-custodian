@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "TaggedResources": [
+            {
+                "Tag": {
+                    "Key": "maid_status",
+                    "Value": "Resource does not meet policy: delete@2019/11/26"
+                },
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n-test-pratyush/c7n-test-snapshot",
+                "ResourceType": "snapshot"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "59d49880-f869-11e9-9da1-1b363167c356",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "59d49880-f869-11e9-9da1-1b363167c356",
+                "content-type": "text/xml",
+                "content-length": "651",
+                "date": "Sun, 27 Oct 2019 03:24:56 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

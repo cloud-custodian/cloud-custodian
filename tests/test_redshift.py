@@ -105,6 +105,24 @@ class TestRedshift(BaseTest):
             {
                 "name": "redshift-tag-filter",
                 "resource": "redshift",
+                "filters": [{"tag:c7n_status": "not-null"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["ClusterIdentifier"])
+        tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+        tag_map = {t["Tag"]["Key"] for t in tags}
+        self.assertTrue("c7n_status" in tag_map)
+
+    def test_redshift_simple_tag_filter_deprecated(self):
+        factory = self.replay_flight_data("test_redshift_tag_filter_deprecated")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-tag-filter",
+                "resource": "redshift",
                 "filters": [{"tag:maid_status": "not-null"}],
             },
             session_factory=factory,
@@ -136,9 +154,53 @@ class TestRedshift(BaseTest):
         arn = p.resource_manager.generate_arn(resources[0]["ClusterIdentifier"])
         tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
+        self.assertTrue("c7n_status" in tag_map)
+
+    def test_redshift_cluster_mark_deprecated(self):
+        factory = self.replay_flight_data("test_redshift_cluster_mark_deprecated")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-cluster-mark",
+                "resource": "redshift",
+                "filters": [
+                    {"type": "value", "key": "ClusterIdentifier", "value": "c7n"}
+                ],
+                "actions": [{"type": "mark-for-op", "days": 30, "op": "delete"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["ClusterIdentifier"])
+        tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+        tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertTrue("maid_status" in tag_map)
 
     def test_redshift_cluster_unmark(self):
+        factory = self.replay_flight_data("test_redshift_cluster_unmark")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-cluster-unmark",
+                "resource": "redshift",
+                "filters": [
+                    {"type": "value", "key": "ClusterIdentifier", "value": "c7n"}
+                ],
+                "actions": [{"type": "unmark"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["ClusterIdentifier"])
+        tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+        tag_map = {t["Tag"]["Key"] for t in tags}
+        self.assertFalse("c7n_status" in tag_map)
+
+    def test_redshift_cluster_unmark_deprecated(self):
         factory = self.replay_flight_data("test_redshift_cluster_unmark")
         client = factory().client("redshift")
         p = self.load_policy(
@@ -484,10 +546,62 @@ class TestRedshiftSnapshot(BaseTest):
         arn = p.resource_manager.get_arns(resources)
         tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
+        self.assertTrue("c7n_status" in tag_map)
+
+    def test_redshift_snapshot_mark_deprecated(self):
+        factory = self.replay_flight_data("test_redshift_snapshot_mark_deprecated")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-snapshot-mark",
+                "resource": "redshift-snapshot",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "SnapshotIdentifier",
+                        "value": "c7n-test-snapshot",
+                    }
+                ],
+                "actions": [{"type": "mark-for-op", "days": 30, "op": "delete"}],
+            },
+            session_factory=factory, config={'account_id': '644160558196'}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.get_arns(resources)
+        tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
+        tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertTrue("maid_status" in tag_map)
 
     def test_redshift_snapshot_unmark(self):
         factory = self.replay_flight_data("test_redshift_snapshot_unmark")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift-snapshot-unmark",
+                "resource": "redshift-snapshot",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "SnapshotIdentifier",
+                        "value": "c7n-test-snapshot",
+                    }
+                ],
+                "actions": [{"type": "unmark"}],
+            },
+            session_factory=factory, config={'account_id': '644160558196'}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.get_arns(resources)
+        tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
+        tag_map = {t["Tag"]["Key"] for t in tags}
+        self.assertFalse("c7n_status" in tag_map)
+
+    def test_redshift_snapshot_unmark_deprecated(self):
+        factory = self.replay_flight_data("test_redshift_snapshot_unmark_deprecated")
         client = factory().client("redshift")
         p = self.load_policy(
             {

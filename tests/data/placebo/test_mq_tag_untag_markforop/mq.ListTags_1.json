@@ -20,7 +20,7 @@
         },
         "Tags": {
             "Env": "Dev",
-            "maid_status": "Resource does not meet policy: delete@2019/01/31"
+            "c7n_status": "Resource does not meet policy: delete@2019/01/31"
         }
     }
 }

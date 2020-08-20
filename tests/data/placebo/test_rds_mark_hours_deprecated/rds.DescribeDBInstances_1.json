@@ -1,0 +1,112 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstances": [
+            {
+                "PubliclyAccessible": false, 
+                "MasterUsername": "admin", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "general-public-license", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-05d3a670a5842a0a8"
+                    }
+                ], 
+                "InstanceCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 42, 
+                    "microsecond": 180000, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 47
+                }, 
+                "CopyTagsToSnapshot": true, 
+                "OptionGroupMemberships": [
+                    {
+                        "Status": "in-sync", 
+                        "OptionGroupName": "default:mysql-5-6"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "Engine": "mysql", 
+                "MultiAZ": false, 
+                "DBSecurityGroups": [], 
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.mysql5.6", 
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ], 
+                "PerformanceInsightsEnabled": false, 
+                "AutoMinorVersionUpgrade": true, 
+                "PreferredBackupWindow": "08:32-09:02", 
+                "DBSubnetGroup": {
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-19bfcb7f", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-f5c054bd", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-4097a11b", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            }
+                        }
+                    ], 
+                    "DBSubnetGroupName": "default", 
+                    "VpcId": "vpc-172f0c71", 
+                    "DBSubnetGroupDescription": "default", 
+                    "SubnetGroupStatus": "Complete"
+                }, 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 20, 
+                "DBInstanceArn": "arn:aws:rds:us-east-1:123456789012:db:db1",
+                "BackupRetentionPeriod": 0, 
+                "PreferredMaintenanceWindow": "sun:09:32-sun:10:02", 
+                "Endpoint": {
+                    "HostedZoneId": "Z1PVIF0B656C1W", 
+                    "Port": 3306, 
+                    "Address": "db1.camx4omr69zr.us-east-1.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "EngineVersion": "5.6.39", 
+                "AvailabilityZone": "us-west-2c", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-IAMMMJGR7VZFVOVL5SHAYO4HKY", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "StorageEncrypted": false, 
+                "DBInstanceClass": "db.t2.micro", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "db1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "89df140b-dca5-49a4-8b5d-d3a0b28f0696", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "89df140b-dca5-49a4-8b5d-d3a0b28f0696", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4076", 
+                "content-type": "text/xml", 
+                "date": "Wed, 09 May 2018 16:20:17 GMT"
+            }
+        }
+    }
+}

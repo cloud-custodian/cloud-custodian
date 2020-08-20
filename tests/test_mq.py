@@ -95,4 +95,36 @@ class MessageQueue(BaseTest):
         self.assertEqual(
             tags,
             {'Env': 'Dev',
+             'c7n_status': 'Resource does not meet policy: delete@2019/01/31'})
+
+    def test_mq_tag_untag_markforop_deprecated(self):
+        factory = self.replay_flight_data("test_mq_tag_untag_markforop_deprecated")
+        p = self.load_policy(
+            {
+                "name": "mark-unused-mq-delete",
+                "resource": "message-broker",
+                'filters': [{'tag:Role': 'Dev'}],
+                "actions": [
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['Role']},
+                    {'type': 'mark-for-op',
+                     'op': 'delete',
+                     'days': 2}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = factory().client("mq")
+        if self.recording:
+            time.sleep(1)
+        tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            tags,
+            {'Env': 'Dev',
              'maid_status': 'Resource does not meet policy: delete@2019/01/31'})

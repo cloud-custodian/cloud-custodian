@@ -15,7 +15,7 @@
         "TagList": [
             {
                 "Value": "Resource does not meet policy: delete@2018/05/09 2120 UTC", 
-                "Key": "maid_status"
+                "Key": "c7n_status"
             }, 
             {
                 "Value": "other", 

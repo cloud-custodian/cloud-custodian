@@ -244,6 +244,40 @@ class RDSTest(BaseTest):
         resource = rds.list_tags_for_resource(
             ResourceName=resources[0]["DBInstanceArn"]
         )
+        tags = [t["Value"] for t in resource["TagList"] if t["Key"] == "c7n_status"]
+        result = datetime.datetime.strptime(
+            tags[0].strip().split("@", 1)[-1], "%Y/%m/%d %H%M %Z"
+        ).replace(
+            tzinfo=localtz
+        )
+        self.assertEqual(result, dt)
+
+    def test_rds_mark_hours_deprecated(self):
+        localtz = tzutil.gettz("Etc/UTC")
+        dt = datetime.datetime.now(localtz)
+        dt = dt.replace(
+            year=2018, month=5, day=9, hour=21, minute=20, second=0, microsecond=0
+        )
+        session_factory = self.replay_flight_data("test_rds_mark_hours_deprecated")
+        session = session_factory(region="us-east-1")
+        rds = session.client("rds")
+
+        policy = self.load_policy(
+            {
+                "name": "rds-mark-5-hours",
+                "resource": "rds",
+                "filters": [{"tag:CreatorName": "absent"}],
+                "actions": [{"type": "mark-for-op", "hours": 5, "op": "delete"}],
+            },
+            config={"account_id": "123456789012"},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        resource = rds.list_tags_for_resource(
+            ResourceName=resources[0]["DBInstanceArn"]
+        )
         tags = [t["Value"] for t in resource["TagList"] if t["Key"] == "maid_status"]
         result = datetime.datetime.strptime(
             tags[0].strip().split("@", 1)[-1], "%Y/%m/%d %H%M %Z"
@@ -1131,11 +1165,43 @@ class RDSSnapshotTest(BaseTest):
         arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertTrue("c7n_status" in tag_map)
+        self.assertTrue("delete@" in tag_map["c7n_status"])
+
+    def test_rds_snapshot_tag_filter_deprecated(self):
+        factory = self.replay_flight_data("test_rds_snapshot_tag_filter_deprecated")
+        client = factory().client("rds")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-tag-filter",
+                "resource": "rds-snapshot",
+                "filters": [{"type": "marked-for-op", "op": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
         self.assertTrue("maid_status" in tag_map)
         self.assertTrue("delete@" in tag_map["maid_status"])
 
     def test_rds_snapshot_age_filter(self):
         factory = self.replay_flight_data("test_rds_snapshot_age_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-age-filter",
+                "resource": "rds-snapshot",
+                "filters": [{"type": "age", "days": 7}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_snapshot_age_filter_deprecated(self):
+        factory = self.replay_flight_data("test_rds_snapshot_age_filter_deprecated")
         p = self.load_policy(
             {
                 "name": "rds-snapshot-age-filter",
@@ -1195,9 +1261,45 @@ class RDSSnapshotTest(BaseTest):
         arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertTrue("c7n_status" in tag_map)
+
+    def test_rds_snapshot_mark_deprecated(self):
+        factory = self.replay_flight_data("test_rds_snapshot_mark_deprecated")
+        client = factory().client("rds")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-mark",
+                "resource": "rds-snapshot",
+                "actions": [{"type": "mark-for-op", "op": "delete", "days": 1}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
         self.assertTrue("maid_status" in tag_map)
 
     def test_rds_snapshot_unmark(self):
+        factory = self.replay_flight_data("test_rds_snapshot_unmark")
+        client = factory().client("rds")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-unmark",
+                "resource": "rds-snapshot",
+                "actions": [{"type": "unmark"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertFalse("c7n_status" in tag_map)
+
+    def test_rds_snapshot_unmark_deprecated(self):
         factory = self.replay_flight_data("test_rds_snapshot_unmark")
         client = factory().client("rds")
         p = self.load_policy(

@@ -7,7 +7,7 @@
                 "Value": "test"
             },
             {
-                "Key": "maid_status",
+                "Key": "c7n_status",
                 "Value": "Resource does not meet policy: tag@2018/12/11"
             },
             {

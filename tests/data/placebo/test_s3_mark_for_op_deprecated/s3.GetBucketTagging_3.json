@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "D96D809048318E89",
+            "HostId": "tk6EXmmr+xqJ6mfgEOZrJCIKSky7leTJ0LDUVSpSti00DsPacxTmJXFRB5c1zxgtQcpF+q0T6w8=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "tk6EXmmr+xqJ6mfgEOZrJCIKSky7leTJ0LDUVSpSti00DsPacxTmJXFRB5c1zxgtQcpF+q0T6w8=",
+                "x-amz-request-id": "D96D809048318E89",
+                "date": "Wed, 28 Mar 2018 10:46:25 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "TagSet": [
+            {
+                "Key": "env",
+                "Value": "dev"
+            },
+            {
+                "Key": "maid_status",
+                "Value": "Resource does not meet policy: delete@2018/03/31"
+            }
+        ]
+    }
+}

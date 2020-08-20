@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-001", 
+                "Tags": [
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/07/24", 
+                        "Key": "maid_status"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-002", 
+                "Tags": [
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/07/24", 
+                        "Key": "maid_status"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-003", 
+                "Tags": [
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/07/24", 
+                        "Key": "maid_status"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bfe1c0cc-5884-11e7-992f-c7e25da019df", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bfe1c0cc-5884-11e7-992f-c7e25da019df", 
+                "date": "Sat, 24 Jun 2017 02:28:03 GMT", 
+                "content-length": "553", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

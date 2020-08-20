@@ -11,7 +11,7 @@
                 },
                 {
                     "Value": "Resource does not meet policy: notify@2017/05/15",
-                    "Key": "maid_status"
+                    "Key": "c7n_status"
                 }
             ]
         },

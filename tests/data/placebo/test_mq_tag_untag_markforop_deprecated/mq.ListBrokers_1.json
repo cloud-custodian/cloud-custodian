@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "c6bcbf26-23fc-11e9-af96-81bdf247f3fe",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "338",
+                "connection": "keep-alive",
+                "date": "Tue, 29 Jan 2019 19:33:38 GMT",
+                "x-amzn-requestid": "c6bcbf26-23fc-11e9-af96-81bdf247f3fe",
+                "x-amz-apigw-id": "UR-W4EwRoAMFcew=",
+                "cache-control": "no-cache; no-store, must-revalidate, private",
+                "expires": "0",
+                "x-amzn-trace-id": "Root=1-5c50aa92-b06541c09577a280e842a290;Sampled=1",
+                "pragma": "no-cache",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 f2c051917a765f1d1a1cd2ce1622adb9.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "JcPbMHAuQsP5ungsEFiYCPcmYBOcN5BYDOz-kcbdWKO0bviCigevug=="
+            },
+            "RetryAttempts": 0
+        },
+        "BrokerSummaries": [
+            {
+                "BrokerArn": "arn:aws:mq:us-east-1:644160558196:broker:dev:b-9f765c8d-6164-4f28-b0c9-556de5077776",
+                "BrokerId": "b-9f765c8d-6164-4f28-b0c9-556de5077776",
+                "BrokerName": "dev",
+                "BrokerState": "RUNNING",
+                "Created": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 34,
+                    "second": 46,
+                    "microsecond": 507000
+                },
+                "DeploymentMode": "SINGLE_INSTANCE",
+                "HostInstanceType": "mq.t2.micro"
+            }
+        ]
+    }
+}

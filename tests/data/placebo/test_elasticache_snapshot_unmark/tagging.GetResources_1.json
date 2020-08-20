@@ -8,7 +8,7 @@
                 "Tags": [
                     {
                         "Value": "Resource does not meet policy: delete@2017/07/24", 
-                        "Key": "maid_status"
+                        "Key": "c7n_status"
                     }, 
                     {
                         "Value": "1", 

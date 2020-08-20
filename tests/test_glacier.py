@@ -73,6 +73,26 @@ class GlacierTagTest(BaseTest):
 
         tags = client.list_tags_for_vault(vaultName=resources[0]["VaultName"])
         self.assertEqual(len(tags["Tags"]), 2)
+        self.assertTrue("c7n_status" in tags["Tags"])
+
+    def test_glacier_markop_deprecated(self):
+        session_factory = self.replay_flight_data("test_glacier_markop_deprecated")
+        client = session_factory().client("glacier")
+
+        p = self.load_policy(
+            {
+                "name": "glacier",
+                "resource": "glacier",
+                "filters": [{"tag:abc": "present"}],
+                "actions": [{"type": "mark-for-op", "op": "notify", "days": 4}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_vault(vaultName=resources[0]["VaultName"])
+        self.assertEqual(len(tags["Tags"]), 2)
         self.assertTrue("maid_status" in tags["Tags"])
 
 

@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "e14086a5-9a12-11e6-b7b8-6d6eced470f1",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e14086a5-9a12-11e6-b7b8-6d6eced470f1",
+                "date": "Mon, 24 Oct 2016 17:54:16 GMT",
+                "content-length": "394",
+                "content-type": "text/xml"
+            }
+        },
+        "TagList": [
+            {
+                "Value": "other",
+                "Key": "workload-type"
+            },
+            {
+                "Value": "test-value",
+                "Key": "test-key"
+            },
+            {
+                "Value": "Resource does not meet policy: delete@12/12/2012",
+                "Key": "maid_status"
+            }
+        ]
+    }
+}

@@ -20,7 +20,7 @@
                 "Value": "dev"
             },
             {
-                "Key": "maid_status",
+                "Key": "c7n_status",
                 "Value": "blarg"
             }
         ]

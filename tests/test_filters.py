@@ -694,6 +694,34 @@ class TestMarkedForAction(BaseFilterTest):
             return instance(
                 Tags=[
                     {
+                        "Key": "c7n_status",
+                        "Value": "not compliant: %s@%s"
+                        % (action, d.strftime("%Y/%m/%d")),
+                    }
+                ]
+            )
+
+        for inst, skew, expected in [
+            (i(next_week), 7, True),
+            (i(next_week), 3, False),
+            (i(now), 0, True),
+            (i(now), 5, True),
+            (i(yesterday), 5, True),
+            (i(now + timedelta(1)), 1, True),
+            (i(now + timedelta(2)), 1, False),
+            (i(now + timedelta(3)), 1, False),
+        ]:
+            self.assertFilter({"type": "marked-for-op", "skew": skew}, inst, expected)
+
+    def test_marked_for_op_with_skew_deprecated(self):
+        now = datetime.now()
+        yesterday = datetime.now() - timedelta(7)
+        next_week = now + timedelta(7)
+
+        def i(d, action="stop"):
+            return instance(
+                Tags=[
+                    {
                         "Key": "maid_status",
                         "Value": "not compliant: %s@%s"
                         % (action, d.strftime("%Y/%m/%d")),
@@ -714,6 +742,30 @@ class TestMarkedForAction(BaseFilterTest):
             self.assertFilter({"type": "marked-for-op", "skew": skew}, inst, expected)
 
     def test_filter_action_date(self):
+        now = datetime.now()
+        yesterday = now - timedelta(1)
+        tomorrow = now + timedelta(1)
+
+        def i(d, action="stop"):
+            return instance(
+                Tags=[
+                    {
+                        "Key": "c7n_status",
+                        "Value": "not compliant: %s@%s"
+                        % (action, d.strftime("%Y/%m/%d")),
+                    }
+                ]
+            )
+
+        for ii, v in [
+            (i(yesterday), True),
+            (i(now), True),
+            (i(tomorrow), False),
+            (i(yesterday, "terminate"), False),
+        ]:
+            self.assertFilter({"type": "marked-for-op"}, ii, v)
+
+    def test_filter_action_date_deprecated(self):
         now = datetime.now()
         yesterday = now - timedelta(1)
         tomorrow = now + timedelta(1)

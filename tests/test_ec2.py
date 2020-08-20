@@ -807,6 +807,55 @@ class TestTag(BaseTest):
         ][
             0
         ]
+        tags = [t["Value"] for t in resource["Tags"] if t["Key"] == "c7n_status"]
+        result = datetime.datetime.strptime(
+            tags[0].strip().split("@", 1)[-1], "%Y/%m/%d"
+        ).replace(
+            tzinfo=localtz
+        )
+        self.assertEqual(result.date(), dt.date())
+
+    def test_ec2_mark_zero_deprecated(self):
+        localtz = tz.gettz("America/New_York")
+        dt = datetime.datetime.now(localtz)
+        dt = dt.replace(year=2017, month=11, day=24, hour=7, minute=00)
+        session_factory = self.replay_flight_data("test_ec2_mark_zero_deprecated")
+        session = session_factory(region="us-east-1")
+        ec2 = session.client("ec2")
+        resource = ec2.describe_instances(InstanceIds=["i-04d3e0630bd342566"])[
+            "Reservations"
+        ][
+            0
+        ][
+            "Instances"
+        ][
+            0
+        ]
+        tags = [t["Value"] for t in resource["Tags"] if t["Key"] == "maid_status"]
+        self.assertEqual(len(tags), 0)
+
+        policy = self.load_policy(
+            {
+                "name": "ec2-mark-zero-days",
+                "resource": "ec2",
+                "filters": [{"tag:CreatorName": "joshuaroot"}],
+                "actions": [{"type": "mark-for-op", "days": 0, "op": "terminate"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["InstanceId"], "i-04d3e0630bd342566")
+
+        resource = ec2.describe_instances(InstanceIds=["i-04d3e0630bd342566"])[
+            "Reservations"
+        ][
+            0
+        ][
+            "Instances"
+        ][
+            0
+        ]
         tags = [t["Value"] for t in resource["Tags"] if t["Key"] == "maid_status"]
         result = datetime.datetime.strptime(
             tags[0].strip().split("@", 1)[-1], "%Y/%m/%d"

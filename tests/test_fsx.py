@@ -52,7 +52,65 @@ class TestFSx(BaseTest):
 
         self.assertTrue([t for t in tags['Tags'] if t['Key'] == 'test'])
 
+    def test_fsx_tag_resource_deprecated(self):
+        session_factory = self.replay_flight_data('test_fsx_tag_resource_deprecated')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'tag:Name': 'test'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'tag',
+                        'key': 'test',
+                        'value': 'test-value'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources))
+        client = session_factory().client('fsx')
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]['ResourceARN'])
+
+        self.assertTrue([t for t in tags['Tags'] if t['Key'] == 'test'])
+
     def test_fsx_remove_tag_resource(self):
+        session_factory = self.replay_flight_data('test_fsx_remove_tag_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'tag:Name': 'test'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'remove-tag',
+                        'tags': [
+                            'c7n_status',
+                            'test'
+                        ],
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources))
+        client = session_factory().client('fsx')
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]['ResourceARN'])
+
+        self.assertFalse([t for t in tags['Tags'] if t['Key'] != 'Name'])
+
+    def test_fsx_remove_tag_resource_deprecated(self):
         session_factory = self.replay_flight_data('test_fsx_remove_tag_resource')
         p = self.load_policy(
             {
@@ -84,6 +142,33 @@ class TestFSx(BaseTest):
 
     def test_fsx_mark_for_op_resource(self):
         session_factory = self.replay_flight_data('test_fsx_mark_for_op_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'tag:Name': 'test'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'mark-for-op',
+                        'op': 'tag'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources))
+        client = session_factory().client('fsx')
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]['ResourceARN'])
+
+        self.assertTrue([t for t in tags['Tags'] if t['Key'] == 'c7n_status'])
+
+    def test_fsx_mark_for_op_resource_deprecated(self):
+        session_factory = self.replay_flight_data('test_fsx_mark_for_op_resource_deprecated')
         p = self.load_policy(
             {
                 'name': 'test-fsx',
@@ -474,6 +559,42 @@ class TestFSxBackup(BaseTest):
 
     def test_fsx_backup_mark_for_op(self):
         session_factory = self.replay_flight_data('test_fsx_backup_mark_for_op')
+        backup_id = 'backup-09d3dfca849cfc629'
+        p = self.load_policy(
+            {
+                'name': 'fsx-backup-resource-mark-for-op',
+                'resource': 'fsx-backup',
+                'filters': [
+                    {'BackupId': backup_id},
+                    {'Tags': []}
+                ],
+                'actions': [
+                    {'type': 'mark-for-op', 'op': 'delete'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+
+        client = session_factory().client('fsx')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ['fs-002ccbccdcf032728']
+                }
+            ]
+        )['Backups']
+        tags = None
+        for b in backups:
+            if b['BackupId'] == backup_id:
+                self.assertTrue(len(b['Tags']), 1)
+                tags = [t for t in b['Tags'] if t['Key'] == 'c7n_status']
+        self.assertTrue(tags)
+
+    def test_fsx_backup_mark_for_op_deprecated(self):
+        session_factory = self.replay_flight_data('test_fsx_backup_mark_for_op_deprecated')
         backup_id = 'backup-09d3dfca849cfc629'
         p = self.load_policy(
             {

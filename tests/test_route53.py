@@ -101,6 +101,27 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
+    def test_route53_hostedzone_markop_deprecated(self):
+        session_factory = self.replay_flight_data("test_route53_hostedzone_markop_deprecated")
+
+        p = self.load_policy(
+            {
+                "name": "hostedzone-markop-records",
+                "resource": "hostedzone",
+                "filters": [{"tag:abc": "present"}],
+                "actions": [{"type": "mark-for-op", "op": "notify", "days": 4}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("route53")
+        _id = resources[0]["Id"].split("/")[-1]
+        tags = client.list_tags_for_resource(ResourceType="hostedzone", ResourceId=_id)
+        self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
+        self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
+
 
 class Route53HealthCheckTest(BaseTest):
 
@@ -157,6 +178,27 @@ class Route53HealthCheckTest(BaseTest):
 
     def test_route53_healthcheck_markop(self):
         session_factory = self.replay_flight_data("test_route53_healthcheck_markop")
+
+        p = self.load_policy(
+            {
+                "name": "healthcheck-markop-records",
+                "resource": "healthcheck",
+                "filters": [{"tag:abc": "present"}],
+                "actions": [{"type": "mark-for-op", "op": "notify", "days": 4}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("route53")
+        _id = resources[0]["Id"].split("/")[-1]
+        tags = client.list_tags_for_resource(ResourceType="healthcheck", ResourceId=_id)
+        self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 3)
+        self.assertTrue("c7n_status" in tags["ResourceTagSet"]["Tags"][1].values())
+
+    def test_route53_healthcheck_markop_deprecated(self):
+        session_factory = self.replay_flight_data("test_route53_healthcheck_markop_deprecated")
 
         p = self.load_policy(
             {

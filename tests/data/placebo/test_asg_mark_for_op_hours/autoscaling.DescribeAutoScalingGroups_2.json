@@ -36,7 +36,7 @@
           {
             "ResourceId": "marked",
             "ResourceType": "auto-scaling-group",
-            "Key": "maid_status",
+            "Key": "c7n_status",
             "Value": "AutoScaleGroup does not meet org policy: delete@2018/02/20 1242 UTC",
             "PropagateAtLaunch": true
           }

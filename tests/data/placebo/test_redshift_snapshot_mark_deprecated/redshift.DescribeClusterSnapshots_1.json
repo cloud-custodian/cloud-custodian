@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "SnapshotIdentifier": "c7n-test-snapshot",
+                "ClusterIdentifier": "c7n-test-pratyush",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 46,
+                    "microsecond": 873000
+                },
+                "Status": "available",
+                "Port": 5439,
+                "AvailabilityZone": "us-east-1e",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 16,
+                    "second": 33,
+                    "microsecond": 196000
+                },
+                "MasterUsername": "awsuser",
+                "ClusterVersion": "1.0",
+                "SnapshotType": "manual",
+                "NodeType": "dc2.large",
+                "NumberOfNodes": 1,
+                "DBName": "dev",
+                "VpcId": "vpc-d2d616b5",
+                "Encrypted": false,
+                "EncryptedWithHSM": false,
+                "OwnerAccount": "644160558196",
+                "TotalBackupSizeInMegaBytes": 22.0,
+                "ActualIncrementalBackupSizeInMegaBytes": 13.0,
+                "BackupProgressInMegaBytes": 13.0,
+                "CurrentBackupRateInMegaBytesPerSecond": 12.4402,
+                "EstimatedSecondsToCompletion": 0,
+                "ElapsedTimeInSeconds": 1,
+                "Tags": [],
+                "RestorableNodeTypes": [
+                    "dc2.large"
+                ],
+                "EnhancedVpcRouting": false,
+                "MaintenanceTrackName": "current",
+                "ManualSnapshotRetentionPeriod": 2,
+                "ManualSnapshotRemainingDays": 1,
+                "SnapshotRetentionStartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 47,
+                    "microsecond": 918000
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "592f578f-f869-11e9-9da1-1b363167c356",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "592f578f-f869-11e9-9da1-1b363167c356",
+                "content-type": "text/xml",
+                "content-length": "2106",
+                "vary": "Accept-Encoding",
+                "date": "Sun, 27 Oct 2019 03:24:55 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

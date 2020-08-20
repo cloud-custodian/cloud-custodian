@@ -21,7 +21,7 @@
                 "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-09d3dfca849cfc629",
                 "Tags": [
                     {
-                        "Key": "maid_status",
+                        "Key": "c7n_status",
                         "Value": "Resource does not meet policy: delete@2018/12/14"
                     }
                 ],

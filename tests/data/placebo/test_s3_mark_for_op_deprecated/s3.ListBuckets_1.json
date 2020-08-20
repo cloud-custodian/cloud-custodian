@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "C3A5A5A24FEE2CCE",
+            "HostId": "R09knsyAde8Au57Ie9R4r9e3uvWvKxA2ljPNcIhUR23DtdkqEEQtK873xwOmlBLV1hXFXKVhq7g=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "R09knsyAde8Au57Ie9R4r9e3uvWvKxA2ljPNcIhUR23DtdkqEEQtK873xwOmlBLV1hXFXKVhq7g=",
+                "x-amz-request-id": "C3A5A5A24FEE2CCE",
+                "date": "Wed, 28 Mar 2018 10:46:23 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Buckets": [
+            {
+                "Name": "custodian-mark-test",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 3,
+                    "day": 28,
+                    "hour": 10,
+                    "minute": 41,
+                    "second": 27,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}
