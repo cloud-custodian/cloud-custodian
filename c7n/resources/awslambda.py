@@ -660,7 +660,7 @@ class LayerPostFinding(PostFinding):
 @AWSLambda.filter_registry.register('lambda-edge')
 class LambdaVersionEdgeFilter(Filter):
     """
-    Return lambda@edge versions'
+    Filter for lambda@edge functions
 
     :example:
 
