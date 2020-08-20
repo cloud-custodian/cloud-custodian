@@ -9,7 +9,7 @@ untag policy if the resource has become compliant in the mean time.
 You can use this principle to implement garbage collection on resources. In this
 example, Custodian will first mark all unattached EBS volumes for deletion. The
 next policy will then unmark any volume that has been attached and has the
-``maid_status`` tag, indicating that it had been previously marked. Finally, the
+``c7n_status`` tag, indicating that it had been previously marked. Finally, the
 third policy will filter in any resources that have been marked and run the
 ``delete`` action.
 
@@ -33,7 +33,7 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
          appear to be just garbage creation.
        filters:
          - Attachments: []
-         - "tag:maid_status": absent
+         - "tag:c7n_status": absent
        actions:
          - type: mark-for-op
            op: delete
@@ -48,7 +48,7 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
          - type: value
            key: "Attachments[0].Device"
            value: not-null
-         - "tag:maid_status": not-null
+         - "tag:c7n_status": not-null
        actions:
          - unmark
    

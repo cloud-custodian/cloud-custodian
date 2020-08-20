@@ -27,7 +27,8 @@ from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
-DEFAULT_TAG = "maid_status"
+DEFAULT_TAG = "c7n_status"
+OLD_DEFAULT_TAG = "maid_status"
 
 
 def register_ec2_tags(filters, actions):
@@ -233,7 +234,7 @@ class TagActionFilter(Filter):
     date for an action.
 
     The filter parses the tag values looking for an 'op@date'
-    string. The date is parsed and compared to do today's date, the
+    string. The date is parsed and compared to today's date, the
     filter succeeds if today's date is gte to the target date.
 
     The optional 'skew' parameter provides for incrementing today's
@@ -289,17 +290,18 @@ class TagActionFilter(Filter):
         return self
 
     def __call__(self, i):
-        tag = self.data.get('tag', DEFAULT_TAG)
+        tags = [self.data.get('tag', DEFAULT_TAG), self.data.get('tag', OLD_DEFAULT_TAG)]
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
         tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
-        for n in i.get('Tags', ()):
-            if n['Key'] == tag:
-                v = n['Value']
-                break
+        for tag in tags:
+            for n in i.get('Tags', ()):
+                if n['Key'] == tag:
+                    v = n['Value']
+                    break
 
         if v is None:
             return False
@@ -392,7 +394,7 @@ class Tag(Action):
         msg = self.data.get('msg')
         msg = self.data.get('value') or msg
 
-        tag = self.data.get('tag', DEFAULT_TAG)
+        tag = self.data.get('tag', DEFAULT_TAG) or self.data.get('tag', OLD_DEFAULT_TAG)
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
@@ -452,7 +454,7 @@ class RemoveTag(Action):
     def process(self, resources):
         self.id_key = self.manager.get_model().id
 
-        tags = self.data.get('tags', [DEFAULT_TAG])
+        tags = self.data.get('tags', [DEFAULT_TAG, OLD_DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
 
         client = self.get_client()
@@ -641,7 +643,7 @@ class TagDelayedAction(Action):
     def get_config_values(self):
         d = {
             'op': self.data.get('op', 'stop'),
-            'tag': self.data.get('tag', DEFAULT_TAG),
+            'tag': self.data.get('tag', DEFAULT_TAG) or self.data.get('tag', OLD_DEFAULT_TAG),
             'msg': self.data.get('msg', self.default_template),
             'tz': self.data.get('tz', 'utc'),
             'days': self.data.get('days', 0),
@@ -826,7 +828,7 @@ class UniversalTag(Tag):
         msg = self.data.get('msg')
         msg = self.data.get('value') or msg
 
-        tag = self.data.get('tag', DEFAULT_TAG)
+        tag = self.data.get('tag', DEFAULT_TAG) or self.data.get('tag', OLD_DEFAULT_TAG)
         tag = self.data.get('key') or tag
 
         # Support setting multiple tags in a single go with a mapping
@@ -906,7 +908,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
         msg_tmpl = self.data.get('msg', self.default_template)
 
         op = self.data.get('op', 'stop')
-        tag = self.data.get('tag', DEFAULT_TAG)
+        tag = self.data.get('tag', DEFAULT_TAG) or self.data.get('tag', OLD_DEFAULT_TAG)
         days = self.data.get('days', 0)
         hours = self.data.get('hours', 0)
         action_date = self.generate_timestamp(days, hours)

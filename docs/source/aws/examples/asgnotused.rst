@@ -35,7 +35,7 @@ If value won't change cloudCustodian will send an alert with ASGs.
         key: DesiredCapacity
         op: greater-than
         value: 0
-      - "tag:maid_status": not-null
+      - "tag:c7n_status": not-null
     actions:
       - unmark
   - name: asg-slack-alert
@@ -43,7 +43,7 @@ If value won't change cloudCustodian will send an alert with ASGs.
     comments: |
       Alert for ASG which have MinSize < 0 and DesiredCapacity < 0
     filters:
-      - "tag:maid_status": not-null
+      - "tag:c7n_status": not-null
       - type: marked-for-op
         op: notify
     actions:

@@ -20,7 +20,8 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.securityhub import PostFinding
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
+from c7n.tags import (
+    TagActionFilter, DEFAULT_TAG, OLD_DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction)
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, select_keys)
 
@@ -1043,7 +1044,7 @@ class RemoveTag(Action):
         error = False
         tags = self.data.get('tags', [])
         if not tags:
-            tags = [self.data.get('key', DEFAULT_TAG)]
+            tags = [self.data.get('key', DEFAULT_TAG), self.data.get('key', OLD_DEFAULT_TAG)]
         client = local_session(self.manager.session_factory).client('autoscaling')
 
         with self.executor_factory(max_workers=2) as w:
@@ -1059,7 +1060,8 @@ class RemoveTag(Action):
                         "Exception untagging asg:%s tag:%s error:%s" % (
                             ", ".join([a['AutoScalingGroupName']
                                        for a in asg_set]),
-                            self.data.get('key', DEFAULT_TAG),
+                            self.data.get('key', DEFAULT_TAG)
+                            or self.data.get('key', OLD_DEFAULT_TAG),
                             f.exception()))
         if error:
             raise error
@@ -1115,7 +1117,8 @@ class Tag(Action):
 
     def get_tag_set(self):
         tags = []
-        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
+        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG)
+        or self.data.get('tag', OLD_DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
@@ -1418,7 +1421,8 @@ class MarkForOp(TagDelayedAction):
     def get_config_values(self):
         d = {
             'op': self.data.get('op', 'stop'),
-            'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)),
+            'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)
+            or self.data.get('tag', OLD_DEFAULT_TAG)),
             'msg': self.data.get('message', self.data.get('msg', self.default_template)),
             'tz': self.data.get('tz', 'utc'),
             'days': self.data.get('days', 0),

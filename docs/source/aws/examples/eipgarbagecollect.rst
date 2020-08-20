@@ -9,7 +9,7 @@ untag policy if the resource has become compliant in the mean time.
 You can use this principle to implement garbage collection on resources. In this
 example, Custodian will first mark all unattached Elastic IPs for removal. The
 next policy will then unmark any EIP that has been attached and has the
-``maid_status`` tag, indicating that it had been previously marked. Finally, the
+``c7n_status`` tag, indicating that it had been previously marked. Finally, the
 third policy will filter in any resources that have been marked and run the
 ``release`` action.
 

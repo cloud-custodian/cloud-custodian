@@ -23,11 +23,11 @@ and configured.
         Mark any ELB with no instances attached for deletion in 14 days.
         Also send an email to the ELB resource owner informing them its unused.
       filters:
-        - "tag:maid_status": absent
+        - "tag:c7n_status": absent
         - Instances: []
       actions:
         - type: mark-for-op
-          tag: maid_status
+          tag: c7n_status
           op: delete
           days: 14
         - type: notify
@@ -50,15 +50,15 @@ and configured.
     - name: elb-unmark-if-in-use
       resource: elb
       description: |
-        Remove the maid_status tag from any elb which has instances attached
+        Remove the c7n_status tag from any elb which has instances attached
         so it doesn't get deleted by the following policy
       filters:
-        - "tag:maid_status": not-null
+        - "tag:c7n_status": not-null
         - not:
           - Instances: []
       actions:
         - type: remove-tag
-          tags: [maid_status]
+          tags: [c7n_status]
 
     - name: elb-delete-unused
       resource: elb
