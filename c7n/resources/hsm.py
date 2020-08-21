@@ -46,7 +46,7 @@ class DeleteHSMCluster(BaseAction):
     permissions = ('cloudhsm:DeleteCluster',)
 
     def process(self, resources):
-        resources = self.filter_resources(crawlers, 'State', self.valid_origin_states)
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('cloudhsmv2')
         for r in resources:
             self.manager.retry(client.delete_cluster, ClusterId=r['ClusterId'], ignore_err_codes=(
