@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import (RemoveTag, Tag, universal_augment)
+from c7n.tags import universal_augment
 import c7n.filters.vpc as net_filters
 from c7n.actions import BaseAction
 from c7n.utils import local_session, type_schema
@@ -49,7 +49,7 @@ class DeleteHSMCluster(BaseAction):
         client = local_session(self.manager.session_factory).client('cloudhsmv2')
         for r in resources:
             self.manager.retry(client.delete_cluster, ClusterId=r['ClusterId'], ignore_err_codes=(
-              'CloudHsmResourceNotFoundException',))
+                'CloudHsmResourceNotFoundException',))
 
 
 @resources.register('hsm')
