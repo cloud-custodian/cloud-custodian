@@ -61,14 +61,15 @@ def renderLambda(p):
         'Type': 'AWS::Serverless::Function',
         'Properties': properties}
 
-def renderConfigRule(p):
 
+def renderConfigRule(p):
     policy_lambda = mu.PolicyLambda(p)
     sts = boto3.client("sts")
-
     account_id = sts.get_caller_identity()["Arn"].split(":")[4]
     region = boto3.session.Session().region_name
-    policy_lambda.arn = "arn:aws:lambda:" + str(region) + ":"+account_id + ":function:" + policy_lambda.name
+    policy_lambda.arn = "arn:aws:lambda:" + str(region) \
+                        + ":" + account_id + ":function:" \
+                        + policy_lambda.name
     config_rule = policy_lambda.get_events(Session)
     attributes = {}
 
@@ -80,21 +81,22 @@ def renderConfigRule(p):
         properties.pop('Scope', None)
 
     attributes['Type'] = 'AWS::Config::ConfigRule'
-    attributes['DependsOn'] = resource_name(p.name)+"Invoke"
+    attributes['DependsOn'] = resource_name(p.name) + "Invoke"
     attributes['Properties'] = properties
     return attributes
 
-def renderInvoke(name):
 
+def renderInvoke(name):
     return {
-        "DependsOn": name+"Lambda",
+        "DependsOn": name + "Lambda",
         "Type": "AWS::Lambda::Permission",
         "Properties": {
             "Action": "lambda:InvokeFunction",
-            "FunctionName": {"Ref": name+"Lambda"},
+            "FunctionName": {"Ref": name + "Lambda"},
             "Principal": "config.amazonaws.com"
         }
     }
+
 
 def resource_name(policy_name):
     parts = policy_name.replace('_', '-').split('-')
