@@ -34,7 +34,7 @@ from boto3.session import Session
 import boto3
 
 
-def renderLambda(p):
+def render_lambda(p):
     policy_lambda = mu.PolicyLambda(p)
     properties = policy_lambda.get_config()
 
@@ -62,31 +62,25 @@ def renderLambda(p):
         'Properties': properties}
 
 
-def renderConfigRule(p):
+def render_config_rule(p):
     policy_lambda = mu.PolicyLambda(p)
-    sts = boto3.client("sts")
-    account_id = sts.get_caller_identity()["Arn"].split(":")[4]
-    region = boto3.session.Session().region_name
-    policy_lambda.arn = "arn:aws:lambda:" + str(region) \
-                        + ":" + account_id + ":function:" \
-                        + policy_lambda.name
+    policy_lambda.arn = get_lambda_arn(policy_lambda.name)
     config_rule = policy_lambda.get_events(Session)
-    attributes = {}
 
     properties = config_rule[0].get_rule_params(policy_lambda)
 
     exec_mode_type = p.data.get('mode', {'type': 'pull'}).get('type')
-
     if exec_mode_type == 'config-poll-rule':
         properties.pop('Scope', None)
 
+    attributes = {}
     attributes['Type'] = 'AWS::Config::ConfigRule'
     attributes['DependsOn'] = resource_name(p.name) + "Invoke"
     attributes['Properties'] = properties
     return attributes
 
 
-def renderInvoke(name):
+def render_invoke(name):
     return {
         "DependsOn": name + "Lambda",
         "Type": "AWS::Lambda::Permission",
@@ -96,6 +90,16 @@ def renderInvoke(name):
             "Principal": "config.amazonaws.com"
         }
     }
+
+
+def get_lambda_arn(function_name):
+    sts = boto3.client("sts")
+    account_id = sts.get_caller_identity()["Arn"].split(":")[4]
+    region = boto3.session.Session().region_name
+    arn = "arn:aws:lambda:" + str(region) \
+          + ":" + account_id + ":function:" \
+          + function_name
+    return arn
 
 
 def resource_name(policy_name):
@@ -144,9 +148,9 @@ def main():
         if exec_mode_type == 'pull':
             continue
 
-        sam_func = renderLambda(p)
-        configrule_resource = renderConfigRule(p)
-        invoke_resource = renderInvoke(resource_name(p.name))
+        sam_func = render_lambda(p)
+        configrule_resource = render_config_rule(p)
+        invoke_resource = render_invoke(resource_name(p.name))
         if sam_func:
             sam['Resources'][resource_name(p.name) + "Lambda"] = sam_func
             sam['Resources'][resource_name(p.name) + "Invoke"] = invoke_resource
