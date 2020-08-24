@@ -24,9 +24,7 @@ $ aws cloudformation deploy cfn.yml
 
 """
 import argparse
-import json
 import os
-import string
 import yaml
 
 from c7n.config import Config
@@ -64,11 +62,13 @@ def renderLambda(p):
         'Properties': properties}
 
 def renderConfigRule(p):
+
     policy_lambda = mu.PolicyLambda(p)
     sts = boto3.client("sts")
+
     account_id = sts.get_caller_identity()["Arn"].split(":")[4]
     region = boto3.session.Session().region_name
-    policy_lambda.arn = "arn:aws:lambda:"+str(region)+":"+account_id+":function:"+policy_lambda.name
+    policy_lambda.arn = "arn:aws:lambda:" + str(region) + ":"+account_id + ":function:" + policy_lambda.name
     config_rule = policy_lambda.get_events(Session)
     attributes = {}
 
@@ -85,14 +85,15 @@ def renderConfigRule(p):
     return attributes
 
 def renderInvoke(name):
+
     return {
-            "DependsOn": name+"Lambda",
-            "Type": "AWS::Lambda::Permission",
-            "Properties": {
-                "Action": "lambda:InvokeFunction",
-                "FunctionName": {"Ref":name+"Lambda"},
-                "Principal":"config.amazonaws.com"
-            }
+        "DependsOn": name+"Lambda",
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "Action": "lambda:InvokeFunction",
+            "FunctionName": {"Ref": name+"Lambda"},
+            "Principal": "config.amazonaws.com"
+        }
     }
 
 def resource_name(policy_name):
@@ -145,9 +146,9 @@ def main():
         configrule_resource = renderConfigRule(p)
         invoke_resource = renderInvoke(resource_name(p.name))
         if sam_func:
-            sam['Resources'][resource_name(p.name)+"Lambda"] = sam_func
-            sam['Resources'][resource_name(p.name)+"Invoke"] = invoke_resource
-            sam['Resources'][resource_name(p.name)+"ConfigRule"] = configrule_resource
+            sam['Resources'][resource_name(p.name) + "Lambda"] = sam_func
+            sam['Resources'][resource_name(p.name) + "Invoke"] = invoke_resource
+            sam['Resources'][resource_name(p.name) + "ConfigRule"] = configrule_resource
             sam_func['Properties']['CodeUri'] = './%s.zip' % p.name
         else:
             print("unable to render sam for policy:%s" % p.name)
