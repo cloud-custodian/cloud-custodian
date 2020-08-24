@@ -223,20 +223,20 @@ There are several ways to get a list of possible keys for each resource.
        op: lt
        value: 2
 
-      # This policy will use `intersect` op to compare rds instances subnet group list
-      # against a user provided list of public subnets from a s3 txt file.
-      - name: find-rds-on-public-subnets-using-s3-list
-        comment:  |
-           The txt file needs to be in utf-8 no BOM format and contain one
-           subnet per line in the file no quotes around the subnets either.
-        resource: aws.rds
-        filters:
-            - type: value
-              key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
-              op: intersect
-              value_from:
-                  url: s3://cloud-custodian-bucket/PublicSubnets.txt
-                  format: txt
+     # This policy will use `intersect` op to compare rds instances subnet group list
+     # against a user provided list of public subnets from a s3 txt file.
+     - name: find-rds-on-public-subnets-using-s3-list
+       comment:  |
+          The txt file needs to be in utf-8 no BOM format and contain one
+          subnet per line in the file no quotes around the subnets either.
+       resource: aws.rds
+       filters:
+           - type: value
+             key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
+             op: intersect
+             value_from:
+                 url: s3://cloud-custodian-bucket/PublicSubnets.txt
+                 format: txt
 
      # This policy will compare rds instances subnet group list against a
      # inline user provided list of public subnets.
