@@ -3,20 +3,20 @@
     "data": {
         "Cluster": {
             "BackupPolicy": "DEFAULT",
-            "ClusterId": "cluster-kguzf4r7umz",
+            "ClusterId": "cluster-wji5atppqo3",
             "CreateTimestamp": {
                 "__class__": "datetime",
                 "year": 2020,
-                "month": 4,
-                "day": 3,
-                "hour": 15,
-                "minute": 40,
-                "second": 6,
-                "microsecond": 513000
+                "month": 8,
+                "day": 25,
+                "hour": 10,
+                "minute": 3,
+                "second": 55,
+                "microsecond": 843000
             },
             "Hsms": [],
             "HsmType": "hsm1.medium",
-            "SecurityGroup": "sg-06efdb71a0b14b5c3",
+            "SecurityGroup": "sg-09135979c4cd49b8c",
             "State": "DELETE_IN_PROGRESS",
             "StateMessage": "The cluster is being deleted.",
             "SubnetMapping": {

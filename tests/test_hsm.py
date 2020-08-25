@@ -2,6 +2,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+import time
 
 
 class CloudHSMClusterTest(BaseTest):
@@ -39,8 +40,10 @@ class CloudHSMClusterTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('ClusterId'), 'cluster-kguzf4r7umz')
+        self.assertEqual(resources[0].get('ClusterId'), 'cluster-wji5atppqo3')
         self.assertEqual(resources[0].get('SubnetMapping'), {"us-east-1a": "subnet-914763e7"})
+        if self.recording:
+            time.sleep(5)
         self.assertEqual(
-            client.describe_clusters(Filters={'clusterIds': ['cluster-p67ybp4edfe']}).get(
-                'Clusters'), [])
+            client.describe_clusters(Filters={'clusterIds': ['cluster-wji5atppqo3']}).get(
+                'Clusters')[0].get('State'), 'DELETED')

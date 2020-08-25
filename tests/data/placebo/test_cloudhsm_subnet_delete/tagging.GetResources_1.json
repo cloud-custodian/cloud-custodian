@@ -2,21 +2,7 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:cloudhsm:us-east-1:644160558196:cluster/cluster-kguzf4r7umz",
-                "Tags": [
-                    {
-                        "Key": "name",
-                        "Value": "c7n"
-                    },
-                    {
-                        "Key": "test",
-                        "Value": "new"
-                    }
-                ]
-            }
-        ],
+        "ResourceTagMappingList": [],
         "ResponseMetadata": {}
     }
 }
