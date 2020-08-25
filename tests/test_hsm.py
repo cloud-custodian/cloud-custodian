@@ -43,7 +43,7 @@ class CloudHSMClusterTest(BaseTest):
         self.assertEqual(resources[0].get('ClusterId'), 'cluster-wji5atppqo3')
         self.assertEqual(resources[0].get('SubnetMapping'), {"us-east-1a": "subnet-914763e7"})
         if self.recording:
-            time.sleep(5)
+            time.sleep(6)
         self.assertEqual(
             client.describe_clusters(Filters={'clusterIds': ['cluster-wji5atppqo3']}).get(
                 'Clusters')[0].get('State'), 'DELETED')
