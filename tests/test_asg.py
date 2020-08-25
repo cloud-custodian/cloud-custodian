@@ -206,6 +206,66 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('Env' in resources[0].get('Tags')[1].values())
 
+    def test_asg_image_filter_from_launch_template(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_template")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*CentOS7.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_launch_config(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*Ubuntu1804.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_lc_and_lt(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_lc_and_lt")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*AmazonLinux2.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
         p = self.load_policy(

@@ -57,7 +57,7 @@ azure-storage-file==2.1.0
 azure-storage-queue==2.1.0
 bcrypt==3.1.7
 certifi==2020.6.20
-cffi==1.14.0
+cffi==1.14.1
 chardet==3.0.4
 click==7.1.2
 colorama==0.4.3
@@ -71,7 +71,7 @@ isodate==0.6.0
 jmespath==0.10.0
 jsonpickle==1.4.1
 knack==0.6.3
-msrest==0.6.17
+msrest==0.6.18
 msrestazure==0.6.4
 netaddr==0.7.20
 oauthlib==3.1.0
