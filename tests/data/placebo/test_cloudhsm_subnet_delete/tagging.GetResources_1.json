@@ -9,15 +9,10 @@
                     {
                         "Key": "name",
                         "Value": "c7n"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:cloudhsm:us-east-1:644160558196:cluster/cluster-p67ybp4edfr",
-                "Tags": [
+                    },
                     {
                         "Key": "test",
-                        "Value": "pratyush"
+                        "Value": "new"
                     }
                 ]
             }

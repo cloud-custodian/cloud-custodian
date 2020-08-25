@@ -3,27 +3,26 @@
     "data": {
         "Cluster": {
             "BackupPolicy": "DEFAULT",
-            "ClusterId": "cluster-p67ybp4edfr",
+            "ClusterId": "cluster-kguzf4r7umz",
             "CreateTimestamp": {
                 "__class__": "datetime",
                 "year": 2020,
-                "month": 8,
-                "day": 21,
-                "hour": 13,
-                "minute": 55,
-                "second": 57,
-                "microsecond": 481000
+                "month": 4,
+                "day": 3,
+                "hour": 15,
+                "minute": 40,
+                "second": 6,
+                "microsecond": 513000
             },
             "Hsms": [],
             "HsmType": "hsm1.medium",
-            "SecurityGroup": "sg-02774b9ff5b5e7d09",
+            "SecurityGroup": "sg-06efdb71a0b14b5c3",
             "State": "DELETE_IN_PROGRESS",
             "StateMessage": "The cluster is being deleted.",
             "SubnetMapping": {
-                "us-east-1a": "subnet-083ab4dd1a8b6eaa6",
-                "us-east-1b": "subnet-0544e30702e2e1ad4"
+                "us-east-1a": "subnet-914763e7"
             },
-            "VpcId": "vpc-0598080981e0332f9",
+            "VpcId": "vpc-d2d616b5",
             "Certificates": {}
         },
         "ResponseMetadata": {}

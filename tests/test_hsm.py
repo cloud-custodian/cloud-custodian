@@ -31,7 +31,7 @@ class CloudHSMClusterTest(BaseTest):
                 "name": "cloudhsm",
                 "resource": "cloudhsm-cluster",
                 "filters": [
-                    {"type": "subnet", "key": "SubnetId", "value": "subnet-0544e30702e2e1ad4"},
+                    {"type": "subnet", "key": "SubnetId", "value": "subnet-914763e7"},
                 ],
                 "actions": [{"type": "delete"}]
             },
@@ -39,7 +39,8 @@ class CloudHSMClusterTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('ClusterId'), 'cluster-p67ybp4edfr')
+        self.assertEqual(resources[0].get('ClusterId'), 'cluster-kguzf4r7umz')
+        self.assertEqual(resources[0].get('SubnetMapping'), {"us-east-1a": "subnet-914763e7"})
         self.assertEqual(
             client.describe_clusters(Filters={'clusterIds': ['cluster-p67ybp4edfe']}).get(
                 'Clusters'), [])

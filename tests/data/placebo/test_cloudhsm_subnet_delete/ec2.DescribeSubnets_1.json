@@ -5,50 +5,6 @@
             {
                 "AvailabilityZone": "us-east-1a",
                 "AvailabilityZoneId": "use1-az4",
-                "AvailableIpAddressCount": 250,
-                "CidrBlock": "172.16.1.0/24",
-                "DefaultForAz": false,
-                "MapPublicIpOnLaunch": false,
-                "MapCustomerOwnedIpOnLaunch": false,
-                "State": "available",
-                "SubnetId": "subnet-083ab4dd1a8b6eaa6",
-                "VpcId": "vpc-0598080981e0332f9",
-                "OwnerId": "644160558196",
-                "AssignIpv6AddressOnCreation": false,
-                "Ipv6CidrBlockAssociationSet": [],
-                "Tags": [
-                    {
-                        "Key": "AWSServiceAccount",
-                        "Value": "644160558196"
-                    }
-                ],
-                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-083ab4dd1a8b6eaa6"
-            },
-            {
-                "AvailabilityZone": "us-east-1b",
-                "AvailabilityZoneId": "use1-az6",
-                "AvailableIpAddressCount": 250,
-                "CidrBlock": "172.16.0.0/24",
-                "DefaultForAz": false,
-                "MapPublicIpOnLaunch": false,
-                "MapCustomerOwnedIpOnLaunch": false,
-                "State": "available",
-                "SubnetId": "subnet-0544e30702e2e1ad4",
-                "VpcId": "vpc-0598080981e0332f9",
-                "OwnerId": "644160558196",
-                "AssignIpv6AddressOnCreation": false,
-                "Ipv6CidrBlockAssociationSet": [],
-                "Tags": [
-                    {
-                        "Key": "AWSServiceAccount",
-                        "Value": "644160558196"
-                    }
-                ],
-                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0544e30702e2e1ad4"
-            },
-            {
-                "AvailabilityZone": "us-east-1a",
-                "AvailabilityZoneId": "use1-az4",
                 "AvailableIpAddressCount": 4088,
                 "CidrBlock": "172.31.0.0/20",
                 "DefaultForAz": true,
