@@ -114,6 +114,41 @@ class LogGroupTest(BaseTest):
             float(resources[0]["creationTime"])
         )
 
+    def test_last_write_empty_streams(self):
+        log_group = "test-log-group"
+        log_stream = "stream1"
+        factory = self.replay_flight_data("test_log_group_last_write_empty_streams")
+        if self.recording:
+            client = factory().client("logs")
+            client.create_log_group(logGroupName=log_group)
+            self.addCleanup(client.delete_log_group, logGroupName=log_group)
+            time.sleep(5)
+            client.create_log_stream(logGroupName=log_group, logStreamName=log_stream)
+
+        p = self.load_policy(
+            {
+                "name": "test-last-write",
+                "resource": "log-group",
+                "filters": [
+                    {"logGroupName": log_group},
+                    {"type": "last-write", "days": 0},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], log_group)
+        # should match CreationTime on latest stream
+        self.assertEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["streams"][0]["creationTime"])
+        )
+        self.assertNotEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["creationTime"])
+        )
+
     @functional
     def test_retention(self):
         log_group = "c7n-test-a"

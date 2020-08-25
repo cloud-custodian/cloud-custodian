@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/custodian-run-ec2-tag-compliance-unmark",
+                "creationTime": 1596963009750,
+                "retentionInDays": 14,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-run-ec2-tag-compliance-unmark:*",
+                "storedBytes": 7795
+            },
+            {
+                "logGroupName": "/aws/lambda/ta-tool-ec2-rds-LambdaFunctionEC2-1P4WPGDDJ7SUB",
+                "creationTime": 1576778516878,
+                "retentionInDays": 30,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/ta-tool-ec2-rds-LambdaFunctionEC2-1P4WPGDDJ7SUB:*",
+                "storedBytes": 20065
+            },
+            {
+                "logGroupName": "test-log-group",
+                "creationTime": 1598340675194,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-log-group:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
