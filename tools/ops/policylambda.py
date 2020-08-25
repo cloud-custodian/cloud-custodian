@@ -115,7 +115,7 @@ def render_invoke(name):
         "Type": "AWS::Lambda::Permission",
         "Properties": {
             "Action": "lambda:InvokeFunction",
-            "FunctionName": {"Ref": name },
+            "FunctionName": {"Ref": name},
             "Principal": "config.amazonaws.com"
         }
     }
