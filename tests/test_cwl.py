@@ -1,6 +1,8 @@
 # Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
@@ -38,21 +40,114 @@ class LogGroupTest(BaseTest):
         self.assertEqual(resources[0]['creationTime'], 1548368507.441)
 
     def test_last_write(self):
+        log_group = "test-log-group"
+        log_stream = "stream1"
         factory = self.replay_flight_data("test_log_group_last_write")
+        if self.recording:
+            client = factory().client("logs")
+            client.create_log_group(logGroupName=log_group)
+            self.addCleanup(client.delete_log_group, logGroupName=log_group)
+            time.sleep(5)
+            client.create_log_stream(logGroupName=log_group, logStreamName=log_stream)
+            time.sleep(5)
+            client.put_log_events(
+                logGroupName=log_group,
+                logStreamName=log_stream,
+                logEvents=[
+                    {
+                        'timestamp': int(time.time() * 1000),
+                        'message': 'message 1'
+                    }
+                ]
+            )
+            time.sleep(5)
+
         p = self.load_policy(
             {
-                "name": "set-retention",
+                "name": "test-last-write",
                 "resource": "log-group",
                 "filters": [
-                    {"logGroupName": "/aws/lambda/ec2-instance-type"},
-                    {"type": "last-write", "days": 0.1},
+                    {"logGroupName": log_group},
+                    {"type": "last-write", "days": 0},
                 ],
             },
             session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["logGroupName"], "/aws/lambda/ec2-instance-type")
+        self.assertEqual(resources[0]["logGroupName"], log_group)
+        # should match lastIngestionTime on first stream
+        self.assertEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["streams"][0]["lastIngestionTime"])
+        )
+        self.assertNotEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["creationTime"])
+        )
+
+    def test_last_write_no_streams(self):
+        log_group = "test-log-group"
+        factory = self.replay_flight_data("test_log_group_last_write_no_streams")
+        if self.recording:
+            client = factory().client("logs")
+            client.create_log_group(logGroupName=log_group)
+            self.addCleanup(client.delete_log_group, logGroupName=log_group)
+
+        p = self.load_policy(
+            {
+                "name": "test-last-write",
+                "resource": "log-group",
+                "filters": [
+                    {"logGroupName": log_group},
+                    {"type": "last-write", "days": 0},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], log_group)
+        # should match CreationTime on group itself
+        self.assertEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["creationTime"])
+        )
+
+    def test_last_write_empty_streams(self):
+        log_group = "test-log-group"
+        log_stream = "stream1"
+        factory = self.replay_flight_data("test_log_group_last_write_empty_streams")
+        if self.recording:
+            client = factory().client("logs")
+            client.create_log_group(logGroupName=log_group)
+            self.addCleanup(client.delete_log_group, logGroupName=log_group)
+            time.sleep(5)
+            client.create_log_stream(logGroupName=log_group, logStreamName=log_stream)
+
+        p = self.load_policy(
+            {
+                "name": "test-last-write",
+                "resource": "log-group",
+                "filters": [
+                    {"logGroupName": log_group},
+                    {"type": "last-write", "days": 0},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["logGroupName"], log_group)
+        # should match CreationTime on latest stream
+        self.assertEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["streams"][0]["creationTime"])
+        )
+        self.assertNotEqual(
+            resources[0]["lastWrite"].timestamp() * 1000,
+            float(resources[0]["creationTime"])
+        )
 
     @functional
     def test_retention(self):

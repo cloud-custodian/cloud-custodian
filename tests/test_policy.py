@@ -1205,7 +1205,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',
