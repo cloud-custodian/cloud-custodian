@@ -78,11 +78,11 @@ class LogGroupTest(BaseTest):
         self.assertEqual(resources[0]["logGroupName"], log_group)
         # should match lastIngestionTime on first stream
         self.assertEqual(
-            float(resources[0]["lastWrite"].strftime("%s.%f")) * 1000,
+            resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["streams"][0]["lastIngestionTime"])
         )
         self.assertNotEqual(
-            float(resources[0]["lastWrite"].strftime("%s.%f")) * 1000,
+            resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["creationTime"])
         )
 
@@ -110,7 +110,7 @@ class LogGroupTest(BaseTest):
         self.assertEqual(resources[0]["logGroupName"], log_group)
         # should match CreationTime on group itself
         self.assertEqual(
-            float(resources[0]["lastWrite"].strftime("%s.%f")) * 1000,
+            resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["creationTime"])
         )
 
