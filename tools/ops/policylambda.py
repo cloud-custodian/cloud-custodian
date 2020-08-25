@@ -56,31 +56,31 @@ def render(p):
     if key_arn:
         properties['KmsKeyArn']
 
-    if p.execution_mode == 'periodic' or p.execution_mode == 'cloudtrail':
+    if p.execution_mode == 'periodic':
         # Event render
         revents = {}
-        if p.execution_mode == 'periodic':
-            revents = {
-                'PolicySchedule': {
-                    'Type': 'Schedule',
+        revents = {
+            'PolicySchedule': {
+                'Type': 'Schedule',
+                'Properties': {
+                    'Schedule': p.data.get('mode', {}).get('schedule')}}
+        }
+        properties['Events'] = revents
+
+    elif p.execution_mode == 'cloudtrail':
+        events = [e for e in policy_lambda.get_events(None)
+                if isinstance(e, mu.CloudWatchEventSource)]
+        if not events:
+            return
+
+        revents = {}
+        for idx, e in enumerate(events):
+            revents[
+                'PolicyTrigger%s' % string.ascii_uppercase[idx]] = {
+                    'Type': 'CloudWatchEvent',
                     'Properties': {
-                        'Schedule': p.data.get('mode', {}).get('schedule')}}
+                        'Pattern': json.loads(e.render_event_pattern())}
             }
-        else:
-            events = [e for e in policy_lambda.get_events(None)
-                    if isinstance(e, mu.CloudWatchEventSource)]
-            if not events:
-                return
-
-            revents = {}
-            for idx, e in enumerate(events):
-                revents[
-                    'PolicyTrigger%s' % string.ascii_uppercase[idx]] = {
-                        'Type': 'CloudWatchEvent',
-                        'Properties': {
-                            'Pattern': json.loads(e.render_event_pattern())}
-                }
-
         properties['Events'] = revents
 
     elif p.execution_mode == 'config-rule':
@@ -115,7 +115,7 @@ def render_invoke(name):
         "Type": "AWS::Lambda::Permission",
         "Properties": {
             "Action": "lambda:InvokeFunction",
-            "FunctionName": {"Ref": name},
+            "FunctionName": {"Ref": name },
             "Principal": "config.amazonaws.com"
         }
     }
