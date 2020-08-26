@@ -399,7 +399,7 @@ class AccessAnalyzer(Filter):
         client = local_session(self.manager.session_factory).client('accessanalyzer')
 
         try:
-            analyzers = client.list_analyzers()['analyzers']
+            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
             for analyzer in analyzers:
                 if analyzer['status'].lower() == status and analyzer['type'].lower() == trust:
                     account['c7n:AccessAnalyzer'] = analyzer
