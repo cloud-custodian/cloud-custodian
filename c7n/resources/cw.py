@@ -269,10 +269,10 @@ class LastWriteDays(Filter):
         group['streams'] = streams
         if not streams:
             last_timestamp = group['creationTime']
-        elif streams[0]['storedBytes'] == 0:
-            last_timestamp = streams[0]['creationTime']
-        else:
+        elif 'lastIngestionTime' in streams[0]:
             last_timestamp = streams[0]['lastIngestionTime']
+        else:
+            last_timestamp = streams[0]['creationTime']
 
         last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
