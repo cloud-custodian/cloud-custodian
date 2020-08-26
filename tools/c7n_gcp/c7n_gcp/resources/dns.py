@@ -68,7 +68,7 @@ class Delete(MethodAction):
                   - type: value
                     key: name
                     op: eq
-                    value: 'test-demo.com'
+                    value: 'test-custodian.com'
                 actions:
                   - type: delete
     """

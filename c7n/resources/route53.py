@@ -208,10 +208,7 @@ class Delete(BaseAction):
               - name: route53-delete-testing-hosted-zones
                 resource: aws.hostedzone
                 filters:
-                  - type: value
-                    key: name
-                    op: regex
-                    value: '^(test-|demo-)*'
+                  - 'tag:TestTag': present
                 actions:
                   - type: delete
     """
