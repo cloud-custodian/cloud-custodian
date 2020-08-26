@@ -2,6 +2,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from googleapiclient.errors import HttpError
 from gcp_common import BaseTest, event_data
 
 
@@ -43,18 +44,26 @@ class DnsManagedZoneTest(BaseTest):
     
     def test_managed_zone_delete(self):
         project_id = "cloud-custodian"
+        resource_name = "test-dns-managed-zone"
 
         factory = self.record_flight_data('dns-managed-zone-delete', project_id)
         p = self.load_policy(
             {'name': 'gcp-dns-managed-zone-delete',
              'resource': 'gcp.dns-managed-zone',
-             'filters': [{'name': 'test'}],
+             'filters': [{'name': resource_name}],
              'actions': ['delete']},
             session_factory=factory
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['status'], 'DELETING')
+        self.assertEqual(resources[0]['name'], resource_name)
+        client = p.resource_manager.get_client()
+        
+        managedZoneName = 'projects/{project_id}/managedZones/{name}'.format(
+            project_id=project_id,
+            name=resource_name)
+
+        with self.assertRaises(HttpError):
+            client.execute_query('get', {'managedZones': managedZoneName})
 
 
 class DnsPolicyTest(BaseTest):
