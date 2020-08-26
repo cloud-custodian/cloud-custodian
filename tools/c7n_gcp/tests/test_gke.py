@@ -39,6 +39,21 @@ class KubernetesClusterTest(BaseTest):
         clusters = exec_mode.run(event, None)
 
         self.assertEqual(clusters[0]['name'], name)
+    
+    def test_cluster_delete(self):
+        project_id = "cloud-custodian"
+
+        factory = self.record_flight_data('gke-cluster-delete', project_id)
+        p = self.load_policy(
+            {'name': 'delete-gke-cluster',
+             'resource': 'gcp.gke-cluster',
+             'filters': [{'name': 'test'}],
+             'actions': ['delete']},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['status'], 'DELETING')
 
 
 class KubernetesClusterNodePoolTest(BaseTest):

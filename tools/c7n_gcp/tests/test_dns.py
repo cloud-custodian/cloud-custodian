@@ -40,6 +40,21 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+    
+    def test_managed_zone_delete(self):
+        project_id = "cloud-custodian"
+
+        factory = self.record_flight_data('dns-managed-zone-delete', project_id)
+        p = self.load_policy(
+            {'name': 'gcp-dns-managed-zone-delete',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'name': 'test'}],
+             'actions': ['delete']},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['status'], 'DELETING')
 
 
 class DnsPolicyTest(BaseTest):
