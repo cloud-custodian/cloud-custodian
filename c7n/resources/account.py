@@ -404,9 +404,11 @@ class AccessAnalyzer(Filter):
                 if analyzer['status'].lower() == status and analyzer['type'].lower() == trust:
                     account['c7n:AccessAnalyzer'] = analyzer
                     return resources
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to list analyzers in account: %s error: %s",
+                self.manager.config.account_id, e)
+            raise e
         return []
 
 
