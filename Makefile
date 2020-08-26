@@ -75,7 +75,7 @@ pkg-publish-wheel:
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r testpypi dist/* && cd ../..; done
 
 test-poetry:
-	. test.env && poetry run pytest -n auto tests tools
+	. $(PWD)/test.env && poetry run pytest -n auto tests tools
 
 test:
 	./bin/tox -e py38

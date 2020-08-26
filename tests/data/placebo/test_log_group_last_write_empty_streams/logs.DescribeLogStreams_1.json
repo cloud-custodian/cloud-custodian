@@ -4,11 +4,7 @@
         "logStreams": [
             {
                 "logStreamName": "stream1",
-                "creationTime": 1598337794706,
-                "firstEventTimestamp": 1598337799769,
-                "lastEventTimestamp": 1598337799769,
-                "lastIngestionTime": 1598337799829,
-                "uploadSequenceToken": "49609538486258003219375262998828380693436133092895373906",
+                "creationTime": 1598340680394,
                 "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-log-group:log-stream:stream1",
                 "storedBytes": 0
             }
