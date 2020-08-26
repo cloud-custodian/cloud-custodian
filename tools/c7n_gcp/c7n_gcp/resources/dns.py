@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.actions import MethodAction
+from c7n.utils import type_schema, local_session
 
 
 @resources.register('dns-managed-zone')
@@ -47,3 +49,35 @@ class DnsPolicy(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'policy': resource_info['policy_name']})
+
+
+@DnsManagedZone.action_registry.register('delete')
+class Delete(MethodAction):
+    """Action to delete DNS managed zones
+
+    It is recommended to use a filter to avoid unwanted deletion of DNS managed zones
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-dns-managed-zones
+                resource: gcp.dns-managed-zone
+                filters:
+                  - type: value
+                    key: name
+                    op: eq
+                    value: 'test-demo.com'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        return {
+            'project': project,
+            'managedZone': resource['name']}

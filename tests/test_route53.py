@@ -101,6 +101,19 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
+    def test_route53_delete_hostedzone(self):
+        session_factory = self.record_flight_data("test_route53_delete_hostedzone")
+        p = self.load_policy(
+            {
+                "name": "r53domain-delete-hostedzone",
+                "resource": "r53domain",
+                "filters": [{"tag:TestTag": "present"}],
+                "actions": ["delete"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 class Route53HealthCheckTest(BaseTest):
 

@@ -194,6 +194,42 @@ class Route53DomainRemoveTag(RemoveTag):
                 TagsToDelete=keys)
 
 
+@HostedZone.action_registry.register('delete')
+class Delete(BaseAction):
+    """Action to delete Route 53 hosted zones
+
+    It is recommended to use a filter to avoid unwanted deletion of R53 hosted zones
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: route53-delete-testing-hosted-zones
+                resource: aws.hostedzone
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: '^(test-|demo-)*'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('route53:DeleteHostedZone')
+
+    def process(self, hosted_zones):
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_hosted_zones, hosted_zones))
+
+    def process_hosted_zones(self, hosted_zone):
+        client = local_session(self.manager.session_factory).client('route53')
+        self.manager.retry(
+            client.delete_hosted_zone, Id=hosted_zone['Id']
+        )
+
+
 @HostedZone.action_registry.register('set-query-logging')
 class SetQueryLogging(BaseAction):
     """Enables query logging on a hosted zone.
