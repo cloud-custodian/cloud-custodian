@@ -1,4 +1,7 @@
+import re
 import pytest
+
+from .zpill import ACCOUNT_ID
 
 try:
     from .zpill import PillTest
@@ -28,3 +31,10 @@ def test(request):
     test_utils = CustodianAWSTesting(request)
     test_utils.addCleanup(reset_session_cache)
     return test_utils
+
+
+def pytest_terraform_modify_state(tfstate):
+    """ Sanitize functional testing account data """
+    state = tfstate.save()
+    state = re.sub(r'([0-9]+){12}', ACCOUNT_ID, state)
+    tfstate.load(state)
