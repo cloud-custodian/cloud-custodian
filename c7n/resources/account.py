@@ -367,6 +367,49 @@ class IAMSummary(ValueFilter):
         return []
 
 
+@filters.register('access-analyzer')
+class AccessAnalyzer(Filter):
+    """Check for access analyzers in an account
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: account-access-analyzer
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: access-analyzer
+                    status: active
+                    trust: organization
+    """
+
+    schema = type_schema('access-analyzer',
+                        status={'oneOf': [{'enum': ['active', 'creating', 'disabled', 'failed']}]},
+                        trust={'oneOf': [{'enum': ['account', 'organization']}]})
+    schema_alias = False
+    permissions = ('access-analyzer:ListAnalyzers',)
+
+    def process(self, resources, event=None):
+        account = resources[0]
+        status = self.data.get('status', 'active')
+        trust = self.data.get('trust', 'account')
+
+        client = local_session(self.manager.session_factory).client('accessanalyzer')
+
+        try:
+            analyzers = client.list_analyzers()['analyzers']
+            for analyzer in analyzers:
+                if analyzer['status'].lower() == status and analyzer['type'].lower() == trust:
+                    account['c7n:AccessAnalyzer'] = analyzer
+                    return resources
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
+        return []
+
+
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
     """Check an account's password policy.
