@@ -5,6 +5,7 @@
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
+
 class KubernetesClusterTest(BaseTest):
 
     def test_cluster_query(self):
@@ -39,7 +40,7 @@ class KubernetesClusterTest(BaseTest):
         clusters = exec_mode.run(event, None)
 
         self.assertEqual(clusters[0]['name'], name)
-    
+
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
         resource_name = "test-cluster"
@@ -53,10 +54,10 @@ class KubernetesClusterTest(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        
+
         self.assertEqual(resources[0]['name'], resource_name)
         client = p.resource_manager.get_client()
-        
+
         clusterName = 'projects/{project_id}/locations/us-east-1b/clusters/{name}'.format(
             project_id=project_id,
             name=resource_name)

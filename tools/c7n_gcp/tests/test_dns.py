@@ -41,7 +41,7 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
-    
+
     def test_managed_zone_delete(self):
         project_id = "cloud-custodian"
         resource_name = "test-dns-managed-zone"
@@ -57,7 +57,7 @@ class DnsManagedZoneTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]['name'], resource_name)
         client = p.resource_manager.get_client()
-        
+
         managedZoneName = 'projects/{project_id}/managedZones/{name}'.format(
             project_id=project_id,
             name=resource_name)

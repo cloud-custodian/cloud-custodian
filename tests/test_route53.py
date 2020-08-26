@@ -115,6 +115,7 @@ class Route53HostedZoneTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+
 class Route53HealthCheckTest(BaseTest):
 
     def test_route53_healthcheck_tag(self):
