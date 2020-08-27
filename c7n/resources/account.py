@@ -394,14 +394,15 @@ class AccessAnalyzer(Filter):
     def process(self, resources, event=None):
         account = resources[0]
         status = self.data.get('status', 'active')
-        trust = self.data.get('trust', 'account')
+        trust = self.data.get('trust', '')
 
         client = local_session(self.manager.session_factory).client('accessanalyzer')
 
         try:
             analyzers = self.manager.retry(client.list_analyzers)['analyzers']
             for analyzer in analyzers:
-                if analyzer['status'].lower() == status and analyzer['type'].lower() == trust:
+                if (not trust and analyzer['status'].lower() == status) or \
+                   (analyzer['type'].lower() == trust and analyzer['status'].lower()):
                     account['c7n:AccessAnalyzer'] = analyzer
                     return resources
         except Exception as e:
