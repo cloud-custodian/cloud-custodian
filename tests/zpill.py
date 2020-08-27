@@ -287,7 +287,7 @@ class PillTest(CustodianTestCore):
     def cleanUp(self):
         self.pill = None
 
-    def record_flight_data(self, test_case, zdata=False, augment=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False, assume_role=None):
         self.recording = True
         test_dir = os.path.join(self.placebo_dir, test_case)
         if not (zdata or augment):
@@ -317,16 +317,16 @@ class PillTest(CustodianTestCore):
                 # assume role api calls creds into test data, they will
                 # go stale, but its best to modify before commiting.
                 # Disabled by default.
-                if 0 and (assume is not False and fake.assume_role):
+                if assume is not False and assume_role:
                     client = session.client('sts')
                     creds = client.assume_role(
-                        RoleArn=fake.assume_role,
+                        RoleArn=assume_role,
                         RoleSessionName='CustodianTest')['Credentials']
                     new_session = boto3.Session(
                         aws_access_key_id=creds['AccessKeyId'],
                         aws_secret_access_key=creds['SecretAccessKey'],
                         aws_session_token=creds['SessionToken'],
-                        region_name=region or fake.region or default_region)
+                        region_name=region or default_region)
                 elif region and region != default_region:
                     new_session = boto3.Session(region_name=region)
 

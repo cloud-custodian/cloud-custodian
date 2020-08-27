@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+import os
+import argparse
+import json
+import yaml
+import c7n.tests.common
+import c7n.filters.core
+import c7n.testing
+import c7n.utils
+import c7n.output
+
+@c7n.output.log_outputs.register('default')
+class NullOutput(object):
+    def __init__(self, ctx, config=None):
+        self.ctx = ctx
+        self.config = config or {}
+        self.handler = None
+
+    def get_handler(self):
+        raise NotImplementedError()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        pass
+
+    def join_log(self):
+        pass
+
+    def leave_log(self):
+        pass
+
+def patch(replay):
+    process_set = c7n.filters.core.Not.process_set
+    def _process_set(self, resources, event):
+        results = process_set(self, resources, event)
+        return sorted(results, key=lambda x: x[self.manager.resource_type.id])
+    c7n.filters.core.Not.process_set = _process_set
+
+    if replay:
+        c7n.policy.Policy._write_file = lambda self, rel_path, value: None
+
+def get_policy(policies, name):
+    for policy in policies:
+        if policy.get('name') == name:
+            return [policy]
+
+    return []
+
+class TestPolicy(c7n.testing.TestUtils, tests.zpill.PillTest):
+    def __init__(self, cache, assume_role=None):
+        self.assume_role = assume_role
+        self.account_id = None
+        self.cleanup = []
+        self.placebo_dir = cache
+        if assume_role:
+            self.account_id = self.assume_role.split(':')[4]
+
+    def run(self, policy, replay):
+        ret = True
+        if replay:
+            session_factory = self.replay_flight_data(policy['name'])
+        else:
+            session_factory = self.record_flight_data(policy['name'], assume_role=self.assume_role)
+
+        test_dir = os.path.join(self.placebo_dir, policy['name'])
+
+        policy = self.load_policy(
+            policy,
+            config={'dryrun': True, 'output_dir': self.placebo_dir, 'account_id': self.account_id},
+            session_factory=session_factory,
+            validate=True,
+            output_dir=self.placebo_dir,
+        )
+        resources = policy.run()
+        resources = c7n.utils.loads(c7n.utils.dumps(resources))
+
+        if replay:
+            with open(os.path.join(test_dir, 'resources.json'), 'r') as fh:
+                old_resources = c7n.utils.loads(fh.read())
+                ret = resources == old_resources
+
+        for func, args, kw in self.cleanup:
+            func(*args, **kw)
+
+        self.cleanup = []
+
+        return ret
+
+    def addCleanup(self, func, *args, **kw):
+        self.cleanup.append((func, args, kw))
+
+def main():
+    parser = argparse.ArgumentParser('Policy Tester')
+    parser.add_argument('--assume', dest='assume_role', help='Role to assume')
+    subparsers = parser.add_subparsers(dest='command', help='Execution mode')
+    subparsers.required=True
+
+    record_parser = subparsers.add_parser('record')
+    record_parser.add_argument('cache', type=str, default='test', help='Cache dir to write to')
+    record_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
+    record_parser.add_argument('--name', type=str, default='all', help='Name of the policy')
+
+    test_parser = subparsers.add_parser('replay')
+    test_parser.add_argument('cache', type=str, default='test', help='Cache dir to consume')
+    test_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
+    test_parser.add_argument('--name', type=str, default='all', help='Name of the policy')
+
+    args = parser.parse_args()
+
+    policies = yaml.safe_load(args.policy).get('policies')
+    if args.name != 'all':
+        policies = get_policy(policies, args.name)
+
+    if not policies:
+        print("No policies found!")
+        return
+
+    replay = args.command == 'replay'
+    patch(replay)
+    runner = TestPolicy(args.cache, args.assume_role)
+
+    for policy in policies:
+        ret = '⚠️ '
+        status = None
+        try:
+            if runner.run(policy=policy, replay=replay):
+                ret, status = '✅', 'OK'
+            else:
+                ret, status = '❌', 'Mismatch'
+        except json.decoder.JSONDecodeError as e:
+            status = 'Invalid json'
+        except OSError as e:
+            status = str(e)
+        except RuntimeError as e:
+            status = str(e)
+        print("%s %s, %s" % (ret, policy['name'], status))
+
+if __name__ == '__main__':
+    main()
