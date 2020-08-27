@@ -107,7 +107,7 @@ class Delete(MethodAction):
 
             policies:
               - name: gcp-delete-testing-gke-clusters
-                resource: gcp.gke
+                resource: gcp.gke-cluster
                 filters:
                   - type: value
                     key: name
