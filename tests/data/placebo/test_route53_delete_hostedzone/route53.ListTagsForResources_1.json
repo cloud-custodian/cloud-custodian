@@ -8,10 +8,6 @@
                 "ResourceId": "Z030759217ELGOQG09VAT",
                 "Tags": [
                     {
-                        "Key": "test",
-                        "Value": "yes"
-                    },
-                    {
                         "Key": "TestTag",
                         "Value": "yes"
                     }
