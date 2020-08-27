@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z030759217ELGOQG09VAT",
+                "Name": "cloudcustodian-test.nami.run.",
+                "CallerReference": "00306eef-e49d-41e4-907f-9d1bd5463013",
+                "Config": {
+                    "Comment": "",
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 2
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

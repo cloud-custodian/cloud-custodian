@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 27 Aug 2020 09:39:49 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3565",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones?alt=json"
+  },
+  "body": {
+    "managedZones": [
+      {
+        "name": "custodian",
+        "dnsName": "cloudcustodian-test.nami.run.",
+        "description": "",
+        "id": "2229820864159812690",
+        "nameServers": [
+          "ns-cloud-a1.googledomains.com.",
+          "ns-cloud-a2.googledomains.com.",
+          "ns-cloud-a3.googledomains.com.",
+          "ns-cloud-a4.googledomains.com."
+        ],
+        "creationTime": "2020-08-27T09:39:31.916Z",
+        "visibility": "public",
+        "kind": "dns#managedZone"
+      }
+    ],
+    "kind": "dns#managedZonesListResponse"
+  }
+}

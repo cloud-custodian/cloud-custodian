@@ -214,17 +214,13 @@ class Delete(BaseAction):
     """
 
     schema = type_schema('delete')
-    permissions = ('route53:DeleteHostedZone')
+    permissions = ('route53:DeleteHostedZone',)
 
     def process(self, hosted_zones):
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_hosted_zones, hosted_zones))
-
-    def process_hosted_zones(self, hosted_zone):
         client = local_session(self.manager.session_factory).client('route53')
-        self.manager.retry(
-            client.delete_hosted_zone, Id=hosted_zone['Id']
-        )
+        for hz in hosted_zones:
+            self.manager.retry(
+                client.delete_hosted_zone, Id=hz['Id'])
 
 
 @HostedZone.action_registry.register('set-query-logging')

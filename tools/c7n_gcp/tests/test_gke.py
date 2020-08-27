@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
-from googleapiclient.errors import HttpError
 
 
 class KubernetesClusterTest(BaseTest):
@@ -43,9 +42,9 @@ class KubernetesClusterTest(BaseTest):
 
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
-        resource_name = "test-cluster"
+        resource_name = "custodian-test-delete-cluster"
 
-        factory = self.record_flight_data('gke-cluster-delete', project_id)
+        factory = self.replay_flight_data('gke-cluster-delete', project_id)
         p = self.load_policy(
             {'name': 'delete-gke-cluster',
              'resource': 'gcp.gke-cluster',
@@ -54,16 +53,7 @@ class KubernetesClusterTest(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-
         self.assertEqual(resources[0]['name'], resource_name)
-        client = p.resource_manager.get_client()
-
-        clusterName = 'projects/{project_id}/locations/us-east-1b/clusters/{name}'.format(
-            project_id=project_id,
-            name=resource_name)
-
-        with self.assertRaises(HttpError):
-            client.execute_query('get', {'clusters': clusterName})
 
 
 class KubernetesClusterNodePoolTest(BaseTest):
