@@ -866,7 +866,7 @@ class AccountTests(BaseTest):
                 "name": "account-access-analyzer",
                 "resource": "account",
                 "filters": [{"type": "access-analyzer",
-                             "key": "[*].status",
+                             "key": "[].status",
                              "value": "ACTIVE",
                              "op": "contains"}],
             },

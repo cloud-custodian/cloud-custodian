@@ -381,7 +381,7 @@ class AccessAnalyzer(ValueFilter):
                 region: us-east-1
                 filters:
                   - type: access-analyzer
-                    key: [*].status
+                    key: [].status
                     value: ACTIVE
                     op: contains
     """
