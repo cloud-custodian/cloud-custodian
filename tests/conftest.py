@@ -35,6 +35,4 @@ def test(request):
 
 def pytest_terraform_modify_state(tfstate):
     """ Sanitize functional testing account data """
-    state = tfstate.save()
-    state = re.sub(r'([0-9]+){12}', ACCOUNT_ID, state)
-    tfstate.load(state)
+    tfstate.update(re.sub(r'([0-9]+){12}', ACCOUNT_ID, str(tfstate)))
