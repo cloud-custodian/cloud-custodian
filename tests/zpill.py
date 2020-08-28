@@ -287,7 +287,7 @@ class PillTest(CustodianTestCore):
     def cleanUp(self):
         self.pill = None
 
-    def record_flight_data(self, test_case, zdata=False, augment=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False, region=None):
         self.recording = True
         test_dir = os.path.join(self.placebo_dir, test_case)
         if not (zdata or augment):
@@ -295,7 +295,7 @@ class PillTest(CustodianTestCore):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         default_region = session.region_name
         if not zdata:
             pill = RedPill()
