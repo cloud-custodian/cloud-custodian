@@ -13,7 +13,6 @@ import datetime
 from dateutil import parser
 import json
 import mock
-from unittest.mock import MagicMock
 import time
 
 from .common import functional
@@ -866,39 +865,15 @@ class AccountTests(BaseTest):
             {
                 "name": "account-access-analyzer",
                 "resource": "account",
-                "filters": ["access-analyzer"],
+                "filters": [{"type": "access-analyzer",
+                             "key": "[*].status",
+                             "value": "ACTIVE",
+                             "op": "contains"}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-    def test_account_access_analyzer_filter_error(self):
-        session_factory = self.replay_flight_data("test_account_access_analyzer_filter")
-        client = session_factory().client("accessanalyzer")
-        mock_factory = MagicMock()
-        mock_factory.region = 'us-east-1'
-        mock_factory().client(
-            'accessanalyzer').exceptions.InternalServerException = (
-                client.exceptions.InternalServerException)
-
-        mock_factory().client('accessanalyzer').list_analyzers.side_effect = (
-            client.exceptions.InternalServerException(
-                {'Error': {'Code': 'InternalServerException'}},
-                operation_name='list_analyzers'))
-
-        p = self.load_policy(
-            {
-                "name": "account-access-analyzer",
-                "resource": "account",
-                "filters": ["access-analyzer"],
-            },
-            session_factory=mock_factory,
-        )
-        try:
-            p.run()
-        except client.exceptions.InternalServerException:
-            mock_factory().client('accessanalyzer').list_analyzers.assert_called_once()
 
     def test_account_shield_filter(self):
         session_factory = self.replay_flight_data("test_account_shield_advanced_filter")

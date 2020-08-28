@@ -368,7 +368,7 @@ class IAMSummary(ValueFilter):
 
 
 @filters.register('access-analyzer')
-class AccessAnalyzer(Filter):
+class AccessAnalyzer(ValueFilter):
     """Check for access analyzers in an account
 
     :example:
@@ -381,35 +381,22 @@ class AccessAnalyzer(Filter):
                 region: us-east-1
                 filters:
                   - type: access-analyzer
-                    status: active
-                    trust: organization
+                    key: [*].status
+                    value: ACTIVE
+                    op: contains
     """
 
-    schema = type_schema('access-analyzer',
-                        status={'oneOf': [{'enum': ['active', 'creating', 'disabled', 'failed']}]},
-                        trust={'oneOf': [{'enum': ['account', 'organization']}]})
+    schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('access-analyzer:ListAnalyzers',)
 
     def process(self, resources, event=None):
-        account = resources[0]
-        status = self.data.get('status', 'active')
-        trust = self.data.get('trust', '')
-
-        client = local_session(self.manager.session_factory).client('accessanalyzer')
-
-        try:
-            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
-            for analyzer in analyzers:
-                if (not trust and analyzer['status'].lower() == status) or \
-                   (analyzer['type'].lower() == trust and analyzer['status'].lower()):
-                    account['c7n:AccessAnalyzer'] = analyzer
-                    return resources
-        except Exception as e:
-            self.log.warning(
-                "Exception trying to list analyzers in account: %s error: %s",
-                self.manager.config.account_id, e)
-            raise e
+        if not resources[0].get('c7n:access_analyzers'):
+            client = local_session(self.manager.session_factory).client('accessanalyzer')
+            resources[0]['c7n:access_analyzers'] = self.manager.retry(
+                client.list_analyzers)['analyzers']
+        if self.match(resources[0]['c7n:access_analyzers']):
+            return resources
         return []
 
 
