@@ -375,15 +375,14 @@ class AccessAnalyzer(ValueFilter):
 
     .. code-block:: yaml
 
-            policies:
-              - name: account-access-analyzer
-                resource: account
-                region: us-east-1
-                filters:
-                  - type: access-analyzer
-                    key: [].status
-                    value: ACTIVE
-                    op: contains
+      policies:
+        - name: account-access-analyzer
+          resource: account
+          filters:
+            - type: access-analyzer
+              key: [].status
+              value: ACTIVE
+              op: contains
     """
 
     schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
