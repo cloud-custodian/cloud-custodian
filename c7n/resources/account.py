@@ -380,7 +380,7 @@ class AccessAnalyzer(ValueFilter):
           resource: account
           filters:
             - type: access-analyzer
-              key: [].status
+              key: '[].status'
               value: ACTIVE
               op: contains
     """
