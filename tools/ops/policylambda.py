@@ -28,8 +28,6 @@ import json
 import os
 import string
 import yaml
-import boto3
-from boto3.session import Session
 
 from c7n.config import Config
 from c7n.loader import PolicyLoader
@@ -93,7 +91,7 @@ def render_cwe(p, policy_lambda, sam):
 def render_config_rule(p, policy_lambda, sam):
     properties = render_function_properties(p, policy_lambda)
     policy_lambda.arn = {'Ref': resource_name(p.name)}
-    config_rule = policy_lambda.get_events(Session).pop()
+    config_rule = policy_lambda.get_events(None).pop()
     rule_properties = config_rule.get_rule_params(policy_lambda)
 
     if p.execution_mode == 'config-poll-rule':
