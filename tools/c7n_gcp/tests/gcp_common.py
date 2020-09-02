@@ -14,8 +14,6 @@ from c7n_gcp.client import Session, LOCAL_THREAD
 from recorder import HttpRecorder, HttpReplay
 
 
-PROJECT_ID = ""
-
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data', 'flights')
 
 EVENT_DIR = os.path.join(os.path.dirname(__file__), 'data', 'events')
@@ -68,4 +66,4 @@ class BaseTest(FlightRecorderTest):
 
     @property
     def account_id(self):
-        return PROJECT_ID
+        return ""
