@@ -72,3 +72,11 @@ optional arguments:
   -v                    toggle verbose logging
 
 ```
+
+### mugc Usage with c7n-org
+
+In order to use mugc in conjunction with c7n-org to cleanup policies in multiple accounts within a single run, it must be ran with `run-script`. Below is an example of how to run it against a single account in a single region utilizing the c7n-org configuration file.
+
+```shell
+$ c7n-org run-script -r us-east-1 -s output-dir -c config.yaml -a account-name "/path/to/python mugc.py -c policies.yaml --dryrun"
+```
