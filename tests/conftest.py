@@ -1,7 +1,7 @@
 import re
 import pytest
 
-from .zpill import ACCOUNT_ID
+from .constants import ACCOUNT_ID
 
 try:
     from .zpill import PillTest
