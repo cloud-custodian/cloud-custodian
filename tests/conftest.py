@@ -1,9 +1,8 @@
-import re
 import os
 import pytest
 
-from .constants import ACCOUNT_ID
 from distutils.util import strtobool
+from .hooks import TerraformHooks
 
 try:
     from .zpill import PillTest
@@ -29,6 +28,12 @@ LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 LazyPluginCacheDir.value = '../.tfcache'
 
 
+def pytest_configure(config):
+    # Only register pytest-terraform hooks if the plugin is available
+    if config.pluginmanager.hasplugin("terraform"):
+        config.pluginmanager.register(TerraformHooks())
+
+
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture
     """
@@ -39,8 +44,3 @@ def test(request):
     test_utils = CustodianAWSTesting(request)
     test_utils.addCleanup(reset_session_cache)
     return test_utils
-
-
-def pytest_terraform_modify_state(tfstate):
-    """ Sanitize functional testing account data """
-    tfstate.update(re.sub(r'([0-9]+){12}', ACCOUNT_ID, str(tfstate)))
