@@ -1,11 +1,14 @@
 import re
+import os
 import pytest
 
 from .constants import ACCOUNT_ID
+from distutils.util import strtobool
 
 try:
     from .zpill import PillTest
     from c7n.testing import PyTestUtils, reset_session_cache
+    from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 except ImportError: # noqa
     # docker tests run with minimial deps
     class PyTestUtils:
@@ -14,11 +17,16 @@ except ImportError: # noqa
     class PillTest:
         pass
 
-try:
-    from pytest_terraform.tf import LazyReplay
-    LazyReplay.value = True
-except ImportError: # noqa
-    pass
+    class LazyReplay:
+        pass
+
+    class LazyPluginCacheDir:
+        pass
+
+
+# If we have C7N_FUNCTIONAL make sure Replay is False otherwise enable Replay
+LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
+LazyPluginCacheDir.value = '../.tfcache'
 
 
 class CustodianAWSTesting(PyTestUtils, PillTest):
