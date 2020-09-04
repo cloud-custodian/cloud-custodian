@@ -629,7 +629,7 @@ description = "A pytest plugin for using terraform fixtures"
 name = "pytest-terraform"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.3.2"
+version = "0.4.0"
 
 [package.dependencies]
 jmespath = ">=0.10.0,<0.11.0"
@@ -977,7 +977,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "b05537961e8a89b73d79d65ab31e4f2c85088d35c57fe4410655f03f81fed7f5"
+content-hash = "792bfd64ab1c7878f1c1b8109c1d028aea0b47933435c6f7c4926146e767a813"
 lock-version = "1.0"
 python-versions = "^3.6"
 
@@ -1294,7 +1294,8 @@ pytest-sugar = [
     {file = "pytest-sugar-0.9.4.tar.gz", hash = "sha256:b1b2186b0a72aada6859bea2a5764145e3aaa2c1cfbb23c3a19b5f7b697563d3"},
 ]
 pytest-terraform = [
-    {file = "pytest_terraform-0.3.2-py3-none-any.whl", hash = "sha256:255f49c7364efb700e324507854b4943281808330541e80d01ace27fc62892e0"},
+    {file = "pytest-terraform-0.4.0.tar.gz", hash = "sha256:5211e7447da64c75da97cf0327366444ee887d7232cf64906ce2b5b1148568f3"},
+    {file = "pytest_terraform-0.4.0-py3-none-any.whl", hash = "sha256:da1183a3dae8ecc9e653c5b08da2c7d23c1acdc25a9d9faf5915ed58c6faf175"},
 ]
 pytest-xdist = [
     {file = "pytest-xdist-1.34.0.tar.gz", hash = "sha256:340e8e83e2a4c0d861bdd8d05c5d7b7143f6eea0aba902997db15c2a86be04ee"},
