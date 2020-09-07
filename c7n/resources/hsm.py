@@ -20,7 +20,7 @@ class CloudHSMCluster(QueryResourceManager):
         id = name = 'ClusterId'
         filter_name = 'Filters'
         filter_type = 'scalar'
-        universal_taggable = True
+        universal_taggable = object()
 
     augment = universal_augment
 
