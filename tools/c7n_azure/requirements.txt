@@ -5,7 +5,7 @@ apscheduler==3.6.3
 argcomplete==1.12.0
 azure-cli-core==2.0.81
 azure-cli-nspkg==3.0.4
-azure-cli-telemetry==1.0.4
+azure-cli-telemetry==1.0.6
 azure-common==1.1.25
 azure-cosmos==3.2.0
 azure-cosmosdb-nspkg==2.0.2
@@ -32,7 +32,7 @@ azure-mgmt-datalake-store==0.5.0
 azure-mgmt-dns==3.0.0
 azure-mgmt-eventgrid==2.2.0
 azure-mgmt-eventhub==3.1.0
-azure-mgmt-hdinsight==1.6.0
+azure-mgmt-hdinsight==1.7.0
 azure-mgmt-iothub==0.10.0
 azure-mgmt-keyvault==1.1.0
 azure-mgmt-logic==3.0.0
@@ -55,13 +55,13 @@ azure-storage-blob==2.1.0
 azure-storage-common==2.1.0
 azure-storage-file==2.1.0
 azure-storage-queue==2.1.0
-bcrypt==3.1.7
+bcrypt==3.2.0
 certifi==2020.6.20
-cffi==1.14.1
+cffi==1.14.2
 chardet==3.0.4
 click==7.1.2
 colorama==0.4.3
-cryptography==3.0
+cryptography==3.1
 distlib==0.3.1
 humanfriendly==4.18
 idna==2.10
@@ -75,7 +75,7 @@ msrest==0.6.18
 msrestazure==0.6.4
 netaddr==0.7.20
 oauthlib==3.1.0
-paramiko==2.7.1
+paramiko==2.7.2
 portalocker==1.7.1
 pycparser==2.20
 pygments==2.6.1

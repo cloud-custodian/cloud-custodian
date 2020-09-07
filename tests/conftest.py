@@ -11,6 +11,12 @@ except ImportError: # noqa
     class PillTest:
         pass
 
+try:
+    from pytest_terraform.tf import LazyReplay
+    LazyReplay.value = True
+except ImportError: # noqa
+    pass
+
 
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture

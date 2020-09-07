@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_policystream"
-version = "0.4.4"
+version = "0.4.5"
 description = "Cloud Custodian - Git Commits as Logical Policy Changes"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
@@ -26,7 +26,7 @@ pygit2 = "~1.0"
 boto3 = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "~5.3.5"
+pytest = "~6.0.0"
 c7n = {path = "../..", develop = true}
 mock = "^4.0.2"
 

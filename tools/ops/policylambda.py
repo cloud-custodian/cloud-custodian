@@ -28,6 +28,8 @@ import json
 import os
 import string
 import yaml
+import boto3
+from boto3.session import Session
 
 from c7n.config import Config
 from c7n.policy import load as policy_load
@@ -54,18 +56,20 @@ def render(p):
     if key_arn:
         properties['KmsKeyArn']
 
-    # Event render
-    revents = {}
     if p.execution_mode == 'periodic':
+        # Event render
+        revents = {}
         revents = {
             'PolicySchedule': {
                 'Type': 'Schedule',
                 'Properties': {
                     'Schedule': p.data.get('mode', {}).get('schedule')}}
         }
-    else:
+        properties['Events'] = revents
+
+    elif p.execution_mode == 'cloudtrail':
         events = [e for e in policy_lambda.get_events(None)
-                  if isinstance(e, mu.CloudWatchEventSource)]
+                if isinstance(e, mu.CloudWatchEventSource)]
         if not events:
             return
 
@@ -77,11 +81,54 @@ def render(p):
                     'Properties': {
                         'Pattern': json.loads(e.render_event_pattern())}
             }
+        properties['Events'] = revents
 
-    properties['Events'] = revents
+    elif p.execution_mode == 'config-rule':
+        properties.pop('Delay', None)
+
     return {
         'Type': 'AWS::Serverless::Function',
         'Properties': properties}
+
+
+def render_config_rule(p):
+    policy_lambda = mu.PolicyLambda(p)
+    policy_lambda.arn = get_lambda_arn(policy_lambda.name)
+    config_rule = policy_lambda.get_events(Session)
+
+    properties = config_rule[0].get_rule_params(policy_lambda)
+
+    exec_mode_type = p.data.get('mode', {'type': 'pull'}).get('type')
+    if exec_mode_type == 'config-poll-rule':
+        properties.pop('Scope', None)
+
+    attributes = {}
+    attributes['Type'] = 'AWS::Config::ConfigRule'
+    attributes['DependsOn'] = resource_name(p.name) + "Invoke"
+    attributes['Properties'] = properties
+    return attributes
+
+
+def render_invoke(name):
+    return {
+        "DependsOn": name,
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+            "Action": "lambda:InvokeFunction",
+            "FunctionName": {"Ref": name},
+            "Principal": "config.amazonaws.com"
+        }
+    }
+
+
+def get_lambda_arn(function_name):
+    sts = boto3.client("sts")
+    account_id = sts.get_caller_identity()["Arn"].split(":")[4]
+    region = boto3.session.Session().region_name
+    arn = "arn:aws:lambda:" + str(region) \
+          + ":" + account_id + ":function:" \
+          + function_name
+    return arn
 
 
 def resource_name(policy_name):
@@ -133,6 +180,13 @@ def main():
         sam_func = render(p)
         if sam_func:
             sam['Resources'][resource_name(p.name)] = sam_func
+
+            if exec_mode_type == 'config-rule' or exec_mode_type == 'config-poll-rule':
+                configrule_resource = render_config_rule(p)
+                invoke_resource = render_invoke(resource_name(p.name))
+                sam['Resources'][resource_name(p.name) + "Invoke"] = invoke_resource
+                sam['Resources'][resource_name(p.name) + "ConfigRule"] = configrule_resource
+
             sam_func['Properties']['CodeUri'] = './%s.zip' % p.name
         else:
             print("unable to render sam for policy:%s" % p.name)
