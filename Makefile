@@ -1,5 +1,5 @@
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
-
+PKG_REPO = testpypi
 PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext
 
 install:
@@ -59,8 +59,11 @@ pkg-increment:
 	for pkg in $(PKG_SET); do cd $$pkg && poetry version patch && cd ../..; done
 # generate setup
 	@$(MAKE) pkg-gen-setup
+	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-publish-wheel:
+# azure pin uses ancient wheel version, upgrade first
+	pip install -U wheel
 # clean up any artifacts first
 	rm -f dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
@@ -71,8 +74,8 @@ pkg-publish-wheel:
 	twine check dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine check dist/* && cd ../..; done
 # upload to test pypi
-	twine upload -r testpypi dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r testpypi dist/* && cd ../..; done
+	twine upload -r $(PKG_REPO) dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 test-poetry:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
