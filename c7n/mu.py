@@ -936,7 +936,12 @@ def zinfo(fname):
 
 
 class AWSEventBase:
+    """for AWS Event Sources that want to utilize lazy client initialization.
 
+    Primarily utilized by sources that support static rendering to
+    IAAC templates (tools/ops/policylambda.py) to do so in an account
+    agnostic fashion.
+    """
     client_service = None
 
     def __init__(self, data, session_factory):
