@@ -52,7 +52,7 @@ def test_cloudtrail_policy():
 
 
 def test_fail_on_purpose():
-    print(1/0)
+    print(1 / 0)
 
 
 def test_periodic_policy():
