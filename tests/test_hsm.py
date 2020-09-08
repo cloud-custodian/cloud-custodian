@@ -47,3 +47,22 @@ class CloudHSMClusterTest(BaseTest):
         self.assertEqual(
             client.describe_clusters(Filters={'clusterIds': ['cluster-pqczsunscng']}).get(
                 'Clusters')[0].get('State'), 'DELETED')
+
+    def test_cloudhsm_tag(self):
+        factory = self.replay_flight_data("test_cloudhsm_tag")
+        client = factory().client("cloudhsmv2")
+        p = self.load_policy(
+            {
+                "name": "cloudhsm",
+                "resource": "cloudhsm-cluster",
+                "filters": [{"tag:c7n": "absent"}],
+                "actions": [{"type": "tag", "key": "c7n", "value": "test"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        id = resources[0]["ClusterId"]
+        tags = client.list_tags(ResourceId=id)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertTrue("c7n" in tag_map)
