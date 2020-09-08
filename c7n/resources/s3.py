@@ -1547,7 +1547,7 @@ class ToggleVersioning(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] != 'AccessDenied':
                 log.error(
-                    "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
+                    "Unable to put bucket versioning on bucket %s: %s" % (resource['Name'], e))
                 raise
             log.warning(
                 "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
