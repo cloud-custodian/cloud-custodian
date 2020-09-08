@@ -1,6 +1,7 @@
 # Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from gcp_common import BaseTest, event_data
 
@@ -41,8 +42,8 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(clusters[0]['name'], name)
 
     def test_cluster_delete(self):
-        project_id = "cloud-custodian"
-        resource_name = "custodian-test-delete-cluster"
+        project_id = "custodian"
+        resource_name = "custodian-cluster-delete-test"
 
         factory = self.replay_flight_data('gke-cluster-delete', project_id)
         p = self.load_policy(
@@ -53,8 +54,18 @@ class KubernetesClusterTest(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(len(resources), 1)
 
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'parent': 'projects/{}/locations/{}'.format(
+                    project_id,
+                    'us-east1-b')}
+            )
+        self.assertEqual(result['clusters'][0]['status'], 'STOPPING')
 
 class KubernetesClusterNodePoolTest(BaseTest):
 

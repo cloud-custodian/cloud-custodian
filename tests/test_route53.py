@@ -1,6 +1,7 @@
 # Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from .common import BaseTest
 
 
@@ -103,6 +104,33 @@ class Route53HostedZoneTest(BaseTest):
 
     def test_route53_delete_hostedzone(self):
         session_factory = self.replay_flight_data("test_route53_delete_hostedzone")
+        session = session_factory()
+        client = session.client("route53")
+        hosted_zone_name = "custodian-test.net"
+
+        if self.recording:
+            # Destroy the hzone if present
+            deleteHostedZoneIfPresent(client, hosted_zone_name)
+        
+        creation_response = client.create_hosted_zone(
+            Name=hosted_zone_name,
+            CallerReference="32313394123196",
+            HostedZoneConfig={
+                'Comment': 'Temp hosted zone for Cloud Custodian tests',
+                'PrivateZone': False
+            },
+        )
+        client.change_tags_for_resource (
+            ResourceType='hostedzone',
+            ResourceId=creation_response['HostedZone']['Id'][12:],
+            AddTags=[
+                {
+                    'Key': 'TestTag',
+                    'Value': 'yes'
+                },
+            ],
+        )
+
         p = self.load_policy(
             {
                 "name": "r53domain-delete-hostedzone",
@@ -112,8 +140,34 @@ class Route53HostedZoneTest(BaseTest):
             },
             session_factory=session_factory,
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        p.run()
+
+        try:
+            if self.recording:
+                # wait for hosted zone deletion
+                time.sleep(30)
+            client.delete_hosted_zone(Id=creation_response['HostedZone']['Id'][12:])
+        except Exception as exc:
+            response = getattr(
+                exc, "response"
+            )
+            if response["Error"]["Code"] != "NoSuchHostedZone":
+                raise
+
+
+def deleteHostedZoneIfPresent(client, hosted_zone_name):
+    try:
+        response = client.list_hosted_zones_by_name(DNSName=hosted_zone_name)        
+        for zone in response['HostedZones']:
+            client.delete_hosted_zone(Id=zone['Id'])
+
+    except Exception as exc:
+        response = getattr(
+            exc, "response"
+        )
+        if response["Error"]["Code"] != "NoSuchHostedZone":
+            raise
+
 
 
 class Route53HealthCheckTest(BaseTest):

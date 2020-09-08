@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "No hosted zone found with ID: Z02649631VO19X1SIJ2FI",
+            "Code": "NoSuchHostedZone",
+            "Type": "Sender"
+        },
+        "ResponseMetadata": {}
+    }
+}

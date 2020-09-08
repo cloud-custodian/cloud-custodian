@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Thu, 27 Aug 2020 09:22:36 GMT",
+    "date": "Tue, 08 Sep 2020 15:27:50 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
@@ -11,14 +11,14 @@
     "alt-svc": "h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "37735",
+    "content-length": "6701",
     "-content-encoding": "gzip",
-    "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/-/clusters?alt=json"
+    "content-location": "https://container.googleapis.com/v1/projects/custodian/locations/us-east1-b/clusters?alt=json"
   },
   "body": {
     "clusters": [
       {
-        "name": "custodian-test-delete-cluster",
+        "name": "custodian-cluster-delete-test",
         "nodeConfig": {
           "machineType": "e2-medium",
           "diskSizeGb": 100,
@@ -41,12 +41,12 @@
           }
         },
         "masterAuth": {
-          "clusterCaCertificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLekNDQWhPZ0F3SUJBZ0lSQU1SVmZlcmdkNVh5UUVXYjIxeE9mbmd3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1pUQTRPVGcyTXpRdFpURTJNQzAwWWpneExXRTFNR1l0WkRBM05HVXdZakZrT0dReQpNQjRYRFRJd01EZ3lOekE0TVRjek1Gb1hEVEkxTURneU5qQTVNVGN6TUZvd0x6RXRNQ3NHQTFVRUF4TWtaVEE0Ck9UZzJNelF0WlRFMk1DMDBZamd4TFdFMU1HWXRaREEzTkdVd1lqRmtPR1F5TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBcjdMdTRnL3NvL3ZoUTJhQ2FTSjRNZDU2eUJBaFVKcHpMeFk2UlBxZgpSWklzWWc1QVVoaW4reUFLdEVpQWgvYWZWUW92Q1hwQlliUHRhZEVudDk1bGJzNi8rMncyT0d5WVlpOVpPQktBCkkvUVN2VVR2VExjWnI3eEtMdmdUbHp5dFJqSi94RG1EN2lDajJpendDOGtGY3hBVWszUngxWUFad2FnVjJVVnoKQmg0Mkt1R3NTSnE0bkdlL2FhQnVGR1liaHBNbGljTjdPbGxEbzNocytJbUhpUGk4c0NBbkpmWmkvakNMdmQ5OApsbkJJSnQwNlBDTmp1M2lMWEhWY1RkMlhPMzV1UXFQU2pSemV3SUlIWnVha0t3Rlo1Qkl0U04vKzRneGYwbUl6CktnUklLNmFsMEpTeDFZSXdpQmZTbW1NTXQ1YUFMcll5VTUza0RQU3R0alRkTVFJREFRQUJvMEl3UURBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVUR5TjliYVVFdWF0NwpXTHlqQlR3Wml6eTV1ZXd3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUJzdGl5WmZORnNFUldVS3Jqb2hoR3ZhCmFaNTAzbFoyUmwrV0hhVHNuS1graVhzQUNnZGN3aU1oTDNZcnIzOWpjS2VoWFQ4Z3BibFhiTDVZMnRDMUlNbkQKWUJneDNXRERhMzZ5cFpBb0ltZStVRnJVSzQxNmRPNmUzUStFaGFuU2tFQUNQajhTQ2hpeVd1eUFlcWE2KzQ4Vgo5WFUzUnQ5eUc4OXV0OXg5a1IxZnYxbHJlRTRlN0JjeERoUU1ZK1JRSnRYNmVHM3ZvN2dWbzhWUjcyZjlHMUJmCkUxWUNxVFVSbVFkZ0lHTmZaTzVKNGMyL0xzTW5Yd0lubTd5N010RXBVRjdDb3UvNGtTV2gyS2RnVERoSXlDSjAKUlJUeVJydFYxUFBod3I4Ym50UEdsUHpWWmNpc1FnaTJFa1A5QXgwRkEwVEtZSDNXWEhlU3RWeFlmMVpzb2JBPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+          "clusterCaCertificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLekNDQWhPZ0F3SUJBZ0lSQU5qTEdPSHcxWmE2OFRVM2xldXpBOEF3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1pUSmxNV0U0T1dJdE9HWTROQzAwWkRWakxUaGhaVEV0TkRjMU1qWmtPV0U0WVdSbQpNQjRYRFRJd01Ea3dPREUwTWpRME1Gb1hEVEkxTURrd056RTFNalEwTUZvd0x6RXRNQ3NHQTFVRUF4TWtaVEpsCk1XRTRPV0l0T0dZNE5DMDBaRFZqTFRoaFpURXRORGMxTWpaa09XRTRZV1JtTUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBeGpVODkxOCtOOVdNVTlPTFkreWEvb29ZUURiL0tyQy9DMlp0cTY2cApKU1k3OUV3TjhjcWhXc2Z3SUpxLzh0ei9BRjdUWVdZSTZUaDAvMnB6Sm54RFJ5NTY2RmhFVkNXY0FtSFZod1pPCnkrcjFPRFIwZjQ1UWxpUHk4Y05pRjBWOFFlNUY4TXBSUy9tSU9WRFBYUExRMmNqWVJQTUl1ZjNVcm9HZ0hIUE4KWDRyUTNRNTRZNHlKN1VqTCtKOUhTbWdwZDY5SFRCQmt3Tml0K0s2dTdXS2lXZEcrcG9sbGQvSEQrbVdEZEh5egpJRXdjMXgxWE5GRmxMQmw0ODVoNGJSTWtWMHRybWNaaDBheWdoOUZ5VksycVBZQ2t5NFFlSVVpamtqSldnc2JHCitXSEYyR3dqcHo4cmtqUHowc2Z4OTFHYkVyUytONjRjdG1QVUVkUERZWURQb1FJREFRQUJvMEl3UURBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVU1xMml1V1VRSHJxQgpxVGhLQ1lQSnMvaS9lcFF3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUlZUy83S3dSdXFabHltTXVvQnBHSDJmCjhQMzIzdW1HWXBuQ3kzOGdqL2hTcXVrd3B4WEtaZ0RPZW1UdHR6WDFXV3FJY01PNm9rVzRhN2QxMS95RG9RNkYKU1F2VnpsbnBwRy9GdHRGaERoazRHbElETzFLcnVRUEpvM3RML1BBdHNKdkY0emFicVRBbzc1MTl2V1Uxck1XRQpHQnRKeUo3NlJ2L1NqMDNmcVNDWG0xL3FQTEdadlhxZEtyZXlxYXRUbkNaYjJqYllWSW9SQllOOFBSV0svQjRNCnJ0OXhRZkpRbEJGNkdiUG5xOWtQeEMzdnVXS0JIQ0dCMDh2NEZGaUl1QktkbEpVR2RGYmVGU3hMbWJlVEpGMUIKekpCNDkrdElvMXhhZlRVbVkyWlJHb3dxTXVQcEFldjhic0hPeXRZcGQxQnRVcXVTTTd1WU9uNndieTRLcVR3PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
         },
         "loggingService": "logging.googleapis.com/kubernetes",
         "monitoringService": "monitoring.googleapis.com/kubernetes",
         "network": "default",
-        "clusterIpv4Cidr": "10.68.0.0/14",
+        "clusterIpv4Cidr": "10.120.0.0/14",
         "addonsConfig": {
           "httpLoadBalancing": {},
           "horizontalPodAutoscaling": {},
@@ -96,12 +96,12 @@
             "locations": [
               "us-east1-b"
             ],
-            "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-east1-b/clusters/custodian-test-delete-cluster/nodePools/default-pool",
+            "selfLink": "https://container.googleapis.com/v1/projects/custodian/zones/us-east1-b/clusters/custodian-cluster-delete-test/nodePools/default-pool",
             "version": "1.15.12-gke.2",
             "instanceGroupUrls": [
-              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/instanceGroupManagers/gke-custodian-test-delet-default-pool-92ccc999-grp"
+              "https://www.googleapis.com/compute/v1/projects/custodian/zones/us-east1-b/instanceGroupManagers/gke-custodian-cluster-de-default-pool-c4187174-grp"
             ],
-            "status": "RUNNING",
+            "status": "STOPPING",
             "upgradeSettings": {
               "maxSurge": 1
             }
@@ -115,12 +115,12 @@
         "networkPolicy": {},
         "ipAllocationPolicy": {
           "useIpAliases": true,
-          "clusterIpv4Cidr": "10.68.0.0/14",
-          "servicesIpv4Cidr": "10.126.0.0/20",
-          "clusterSecondaryRangeName": "gke-custodian-test-delete-cluster-pods-913f875a",
-          "servicesSecondaryRangeName": "gke-custodian-test-delete-cluster-services-913f875a",
-          "clusterIpv4CidrBlock": "10.68.0.0/14",
-          "servicesIpv4CidrBlock": "10.126.0.0/20"
+          "clusterIpv4Cidr": "10.120.0.0/14",
+          "servicesIpv4Cidr": "10.124.0.0/20",
+          "clusterSecondaryRangeName": "gke-custodian-cluster-delete-test-pods-a4a19857",
+          "servicesSecondaryRangeName": "gke-custodian-cluster-delete-test-services-a4a19857",
+          "clusterIpv4CidrBlock": "10.120.0.0/14",
+          "servicesIpv4CidrBlock": "10.124.0.0/20"
         },
         "masterAuthorizedNetworksConfig": {},
         "maintenancePolicy": {
@@ -128,8 +128,8 @@
         },
         "autoscaling": {},
         "networkConfig": {
-          "network": "projects/cloud-custodian/global/networks/default",
-          "subnetwork": "projects/cloud-custodian/regions/us-east1/subnetworks/default"
+          "network": "projects/custodian/global/networks/default",
+          "subnetwork": "projects/custodian/regions/us-east1/subnetworks/default"
         },
         "defaultMaxPodsConstraint": {
           "maxPodsPerNode": "110"
@@ -139,17 +139,17 @@
           "state": "DECRYPTED"
         },
         "shieldedNodes": {},
-        "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-east1-b/clusters/custodian-test-delete-cluster",
+        "selfLink": "https://container.googleapis.com/v1/projects/custodian/zones/us-east1-b/clusters/custodian-cluster-delete-test",
         "zone": "us-east1-b",
-        "endpoint": "35.229.19.4",
+        "endpoint": "35.237.226.38",
         "initialClusterVersion": "1.15.12-gke.2",
         "currentMasterVersion": "1.15.12-gke.2",
         "currentNodeVersion": "1.15.12-gke.2",
-        "createTime": "2020-08-27T09:17:30+00:00",
-        "status": "RUNNING",
-        "servicesIpv4Cidr": "10.126.0.0/20",
+        "createTime": "2020-09-08T15:24:40+00:00",
+        "status": "STOPPING",
+        "servicesIpv4Cidr": "10.124.0.0/20",
         "instanceGroupUrls": [
-          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/instanceGroupManagers/gke-custodian-test-delet-default-pool-92ccc999-grp"
+          "https://www.googleapis.com/compute/v1/projects/custodian/zones/us-east1-b/instanceGroupManagers/gke-custodian-cluster-de-default-pool-c4187174-grp"
         ],
         "currentNodeCount": 3,
         "location": "us-east1-b"

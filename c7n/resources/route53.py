@@ -220,7 +220,9 @@ class Delete(BaseAction):
         client = local_session(self.manager.session_factory).client('route53')
         for hz in hosted_zones:
             self.manager.retry(
-                client.delete_hosted_zone, Id=hz['Id'])
+                client.delete_hosted_zone,
+                Id=hz['Id'],
+                ignore_err_codes=('NoSuchHostedZone', 'HostedZoneNotEmpty'))
 
 
 @HostedZone.action_registry.register('set-query-logging')

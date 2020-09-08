@@ -1,0 +1,39 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "Location": "https://route53.amazonaws.com/2013-04-01/hostedzone/Z02649631VO19X1SIJ2FI",
+        "HostedZone": {
+            "Id": "/hostedzone/Z02649631VO19X1SIJ2FI",
+            "Name": "custodian-test.net.",
+            "CallerReference": "32313394123196",
+            "Config": {
+                "Comment": "Temp hosted zone for Cloud Custodian tests",
+                "PrivateZone": false
+            },
+            "ResourceRecordSetCount": 2
+        },
+        "ChangeInfo": {
+            "Id": "/change/C02409161K4ZQAGNG6AV1",
+            "Status": "PENDING",
+            "SubmittedAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 9,
+                "day": 8,
+                "hour": 11,
+                "minute": 1,
+                "second": 34,
+                "microsecond": 383000
+            }
+        },
+        "DelegationSet": {
+            "NameServers": [
+                "ns-1300.awsdns-34.org",
+                "ns-2022.awsdns-60.co.uk",
+                "ns-359.awsdns-44.com",
+                "ns-916.awsdns-50.net"
+            ]
+        }
+    }
+}

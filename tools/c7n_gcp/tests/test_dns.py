@@ -42,8 +42,8 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(resources[0]['name'], resource_name)
 
     def test_managed_zone_delete(self):
-        project_id = "cloud-custodian"
-        resource_name = "custodian"
+        project_id = "custodian"
+        resource_name = "custodian-delete-test"
 
         factory = self.replay_flight_data('dns-managed-zone-delete', project_id)
         p = self.load_policy(
@@ -54,7 +54,11 @@ class DnsManagedZoneTest(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(len(resources), 1)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query('list', {"project": project_id})
+        self.assertNotIn(resource_name, result['managedZones'])
 
 
 class DnsPolicyTest(BaseTest):
