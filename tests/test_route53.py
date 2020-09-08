@@ -111,7 +111,7 @@ class Route53HostedZoneTest(BaseTest):
         if self.recording:
             # Destroy the hzone if present
             deleteHostedZoneIfPresent(client, hosted_zone_name)
-        
+
         creation_response = client.create_hosted_zone(
             Name=hosted_zone_name,
             CallerReference="32313394123196",
@@ -120,7 +120,7 @@ class Route53HostedZoneTest(BaseTest):
                 'PrivateZone': False
             },
         )
-        client.change_tags_for_resource (
+        client.change_tags_for_resource(
             ResourceType='hostedzone',
             ResourceId=creation_response['HostedZone']['Id'][12:],
             AddTags=[
@@ -157,7 +157,7 @@ class Route53HostedZoneTest(BaseTest):
 
 def deleteHostedZoneIfPresent(client, hosted_zone_name):
     try:
-        response = client.list_hosted_zones_by_name(DNSName=hosted_zone_name)        
+        response = client.list_hosted_zones_by_name(DNSName=hosted_zone_name)
         for zone in response['HostedZones']:
             client.delete_hosted_zone(Id=zone['Id'])
 
@@ -167,7 +167,6 @@ def deleteHostedZoneIfPresent(client, hosted_zone_name):
         )
         if response["Error"]["Code"] != "NoSuchHostedZone":
             raise
-
 
 
 class Route53HealthCheckTest(BaseTest):

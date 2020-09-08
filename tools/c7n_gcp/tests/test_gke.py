@@ -62,10 +62,11 @@ class KubernetesClusterTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query(
             'list', {'parent': 'projects/{}/locations/{}'.format(
-                    project_id,
-                    'us-east1-b')}
-            )
+                project_id,
+                'us-east1-b')})
+
         self.assertEqual(result['clusters'][0]['status'], 'STOPPING')
+
 
 class KubernetesClusterNodePoolTest(BaseTest):
 
