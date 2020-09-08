@@ -380,9 +380,9 @@ class AccessAnalyzer(ValueFilter):
           resource: account
           filters:
             - type: access-analyzer
-              key: '[].status'
+              key: 'status'
               value: ACTIVE
-              op: contains
+              op: eq
     """
 
     schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
@@ -390,12 +390,15 @@ class AccessAnalyzer(ValueFilter):
     permissions = ('access-analyzer:ListAnalyzers',)
 
     def process(self, resources, event=None):
-        if not resources[0].get('c7n:access_analyzers'):
+        account = resources[0]
+        if not account.get('c7n:access_analyzers'):
             client = local_session(self.manager.session_factory).client('accessanalyzer')
-            resources[0]['c7n:access_analyzers'] = self.manager.retry(
+            analyzers = self.manager.retry(
                 client.list_analyzers)['analyzers']
-        if self.match(resources[0]['c7n:access_analyzers']):
-            return resources
+        for analyzer in analyzers:
+            if self.match(analyzer):
+                account['c7n:access_analyzer'] = analyzer
+                return resources
         return []
 
 

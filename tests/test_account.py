@@ -866,9 +866,9 @@ class AccountTests(BaseTest):
                 "name": "account-access-analyzer",
                 "resource": "account",
                 "filters": [{"type": "access-analyzer",
-                             "key": "[].status",
+                             "key": "status",
                              "value": "ACTIVE",
-                             "op": "contains"}],
+                             "op": "eq"}],
             },
             session_factory=session_factory,
         )
