@@ -31,7 +31,7 @@ LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 LazyPluginCacheDir.value = '../.tfcache'
 
 
-class TerraformRewriteHooks:
+class TerraformAWSRewriteHooks:
     """ Local pytest plugin
 
     Work around to allow for dynamic registration of hooks based on plugin availability
@@ -49,7 +49,7 @@ class CustodianAWSTesting(PyTestUtils, PillTest):
 def pytest_configure(config):
     # Only register pytest-terraform hooks if the plugin is available
     if config.pluginmanager.hasplugin("terraform"):
-        config.pluginmanager.register(TerraformRewriteHooks())
+        config.pluginmanager.register(TerraformAWSRewriteHooks())
 
 
 @pytest.fixture(scope='function')
