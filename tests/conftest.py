@@ -1,8 +1,9 @@
 import os
+import re
 import pytest
 
 from distutils.util import strtobool
-from .hooks import TerraformHooks
+from .constants import ACCOUNT_ID
 
 try:
     from .zpill import PillTest
@@ -28,15 +29,25 @@ LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 LazyPluginCacheDir.value = '../.tfcache'
 
 
-def pytest_configure(config):
-    # Only register pytest-terraform hooks if the plugin is available
-    if config.pluginmanager.hasplugin("terraform"):
-        config.pluginmanager.register(TerraformHooks())
+class TerraformRewriteHooks():
+    """ Local pytest plugin
+
+    Work around to allow for dynamic registration of hooks based on plugin availability
+    """
+    def pytest_terraform_modify_state(self, tfstate):
+        """ Sanitize functional testing account data """
+        tfstate.update(re.sub(r'([0-9]+){12}', ACCOUNT_ID, str(tfstate)))
 
 
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture
     """
+
+
+def pytest_configure(config):
+    # Only register pytest-terraform hooks if the plugin is available
+    if config.pluginmanager.hasplugin("terraform"):
+        config.pluginmanager.register(TerraformRewriteHooks())
 
 
 @pytest.fixture(scope='function')
