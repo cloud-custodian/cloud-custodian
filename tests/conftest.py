@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import os
 import re
 import pytest
@@ -29,7 +31,7 @@ LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 LazyPluginCacheDir.value = '../.tfcache'
 
 
-class TerraformRewriteHooks():
+class TerraformRewriteHooks:
     """ Local pytest plugin
 
     Work around to allow for dynamic registration of hooks based on plugin availability
