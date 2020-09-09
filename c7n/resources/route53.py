@@ -231,21 +231,21 @@ class Delete(BaseAction):
                 # the hosted zone
                 self.manager.retry(
                     client.change_resource_record_sets,
-                        HostedZoneId=hz['Id'],
-                        ChangeBatch={
-                            'Changes': [
-                                {
-                                    'Action': 'DELETE',
-                                    'ResourceRecordSet': {
-                                        'Name': rrset['Name'],
-                                        'Type': rrset['Type'],
-                                        'TTL': rrset['TTL'],
-                                        'ResourceRecords': rrset['ResourceRecords']
-                                    },
-                                }
-                            ]
-                        },
-                        ignore_err_codes=('InvalidChangeBatch'))
+                    HostedZoneId=hz['Id'],
+                    ChangeBatch={
+                        'Changes': [
+                            {
+                                'Action': 'DELETE',
+                                'ResourceRecordSet': {
+                                    'Name': rrset['Name'],
+                                    'Type': rrset['Type'],
+                                    'TTL': rrset['TTL'],
+                                    'ResourceRecords': rrset['ResourceRecords']
+                                },
+                            }
+                        ]
+                    },
+                    ignore_err_codes=('InvalidChangeBatch'))
 
             self.manager.retry(
                 client.delete_hosted_zone,
