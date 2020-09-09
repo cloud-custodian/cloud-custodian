@@ -5,7 +5,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
-from c7n.tags import Tag, RemoveTag, universal_augment
+from c7n.tags import Tag, RemoveTag, universal_augment, TagDelayedAction, TagActionFilter
 
 
 @resources.register('directory')
@@ -105,6 +105,10 @@ class DirectoryRemoveTag(RemoveTag):
                     ResourceId=d['DirectoryId'], TagKeys=tags)
             except client.exceptions.EntityDoesNotExistException:
                 continue
+
+
+Directory.filter_registry.register('marked-for-op', TagActionFilter)
+Directory.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @resources.register('cloud-directory')

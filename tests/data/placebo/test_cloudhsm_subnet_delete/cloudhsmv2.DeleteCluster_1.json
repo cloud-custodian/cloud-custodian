@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Cluster": {
+            "BackupPolicy": "DEFAULT",
+            "ClusterId": "cluster-pqczsunscng",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 8,
+                "day": 25,
+                "hour": 15,
+                "minute": 42,
+                "second": 28,
+                "microsecond": 583000
+            },
+            "Hsms": [],
+            "HsmType": "hsm1.medium",
+            "SecurityGroup": "sg-0883c648cb9c52db2",
+            "State": "DELETE_IN_PROGRESS",
+            "StateMessage": "The cluster is being deleted.",
+            "SubnetMapping": {
+                "us-east-1a": "subnet-914763e7"
+            },
+            "VpcId": "vpc-d2d616b5",
+            "Certificates": {}
+        },
+        "ResponseMetadata": {}
+    }
+}
