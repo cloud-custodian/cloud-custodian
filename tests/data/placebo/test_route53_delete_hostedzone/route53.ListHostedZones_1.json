@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z03600293N9B4OGICOZ00",
+                "Name": "custodian-test.net.",
+                "CallerReference": "3231334178314555",
+                "Config": {
+                    "Comment": "Temp hosted zone for Cloud Custodian tests",
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 3
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}
