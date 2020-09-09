@@ -196,9 +196,11 @@ class Route53DomainRemoveTag(RemoveTag):
 
 @HostedZone.action_registry.register('delete')
 class Delete(BaseAction):
-    """Action to delete Route 53 hosted zones
+    """Action to delete Route 53 hosted zones.
 
-    It is recommended to use a filter to avoid unwanted deletion of R53 hosted zones
+    It is recommended to use a filter to avoid unwanted deletion of R53 hosted zones.
+    Beware that this action will wipe out the entire hosted zone, with all of the resource
+    record sets (DNS records) it contains.
 
     :example:
 
@@ -219,6 +221,32 @@ class Delete(BaseAction):
     def process(self, hosted_zones):
         client = local_session(self.manager.session_factory).client('route53')
         for hz in hosted_zones:
+
+            rrsets = client.list_resource_record_sets(
+                HostedZoneId=hz['Id'],
+            )
+
+            for rrset in rrsets['ResourceRecordSets']:
+                # Trigger the deletion of all the resource record sets before deleting
+                # the hosted zone
+                self.manager.retry(
+                    client.change_resource_record_sets,
+                        HostedZoneId=hz['Id'],
+                        ChangeBatch={
+                            'Changes': [
+                                {
+                                    'Action': 'DELETE',
+                                    'ResourceRecordSet': {
+                                        'Name': rrset['Name'],
+                                        'Type': rrset['Type'],
+                                        'TTL': rrset['TTL'],
+                                        'ResourceRecords': rrset['ResourceRecords']
+                                    },
+                                }
+                            ]
+                        },
+                        ignore_err_codes=('InvalidChangeBatch'))
+
             self.manager.retry(
                 client.delete_hosted_zone,
                 Id=hz['Id'],

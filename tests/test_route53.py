@@ -103,7 +103,7 @@ class Route53HostedZoneTest(BaseTest):
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
     def test_route53_delete_hostedzone(self):
-        session_factory = self.replay_flight_data("test_route53_delete_hostedzone")
+        session_factory = self.record_flight_data("test_route53_delete_hostedzone")
         session = session_factory()
         client = session.client("route53")
         hosted_zone_name = "custodian-test.net"
@@ -112,17 +112,37 @@ class Route53HostedZoneTest(BaseTest):
             # Destroy the hzone if present
             deleteHostedZoneIfPresent(client, hosted_zone_name)
 
-        creation_response = client.create_hosted_zone(
+        hz = client.create_hosted_zone(
             Name=hosted_zone_name,
-            CallerReference="32313394123196",
+            CallerReference="3231334178314555",
             HostedZoneConfig={
                 'Comment': 'Temp hosted zone for Cloud Custodian tests',
                 'PrivateZone': False
             },
         )
+        client.change_resource_record_sets(
+            HostedZoneId=hz['HostedZone']['Id'][12:],
+            ChangeBatch={
+                'Changes': [
+                    {
+                        'Action': 'CREATE',
+                        'ResourceRecordSet': {
+                            'Name': 'custodian-test.net',
+                            'Type': 'A',
+                            'TTL': 300,
+                            'ResourceRecords': [
+                                {
+                                    'Value': '1.1.1.1'
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        )
         client.change_tags_for_resource(
             ResourceType='hostedzone',
-            ResourceId=creation_response['HostedZone']['Id'][12:],
+            ResourceId=hz['HostedZone']['Id'][12:],
             AddTags=[
                 {
                     'Key': 'TestTag',
@@ -146,7 +166,7 @@ class Route53HostedZoneTest(BaseTest):
             if self.recording:
                 # wait for hosted zone deletion
                 time.sleep(30)
-            client.delete_hosted_zone(Id=creation_response['HostedZone']['Id'][12:])
+            client.delete_hosted_zone(Id=hz['HostedZone']['Id'][12:])
         except Exception as exc:
             response = getattr(
                 exc, "response"
