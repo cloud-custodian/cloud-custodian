@@ -391,14 +391,16 @@ class AccessAnalyzer(ValueFilter):
 
     def process(self, resources, event=None):
         account = resources[0]
-        if not account.get('c7n:access_analyzers'):
+        if not account.get('c7n:matched_analyzers'):
             client = local_session(self.manager.session_factory).client('accessanalyzer')
             analyzers = self.manager.retry(
                 client.list_analyzers)['analyzers']
+            account['c7n:matched_analyzers'] = []
         for analyzer in analyzers:
             if self.match(analyzer):
-                account['c7n:access_analyzer'] = analyzer
-                return resources
+                account['c7n:matched_analyzers'].append(analyzer)
+        if account['c7n:matched_analyzers']:
+            return resources
         return []
 
 
