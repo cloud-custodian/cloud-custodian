@@ -2,7 +2,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional
-from pytest_terraform import terraform, teardown
+from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
 import json
@@ -14,8 +14,7 @@ from c7n.resources.aws import shape_validate
 
 class TestSqs:
 
-    @functional
-    @terraform('sqs_delete', teardown=teardown.IGNORE)
+    @terraform('sqs_delete', teardown=terraform.TEARDOWN_IGNORE)
     def test_sqs_delete(self, test, sqs_delete):
         session_factory = test.replay_flight_data("test_sqs_delete", region='us-east-2')
         client = session_factory().client("sqs")
@@ -44,7 +43,6 @@ class TestSqs:
         if test.recording:
             time.sleep(2)
 
-    @functional
     @terraform('sqs_set_encryption')
     def test_sqs_set_encryption(self, test, sqs_set_encryption):
         session_factory = test.replay_flight_data("test_sqs_set_encryption", region='us-west-2')
@@ -76,7 +74,6 @@ class TestSqs:
         check_master_key = queue_attributes["Attributes"]["KmsMasterKeyId"]
         test.assertEqual(check_master_key, key_id)
 
-    @functional
     @terraform('sqs_remove_matched')
     def test_sqs_remove_matched(self, test, sqs_remove_matched):
         session_factory = test.replay_flight_data("test_sqs_remove_matched", region="us-east-2")
