@@ -2236,14 +2236,11 @@ class UserGroupDelete(BaseAction):
         error = None
         force = self.data.get('force', False)
         if force:
-            users = client.list_users()['Users']
+            users = client.get_group(GroupName=r['GroupName']).get('Users', [])
             for user in users:
-                try:
-                    client.remove_user_from_group(UserName=user['UserName'],
-                                                  GroupName=r['GroupName'])
-                except client.exceptions.NoSuchEntityException:
-                    # if user not in group, skip
-                    pass
+                client.remove_user_from_group(
+                    UserName=user['UserName'], GroupName=r['GroupName'])
+
         try:
             client.delete_group(GroupName=r['GroupName'])
         except client.exceptions.DeleteConflictException as e:
@@ -2252,9 +2249,7 @@ class UserGroupDelete(BaseAction):
                  "set force to remove all users from group")
                 % r['Arn'])
             error = e
-        except client.exceptions.NoSuchEntityException:
-            pass
-        except client.exceptions.UnmodifiableEntityException:
+        except (client.exceptions.NoSuchEntityException, client.exceptions.UnmodifiableEntityException):
             pass
         if error:
             raise error
