@@ -13,7 +13,7 @@ from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 import pytest
-from pytest_terraform import terraform, teardown
+from pytest_terraform import terraform
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
@@ -979,8 +979,7 @@ class IamPolicy(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-@functional
-@terraform('iam_user_group', teardown=teardown.IGNORE)
+@terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_group_delete(test, iam_user_group):
     session_factory = test.replay_flight_data('test_iam_group_delete')
     client = session_factory().client('iam')
