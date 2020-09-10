@@ -409,6 +409,46 @@ class IsQueryLoggingEnabled(Filter):
         return results
 
 
+@HostedZone.filter_registry.register('dangling-records')
+class DanglingRecords(Filter):
+    """Filter for hosted zones that have dangling records
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dangling-records
+            resource: hostedzone
+            region: us-east-1
+            filters:
+              - type: dangling-records
+    """
+
+    permissions = ('route53:ListResourceRecordSets',
+                   'route53:GetHostedZone',
+                   'ec2:DescribeAddresses')
+    schema = type_schema('dangling-records')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53')
+        ec2 = local_session(self.manager.session_factory).client('ec2')
+        results = []
+
+        for r in resources:
+            zid = r['Id'].split('/', 2)[-1]
+            record_sets = self.manager.retry(
+                client.list_resource_record_sets, HostedZoneId=zid)['ResourceRecordSets']
+            eips = [eip for record_set in record_sets
+                for eip in record_set['ResourceRecords'] if record_set['Type'] == 'A']
+            addresses = self.manager.retry(ec2.describe_addresses,
+                               Filters=[{'Name': 'public-ip', 'Values': eips}])['Addresses']
+            if addresses:
+                r['c7n:dangling-records'] = eips
+                results.append(r)
+        return results
+
+
 @HostedZone.action_registry.register('dangling-records')
 class GetDanglingRecords(BaseAction):
     """Enables query logging on a hosted zone.
