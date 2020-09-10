@@ -23,7 +23,7 @@ def test_config_rule_policy():
         'CheckEc2', 'CheckEc2ConfigRule', 'CheckEc2InvokePermission'))
     assert jmespath.search(
         'Resources.CheckEc2ConfigRule.Properties.Source.SourceIdentifier',
-        sam) == {'Fn:GetAtt': 'CheckEc2' + '.Arn'}
+        sam) == {'Fn::GetAtt': 'CheckEc2' + '.Arn'}
 
 
 def test_cloudtrail_policy():
