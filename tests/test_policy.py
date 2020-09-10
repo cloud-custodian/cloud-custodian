@@ -214,6 +214,16 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
@@ -1205,7 +1215,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',

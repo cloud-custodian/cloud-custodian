@@ -2202,3 +2202,55 @@ class IamGroupInlinePolicy(Filter):
             if len(r['c7n:InlinePolicies']) == 0 and not value:
                 res.append(r)
         return res
+
+
+@Group.action_registry.register('delete')
+class UserGroupDelete(BaseAction):
+    """Delete an IAM User Group.
+
+    For example, if you want to delete a group named 'test'.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-user-group
+          resource: aws.iam-group
+          filters:
+            - type: value
+              key: GroupName
+              value: test
+          actions:
+            - type: delete
+              force: True
+    """
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('iam:DeleteGroup', 'iam:RemoveUserFromGroup')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        error = None
+        force = self.data.get('force', False)
+        if force:
+            users = client.get_group(GroupName=r['GroupName']).get('Users', [])
+            for user in users:
+                client.remove_user_from_group(
+                    UserName=user['UserName'], GroupName=r['GroupName'])
+
+        try:
+            client.delete_group(GroupName=r['GroupName'])
+        except client.exceptions.DeleteConflictException as e:
+            self.log.warning(
+                ("Group:%s cannot be deleted, "
+                 "set force to remove all users from group")
+                % r['Arn'])
+            error = e
+        except (client.exceptions.NoSuchEntityException,
+                client.exceptions.UnmodifiableEntityException):
+            pass
+        if error:
+            raise error

@@ -3,11 +3,12 @@ Supplemental tooling for managing custodian packaging.
 
 Has various workarounds for poetry
 """
+from collections import defaultdict
 import click
 import os
 import sys
-
-from collections import defaultdict
+import toml
+from pathlib import Path
 
 
 @click.group()
@@ -49,6 +50,17 @@ setup_kwargs = {{
 
 setup(**setup_kwargs)
 """
+
+
+@cli.command()
+@click.option('-p', '--package-dir', type=click.Path())
+@click.option('-f', '--version-file', type=click.Path())
+def gen_version_file(package_dir, version_file):
+    data = toml.load(Path(str(package_dir)) / 'pyproject.toml')
+    version = data['tool']['poetry']['version']
+    with open(version_file, 'w') as fh:
+        fh.write('# Generated via tools/dev/poetrypkg.py\n')
+        fh.write('version = "{}"\n'.format(version))
 
 
 @cli.command()

@@ -798,13 +798,15 @@ class RedshiftSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'redshift'
-        arn_type = 'redshift-subnet-group'
+        arn_type = 'subnetgroup'
+        arn_separator = ':'
         id = name = 'ClusterSubnetGroupName'
         enum_spec = (
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
         cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
+        universal_taggable = object()
 
 
 @resources.register('redshift-snapshot')

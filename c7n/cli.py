@@ -1,6 +1,6 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+#
 # PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
 # is failing, move this above the license)
 
@@ -228,7 +228,7 @@ def setup_parser():
             "https://cloudcustodian.io/docs/aws/usage.html#metrics")
 
     run.add_argument(
-        "-m", "--metrics-enabled",
+        "-m", "--metrics-enabled", metavar="PROVIDER",
         default=None, nargs="?", const="aws",
         help=metrics_help)
     run.add_argument(
