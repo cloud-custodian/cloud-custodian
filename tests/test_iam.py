@@ -981,9 +981,9 @@ class IamPolicy(BaseTest):
 
 
 @functional
-@terraform('iam_user_group', teardown=teardown.IGNORE, replay=False)
+@terraform('iam_user_group', teardown=teardown.IGNORE)
 def test_iam_group_delete(test, iam_user_group):
-    session_factory = test.record_flight_data('test_iam_group_delete')
+    session_factory = test.replay_flight_data('test_iam_group_delete')
     client = session_factory().client('iam')
 
     pdata = {
