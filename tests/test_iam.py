@@ -12,6 +12,8 @@ from unittest import TestCase
 from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
+import pytest
+from pytest_terraform import terraform, teardown
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
@@ -977,7 +979,31 @@ class IamPolicy(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class IamGroupFilterUsage(BaseTest):
+
+@functional
+@terraform('iam_user_group', teardown=teardown.OFF)
+def test_iam_group_delete(test, iam_user_group):
+    session_factory = test.replay_flight_data('test_iam_group_delete')
+    client = session_factory().client('iam')
+
+    p = test.load_policy({
+        'name': 'group-delete',
+        'resource': 'iam-group',
+        'filters': [{'GroupName': 'sandbox_developers'}],
+        'actions': ['delete']},
+        session_factory=session_factory)
+
+    if test.recording:
+        time.sleep(3)
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_group(GroupName=resources[0]['GroupName'])
+
+
+class IamGroupTests(BaseTest):
 
     def test_iam_group_used_users(self):
         session_factory = self.replay_flight_data("test_iam_group_used_users")

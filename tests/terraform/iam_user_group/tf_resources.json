@@ -1,0 +1,15 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_group": {
+            "sandbox_evs": {
+                "arn": "arn:aws:iam::644160558196:group/users/sandbox_developers",
+                "id": "sandbox_developers",
+                "name": "sandbox_developers",
+                "path": "/users/",
+                "unique_id": "AGPAZL6XWCR2BKSYL5DVD"
+            }
+        }
+    }
+}
