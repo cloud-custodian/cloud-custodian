@@ -1,33 +1,21 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "KmsDataKeyReusePeriodSeconds": "300", 
-            "KmsMasterKeyId": "b5f0e072-1669-48e5-b110-c4989287ba54", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1509792347", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1509792378", 
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:sqs-test"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "5f8d6749-d4f8-55f0-91d0-353e48421f3a", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "5f8d6749-d4f8-55f0-91d0-353e48421f3a", 
-                "content-length": "1345", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 04 Nov 2017 10:46:18 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:4f300077-bffd-f1ce-7930-fc21b29cbf49",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1599099207",
+            "LastModifiedTimestamp": "1599099242",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "KmsMasterKeyId": "73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+            "KmsDataKeyReusePeriodSeconds": "300"
+        },
+        "ResponseMetadata": {}
     }
 }

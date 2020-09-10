@@ -17,10 +17,11 @@ from botocore.response import StreamingBody
 from placebo import pill
 
 from c7n.testing import CustodianTestCore
+from .constants import ACCOUNT_ID
 
 # Custodian Test Account. This is used only for testing.
 # Access is available for community project maintainers.
-ACCOUNT_ID = "644160558196"
+
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -287,7 +288,7 @@ class PillTest(CustodianTestCore):
     def cleanUp(self):
         self.pill = None
 
-    def record_flight_data(self, test_case, zdata=False, augment=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False, region=None):
         self.recording = True
         test_dir = os.path.join(self.placebo_dir, test_case)
         if not (zdata or augment):
@@ -295,7 +296,7 @@ class PillTest(CustodianTestCore):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         default_region = session.region_name
         if not zdata:
             pill = RedPill()
@@ -355,7 +356,7 @@ class PillTest(CustodianTestCore):
             if not os.path.exists(test_dir):
                 raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         if not zdata:
             pill = placebo.attach(session, test_dir)
             # pill = BluePill()
