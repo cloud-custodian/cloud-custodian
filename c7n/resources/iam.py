@@ -2249,7 +2249,8 @@ class UserGroupDelete(BaseAction):
                  "set force to remove all users from group")
                 % r['Arn'])
             error = e
-        except (client.exceptions.NoSuchEntityException, client.exceptions.UnmodifiableEntityException):
+        except (client.exceptions.NoSuchEntityException,
+                client.exceptions.UnmodifiableEntityException):
             pass
         if error:
             raise error

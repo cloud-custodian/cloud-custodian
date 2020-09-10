@@ -979,7 +979,6 @@ class IamPolicy(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-
 @functional
 @terraform('iam_user_group', teardown=teardown.IGNORE)
 def test_iam_group_delete(test, iam_user_group):
@@ -1004,7 +1003,7 @@ def test_iam_group_delete(test, iam_user_group):
 
     if test.recording:
         time.sleep(3)
-    
+
     p = test.load_policy(pdata, session_factory=session_factory)
     with pytest.raises(client.exceptions.DeleteConflictException):
         p.push(event)
