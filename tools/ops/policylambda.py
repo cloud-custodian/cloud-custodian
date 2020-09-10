@@ -81,9 +81,8 @@ def render_cwe(p, policy_lambda, sam):
             'PolicyTrigger%s' % string.ascii_uppercase[idx]] = {
                 'Type': 'CloudWatchEvent',
                 'Properties': {
-                    'Pattern': json.loads(e.render_event_pattern())
-                }
-            }
+                    'Pattern': json.loads(e.render_event_pattern())}
+        }
     properties['Events'] = revents
     return properties
 
