@@ -98,7 +98,7 @@ def render_config_rule(p, policy_lambda, sam):
 
     sam['Resources'][resource_name(p.name) + 'ConfigRule'] = {
         'Type': 'AWS::Config::ConfigRule',
-        'DependsOn': resource_name(p.name) + "Invoke",
+        'DependsOn': resource_name(p.name) + "InvokePermission",
         'Properties': rule_properties
     }
     sam['Resources'][resource_name(p.name) + 'InvokePermission'] = {
