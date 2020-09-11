@@ -388,21 +388,22 @@ class AccessAnalyzer(ValueFilter):
     schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('access-analyzer:ListAnalyzers',)
+    annotation_key = 'c7n:matched-analyzers'
 
     def process(self, resources, event=None):
         account = resources[0]
-        if not account.get('c7n:matched_analyzers'):
+        if not account.get(self.annotation_key):
             client = local_session(self.manager.session_factory).client('accessanalyzer')
-            analyzers = self.manager.retry(
-                client.list_analyzers)['analyzers']
-            matched_analyzers = []
-            for analyzer in analyzers:
-                if self.match(analyzer):
-                    matched_analyzers.append(analyzer)
-            account['c7n:matched_analyzers'] = matched_analyzers
-        if account.get('c7n:matched_analyzers', []):
-            return resources
-        return []
+            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
+        else:
+            analyzers = account.get(self.annotation_key)
+
+        matched_analyzers = []
+        for analyzer in analyzers:
+            if self.match(analyzer):
+                matched_analyzers.append(analyzer)
+        account[self.annotation_key] = matched_analyzers
+        return matched_analyzers and resources or []
 
 
 @filters.register('password-policy')
