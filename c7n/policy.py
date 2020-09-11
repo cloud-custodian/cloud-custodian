@@ -1129,7 +1129,7 @@ class Policy:
             if old_a.type == 'notify' and 'subject' in old_a.data:
                 new_a.data['subject'] = old_a.data['subject']
 
-    def push(self, event, lambda_ctx):
+    def push(self, event, lambda_ctx=None):
         mode = self.get_execution_mode()
         return mode.run(event, lambda_ctx)
 

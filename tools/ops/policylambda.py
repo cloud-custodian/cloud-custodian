@@ -89,7 +89,7 @@ def render_cwe(p, policy_lambda, sam):
 
 def render_config_rule(p, policy_lambda, sam):
     properties = render_function_properties(p, policy_lambda)
-    policy_lambda.arn = {'Ref': resource_name(p.name)}
+    policy_lambda.arn = {'Fn::GetAtt': resource_name(p.name) + ".Arn"}
     config_rule = policy_lambda.get_events(None).pop()
     rule_properties = config_rule.get_rule_params(policy_lambda)
 
@@ -98,7 +98,7 @@ def render_config_rule(p, policy_lambda, sam):
 
     sam['Resources'][resource_name(p.name) + 'ConfigRule'] = {
         'Type': 'AWS::Config::ConfigRule',
-        'DependsOn': resource_name(p.name) + "Invoke",
+        'DependsOn': resource_name(p.name) + "InvokePermission",
         'Properties': rule_properties
     }
     sam['Resources'][resource_name(p.name) + 'InvokePermission'] = {
