@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceRecordSets": [
+            {
+                "Name": "test.cloudcustodian.io.",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "3.83.0.194"
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

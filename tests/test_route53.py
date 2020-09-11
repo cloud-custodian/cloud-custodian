@@ -243,6 +243,19 @@ class Route53DomainTest(BaseTest):
         ]
         self.assertEqual(len(tags), 0)
 
+    def test_hostedzone_dangling_record(self):
+        session_factory = self.replay_flight_data(
+            'test_hosted_zone_dangling_record')
+        p = self.load_policy({
+            'name': 'dangling-records',
+            'resource': 'hostedzone',
+            'filters': [{'type': 'dangling-records'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], "/hostedzone/Z20H1474487I0O")
+        self.assertEqual(resources[0]['c7n:dangling-records'][0]['Name'], "test.cloudcustodian.io.")
+
 
 class Route53EnableDNSQueryLoggingTest(BaseTest):
 

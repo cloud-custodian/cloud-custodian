@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceTagSets": [
+            {
+                "ResourceType": "hostedzone",
+                "ResourceId": "Z20H1474487I0O",
+                "Tags": []
+            }
+        ]
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z20H1474487I0O",
+                "Name": "cloudcustodian.io.",
+                "CallerReference": "82155185-1D01-4ED0-8F5E-490E8715D384",
+                "Config": {
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 3
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

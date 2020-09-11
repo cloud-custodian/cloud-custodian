@@ -420,7 +420,6 @@ class DanglingRecords(Filter):
         policies:
           - name: dangling-records
             resource: hostedzone
-            region: us-east-1
             filters:
               - type: dangling-records
     """
@@ -439,97 +438,16 @@ class DanglingRecords(Filter):
             zid = r['Id'].split('/', 2)[-1]
             record_sets = self.manager.retry(
                 client.list_resource_record_sets, HostedZoneId=zid)['ResourceRecordSets']
-            eips = [eip for record_set in record_sets
-                for eip in record_set['ResourceRecords'] if record_set['Type'] == 'A']
-            addresses = self.manager.retry(ec2.describe_addresses,
-                               Filters=[{'Name': 'public-ip', 'Values': eips}])['Addresses']
-            if addresses:
-                r['c7n:dangling-records'] = eips
+            record_sets = [record_set for record_set in record_sets if record_set['Type'] == 'A']
+            eips = [eip for record_set in record_sets for eip in record_set['ResourceRecords']]
+            eips = [eip['Value'] for eip in eips]
+            if not eips:
+                continue
+            for ind, eip in enumerate(eips):
+                addresses = self.manager.retry(ec2.describe_addresses,
+                                Filters=[{'Name': 'public-ip', 'Values': [eip]}])['Addresses']
+                if not addresses:
+                    r.setdefault('c7n:dangling-records', []).append(record_sets[ind])
+            if 'c7n:dangling-records' in r and r['c7n:dangling-records']:
                 results.append(r)
         return results
-
-
-@HostedZone.action_registry.register('dangling-records')
-class GetDanglingRecords(BaseAction):
-    """Enables query logging on a hosted zone.
-
-    By default this enables a log group per route53 domain, alternatively
-    a log group name can be specified for a unified log across domains.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: enablednsquerylogging
-            resource: hostedzone
-            region: us-east-1
-            filters:
-              - type: query-logging-enabled
-                state: false
-            actions:
-              - type: set-query-logging
-                state: true
-
-    """
-
-    permissions = (
-        'route53:GetQueryLoggingConfig',
-        'route53:CreateQueryLoggingConfig',
-        'route53:DeleteQueryLoggingConfig',
-        'logs:DescribeLogGroups',
-        'logs:CreateLogGroup',
-        'logs:GetResourcePolicy',
-        'logs:PutResourcePolicy')
-
-    schema = type_schema(
-        'set-query-logging', **{
-            'set-permissions': {'type': 'boolean'},
-            'log-group-prefix': {'type': 'string', 'default': '/aws/route53'},
-            'log-group': {'type': 'string', 'default': 'auto'},
-            'state': {'type': 'boolean'}})
-
-    def validate(self):
-        if not self.data.get('state', True):
-            # By forcing use of a filter we ensure both getting to right set of
-            # resources as well avoiding an extra api call here, as we'll reuse
-            # the annotation from the filter for logging config.
-            if not [f for f in self.manager.iter_filters() if isinstance(
-                    f, IsQueryLoggingEnabled)]:
-                raise ValueError(
-                    "set-query-logging when deleting requires "
-                    "use of query-logging-enabled filter in policy")
-        return self
-
-    def process(self, resources):
-        if self.manager.config.region != 'us-east-1':
-            self.log.warning("set-query-logging should be only be performed region: us-east-1")
-
-        client = local_session(self.manager.session_factory).client('route53')
-        state = self.data.get('state', True)
-
-        zone_log_names = {z['Id']: self.get_zone_log_name(z) for z in resources}
-        if state:
-            self.ensure_log_groups(set(zone_log_names.values()))
-
-        for r in resources:
-            if not state:
-                try:
-                    client.delete_query_logging_config(Id=r['c7n:log-config']['Id'])
-                except client.exceptions.NoSuchQueryLoggingConfig:
-                    pass
-                continue
-            log_arn = "arn:aws:logs:us-east-1:{}:log-group:{}".format(
-                self.manager.account_id, zone_log_names[r['Id']])
-            client.create_query_logging_config(
-                HostedZoneId=r['Id'],
-                CloudWatchLogsLogGroupArn=log_arn)
-
-    def get_zone_log_name(self, zone):
-        if self.data.get('log-group', 'auto') == 'auto':
-            log_group_name = "%s/%s" % (
-                self.data.get('log-group-prefix', '/aws/route53').rstrip('/'),
-                zone['Name'][:-1])
-        else:
-            log_group_name = self.data['log-group']
-        return log_group_name
