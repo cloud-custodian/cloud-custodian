@@ -105,7 +105,7 @@ class KmsFilter(KmsRelatedFilter):
 
         policies:
           - name: elasticsearch-kms-key
-            resource: elasticsearch
+            resource: aws.elasticsearch
             filters:
               - type: kms-key
                 key: c7n:AliasName
