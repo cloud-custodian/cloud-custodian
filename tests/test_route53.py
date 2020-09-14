@@ -6,6 +6,7 @@ import time
 from .common import BaseTest
 from pytest_terraform import terraform
 
+
 class Route53HostedZoneTest(BaseTest):
 
     def test_hostedzone_shield(self):
@@ -105,9 +106,9 @@ class Route53HostedZoneTest(BaseTest):
 
     @terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
     def test_route53_delete_hostedzone(self):
-        session_factory = self.record_flight_data("test_route53_delete_hostedzone")
+        session_factory = self.replay_flight_data("test_route53_delete_hostedzone")
         session = session_factory()
-        client = session.client("route53") 
+        client = session.client("route53")
         hosted_zone_name = "custodian-test.net"
 
         if self.recording:
@@ -128,7 +129,7 @@ class Route53HostedZoneTest(BaseTest):
             if self.recording:
                 # wait for hosted zone deletion
                 time.sleep(30)
-            
+
             client.list_hosted_zones_by_name(DNSName=hosted_zone_name)
         except Exception as exc:
             response = getattr(
