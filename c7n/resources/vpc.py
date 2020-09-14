@@ -994,13 +994,15 @@ class SGPermission(Filter):
 
     .. code-block:: yaml
 
-      - type: ingress
-        Ports: [22, 3389]
-        Cidr:
-          value:
-            - "0.0.0.0/0"
-            - "::/0"
-          op: in
+      - or:
+        - type: ingress
+          Ports: [22, 3389]
+          Cidr:
+            value: "0.0.0.0/0"
+        - type: ingress
+          Ports: [22, 3389]
+          CidrV6:
+            value: "::/0"
 
     `SGReferences` can be used to filter out SG references in rules.
     In this example we want to block ingress rules that reference a SG

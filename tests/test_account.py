@@ -859,6 +859,22 @@ class AccountTests(BaseTest):
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status["IsLogging"])
 
+    def test_account_access_analyzer_filter(self):
+        session_factory = self.replay_flight_data("test_account_access_analyzer_filter")
+        p = self.load_policy(
+            {
+                "name": "account-access-analyzer",
+                "resource": "account",
+                "filters": [{"type": "access-analyzer",
+                             "key": "status",
+                             "value": "ACTIVE",
+                             "op": "eq"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_account_shield_filter(self):
         session_factory = self.replay_flight_data("test_account_shield_advanced_filter")
         p = self.load_policy(

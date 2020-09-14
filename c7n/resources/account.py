@@ -367,6 +367,45 @@ class IAMSummary(ValueFilter):
         return []
 
 
+@filters.register('access-analyzer')
+class AccessAnalyzer(ValueFilter):
+    """Check for access analyzers in an account
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: account-access-analyzer
+          resource: account
+          filters:
+            - type: access-analyzer
+              key: 'status'
+              value: ACTIVE
+              op: eq
+    """
+
+    schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('access-analyzer:ListAnalyzers',)
+    annotation_key = 'c7n:matched-analyzers'
+
+    def process(self, resources, event=None):
+        account = resources[0]
+        if not account.get(self.annotation_key):
+            client = local_session(self.manager.session_factory).client('accessanalyzer')
+            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
+        else:
+            analyzers = account.get(self.annotation_key)
+
+        matched_analyzers = []
+        for analyzer in analyzers:
+            if self.match(analyzer):
+                matched_analyzers.append(analyzer)
+        account[self.annotation_key] = matched_analyzers
+        return matched_analyzers and resources or []
+
+
 @filters.register('password-policy')
 class AccountPasswordPolicy(ValueFilter):
     """Check an account's password policy.
