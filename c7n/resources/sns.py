@@ -338,7 +338,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 new_policy = policy_statements
             new_policy, added = self.add_statements(new_policy)
 
-            if not removed or not added:
+            if not removed and not added:
                 continue
 
             results += {
