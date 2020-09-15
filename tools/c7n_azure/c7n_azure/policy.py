@@ -412,7 +412,7 @@ class AzureEventGridMode(AzureFunctionMode):
     def __init__(self, policy):
         super(AzureEventGridMode, self).__init__(policy)
         self.subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
+            self.policy.data['mode'].get('events', ()))
 
     def validate(self):
         super(AzureEventGridMode, self).validate()

@@ -258,6 +258,29 @@ class ElasticSearch(BaseTest):
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
         )
 
+    def test_backup_vault_kms_filter(self):
+        session_factory = self.replay_flight_data('test_elasticsearch_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-kms-filter',
+                'resource': 'elasticsearch',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/aws/es)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
 
 class TestReservedInstances(BaseTest):
 

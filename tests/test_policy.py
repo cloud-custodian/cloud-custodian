@@ -642,6 +642,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 

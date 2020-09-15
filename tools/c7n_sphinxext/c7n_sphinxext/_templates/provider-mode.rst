@@ -12,4 +12,9 @@
 {{edoc(m)}}
 {{eschema(m)}}
 
+{% set permissions = eperm(m) %}
+{% if permissions %}
+Permissions - {{ permissions | join(", ") }}
+{% endif %}
+
 {% endfor %}

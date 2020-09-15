@@ -181,6 +181,7 @@ class PolicyExecutionMode:
     """Policy execution semantics"""
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+    permissions = ()
 
     def __init__(self, policy):
         self.policy = policy
@@ -198,6 +199,9 @@ class PolicyExecutionMode:
 
     def validate(self):
         """Validate configuration settings for execution mode."""
+
+    def get_permissions(self):
+        return self.permissions
 
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""

@@ -10,6 +10,7 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
+from c7n.filters.kms import KmsRelatedFilter
 
 from .securityhub import PostFinding
 
@@ -90,6 +91,28 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: elasticsearch-kms-key
+            resource: aws.elasticsearch
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/es)"
+                op: regex
+    """
+    RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')
