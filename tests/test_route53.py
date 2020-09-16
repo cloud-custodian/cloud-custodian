@@ -123,7 +123,7 @@ def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
         time.sleep(30)
 
     assert client.list_hosted_zones_by_name(
-        DNSName='custodian.net').get('HostedZones') == []
+        DNSName=route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']).get('HostedZones') == []
 
 
 class Route53HealthCheckTest(BaseTest):
