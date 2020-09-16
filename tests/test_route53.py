@@ -124,7 +124,7 @@ def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
 
     assert client.list_hosted_zones_by_name(
         DNSName=route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']
-        ).get('HostedZones') == []
+    ).get('HostedZones') == []
 
 
 class Route53HealthCheckTest(BaseTest):
