@@ -22,7 +22,6 @@ import jmespath
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
-from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr
@@ -182,27 +181,11 @@ def trim_runtime(filters):
 
 class Filter(Element):
 
-    executor_factory = ThreadPoolExecutor
-
     log = logging.getLogger('custodian.filters')
-
-    metrics = ()
-    permissions = ()
-    schema = {'type': 'object'}
-    # schema aliases get hoisted into a jsonschema definition
-    # location, and then referenced inline.
-    schema_alias = None
 
     def __init__(self, data, manager=None):
         self.data = data
         self.manager = manager
-
-    def get_permissions(self):
-        return self.permissions
-
-    def validate(self):
-        """validate filter config, return validation error or self"""
-        return self
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
