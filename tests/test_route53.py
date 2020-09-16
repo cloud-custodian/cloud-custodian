@@ -104,15 +104,11 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
-    @terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
-    def test_route53_delete_hostedzone(self):
-        session_factory = self.replay_flight_data("test_route53_delete_hostedzone")
-        session = session_factory()
-        client = session.client("route53")
-        hosted_zone_name = "custodian-test.net"
-
-        if self.recording:
-            time.sleep(60)
+    
+    @terraform('route53_hostedzone_delete', scope='session')
+    def test_route53_hostedzone_delete(self, route53_hostedzone_delete):
+        session_factory = self.record_flight_data("test_route53_hostedzone_delete")
+        client = session_factory().client("route53")
 
         p = self.load_policy(
             {
@@ -129,8 +125,8 @@ class Route53HostedZoneTest(BaseTest):
             if self.recording:
                 # wait for hosted zone deletion
                 time.sleep(30)
-
-            client.list_hosted_zones_by_name(DNSName=hosted_zone_name)
+#route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']
+            client.list_hosted_zones_by_name(DNSName='custodian.net')
         except Exception as exc:
             response = getattr(
                 exc, "response"

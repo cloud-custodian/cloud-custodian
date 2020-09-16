@@ -1,4 +1,4 @@
-resource "aws_route53_zone" "custodian-test-hosted-zone" {
+resource "aws_route53_zone" "test_hosted_zone" {
     name = "custodian.net"
 
     tags = {
@@ -6,7 +6,7 @@ resource "aws_route53_zone" "custodian-test-hosted-zone" {
     }
 }
 
-resource "aws_route53_record" "test-custodian-r53-record" {
+resource "aws_route53_record" "test_r53_record" {
   zone_id = aws_route53_zone.custodian-test-hosted-zone.zone_id
   name    = "test.custodian.net"
   type    = "A"
