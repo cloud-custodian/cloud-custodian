@@ -104,35 +104,26 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
-    
-    @terraform('route53_hostedzone_delete', scope='session')
-    def test_route53_hostedzone_delete(self, route53_hostedzone_delete):
-        session_factory = self.record_flight_data("test_route53_hostedzone_delete")
-        client = session_factory().client("route53")
 
-        p = self.load_policy(
-            {
-                "name": "r53domain-delete-hostedzone",
-                "resource": "hostedzone",
-                "filters": [{"tag:TestTag": "present"}],
-                "actions": ["delete"],
-            },
-            session_factory=session_factory,
-        )
-        p.run()
+@terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_OFF)
+def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
+    session_factory = test.replay_flight_data("test_route53_hostedzone_delete")
+    client = session_factory().client("route53")
+    p = test.load_policy({
+        "name": "r53domain-delete-hostedzone",
+        "resource": "hostedzone",
+        "filters": [{"tag:TestTag": "present"}],
+        "actions": ["delete"]},
+        session_factory=session_factory)
 
-        try:
-            if self.recording:
-                # wait for hosted zone deletion
-                time.sleep(30)
-#route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']
-            client.list_hosted_zones_by_name(DNSName='custodian.net')
-        except Exception as exc:
-            response = getattr(
-                exc, "response"
-            )
-            if response["Error"]["Code"] != "InvalidDomainName":
-                raise
+    p.run()
+
+    if test.recording:
+        # wait for hosted zone deletion
+        time.sleep(30)
+
+    assert client.list_hosted_zones_by_name(
+        DNSName='custodian.net').get('HostedZones') == []
 
 
 class Route53HealthCheckTest(BaseTest):

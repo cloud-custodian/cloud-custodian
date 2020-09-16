@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "[A HostedZone must contain at least one NS record for the zone itself.]",
+            "Code": "InvalidChangeBatch",
+            "Type": "Sender"
+        },
+        "ResponseMetadata": {}
+    }
+}
