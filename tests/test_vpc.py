@@ -2790,7 +2790,7 @@ class NATGatewayTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-        p = self.load_policy(
+        p1 = self.load_policy(
             {
                 "name": "nat-gateways-no-connections",
                 "resource": "nat-gateway",
@@ -2807,7 +2807,7 @@ class NATGatewayTest(BaseTest):
             },
             session_factory=factory,
         )
-        resources = p.run()
+        resources = p1.run()
         self.assertEqual(len(resources), 1)
 
 
