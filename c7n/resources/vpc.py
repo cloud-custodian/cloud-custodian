@@ -2099,7 +2099,7 @@ class NATGateway(query.QueryResourceManager):
         date = 'CreateTime'
         dimension = 'NatGatewayId'
         metrics_namespace = 'AWS/NATGateway'
-        id_prefix = "nat-",
+        id_prefix = "nat-"
         cfn_type = config_type = 'AWS::EC2::NatGateway'
 
 
