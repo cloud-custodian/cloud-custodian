@@ -59,6 +59,16 @@ CONFIG_SCHEMA = {
         # Azure Function Config
         'function_properties': {
             'type': 'object',
+            'identity': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'type': {'enum': [
+                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'client_id': {'type': 'string'},
+                    'id': {'type': 'string'},
+                },
+            },
             'appInsights': {
                 'type': 'object',
                 'oneOf': [

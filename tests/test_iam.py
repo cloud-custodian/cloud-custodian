@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import datetime
 import os
@@ -22,6 +12,8 @@ from unittest import TestCase
 from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
+import pytest
+from pytest_terraform import terraform
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
@@ -374,6 +366,36 @@ class IAMMFAFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+@terraform('iam_role_delete', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_role_delete(test, iam_role_delete):
+    session_factory = test.replay_flight_data('test_iam_role_delete')
+    client = session_factory().client('iam')
+    pdata = {
+        'name': 'group-delete',
+        'resource': 'iam-role',
+        'mode': {
+            'type': 'cloudtrail',
+            'events': [{
+                'source': 'source',
+                'event': 'event',
+                'ids': "RoleNames"}]
+        },
+        'actions': [{'type': 'delete', 'force': True}]
+    }
+
+    event = {'detail': {
+        'eventName': 'event', 'eventSource': 'source',
+        'RoleNames': [iam_role_delete['aws_iam_role.test_role.name']]}}
+    if test.recording:
+        time.sleep(3)
+    p = test.load_policy(pdata, session_factory=session_factory)
+    resources = p.push(event)
+    assert len(resources) == 1
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_role(RoleName=iam_role_delete['aws_iam_role.test_role.name'])
 
 
 class IamRoleTest(BaseTest):
@@ -987,7 +1009,44 @@ class IamPolicy(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class IamGroupFilterUsage(BaseTest):
+@terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_group_delete(test, iam_user_group):
+    session_factory = test.replay_flight_data('test_iam_group_delete')
+    client = session_factory().client('iam')
+
+    pdata = {
+        'name': 'group-delete',
+        'resource': 'iam-group',
+        'mode': {
+            'type': 'cloudtrail',
+            'events': [{
+                'source': 'source',
+                'event': 'event',
+                'ids': "GroupNames"}]
+        },
+        'actions': ['delete']
+    }
+    event = {'detail': {
+        'eventName': 'event', 'eventSource': 'source',
+        'GroupNames': [iam_user_group['aws_iam_group.sandbox_devs.name']]}}
+
+    if test.recording:
+        time.sleep(3)
+
+    p = test.load_policy(pdata, session_factory=session_factory)
+    with pytest.raises(client.exceptions.DeleteConflictException):
+        p.push(event)
+
+    pdata['actions'] = [{'type': 'delete', 'force': True}]
+    p = test.load_policy(pdata, session_factory=session_factory)
+    resources = p.push(event)
+    assert len(resources) == 1
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_group(GroupName=resources[0]['GroupName'])
+
+
+class IamGroupTests(BaseTest):
 
     def test_iam_group_used_users(self):
         session_factory = self.replay_flight_data("test_iam_group_used_users")

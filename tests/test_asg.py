@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 from dateutil import tz as tzutil
 
@@ -215,6 +205,66 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue('Env' in resources[0].get('Tags')[1].values())
+
+    def test_asg_image_filter_from_launch_template(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_template")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*CentOS7.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_launch_config(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*Ubuntu1804.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_lc_and_lt(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_lc_and_lt")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*AmazonLinux2.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")

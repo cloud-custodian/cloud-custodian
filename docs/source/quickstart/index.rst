@@ -52,7 +52,7 @@ To install via docker, just run::
   $ docker pull cloudcustodian/c7n
 
 You'll need to export cloud provider credentials to the container
-when executing. One example, if your using environment variables for provider
+when executing. One example, if you're using environment variables for provider
 credentials::
 
   $ docker run -it \
@@ -211,7 +211,7 @@ You'll now have completion and validation while authoring policies.
 
 .. image:: c7n-editor.png
 
-Note if your authoring policies in json you can also configure the
+Note if you're authoring policies in json you can also configure the
 json-language-server for the same.
 
 Also, if you're seeing errors like ``'Request textDocument/hover failed with

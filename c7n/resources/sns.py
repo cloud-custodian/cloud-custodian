@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
@@ -41,6 +31,15 @@ class DescribeTopic(DescribeSource):
             return list(w.map(_augment, resources))
 
 
+class ConfigSNS(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['Tags'] = [{'Key': t['key'], 'Value': t['value']}
+          for t in item['supplementaryConfiguration']['Tags']]
+        return resource
+
+
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
@@ -53,7 +52,7 @@ class SNS(QueryResourceManager):
         id = 'TopicArn'
         name = 'DisplayName'
         dimension = 'TopicName'
-        cfn_type = 'AWS::SNS::Topic'
+        cfn_type = config_type = 'AWS::SNS::Topic'
         default_report_fields = (
             'TopicArn',
             'DisplayName',
@@ -65,7 +64,7 @@ class SNS(QueryResourceManager):
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
         'describe': DescribeTopic,
-        'config': ConfigSource
+        'config': ConfigSNS
     }
 
 
@@ -339,7 +338,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 new_policy = policy_statements
             new_policy, added = self.add_statements(new_policy)
 
-            if not removed or not added:
+            if not removed and not added:
                 continue
 
             results += {

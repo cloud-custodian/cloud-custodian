@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -25,6 +15,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('glue-connection')
@@ -411,6 +402,47 @@ class GlueSecurityConfiguration(QueryResourceManager):
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
         cfn_type = 'AWS::Glue::SecurityConfiguration'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-security-configuration-kms-key
+            resource: glue-security-configuration
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/)"
+                op: regex
+    """
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+            'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
+        }
+        key_type = self.data.get('key_type', 'all')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')

@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z2UGBO0SA2RMJ1",
+                "Name": "local.",
+                "CallerReference": "6c6azf4uswtoblvusgbbncdrvs7pkl5u-jopzl8e7",
+                "Config": {
+                    "Comment": "Created by Route 53 Auto Naming",
+                    "PrivateZone": true
+                },
+                "ResourceRecordSetCount": 2,
+                "LinkedService": {
+                    "ServicePrincipal": "servicediscovery.amazonaws.com",
+                    "Description": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-yolek4rawejl6tpc"
+                }
+            },
+            {
+                "Id": "/hostedzone/Z20H1474487I0O",
+                "Name": "cloudcustodian.io.",
+                "CallerReference": "82155185-1D01-4ED0-8F5E-490E8715D384",
+                "Config": {
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 3
+            },
+            {
+                "Id": "/hostedzone/Z010133614PKP2WTT25YJ",
+                "Name": "custodian.net.",
+                "CallerReference": "terraform-20200916140635881500000001",
+                "Config": {
+                    "Comment": "Managed by Terraform",
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 3
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

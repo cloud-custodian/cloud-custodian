@@ -1,16 +1,6 @@
 # Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from azure.mgmt.web.models import (
     Site,
@@ -18,7 +8,7 @@ from azure.mgmt.web.models import (
     ManagedServiceIdentity,
     ManagedServiceIdentityUserAssignedIdentitiesValue as UserAssignedIdentity)
 
-from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
+from c7n_azure.constants import (AUTH_TYPE_EMBED, FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.utils import azure_name_value_pair
 
@@ -36,7 +26,9 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
 
     def _get_identity(self, params):
         if 'identity' not in params:
-            return None
+            return
+        if params['identity']['type'] == AUTH_TYPE_EMBED:
+            return
         identity = ManagedServiceIdentity(type=params['identity']['type'])
         if 'id' in params['identity']:
             identity.user_assigned_identities = {

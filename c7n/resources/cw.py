@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -279,10 +269,10 @@ class LastWriteDays(Filter):
         group['streams'] = streams
         if not streams:
             last_timestamp = group['creationTime']
-        elif streams[0]['storedBytes'] == 0:
-            last_timestamp = streams[0]['creationTime']
-        else:
+        elif 'lastIngestionTime' in streams[0]:
             last_timestamp = streams[0]['lastIngestionTime']
+        else:
+            last_timestamp = streams[0]['creationTime']
 
         last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
