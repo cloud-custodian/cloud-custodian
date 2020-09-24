@@ -940,7 +940,7 @@ class PolicyConditions:
             'resource': self.policy.resource_type,
             'provider': self.policy.provider_name,
             'account_id': self.policy.options.account_id,
-            'now': datetime.utcnow().replace(tzinfo=tzutil.tzutc()),
+            'now': datetime.now(tzutil.tzutc()),
             'policy': self.policy.data
         })
 

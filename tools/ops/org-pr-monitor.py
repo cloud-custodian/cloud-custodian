@@ -162,7 +162,7 @@ def run(organization, hook_context, github_url, github_token,
             "Query failed to run by returning code of {}. {}".format(
                 response.status_code, response.content))
 
-    now = datetime.utcnow().replace(tzinfo=tzutc())
+    now = datetime.now(tzutc())
     stats = Counter()
     repo_metrics = RepoMetrics(
         Bag(session_factory=SessionFactory(region, assume_role=assume)),

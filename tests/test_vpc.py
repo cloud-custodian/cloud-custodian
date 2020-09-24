@@ -2768,6 +2768,48 @@ class NATGatewayTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_nat_gateways_metrics_filter(self):
+        factory = self.replay_flight_data("test_nat_gateways_metrics_filter")
+        p = self.load_policy(
+            {
+                "name": "nat-gateways-no-connections",
+                "resource": "nat-gateway",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "ActiveConnectionCount",
+                        "op": "lt",
+                        "value": 100,
+                        "statistics": "Sum",
+                        "days": 1
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p1 = self.load_policy(
+            {
+                "name": "nat-gateways-no-connections",
+                "resource": "nat-gateway",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "ActiveConnectionCount",
+                        "op": "gt",
+                        "value": 100,
+                        "statistics": "Sum",
+                        "days": 1
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p1.run()
+        self.assertEqual(len(resources), 1)
+
 
 class FlowLogsTest(BaseTest):
 

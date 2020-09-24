@@ -163,9 +163,10 @@ class NetworkLocation(Filter):
         results = []
         for r in resources:
             resource_sgs = self.filter_ignored(
-                [related_sg[sid] for sid in self.sg.get_related_ids([r])])
-            resource_subnets = self.filter_ignored([
-                related_subnet[sid] for sid in self.subnet.get_related_ids([r])])
+                [related_sg[sid] for sid in self.sg.get_related_ids([r]) if sid in related_sg])
+            resource_subnets = self.filter_ignored(
+                [related_subnet[sid] for sid in self.subnet.get_related_ids([r])
+                if sid in related_subnet])
             found = self.process_resource(r, resource_sgs, resource_subnets, key)
             if found:
                 results.append(found)
