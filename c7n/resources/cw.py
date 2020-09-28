@@ -175,7 +175,18 @@ class InsightRule(QueryResourceManager):
         enum_spec = ('describe_insight_rules', 'InsightRules', None)
         name = id = 'Name'
         universal_taggable = True
-        cfn_type = 'AWS::CloudWatch::InsightRule'
+        cfn_type = 'AWS::CloudWatch::ListTagsForResource'
+
+    def augment(self, rules):
+        client = local_session(self.session_factory).client('cloudwatch')
+
+        def _add_tags(r):
+            arn = self.generate_arn(r['Name'])
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceARN=arn).get('Tags', [])
+            return r
+
+        return list(map(_add_tags, rules))
 
 
 @InsightRule.action_registry.register('disable')
