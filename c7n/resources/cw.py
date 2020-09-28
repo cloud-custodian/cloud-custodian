@@ -175,7 +175,8 @@ class InsightRule(QueryResourceManager):
         enum_spec = ('describe_insight_rules', 'InsightRules', None)
         name = id = 'Name'
         universal_taggable = True
-        cfn_type = 'AWS::CloudWatch::ListTagsForResource'
+        permission_augment = ('cloudWatch::ListTagsForResource')
+        cfn_type = 'AWS::CloudWatch::InsightRule'
 
     def augment(self, rules):
         client = local_session(self.session_factory).client('cloudwatch')
