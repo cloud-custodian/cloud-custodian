@@ -93,6 +93,7 @@ ResourceMap = {
     "aws.iam-role": "c7n.resources.iam.Role",
     "aws.iam-user": "c7n.resources.iam.User",
     "aws.identity-pool": "c7n.resources.cognito.CognitoIdentityPool",
+    "aws.insight-rule": "c7n.resources.cw.InsightRule",
     "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
     "aws.iot": "c7n.resources.iot.IoT",
     "aws.kafka": "c7n.resources.kafka.Kafka",

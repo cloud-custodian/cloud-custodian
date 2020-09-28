@@ -166,6 +166,84 @@ class LogGroup(QueryResourceManager):
         return [r['arn'][:-2] for r in resources]
 
 
+@resources.register('insight-rule')
+class InsightRule(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudwatch'
+        arn_type = 'insight-rule'
+        enum_spec = ('describe_insight_rules', 'InsightRules', None)
+        name = id = 'Name'
+        universal_taggable = True
+        cfn_type = 'AWS::CloudWatch::InsightRule'
+
+
+@InsightRule.action_registry.register('disable')
+class InsightRuleDisable(BaseAction):
+    """Disable a cloudwatch contributor insight rule.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-disable-insight-rule
+                resource: insight-rule
+                filters:
+                  - type: value
+                    key: State
+                    value: ENABLED
+                    op: eq
+                actions:
+                  - disable
+    """
+
+    schema = type_schema('disable')
+    permissions = ('cloudwatch:DisableInsightRules',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.disable_insight_rules,
+                RuleNames=[r['Name'] for r in resource_set])
+
+
+@InsightRule.action_registry.register('delete')
+class InsightRuleDelete(BaseAction):
+    """Delete a cloudwatch contributor insight rule
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-stale-alarms
+                resource: insight-rule
+                filters:
+                  - type: value
+                    key: State
+                    value: ENABLED
+                    op: eq
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteInsightRules',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_insight_rules,
+                RuleNames=[r['Name'] for r in resource_set])
+
+
 @LogGroup.filter_registry.register('metrics')
 class LogGroupMetrics(MetricsFilter):
 
