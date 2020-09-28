@@ -220,7 +220,7 @@ class InsightRuleDelete(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: cloudwatch-delete-stale-alarms
+              - name: cloudwatch-delete-insight-rule
                 resource: insight-rule
                 filters:
                   - type: value
