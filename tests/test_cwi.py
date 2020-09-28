@@ -26,7 +26,7 @@ class CloudWatchInsightRule(BaseTest):
         self.assertEqual(insight_rules[0]["State"], "DISABLED")
 
     def test_delete_insight_rule(self):
-        factory = self.record_flight_data("test_insight_rule_delete")
+        factory = self.replay_flight_data("test_insight_rule_delete")
         p = self.load_policy(
             {
                 "name": "delete-insight-rule",
