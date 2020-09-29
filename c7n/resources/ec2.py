@@ -2182,3 +2182,17 @@ class ReservedInstance(query.QueryResourceManager):
         filter_name = 'ReservedInstancesIds'
         filter_type = 'list'
         arn_type = "reserved-instances"
+
+
+@resources.register('ec2-host')
+class DedicatedHost(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        name = id = 'HostId'
+        enum_spec = ('describe_hosts', 'Hosts', None)
+        arn_type = "dedicated-host"
+        filter_name = 'HostIds'
+        filter_type = 'list'
+        date = 'AllocationTime'
+        cfn_type = config_type = 'AWS::EC2::Host'

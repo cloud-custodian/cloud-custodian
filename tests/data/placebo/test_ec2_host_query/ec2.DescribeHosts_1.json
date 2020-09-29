@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "Hosts": [
+            {
+                "AutoPlacement": "off",
+                "AvailabilityZone": "us-east-1a",
+                "AvailableCapacity": {
+                    "AvailableInstanceCapacity": [
+                        {
+                            "AvailableCapacity": 48,
+                            "InstanceType": "m5.large",
+                            "TotalCapacity": 48
+                        }
+                    ],
+                    "AvailableVCpus": 96
+                },
+                "ClientToken": "token-123456",
+                "HostId": "h-05abcdd96ee9ca123",
+                "HostProperties": {
+                    "Cores": 48,
+                    "InstanceType": "m5.large",
+                    "InstanceFamily": "m5",
+                    "Sockets": 2,
+                    "TotalVCpus": 96
+                },
+                "HostReservationId": null,
+                "Instances": [],
+                "State": "available",
+                "AllocationTime": "2018-01-23T12:33:31.692Z",
+                "ReleaseTime": null,
+                "Tags": [],
+                "HostRecovery": "off",
+                "AllowsMultipleInstanceTypes": "off",
+                "OwnerId": "123412341234",
+                "AvailabilityZoneId": "use1-az1",
+                "MemberOfServiceLinkedResourceGroup": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
