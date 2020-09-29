@@ -174,7 +174,7 @@ class InsightRule(QueryResourceManager):
         arn_type = 'insight-rule'
         enum_spec = ('describe_insight_rules', 'InsightRules', None)
         name = id = 'Name'
-        universal_taggable = True
+        universal_taggable = object()
         permission_augment = ('cloudWatch::ListTagsForResource')
         cfn_type = 'AWS::CloudWatch::InsightRule'
 
