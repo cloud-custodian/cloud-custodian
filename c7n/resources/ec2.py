@@ -2186,6 +2186,8 @@ class ReservedInstance(query.QueryResourceManager):
 
 @resources.register('ec2-host')
 class DedicatedHost(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Dedicated Hosts.
+    """
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
@@ -2196,3 +2198,4 @@ class DedicatedHost(query.QueryResourceManager):
         filter_type = 'list'
         date = 'AllocationTime'
         cfn_type = config_type = 'AWS::EC2::Host'
+        permissions_enum = ('ec2:DescribeHosts',)
