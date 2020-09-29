@@ -1977,4 +1977,20 @@ class TestDedicatedHost(BaseTest):
             'name': 'ec2-dedicated-hosts',
             'resource': 'aws.ec2-host'}, session_factory=factory)
         resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_dedicated_host_instances_running_filter(self):
+        factory = self.replay_flight_data('test_ec2_host_query')
+        p = self.load_policy({
+            'name': 'ec2-dedicated-hosts',
+            'resource': 'aws.ec2-host',
+            'filters': [
+                {
+                    'type': 'instances-running',
+                    'op': 'less-than',
+                    'value': 2
+                }
+            ]}, session_factory=factory)
+        resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['HostId'], 'h-05abcdd96ee9ca123')
