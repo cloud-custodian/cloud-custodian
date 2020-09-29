@@ -2223,10 +2223,6 @@ class InstancesRunning(ValueFilter):
         required=['op', 'value'],
         rinherit=ValueFilter.schema,
         **{
-            'key': {
-                'type': 'string',
-                'default': 'Instances'
-            },
             'value': {
                 'type': 'integer'
             }
@@ -2240,7 +2236,7 @@ class InstancesRunning(ValueFilter):
         if 'op' not in self.data and 'op' in self.required_keys:
             raise PolicyValidationError(
                 "Missing 'op' in instances-running filter %s" % self.data)
-        if not self.data['op'] in OPERATORS:
+        if not self.data.get('op') in OPERATORS:
             raise PolicyValidationError(
                 "Invalid operator in instances-running filter %s" % self.data)
         if 'value' not in self.data and 'value' in self.required_keys:
@@ -2256,7 +2252,7 @@ class InstancesRunning(ValueFilter):
 
     def process(self, resources, event=None):
         op = OPERATORS[self.data.get('op')]
-        key = self.data.get('key', self.schema['properties']['key']['default'])
+        key = 'Instances'
         value = int(self.data.get('value'))
 
         return list(filter(lambda resource:

@@ -1994,3 +1994,56 @@ class TestDedicatedHost(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['HostId'], 'h-05abcdd96ee9ca123')
+
+    def test_dedicated_host_instances_running_filter_validation(self):
+        invalid_policies = [
+            # No op
+            {
+                'name': 'ec2-dedicated-hosts',
+                'resource': 'aws.ec2-host',
+                'filters': [
+                    {
+                        'type': 'instances-running',
+                        'value': 2
+                    }
+                ]
+            },
+            # Invalid op
+            {
+                'name': 'ec2-dedicated-hosts',
+                'resource': 'aws.ec2-host',
+                'filters': [
+                    {
+                        'type': 'instances-running',
+                        'op': 'anything',
+                        'value': 2
+                    }
+                ]
+            },
+            # No value
+            {
+                'name': 'ec2-dedicated-hosts',
+                'resource': 'aws.ec2-host',
+                'filters': [
+                    {
+                        'type': 'instances-running',
+                        'op': 'less-than'
+                    }
+                ]
+            },
+            # Invalid value
+            {
+                'name': 'ec2-dedicated-hosts',
+                'resource': 'aws.ec2-host',
+                'filters': [
+                    {
+                        'type': 'instances-running',
+                        'op': 'less-than',
+                        'value': 'abc'
+                    }
+                ]
+            }
+        ]
+
+        for invalid_policy in invalid_policies:
+            self.assertRaises(PolicyValidationError, self.load_policy, invalid_policy)
