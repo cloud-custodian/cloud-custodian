@@ -562,12 +562,12 @@ class EBSPostFinding(PostFinding):
         envelope, payload = self.format_envelope(r)
         details = select_keys(
             r, ['KmsKeyId', 'Size', 'SnapshotId', 'Status', 'CreateTime', 'Encrypted'])
-        details['CreateTime'] = details['CreateTime'].isoformat()
+        details['CreateTime'] = details['CreateTime']
         self.filter_empty(details)
         for attach in r.get('Attachments', ()):
             details.setdefault('Attachments', []).append(
                 self.filter_empty({
-                    'AttachTime': attach['AttachTime'].isoformat(),
+                    'AttachTime': attach['AttachTime'],
                     'InstanceId': attach.get('InstanceId'),
                     'DeleteOnTermination': attach['DeleteOnTermination'],
                     'Status': attach['State']}))

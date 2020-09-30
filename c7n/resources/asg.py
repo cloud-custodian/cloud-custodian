@@ -736,7 +736,7 @@ class AsgPostFinding(PostFinding):
         lid = self.launch_info.get_launch_id(r)
         if isinstance(lid, tuple):
             lid = "%s:%s" % lid
-        details['CreatedTime'] = details['CreatedTime'].isoformat()
+        details['CreatedTime'] = details['CreatedTime']
         # let's arbitrarily cut off key information per security hub's restrictions...
         details['LaunchConfigurationName'] = lid[:32]
         payload.update(details)
