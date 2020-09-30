@@ -112,6 +112,7 @@ class RemoveSharedAccounts(BaseAction):
     :example:
 
     .. code-block:: yaml
+
             policies:
               - name: catalog-portfolio-delete-share
                 resource: aws.catalog-portfolio
