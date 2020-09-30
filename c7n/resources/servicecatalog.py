@@ -105,10 +105,7 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
 
 @CatalogPortfolio.action_registry.register('remove-shared-accounts')
 class RemoveSharedAccounts(BaseAction):
-    """Action to remove the ability to launch an instance from an AMI
-    This action will remove any launch permissions granted to other
-    AWS accounts from the image, leaving only the owner capable of
-    launching it
+    """Action to delete Portfolio share with other accounts
 
     :example:
 
