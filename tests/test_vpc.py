@@ -8,6 +8,25 @@ from unittest.mock import MagicMock
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+from pytest_terraform import terraform
+
+
+@terraform('aws_code_build_vpc')
+def test_codebuild_unused(test, aws_code_build_vpc):
+    factory = test.replay_flight_data("test_security_group_codebuild_unused")
+    p = test.load_policy(
+        {"name": "sg-unused", "resource": "security-group", "filters": ["unused"]},
+        session_factory=factory,
+    )
+    unused = p.resource_manager.filters[0]
+    test.patch(
+        unused,
+        'get_scanners',
+        lambda: (('codebuild', unused.get_codebuild_sgs),))
+    resources = p.run()
+    sg_names = [resource['GroupName'] for resource in resources]
+    assert 'example2' in sg_names
+    assert 'example1' not in sg_names
 
 
 class VpcTest(BaseTest):
@@ -2766,6 +2785,48 @@ class NATGatewayTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_nat_gateways_metrics_filter(self):
+        factory = self.replay_flight_data("test_nat_gateways_metrics_filter")
+        p = self.load_policy(
+            {
+                "name": "nat-gateways-no-connections",
+                "resource": "nat-gateway",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "ActiveConnectionCount",
+                        "op": "lt",
+                        "value": 100,
+                        "statistics": "Sum",
+                        "days": 1
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p1 = self.load_policy(
+            {
+                "name": "nat-gateways-no-connections",
+                "resource": "nat-gateway",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "ActiveConnectionCount",
+                        "op": "gt",
+                        "value": 100,
+                        "statistics": "Sum",
+                        "days": 1
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p1.run()
         self.assertEqual(len(resources), 1)
 
 
