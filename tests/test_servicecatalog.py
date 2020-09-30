@@ -4,6 +4,7 @@
 
 from .common import BaseTest
 import time
+from c7n.exceptions import PolicyValidationError
 
 
 class TestServiceCatalog(BaseTest):
@@ -46,3 +47,14 @@ class TestServiceCatalog(BaseTest):
         self.assertEqual(resources[0]['Id'], 'port-hlgxpz7lc55iw')
         response = client.list_portfolio_access(PortfolioId='port-hlgxpz7lc55iw').get('AccountIds')
         self.assertEqual(len(response), 0)
+
+    def test_remove_accounts_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "catalog-portfolio-delete-shared-accounts",
+                "resource": "aws.catalog-portfolio",
+                "actions": [{"type": "remove-shared-accounts", "accounts": "matched"}],
+            }
+        )
