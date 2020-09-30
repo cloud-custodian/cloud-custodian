@@ -270,6 +270,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::XRay::EncryptionConfig',
             'AWS::SSM::AssociationCompliance',
+            'AWS::ServiceCatalog::Portfolio',
             'AWS::SSM::PatchCompliance',
             'AWS::ShieldRegional::Protection',
             'AWS::Config::ResourceCompliance',
