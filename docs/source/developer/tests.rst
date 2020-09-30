@@ -63,8 +63,8 @@ If a test requires pre-existing cloud resources in order to operate,
 `pytest-terraform` is the preferred method for creating those
 resources.  Pytest Terraform uses `Terraform <https://terraform.io>`_
 to repeatably & reliably stand up cloud resources.  Make sure you have
-installed terraform and the ``terraform`` command is available in you
-terminals path.
+installed terraform and the ``terraform`` command is available in your
+shell's PATH.
 
 .. code-block:: shell
 
