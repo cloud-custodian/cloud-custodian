@@ -25,7 +25,7 @@ Testing done without ``C7N_TEST_RUN`` and ``C7N_VALIDATE`` may not match ``tox``
 Operating System Compatibility
 ------------------------------
 
-Tests are currently executed on both Ubuntu 1604 and Windows Server 2019
+Tests are currently executed on both Ubuntu 1804 and Windows Server 2019
 and must pass on both operating systems.
 
 Both Windows and Linux sample dockerfiles are provided for running Tox which may help you.
@@ -43,21 +43,28 @@ directly from Microsoft for any hypervisor.
 Writing Tests for Cloud Controlled Resources
 --------------------------------------------
 
-Cloud Custodian makes use of flight recording to allow for both functional and unit testing.
-Several libraries are used to perform flight recording and replay.
+Cloud Custodian makes use of flight recording to allow for both
+functional and unit testing. Each of the custodian providers uses a
+separate technique that integrates with the provider sdk to handle
+flight recording of custodian's api calls, we provide a common
+abstraction over that in our testing framework via
+record_flight_data/replay_flight_data/
 
-  - `Placebo <https://placebo.readthedocs.io/en/latest/>`_ a library used to record and reply API calls
+For setting up infrastructure to execute/test policies against we use
+the pytest-terraform library.
+
   - `Pytest Terraform <https://github.com/cloud-custodian/pytest-terraform>`_ a Pytest Plugin leveraging terraform to setup test environments
 
-
-Each of these libraries record the responses from invocation and allow them to be replayed so tests can be run locally in a fraction of the time it would take in a live environment.
 
 Creating Cloud Resources with Terraform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a test requires pre-existing cloud resources in order to operate, `pytest-terraform` is the preferred method for creating those resources.
-Pytest Terraform uses `Terraform <https://terraform.io>`_ to repeatably & reliably stand up cloud resources.
-Make sure you have installed terraform and the ``terraform`` command is available in you terminals path.
+If a test requires pre-existing cloud resources in order to operate,
+`pytest-terraform` is the preferred method for creating those
+resources.  Pytest Terraform uses `Terraform <https://terraform.io>`_
+to repeatably & reliably stand up cloud resources.  Make sure you have
+installed terraform and the ``terraform`` command is available in you
+terminals path.
 
 .. code-block:: shell
 
@@ -81,9 +88,13 @@ It is placed in ``tests/terraform/file_example/main.tf``.
 
 When invoked, this terraform module will create a file ``bar.txt`` with the contents ``bar!``.
 
-In order to access this terraform module, import and wrap a test method with the ``@terraform`` decorator.
-The decorator takes one required positional argument, the name of the module, which in the above example is ``file_example``.
-In addition to the single positional argument, there are `several keyword arguments <https://github.com/cloud-custodian/pytest-terraform#usage>`_ to control how the decorator operates.
+In order to access this terraform module, import and wrap a test
+method with the ``@terraform`` decorator.  The decorator takes one
+required positional argument, the name of the module, which in the
+above example is ``file_example``.  In addition to the single
+positional argument, there are `several keyword arguments
+<https://github.com/cloud-custodian/pytest-terraform#usage>`_ to
+control how the decorator operates.
 
 The following code example demonstrates how to run and interact with the previous terraform file.
 
@@ -94,12 +105,17 @@ The following code example demonstrates how to run and interact with the previou
     def test_file_example(file_example):
         assert file_example['local_file.bar.content'] == 'bar!'
 
-When first creating a test, explicitly set the ``replay`` parameter to ``False``.
-This will force terraform to run on each invocation of the test and perform the flight recording function.
+When first creating a test, explicitly set the ``replay`` parameter to
+``False``.  This will force terraform to run on each invocation of the
+test and perform the flight recording function.
 
-The outputs and results of the terraform run are available via the fixture passed into the test method.
-The fixture will always be named after the terraform module supplied in the first parameter to the decorator, in this case ``file_example``.
-Pytest Terraform uses JMSEPath lookups, so in order to get the content of the ``bar`` resource ``local_file.bar.content`` is supplied as the item for lookup.
+The outputs and results of the terraform run are available via the
+fixture passed into the test method.  The fixture will always be named
+after the terraform module supplied in the first parameter to the
+decorator, in this case ``file_example``.  Pytest Terraform uses
+JMSEPath lookups, so in order to get the content of the ``bar``
+resource ``local_file.bar.content`` is supplied as the item for
+lookup.
 
 Run this test using the following command, which will also generate flight recordings for terraform:
 
@@ -296,7 +312,8 @@ with ``@functional`` and used class-based tests which inherited ``BaseTest``.
 
 To convert a previous functional testing to use the preferred pytest-terraform method
 outlined above, first move the method to either a base class which does not inherit
-``BaseTest`` or move the method to the root of the file.
+``BaseTest`` as pytest does not support fixtures with unittest derived classes, alternatively
+convert the test to a function.
 
 Once the test method has been relocated, replace any references to ``@functional``
 with the appropriate ``@terraform`` decorator from `Creating Cloud Resources with Terraform`_.
