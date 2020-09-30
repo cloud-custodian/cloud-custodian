@@ -53,6 +53,7 @@ class CatalogPortfolioDeleteAction(BaseAction):
               - type: cross-account
             actions:
               - type: remove-shared-accounts
+                accounts: matched
               - delete
     """
 
