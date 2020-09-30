@@ -270,7 +270,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::XRay::EncryptionConfig',
             'AWS::SSM::AssociationCompliance',
-            'AWS::ServiceCatalog::Portfolio',
             'AWS::SSM::PatchCompliance',
             'AWS::ShieldRegional::Protection',
             'AWS::Config::ResourceCompliance',
@@ -278,7 +277,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio',
             'AWS::SSM::FileData',
             'AWS::SecretsManager::Secret'}
 
