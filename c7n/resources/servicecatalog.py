@@ -4,8 +4,7 @@
 
 
 from c7n.actions import BaseAction
-from c7n.filters import CrossAccountAccessFilter, Filter
-from c7n.resolver import ValuesFrom
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.exceptions import PolicyValidationError
@@ -129,7 +128,7 @@ class RemoveSharedAccounts(BaseAction):
             {'enum': ['matched']},
             {'type': 'array', 'items': {'type': 'string', 'minLength': 12, 'maxLength': 12}}]},
         required=['accounts'])
-    
+
     permissions = ('servicecatalog:DeletePortfolioShare',)
 
     def validate(self):

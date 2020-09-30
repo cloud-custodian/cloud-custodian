@@ -5,6 +5,7 @@
 from .common import BaseTest
 import time
 
+
 class TestServiceCatalog(BaseTest):
 
     def test_portfolio_delete(self):
