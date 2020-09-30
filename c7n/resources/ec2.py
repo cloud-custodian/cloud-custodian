@@ -1142,7 +1142,7 @@ class InstanceFinding(PostFinding):
             "ImageId": r["ImageId"],
             "IpV4Addresses": ip_addresses,
             "KeyName": r.get("KeyName"),
-            "LaunchedAt": r["LaunchTime"]
+            "LaunchedAt": parse(r["LaunchTime"]).isoformat()
         }
 
         if "VpcId" in r:
