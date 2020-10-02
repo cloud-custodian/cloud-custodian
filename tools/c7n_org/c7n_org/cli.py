@@ -32,6 +32,7 @@ from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps
+from c7n.provider import clouds
 
 from c7n_org.utils import environ, account_tags
 
@@ -480,10 +481,12 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 def accounts_iterator(config):
     for a in config.get('accounts', ()):
+        a['provider'] = 'aws'
         yield a
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
+             'provider': 'azure',
              'regions': ['global'],
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
@@ -491,6 +494,7 @@ def accounts_iterator(config):
     for a in config.get('projects', ()):
         d = {'account_id': a['project_id'],
              'name': a.get('name', a['project_id']),
+             'provider': 'gcp',
              'regions': ['global'],
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
@@ -513,7 +517,7 @@ def run_account(account, region, policies_config, output_path,
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
     config = Config.empty(
-        region=region, cache=cache_path,
+        region=region, cache=cache_path, provider=account['provider'], regions=[region],
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         log_group=None, profile=None, external_id=None)
@@ -532,6 +536,11 @@ def run_account(account, region, policies_config, output_path,
         config['profile'] = account['profile']
 
     policies = PolicyCollection.from_data(policies_config, config)
+    provider = clouds[config['provider']]()
+    p_options = provider.initialize(config)
+    policies = provider.initialize_policies(PolicyCollection(policies, p_options),
+            p_options)
+
     policy_counts = {}
     success = True
     st = time.time()
@@ -543,6 +552,7 @@ def run_account(account, region, policies_config, output_path,
             # Variable expansion and non schema validation (not optional)
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
+
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
