@@ -1,18 +1,7 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import mock
-import sys
 from jsonschema.exceptions import best_match
 
 from c7n.exceptions import PolicyValidationError
@@ -110,7 +99,7 @@ class StructureParserTest(BaseTest):
         self.assertEqual(
             p.get_resource_types({'policies': [
                 {'resource': 'ec2'}, {'resource': 'gcp.instance'}]}),
-            set(('aws.ec2', 'gcp.instance')))
+            {'aws.ec2', 'gcp.instance'})
 
 
 class SchemaTest(BaseTest):
@@ -195,10 +184,6 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = specific_error(errors[0])
-        # the repr unicode situation on py2.7 makes this harder to do
-        # an exact match
-        if sys.version_info.major == 2:
-            return self.assertIn('StorageType', str(error))
         self.assertIn(
             "[{'StorageType': 'StandardStorage'}] is not of type 'object'",
             str(error))
@@ -306,6 +291,14 @@ class SchemaTest(BaseTest):
         data = {
             "vars": {"alpha": 1, "beta": 2},
             "policies": [{"name": "test", "resource": "ec2", "tags": ["controls"]}],
+        }
+        load_resources(('aws.ec2',))
+        validator = self.get_validator(data)
+        self.assertEqual(list(validator.iter_errors(data)), [])
+
+    def test_metadata(self):
+        data = {
+            "policies": [{"name": "test", "resource": "ec2", "metadata": {"createdBy": "Totoro"}}],
         }
         load_resources(('aws.ec2',))
         validator = self.get_validator(data)

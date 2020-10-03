@@ -196,6 +196,57 @@ The final example shows how to use resource ids to specify existing infrastructu
             value_type: swap
             value: "PowerState/running"
 
+
+Authentication Options
+######################
+
+Custodian function policies support three different authentications
+modes.
+
+ - User Assigned Identities
+ - Managed System Identities
+ - Service Principal Credentials (embedded)
+
+Its highly recommended to utilize User Assigned Identities, like
+Managed System Identities they provide for dynamic automatically
+rotated credentials, but they also allow for simplicity of managing
+role assignments to a smaller population of IAM resources, instead
+of one per policy function.
+
+.. code-block:: yaml
+
+    policies:
+      - name: stopped-vm
+        mode:
+            type: azure-periodic
+            schedule: '0 0 * * * *'
+            provision-options:
+              identity:
+                type: UserAssigned
+		id: my-custodian-identity
+         resource: azure.vm
+
+The identity id can be provided as the user assigned identity's name
+or the id, it will be resolved and verified as the policy is
+provisioned.
+
+Using a Managed System Identity results in the creation of an identity
+per policy function, which then needs subsequent role assignments
+before the policy will be able to successfully execute.
+
+.. code-block:: yaml
+
+    policies:
+      - name: stopped-vm
+        mode:
+            type: azure-periodic
+            schedule: '0 0 * * * *'
+            provision-options:
+              identity:
+                type: SystemAssigned
+         resource: azure.vm
+
+
 Execution Options
 #################
 
@@ -268,27 +319,6 @@ The following example shows an Event Grid Function that runs when a value is wri
           - type: auto-tag-user
             tag: CreatorEmail
 
-Advanced Authentication Options
-###############################
-
-By default, the Function is both deployed and executed using the credentials and subscription ID you have configured
-for the Custodian CLI. To target your policy toward a subscription ID different than 
-the one that the Function is deployed in, you can provide environment variables to set the Service Principal that should be
-used when the function is executed.
-
-The following variables are used to overwrite the Service Principal configuration used when the Function is executed:
-
-.. code-block:: bash
-
-    AZURE_FUNCTION_TENANT_ID
-    AZURE_FUNCTION_CLIENT_ID
-    AZURE_FUNCTION_CLIENT_SECRET
-    AZURE_FUNCTION_SUBSCRIPTION_ID
-
-These will be used for Function execution, but the normal Service Principal credentials will still be
-used for deployment.
-
-You may provide the Service Principal credentials for the function but omit the subscription ID if you wish.
 
 Management Groups Support
 #########################

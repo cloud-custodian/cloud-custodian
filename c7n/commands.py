@@ -1,25 +1,15 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
+import json
 import itertools
 import logging
 import os
 import sys
 
-import six
 import yaml
 from yaml.constructor import ConstructorError
 
@@ -123,7 +113,7 @@ def policy_command(f):
             policies_by_region[p.options.region].append(p)
         for region in policies_by_region.keys():
             counts = Counter([p.name for p in policies_by_region[region]])
-            for policy, count in six.iteritems(counts):
+            for policy, count in counts.items():
                 if count > 1:
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
@@ -276,17 +266,21 @@ def run(options, policies):
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
+    errored_policies = []
     for policy in policies:
         try:
             policy()
         except Exception:
             exit_code = 2
+            errored_policies.append(policy.name)
             if options.debug:
                 raise
             log.exception(
                 "Error while executing policy %s, continuing" % (
                     policy.name))
     if exit_code != 0:
+        log.error("The following policies had errors while executing\n - %s" % (
+            "\n - ".join(errored_policies)))
         sys.exit(exit_code)
 
 
@@ -318,6 +312,17 @@ def logs(options, policies):
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
     from c7n import schema
+
+    if options.outline:
+        provider = options.resource and options.resource.lower().split('.')[0] or None
+        load_available()
+        outline = schema.resource_outline(provider)
+        if options.json:
+            print(json.dumps(outline, indent=2))
+            return
+        print(yaml_dump(outline))
+        return
+
     if options.json:
         schema.json_dump(options.resource)
         return
@@ -349,7 +354,7 @@ def schema_cmd(options):
     if not options.resource:
         load_available(resources=False)
         resource_list = {'resources': sorted(itertools.chain(
-            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES]))}
+            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES if p in clouds]))}
         print(yaml_dump(resource_list))
         return
 
@@ -368,14 +373,14 @@ def schema_cmd(options):
         components[0] = '%s.%s' % (cloud_provider, components[0])
         load_resources((components[0],))
         resource_mapping = schema.resource_vocabulary(
-            cloud_provider)
+            cloud_provider, aliases=True)
     elif components[0] == 'mode':
         load_available(resources=False)
         resource_mapping = schema.resource_vocabulary()
     else:  # compatibility, aws is default for provider
         components[0] = 'aws.%s' % components[0]
         load_resources((components[0],))
-        resource_mapping = schema.resource_vocabulary('aws')
+        resource_mapping = schema.resource_vocabulary('aws', aliases=True)
 
     #
     # Handle mode
@@ -402,18 +407,21 @@ def schema_cmd(options):
     # Handle resource
     #
     resource = components[0]
-    if resource not in resource_mapping:
+    resource_info = resource_mapping.get(resource, resource_mapping['aliases'].get(resource))
+    if resource_info is None:
         log.error('{} is not a valid resource'.format(resource))
         sys.exit(1)
 
     if len(components) == 1:
         docstring = ElementSchema.doc(
-            resource_mapping[resource]['classes']['resource'])
-        del(resource_mapping[resource]['classes'])
+            resource_info['classes']['resource'])
+        resource_info.pop('classes', None)
+        # de-alias to preferred resource name
+        resource = resource_info.pop('resource_type', resource)
         if docstring:
             print("\nHelp\n----\n")
             print(docstring + '\n')
-        output = {resource: resource_mapping[resource]}
+        output = {resource: resource_info}
         print(yaml_dump(output))
         return
 
@@ -427,9 +435,9 @@ def schema_cmd(options):
 
     if len(components) == 2:
         output = "No {} available for resource {}.".format(category, resource)
-        if category in resource_mapping[resource]:
+        if category in resource_info:
             output = {resource: {
-                category: resource_mapping[resource][category]}}
+                category: resource_info[category]}}
         print(yaml_dump(output))
         return
 
@@ -437,12 +445,12 @@ def schema_cmd(options):
     # Handle item
     #
     item = components[2]
-    if item not in resource_mapping[resource][category]:
+    if item not in resource_info[category]:
         log.error('{} is not in the {} list for resource {}'.format(item, category, resource))
         sys.exit(1)
 
     if len(components) == 3:
-        cls = resource_mapping[resource]['classes'][category][item]
+        cls = resource_info['classes'][category][item]
         _print_cls_schema(cls)
 
         return

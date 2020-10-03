@@ -1,16 +1,6 @@
 # Copyright 2015-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import itertools
 import logging
 
@@ -30,35 +20,6 @@ from c7n.utils import local_session, type_schema, chunks, merge_dict_list
 log = logging.getLogger('custodian.ami')
 
 
-@resources.register('ami')
-class AMI(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'ec2'
-        arn_type = 'image'
-        enum_spec = (
-            'describe_images', 'Images', None)
-        id = 'ImageId'
-        filter_name = 'ImageIds'
-        filter_type = 'list'
-        name = 'Name'
-        date = 'CreationDate'
-
-    def resources(self, query=None):
-        if query is None and 'query' in self.data:
-            query = merge_dict_list(self.data['query'])
-        elif query is None:
-            query = {}
-        if query.get('Owners') is None:
-            query['Owners'] = ['self']
-        return super(AMI, self).resources(query=query)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeImageSource(self)
-        return super(AMI, self).get_source(source_type)
-
-
 class DescribeImageSource(DescribeSource):
 
     def get_resources(self, ids, cache=True):
@@ -73,6 +34,34 @@ class DescribeImageSource(DescribeSource):
                     continue
                 raise
         return []
+
+
+@resources.register('ami')
+class AMI(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ec2'
+        arn_type = 'image'
+        enum_spec = (
+            'describe_images', 'Images', None)
+        id = 'ImageId'
+        filter_name = 'ImageIds'
+        filter_type = 'list'
+        name = 'Name'
+        date = 'CreationDate'
+
+    source_mapping = {
+        'describe': DescribeImageSource
+    }
+
+    def resources(self, query=None):
+        if query is None and 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        if query.get('Owners') is None:
+            query['Owners'] = ['self']
+        return super(AMI, self).resources(query=query)
 
 
 class ErrorHandler:

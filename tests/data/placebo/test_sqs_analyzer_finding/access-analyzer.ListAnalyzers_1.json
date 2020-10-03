@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "analyzers": [
+            {
+                "arn": "arn:aws:access-analyzer:us-east-1:644160558196:analyzer/ConsoleAnalyzer-d534345f-499c-43bd-bbcc-dd637ab352d2",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 13,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "lastResourceAnalyzed": "arn:aws:sqs:us-east-1:644160558196:public-test",
+                "lastResourceAnalyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 17,
+                    "second": 55,
+                    "microsecond": 64000
+                },
+                "name": "ConsoleAnalyzer-d534345f-499c-43bd-bbcc-dd637ab352d2",
+                "status": "ACTIVE",
+                "tags": {},
+                "type": "ACCOUNT"
+            }
+        ]
+    }
+}

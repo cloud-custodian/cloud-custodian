@@ -1,17 +1,7 @@
 # Copyright 2018-2019 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
@@ -195,7 +185,7 @@ class SecurityHub(LambdaMode):
             resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
-                set((self.policy.options.account_id,)) != {
+                {self.policy.options.account_id} != {
                     rarn.account_id for rarn in resource_arns}):
             msg = ('hub-mode not configured for multi-account member-role '
                    'but multiple resource accounts found')
@@ -288,6 +278,9 @@ class PostFinding(Action):
 
     Example generate a finding for accounts that don't have shield enabled.
 
+    Note with Cloud Custodian (0.9+) you need to enable the Custodian integration
+    to post-findings, see Getting Started with :ref:`Security Hub <aws-securityhub>`.
+
     :example:
 
     .. code-block:: yaml
@@ -315,6 +308,8 @@ class PostFinding(Action):
     FindingVersion = "2018-10-08"
 
     permissions = ('securityhub:BatchImportFindings',)
+
+    resource_type = ""
 
     schema_alias = True
     schema = type_schema(
@@ -394,7 +389,7 @@ class PostFinding(Action):
             self.manager.session_factory).client(
                 "securityhub", region_name=region_name)
 
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        now = datetime.now(tzutc()).isoformat()
         # default batch size to one to work around security hub console issue
         # which only shows a single resource in a finding.
         batch_size = self.data.get('batch_size', 1)
@@ -539,6 +534,20 @@ class PostFinding(Action):
 
         return filter_empty(finding)
 
+    def format_envelope(self, r):
+        details = {}
+        envelope = filter_empty({
+            'Id': self.manager.get_arns([r])[0],
+            'Region': self.manager.config.region,
+            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Partition': get_partition(self.manager.config.region),
+            'Details': {self.resource_type: details},
+            'Type': self.resource_type
+        })
+        return envelope, details
+
+    filter_empty = staticmethod(filter_empty)
+
     def format_resource(self, r):
         raise NotImplementedError("subclass responsibility")
 
@@ -546,6 +555,7 @@ class PostFinding(Action):
 class OtherResourcePostFinding(PostFinding):
 
     fields = ()
+    resource_type = 'Other'
 
     def format_resource(self, r):
         details = {}
@@ -573,11 +583,11 @@ class OtherResourcePostFinding(PostFinding):
 
         details['c7n:resource-type'] = self.manager.type
         other = {
-            'Type': 'Other',
+            'Type': self.resource_type,
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
             'Partition': get_partition(self.manager.config.region),
-            'Details': {'Other': filter_empty(details)}
+            'Details': {self.resource_type: filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
         if tags:

@@ -1,20 +1,10 @@
 # Copyright 2019 Manheim / Cox Automotive
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 from time import sleep
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from random import uniform
 import requests
 from jsonpointer import resolve_pointer, JsonPointerException
@@ -57,6 +47,7 @@ class SplunkHecDelivery:
         payloads = []
         events = self.get_splunk_events(msg)
         indices = self._splunk_indices_for_message(msg)
+        sourcetype = self.config.get('splunk_hec_sourcetype', '_json')
         for event in events:
             for index in indices:
                 payloads.append({
@@ -65,7 +56,7 @@ class SplunkHecDelivery:
                     'source': '%s-cloud-custodian' % event.get(
                         'account', 'unknown'
                     ),
-                    'sourcetype': '_json',
+                    'sourcetype': sourcetype,
                     'index': index,
                     'event': event
                 })

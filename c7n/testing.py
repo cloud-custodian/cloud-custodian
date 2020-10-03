@@ -1,16 +1,6 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import functools
 import io
@@ -25,7 +15,6 @@ import unittest
 
 import pytest
 import mock
-import six
 import yaml
 
 from c7n import policy
@@ -192,7 +181,7 @@ class CustodianTestCore:
     # Backport from stdlib for 2.7 compat, drop when 2.7 support is dropped.
     def assertRegex(self, text, expected_regex, msg=None):
         """Fail the test unless the text matches the regular expression."""
-        if isinstance(expected_regex, six.string_types):
+        if isinstance(expected_regex, str):
             assert expected_regex, "expected_regex must not be empty."
             expected_regex = re.compile(expected_regex)
         if not expected_regex.search(text):
@@ -247,7 +236,7 @@ class TextTestIO(io.StringIO):
         # we want to print from (think: traceback.print_exc) so we can't
         # standardize the arg type up at the call sites. Hack it here.
 
-        if not isinstance(b, six.text_type):
+        if not isinstance(b, str):
             b = b.decode("utf8")
         return super(TextTestIO, self).write(b)
 
@@ -277,10 +266,8 @@ def mock_datetime_now(tgt, dt):
         def utcnow(cls):
             return cls.target
 
-        # Python2 & Python3 compatible metaclass
-
     MockedDatetime = DatetimeSubclassMeta(
-        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
+        "datetime",
         (BaseMockedDatetime,),
         {},
     )

@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
@@ -869,6 +859,22 @@ class AccountTests(BaseTest):
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status["IsLogging"])
 
+    def test_account_access_analyzer_filter(self):
+        session_factory = self.replay_flight_data("test_account_access_analyzer_filter")
+        p = self.load_policy(
+            {
+                "name": "account-access-analyzer",
+                "resource": "account",
+                "filters": [{"type": "access-analyzer",
+                             "key": "status",
+                             "value": "ACTIVE",
+                             "op": "eq"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_account_shield_filter(self):
         session_factory = self.replay_flight_data("test_account_shield_advanced_filter")
         p = self.load_policy(
@@ -958,6 +964,55 @@ class AccountTests(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
+
+    def test_get_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'get-emr-block-public-access-configuration',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'emr-block-public-access',
+                    'key': 'BlockPublicAccessConfiguration',
+                    'value': 'not-null'
+                }]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:emr-block-public-access"]
+            ['BlockPublicAccessConfigurationMetadata']['CreatedByArn'],
+            "arn:aws:iam::12345678901:user/test")
+
+    def test_set_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_set_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'account',
+                'actions': [{
+                    "type": "set-emr-block-public-access",
+                    "config": {
+                        "BlockPublicSecurityGroupRules": True,
+                        "PermittedPublicSecurityGroupRuleRanges": [{
+                            "MinRange": 23,
+                            "MaxRange": 23,
+                        }]
+                    }
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(session_factory).client("emr")
+        resp = client.get_block_public_access_configuration()
+
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MinRange'], 23)
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MaxRange'], 23)
 
 
 class AccountDataEvents(BaseTest):
@@ -1115,5 +1170,20 @@ class AccountDataEvents(BaseTest):
             },
             session_factory=session_factory,
         )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_enable_securityhub(self):
+        session_factory = self.replay_flight_data("test_enable_securityhub")
+        p = self.load_policy(
+            {
+                'name': 'enable-sechub',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'securityhub',
+                    'enabled': False
+                }],
+            },
+            session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

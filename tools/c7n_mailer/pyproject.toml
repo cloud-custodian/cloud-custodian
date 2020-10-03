@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_mailer"
-version = "0.5.7"
+version = "0.6.5"
 description = "Cloud Custodian - Reference Mailer"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -15,6 +15,7 @@ classifiers = [
 
 [tool.poetry.scripts]
 c7n-mailer = 'c7n_mailer.cli:main'
+c7n-mailer-replay = 'c7n_mailer.replay:main'
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -27,10 +28,12 @@ sendgrid = "^6.1.1"
 datadog = "^0.34.0"
 ldap3 = "^2.6.1"
 redis = "^3.4.1"
+jsonpointer = "^2.0"
+jsonpatch = "^1.25"
 
 [tool.poetry.dev-dependencies]
 fakeredis = "^1.2.0"
-pytest = "~5.3.5"
+pytest = "~6.0.0"
 importlib-metadata = "^1.5.0;python_version<3.8"
 
 [build-system]

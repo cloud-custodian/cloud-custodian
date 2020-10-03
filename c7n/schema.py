@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Jsonschema validation of cloud custodian config.
 
@@ -30,14 +20,21 @@ import json
 import inspect
 import logging
 
-from jsonschema import Draft4Validator as JsonSchemaValidator
+from jsonschema import Draft7Validator as JsonSchemaValidator
 from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
-from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
+from c7n.filters.core import (
+    ValueFilter,
+    EventFilter,
+    AgeFilter,
+    ReduceFilter,
+    OPERATORS,
+    VALUE_TYPES,
+)
 from c7n.structure import StructureParser # noqa
 
 
@@ -151,6 +148,24 @@ def generate(resource_types=()):
     resource_defs = {}
     definitions = {
         'resources': resource_defs,
+        'string_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {"type": "string"},
+            },
+        },
+        'basic_dict': {
+            "type": "object",
+            "patternProperties": {
+                "": {
+                    'oneOf': [
+                        {"type": "string"},
+                        {"type": "boolean"},
+                        {"type": "number"},
+                    ],
+                }
+            },
+        },
         'iam-statement': {
             'additionalProperties': False,
             'type': 'object',
@@ -184,6 +199,7 @@ def generate(resource_types=()):
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
             'age': AgeFilter.schema,
+            'reduce': ReduceFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
@@ -243,8 +259,9 @@ def generate(resource_types=()):
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'metadata': {'$ref': '#/definitions/basic_dict'},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config',
+                'source': {'enum': ['describe', 'config', 'inventory',
                                     'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',
@@ -279,13 +296,12 @@ def generate(resource_types=()):
     }
 
     resource_refs = []
-    for cloud_name, cloud_type in clouds.items():
-        for type_name, resource_type in cloud_type.resources.items():
+    for cloud_name, cloud_type in sorted(clouds.items()):
+        for type_name, resource_type in sorted(cloud_type.resources.items()):
             r_type_name = "%s.%s" % (cloud_name, type_name)
             if resource_types and r_type_name not in resource_types:
                 if not resource_type.type_aliases:
                     continue
-                # atm only azure is using type aliases.
                 elif not {"%s.%s" % (cloud_name, ralias) for ralias
                         in resource_type.type_aliases}.intersection(
                         resource_types):
@@ -426,9 +442,25 @@ def process_resource(
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary(cloud_name=None, qualify_name=True):
+def resource_outline(provider=None):
+    outline = {}
+    for cname, ctype in sorted(clouds.items()):
+        if provider and provider != cname:
+            continue
+        cresources = outline[cname] = {}
+        for rname, rtype in sorted(ctype.resources.items()):
+            cresources['%s.%s' % (cname, rname)] = rinfo = {}
+            rinfo['filters'] = sorted(rtype.filter_registry.keys())
+            rinfo['actions'] = sorted(rtype.action_registry.keys())
+    return outline
+
+
+def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
     vocabulary = {}
     resources = {}
+
+    if aliases:
+        vocabulary['aliases'] = {}
 
     for cname, ctype in clouds.items():
         if cloud_name is not None and cloud_name != cname:
@@ -458,6 +490,15 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+        if aliases and resource_type.type_aliases:
+            provider = type_name.split('.', 1)[0]
+            for type_alias in resource_type.type_aliases:
+                vocabulary['aliases'][
+                    "{}.{}".format(provider, type_alias)] = vocabulary[type_name]
+                if provider == 'aws':
+                    vocabulary['aliases'][type_alias] = vocabulary[type_name]
+            vocabulary[type_name]['resource_type'] = type_name
 
     vocabulary["mode"] = {}
     for mode_name, cls in execution.items():

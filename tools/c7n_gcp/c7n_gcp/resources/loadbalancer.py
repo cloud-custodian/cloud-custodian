@@ -1,16 +1,6 @@
 # Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -31,6 +21,7 @@ class LoadBalancingAddress(QueryResourceManager):
         default_report_fields = [
             name, "description", "address", "status", "region", "addressType"
         ]
+        asset_type = "compute.googleapis.com/Address"
 
         @staticmethod
         def get(client, resource_info):
@@ -69,6 +60,7 @@ class LoadBalancingUrlMap(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "defaultService"
         ]
+        asset_type = "compute.googleapis.com/UrlMap"
 
         @staticmethod
         def get(client, resource_info):
@@ -92,6 +84,7 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "service"
         ]
+        asset_type = " compute.googleapis.com/TargetTcpProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -115,6 +108,7 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "service", "sslPolicy"
         ]
+        asset_type = "compute.googleapis.com/TargetSslProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -191,6 +185,7 @@ class LoadBalancingSslCertificate(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "type", "region", "expireTime"
         ]
+        asset_type = "compute.googleapis.com/SslCertificate"
 
         @staticmethod
         def get(client, resource_info):
@@ -213,6 +208,7 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
         default_report_fields = [
             name, "description", "creationTimestamp", "sslPolicy", "urlMap"
         ]
+        asset_type = "compute.googleapis.com/TargetHttpsProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -236,6 +232,7 @@ class LoadBalancingBackendBucket(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "bucketName", "enableCdn"
         ]
+        asset_type = "compute.googleapis.com/BackendBucket"
 
         @staticmethod
         def get(client, resource_info):
@@ -288,6 +285,7 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             name, "description", "host", "port", "requestPath", "checkIntervalSec"]
+        asset_type = "compute.googleapis.com/HttpsHealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -310,6 +308,7 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             name, "description", "host", "port", "requestPath", "checkIntervalSec"]
+        asset_type = "compute.googleapis.com/HttpHealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -333,6 +332,7 @@ class LoadBalancingHealthCheck(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "checkIntervalSec",
             "healthyThreshold", "unhealthyThreshold", "timeoutSec"]
+        asset_type = "compute.googleapis.com/HealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -355,6 +355,7 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "urlMap"]
+        asset_type = "compute.googleapis.com/TargetHttpProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -377,6 +378,7 @@ class LoadBalancingBackendService(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "network"]
+        asset_type = "compute.googleapis.com/BackendService"
 
         @staticmethod
         def get(client, resource_info):
@@ -399,6 +401,7 @@ class LoadBalancingTargetInstance(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             name, "description", "creationTimestamp", "zone", "natPolicy", "instance"]
+        asset_type = "compute.googleapis.com/TargetInstance"
 
         @staticmethod
         def get(client, resource_info):
@@ -424,6 +427,7 @@ class LoadBalancingTargetPool(QueryResourceManager):
             name, "description", "region",
             "failoverRatio", "sessionAffinity", "backupPool"
         ]
+        asset_type = "compute.googleapis.com/TargetPool"
 
         @staticmethod
         def get(client, resource_info):
@@ -449,6 +453,7 @@ class LoadBalancingForwardingRule(QueryResourceManager):
             "name", "description", "region", "IPAddress", "IPProtocol", "target",
             "loadBalancerScheme", "serviceName",
         ]
+        asset_type = "compute.googleapis.com/ForwardingRule"
 
         @staticmethod
         def get(client, resource_info):
@@ -473,6 +478,7 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
             "name", "description", "creationTimestamp", "network",
             "networkTier", "loadBalancerScheme", "subnetwork", "allowGlobalAccess"
         ]
+        asset_type = "compute.googleapis.com/GlobalForwardingRule"
 
         @staticmethod
         def get(client, resource_info):
@@ -495,6 +501,7 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         default_report_fields = [
             "name", "description", "status", "creationTimestamp", "address", "region"
         ]
+        asset_type = "compute.googleapis.com/GlobalAddress"
 
         @staticmethod
         def get(client, resource_info):

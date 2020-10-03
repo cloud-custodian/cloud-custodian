@@ -1,19 +1,9 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
-import six
+from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
@@ -27,35 +17,11 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, select_keys
+
+from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
-
-
-@resources.register('lambda')
-class AWSLambda(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'lambda'
-        arn_type = 'function'
-        arn_separator = ":"
-        enum_spec = ('list_functions', 'Functions', None)
-        name = id = 'FunctionName'
-        date = 'LastModified'
-        dimension = 'FunctionName'
-        config_type = "AWS::Lambda::Function"
-        universal_taggable = object()
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeLambda(self)
-        elif source_type == 'config':
-            return ConfigLambda(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-    def get_resources(self, ids, cache=True, augment=False):
-        return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
 class DescribeLambda(query.DescribeSource):
@@ -74,6 +40,9 @@ class DescribeLambda(query.DescribeSource):
                 continue
             config = func.pop('Configuration')
             config.update(func)
+            if 'Tags' in config:
+                config['Tags'] = [
+                    {'Key': k, 'Value': v} for k, v in config['Tags'].items()]
             resources.append(config)
         return resources
 
@@ -88,6 +57,30 @@ class ConfigLambda(query.ConfigSource):
         resource['c7n:Policy'] = item[
             'supplementaryConfiguration'].get('Policy')
         return resource
+
+
+@resources.register('lambda')
+class AWSLambda(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        arn_type = 'function'
+        arn_separator = ":"
+        enum_spec = ('list_functions', 'Functions', None)
+        name = id = 'FunctionName'
+        date = 'LastModified'
+        dimension = 'FunctionName'
+        config_type = 'AWS::Lambda::Function'
+        cfn_type = 'AWS::Lambda::Function'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeLambda,
+        'config': ConfigLambda
+    }
+
+    def get_resources(self, ids, cache=True, augment=False):
+        return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
 @AWSLambda.filter_registry.register('security-group')
@@ -280,6 +273,49 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
+@AWSLambda.action_registry.register('post-finding')
+class LambdaPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaFunction'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        # security hub formatting beggars belief
+        details = self.filter_empty(select_keys(r,
+            ['CodeSha256',
+             'DeadLetterConfig',
+             'Environment',
+             'Handler',
+             'KMSKeyArn',
+             'LastModified',
+             'MemorySize',
+             'MasterArn',
+             'RevisionId',
+             'Role',
+             'Runtime',
+             'TracingConfig',
+             'Timeout',
+             'Version',
+             'VpcConfig']))
+        # do the brain dead parts Layers, Code, TracingConfig
+        if 'Layers' in r:
+            r['Layers'] = {
+                'Arn': r['Layers'][0]['Arn'],
+                'CodeSize': r['Layers'][0]['CodeSize']}
+        details.get('VpcConfig', {}).pop('VpcId', None)
+
+        if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
+            parsed = urlparse(r['Code']['Location'])
+            details['Code'] = {
+                'S3Bucket': parsed.netloc.split('.', 1)[0],
+                'S3Key': parsed.path[1:]}
+            params = parse_qs(parsed.query)
+            if params['versionId']:
+                details['Code']['S3ObjectVersion'] = params['versionId'][0]
+        payload.update(details)
+        return envelope
+
+
 @AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy/permission statements from lambda functions.
@@ -367,7 +403,7 @@ class SetConcurrency(BaseAction):
                    'lambda:PutFunctionConcurrency')
 
     def validate(self):
-        if self.data.get('expr', False) and not isinstance(self.data['value'], six.text_type):
+        if self.data.get('expr', False) and not isinstance(self.data['value'], str):
             raise ValueError("invalid value expression %s" % self.data['value'])
         return self
 
@@ -481,6 +517,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
         date = 'CreatedDate'
         arn = "LayerVersionArn"
         arn_type = "layer"
+        cfn_type = 'AWS::Lambda::LayerVersion'
 
     def augment(self, resources):
         versions = {}
@@ -596,3 +633,15 @@ class DeleteLayerVersion(BaseAction):
                     VersionNumber=r['Version'])
             except client.exceptions.ResourceNotFound:
                 continue
+
+
+@LambdaLayerVersion.action_registry.register('post-finding')
+class LayerPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaLayerVersion'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty(
+            select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
+        return envelope

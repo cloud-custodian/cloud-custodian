@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "fargateProfile": {
+            "fargateProfileName": "test",
+            "fargateProfileArn": "arn:aws:eks:us-east-1:644160558196:fargateprofile/test_f1/test/5cb8dc2a-50f2-6f2c-8573-93d8927beeb7",
+            "clusterName": "test_f1",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 17,
+                "minute": 11,
+                "second": 29,
+                "microsecond": 178000
+            },
+            "podExecutionRoleArn": "arn:aws:iam::644160558196:role/AmazonEKSFargatePodExecutionRole",
+            "subnets": [
+                "subnet-068dfbf3f275a6ae8",
+                "subnet-03ec1a55eadb55221"
+            ],
+            "selectors": [
+                {
+                    "namespace": "test",
+                    "labels": {}
+                }
+            ],
+            "status": "DELETING",
+            "tags": {}
+        }
+    }
+}

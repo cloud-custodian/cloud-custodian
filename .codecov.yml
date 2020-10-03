@@ -11,7 +11,7 @@ coverage:
   status:
     patch:
       default:
-        threshold: "10%"
+        threshold: "5%"
         only_pulls: true
     project:
       azure:

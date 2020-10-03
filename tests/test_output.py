@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import gzip
 import logging
@@ -22,7 +12,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
-from c7n.output import DirectoryOutput, LogFile, metrics_outputs
+from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
 from c7n.resources.aws import S3Output, MetricsOutput
 from c7n.testing import mock_datetime_now, TestUtils
 
@@ -56,26 +46,36 @@ class DirOutputTest(BaseTest):
 
 class S3OutputTest(TestUtils):
 
-    def test_path_join(self):
-
-        self.assertEqual(S3Output.join("s3://xyz/", "/bar/"), "s3://xyz/bar")
-
-        self.assertEqual(S3Output.join("s3://xyz/", "/bar/", "foo"), "s3://xyz/bar/foo")
-
-        self.assertEqual(S3Output.join("s3://xyz/xyz/", "/bar/"), "s3://xyz/xyz/bar")
-
-    def get_s3_output(self):
-        output_dir = "s3://cloud-custodian/policies"
-        output = S3Output(
+    def get_s3_output(self, output_url=None, cleanup=True, klass=S3Output):
+        if output_url is None:
+            output_url = "s3://cloud-custodian/policies"
+        output = klass(
             ExecutionContext(
-                None,
+                lambda assume=False: mock.MagicMock(),
                 Bag(name="xyz", provider_name="ostack"),
-                Config.empty(output_dir=output_dir)),
-            {'url': output_dir})
+                Config.empty(output_dir=output_url, account_id='112233445566')),
+            {'url': output_url, 'test': True})
 
-        self.addCleanup(shutil.rmtree, output.root_dir)
+        if cleanup:
+            self.addCleanup(shutil.rmtree, output.root_dir)
 
         return output
+
+    def test_blob_output(self):
+        blob_output = self.get_s3_output(klass=BlobOutput)
+        self.assertRaises(NotImplementedError,
+                          blob_output.upload_file, 'xyz', '/prefix/xyz')
+
+    def test_output_path(self):
+        with mock_datetime_now(date_parse('2020/06/10 13:00'), datetime):
+            output = self.get_s3_output(output_url='s3://prefix/')
+            self.assertEqual(
+                output.get_output_path('s3://prefix/'),
+                's3://prefix/xyz/2020/06/10/13')
+            self.assertEqual(
+                output.get_output_path('s3://prefix/{region}/{account_id}/{policy_name}/{now:%Y}/'),
+                's3://prefix/us-east-1/112233445566/xyz/2020'
+            )
 
     def test_s3_output(self):
         output = self.get_s3_output()
@@ -85,9 +85,20 @@ class S3OutputTest(TestUtils):
         name = str(output)
         self.assertIn("bucket:cloud-custodian", name)
 
+    def test_s3_context_manager(self):
+        log_output = self.capture_logging(
+            'custodian.output.blob', level=logging.DEBUG)
+        output = self.get_s3_output(cleanup=False)
+        with output:
+            pass
+        self.assertEqual(log_output.getvalue(), (
+            's3: uploading policy logs\n'
+            's3: policy logs uploaded\n'))
+
     def test_join_leave_log(self):
         temp_dir = self.get_temp_dir()
         output = LogFile(Bag(log_dir=temp_dir), {})
+        logging.getLogger('custodian').setLevel(logging.INFO)
         output.join_log()
 
         l = logging.getLogger("custodian.s3") # NOQA
@@ -129,7 +140,7 @@ class S3OutputTest(TestUtils):
 
         with mock_datetime_now(date_parse('2018/09/01 13:00'), datetime):
             output = self.get_s3_output()
-            self.assertEqual(output.key_prefix, "/policies/xyz/2018/09/01/13")
+            self.assertEqual(output.key_prefix, "policies/xyz/2018/09/01/13")
 
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
