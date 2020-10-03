@@ -18,6 +18,8 @@ from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
+from c7n.resources.securityhub import DescribePostFinding
+
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -87,6 +89,12 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
+@RDSCluster.action_registry.register('post-finding')
+class ClusterPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsRdsDbCluster'
 
 
 @RDSCluster.action_registry.register('delete')
@@ -458,6 +466,12 @@ class RDSSnapshotAge(AgeFilter):
         op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
+
+
+@RDSClusterSnapshot.action_registry.register('post-finding')
+class SnapshotPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsRdsDbClusterSnapshot'
 
 
 @RDSClusterSnapshot.action_registry.register('delete')

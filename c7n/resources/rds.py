@@ -60,7 +60,7 @@ from c7n.tags import universal_augment
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import DescribePostFinding
 
 log = logging.getLogger('custodian.rds')
 
@@ -665,11 +665,9 @@ class CopySnapshotTags(BaseAction):
 
 
 @RDS.action_registry.register("post-finding")
-class DbInstanceFinding(OtherResourcePostFinding):
-    fields = [
-        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
-        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
-    ]
+class DbInstanceFinding(DescribePostFinding):
+
+    resource_type = 'AwsRdsDbInstance'
 
 
 @actions.register('snapshot')
@@ -1051,6 +1049,12 @@ class RDSSnapshotAge(AgeFilter):
 
     def get_resource_date(self, i):
         return i.get('SnapshotCreateTime')
+
+
+@RDSSnapshot.action_registry.register('post-finding')
+class SnapshotPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsRdsDbSnapshot'
 
 
 @RDSSnapshot.action_registry.register('restore')

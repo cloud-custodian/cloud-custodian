@@ -16,7 +16,8 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
+from c7n.resources.securityhub import (
+    OtherResourcePostFinding, PostFinding, DescribePostFinding)
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
@@ -1972,6 +1973,12 @@ class NetworkAddress(query.QueryResourceManager):
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
 NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
+
+
+@NetworkAddress.action_registry.register('post-finding')
+class NetworkAddrPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsEc2Eip'
 
 
 @NetworkAddress.action_registry.register('release')

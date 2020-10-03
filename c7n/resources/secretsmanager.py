@@ -7,6 +7,8 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
 
+from c7n.resources.securityhub import DescribePostFinding
+
 
 @resources.register('secrets-manager')
 class SecretsManager(QueryResourceManager):
@@ -41,6 +43,12 @@ class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
         r[self.policy_annotation] = p = self.client.get_resource_policy(
             SecretId=r['Name']).get('ResourcePolicy', None)
         return p
+
+
+@SecretsManager.action_registry.register('post-finding')
+class SecretPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsSecretsManagerSecret'
 
 
 @SecretsManager.action_registry.register('tag')

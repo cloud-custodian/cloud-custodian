@@ -552,6 +552,18 @@ class PostFinding(Action):
         raise NotImplementedError("subclass responsibility")
 
 
+class DescribePostFinding(PostFinding):
+    """newer security hub resources use default describe format.
+
+    ie no more brain dead lossy conversions with high manual effort.
+    """
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty(dict(r)))
+        return envelope
+
+
 class OtherResourcePostFinding(PostFinding):
 
     fields = ()

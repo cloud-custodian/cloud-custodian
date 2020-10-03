@@ -33,7 +33,7 @@ from c7n.utils import (
 )
 
 from c7n.resources.aws import Arn
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import OtherResourcePostFinding, DescribePostFinding
 
 
 class DescribeGroup(DescribeSource):
@@ -1232,6 +1232,12 @@ class AllowAllIamPolicies(Filter):
             "%d of %d iam policies have allow all.",
             len(results), len(resources))
         return results
+
+
+@Policy.action_registry.register('post-finding')
+class PolicyPostFinding(DescribePostFinding):
+
+    resource_type = 'AwsIamPolicy'
 
 
 @Policy.action_registry.register('delete')

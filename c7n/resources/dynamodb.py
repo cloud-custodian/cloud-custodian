@@ -16,6 +16,8 @@ from c7n.utils import (
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.filters import ValueFilter
 
+from c7n.resources.securityhub import DescribePostFinding
+
 
 class ConfigTable(query.ConfigSource):
 
@@ -135,6 +137,12 @@ class TableContinuousBackupFilter(ValueFilter):
 
     def __call__(self, r):
         return super().__call__(r[self.annotation_key])
+
+
+@Table.action_registry.register('post-finding')
+class TablePostFinding(DescribePostFinding):
+
+    resource_type = 'AwsDynamoDbTable'
 
 
 @Table.action_registry.register('set-continuous-backup')

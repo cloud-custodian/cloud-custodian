@@ -214,15 +214,15 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
-            # newer wave q3 2020
-            'AwsDynamoDbTable',
-            'AwsEc2Eip',
-            'AwsIamPolicy',
-            'AwsIamUser',
-            'AwsRdsDbCluster',
-            'AwsRdsDbClusterSnapshot',
-            'AwsRdsDbSnapshot',
-            'AwsSecretsManagerSecret',
+            # newer wave q3 2020 ~ these seem to use describe format
+            # 'AwsDynamoDbTable',
+            # 'AwsEc2Eip',
+            # 'AwsIamPolicy',
+            'AwsIamUser',  # this one has backwards compatible implications
+            # 'AwsRdsDbCluster',
+            # 'AwsRdsDbClusterSnapshot',
+            # 'AwsRdsDbSnapshot',
+            # 'AwsSecretsManagerSecret',
             # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
