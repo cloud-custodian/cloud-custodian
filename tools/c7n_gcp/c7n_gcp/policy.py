@@ -1,16 +1,6 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 
 from dateutil.tz import tz
@@ -28,14 +18,15 @@ class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
         'gcp',
-        **{'execution-options': {'type': 'object'},
+        **{'execution-options': {'$ref': '#/definitions/basic_dict'},
            'timeout': {'type': 'string'},
            'memory-size': {'type': 'integer'},
-           'labels': {'type': 'object'},
+           'labels': {'$ref': '#/definitions/string_dict'},
            'network': {'type': 'string'},
            'max-instances': {'type': 'integer'},
            'service-account': {'type': 'string'},
-           'environment': {'type': 'object'}})
+           'environment': {'$ref': '#/definitions/string_dict'}}
+    )
 
     def __init__(self, policy):
         self.policy = policy

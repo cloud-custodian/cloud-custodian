@@ -1,18 +1,9 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import itertools
+import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -30,6 +21,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
+from .aws import shape_validate
 
 
 @resources.register('redshift')
@@ -45,7 +37,7 @@ class Redshift(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
-        config_type = "AWS::Redshift::Cluster"
+        cfn_type = config_type = "AWS::Redshift::Cluster"
 
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -124,20 +116,8 @@ class LoggingFilter(ValueFilter):
         return results
 
 
-class StateTransitionAction(BaseAction):
-
-    def filter_cluster_state(self, resources, states):
-        resource_count = len(resources)
-        results = [r for r in resources if r['ClusterStatus'] in states]
-        if resource_count != len(results):
-            self.log.warning(
-                '%s filtered to %d of %d clusters in states: %s',
-                self.type, len(results), resource_count, ', '.join(states))
-        return results
-
-
 @Redshift.action_registry.register('pause')
-class Pause(StateTransitionAction):
+class Pause(BaseAction):
 
     schema = type_schema('pause')
     permissions = ('redshift:PauseCluster',)
@@ -145,7 +125,7 @@ class Pause(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('available',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('available',)):
             try:
                 client.pause_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -155,7 +135,7 @@ class Pause(StateTransitionAction):
 
 
 @Redshift.action_registry.register('resume')
-class Resume(StateTransitionAction):
+class Resume(BaseAction):
 
     schema = type_schema('resume')
     permissions = ('redshift:ResumeCluster',)
@@ -163,7 +143,7 @@ class Resume(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('paused',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('paused',)):
             try:
                 client.resume_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -603,6 +583,81 @@ class RedshiftSetPublicAccess(BaseAction):
         return clusters
 
 
+@Redshift.action_registry.register('set-attributes')
+class RedshiftSetAttributes(BaseAction):
+    """
+    Action to modify Redshift clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: redshift-modify-cluster
+                  resource: redshift
+                  filters:
+                    - type: value
+                      key: AllowVersionUpgrade
+                      value: false
+                  actions:
+                    - type: set-attributes
+                      attributes:
+                        AllowVersionUpgrade: true
+    """
+
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
+    permissions = ('redshift:ModifyCluster',)
+    cluster_mapping = {
+        'ElasticIp': 'ElasticIpStatus.ElasticIp',
+        'ClusterSecurityGroups': 'ClusterSecurityGroups[].ClusterSecurityGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].ClusterSecurityGroupName',
+        'HsmClientCertificateIdentifier': 'HsmStatus.HsmClientCertificateIdentifier',
+        'HsmConfigurationIdentifier': 'HsmStatus.HsmConfigurationIdentifier'
+    }
+
+    shape = 'ModifyClusterMessage'
+
+    def validate(self):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('ClusterIdentifier'):
+            raise PolicyValidationError('ClusterIdentifier field cannot be updated')
+        attrs["ClusterIdentifier"] = ""
+        return shape_validate(attrs, self.shape, 'redshift')
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for cluster in clusters:
+            self.process_cluster(client, cluster)
+
+    def process_cluster(self, client, cluster):
+        try:
+            config = dict(self.data.get('attributes'))
+            modify = {}
+            for k, v in config.items():
+                if ((k in self.cluster_mapping and
+                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
+                    modify[k] = v
+            if not modify:
+                return
+
+            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
+                                          .get('ClusterIdentifier')
+                                          or cluster.get('ClusterIdentifier'))
+            client.modify_cluster(**modify)
+        except (client.exceptions.ClusterNotFoundFault):
+            return
+        except ClientError as e:
+            self.log.warning(
+                "Exception trying to modify cluster: %s error: %s",
+                cluster['ClusterIdentifier'], e)
+            raise
+
+
 @Redshift.action_registry.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Action to create an action to be performed at a later time
@@ -743,13 +798,15 @@ class RedshiftSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'redshift'
-        arn_type = 'redshift-subnet-group'
+        arn_type = 'subnetgroup'
+        arn_separator = ':'
         id = name = 'ClusterSubnetGroupName'
         enum_spec = (
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
-        config_type = "AWS::Redshift::ClusterSubnetGroup"
+        cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
+        universal_taggable = object()
 
 
 @resources.register('redshift-snapshot')
@@ -923,3 +980,18 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                             ', '.join(
                                 [s['SnapshotIdentifier'] for s in futures[f]]),
                             f.exception()))
+
+
+@resources.register('redshift-reserved')
+class ReservedNode(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'redshift'
+        name = id = 'ReservedNodeId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_nodes', 'ReservedNodes', None)
+        filter_name = 'ReservedNodes'
+        filter_type = 'list'
+        arn_type = "reserved-nodes"
+        permissions_enum = ('redshift:DescribeReservedNodes',)

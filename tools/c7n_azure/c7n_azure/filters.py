@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import isodate
 import operator
@@ -18,7 +8,6 @@ from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
 from datetime import timedelta
 
-import six
 from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryComparisonExpression,
                                               QueryDataset, QueryDefinition,
@@ -526,8 +515,7 @@ class AzureOnHour(OnHour):
         return tag_value
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallRulesFilter(Filter):
+class FirewallRulesFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall rules
 
     Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
@@ -642,8 +630,7 @@ class FirewallRulesFilter(Filter):
             raise FilterValidationError("Internal error.")
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallBypassFilter(Filter):
+class FirewallBypassFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall bypass rules
     """
 

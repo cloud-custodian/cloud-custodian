@@ -37,6 +37,7 @@ CONFIG_SCHEMA = {
     'required': ['queue_url'],
     'properties': {
         'queue_url': {'type': 'string'},
+        'endpoint_url': {'type': 'string'},
         'from_address': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
@@ -58,6 +59,16 @@ CONFIG_SCHEMA = {
         # Azure Function Config
         'function_properties': {
             'type': 'object',
+            'identity': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'type': {'enum': [
+                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'client_id': {'type': 'string'},
+                    'id': {'type': 'string'},
+                },
+            },
             'appInsights': {
                 'type': 'object',
                 'oneOf': [
@@ -138,6 +149,7 @@ CONFIG_SCHEMA = {
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},
+        'splunk_hec_sourcetype': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},

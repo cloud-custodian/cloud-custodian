@@ -1,22 +1,10 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "b63bf6dd-3564-47e2-931f-34f9b4045f13",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b63bf6dd-3564-47e2-931f-34f9b4045f13",
-                "etag": "E2LOA0W0H4PY7B",
-                "content-type": "text/xml",
-                "content-length": "2298",
-                "vary": "Accept-Encoding",
-                "date": "Fri, 28 Feb 2020 17:58:16 GMT"
-            },
-            "RetryAttempts": 0
-        },
-        "ETag": "E2LOA0W0H4PY7B",
+        "ResponseMetadata": {},
+        "ETag": "ETAPGKTC9B1VZ",
         "DistributionConfig": {
-            "CallerReference": "1582867337153",
+            "CallerReference": "6441605581961",
             "Comment": "",
             "Enabled": true,
             "Logging": {

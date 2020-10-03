@@ -1,20 +1,23 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+
+from c7n.resources.aws import shape_validate
 
 
 class ElasticSearch(BaseTest):
+
+    def test_get_resources(self):
+        factory = self.replay_flight_data('test_elasticsearch_get')
+        p = self.load_policy({
+            'name': 'es-get',
+            'resource': 'aws.elasticsearch'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(['devx'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'], 'devx')
 
     def test_resource_manager(self):
         factory = self.replay_flight_data("test_elasticsearch_query")
@@ -84,6 +87,45 @@ class ElasticSearch(BaseTest):
             "DomainStatus"
         ]
         self.assertEqual(state["Deleted"], True)
+
+    def test_post_finding_es(self):
+        factory = self.replay_flight_data('test_elasticsearch_post_finding')
+        p = self.load_policy({
+            'name': 'es-post',
+            'resource': 'aws.elasticsearch',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = p.resource_manager.resources()
+        self.maxDiff = None
+        self.assertEqual(len(resources), 1)
+        fresource = p.resource_manager.actions[0].format_resource(resources[0])
+        self.assertEqual(
+            fresource['Details']['AwsElasticsearchDomain'],
+            {'AccessPolicies': '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"*"},"Action":"es:*","Resource":"arn:aws:es:us-west-2:644160558196:domain/devx/*"}]}',  # noqa
+             'DomainEndpointOptions': {
+                 'EnforceHTTPS': True,
+                 'TLSSecurityPolicy': 'Policy-Min-TLS-1-0-2019-07'},
+             'DomainId': '644160558196/devx',
+             'DomainName': 'devx',
+             'Endpoints': {
+                 'vpc': 'vpc-devx-4j4l2ateukiwrnnxgbowppjt64.us-west-2.es.amazonaws.com'},
+             'ElasticsearchVersion': '7.4',
+             'EncryptionAtRestOptions': {
+                 'Enabled': True,
+                 'KmsKeyId': 'arn:aws:kms:us-west-2:644160558196:key/9b776c6e-0a40-45d0-996b-707018677fe9'  # noqa
+             },
+             'NodeToNodeEncryptionOptions': {'Enabled': True},
+             'VPCOptions': {'AvailabilityZones': ['us-west-2b'],
+                            'SecurityGroupIds': ['sg-0eecc076'],
+                            'SubnetIds': ['subnet-63c97615'],
+                            'VPCId': 'vpc-4a9ff72e'}})
+        shape_validate(
+            fresource['Details']['AwsElasticsearchDomain'],
+            'AwsElasticsearchDomainDetails',
+            'securityhub')
 
     def test_domain_add_tag(self):
         session_factory = self.replay_flight_data("test_elasticsearch_add_tag")
@@ -214,4 +256,46 @@ class ElasticSearch(BaseTest):
         self.assertEqual(
             sorted(result[0]["VPCOptions"]["SecurityGroupIds"]),
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
+        )
+
+    def test_backup_vault_kms_filter(self):
+        session_factory = self.replay_flight_data('test_elasticsearch_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-kms-filter',
+                'resource': 'elasticsearch',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/aws/es)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
+
+class TestReservedInstances(BaseTest):
+
+    def test_elasticsearch_reserved_node_query(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-reserved",
+                "resource": "aws.elasticsearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedElasticsearchInstanceId"],
+            "036381d0-4fa5-4484-bd1a-efc1b43af0bf"
         )

@@ -1,16 +1,6 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, event_data
@@ -134,7 +124,7 @@ class SecurityHubTest(BaseTest):
                 {'type': 'post-finding',
                  'types': [
                      "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
-                     ]}]})
+                 ]}]})
         post_finding = policy.resource_manager.actions[0]
         resource = post_finding.format_resource(
             {'Name': 'xyz', 'CreationDate': 'xtf'})
@@ -445,61 +435,6 @@ class SecurityHubTest(BaseTest):
                     "Other": {
                         "CreateDate": "2016-09-10T15:45:42+00:00",
                         "UserId": "AIDAJYFPV7WUG3EV7MIIO"
-                    }
-                }
-            }
-        )
-
-    def test_iam_role(self):
-        factory = self.replay_flight_data("test_security_hub_iam_role")
-
-        policy = self.load_policy(
-            {
-                "name": "iam-role-finding",
-                "resource": "iam-role",
-                "filters": [{"type": "value", "key": "RoleName", "value": "app1"}],
-                "actions": [
-                    {
-                        "type": "post-finding",
-                        "severity": 10,
-                        "severity_normalized": 10,
-                        "types": [
-                            "Software and Configuration Checks/AWS Security Best Practices"
-                        ],
-                    }
-                ],
-            },
-            config={"account_id": "101010101111"},
-            session_factory=factory,
-        )
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-        client = factory().client("securityhub")
-        findings = client.get_findings(
-            Filters={
-                "ResourceId": [
-                    {
-                        "Value": "arn:aws:iam::1010101011111:role/app1",
-                        "Comparison": "EQUALS",
-                    }
-                ]
-            }
-        ).get("Findings")
-        self.assertEqual(len(findings), 1)
-        self.assertEqual(
-            findings[0]["Resources"][0],
-            {
-                "Region": "us-east-1",
-                "Type": "Other",
-                "Id": "arn:aws:iam::101010101111:role/app1",
-                "Details": {
-                    "Other": {
-                        "RoleName": "app1",
-                        "CreateDate": "2017-11-18T22:29:22+00:00",
-                        "c7n:MatchedFilters": "[\"tag:CostCenter\", \"tag:Project\"]",
-                        "RoleId": "AROAIV5QVPWUHSYPBTURM"
                     }
                 }
             }

@@ -1,25 +1,15 @@
 # Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Run a custodian policy across an organization's accounts
 """
 
+import csv
 from collections import Counter
 import logging
 import os
 import time
 import subprocess
-import six
 import sys
 
 import multiprocessing
@@ -44,7 +34,6 @@ from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
-from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
 
@@ -212,7 +201,7 @@ def resolve_regions(regions):
 def get_session(account, session_name, region):
     if account.get('role'):
         roles = account['role']
-        if isinstance(roles, six.string_types):
+        if isinstance(roles, str):
             roles = [roles]
         s = None
         for r in roles:
@@ -391,7 +380,7 @@ def report(config, output, use, output_dir, accounts,
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = UnicodeWriter(output, formatter.headers())
+    writer = csv.writer(output, formatter.headers())
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
@@ -532,7 +521,7 @@ def run_account(account, region, policies_config, output_path,
     env_vars = account_tags(account)
 
     if account.get('role'):
-        if isinstance(account['role'], six.string_types):
+        if isinstance(account['role'], str):
             config['assume_role'] = account['role']
             config['external_id'] = account.get('external_id')
         else:

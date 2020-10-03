@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import datetime
 import os
@@ -22,6 +12,8 @@ from unittest import TestCase
 from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
+import pytest
+from pytest_terraform import terraform
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
@@ -29,6 +21,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
+from c7n.resources.aws import shape_validate
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
     UserMfaDevice,
@@ -375,7 +368,79 @@ class IAMMFAFilter(BaseTest):
         self.assertEqual(len(resources), 2)
 
 
+@terraform('iam_role_delete', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_role_delete(test, iam_role_delete):
+    session_factory = test.replay_flight_data('test_iam_role_delete')
+    client = session_factory().client('iam')
+    pdata = {
+        'name': 'group-delete',
+        'resource': 'iam-role',
+        'mode': {
+            'type': 'cloudtrail',
+            'events': [{
+                'source': 'source',
+                'event': 'event',
+                'ids': "RoleNames"}]
+        },
+        'actions': [{'type': 'delete', 'force': True}]
+    }
+
+    event = {'detail': {
+        'eventName': 'event', 'eventSource': 'source',
+        'RoleNames': [iam_role_delete['aws_iam_role.test_role.name']]}}
+    if test.recording:
+        time.sleep(3)
+    p = test.load_policy(pdata, session_factory=session_factory)
+    resources = p.push(event)
+    assert len(resources) == 1
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_role(RoleName=iam_role_delete['aws_iam_role.test_role.name'])
+
+
 class IamRoleTest(BaseTest):
+
+    def test_iam_role_post(self):
+        factory = self.replay_flight_data("test_security_hub_iam_role")
+        policy = self.load_policy(
+            {
+                "name": "iam-role-finding",
+                "resource": "iam-role",
+                "filters": [{"type": "value", "key": "RoleName", "value": "app1"}],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.resource_manager.get_resources(['app1'])
+        self.assertEqual(len(resources), 1)
+        rfinding = policy.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertIn('AssumeRolePolicyDocument', rfinding['Details']['AwsIamRole'])
+        rfinding['Details']['AwsIamRole'].pop('AssumeRolePolicyDocument')
+        self.assertEqual(rfinding, {
+            'Details': {'AwsIamRole': {
+                'CreateDate': '2018-05-24T13:34:59+00:00',
+                'MaxSessionDuration': 3600,
+                'Path': '/',
+                'RoleId': 'AROAIGK7B2VUDZL4I73HK',
+                'RoleName': 'app1'}},
+            'Id': 'arn:aws:iam::101010101111:role/app1',
+            'Partition': 'aws',
+            'Region': 'us-east-1',
+            'Type': 'AwsIamRole'})
+        shape_validate(rfinding['Details']['AwsIamRole'], 'AwsIamRoleDetails', 'securityhub')
 
     def test_iam_role_inuse(self):
         session_factory = self.replay_flight_data("test_iam_role_inuse")
@@ -944,7 +1009,44 @@ class IamPolicy(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class IamGroupFilterUsage(BaseTest):
+@terraform('iam_user_group', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_group_delete(test, iam_user_group):
+    session_factory = test.replay_flight_data('test_iam_group_delete')
+    client = session_factory().client('iam')
+
+    pdata = {
+        'name': 'group-delete',
+        'resource': 'iam-group',
+        'mode': {
+            'type': 'cloudtrail',
+            'events': [{
+                'source': 'source',
+                'event': 'event',
+                'ids': "GroupNames"}]
+        },
+        'actions': ['delete']
+    }
+    event = {'detail': {
+        'eventName': 'event', 'eventSource': 'source',
+        'GroupNames': [iam_user_group['aws_iam_group.sandbox_devs.name']]}}
+
+    if test.recording:
+        time.sleep(3)
+
+    p = test.load_policy(pdata, session_factory=session_factory)
+    with pytest.raises(client.exceptions.DeleteConflictException):
+        p.push(event)
+
+    pdata['actions'] = [{'type': 'delete', 'force': True}]
+    p = test.load_policy(pdata, session_factory=session_factory)
+    resources = p.push(event)
+    assert len(resources) == 1
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_group(GroupName=resources[0]['GroupName'])
+
+
+class IamGroupTests(BaseTest):
 
     def test_iam_group_used_users(self):
         session_factory = self.replay_flight_data("test_iam_group_used_users")
@@ -1538,6 +1640,33 @@ class CrossAccountChecker(TestCase):
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+    def test_principal_org_id(self):
+        statements = [
+            {'Actions': ['Deploy', 'UnshareApplication'],
+             'Principal': ['*'],
+             'StatementId': 'cab89702-05f0-4751-818e-ced6e98ef5f9',
+             'Effect': 'Allow',
+             'Condition': {
+                 'StringEquals': {
+                     'aws:PrincipalOrgID': ['o-4pmkskbcf9']}}},
+            {'Actions': ['Deploy'],
+             'Principal': ['619193117841'],
+             'StatementId': 'b364d84f-62d2-411c-9787-3636b2b1975c',
+             'Effect': 'Allow'}
+        ]
+
+        checker = PolicyChecker({
+            'allowed_orgid': ['o-4pmkskbcf9']})
+
+        for statement, expected in zip(statements, [False, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({})
+        for statement, expected in zip(statements, [True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
 
     def test_s3_policies(self):
         policies = load_data("iam/s3-policies.json")

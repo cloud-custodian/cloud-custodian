@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceRecordSets": [
+            {
+                "Name": "custodian.net.",
+                "Type": "NS",
+                "TTL": 172800,
+                "ResourceRecords": [
+                    {
+                        "Value": "ns-1971.awsdns-54.co.uk."
+                    },
+                    {
+                        "Value": "ns-50.awsdns-06.com."
+                    },
+                    {
+                        "Value": "ns-1489.awsdns-58.org."
+                    },
+                    {
+                        "Value": "ns-985.awsdns-59.net."
+                    }
+                ]
+            },
+            {
+                "Name": "custodian.net.",
+                "Type": "SOA",
+                "TTL": 900,
+                "ResourceRecords": [
+                    {
+                        "Value": "ns-1971.awsdns-54.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                    }
+                ]
+            },
+            {
+                "Name": "test.custodian.net.",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "1.1.1.1"
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

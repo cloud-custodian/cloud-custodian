@@ -1,17 +1,8 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import fnmatch
+from io import StringIO
 import json
 import os
 import shutil
@@ -24,13 +15,13 @@ import boto3
 import placebo
 from botocore.response import StreamingBody
 from placebo import pill
-from six import StringIO
 
 from c7n.testing import CustodianTestCore
+from .constants import ACCOUNT_ID
 
 # Custodian Test Account. This is used only for testing.
 # Access is available for community project maintainers.
-ACCOUNT_ID = "644160558196"
+
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -125,12 +116,10 @@ class BluePill(pill.Pill):
         self._avail = self.get_available()
 
     def get_available(self):
-        return set(
-            [
-                os.path.join(self.data_path, n)
-                for n in fnmatch.filter(os.listdir(self.data_path), "*.json")
-            ]
-        )
+        return {
+            os.path.join(self.data_path, n)
+            for n in fnmatch.filter(os.listdir(self.data_path), "*.json")
+        }
 
     def get_next_file_path(self, service, operation):
         fn, format = super(BluePill, self).get_next_file_path(service, operation)
@@ -273,7 +262,7 @@ class RedPill(pill.Pill):
             response_data['ResponseMetadata'] = {}
 
         response_data = json.dumps(response_data, default=serialize)
-        response_data = re.sub("\d{12}", ACCOUNT_ID, response_data)  # noqa
+        response_data = re.sub(r"\b\d{12}\b", ACCOUNT_ID, response_data)  # noqa
         response_data = json.loads(response_data, object_hook=deserialize)
 
         super(RedPill, self).save_response(service, operation, response_data,
@@ -299,7 +288,7 @@ class PillTest(CustodianTestCore):
     def cleanUp(self):
         self.pill = None
 
-    def record_flight_data(self, test_case, zdata=False, augment=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False, region=None):
         self.recording = True
         test_dir = os.path.join(self.placebo_dir, test_case)
         if not (zdata or augment):
@@ -307,7 +296,7 @@ class PillTest(CustodianTestCore):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         default_region = session.region_name
         if not zdata:
             pill = RedPill()
@@ -367,7 +356,7 @@ class PillTest(CustodianTestCore):
             if not os.path.exists(test_dir):
                 raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
-        session = boto3.Session()
+        session = boto3.Session(region_name=region)
         if not zdata:
             pill = placebo.attach(session, test_dir)
             # pill = BluePill()

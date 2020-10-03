@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-1/1e0ac88a139a5177",
+                "Tags": [
+                    {
+                        "Value": "VALUE2",
+                        "Key": "KEY2"
+                    },
+                    {
+                        "Value": "VALUE1",
+                        "Key": "KEY1"
+                    }
+                ]
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:loadbalancer/app/alb-2/4dec284f036410cb",
+                "Tags": []
+            }
+        ]
+    }
+}

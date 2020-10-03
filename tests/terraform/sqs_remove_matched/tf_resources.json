@@ -1,0 +1,33 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_sqs_queue": {
+            "test_sqs": {
+                "arn": "arn:aws:sqs:us-east-2:644160558196:c09b0bc7-7270-4b71-2427-a044030a51f2",
+                "content_based_deduplication": false,
+                "delay_seconds": 0,
+                "fifo_queue": false,
+                "id": "https://sqs.us-east-2.amazonaws.com/644160558196/c09b0bc7-7270-4b71-2427-a044030a51f2",
+                "kms_data_key_reuse_period_seconds": 300,
+                "kms_master_key_id": "",
+                "max_message_size": 262144,
+                "message_retention_seconds": 345600,
+                "name": "c09b0bc7-7270-4b71-2427-a044030a51f2",
+                "name_prefix": null,
+                "policy": "",
+                "receive_wait_time_seconds": 0,
+                "redrive_policy": "",
+                "tags": null,
+                "visibility_timeout_seconds": 30
+            }
+        },
+        "aws_sqs_queue_policy": {
+            "test_sqs_policy": {
+                "id": "https://sqs.us-east-2.amazonaws.com/644160558196/c09b0bc7-7270-4b71-2427-a044030a51f2",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}",
+                "queue_url": "https://sqs.us-east-2.amazonaws.com/644160558196/c09b0bc7-7270-4b71-2427-a044030a51f2"
+            }
+        }
+    }
+}

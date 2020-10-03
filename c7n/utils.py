@@ -1,18 +1,7 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
-import csv
 from datetime import datetime, timedelta
 import json
 import itertools
@@ -24,10 +13,8 @@ import re
 import sys
 import threading
 import time
-
-import six
-from six.moves.urllib import parse as urlparse
-from six.moves.urllib.request import getproxies
+from urllib import parse as urlparse
+from urllib.request import getproxies
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -51,23 +38,6 @@ class SafeDumper(BaseSafeDumper or object):
 
 
 log = logging.getLogger('custodian.utils')
-
-
-class UnicodeWriter:
-    """utf8 encoding csv writer."""
-
-    def __init__(self, f, dialect=csv.excel, **kwds):
-        self.writer = csv.writer(f, dialect=dialect, **kwds)
-        if sys.version_info.major == 3:
-            self.writerows = self.writer.writerows
-            self.writerow = self.writer.writerow
-
-    def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
 
 
 class VarsSubstitutionError(Exception):
@@ -366,7 +336,7 @@ def snapshot_identifier(prefix, db_identifier):
 retry_log = logging.getLogger('c7n.retry')
 
 
-def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
+def get_retry(retry_codes=(), max_attempts=8, min_delay=1, log_retries=False):
     """Decorator for retry boto3 api call on transient errors.
 
     https://www.awsarchitectureblog.com/2015/03/backoff.html
@@ -386,13 +356,15 @@ def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
     """
     max_delay = max(min_delay, 2) ** max_attempts
 
-    def _retry(func, *args, **kw):
+    def _retry(func, *args, ignore_err_codes=(), **kw):
         for idx, delay in enumerate(
                 backoff_delays(min_delay, max_delay, jitter=True)):
             try:
                 return func(*args, **kw)
             except ClientError as e:
-                if e.response['Error']['Code'] not in codes:
+                if e.response['Error']['Code'] in ignore_err_codes:
+                    return
+                elif e.response['Error']['Code'] not in retry_codes:
                     raise
                 elif idx == max_attempts - 1:
                     raise
@@ -423,7 +395,7 @@ def parse_cidr(value):
     if '/' not in value:
         klass = ipaddress.ip_address
     try:
-        v = klass(six.text_type(value))
+        v = klass(str(value))
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v
@@ -524,7 +496,7 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
         for item in obj:
             new.append(format_string_values(item, *args, **kwargs))
         return new
-    elif isinstance(obj, six.string_types):
+    elif isinstance(obj, str):
         try:
             return obj.format(*args, **kwargs)
         except err_fallback:
@@ -629,8 +601,8 @@ class QueryParser:
 
             if not cls.multi_value and isinstance(values, list):
                 raise PolicyValidationError(
-                    "%s QUery Filter Invalid Key: Value:%s Must be single valued" % (
-                        cls.type_name, key, values))
+                    "%s Query Filter Invalid Key: Value:%s Must be single valued" % (
+                        cls.type_name, key))
             elif not cls.multi_value:
                 values = [values]
 
@@ -641,7 +613,7 @@ class QueryParser:
 
             vtype = cls.QuerySchema.get(key)
             if vtype is None and key.startswith('tag'):
-                vtype = six.string_types
+                vtype = str
 
             if not isinstance(values, list):
                 raise PolicyValidationError(
@@ -649,7 +621,7 @@ class QueryParser:
                         cls.type_name, data,))
 
             for v in values:
-                if isinstance(vtype, tuple) and vtype != six.string_types:
+                if isinstance(vtype, tuple):
                     if v not in vtype:
                         raise PolicyValidationError(
                             "%s Query Filter Invalid Value: %s Valid: %s" % (
@@ -695,3 +667,10 @@ def merge_dict(a, b):
         if k not in d:
             d[k] = v
     return d
+
+
+def select_keys(d, keys):
+    result = {}
+    for k in keys:
+        result[k] = d.get(k)
+    return result

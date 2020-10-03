@@ -1,16 +1,6 @@
 # Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import base64
 import json
@@ -258,22 +248,25 @@ class Host:
             except yaml.YAMLError as exc:
                 log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
                 os.unlink(path)
-                return
+                return path
 
-        removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
-        log.info('Removing policies %s' % removed)
+        try:
+            removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
+            log.info('Removing policies %s' % removed)
 
-        # update periodic
-        periodic_names = \
-            [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('schedule')]
-        periodic_to_remove = \
-            [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
+            # update periodic
+            periodic_names = \
+                [p['name'] for p in policy_config.get('policies', [])
+                 if p.get('mode', {}).get('schedule')]
+            periodic_to_remove = \
+                [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
 
-        for name in periodic_to_remove:
-            self.scheduler.remove_job(job_id=name)
+            for name in periodic_to_remove:
+                self.scheduler.remove_job(job_id=name)
+        except (AttributeError, KeyError) as exc:
+            log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
 
         os.unlink(path)
-
         return path
 
     def update_periodic(self, policy):

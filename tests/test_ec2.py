@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
 import time
@@ -106,6 +96,43 @@ class TestInstanceAttrFilter(BaseTest):
         self.assertEqual(
             resources[0]["c7n:attribute-rootDeviceName"], {"Value": "/dev/sda1"}
         )
+
+
+class TestSetMetadata(BaseTest):
+
+    def test_set_metadata_server(self):
+        output = self.capture_logging('custodian.actions')
+        session_factory = self.replay_flight_data('test_ec2_set_md_access')
+        policy = self.load_policy({
+            'name': 'ec2-imds-access',
+            'resource': 'aws.ec2',
+            'actions': [
+                {'type': 'set-metadata-access',
+                 'tokens': 'required'},
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        if self.recording:
+            time.sleep(2)
+        results = session_factory().client('ec2').describe_instances(
+            InstanceIds=[r['InstanceId'] for r in resources])
+        self.assertJmes('[0].MetadataOptions.HttpTokens', resources, 'optional')
+        self.assertJmes(
+            'Reservations[].Instances[].MetadataOptions',
+            results,
+            [{'HttpEndpoint': 'enabled',
+              'HttpPutResponseHopLimit': 1,
+              'HttpTokens': 'required',
+              'State': 'pending'},
+             {'HttpEndpoint': 'enabled',
+              'HttpPutResponseHopLimit': 1,
+              'HttpTokens': 'required',
+              'State': 'applied'}])
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            output.getvalue(),
+            ('set-metadata-access implicitly filtered 1 of 2 resources '
+             'key:MetadataOptions.HttpTokens on optional\n'))
 
 
 class TestMetricFilter(BaseTest):
@@ -211,13 +238,11 @@ class TestDisableApiTermination(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "ec2:DescribeInstanceAttribute",
-                )
-            ),
+            {
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "ec2:DescribeInstanceAttribute",
+            },
         )
 
 
@@ -1145,6 +1170,30 @@ class TestSnapshot(BaseTest):
         rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
         rtags.pop('App')
         rtags['custodian_snapshot'] = ''
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+
+    def test_ec2_snapshot_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_snapshot_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-snapshot",
+                "resource": "ec2",
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage'],
+                             "tags": {"test-tag": 'custodian'}}]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('App')
+        rtags['test-tag'] = 'custodian'
         for s in snaps:
             self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 

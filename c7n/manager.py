@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import deque
 import logging
 
@@ -28,6 +18,18 @@ except ImportError:
 from c7n.utils import dumps
 
 
+def iter_filters(filters, block_end=False):
+    queue = deque(filters)
+    while queue:
+        f = queue.popleft()
+        if f is not None and f.type in ('or', 'and', 'not'):
+            if block_end:
+                queue.appendleft(None)
+            for gf in f.filters:
+                queue.appendleft(gf)
+        yield f
+
+
 class ResourceManager:
     """
     A Cloud Custodian resource
@@ -37,6 +39,7 @@ class ResourceManager:
     action_registry = None
     executor_factory = ThreadPoolExecutor
     retry = None
+    permissions = ()
 
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -99,8 +102,8 @@ class ResourceManager:
         original = len(resources)
         if event and event.get('debug', False):
             self.log.info(
-                "Filtering resources with %s", self.filters)
-        for f in self.filters:
+                "Filtering resources using %d filters", len(self.filters))
+        for idx, f in enumerate(self.filters, start=1):
             if not resources:
                 break
             rcount = len(resources)
@@ -110,7 +113,8 @@ class ResourceManager:
 
             if event and event.get('debug', False):
                 self.log.debug(
-                    "applied filter %s %d->%d", f, rcount, len(resources))
+                    "Filter #%d applied %d->%d filter: %s",
+                    idx, rcount, len(resources), dumps(f.data, indent=None))
         self.log.debug("Filtered from %d to %d %s" % (
             original, len(resources), self.__class__.__name__.lower()))
         return resources
@@ -121,15 +125,7 @@ class ResourceManager:
         return self.query.resolve(self.resource_type)
 
     def iter_filters(self, block_end=False):
-        queue = deque(self.filters)
-        while queue:
-            f = queue.popleft()
-            if f and f.type in ('or', 'and', 'not'):
-                if block_end:
-                    queue.appendleft(None)
-                for gf in f.filters:
-                    queue.appendleft(gf)
-            yield f
+        return iter_filters(self.filters, block_end=block_end)
 
     def validate(self):
         """

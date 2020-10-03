@@ -1,16 +1,6 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 # PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
 # is failing, move this above the license)
 
@@ -38,16 +28,16 @@ DEFAULT_REGION = 'us-east-1'
 log = logging.getLogger('custodian.cli')
 
 
-def _default_options(p, blacklist=""):
+def _default_options(p, exclude=[]):
     """ Add basic options ot the subparser.
 
-    `blacklist` is a list of options to exclude from the default set.
+    `exclude` is a list of options to exclude from the default set.
     e.g.: ['region', 'log-group']
     """
     provider = p.add_argument_group(
         "provider", "AWS account information, defaults per the aws cli")
 
-    if 'region' not in blacklist:
+    if 'region' not in exclude:
         provider.add_argument(
             "-r", "--region", action='append', default=[],
             dest='regions', metavar='REGION',
@@ -74,7 +64,7 @@ def _default_options(p, blacklist=""):
 
     output = p.add_argument_group("output", "Output control")
     output.add_argument("-v", "--verbose", action="count", help="Verbose logging")
-    if 'quiet' not in blacklist:
+    if 'quiet' not in exclude:
         output.add_argument("-q", "--quiet", action="count",
                             help="Less logging (repeatable, -qqq for no output)")
     else:
@@ -82,23 +72,23 @@ def _default_options(p, blacklist=""):
     output.add_argument("--debug", default=False, help=argparse.SUPPRESS,
                         action="store_true")
 
-    if 'vars' not in blacklist:
+    if 'vars' not in exclude:
         # p.add_argument('--vars', default=None,
         #               help='Vars file to substitute into policy')
         p.set_defaults(vars=None)
 
-    if 'log-group' not in blacklist:
+    if 'log-group' not in exclude:
         p.add_argument(
             "-l", "--log-group", default=None,
             help="Location to send policy logs (Ex: AWS CloudWatch Log Group)")
     else:
         p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 
-    if 'output-dir' not in blacklist:
+    if 'output-dir' not in exclude:
         p.add_argument("-s", "--output-dir", required=True,
                        help="[REQUIRED] Directory or S3 URL For policy output")
 
-    if 'cache' not in blacklist:
+    if 'cache' not in exclude:
         p.add_argument(
             "-f", "--cache", default="~/.cache/cloud-custodian.cache",
             help="Cache file (default %(default)s)")
@@ -111,7 +101,7 @@ def _default_options(p, blacklist=""):
 
 def _report_options(p):
     """ Add options specific to the report subcommand. """
-    _default_options(p, blacklist=['cache', 'log-group', 'quiet'])
+    _default_options(p, exclude=['cache', 'log-group', 'quiet'])
     p.add_argument(
         '--days', type=float, default=1,
         help="Number of days of history to consider")
@@ -135,7 +125,7 @@ def _report_options(p):
 
 def _metrics_options(p):
     """ Add options specific to metrics subcommand. """
-    _default_options(p, blacklist=['log-group', 'output-dir', 'cache', 'quiet'])
+    _default_options(p, exclude=['log-group', 'output-dir', 'cache', 'quiet'])
 
     p.add_argument(
         '--start', type=date_parse,
@@ -150,7 +140,7 @@ def _metrics_options(p):
 
 def _logs_options(p):
     """ Add options specific to logs subcommand. """
-    _default_options(p, blacklist=['cache', 'quiet'])
+    _default_options(p, exclude=['cache', 'quiet'])
 
     # default time range is 0 to "now" (to include all log entries)
     p.add_argument(
@@ -173,7 +163,10 @@ def _schema_options(p):
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
-    p.add_argument('--json', action="store_true", help=argparse.SUPPRESS)
+    p.add_argument('--json', action="store_true",
+        help="Export custodian's jsonschema")
+    p.add_argument('--outline', action="store_true",
+        help="Print outline of all resources and their actions and filters")
     p.add_argument("-v", "--verbose", action="count", help="Verbose logging")
     p.add_argument("-q", "--quiet", action="count", help=argparse.SUPPRESS)
     p.add_argument("--debug", default=False, help=argparse.SUPPRESS)
@@ -235,7 +228,7 @@ def setup_parser():
             "https://cloudcustodian.io/docs/aws/usage.html#metrics")
 
     run.add_argument(
-        "-m", "--metrics-enabled",
+        "-m", "--metrics-enabled", metavar="PROVIDER",
         default=None, nargs="?", const="aws",
         help=metrics_help)
     run.add_argument(

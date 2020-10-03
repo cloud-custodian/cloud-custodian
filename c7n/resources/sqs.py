@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 import json
@@ -20,10 +10,38 @@ from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.utils import local_session
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
+
+from c7n.resources.securityhub import PostFinding
+
+
+class DescribeQueue(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sqs')
+
+        def _augment(r):
+            try:
+                queue = self.manager.retry(
+                    client.get_queue_attributes,
+                    QueueUrl=r,
+                    AttributeNames=['All'])['Attributes']
+                queue['QueueUrl'] = r
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
+                    return
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    self.log.warning("Denied access to sqs %s" % r)
+                    return
+                raise
+            return queue
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            return universal_augment(
+                self.manager, list(filter(None, w.map(_augment, resources))))
 
 
 @resources.register('sqs')
@@ -34,6 +52,7 @@ class SQS(QueryResourceManager):
         arn_type = ""
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
+        cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
         arn = "QueueArn"
         filter_name = 'QueueNamePrefix'
@@ -48,6 +67,11 @@ class SQS(QueryResourceManager):
             'ApproximateNumberOfMessages',
         )
 
+    source_mapping = {
+        'describe': DescribeQueue,
+        'config': ConfigSource
+    }
+
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
@@ -61,29 +85,6 @@ class SQS(QueryResourceManager):
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
         return super(SQS, self).get_resources(ids_normalized, cache)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sqs')
-
-        def _augment(r):
-            try:
-                queue = self.retry(
-                    client.get_queue_attributes,
-                    QueueUrl=r,
-                    AttributeNames=['All'])['Attributes']
-                queue['QueueUrl'] = r
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
-                    return
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
-                    return
-                raise
-            return queue
-
-        with self.executor_factory(max_workers=2) as w:
-            return universal_augment(
-                self, list(filter(None, w.map(_augment, resources))))
 
 
 @SQS.filter_registry.register('metrics')
@@ -138,6 +139,25 @@ class KmsFilter(KmsRelatedFilter):
                         op: regex
     """
     RelatedIdsExpression = 'KmsMasterKeyId'
+
+
+@SQS.action_registry.register('post-finding')
+class SQSPostFinding(PostFinding):
+
+    resource_type = 'AwsSqsQueue'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty({
+            'KmsDataKeyReusePeriodSeconds': r.get('KmsDataKeyReusePeriodSeconds'),
+            'KmsMasterKeyId': r.get('KmsMasterKeyId'),
+            'QueueName': r['QueueArn'].split(':')[-1],
+            'DeadLetterTargetArn': r.get('DeadLetterTargetArn')
+        }))
+        if 'KmsDataKeyReusePeriodSeconds' in payload:
+            payload['KmsDataKeyReusePeriodSeconds'] = int(
+                payload['KmsDataKeyReusePeriodSeconds'])
+        return envelope
 
 
 @SQS.action_registry.register('remove-statements')

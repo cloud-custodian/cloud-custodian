@@ -1,25 +1,30 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import local_session, type_schema
+
+
+class DescribeECR(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        results = []
+        for r in resources:
+            try:
+                r['Tags'] = client.list_tags_for_resource(
+                    resourceArn=r['repositoryArn']).get('tags')
+                results.append(r)
+            except client.exceptions.RepositoryNotFoundException:
+                continue
+        return results
 
 
 @resources.register('ecr')
@@ -33,19 +38,12 @@ class ECR(QueryResourceManager):
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
+        cfn_type = 'AWS::ECR::Repository'
 
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('ecr')
-        results = []
-        for r in resources:
-            try:
-                r['Tags'] = client.list_tags_for_resource(
-                    resourceArn=r['repositoryArn']).get('tags')
-                results.append(r)
-            except client.exceptions.RepositoryNotFoundException:
-                continue
-
-        return results
+    source_mapping = {
+        'describe': DescribeECR,
+        'config': ConfigSource
+    }
 
 
 @ECR.action_registry.register('tag')

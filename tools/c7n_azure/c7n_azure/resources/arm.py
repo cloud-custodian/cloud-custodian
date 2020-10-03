@@ -1,18 +1,7 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-import six
 from c7n_azure.actions.delete import DeleteAction
 from c7n_azure.actions.lock import LockAction
 from c7n_azure.actions.tagging import (AutoTagDate)
@@ -28,8 +17,7 @@ from c7n_azure.utils import ResourceIdParser
 arm_resource_types = {}
 
 
-@six.add_metaclass(TypeMeta)
-class ArmTypeInfo(TypeInfo):
+class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
     # api client construction information for ARM resources
     id = 'id'
     name = 'name'
@@ -43,8 +31,7 @@ class ArmTypeInfo(TypeInfo):
     enable_tag_operations = True
 
 
-@six.add_metaclass(QueryMeta)
-class ArmResourceManager(QueryResourceManager):
+class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
     class resource_type(ArmTypeInfo):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
@@ -101,8 +88,7 @@ class ArmResourceManager(QueryResourceManager):
             resource_class.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
 
 
-@six.add_metaclass(QueryMeta)
-class ChildArmResourceManager(ChildResourceManager, ArmResourceManager):
+class ChildArmResourceManager(ChildResourceManager, ArmResourceManager, metaclass=QueryMeta):
 
     class resource_type(ChildTypeInfo, ArmTypeInfo):
         pass

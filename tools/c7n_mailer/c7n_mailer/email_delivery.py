@@ -1,19 +1,8 @@
 # Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from itertools import chain
 
-import six
 from c7n_mailer.smtp_delivery import SmtpDelivery
 from c7n_mailer.utils_email import is_email, get_mimetext_message
 import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
@@ -195,7 +184,7 @@ class EmailDelivery:
     def get_to_addrs_email_messages_map(self, sqs_message):
         to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(sqs_message)
         to_addrs_to_mimetext_map = {}
-        for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
+        for to_addrs, resources in to_addrs_to_resources_map.items():
             to_addrs_to_mimetext_map[to_addrs] = get_mimetext_message(
                 self.config,
                 self.logger,
