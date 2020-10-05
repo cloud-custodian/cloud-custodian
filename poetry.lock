@@ -629,7 +629,7 @@ description = "A pytest plugin for using terraform fixtures"
 name = "pytest-terraform"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.5.0"
+version = "0.5.1"
 
 [package.dependencies]
 jmespath = ">=0.10.0,<0.11.0"
@@ -1294,8 +1294,8 @@ pytest-sugar = [
     {file = "pytest-sugar-0.9.4.tar.gz", hash = "sha256:b1b2186b0a72aada6859bea2a5764145e3aaa2c1cfbb23c3a19b5f7b697563d3"},
 ]
 pytest-terraform = [
-    {file = "pytest-terraform-0.5.0.tar.gz", hash = "sha256:d4157ff78cc62d9360b9b8a2b29b1f77f42b1d90bc24b43f3c608f56ff9b52e5"},
-    {file = "pytest_terraform-0.5.0-py3-none-any.whl", hash = "sha256:2bf7df395c3e8570fb5471934f8884f924bf5430719c00739180797e2c4224f6"},
+    {file = "pytest-terraform-0.5.1.tar.gz", hash = "sha256:cc07db7bf1b8aa628caf67c2b45e369a7afc22c0a119e21681c05555f8cb97ae"},
+    {file = "pytest_terraform-0.5.1-py3-none-any.whl", hash = "sha256:c91e918b0763bb1c85d5b7c8282c2afc29b62d7696804979975c360d4de4e8cb"},
 ]
 pytest-xdist = [
     {file = "pytest-xdist-1.34.0.tar.gz", hash = "sha256:340e8e83e2a4c0d861bdd8d05c5d7b7143f6eea0aba902997db15c2a86be04ee"},
