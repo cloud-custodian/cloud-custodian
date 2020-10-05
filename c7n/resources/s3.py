@@ -285,9 +285,10 @@ class ConfigS3(query.ConfigSource):
                 'Status': r['status'],
                 'Prefix': r['prefix'],
                 'Destination': {
-                    'Account': r['destinationConfig']['Account'],
                     'Bucket': r['destinationConfig']['bucketARN']}
             }
+            if 'Account' in r['destinationConfig']:
+                rule['Destination']['Account'] = r['destinationConfig']['Account']
             if r['destinationConfig']['storageClass']:
                 rule['Destination']['StorageClass'] = r['destinationConfig']['storageClass']
             d['Rules'].append(rule)

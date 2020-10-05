@@ -719,7 +719,8 @@ class SGUsage(Filter):
             ("sg-perm-refs", self.get_sg_refs),
             ('lambdas', self.get_lambda_sgs),
             ("launch-configs", self.get_launch_config_sgs),
-            ("ecs-cwe", self.get_ecs_cwe_sgs)
+            ("ecs-cwe", self.get_ecs_cwe_sgs),
+            ("codebuild", self.get_codebuild_sgs),
         )
 
     def scan_groups(self):
@@ -759,6 +760,12 @@ class SGUsage(Filter):
         for nic in self.manager.get_resource_manager('eni').resources():
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
+        return sg_ids
+
+    def get_codebuild_sgs(self):
+        sg_ids = set()
+        for cb in self.manager.get_resource_manager('codebuild').resources():
+            sg_ids |= set(cb.get('vpcConfig', {}).get('securityGroupIds', []))
         return sg_ids
 
     def get_sg_refs(self):

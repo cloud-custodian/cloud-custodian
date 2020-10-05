@@ -29,5 +29,5 @@ click = "^7.1.2"
 c7n = {path = "../..", develop = true}
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
