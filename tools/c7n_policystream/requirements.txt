@@ -1,10 +1,9 @@
-boto3==1.14.54
-botocore==1.17.54
+boto3==1.15.11
+botocore==1.18.11
 certifi==2020.6.20
-cffi==1.14.2
+cffi==1.14.3
 chardet==3.0.4
 click==7.1.2
-docutils==0.15.2
 idna==2.10
 jmespath==0.10.0
 pycparser==2.20

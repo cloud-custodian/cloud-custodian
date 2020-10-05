@@ -23,5 +23,5 @@ pytest = "~6.0.0"
 vcrpy = "^4.0.2"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
