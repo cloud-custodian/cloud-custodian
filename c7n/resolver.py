@@ -21,18 +21,20 @@ ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 class URIResolver:
 
-    def __init__(self, session_factory, cache):
+    def __init__(self, session_factory, cache, query_params):
         self.session_factory = session_factory
         self.cache = cache
+        self.query_params = query_params or {}
 
     def resolve(self, uri):
         if self.cache:
             contents = self.cache.get(("uri-resolver", uri))
             if contents is not None:
                 return contents
-
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
+        elif uri.startswith('dynamodb:'):
+            contents = self.get_dynamodb_url(uri)
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
@@ -66,6 +68,17 @@ class URIResolver:
             return body
         else:
             return body.decode('utf-8')
+    
+    def get_dynamodb_url(self, uri):
+        table_name = uri.split('table/')[1]
+        dynamodb = self.session_factory().resource('dynamodb')
+        table = dynamodb.Table(table_name)
+        if not table:
+            raise ValueError(
+                "Table %s does not exist",
+                table_name)
+
+        return json.dumps(table.query(**self.query_params)["Items"])
 
 
 class ValuesFrom:
@@ -98,12 +111,55 @@ class ValuesFrom:
          format: csv2dict
          expr: key[1]
 
+      value_from:
+        url: dynamodb:us-east-1:644160558196:table/test
+        format: json
+        query:
+
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
     supported_formats = ('json', 'txt', 'csv', 'csv2dict')
 
     # intent is that callers embed this schema
+
+    table_query_schema = { 
+        'IndexName':{'type':'string'},
+        'AttributesToGet': {'type': 'array', 'items': {'type': 'string'}},
+        'Limit':{'type': 'integer'},
+        'KeyConditions': {
+            'type':'object',
+            'propterties': {
+                'AttributeValueList': {'type': 'array', 'items': {'oneOf': [
+                    {'type': 'integer'},
+                    {'type': 'string'},
+                    {'type':'boolean'}]}},
+                'ComparisonOperator': {'enum': ['EQ','NE','IN','LE','LT',
+                    'GE','GT','BETWEEN','NOT_NULL','NULL','CONTAINS',
+                    'NOT_CONTAINS','BEGINS_WITH']},
+            }
+        },
+        'QueryFilter':{
+                'type':'object',
+                'propterties': {
+                    'AttributeValueList': {'type': 'array', 'items': {'oneOf': [
+                        {'type': 'integer'},
+                        {'type': 'string'},
+                        {'type':'boolean'}]}},
+                    'ComparisonOperator': {'enum': ['EQ','NE','IN','LE','LT',
+                        'GE','GT','BETWEEN','NOT_NULL','NULL','CONTAINS',
+                        'NOT_CONTAINS','BEGINS_WITH']},
+                }
+        },
+        'ConditionalOperator':{'enum': ['AND', 'OR']},
+        'ScanIndexForward':{'type':'boolean'},
+        'ProjectionExpression':{'type': 'string'},
+        'FilterExpression':{'type': 'string'},
+        'KeyConditionExpression':{'type': 'string'},
+        'ExpressionAttributeNames': {'type': 'object'},
+        'ExpressionAttributeValues': {'type': 'object'},
+    }
+
     schema = {
         'type': 'object',
         'additionalProperties': 'False',
@@ -113,7 +169,11 @@ class ValuesFrom:
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
-                {'type': 'string'}]}
+                {'type': 'string'}]},
+            'query': {
+                'type':'object',
+                'properties': table_query_schema
+            }
         }
     }
 
@@ -125,7 +185,7 @@ class ValuesFrom:
         self.data = format_string_values(data, **config_args)
         self.manager = manager
         self.cache = manager._cache
-        self.resolver = URIResolver(manager.session_factory, manager._cache)
+        self.resolver = URIResolver(manager.session_factory, manager._cache, self.data.get('query'))
 
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
