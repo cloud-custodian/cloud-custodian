@@ -1956,6 +1956,12 @@ class AclAwsS3Cidrs(Filter):
         return results
 
 
+class DescribeElasticIp(query.DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if self.manager.resource_type.id in r]
+
+
 @resources.register('elastic-ip', aliases=('network-addr',))
 class NetworkAddress(query.QueryResourceManager):
 
@@ -1968,6 +1974,11 @@ class NetworkAddress(query.QueryResourceManager):
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
+
+    source_mapping = {
+        'describe': DescribeElasticIp,
+        'config': query.ConfigSource
+    }
 
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)

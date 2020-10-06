@@ -51,12 +51,16 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
         for tag in list_tags_for_account(client, a['Id']):
             tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
 
+        if not role.startswith('arn'):
+            arn_role = "arn:aws:iam::{}:role/{}".format(a['Id'], role)
+        else:
+            arn_role = role.format(**a)
         ainfo = {
             'account_id': a['Id'],
             'email': a['Email'],
             'name': a['Name'],
             'tags': tags,
-            'role': role.format(**a)}
+            'role': arn_role}
         if regions:
             ainfo['regions'] = list(regions)
         results.append(ainfo)
