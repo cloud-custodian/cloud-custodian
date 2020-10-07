@@ -480,6 +480,9 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 def accounts_iterator(config):
     for a in config.get('accounts', ()):
+        if isinstance(a['role'], str) and not a['role'].startswith('arn'):
+            a['role'] = "arn:aws:iam::{}:role/{}".format(
+                a['account_id'], a['role'])
         yield a
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],

@@ -1149,7 +1149,8 @@ class InstanceFinding(PostFinding):
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
             details["SubnetId"] = r["SubnetId"]
-        if "IamInstanceProfile" in r:
+        # config will use an empty key
+        if "IamInstanceProfile" in r and r['IamInstanceProfile']:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {

@@ -342,7 +342,7 @@ class ConfigSource:
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
-        return camelResource(item_config)
+        return camelResource(item_config, implicitDate=True)
 
     def get_listed_resources(self, client):
         # fallback for when config decides to arbitrarily break select

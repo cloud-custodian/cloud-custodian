@@ -16,6 +16,9 @@ import time
 from urllib import parse as urlparse
 from urllib.request import getproxies
 
+
+from dateutil.parser import ParserError, parse as parse_date
+
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
 
@@ -188,16 +191,34 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def camelResource(obj):
+def camelResource(obj, implicitDate=False):
     """Some sources from apis return lowerCased where as describe calls
 
     always return TitleCase, this function turns the former to the later
+
+    implicitDate ~ automatically sniff keys that look like isoformat date strings
+     and convert to python datetime objects.
     """
     if not isinstance(obj, dict):
         return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
         obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if implicitDate:
+            # config service handles datetime differently then describe sdks
+            # the sdks use knowledge of the shape to support language native
+            # date times, while config just turns everything into a serialized
+            # json with mangled keys without type info. to normalize to describe
+            # we implicitly sniff keys which look like datetimes, and have an
+            # isoformat marker ('T').
+            kn = k.lower()
+            if isinstance(v, str) and ('time' in kn or 'date' in kn) and "T" in v:
+                try:
+                    dv = parse_date(v)
+                except ParserError:
+                    pass
+                else:
+                    obj["%s%s" % (k[0].upper(), k[1:])] = dv
         if isinstance(v, dict):
             camelResource(v)
         elif isinstance(v, list):
