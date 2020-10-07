@@ -62,8 +62,10 @@ class TestServiceCatalog(BaseTest):
     def test_portfolio_remove_share_accountid(self):
         session_factory = self.replay_flight_data("test_portfolio_remove_share_accountid")
         client = session_factory().client("servicecatalog")
-        self.assertTrue('644160558196' in client.list_portfolio_access(PortfolioId='port-hlgxpz7lc55iw').get('AccountIds'))
-        self.assertTrue('644160558196' in client.list_portfolio_access(PortfolioId='port-srkytozjwbzpc').get('AccountIds'))
+        self.assertTrue('644160558196' in client.list_portfolio_access(
+            PortfolioId='port-hlgxpz7lc55iw').get('AccountIds'))
+        self.assertTrue('644160558196' in client.list_portfolio_access(
+            PortfolioId='port-srkytozjwbzpc').get('AccountIds'))
         p = self.load_policy(
             {
                 "name": "servicecatalog-portfolio-cross-account",
@@ -74,5 +76,7 @@ class TestServiceCatalog(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-        self.assertFalse('644160558196' in client.list_portfolio_access(PortfolioId='port-hlgxpz7lc55iw').get('AccountIds'))
-        self.assertTrue('644160558196' in client.list_portfolio_access(PortfolioId='port-srkytozjwbzpc').get('AccountIds'))
+        self.assertFalse('644160558196' in client.list_portfolio_access(
+            PortfolioId='port-hlgxpz7lc55iw').get('AccountIds'))
+        self.assertTrue('644160558196' in client.list_portfolio_access(
+            PortfolioId='port-srkytozjwbzpc').get('AccountIds'))
