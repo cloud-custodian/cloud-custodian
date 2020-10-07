@@ -140,13 +140,13 @@ class RemoveSharedAccounts(BaseAction):
         'remove-shared-accounts',
         accounts={'oneOf': [
             {'enum': ['matched']},
-            {'type': 'array', 'items': {'type': 'string', 'minLength': 12, 'maxLength': 12}}]},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^[0-9]{12}$'}}]},
         required=['accounts'])
 
     permissions = ('servicecatalog:DeletePortfolioShare',)
 
     def validate(self):
-        if 'accounts' in self.data and self.data['accounts'] == 'matched':
+        if self.data['accounts'] == 'matched':
             found = False
             for f in self.manager.iter_filters():
                 if isinstance(f, CatalogPortfolioCrossAccount):
@@ -154,7 +154,7 @@ class RemoveSharedAccounts(BaseAction):
                     break
             if not found:
                 raise PolicyValidationError(
-                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                    "policy:%s action:%s with matched requires cross-account filter" % (
                         self.manager.ctx.policy.name, self.type))
 
     def delete_shared_accounts(self, client, portfolio):
