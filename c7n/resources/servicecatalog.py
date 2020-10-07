@@ -67,6 +67,16 @@ class CatalogPortfolioDeleteAction(BaseAction):
 @CatalogPortfolio.filter_registry.register('cross-account')
 class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
     """Check for account ids that the service catalog portfolio is shared with
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: catalog-portfolio-cross-account
+                resource: aws.catalog-portfolio
+                filters:
+                  - type: cross-account
     """
 
     schema = type_schema(
@@ -116,6 +126,14 @@ class RemoveSharedAccounts(BaseAction):
                 actions:
                   - type: remove-shared-accounts
                     accounts: matched
+
+              - name: catalog-portfolio-delete-shared-account
+                resource: aws.catalog-portfolio
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-shared-accounts
+                    accounts: ['123456789123']
     """
 
     schema = type_schema(
