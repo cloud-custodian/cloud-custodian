@@ -1977,7 +1977,7 @@ class TestDedicatedHost(BaseTest):
             'name': 'ec2-dedicated-hosts',
             'resource': 'aws.ec2-host'}, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
 
     def test_dedicated_host_instances_running_filter(self):
         factory = self.replay_flight_data('test_ec2_host_query')
@@ -1987,13 +1987,13 @@ class TestDedicatedHost(BaseTest):
             'filters': [
                 {
                     'type': 'instances-running',
-                    'op': 'less-than',
-                    'value': 2
+                    'op': 'eq',
+                    'value': 0
                 }
             ]}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['HostId'], 'h-05abcdd96ee9ca123')
+        self.assertEqual(resources[0]['HostId'], 'h-0fd4c41a3a3592145')
 
     def test_dedicated_host_instances_running_filter_validation(self):
         invalid_policies = [

@@ -4,81 +4,140 @@
         "Hosts": [
             {
                 "AutoPlacement": "off",
-                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZone": "us-east-1b",
                 "AvailableCapacity": {
                     "AvailableInstanceCapacity": [
                         {
-                            "AvailableCapacity": 48,
-                            "InstanceType": "m5.large",
-                            "TotalCapacity": 48
+                            "AvailableCapacity": 15,
+                            "InstanceType": "a1.medium",
+                            "TotalCapacity": 16
                         }
                     ],
-                    "AvailableVCpus": 96
+                    "AvailableVCpus": 15
                 },
-                "ClientToken": "token-123456",
-                "HostId": "h-05abcdd96ee9ca123",
+                "HostId": "h-0fd4c41a3a3592144",
                 "HostProperties": {
-                    "Cores": 48,
-                    "InstanceType": "m5.large",
-                    "InstanceFamily": "m5",
-                    "Sockets": 2,
-                    "TotalVCpus": 96
+                    "Cores": 16,
+                    "InstanceType": "a1.medium",
+                    "Sockets": 1,
+                    "TotalVCpus": 16
                 },
-                "HostReservationId": null,
-                "Instances": [],
+                "Instances": [
+                    {
+                        "InstanceId": "i-0216d1196bb5a52b1",
+                        "InstanceType": "a1.medium",
+                        "OwnerId": "619193117841"
+                    }
+                ],
                 "State": "available",
-                "AllocationTime": "2018-01-23T12:33:31.692Z",
-                "ReleaseTime": null,
-                "Tags": [],
+                "AllocationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 11,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    }
+                ],
                 "HostRecovery": "off",
                 "AllowsMultipleInstanceTypes": "off",
-                "OwnerId": "123412341234",
-                "AvailabilityZoneId": "use1-az1",
+                "OwnerId": "619193117841",
+                "AvailabilityZoneId": "use1-az2",
                 "MemberOfServiceLinkedResourceGroup": false
             },
             {
                 "AutoPlacement": "off",
-                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZone": "us-east-1b",
                 "AvailableCapacity": {
                     "AvailableInstanceCapacity": [
                         {
-                            "AvailableCapacity": 24,
-                            "InstanceType": "m5.large",
-                            "TotalCapacity": 48
+                            "AvailableCapacity": 16,
+                            "InstanceType": "a1.medium",
+                            "TotalCapacity": 16
                         }
                     ],
-                    "AvailableVCpus": 48
+                    "AvailableVCpus": 16
                 },
-                "ClientToken": "token-123567",
-                "HostId": "h-05abcdd96ee9ca234",
+                "HostId": "h-0fd4c41a3a3592145",
                 "HostProperties": {
-                    "Cores": 48,
-                    "InstanceType": "m5.large",
-                    "InstanceFamily": "m5",
-                    "Sockets": 2,
-                    "TotalVCpus": 96
+                    "Cores": 16,
+                    "InstanceType": "a1.medium",
+                    "Sockets": 1,
+                    "TotalVCpus": 16
                 },
-                "HostReservationId": null,
-                "Instances": [
+                "Instances": [],
+                "State": "available",
+                "AllocationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 11,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "Tags": [
                     {
-                        "InstanceId": "i-123456",
-                        "InstanceType": "m5.large",
-                        "OwnerId": "123412341234"
-                    },
-                    {
-                        "InstanceId": "i-123567",
-                        "InstanceType": "m5.large",
-                        "OwnerId": "123412341234"
+                        "Key": "Name",
+                        "Value": "test"
                     }
                 ],
-                "State": "available",
-                "AllocationTime": "2018-01-23T12:33:31.692Z",
-                "ReleaseTime": null,
-                "Tags": [],
                 "HostRecovery": "off",
                 "AllowsMultipleInstanceTypes": "off",
-                "OwnerId": "123412341234",
-                "AvailabilityZoneId": "use1-az1",
+                "OwnerId": "619193117841",
+                "AvailabilityZoneId": "use1-az2",
+                "MemberOfServiceLinkedResourceGroup": false
+            },
+            {
+                "AutoPlacement": "off",
+                "AvailabilityZone": "us-east-1b",
+                "HostId": "h-0fd4c41a3a3592145",
+                "HostProperties": {
+                    "Cores": 16,
+                    "InstanceType": "a1.medium",
+                    "Sockets": 1,
+                    "TotalVCpus": 16
+                },
+                "Instances": [],
+                "State": "released",
+                "AllocationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 11,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "ReleaseTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 17,
+                    "second": 56,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    }
+                ],
+                "HostRecovery": "off",
+                "AllowsMultipleInstanceTypes": "off",
+                "OwnerId": "619193117841",
+                "AvailabilityZoneId": "use1-az2",
                 "MemberOfServiceLinkedResourceGroup": false
             }
         ],

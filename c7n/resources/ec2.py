@@ -2256,6 +2256,6 @@ class InstancesRunning(ValueFilter):
         value = int(self.data.get('value'))
 
         return list(filter(lambda resource:
-            op(len(resource[key]), value),
+            (op(len(resource[key]), value) and resource['State'] == 'available'),
             resources
         ))
