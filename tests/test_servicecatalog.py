@@ -76,6 +76,7 @@ class TestServiceCatalog(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        self.assertTrue(r['Id'] in ['port-hlgxpz7lc55iw', 'port-srkytozjwbzpc'] for r in resources)
         self.assertFalse('644160558196' in client.list_portfolio_access(
             PortfolioId='port-hlgxpz7lc55iw').get('AccountIds'))
         self.assertTrue('644160558196' in client.list_portfolio_access(
