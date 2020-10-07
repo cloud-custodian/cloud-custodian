@@ -463,7 +463,7 @@ class DescribeSubnets(query.DescribeSource):
                 if sid:
                     resource_ids.remove(sid)
                 else:
-                    return
+                    return []
 
 
 RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
