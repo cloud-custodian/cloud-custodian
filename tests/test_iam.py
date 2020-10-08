@@ -1034,10 +1034,13 @@ def test_iam_group_delete(test, iam_user_group):
         time.sleep(3)
 
     p = test.load_policy(pdata, session_factory=session_factory)
-    with pytest.raises(client.exceptions.DeleteConflictException):
+    with pytest.raises(ClientError) as ecm:
         p.push(event)
+    assert ecm.value.response[
+        'Error']['Code'] == 'DeleteConflict'
 
     pdata['actions'] = [{'type': 'delete', 'force': True}]
+
     p = test.load_policy(pdata, session_factory=session_factory)
     resources = p.push(event)
     assert len(resources) == 1

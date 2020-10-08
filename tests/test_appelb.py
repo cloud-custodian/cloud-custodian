@@ -42,16 +42,14 @@ class AppELBTest(BaseTest):
         source = p.resource_manager.get_source("config")
         resource = source.load_resource(event)
         self.maxDiff = None
-        self.assertEqual(
-            resource["Tags"],
-            [
-                {"Key": "App", "Value": "ARTIFACTPLATFORM"},
-                {"Key": "OwnerContact", "Value": "me@example.com"},
-                {"Key": "TeamName", "Value": "Frogger"},
-                {"Key": "Env", "Value": "QA"},
-                {"Key": "Name", "Value": "Artifact ELB"},
-            ],
-        )
+
+        assert resource["Tags"] == [
+            {"Key": "App", "Value": "ARTIFACTPLATFORM"},
+            {"Key": "Env", "Value": "QA"},
+            {"Key": "Name", "Value": "Artifactory ELB"},
+            {"Key": "OwnerContact", "Value": "me@example.com"},
+            {"Key": "TeamName", "Value": "Frogger"},
+        ]
 
     def test_appelb_simple(self):
         self.patch(AppELB, "executor_factory", MainThreadExecutor)

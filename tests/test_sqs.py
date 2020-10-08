@@ -1,7 +1,7 @@
 # Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest, functional
+from .common import BaseTest, functional, event_data
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
@@ -9,7 +9,32 @@ import json
 import pytest
 import time
 
-from c7n.resources.aws import shape_validate
+from c7n.resources.aws import shape_validate, Arn
+
+
+def test_sqs_config_translate(test):
+    # we're using a cwe event as a config, so have to mangle to
+    # config's inane format (json strings in json)
+    event = event_data('sqs-discover.json')
+    p = test.load_policy({
+        'name': 'sqs-check',
+        'resource': 'aws.sqs',
+        'mode': {'type': 'config-rule'}})
+    config = p.resource_manager.get_source('config')
+    resource = config.load_resource(event['detail']['configurationItem'])
+    Arn.parse(resource['QueueArn']).resource == 'config-changes'
+    assert resource == {
+        'CreatedTimestamp': '1602023249',
+        'DelaySeconds': '0',
+        'LastModifiedTimestamp': '1602023249',
+        'MaximumMessageSize': '262144',
+        'MessageRetentionPeriod': '345600',
+        'Policy': '{"Version":"2012-10-17","Statement":[{"Sid":"","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sqs:SendMessage","Resource":"arn:aws:sqs:us-east-1:644160558196:config-changes"}]}', # noqa
+        'QueueArn': 'arn:aws:sqs:us-east-1:644160558196:config-changes',
+        'QueueUrl': 'https://sqs.us-east-1.amazonaws.com/644160558196/config-changes',
+        'ReceiveMessageWaitTimeSeconds': '0',
+        'VisibilityTimeout': '30',
+    }
 
 
 @terraform('sqs_delete', teardown=terraform.TEARDOWN_IGNORE)

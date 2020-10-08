@@ -42,7 +42,6 @@ from botocore.exceptions import ClientError
 
 from collections import defaultdict
 from concurrent.futures import as_completed
-from dateutil.parser import parse as parse_date
 
 try:
     from urllib3.exceptions import SSLError
@@ -110,7 +109,6 @@ class ConfigS3(query.ConfigSource):
 
         # owner is under acl per describe
         resource.pop('Owner', None)
-        resource['CreationDate'] = parse_date(resource['CreationDate'])
 
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
             if cfg.get(k) == null_value:

@@ -75,6 +75,36 @@ class DescribeBuild(DescribeSource):
             super(DescribeBuild, self).augment(resources))
 
 
+class ConfigBuild(ConfigSource):
+
+    def load_resource(self, item):
+        item_config = item['configuration']
+        item_config['Tags'] = [
+            {'Key': t['key'], 'Value': t['value']} for t in item_config.get('tags')]
+
+        # AWS Config garbage mangle undo.
+
+        if 'queuedtimeoutInMinutes' in item_config:
+            item_config['queuedTimeoutInMinutes'] = int(item_config.pop('queuedtimeoutInMinutes'))
+
+        artifacts = item_config.pop('artifacts')
+        item_config['artifacts'] = artifacts.pop(0)
+        if artifacts:
+            item_config['secondaryArtifacts'] = artifacts
+        sources = item_config['source']
+        item_config['source'] = sources.pop(0)
+        if sources:
+            item_config['secondarySources'] = sources
+
+        if 'vpcConfig' in item_config and 'subnets' in item_config['vpcConfig']:
+            item_config['vpcConfig']['subnets'] = [
+                s['subnet'] for s in item_config['vpcConfig']['subnets']]
+
+        item_config['arn'] = 'arn:aws:codebuild:{}:{}:project/{}'.format(
+            self.manager.config.region, self.manager.config.account_id, item_config['name'])
+        return item_config
+
+
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
 
@@ -93,7 +123,7 @@ class CodeBuildProject(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeBuild,
-        'config': ConfigSource
+        'config': ConfigBuild
     }
 
 
