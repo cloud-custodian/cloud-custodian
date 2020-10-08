@@ -491,7 +491,7 @@ def accounts_iterator(config):
         if isinstance(a['role'], str) and not a['role'].startswith('arn'):
             a['role'] = "arn:aws:iam::{}:role/{}".format(
                 a['account_id'], a['role'])
-        yield a
+        yield {**a, **{'provider': 'aws'}}
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
