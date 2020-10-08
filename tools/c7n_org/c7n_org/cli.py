@@ -198,33 +198,31 @@ def resolve_regions(regions):
     return regions
 
 
-
 def get_session(account, session_name, region):
-    if account.get('provider') == 'aws':
-        if account.get('role'):
-            roles = account['role']
-            if isinstance(roles, str):
-                roles = [roles]
-            s = None
-            for r in roles:
-                try:
-                    s = assumed_session(
-                        r, session_name, region=region,
-                        external_id=account.get('external_id'),
-                        session=s)
-                except ClientError as e:
-                    log.error(
-                        "unable to obtain credentials for account:%s role:%s error:%s",
-                        account['name'], r, e)
-                    raise
-            return s
-        elif account.get('profile'):
-            return SessionFactory(region, account['profile'])()
-        else:
-            raise ValueError(
-                "No profile or role assume specified for account %s" % account)
-    else:
+    if account.get('provider') != 'aws':
         return None
+    if account.get('role'):
+        roles = account['role']
+        if isinstance(roles, str):
+            roles = [roles]
+        s = None
+        for r in roles:
+            try:
+                s = assumed_session(
+                    r, session_name, region=region,
+                    external_id=account.get('external_id'),
+                    session=s)
+            except ClientError as e:
+                log.error(
+                    "unable to obtain credentials for account:%s role:%s error:%s",
+                    account['name'], r, e)
+                raise
+        return s
+    elif account.get('profile'):
+        return SessionFactory(region, account['profile'])()
+    else:
+        raise ValueError(
+            "No profile or role assume specified for account %s" % account)
 
 
 def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
@@ -400,7 +398,8 @@ def _get_env_creds(account, session, region):
     elif account["provider"] == 'azure':
         env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
     elif account["provider"] == 'gcp':
-        env['PROJECT_ID'] = account["account_id"]        
+        env['GOOGLE_CLOUD_PROJECT'] = account["account_id"]
+        env['CLOUDSDK_CORE_PROJECT'] = account["account_id"]
     return env
 
 
