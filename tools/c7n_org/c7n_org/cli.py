@@ -420,7 +420,6 @@ def run_account_script(account, region, output_dir, debug, script_args):
         subprocess.check_call(args=script_args, env=env)
         return 0
 
-
     output_dir = os.path.join(output_dir, account['name'], region)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
