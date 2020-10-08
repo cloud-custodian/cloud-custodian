@@ -128,7 +128,7 @@ class SqlServerTest(BaseTest):
                 {'type': 'metric',
                  'metric': 'dtu_consumption_percent',
                  'op': 'equal',
-                 'aggregation': 'maximum',
+                 'aggregation': 'minimum',
                  'threshold': 0,
                  'timeframe': 72,
                  'no_data_action': 'to_zero',
