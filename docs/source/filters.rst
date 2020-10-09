@@ -279,6 +279,11 @@ There are several ways to get a list of possible keys for each resource.
       op: less-than
       value: 0
 
+- Value From:
+
+  ``value_from`` allows the use of external values in the Value Filter
+
+  .. autodoconly:: c7n.resolver.ValuesFrom
 
 Event Filter
 -------------

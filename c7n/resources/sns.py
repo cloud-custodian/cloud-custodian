@@ -31,15 +31,6 @@ class DescribeTopic(DescribeSource):
             return list(w.map(_augment, resources))
 
 
-class ConfigSNS(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super().load_resource(item)
-        resource['Tags'] = [{'Key': t['key'], 'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        return resource
-
-
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
@@ -64,7 +55,7 @@ class SNS(QueryResourceManager):
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
         'describe': DescribeTopic,
-        'config': ConfigSNS
+        'config': ConfigSource
     }
 
 

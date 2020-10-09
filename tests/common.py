@@ -59,7 +59,7 @@ class ConfigTest(BaseTest):
        with the queue url and the resource id.
     """
 
-    def wait_for_config(self, session, queue_url, resource_id):
+    def wait_for_config(self, session, queue_url, resource_id=None):
         # lazy import to avoid circular
         from c7n.sqsexec import MessageIterator
 
@@ -71,7 +71,7 @@ class ConfigTest(BaseTest):
                 msg = json.loads(m["Body"])
                 change = json.loads(msg["Message"])
                 messages.ack(m)
-                if change["configurationItem"]["resourceId"] != resource_id:
+                if resource_id and change["configurationItem"]["resourceId"] != resource_id:
                     continue
                 results.append(change["configurationItem"])
                 break

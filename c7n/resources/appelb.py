@@ -51,15 +51,6 @@ class ConfigAppElb(ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigAppElb, self).load_resource(item)
-        item_tags = item['supplementaryConfiguration']['Tags']
-
-        # Config originally stored supplementaryconfig on elbv2 as json
-        # strings. Support that format for historical queries.
-        if isinstance(item_tags, str):
-            item_tags = json.loads(item_tags)
-        resource['Tags'] = [
-            {'Key': t['key'], 'Value': t['value']} for t in item_tags]
-
         item_attrs = item['supplementaryConfiguration'][
             'LoadBalancerAttributes']
         if isinstance(item_attrs, str):

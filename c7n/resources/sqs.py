@@ -44,6 +44,14 @@ class DescribeQueue(DescribeSource):
                 self.manager, list(filter(None, w.map(_augment, resources))))
 
 
+class QueueConfigSource(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['QueueUrl'] = item['resourceId']
+        return resource
+
+
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
@@ -69,7 +77,7 @@ class SQS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeQueue,
-        'config': ConfigSource
+        'config': QueueConfigSource
     }
 
     def get_permissions(self):

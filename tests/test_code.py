@@ -91,6 +91,17 @@ class CodeCommit(BaseTest):
 
 class CodeBuild(BaseTest):
 
+    def test_config_source(self):
+        factory = self.replay_flight_data('test_codebuild_config')
+        config_resources = self.load_policy({
+            'name': 'builders', 'resource': 'aws.codebuild', 'source': 'config'},
+            session_factory=factory).run()
+        resources = self.load_policy({
+            'name': 'dbuilders', 'resource': 'aws.codebuild'},
+            session_factory=factory).run()
+        assert set(config_resources[0].keys()) == (
+            set(resources[0].keys()).difference(('created', 'lastModified', 'badge')))
+
     def test_query_builds(self):
         factory = self.replay_flight_data("test_codebuild")
         p = self.load_policy(
