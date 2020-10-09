@@ -99,7 +99,7 @@
             {
                 "AutoPlacement": "off",
                 "AvailabilityZone": "us-east-1b",
-                "HostId": "h-0fd4c41a3a3592145",
+                "HostId": "h-0fd4c41a3a3592143",
                 "HostProperties": {
                     "Cores": 16,
                     "InstanceType": "a1.medium",
