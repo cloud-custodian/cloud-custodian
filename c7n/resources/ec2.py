@@ -19,7 +19,7 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase, OPERATORS
+    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
@@ -2200,63 +2200,3 @@ class DedicatedHost(query.QueryResourceManager):
         date = 'AllocationTime'
         cfn_type = config_type = 'AWS::EC2::Host'
         permissions_enum = ('ec2:DescribeHosts',)
-
-
-@DedicatedHost.filter_registry.register('instances-running')
-class InstancesRunning(ValueFilter):
-    """Filter the quantity of instances that are running in the Dedicated Host
-
-    :Example:
-
-    Find hosts that have 0 running instances.
-
-    .. code-block:: yaml
-
-        policies:
-          - name: ec2-host-no-running-instances
-            resource: ec2-host
-            filters:
-              - type: instances-running
-                op: eq
-                value: 0
-    """
-    schema = type_schema('instances-running',
-        required=['op', 'value'],
-        rinherit=ValueFilter.schema,
-        **{
-            'value': {
-                'type': 'integer'
-            }
-        }
-    )
-    schema_alias = False
-    permissions = ('ec2:DescribeHosts',)
-    annotation = 'c7n:InstancesRunning'
-
-    def validate(self):
-        if 'op' not in self.data and 'op' in self.required_keys:
-            raise PolicyValidationError(
-                "Missing 'op' in instances-running filter %s" % self.data)
-        if not self.data.get('op') in OPERATORS:
-            raise PolicyValidationError(
-                "Invalid operator in instances-running filter %s" % self.data)
-        if 'value' not in self.data and 'value' in self.required_keys:
-            raise PolicyValidationError(
-                "Missing 'value' in instances-running filter %s" % self.data)
-        try:
-            int(self.data.get('value'))
-        except ValueError:
-            raise PolicyValidationError(
-                "Invalid 'value' attribute in instances-running filter. It must be an integer.")
-
-        return self
-
-    def process(self, resources, event=None):
-        op = OPERATORS[self.data.get('op')]
-        key = 'Instances'
-        value = int(self.data.get('value'))
-
-        return list(filter(lambda resource:
-            (op(len(resource[key]), value) and resource['State'] == 'available'),
-            resources
-        ))
