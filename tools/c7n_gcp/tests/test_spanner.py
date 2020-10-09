@@ -9,8 +9,7 @@ import time
 class SpannerInstanceTest(BaseTest):
 
     def test_spanner_instance_query(self):
-        project_id = 'atomic-shine-231410'
-        session_factory = self.replay_flight_data('spanner-instance-query', project_id=project_id)
+        session_factory = self.replay_flight_data('spanner-instance-query')
 
         policy = {
             'name': 'all-spanner-instances',
@@ -41,12 +40,12 @@ class SpannerInstanceTest(BaseTest):
 
         self.assertEqual(instances[0]['state'], 'READY')
         self.assertEqual(instances[0]['config'],
-                         'projects/custodian-test-project-0/instanceConfigs/regional-asia-east1')
+                         'projects/cloud-custodian/instanceConfigs/regional-asia-east1')
         self.assertEqual(instances[0]['name'],
-                         'projects/custodian-test-project-0/instances/custodian-spanner-1')
+                         'projects/cloud-custodian/instances/custodian-spanner-1')
 
     def test_spanner_instance_delete(self):
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         deleting_instance_name = 'spanner-instance-0'
         non_deleting_instance_name = 'spanner-instance-1'
         session_factory = self.replay_flight_data('spanner-instance-delete',
@@ -75,7 +74,7 @@ class SpannerInstanceTest(BaseTest):
         self.assertEqual(instances[0]['displayName'], non_deleting_instance_name)
 
     def test_spanner_instance_patch_node_count(self):
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         patching_instance_name = 'spanner-instance-0'
         non_patching_instance_name = 'spanner-instance-1'
 
@@ -119,7 +118,7 @@ class SpannerInstanceTest(BaseTest):
         - there are existing members in addition to the ones specified in the policy;
         - a new role is added.
         """
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         resource_name = 'spanner-instance-0'
         resource_full_name = 'projects/%s/instances/%s' % (project_id, resource_name)
         session_factory = self.replay_flight_data(
@@ -170,7 +169,7 @@ class SpannerInstanceTest(BaseTest):
         - a part of the existing members is filtered out by the policy;
         - a role is removed completely.
         """
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         resource_name = 'spanner-instance-0'
         resource_full_name = 'projects/%s/instances/%s' % (project_id, resource_name)
         session_factory = self.replay_flight_data('spanner-instance-set-iam-policy-remove',
@@ -217,9 +216,7 @@ class SpannerInstanceTest(BaseTest):
 class SpannerDatabaseInstanceTest(BaseTest):
 
     def test_spanner_database_instance_query(self):
-        project_id = 'custodiantestproject'
-        session_factory = self.replay_flight_data('spanner-database-instance-query',
-                                                  project_id=project_id)
+        session_factory = self.replay_flight_data('spanner-database-instance-query')
 
         policy = self.load_policy(
             {'name': 'all-spanner-database-instances',
@@ -250,12 +247,10 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(instances[0]['state'], 'READY')
         self.assertEqual(instances[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner-1')
         self.assertEqual(instances[0]['c7n:spanner-instance']['name'],
-                         'projects/custodian-test-project-0/instances/custodian-spanner-1')
+                         'projects/cloud-custodian/instances/custodian-spanner-1')
 
     def test_spanner_database_instance_delete(self):
-        project_id = 'custodian-test-project-0'
-        session_factory = self.replay_flight_data('spanner-database-instance-delete',
-                                                  project_id=project_id)
+        session_factory = self.replay_flight_data('spanner-database-instance-delete')
         base_policy = {'name': 'gcp-spanner-databases-instance-delete',
                        'resource': 'gcp.spanner-database-instance'}
         policy = self.load_policy(
@@ -286,7 +281,7 @@ class SpannerDatabaseInstanceTest(BaseTest):
         Among the two possible cases of getting no IAM policies in a resource, the one tested there
         involves filtering everything out with mentioning all the members in a policy.
         """
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         instance_name = 'spanner-instance-0'
         resource_name = 'custodian-database-0'
         resource_full_name = 'projects/%s/instances/%s/databases/%s' % (
