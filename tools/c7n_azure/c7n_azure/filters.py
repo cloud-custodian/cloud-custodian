@@ -113,8 +113,8 @@ class MetricFilter(Filter):
         'average': Math.mean,
         'total': Math.sum,
         'count': Math.sum,
-        'minimum': Math.max,
-        'maximum': Math.min
+        'minimum': Math.min,
+        'maximum': Math.max
     }
 
     schema = {

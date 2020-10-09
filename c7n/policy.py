@@ -842,7 +842,7 @@ class ConfigRuleMode(LambdaMode):
         resources = []
 
         # TODO config resource type matches policy check
-        if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
+        if event.get('eventLeftScope') or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
                 "ResourceNotRecorded",
                 "ResourceDeletedNotRecorded"):
