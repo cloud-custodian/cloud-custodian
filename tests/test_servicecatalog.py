@@ -9,44 +9,30 @@ from c7n.exceptions import PolicyValidationError
 
 class TestServiceCatalog(BaseTest):
 
-    def test_portfolio_delete(self):
-        session_factory = self.replay_flight_data("test_portfolio_delete")
-        p = self.load_policy(
-            {
-                "name": "servicecatalog-portfolio-delete",
-                "resource": "catalog-portfolio",
-                "filters": [{"tag:name": "pratyush"}],
-                "actions": [{"type": "delete"}],
-            },
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Id'], 'port-tb63f2b33cska')
-        if self.recording:
-            time.sleep(10)
+    def test_portfolio_cross_account_remove_delete(self):
+        session_factory = self.replay_flight_data("test_portfolio_cross_account_remove_delete")
         client = session_factory().client("servicecatalog")
-        portfolios = client.list_portfolios()
-        self.assertFalse('port-tb63f2b33cska' in [p.get(
-            'Id') for p in portfolios.get('PortfolioDetails')])
-
-    def test_portfolio_cross_account_remove(self):
-        session_factory = self.replay_flight_data("test_portfolio_cross_account_remove")
-        client = session_factory().client("servicecatalog")
-        accounts = client.list_portfolio_access(PortfolioId='port-hlgxpz7lc55iw').get('AccountIds')
+        accounts = client.list_portfolio_access(PortfolioId='port-3cfur4nmnvf4u').get('AccountIds')
         self.assertEqual(len(accounts), 1)
         p = self.load_policy(
             {
                 "name": "servicecatalog-portfolio-cross-account",
                 "resource": "catalog-portfolio",
                 "filters": [{"type": "cross-account"}],
-                "actions": [{"type": "remove-shared-accounts", "accounts": "matched"}],
+                "actions": [
+                    {"type": "remove-shared-accounts", "accounts": "matched"},
+                    {"type": "delete"}
+                ],
             },
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Id'], 'port-hlgxpz7lc55iw')
-        response = client.list_portfolio_access(PortfolioId='port-hlgxpz7lc55iw').get('AccountIds')
-        self.assertEqual(len(response), 0)
+        self.assertEqual(resources[0]['Id'], 'port-3cfur4nmnvf4u')
+        if self.recording:
+            time.sleep(10)
+        portfolios = client.list_portfolios()
+        self.assertFalse('port-3cfur4nmnvf4u' in [p.get(
+            'Id') for p in portfolios.get('PortfolioDetails')])
 
     def test_remove_accounts_validation_error(self):
         self.assertRaises(
