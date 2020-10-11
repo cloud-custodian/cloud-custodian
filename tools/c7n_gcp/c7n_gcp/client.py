@@ -196,7 +196,6 @@ class Session:
         if self.project_id:
             return self.project_id
         default_project = get_default_project()
-
         if default_project:
             return default_project
 
