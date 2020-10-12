@@ -2,72 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-import functools
-import os
-import shutil
 
-from c7n.testing import PyTestUtils, reset_session_cache, CustodianTestCore
-from c7n_gcp.client import Session, get_default_project, LOCAL_THREAD
-from recorder import sanitize_project_name, PROJECT_ID, HttpRecorder, HttpReplay
-from distutils.util import strtobool
 from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 
+from c7n.testing import PyTestUtils, reset_session_cache, C7N_FUNCTIONAL
+from c7n_gcp.client import get_default_project
 
-IS_C7N_FUNCTIONAL = strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
+from gcp_common import GoogleFlightRecorder, PROJECT_ID
+from recorder import sanitize_project_name
 
-# If we have C7N_FUNCTIONAL make sure Replay is False otherwise enable Replay
-LazyReplay.value = not IS_C7N_FUNCTIONAL
+LazyReplay.value = not C7N_FUNCTIONAL
 LazyPluginCacheDir.value = '../.tfcache'
-
-
-class GoogleFlightRecorder(CustodianTestCore):
-
-    data_dir = os.path.join(os.path.dirname(__file__), 'data', 'flights')
-
-    def cleanUp(self):
-        LOCAL_THREAD.http = None
-        return reset_session_cache()
-
-    def record_flight_data(self, test_case, project_id=None):
-        test_dir = os.path.join(self.data_dir, test_case)
-        discovery_dir = os.path.join(self.data_dir, "discovery")
-        self.recording = True
-
-        if os.path.exists(test_dir):
-            shutil.rmtree(test_dir)
-        os.makedirs(test_dir)
-
-        self.addCleanup(self.cleanUp)
-        bound = {'http': HttpRecorder(test_dir, discovery_dir)}
-        if project_id:
-            bound['project_id'] = project_id
-
-        return functools.partial(Session, **bound)
-
-    def replay_flight_data(self, test_case, project_id=None):
-
-        if IS_C7N_FUNCTIONAL:
-            self.recording = True
-            if not project_id:
-                return Session
-            return functools.partial(Session, project_id=project_id)
-
-        if project_id is None:
-            project_id = PROJECT_ID
-
-        test_dir = os.path.join(self.data_dir, test_case)
-        discovery_dir = os.path.join(self.data_dir, "discovery")
-        self.recording = False
-
-        if not os.path.exists(test_dir):
-            raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
-
-        self.addCleanup(self.cleanUp)
-        bound = {
-            'http': HttpReplay(test_dir, discovery_dir),
-            'project_id': project_id,
-        }
-        return functools.partial(Session, **bound)
 
 
 class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
