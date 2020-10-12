@@ -223,21 +223,36 @@ class Delete(BaseAction):
 
     def process(self, hosted_zones):
         client = local_session(self.manager.session_factory).client('route53')
+        error = None
         for hz in hosted_zones:
             if self.data.get('force'):
                 self.delete_records(client, hz)
-            self.manager.retry(
-                client.delete_hosted_zone,
-                Id=hz['Id'],
-                ignore_err_codes=('NoSuchHostedZone', 'HostedZoneNotEmpty'))
+            try:
+                self.manager.retry(
+                    client.delete_hosted_zone,
+                    Id=hz['Id'],
+                    ignore_err_codes=('NoSuchHostedZone'))
+            except client.exceptions.HostedZoneNotEmpty as e:
+                self.log.warning(
+                    "HostedZone: %s cannot be deleted, "
+                    "set force to remove all records in zone",
+                    hz['Name'])
+                error = e
+        if error:
+            raise error
 
     def delete_records(self, client, hz):
         paginator = client.get_paginator('list_resource_record_sets')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        rrsets = paginator.paginate().build_full_result()
+        rrsets = paginator.paginate(HostedZoneId=hz['Id']).build_full_result()
+
         for rrset in rrsets['ResourceRecordSets']:
             # Trigger the deletion of all the resource record sets before deleting
             # the hosted zone
+
+            # Exempt the two zone associated mandatory records
+            if rrset['Name'] == hz['Name'] and rrset['Type'] in ('NS', 'SOA'):
+                continue
             self.manager.retry(
                 client.change_resource_record_sets,
                 HostedZoneId=hz['Id'],

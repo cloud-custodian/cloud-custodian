@@ -2,9 +2,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+import logging
 
-from .common import BaseTest
+import pytest
 from pytest_terraform import terraform
+
+from botocore.exceptions import ClientError
+from .common import BaseTest
 
 
 class Route53HostedZoneTest(BaseTest):
@@ -105,22 +109,30 @@ class Route53HostedZoneTest(BaseTest):
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
 
-@terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_OFF)
+@terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
     session_factory = test.replay_flight_data("test_route53_hostedzone_delete")
     client = session_factory().client("route53")
-    p = test.load_policy({
+    pdata = {
         "name": "r53domain-delete-hostedzone",
         "resource": "hostedzone",
         "filters": [{"tag:TestTag": "present"}],
-        "actions": ["delete"]},
-        session_factory=session_factory)
+        "actions": ["delete"]}
 
+    output = test.capture_logging('custodian.actions', level=logging.WARNING)
+
+    p = test.load_policy(pdata, session_factory=session_factory)
+    with pytest.raises(ClientError) as ecm:
+        p.run()
+    assert ecm.value.response['Error']['Code'] == 'HostedZoneNotEmpty'
+    assert "set force to remove all records in zone" in output.getvalue()
+
+    pdata['actions'] = [{'type': 'delete', 'force': True}]
+    p = test.load_policy(pdata, session_factory=session_factory)
     p.run()
 
     if test.recording:
-        # wait for hosted zone deletion
-        time.sleep(30)
+        time.sleep(3)
 
     assert client.list_hosted_zones_by_name(
         DNSName=route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']

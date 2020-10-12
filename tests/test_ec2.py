@@ -1967,3 +1967,14 @@ class TestMonitoringInstance(BaseTest):
         self.assertIn(
             instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
         )
+
+
+class TestDedicatedHost(BaseTest):
+
+    def test_dedicated_host_query(self):
+        factory = self.replay_flight_data('test_ec2_host_query')
+        p = self.load_policy({
+            'name': 'ec2-dedicated-hosts',
+            'resource': 'aws.ec2-host'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
