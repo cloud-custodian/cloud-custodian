@@ -42,7 +42,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(clusters[0]['name'], name)
 
     def test_cluster_delete(self):
-        project_id = "custodian"
+        project_id = "cloud-custodian"
         resource_name = "custodian-cluster-delete-test"
 
         factory = self.replay_flight_data('gke-cluster-delete', project_id)

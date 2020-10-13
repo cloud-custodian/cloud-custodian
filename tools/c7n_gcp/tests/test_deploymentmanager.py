@@ -8,7 +8,7 @@ from gcp_common import BaseTest
 
 class DMDeploymentTest(BaseTest):
     def test_deployment_query(self):
-        project_id = 'mitraject'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('dm-deployment-query', project_id=project_id)
 
         policy = {
@@ -24,7 +24,7 @@ class DMDeploymentTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'mydep2')
 
     def test_deployment_get(self):
-        project_id = 'mitraject'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('dm-deployment-get', project_id=project_id)
 
         policy = {
@@ -44,7 +44,7 @@ class DMDeploymentTest(BaseTest):
         self.assertEqual(deployment['id'], '7713223424225049872')
 
     def test_deployment_delete(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('dm-deployment-delete', project_id=project_id)
 
         p = self.load_policy(
