@@ -115,6 +115,29 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_metric_database_to_zero(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'metric',
+                 'metric': 'dtu_consumption_percent',
+                 'op': 'equal',
+                 'aggregation': 'minimum',
+                 'threshold': 0,
+                 'timeframe': 72,
+                 'no_data_action': 'to_zero',
+                 'filter': "DatabaseResourceId eq '*'"
+                 }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     @cassette_name('firewall')
     def test_firewall_rules_include_range(self):
         p = self.load_policy({
