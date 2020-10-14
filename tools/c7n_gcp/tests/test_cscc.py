@@ -10,8 +10,7 @@ from gcp_common import BaseTest
 class PostFinding(BaseTest):
 
     def test_cscc_post(self):
-        factory = self.replay_flight_data(
-            'cscc-post-finding', project_id='test-226520')
+        factory = self.replay_flight_data('cscc-post-finding')
         session = factory()
         findings = session.client(
             'securitycenter', 'v1beta1', 'organizations.sources.findings')

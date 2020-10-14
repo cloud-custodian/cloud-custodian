@@ -42,10 +42,10 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(resources[0]['name'], resource_name)
 
     def test_managed_zone_delete(self):
-        project_id = "custodian"
+        project_id = "cloud-custodian"
         resource_name = "custodian-delete-test"
 
-        factory = self.replay_flight_data('dns-managed-zone-delete', project_id)
+        factory = self.replay_flight_data('dns-managed-zone-delete')
         p = self.load_policy(
             {'name': 'gcp-dns-managed-zone-delete',
              'resource': 'gcp.dns-managed-zone',

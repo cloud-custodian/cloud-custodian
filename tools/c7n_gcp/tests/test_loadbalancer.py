@@ -8,9 +8,7 @@ from gcp_common import BaseTest, event_data
 class LoadBalancingAddressTest(BaseTest):
 
     def test_loadbalancer_address_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-addresses-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-addresses-query')
         p = self.load_policy(
             {'name': 'all-lb-addresses',
              'resource': 'gcp.loadbalancer-address'},
@@ -62,9 +60,7 @@ class LoadBalancingAddressTest(BaseTest):
 class LoadBalancingUrlMapTest(BaseTest):
 
     def test_loadbalancer_url_map_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-url-maps-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-url-maps-query')
         p = self.load_policy(
             {'name': 'all-lb-url-maps',
              'resource': 'gcp.loadbalancer-url-map'},
@@ -96,9 +92,7 @@ class LoadBalancingUrlMapTest(BaseTest):
 class LoadBalancingTargetTcpProxyTest(BaseTest):
 
     def test_loadbalancer_target_tcp_proxy_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-tcp-proxies-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-tcp-proxies-query')
         p = self.load_policy(
             {'name': 'all-lb-target-tcp-proxies',
              'resource': 'gcp.loadbalancer-target-tcp-proxy'},
@@ -129,9 +123,7 @@ class LoadBalancingTargetTcpProxyTest(BaseTest):
 class LoadBalancingTargetSslProxyTest(BaseTest):
 
     def test_loadbalancer_target_ssl_proxy_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-ssl-proxies-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-ssl-proxies-query')
         p = self.load_policy(
             {'name': 'all-lb-target-ssl-proxies',
              'resource': 'gcp.loadbalancer-target-ssl-proxy'},
@@ -162,9 +154,7 @@ class LoadBalancingTargetSslProxyTest(BaseTest):
 class LoadBalancingSslPolicyTest(BaseTest):
 
     def test_loadbalancer_ssl_policy_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-ssl-policies-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-ssl-policies-query')
         p = self.load_policy(
             {'name': 'all-lb-ssl-policies',
              'resource': 'gcp.loadbalancer-ssl-policy'},
@@ -225,9 +215,7 @@ class LoadBalancingSslPolicyTest(BaseTest):
 class LoadBalancingSslCertificateTest(BaseTest):
 
     def test_loadbalancer_ssl_certificate_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-ssl-certificates-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-ssl-certificates-query')
         p = self.load_policy(
             {'name': 'all-lb-ssl-certificates',
              'resource': 'gcp.loadbalancer-ssl-certificate'},
@@ -258,9 +246,7 @@ class LoadBalancingSslCertificateTest(BaseTest):
 class LoadBalancingTargetHttpsProxyTest(BaseTest):
 
     def test_loadbalancer_target_https_proxy_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-https-proxies-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-https-proxies-query')
         p = self.load_policy(
             {'name': 'all-lb-target-https-proxies',
              'resource': 'gcp.loadbalancer-target-https-proxy'},
@@ -291,9 +277,7 @@ class LoadBalancingTargetHttpsProxyTest(BaseTest):
 class LoadBalancingBackendBucketTest(BaseTest):
 
     def test_loadbalancer_backend_bucket_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-backend-buckets-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-backend-buckets-query')
         p = self.load_policy(
             {'name': 'all-lb-backend-buckets',
              'resource': 'gcp.loadbalancer-backend-bucket'},
@@ -321,7 +305,7 @@ class LoadBalancingBackendBucketTest(BaseTest):
         self.assertEqual(instances[0]['name'], 'custodian-backend-bucket-0')
 
     def test_loadbalancer_backend_bucket_delete(self):
-        project_id = 'custodian-test-project-0'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('lb-backend-buckets-delete',
                                                   project_id=project_id)
         base_policy = {'name': 'lb-addresses-delete',
@@ -357,10 +341,7 @@ class LoadBalancingBackendBucketTest(BaseTest):
 class LoadBalancingHttpsHealthCheckTest(BaseTest):
 
     def test_loadbalancer_https_health_check_query(self):
-
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-https-health-checks-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-https-health-checks-query')
         p = self.load_policy(
             {'name': 'all-lb-https-health-checks',
              'resource': 'gcp.loadbalancer-https-health-check'},
@@ -391,9 +372,7 @@ class LoadBalancingHttpsHealthCheckTest(BaseTest):
 class LoadBalancingHttpHealthCheckTest(BaseTest):
 
     def test_loadbalancer_http_health_check_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-http-health-checks-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-http-health-checks-query')
         p = self.load_policy(
             {'name': 'all-lb-http-health-checks',
              'resource': 'gcp.loadbalancer-http-health-check'},
@@ -424,9 +403,7 @@ class LoadBalancingHttpHealthCheckTest(BaseTest):
 class LoadBalancingHealthCheckTest(BaseTest):
 
     def test_loadbalancer_health_check_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-health-checks-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-health-checks-query')
         p = self.load_policy(
             {'name': 'all-lb-health-checks',
              'resource': 'gcp.loadbalancer-health-check'},
@@ -457,9 +434,7 @@ class LoadBalancingHealthCheckTest(BaseTest):
 class LoadBalancingTargetHttpProxyTest(BaseTest):
 
     def test_loadbalancer_target_http_proxy_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-http-proxies-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-http-proxies-query')
         p = self.load_policy(
             {'name': 'all-lb-target-http-proxies',
              'resource': 'gcp.loadbalancer-target-http-proxy'},
@@ -490,9 +465,7 @@ class LoadBalancingTargetHttpProxyTest(BaseTest):
 class LoadBalancingBackendServiceTest(BaseTest):
 
     def test_loadbalancer_backend_service_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-backend-services-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-backend-services-query')
         p = self.load_policy(
             {'name': 'all-lb-backend-services',
              'resource': 'gcp.loadbalancer-backend-service'},
@@ -523,9 +496,7 @@ class LoadBalancingBackendServiceTest(BaseTest):
 class LoadBalancingTargetInstanceTest(BaseTest):
 
     def test_loadbalancer_target_instance_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-instances-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-instances-query')
         p = self.load_policy(
             {'name': 'all-lb-target-instances',
              'resource': 'gcp.loadbalancer-target-instance'},
@@ -556,9 +527,7 @@ class LoadBalancingTargetInstanceTest(BaseTest):
 class LoadBalancingTargetPoolTest(BaseTest):
 
     def test_loadbalancer_target_pool_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-target-pools-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-target-pools-query')
         p = self.load_policy(
             {'name': 'all-lb-target-pools',
              'resource': 'gcp.loadbalancer-target-pool'},
@@ -589,9 +558,7 @@ class LoadBalancingTargetPoolTest(BaseTest):
 class LoadBalancingForwardingRuleTest(BaseTest):
 
     def test_loadbalancer_forwarding_rule_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-forwarding-rules-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-forwarding-rules-query')
         p = self.load_policy(
             {'name': 'all-lb-forwarding-rules',
              'resource': 'gcp.loadbalancer-forwarding-rule'},
@@ -622,9 +589,7 @@ class LoadBalancingForwardingRuleTest(BaseTest):
 class LoadBalancingGlobalForwardingRuleTest(BaseTest):
 
     def test_loadbalancer_global_forwarding_rule_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-global-forwarding-rules-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-global-forwarding-rules-query')
         p = self.load_policy(
             {'name': 'all-lb-global-forwarding-rules',
              'resource': 'gcp.loadbalancer-global-forwarding-rule'},
@@ -655,9 +620,7 @@ class LoadBalancingGlobalForwardingRuleTest(BaseTest):
 class LoadBalancingGlobalAddressTest(BaseTest):
 
     def test_loadbalancer_global_address_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('lb-global-addresses-query',
-                                          project_id=project_id)
+        factory = self.replay_flight_data('lb-global-addresses-query')
         p = self.load_policy(
             {'name': 'all-lb-global-addresses',
              'resource': 'gcp.loadbalancer-global-address'},

@@ -17,6 +17,8 @@ import pytest
 import mock
 import yaml
 
+from distutils.util import strtobool
+
 from c7n import policy
 from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
@@ -28,6 +30,8 @@ C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason="We are not validating schemas.")
 functional = pytest.mark.functional
+
+C7N_FUNCTIONAL = strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 
 
 class CustodianTestCore:

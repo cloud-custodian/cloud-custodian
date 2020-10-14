@@ -7,6 +7,7 @@ import jmespath
 import json
 import os.path
 import logging
+import itertools
 from urllib.request import Request, urlopen
 from urllib.parse import parse_qsl, urlparse
 import zlib
@@ -163,23 +164,32 @@ class ValuesFrom:
         if format == 'json':
             data = json.loads(contents)
             if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
-                return res
+                return self._get_resource_values(data)
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
+                if 'expr' in self.data:
+                    return self._get_resource_values(data)
+                else:
+                    combined_data = set(itertools.chain.from_iterable(data.values()))
+                    return combined_data
             else:
                 if isinstance(self.data.get('expr'), int):
-                    return [d[self.data['expr']] for d in data]
+                    return set([d[self.data['expr']] for d in data])
                 data = list(data)
-            if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
-                return res
-            return data
+                if 'expr' in self.data:
+                    return self._get_resource_values(data)
+                else:
+                    combined_data = set(itertools.chain.from_iterable(data))
+                    return combined_data
         elif format == 'txt':
-            return [s.strip() for s in io.StringIO(contents).readlines()]
+            return set([s.strip() for s in io.StringIO(contents).readlines()])
+
+    def _get_resource_values(self, data):
+        res = jmespath.search(self.data['expr'], data)
+        if res is None:
+            log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
+        if isinstance(res, list):
+            res = set(res)
+        return res

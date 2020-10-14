@@ -55,6 +55,7 @@ the pytest-terraform library.
 
   - `Pytest Terraform <https://github.com/cloud-custodian/pytest-terraform>`_ a Pytest Plugin leveraging terraform to setup test environments
 
+.. _Creating Tests:
 
 Creating Cloud Resources with Terraform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -303,6 +304,7 @@ The following test uses the above `sqs_delete` terraform module:
         # Attempt to delete the queue and expect AWS API to produce an error
         pytest.raises(ClientError, client.purge_queue, QueueUrl=queue_url)
 
+.. _Converting Tests:
 
 Converting older functional tests
 ---------------------------------
