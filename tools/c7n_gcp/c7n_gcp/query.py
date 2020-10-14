@@ -212,16 +212,14 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         try:
             return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
-            error = extract_error(e)
-            error_code = extract_error_code(e)
-            error_message = extract_error_message(e)
+            error_reason, error_code, error_message = extract_errors(e)
 
-            if error is None and error_code is None:
+            if error_reason is None and error_code is None:
                 raise
             if error_code == 403 and 'disabled' in error_message:
                 log.warning(error_message)
                 return []
-            elif error == 'accessNotConfigured':
+            elif error_reason == 'accessNotConfigured':
                 log.warning(
                     "Resource:%s not available -> Service:%s not enabled on %s",
                     self.type,
@@ -356,31 +354,13 @@ ERROR_CODE = jmespath.compile('error.code')
 ERROR_MESSAGE = jmespath.compile('error.message')
 
 
-def extract_error(e):
-
+def extract_errors(e):
     try:
         edata = json.loads(e.content)
     except Exception:
-        return None
-    return ERROR_REASON.search(edata)
+        edata = None
 
-
-def extract_error_code(e):
-
-    try:
-        edata = json.loads(e.content)
-    except Exception:
-        return None
-    return ERROR_CODE.search(edata)
-
-
-def extract_error_message(e):
-
-    try:
-        edata = json.loads(e.content)
-    except Exception:
-        return None
-    return ERROR_MESSAGE.search(edata)
+    return ERROR_REASON.search(edata), ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
 
 class GcpLocation:
