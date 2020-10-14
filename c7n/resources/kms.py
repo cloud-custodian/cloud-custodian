@@ -70,7 +70,7 @@ class DescribeKey(DescribeSource):
                 r.update(info)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
+                    self.manager.log.warning(
                         "Access denied when describing key:%s",
                         key_id)
                 else:
