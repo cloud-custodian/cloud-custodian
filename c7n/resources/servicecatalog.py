@@ -87,15 +87,16 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
     permissions = ('servicecatalog:ListPortfolioAccess',)
     annotation_key = 'c7n:CrossAccountViolations'
 
-    def violation_checker(self, client, accounts, resources):
+    def check_access(self, client, accounts, resources):
         results = []
         shared_accounts = set()
         for r in resources:
             accounts = self.manager.retry(
                 client.list_portfolio_access, PortfolioId=r['Id'], ignore_err_codes=(
                     'ResourceNotFoundException',))
-            if accounts:
-                shared_accounts = set(accounts.get('AccountIds'))
+            if not accounts:
+                continue
+            shared_accounts = set(accounts.get('AccountIds'))
             delta_accounts = shared_accounts.difference(accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
@@ -106,7 +107,7 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
         results = []
         client = local_session(self.manager.session_factory).client('servicecatalog')
         accounts = self.get_accounts()
-        results.extend(self.violation_checker(client, accounts, resources))
+        results.extend(self.check_access(client, accounts, resources))
         return results
 
 
@@ -146,16 +147,17 @@ class RemoveSharedAccounts(BaseAction):
     permissions = ('servicecatalog:DeletePortfolioShare',)
 
     def validate(self):
-        if self.data['accounts'] == 'matched':
-            found = False
-            for f in self.manager.iter_filters():
-                if isinstance(f, CatalogPortfolioCrossAccount):
-                    found = True
-                    break
-            if not found:
-                raise PolicyValidationError(
-                    "policy:%s action:%s with matched requires cross-account filter" % (
-                        self.manager.ctx.policy.name, self.type))
+        if self.data['accounts'] != 'matched':
+            return
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, CatalogPortfolioCrossAccount):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                "policy:%s action:%s with matched requires cross-account filter" % (
+                    self.manager.ctx.policy.name, self.type))
 
     def delete_shared_accounts(self, client, portfolio):
         accounts = self.data.get('accounts')
