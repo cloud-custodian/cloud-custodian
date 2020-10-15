@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Items": [
+            {
+                "accountId": {
+                    "S": "1111111111"
+                },
+                "test": {
+                    "S": "1111111111"
+                },
+                "exceptions": {
+                    "M": {
+                        "exception1": {
+                            "L": [
+                                {
+                                    "S": "testing-vpc"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ],
+        "Count": 1,
+        "ScannedCount": 1,
+        "ResponseMetadata": {}
+    }
+}

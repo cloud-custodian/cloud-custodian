@@ -68,6 +68,27 @@ class ResolverTest(BaseTest):
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
+    def test_resolve_dynamo(self):
+        session_factory = self.replay_flight_data("test_dynamo_resolver")
+
+        query_key = "1111111111"
+        query_value = "testing-vpc"
+
+        query_params = {
+            'KeyConditionExpression': '#n2 = :v1',
+            'FilterExpression': 'contains(#n0.#n1, :v0)',
+            'ExpressionAttributeNames': {'#n0': 'exceptions', '#n1': 'exception1', '#n2': 'test'},
+            'ExpressionAttributeValues': {':v0': query_value, ':v1': query_key },
+        }
+        cache = FakeCache()
+        resolver = URIResolver(session_factory, cache, query_params)
+        uri = "dynamodb:us-east-1:644160558196:table/test"
+        data = json.loads(resolver.resolve(uri))
+
+        self.assertEqual(query_key, data[0]['accountId'])
+        self.assertEqual(query_value, data[0]['exceptions']["exception1"][0])
+        self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
+
     def test_handle_content_encoding(self):
         session_factory = self.replay_flight_data("test_s3_resolver")
         cache = FakeCache()

@@ -21,10 +21,10 @@ ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 class URIResolver:
 
-    def __init__(self, session_factory, cache, query_params):
+    def __init__(self, session_factory, cache, query_params={}):
         self.session_factory = session_factory
         self.cache = cache
-        self.query_params = query_params or {}
+        self.query_params = query_params
 
     def resolve(self, uri):
         if self.cache:
@@ -73,10 +73,6 @@ class URIResolver:
         table_name = uri.split('table/')[1]
         dynamodb = self.session_factory().resource('dynamodb')
         table = dynamodb.Table(table_name)
-        if not table:
-            raise ValueError(
-                "Table %s does not exist",
-                table_name)
 
         return json.dumps(table.query(**self.query_params)["Items"])
 
