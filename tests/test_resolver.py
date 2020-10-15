@@ -78,7 +78,7 @@ class ResolverTest(BaseTest):
             'KeyConditionExpression': '#n2 = :v1',
             'FilterExpression': 'contains(#n0.#n1, :v0)',
             'ExpressionAttributeNames': {'#n0': 'exceptions', '#n1': 'exception1', '#n2': 'test'},
-            'ExpressionAttributeValues': {':v0': query_value, ':v1': query_key },
+            'ExpressionAttributeValues': {':v0': query_value, ':v1': query_key},
         }
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache, query_params)

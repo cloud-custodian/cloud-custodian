@@ -33,7 +33,7 @@ class URIResolver:
                 return contents
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
-        elif uri.startswith('dynamodb:'):
+        elif uri.startswith('dynamodb: '):
             contents = self.get_dynamodb_url(uri)
         else:
             # TODO: in the case of file: content and untrusted
@@ -68,7 +68,7 @@ class URIResolver:
             return body
         else:
             return body.decode('utf-8')
-    
+
     def get_dynamodb_url(self, uri):
         table_name = uri.split('table/')[1]
         dynamodb = self.session_factory().resource('dynamodb')
@@ -108,9 +108,14 @@ class ValuesFrom:
          expr: key[1]
 
       value_from:
-        url: dynamodb:us-east-1:644160558196:table/test
+        url: dynamodb:us-east-1:1111111111:table/test
         format: json
         query:
+            KeyConditionExpression: '#n1 = :v1'
+            FilterExpression: 'contains(#n0, :v0)'
+            ExpressionAttributeNames: {'#n0': 'field', '#n1': 'key'}
+            ExpressionAttributeValues: {':v0': 'value', ':v1': '1111111111'}
+        expr: [0].field2
 
        # inferred from extension
        format: [json, csv, csv2dict, txt]
@@ -119,39 +124,39 @@ class ValuesFrom:
 
     # intent is that callers embed this schema
 
-    table_query_schema = { 
-        'IndexName':{'type':'string'},
+    table_query_schema = {
+        'IndexName': {'type': 'string'},
         'AttributesToGet': {'type': 'array', 'items': {'type': 'string'}},
-        'Limit':{'type': 'integer'},
+        'Limit': {'type': 'integer'},
         'KeyConditions': {
-            'type':'object',
+            'type': 'object',
             'propterties': {
                 'AttributeValueList': {'type': 'array', 'items': {'oneOf': [
                     {'type': 'integer'},
                     {'type': 'string'},
-                    {'type':'boolean'}]}},
-                'ComparisonOperator': {'enum': ['EQ','NE','IN','LE','LT',
-                    'GE','GT','BETWEEN','NOT_NULL','NULL','CONTAINS',
-                    'NOT_CONTAINS','BEGINS_WITH']},
+                    {'type': 'boolean'}]}},
+                'ComparisonOperator': {'enum': ['EQ', 'NE', 'IN', 'LE', 'LT',
+                    'GE', 'GT', 'BETWEEN', 'NOT_NULL', 'NULL', 'CONTAINS',
+                    'NOT_CONTAINS', 'BEGINS_WITH']},
             }
         },
-        'QueryFilter':{
-                'type':'object',
-                'propterties': {
-                    'AttributeValueList': {'type': 'array', 'items': {'oneOf': [
-                        {'type': 'integer'},
-                        {'type': 'string'},
-                        {'type':'boolean'}]}},
-                    'ComparisonOperator': {'enum': ['EQ','NE','IN','LE','LT',
-                        'GE','GT','BETWEEN','NOT_NULL','NULL','CONTAINS',
-                        'NOT_CONTAINS','BEGINS_WITH']},
-                }
+        'QueryFilter': {
+            'type': 'object',
+            'propterties': {
+                'AttributeValueList': {'type': 'array', 'items': {'oneOf': [
+                    {'type': 'integer'},
+                    {'type': 'string'},
+                    {'type': 'boolean'}]}},
+                'ComparisonOperator': {'enum': ['EQ', 'NE', 'IN', 'LE', 'LT',
+                    'GE', 'GT', 'BETWEEN', 'NOT_NULL', 'NULL', 'CONTAINS',
+                    'NOT_CONTAINS', 'BEGINS_WITH']},
+            }
         },
-        'ConditionalOperator':{'enum': ['AND', 'OR']},
-        'ScanIndexForward':{'type':'boolean'},
-        'ProjectionExpression':{'type': 'string'},
-        'FilterExpression':{'type': 'string'},
-        'KeyConditionExpression':{'type': 'string'},
+        'ConditionalOperator': {'enum': ['AND', 'OR']},
+        'ScanIndexForward': {'type': 'boolean'},
+        'ProjectionExpression': {'type': 'string'},
+        'FilterExpression': {'type': 'string'},
+        'KeyConditionExpression': {'type': 'string'},
         'ExpressionAttributeNames': {'type': 'object'},
         'ExpressionAttributeValues': {'type': 'object'},
     }
@@ -167,7 +172,7 @@ class ValuesFrom:
                 {'type': 'integer'},
                 {'type': 'string'}]},
             'query': {
-                'type':'object',
+                'type': 'object',
                 'properties': table_query_schema
             }
         }
