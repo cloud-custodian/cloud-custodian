@@ -33,7 +33,7 @@ class URIResolver:
                 return contents
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
-        elif uri.startswith('dynamodb: '):
+        elif uri.startswith('dynamodb:'):
             contents = self.get_dynamodb_url(uri)
         else:
             # TODO: in the case of file: content and untrusted
