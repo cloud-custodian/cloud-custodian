@@ -18,7 +18,7 @@ class RDSClusterTest(BaseTest):
 
     def test_net_location_invalid_subnet(self):
         self.remove_augments()
-        session_factory = self.record_flight_data("test_rdscluster_location_invalid_sub")
+        session_factory = self.replay_flight_data("test_rdscluster_location_invalid_sub")
         p = self.load_policy({
             'name': 'rds',
             'resource': 'aws.rds-cluster',
