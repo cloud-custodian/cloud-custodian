@@ -449,7 +449,6 @@ class VpcPostFinding(PostFinding):
         return envelope
 
 
-
 class DescribeSubnets(query.DescribeSource):
 
     def get_resources(self, resource_ids):
@@ -467,6 +466,7 @@ class DescribeSubnets(query.DescribeSource):
 
 
 RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
+
 
 def extract_subnet_id(state_error):
     "Extract an subnet id from an error"
