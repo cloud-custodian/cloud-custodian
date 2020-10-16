@@ -11,9 +11,11 @@ def account_tags(account):
     for t in account.get('tags', ()):
         if ':' not in t:
             continue
-        k, v = t.split(':', 1)
-        k = 'Account%s' % k.capitalize()
-        tags[k] = v
+        parts = t.split(':')
+        key = 'Account{}'.format("".join([e.capitalize() for e in parts[:-1]]))
+        value = parts[-1]
+
+        tags[key] = value
     return tags
 
 

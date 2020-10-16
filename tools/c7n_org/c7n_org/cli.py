@@ -396,13 +396,13 @@ def _get_env_creds(session, region):
 
 
 def run_account_script(account, region, output_dir, debug, script_args):
-    try:
-        session = get_session(account, "org-script", region)
-    except ClientError:
-        return 1
-
     env = os.environ.copy()
-    env.update(_get_env_creds(session, region))
+
+    if account.get('role') or account.get('profile'):
+        session = get_session(account, "org-script", region)
+        env.update(_get_env_creds(session, region))
+
+    env.update(account_tags(account))
 
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
