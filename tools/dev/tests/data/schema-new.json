@@ -1,0 +1,16 @@
+{
+  "provider1": {
+    "provider1.resource1": {
+      "filters": ["filter1", "filter3", "filter4"],
+      "actions": ["action2", "action3"]
+    },
+    "provider1.resource3": {
+      "filters": ["filter2"],
+      "actions": ["action2", "action3"]
+    },
+    "provider1.resource4": {
+      "filters": ["filter1"],
+      "actions": ["action1", "action3"]
+    }
+  }
+}

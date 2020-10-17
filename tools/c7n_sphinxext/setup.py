@@ -39,7 +39,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.5',
+    'version': '1.1.6',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'long_description': '# Sphinx Extensions\n\nCustom sphinx extensions for use with Cloud Custodian.\n\n',
     'long_description_content_type': 'text/markdown',

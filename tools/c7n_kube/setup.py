@@ -35,7 +35,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.5',
+    'version': '0.2.6',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'long_description': '# Custodian Kubernetes Support\n\n\nWork in Progress - Not Ready For Use.\n\n',
     'long_description_content_type': 'text/markdown',

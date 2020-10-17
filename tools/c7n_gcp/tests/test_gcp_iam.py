@@ -23,7 +23,7 @@ class ProjectRoleTest(BaseTest):
         roles = exec_mode.run(event, None)
 
         self.assertEqual(len(roles), 1)
-        self.assertEqual(roles[0]['name'], 'projects/mythic-tribute-232915/roles/CustomRole1')
+        self.assertEqual(roles[0]['name'], 'projects/cloud-custodian/roles/CustomRole1')
 
 
 class ServiceAccountTest(BaseTest):
@@ -35,8 +35,8 @@ class ServiceAccountTest(BaseTest):
             'resource': 'gcp.service-account'},
             session_factory=factory)
         resource = p.resource_manager.get_resource(
-            {'project_id': 'custodian-1291',
-             'email_id': 'devtest@custodian-1291.iam.gserviceaccount.com',
+            {'project_id': 'cloud-custodian',
+             'email_id': 'devtest@cloud-custodian.iam.gserviceaccount.com',
              'unique_id': '110936229421407410679'})
         self.assertEqual(resource['displayName'], 'devtest')
 

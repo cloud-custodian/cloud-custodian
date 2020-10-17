@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PortfolioDetail": {
+            "Id": "port-3cfur4nmnvf4u",
+            "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-3cfur4nmnvf4u",
+            "DisplayName": "c7n-test",
+            "Description": "Test deletion ",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 10,
+                "day": 10,
+                "hour": 13,
+                "minute": 34,
+                "second": 50,
+                "microsecond": 112000
+            },
+            "ProviderName": "pratyush"
+        },
+        "Tags": [],
+        "TagOptions": [],
+        "Budgets": [],
+        "ResponseMetadata": {}
+    }
+}

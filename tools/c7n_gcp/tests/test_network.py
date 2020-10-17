@@ -84,7 +84,7 @@ class SubnetTest(BaseTest):
 
 class RouterTest(BaseTest):
     def test_router_query(self):
-        project_id = 'atomic-shine-231410'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('router-query', project_id=project_id)
 
         policy = {
@@ -100,7 +100,7 @@ class RouterTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'test-router')
 
     def test_router_get(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('router-get', project_id=project_id)
 
         p = self.load_policy({
@@ -119,7 +119,7 @@ class RouterTest(BaseTest):
         self.assertEqual(routers[0]['bgp']['asn'], 65001)
 
     def test_router_delete(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('router-delete', project_id=project_id)
 
         p = self.load_policy(
@@ -146,7 +146,7 @@ class RouterTest(BaseTest):
 
 class RouteTest(BaseTest):
     def test_route_query(self):
-        project_id = 'atomic-shine-231410'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('route-query', project_id=project_id)
 
         policy = {
@@ -162,7 +162,7 @@ class RouteTest(BaseTest):
         self.assertEqual(resources[0]['destRange'], '10.160.0.0/20')
 
     def test_route_get(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('route-get', project_id=project_id)
 
         p = self.load_policy({

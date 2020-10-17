@@ -5,6 +5,7 @@ import itertools
 import operator
 import zlib
 import jmespath
+import re
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -448,6 +449,34 @@ class VpcPostFinding(PostFinding):
         return envelope
 
 
+class DescribeSubnets(query.DescribeSource):
+
+    def get_resources(self, resource_ids):
+        while resource_ids:
+            try:
+                return super().get_resources(resource_ids)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidSubnetID.NotFound':
+                    raise
+                sid = extract_subnet_id(e)
+                if sid:
+                    resource_ids.remove(sid)
+                else:
+                    return []
+
+
+RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
+
+
+def extract_subnet_id(state_error):
+    "Extract an subnet id from an error"
+    subnet_id = None
+    match = RE_ERROR_SUBNET_ID.search(str(state_error))
+    if match:
+        subnet_id = match.groupdict().get('subnet_id')
+    return subnet_id
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
@@ -460,6 +489,10 @@ class Subnet(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
+
+    source_mapping = {
+        'describe': DescribeSubnets,
+        'config': query.ConfigSource}
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)

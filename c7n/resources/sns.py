@@ -36,7 +36,7 @@ class SNS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sns'
-        arn_type = 'topic'
+        arn_type = ''
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
