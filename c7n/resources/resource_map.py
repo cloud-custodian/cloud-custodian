@@ -10,6 +10,7 @@ ResourceMap = {
     "aws.backup-vault": "c7n.resources.backup.BackupVault",
     "aws.batch-compute": "c7n.resources.batch.ComputeEnvironment",
     "aws.batch-definition": "c7n.resources.batch.JobDefinition",
+    "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
     "aws.cache-cluster": "c7n.resources.elasticache.ElastiCacheCluster",
     "aws.cache-snapshot": "c7n.resources.elasticache.ElastiCacheSnapshot",
     "aws.cache-subnet-group": "c7n.resources.elasticache.ElastiCacheSubnetGroup",
