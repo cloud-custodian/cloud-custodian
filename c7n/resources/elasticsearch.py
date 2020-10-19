@@ -6,6 +6,7 @@ import json
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
 from c7n.filters import MetricsFilter, CrossAccountAccessFilter
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -119,8 +120,7 @@ class KmsFilter(KmsRelatedFilter):
 @ElasticSearchDomain.filter_registry.register('cross-account')
 class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
     """
-    Filter to return all glacier vaults with cross account access permissions
-    The whitelist parameter will omit the accounts that match from the return
+    Filter to return all elasticsearch domains with cross account access permissions
 
     :example:
 
@@ -131,9 +131,6 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
             resource: aws.elasticsearch
             filters:
               - type: cross-account
-                whitelist:
-                  - permitted-account-01
-                  - permitted-account-02
     """
     policy_attribute = 'c7n:Policy'
     permissions = ('es:DescribeElasticsearchDomainConfig',)
@@ -154,7 +151,7 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
 @ElasticSearchDomain.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """
-    Action to remove policy statements from Glacier
+    Action to remove policy statements from elasticsearch
 
     :example:
 
@@ -171,6 +168,14 @@ class RemovePolicyStatement(RemovePolicyBase):
     """
 
     permissions = ('es:DescribeElasticsearchDomainConfig', 'es:UpdateElasticsearchDomainConfig',)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, ElasticSearchCrossAccountAccessFilter):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
 
     def process(self, resources):
         results = []

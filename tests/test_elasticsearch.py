@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import json
-
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 
 
@@ -333,6 +333,17 @@ class ElasticSearch(BaseTest):
         access_policy = json.loads(data['DomainConfig']['AccessPolicies']['Options'])
         self.assertEqual(len(access_policy.get('Statement')), 1)
         self.assertEqual([s['Sid'] for s in access_policy.get('Statement')], ["SpecificAllow"])
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "elasticsearch-remove-matched",
+                "resource": "elasticsearch",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )
 
 
 class TestReservedInstances(BaseTest):
