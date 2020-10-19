@@ -158,8 +158,8 @@ class RemovePolicyStatement(RemovePolicyBase):
     .. code-block:: yaml
 
         policies:
-          - name: glacier-cross-account
-            resource: glacier
+          - name: elasticsearch-cross-account
+            resource: aws.elasticsearch
             filters:
               - type: cross-account
             actions:
