@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import json
-from c7n.exceptions import PolicyValidationError
 
 from c7n.resources.aws import shape_validate
 
