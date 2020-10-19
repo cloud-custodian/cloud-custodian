@@ -2,6 +2,7 @@
 *.egg-info/
 *.swp
 .eggs/
+.terraform
 # c7n/version.py
 src/
 deps/

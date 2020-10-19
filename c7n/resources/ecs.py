@@ -47,6 +47,7 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
+        arn_type = 'cluster'
         cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
@@ -457,6 +458,7 @@ class TaskDefinition(query.QueryResourceManager):
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
         cfn_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
 
     def get_resources(self, ids, cache=True):
         if cache:

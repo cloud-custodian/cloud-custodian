@@ -37,7 +37,7 @@ class LogGroupTest(BaseTest):
             session_factory=factory, config={'region': 'us-west-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['creationTime'], 1548368507.441)
+        self.assertEqual(resources[0]['creationTime'], 1548368507441)
 
     def test_last_write(self):
         log_group = "test-log-group"
@@ -85,6 +85,7 @@ class LogGroupTest(BaseTest):
             resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["creationTime"])
         )
+        self.assertGreater(resources[0]["lastWrite"].year, 2019)
 
     def test_last_write_no_streams(self):
         log_group = "test-log-group"
@@ -113,6 +114,7 @@ class LogGroupTest(BaseTest):
             resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["creationTime"])
         )
+        self.assertGreater(resources[0]["lastWrite"].year, 2019)
 
     def test_last_write_empty_streams(self):
         log_group = "test-log-group"
@@ -148,6 +150,7 @@ class LogGroupTest(BaseTest):
             resources[0]["lastWrite"].timestamp() * 1000,
             float(resources[0]["creationTime"])
         )
+        self.assertGreater(resources[0]["lastWrite"].year, 2019)
 
     @functional
     def test_retention(self):

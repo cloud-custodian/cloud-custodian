@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
+from c7n.filters.core import parse_date
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
@@ -153,12 +154,6 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
-
-    def augment(self, resources):
-        resources = universal_augment(self, resources)
-        for r in resources:
-            r['creationTime'] = r['creationTime'] / 1000.0
-        return resources
 
     def get_arns(self, resources):
         # log group arn in resource describe has ':*' suffix, not all
@@ -345,7 +340,7 @@ class LastWriteDays(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('logs')
-        self.date_threshold = datetime.utcnow() - timedelta(
+        self.date_threshold = parse_date(datetime.utcnow()) - timedelta(
             days=self.data['days'])
         return [r for r in resources if self.check_group(client, r)]
 
@@ -364,7 +359,7 @@ class LastWriteDays(Filter):
         else:
             last_timestamp = streams[0]['creationTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
+        last_write = parse_date(last_timestamp)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write
 
