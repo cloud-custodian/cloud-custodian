@@ -179,8 +179,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             try:
                 results += filter(None, [self.process_resource(client, r)])
             except Exception:
-                self.log.exception(
-                    "Error processing es:%s", r['ARN'])
+                self.log.exception("Error processing es:%s", r['ARN'])
         return results
 
     def process_resource(self, client, resource):
