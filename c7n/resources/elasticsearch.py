@@ -2,9 +2,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+import json
 
-from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter
+from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
+from c7n.filters import MetricsFilter, CrossAccountAccessFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -113,6 +114,94 @@ class KmsFilter(KmsRelatedFilter):
                 op: regex
     """
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
+
+
+@ElasticSearchDomain.filter_registry.register('cross-account')
+class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """
+    Filter to return all glacier vaults with cross account access permissions
+    The whitelist parameter will omit the accounts that match from the return
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: check-elasticsearch-cross-account
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-account
+                whitelist:
+                  - permitted-account-01
+                  - permitted-account-02
+    """
+    policy_attribute = 'c7n:Policy'
+    permissions = ('es:DescribeElasticsearchDomainConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            result = self.manager.retry(
+                client.describe_elasticsearch_domain_config,
+                DomainName=r['DomainName'],
+                ignore_err_codes=('ResourceNotFoundException',))
+            r[self.policy_attribute] = json.loads(result['DomainConfig']['AccessPolicies']['Options'])
+        return super().process(resources)
+
+
+@ElasticSearchDomain.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """
+    Action to remove policy statements from Glacier
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glacier-cross-account
+            resource: glacier
+            filters:
+              - type: cross-account
+            actions:
+              - type: remove-statements
+                statement_ids: matched
+    """
+
+    permissions = ('es:DescribeElasticsearchDomainConfig', 'es:UpdateElasticsearchDomainConfig',)
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except Exception:
+                self.log.exception(
+                    "Error processing es:%s", r['ARN'])
+        return results
+
+    def process_resource(self, client, resource):
+        p = resource.get('c7n:Policy')
+        print(p)
+
+        if p is None:
+            return
+
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        client.update_elasticsearch_domain_config(
+            DomainName=resource['DomainName'],
+            AccessPolicies=json.dumps(p)
+        )
+
+        return {'Name': resource['ARN'],
+                'State': 'PolicyRemoved',
+                'Statements': found}
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')
