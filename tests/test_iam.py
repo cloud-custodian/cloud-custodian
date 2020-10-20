@@ -492,7 +492,10 @@ class IamRoleTest(BaseTest):
                 {'type': 'tag',
                  'tags': {'Env': 'Dev'}},
                 {'type': 'remove-tag',
-                 'tags': ['Application']}
+                 'tags': ['Application']},
+                {'type': 'mark-for-op',
+                 'op': 'delete',
+                 'days': 2}
             ]
         },
             session_factory=factory)
@@ -512,6 +515,9 @@ class IamRoleTest(BaseTest):
         self.assertNotIn(
             {'Application'},
             {t['Key'] for t in role['Tags']})
+        self.assertEqual(
+            {'maid_status': 'Resource does not meet policy: delete@2019/01/25'},
+            {t['Key']: t['Value'] for t in resources[0]['Tags'] if t['Key'] == 'maid_status'})
 
     def test_iam_role_set_boundary(self):
         factory = self.replay_flight_data('test_iam_role_set_boundary')
