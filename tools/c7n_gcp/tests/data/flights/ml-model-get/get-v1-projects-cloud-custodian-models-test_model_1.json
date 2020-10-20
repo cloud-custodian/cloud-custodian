@@ -1,0 +1,25 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 01 Jul 2019 11:20:03 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "128",
+    "-content-encoding": "gzip",
+    "content-location": "https://ml.googleapis.com/v1/projects/cloud-custodian/models/test_model?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/models/test_model",
+    "regions": [
+      "us-central1"
+    ],
+    "etag": "6x0QERRHHpg="
+  }
+}

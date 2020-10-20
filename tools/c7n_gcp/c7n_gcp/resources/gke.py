@@ -1,22 +1,13 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import re
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
                            ChildResourceManager)
-from c7n.utils import local_session
+from c7n.utils import type_schema, local_session
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('gke-cluster')
@@ -102,3 +93,37 @@ class KubernetesClusterNodePool(ChildResourceManager):
                         resource_info['cluster_name'],
                         name)}
             )
+
+
+@KubernetesCluster.action_registry.register('delete')
+class Delete(MethodAction):
+    """Action to delete GKE clusters
+
+    It is recommended to use a filter to avoid unwanted deletion of GKE clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-gke-clusters
+                resource: gcp.gke-cluster
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: '^(test-|demo-)*'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource_info):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+
+        return {'name': 'projects/{}/locations/{}/clusters/{}'.format(
+                        project,
+                        resource_info['location'],
+                        resource_info['name'])}

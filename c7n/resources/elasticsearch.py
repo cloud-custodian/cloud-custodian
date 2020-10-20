@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
@@ -20,6 +10,7 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
+from c7n.filters.kms import KmsRelatedFilter
 
 from .securityhub import PostFinding
 
@@ -100,6 +91,28 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: elasticsearch-kms-key
+            resource: aws.elasticsearch
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/es)"
+                op: regex
+    """
+    RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')
@@ -247,3 +260,18 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+
+
+@resources.register('elasticsearch-reserved')
+class ReservedInstances(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'es'
+        name = id = 'ReservedElasticsearchInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_elasticsearch_instances', 'ReservedElasticsearchInstances', None)
+        filter_name = 'ReservedElasticsearchInstances'
+        filter_type = 'list'
+        arn_type = "reserved-instances"
+        permissions_enum = ('es:DescribeReservedElasticsearchInstances',)

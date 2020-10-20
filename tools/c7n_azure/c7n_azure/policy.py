@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 import re
@@ -422,7 +412,7 @@ class AzureEventGridMode(AzureFunctionMode):
     def __init__(self, policy):
         super(AzureEventGridMode, self).__init__(policy)
         self.subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
+            self.policy.data['mode'].get('events', ()))
 
     def validate(self):
         super(AzureEventGridMode, self).validate()
@@ -449,7 +439,7 @@ class AzureEventGridMode(AzureFunctionMode):
         session = local_session(self.policy.session_factory)
 
         # queue name is restricted to lowercase letters, numbers, and single hyphens
-        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
+        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app['name'].lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         package = self.build_functions_package(queue_name=queue_name)

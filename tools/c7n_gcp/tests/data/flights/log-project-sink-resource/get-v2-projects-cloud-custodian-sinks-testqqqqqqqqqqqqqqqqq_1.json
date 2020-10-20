@@ -1,0 +1,26 @@
+{
+  "body": {
+    "updateTime": "2019-05-21T14:47:37.261675169Z", 
+    "name": "testqqqqqqqqqqqqqqqqq", 
+    "destination": "bigquery.googleapis.com/projects/cloud-custodian/datasets/qwerty1234", 
+    "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com", 
+    "outputVersionFormat": "V2", 
+    "createTime": "2019-05-21T14:47:37.261675169Z"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "338", 
+    "x-xss-protection": "0", 
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks/testqqqqqqqqqqqqqqqqq?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 21 May 2019 14:53:25 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

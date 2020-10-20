@@ -145,6 +145,7 @@ policies:
     actions:
       - type: notify
         slack_template: slack
+        slack_msg_color: danger
         to:
           - slack://owners
           - slack://foo@bar.com
@@ -160,6 +161,16 @@ policies:
 Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
+
+The unique template field `slack_msg_color` can be used to specify a color
+border for the slack message. This accepts the Slack presets of `danger` (red),
+`warning` (yellow) and `good` (green). It can also accept a HTML hex code. See
+the [Slack documentation](https://api.slack.com/reference/messaging/attachments#fields)
+for details.
+
+Note: if you are using a hex color code it will need to be wrapped in quotes
+like so: `slack_msg_color: '#4287f51'`. Otherwise the YAML interpreter will consider it a
+[comment](https://yaml.org/spec/1.2/spec.html#id2780069).
 
 Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
@@ -552,6 +563,40 @@ sendgrid_api_key: <key>
 function_properties:
   servicePlan:
     name: 'testmailer1'
+```
+
+#### Configuring Function Identity
+
+You can configure the service principal used for api calls made by the
+mailer azure function by specifying an identity configuration under
+function properties. Mailer supports User Assigned Identities, System
+Managed Identities, defaulting to an embedding of the cli user's
+service principals credentials.
+
+When specifying a user assigned identity, unlike in a custodian
+function policy where simply providing an name is sufficient, the
+uuid/id and client id of the identity must be provided. You can
+retrieve this information on the cli using the `az identity list`.
+
+```yaml
+
+function_properties:
+  identity:
+    type: UserAssigned
+    id: "/subscriptions/333fd504-7f11-2270-88c8-7325a27f7222/resourcegroups/c7n/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mailer"
+    client_id: "b9cb06fa-dfb8-4342-add3-aab5acb2abbc"
+```
+
+A system managed identity can also be used, and the Azure platform will
+create an identity when the function is provisoned, however the function's identity
+then needs to be retrieved and mapped to rbac permissions post provisioning, this
+user management activity must be performed manually.
+
+```yaml
+
+function_properties:
+  identity:
+    type: SystemAssigned
 ```
 
 ## Writing an email template

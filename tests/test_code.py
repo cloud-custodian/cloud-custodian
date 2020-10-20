@@ -1,20 +1,43 @@
 # Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
 from .common import BaseTest
 
 from c7n.resources.aws import shape_validate
+
+
+class CodeArtifact(BaseTest):
+
+    def test_delete_domain(self):
+        factory = self.replay_flight_data('test_artifact_delete')
+        p = self.load_policy({
+            'name': 'nxdomain',
+            'resource': 'artifact-domain',
+            'filters': [{'name': 'pizzaspace'}],
+            'actions': [{'type': 'delete', 'force': True}]},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        if self.recording:
+            time.sleep(3)
+        assert factory().client('codeartifact').list_domains().get('domains') == []
+
+    def test_cross_account_and_delete_repo(self):
+        factory = self.replay_flight_data('test_artifact_repo_cross_account')
+        p = self.load_policy({
+            'name': 'no-xaccount',
+            'resource': 'artifact-repo',
+            'filters': ['cross-account'],
+            'actions': ['delete']
+        },
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['name'] == 'dop'
+        if self.recording:
+            time.sleep(3)
+        assert factory().client('codeartifact').list_repositories().get('repositories') == []
 
 
 class CodeCommit(BaseTest):
@@ -67,6 +90,17 @@ class CodeCommit(BaseTest):
 
 
 class CodeBuild(BaseTest):
+
+    def test_config_source(self):
+        factory = self.replay_flight_data('test_codebuild_config')
+        config_resources = self.load_policy({
+            'name': 'builders', 'resource': 'aws.codebuild', 'source': 'config'},
+            session_factory=factory).run()
+        resources = self.load_policy({
+            'name': 'dbuilders', 'resource': 'aws.codebuild'},
+            session_factory=factory).run()
+        assert set(config_resources[0].keys()) == (
+            set(resources[0].keys()).difference(('created', 'lastModified', 'badge')))
 
     def test_query_builds(self):
         factory = self.replay_flight_data("test_codebuild")

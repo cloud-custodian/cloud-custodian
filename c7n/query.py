@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Query capability built on skew metamodel
 
@@ -352,7 +342,23 @@ class ConfigSource:
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
-        return camelResource(item_config)
+        resource = camelResource(item_config, implicitDate=True)
+        # normalized tag loading across the many variants of config's inconsistencies.
+        if ((item.get('tags') or item['supplementaryConfiguration'].get('Tags'))
+                and 'Tags' not in resource):
+            if item.get('tags'):
+                resource['Tags'] = [
+                    {u'Key': k, u'Value': v} for k, v in item['tags'].items()]
+            else:
+                # config has a bit more variation on tags (serialized json, list, dict, etc)
+                stags = item['supplementaryConfiguration']['Tags']
+                if isinstance(stags, str):
+                    stags = json.loads(stags)
+                if isinstance(stags, list):
+                    resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']} for t in stags]
+                elif isinstance(stags, dict):
+                    resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
+        return resource
 
     def get_listed_resources(self, client):
         # fallback for when config decides to arbitrarily break select

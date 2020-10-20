@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS Account as a custodian resource.
 """
 import json
@@ -375,6 +365,45 @@ class IAMSummary(ValueFilter):
         if self.match(resources[0]['c7n:iam_summary']):
             return resources
         return []
+
+
+@filters.register('access-analyzer')
+class AccessAnalyzer(ValueFilter):
+    """Check for access analyzers in an account
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: account-access-analyzer
+          resource: account
+          filters:
+            - type: access-analyzer
+              key: 'status'
+              value: ACTIVE
+              op: eq
+    """
+
+    schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('access-analyzer:ListAnalyzers',)
+    annotation_key = 'c7n:matched-analyzers'
+
+    def process(self, resources, event=None):
+        account = resources[0]
+        if not account.get(self.annotation_key):
+            client = local_session(self.manager.session_factory).client('accessanalyzer')
+            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
+        else:
+            analyzers = account.get(self.annotation_key)
+
+        matched_analyzers = []
+        for analyzer in analyzers:
+            if self.match(analyzer):
+                matched_analyzers.append(analyzer)
+        account[self.annotation_key] = matched_analyzers
+        return matched_analyzers and resources or []
 
 
 @filters.register('password-policy')

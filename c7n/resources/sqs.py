@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 import json
@@ -54,6 +44,14 @@ class DescribeQueue(DescribeSource):
                 self.manager, list(filter(None, w.map(_augment, resources))))
 
 
+class QueueConfigSource(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['QueueUrl'] = item['resourceId']
+        return resource
+
+
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
@@ -79,7 +77,7 @@ class SQS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeQueue,
-        'config': ConfigSource
+        'config': QueueConfigSource
     }
 
     def get_permissions(self):

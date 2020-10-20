@@ -1,16 +1,6 @@
 # Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import isodate
 import operator
@@ -123,8 +113,8 @@ class MetricFilter(Filter):
         'average': Math.mean,
         'total': Math.sum,
         'count': Math.sum,
-        'minimum': Math.max,
-        'maximum': Math.min
+        'minimum': Math.min,
+        'maximum': Math.max
     }
 
     schema = {
@@ -140,7 +130,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
-            'no_data_action': {'enum': ['include', 'exclude']},
+            'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'}
         }
     }
@@ -207,6 +197,12 @@ class MetricFilter(Filter):
                 for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
+        if self.no_data_action == "to_zero":
+            if m is None:
+                m = [0]
+            else:
+                m = [0 if v is None else v for v in m]
 
         self._write_metric_to_resource(resource, metrics_data, m)
 

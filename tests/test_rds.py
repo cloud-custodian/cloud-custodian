@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 from dateutil import tz as tzutil
 import json
@@ -1633,3 +1623,23 @@ class TestReservedRDSInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ReservedDBInstanceId"], "ri-2019-05-06-14-19-06-332")
+
+
+class RDSEventSubscription(BaseTest):
+    def test_rds_event_subscription_delete(self):
+        session_factory = self.replay_flight_data("test_rds_event_subscription_delete")
+        p = self.load_policy(
+            {
+                "name": "rds-event-subscription-delete",
+                "resource": "aws.rds-subscription",
+                "filters": [{"type": "value", "key": "tag:name", "value": "pratyush"}],
+                "actions": [{"type": "delete"}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["CustSubscriptionId"], "c7n-test-pratyush")
+        client = session_factory().client("rds")
+        response = client.describe_event_subscriptions()
+        self.assertEqual(len(response.get('EventSubscriptionsList')), 0)

@@ -1,16 +1,6 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import click
 import os
@@ -61,12 +51,16 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
         for tag in list_tags_for_account(client, a['Id']):
             tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
 
+        if not role.startswith('arn'):
+            arn_role = "arn:aws:iam::{}:role/{}".format(a['Id'], role)
+        else:
+            arn_role = role.format(**a)
         ainfo = {
             'account_id': a['Id'],
             'email': a['Email'],
             'name': a['Name'],
             'tags': tags,
-            'role': role.format(**a)}
+            'role': arn_role}
         if regions:
             ainfo['regions'] = list(regions)
         results.append(ainfo)

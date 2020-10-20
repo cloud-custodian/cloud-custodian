@@ -2,16 +2,17 @@ alabaster==0.7.12
 babel==2.8.0
 certifi==2020.6.20
 chardet==3.0.4
+click==7.1.2
 colorama==0.4.3; sys_platform == "win32"
 commonmark==0.9.1
-docutils==0.15.2
+docutils==0.16
 idna==2.10
 imagesize==1.2.0
 jinja2==2.11.2
 markdown==3.0.1
 markupsafe==1.1.1
 packaging==20.4
-pygments==2.6.1
+pygments==2.7.1
 pyparsing==2.4.7
 pytz==2020.1
 recommonmark==0.6.0
@@ -27,4 +28,4 @@ sphinxcontrib-htmlhelp==1.0.3
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
-urllib3==1.25.9
+urllib3==1.25.10

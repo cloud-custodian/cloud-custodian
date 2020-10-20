@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
@@ -173,9 +163,10 @@ class NetworkLocation(Filter):
         results = []
         for r in resources:
             resource_sgs = self.filter_ignored(
-                [related_sg[sid] for sid in self.sg.get_related_ids([r])])
-            resource_subnets = self.filter_ignored([
-                related_subnet[sid] for sid in self.subnet.get_related_ids([r])])
+                [related_sg[sid] for sid in self.sg.get_related_ids([r]) if sid in related_sg])
+            resource_subnets = self.filter_ignored(
+                [related_subnet[sid] for sid in self.subnet.get_related_ids([r])
+                if sid in related_subnet])
             found = self.process_resource(r, resource_sgs, resource_subnets, key)
             if found:
                 results.append(found)

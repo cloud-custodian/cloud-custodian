@@ -1,16 +1,6 @@
 # Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 from c7n.resources.aws import shape_validate
@@ -266,4 +256,46 @@ class ElasticSearch(BaseTest):
         self.assertEqual(
             sorted(result[0]["VPCOptions"]["SecurityGroupIds"]),
             sorted(["sg-6c7fa917", "sg-9a5386e9"]),
+        )
+
+    def test_backup_vault_kms_filter(self):
+        session_factory = self.replay_flight_data('test_elasticsearch_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-kms-filter',
+                'resource': 'elasticsearch',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/aws/es)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
+
+class TestReservedInstances(BaseTest):
+
+    def test_elasticsearch_reserved_node_query(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_reserved_instances_query")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-reserved",
+                "resource": "aws.elasticsearch-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["ReservedElasticsearchInstanceId"],
+            "036381d0-4fa5-4484-bd1a-efc1b43af0bf"
         )

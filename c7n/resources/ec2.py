@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import base64
 import itertools
 import operator
@@ -1159,7 +1149,8 @@ class InstanceFinding(PostFinding):
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
             details["SubnetId"] = r["SubnetId"]
-        if "IamInstanceProfile" in r:
+        # config will use an empty key
+        if "IamInstanceProfile" in r and r['IamInstanceProfile']:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {
@@ -2192,3 +2183,20 @@ class ReservedInstance(query.QueryResourceManager):
         filter_name = 'ReservedInstancesIds'
         filter_type = 'list'
         arn_type = "reserved-instances"
+
+
+@resources.register('ec2-host')
+class DedicatedHost(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Dedicated Hosts.
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        name = id = 'HostId'
+        enum_spec = ('describe_hosts', 'Hosts', None)
+        arn_type = "dedicated-host"
+        filter_name = 'HostIds'
+        filter_type = 'list'
+        date = 'AllocationTime'
+        cfn_type = config_type = 'AWS::EC2::Host'
+        permissions_enum = ('ec2:DescribeHosts',)

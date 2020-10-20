@@ -1,16 +1,6 @@
 # Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 import json
 import logging
@@ -71,7 +61,7 @@ class FunctionPackage:
             self.log.warning('SSL Certificate Validation is disabled')
 
     def _add_functions_required_files(
-            self, policy_data, requirements, queue_name=None):
+            self, policy_data, requirements, queue_name=None, identity=None):
         s = local_session(Session)
 
         self.pkg.add_contents(dest='requirements.txt',
@@ -80,9 +70,11 @@ class FunctionPackage:
         for target_sub_id in self.target_sub_ids:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth if using embedded service principal
-            identity = jmespath.search(
-                'mode."provision-options".identity', policy_data) or {
-                    'type': AUTH_TYPE_EMBED}
+            identity = (identity
+                or jmespath.search(
+                    'mode."provision-options".identity', policy_data)
+                or {'type': AUTH_TYPE_EMBED})
+
             if identity['type'] == AUTH_TYPE_EMBED:
                 auth_contents = s.get_functions_auth_string(target_sub_id)
             elif identity['type'] == AUTH_TYPE_MSI:
@@ -153,14 +145,14 @@ class FunctionPackage:
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, requirements, queue_name=None):
+    def build(self, policy, modules, requirements, queue_name=None, identity=None):
         self.pkg = AzurePythonPackageArchive()
 
         self.pkg.add_modules(None,
                              [m.replace('-', '_') for m in modules])
 
         # add config and policy
-        self._add_functions_required_files(policy, requirements, queue_name)
+        self._add_functions_required_files(policy, requirements, queue_name, identity)
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):

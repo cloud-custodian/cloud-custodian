@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_logexporter"
-version = "0.4.3"
+version = "0.4.6"
 description = "Cloud Custodian - Cloud Watch Log S3 exporter"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
@@ -24,5 +24,5 @@ click = "^7.0"
 c7n = {path = "../..", develop = true}
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"

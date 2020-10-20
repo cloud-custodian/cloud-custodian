@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 RDS Resource Manager
 ====================
@@ -85,15 +75,6 @@ class DescribeRDS(DescribeSource):
             self.manager, super(DescribeRDS, self).augment(dbs))
 
 
-class ConfigRDS(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDS, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        return resource
-
-
 @resources.register('rds')
 class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
@@ -131,7 +112,7 @@ class RDS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRDS,
-        'config': ConfigRDS
+        'config': ConfigSource
     }
 
 
@@ -926,16 +907,48 @@ class RDSSubscription(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subscription'
+        arn_type = 'es'
         cfn_type = 'AWS::RDS::EventSubscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
-        name = id = "EventSubscriptionArn"
+        name = id = "CustSubscriptionId"
+        arn = 'EventSubscriptionArn'
         date = "SubscriptionCreateTime"
-        # SubscriptionName isn't part of describe events results?! all the
-        # other subscription apis.
-        # filter_name = 'SubscriptionName'
-        # filter_type = 'scalar'
+        permissions_enum = ('rds:DescribeEventSubscriptions',)
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@RDSSubscription.action_registry.register('delete')
+class RDSSubscriptionDelete(BaseAction):
+    """Deletes a RDS snapshot resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-subscription-delete
+                resource: rds-subscription
+                filters:
+                  - type: value
+                    key: CustSubscriptionId
+                    value: xyz
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteEventSubscription',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            self.manager.retry(
+                client.delete_event_subscription, SubscriptionName=r['CustSubscriptionId'],
+                ignore_err_codes=('SubscriptionNotFoundFault',
+                'InvalidEventSubscriptionStateFault'))
 
 
 class DescribeRDSSnapshot(DescribeSource):
@@ -943,16 +956,6 @@ class DescribeRDSSnapshot(DescribeSource):
     def augment(self, snaps):
         return universal_augment(
             self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
-
-
-class ConfigRDSSnapshot(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDSSnapshot, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        # TODO: Load DBSnapshotAttributes into annotation
-        return resource
 
 
 @resources.register('rds-snapshot')
@@ -974,7 +977,7 @@ class RDSSnapshot(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRDSSnapshot,
-        'config': ConfigRDSSnapshot
+        'config': ConfigSource
     }
 
 
@@ -1376,14 +1379,16 @@ class RDSSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subnet-group'
+        arn_type = 'subgrp'
         id = name = 'DBSubnetGroupName'
+        arn_separator = ':'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
         permissions_enum = ('rds:DescribeDBSubnetGroups',)
         cfn_type = config_type = 'AWS::RDS::DBSubnetGroup'
+        universal_taggable = object()
 
     source_mapping = {
         'config': ConfigSource,
@@ -1698,6 +1703,9 @@ class ReservedRDS(QueryResourceManager):
             'describe_reserved_db_instances', 'ReservedDBInstances', None)
         filter_name = 'ReservedDBInstances'
         filter_type = 'list'
-        arn_type = "reserved-db"
+        arn_type = "ri"
         arn = "ReservedDBInstanceArn"
         permissions_enum = ('rds:DescribeReservedDBInstances',)
+        universal_taggable = object()
+
+    augment = universal_augment

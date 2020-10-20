@@ -1,16 +1,6 @@
 # Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -57,6 +47,7 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
+        arn_type = 'cluster'
         cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
@@ -467,6 +458,7 @@ class TaskDefinition(query.QueryResourceManager):
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
         cfn_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
 
     def get_resources(self, ids, cache=True):
         if cache:

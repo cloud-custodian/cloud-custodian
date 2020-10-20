@@ -1,16 +1,6 @@
 # Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import jmespath
 import json
@@ -222,10 +212,14 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         try:
             return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
-            error = extract_error(e)
-            if error is None:
+            error_reason, error_code, error_message = extract_errors(e)
+
+            if error_reason is None and error_code is None:
                 raise
-            elif error == 'accessNotConfigured':
+            if error_code == 403 and 'disabled' in error_message:
+                log.warning(error_message)
+                return []
+            elif error_reason == 'accessNotConfigured':
                 log.warning(
                     "Resource:%s not available -> Service:%s not enabled on %s",
                     self.type,
@@ -356,15 +350,17 @@ class ChildTypeInfo(TypeInfo):
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')
+ERROR_CODE = jmespath.compile('error.code')
+ERROR_MESSAGE = jmespath.compile('error.message')
 
 
-def extract_error(e):
-
+def extract_errors(e):
     try:
         edata = json.loads(e.content)
     except Exception:
-        return None
-    return ERROR_REASON.search(edata)
+        edata = None
+
+    return ERROR_REASON.search(edata), ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
 
 class GcpLocation:

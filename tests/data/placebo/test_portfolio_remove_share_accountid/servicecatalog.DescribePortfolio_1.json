@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PortfolioDetail": {
+            "Id": "port-hlgxpz7lc55iw",
+            "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-hlgxpz7lc55iw",
+            "DisplayName": "c7n-test",
+            "Description": "test cross account filter",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 9,
+                "day": 29,
+                "hour": 21,
+                "minute": 8,
+                "second": 39,
+                "microsecond": 484000
+            },
+            "ProviderName": "pratyush"
+        },
+        "Tags": [],
+        "TagOptions": [],
+        "Budgets": [],
+        "ResponseMetadata": {}
+    }
+}

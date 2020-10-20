@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventSubscription": {
+            "CustomerAwsId": "644160558196",
+            "CustSubscriptionId": "c7n-test-pratyush",
+            "SnsTopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-pratyush",
+            "Status": "deleting",
+            "SubscriptionCreationTime": "2020-07-16 04:08:23.406",
+            "SourceType": "db-instance",
+            "Enabled": true,
+            "EventSubscriptionArn": "arn:aws:rds:us-east-1:644160558196:es:c7n-test-pratyush"
+        },
+        "ResponseMetadata": {}
+    }
+}

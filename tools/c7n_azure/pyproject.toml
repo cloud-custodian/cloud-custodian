@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_azure"
-version = "0.7.3"
+version = "0.7.6"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"
@@ -55,7 +55,7 @@ azure-cosmosdb-table = "^1.0.6"
 applicationinsights = "^0.11.9"
 apscheduler = "^3.6.3"
 distlib = "^0.3.0"
-jsonpickle = "^1.2"
+jsonpickle = "1.3"
 requests = "^2.22.0"
 PyJWT = "^1.7.1"
 azure-cli-core = "^2.0.81"
@@ -79,5 +79,5 @@ vcrpy-unittest = "^0.1.7"
 parameterized = "^0.7.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
