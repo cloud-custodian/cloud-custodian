@@ -151,6 +151,7 @@ class Resume(BaseAction):
                     client.exceptions.InvalidClusterStateFault):
                 raise
 
+
 @Redshift.action_registry.register('reboot')
 class Reboot(BaseAction):
 
@@ -167,7 +168,7 @@ class Reboot(BaseAction):
             except (client.exceptions.ClusterNotFoundFault,
                     client.exceptions.InvalidClusterStateFault):
                 raise
-            
+   
 
 @Redshift.action_registry.register('set-logging')
 class SetRedshiftLogging(BaseAction):
