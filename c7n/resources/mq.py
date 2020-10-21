@@ -165,7 +165,7 @@ class MessageConfig(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'mq'
         enum_spec = ('list_configurations', 'Configurations', None)
-        cfn_type = 'AWS::AmazonMQ::Broker'
+        cfn_type = 'AWS::AmazonMQ::Configuration'
         id = 'Id'
         arn = 'Arn'
         name = 'Name'
