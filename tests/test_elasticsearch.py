@@ -294,6 +294,9 @@ class ElasticSearch(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        print(resources[0])
+        access_policy = json.loads(resources[0]['AccessPolicies'])
+        self.assertIn("*", [s['Principal'] for s in access_policy.get('Statement')])
 
     def test_elasticsearch_remove_matched(self):
         session_factory = self.replay_flight_data("test_elasticsearch_remove_matched")

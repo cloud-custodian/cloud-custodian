@@ -138,13 +138,15 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('es')
         for r in resources:
-            result = self.manager.retry(
-                client.describe_elasticsearch_domain_config,
-                DomainName=r['DomainName'],
-                ignore_err_codes=('ResourceNotFoundException',))
-            r[self.policy_attribute] = json.loads(
-                result['DomainConfig']['AccessPolicies']['Options']
-            )
+            if self.policy_attribute not in r:
+                result = self.manager.retry(
+                    client.describe_elasticsearch_domain_config,
+                    DomainName=r['DomainName'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                if result:
+                    r[self.policy_attribute] = json.loads(
+                        result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    )
         return super().process(resources)
 
 
@@ -189,7 +191,6 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     def process_resource(self, client, resource):
         p = resource.get('c7n:Policy')
-        print(p)
 
         if p is None:
             return
