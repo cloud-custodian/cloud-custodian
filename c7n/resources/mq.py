@@ -157,3 +157,25 @@ class MarkForOpMessageBroker(TagDelayedAction):
                     op: delete
                     days: 7
     """
+
+
+@resources.register('message-config')
+class MessageConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'mq'
+        enum_spec = ('list_configurations', 'Configurations', None)
+        cfn_type = 'AWS::AmazonMQ::Broker'
+        id = 'Id'
+        arn = 'Arn'
+        name = 'Name'
+        metrics_namespace = 'AWS/AmazonMQ'
+        universal_taggable = object()
+
+    permissions = ('mq:ListTags',)
+
+    def augment(self, resources):
+        super(MessageBroker, self).augment(resources)
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
+        return resources
