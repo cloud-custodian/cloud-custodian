@@ -151,6 +151,23 @@ class Resume(BaseAction):
                     client.exceptions.InvalidClusterStateFault):
                 raise
 
+@Redshift.action_registry.register('reboot')
+class Reboot(BaseAction):
+
+    schema = type_schema('reboot')
+    permissions = ('redshift:RebootCluster',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('redshift')
+        for r in self.filter_resources(resources, 'ClusterStatus', ('available',)):
+            try:
+                client.reboot_cluster(
+                    ClusterIdentifier=r['ClusterIdentifier'])
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault):
+                raise
+            
 
 @Redshift.action_registry.register('set-logging')
 class SetRedshiftLogging(BaseAction):
