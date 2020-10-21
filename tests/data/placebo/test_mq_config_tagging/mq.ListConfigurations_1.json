@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configurations": [
+            {
+                "Arn": "arn:aws:mq:us-east-1:644160558196:configuration:c-423eb6af-2537-490f-bed2-7a73d65d48a9",
+                "EngineType": "ActiveMQ",
+                "EngineVersion": "5.15.12",
+                "Id": "c-423eb6af-2537-490f-bed2-7a73d65d48a9",
+                "Name": "test-config"
+            }
+        ]
+    }
+}

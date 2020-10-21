@@ -7,7 +7,7 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 
 @resources.register('message-broker')
@@ -172,10 +172,12 @@ class MessageConfig(QueryResourceManager):
         metrics_namespace = 'AWS/AmazonMQ'
         universal_taggable = object()
 
-    permissions = ('mq:ListTags',)
-
     def augment(self, resources):
-        super(MessageBroker, self).augment(resources)
+        client = local_session(self.session_factory).client('mq')
         for r in resources:
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
-        return resources
+            tags = self.retry(
+                client.list_tags,
+                ResourceArn=r['Arn'],
+                ignore_err_codes=('ResourceNotFoundException',))
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.get('Tags', {}).items()]
+        return universal_augment(self, super().augment(resources))
