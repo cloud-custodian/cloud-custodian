@@ -80,14 +80,6 @@ def get_doc_policies(resources):
     return policies
 
 
-skip_condition = not (
-    (sys.version_info.major == 3 and sys.version_info.minor == 6)
-    if os.environ.get('C7N_TEST_RUN')
-    else True
-)
-
-
-@pytest.mark.skipif(skip_condition, reason="Doc tests aren't run in every tox configuration")
 @pytest.mark.parametrize("provider_name", ('aws', 'azure', 'gcp', 'k8s'))
 def test_doc_examples(provider_name):
     load_resources()
