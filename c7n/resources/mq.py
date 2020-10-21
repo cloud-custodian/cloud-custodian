@@ -169,7 +169,6 @@ class MessageConfig(QueryResourceManager):
         id = 'Id'
         arn = 'Arn'
         name = 'Name'
-        metrics_namespace = 'AWS/AmazonMQ'
         universal_taggable = object()
 
     def augment(self, resources):
