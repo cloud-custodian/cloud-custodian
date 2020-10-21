@@ -199,6 +199,8 @@ def resolve_regions(regions):
 
 
 def get_session(account, session_name, region):
+    if account.get('provider') != 'aws':
+        return None
     if account.get('role'):
         roles = account['role']
         if isinstance(roles, str):
@@ -385,24 +387,31 @@ def report(config, output, use, output_dir, accounts,
     writer.writerows(rows)
 
 
-def _get_env_creds(session, region):
-    creds = session._session.get_credentials()
+def _get_env_creds(account, session, region):
     env = {}
-    env['AWS_ACCESS_KEY_ID'] = creds.access_key
-    env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
-    env['AWS_SESSION_TOKEN'] = creds.token
-    env['AWS_DEFAULT_REGION'] = region
+    if account["provider"] == 'aws':
+        creds = session._session.get_credentials()
+        env['AWS_ACCESS_KEY_ID'] = creds.access_key
+        env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
+        env['AWS_SESSION_TOKEN'] = creds.token
+        env['AWS_DEFAULT_REGION'] = region
+    elif account["provider"] == 'azure':
+        env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
+    elif account["provider"] == 'gcp':
+        env['GOOGLE_CLOUD_PROJECT'] = account["account_id"]
+        env['CLOUDSDK_CORE_PROJECT'] = account["account_id"]
     return env
 
 
 def run_account_script(account, region, output_dir, debug, script_args):
+
     try:
         session = get_session(account, "org-script", region)
     except ClientError:
         return 1
 
     env = os.environ.copy()
-    env.update(_get_env_creds(session, region))
+    env.update(_get_env_creds(account, session, region))
 
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
@@ -431,15 +440,13 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('--serial', default=False, is_flag=True)
 @click.argument('script_args', nargs=-1, type=click.UNPROCESSED)
 def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
-    """run an aws script across accounts"""
+    """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
     accounts_config, custodian_config, executor = init(
         config, None, serial, True, accounts, tags, (), ())
-
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
         return
-
     # Support fully quoted scripts, which are common to avoid parameter
     # overlap with c7n-org run-script.
     if len(script_args) == 1 and " " in script_args[0]:
@@ -483,11 +490,12 @@ def accounts_iterator(config):
         if isinstance(a['role'], str) and not a['role'].startswith('arn'):
             a['role'] = "arn:aws:iam::{}:role/{}".format(
                 a['account_id'], a['role'])
-        yield a
+        yield {**a, **{'provider': 'aws'}}
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
              'regions': ['global'],
+             'provider': 'azure',
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
         yield d
@@ -495,6 +503,7 @@ def accounts_iterator(config):
         d = {'account_id': a['project_id'],
              'name': a.get('name', a['project_id']),
              'regions': ['global'],
+             'provider': 'gcp',
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
         yield d
@@ -529,7 +538,7 @@ def run_account(account, region, policies_config, output_path,
             config['external_id'] = account.get('external_id')
         else:
             env_vars.update(
-                _get_env_creds(get_session(account, 'custodian', region), region))
+                _get_env_creds(account, get_session(account, 'custodian', region), region))
 
     elif account.get('profile'):
         config['profile'] = account['profile']
