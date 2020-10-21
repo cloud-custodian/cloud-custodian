@@ -2,9 +2,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
-import os
-import sys
-
 import pytest
 
 from c7n.config import Config
