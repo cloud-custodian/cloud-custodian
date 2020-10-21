@@ -294,7 +294,6 @@ class ElasticSearch(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        print(resources[0])
         access_policy = json.loads(resources[0]['AccessPolicies'])
         self.assertIn("*", [s['Principal'] for s in access_policy.get('Statement')])
 
