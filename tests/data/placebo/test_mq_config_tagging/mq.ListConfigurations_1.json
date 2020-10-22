@@ -4,10 +4,10 @@
         "ResponseMetadata": {},
         "Configurations": [
             {
-                "Arn": "arn:aws:mq:us-east-1:644160558196:configuration:c-423eb6af-2537-490f-bed2-7a73d65d48a9",
+                "Arn": "arn:aws:mq:us-east-1:644160558196:configuration:c-1cd76ad8-81bc-46f6-b43f-56fb118b426c",
                 "EngineType": "ActiveMQ",
                 "EngineVersion": "5.15.12",
-                "Id": "c-423eb6af-2537-490f-bed2-7a73d65d48a9",
+                "Id": "c-1cd76ad8-81bc-46f6-b43f-56fb118b426c",
                 "Name": "test-config"
             }
         ]

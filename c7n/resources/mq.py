@@ -168,15 +168,8 @@ class MessageConfig(QueryResourceManager):
         cfn_type = 'AWS::AmazonMQ::Configuration'
         id = 'Id'
         arn = 'Arn'
+        arn_type = 'configuration'
         name = 'Name'
         universal_taggable = object()
 
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('mq')
-        for r in resources:
-            tags = self.retry(
-                client.list_tags,
-                ResourceArn=r['Arn'],
-                ignore_err_codes=('ResourceNotFoundException',))
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.get('Tags', {}).items()]
-        return universal_augment(self, super().augment(resources))
+    augment = universal_augment

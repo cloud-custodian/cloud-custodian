@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "Tags": {
-            "Role": "Dev"
+            "Env": "Dev"
         }
     }
 }
