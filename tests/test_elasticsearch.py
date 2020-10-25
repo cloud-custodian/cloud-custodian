@@ -295,6 +295,7 @@ class ElasticSearch(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         access_policy = json.loads(resources[0]['AccessPolicies'])
+        self.assertEqual(resources[0]['c7n:Policy'], access_policy)
         self.assertIn("*", [s['Principal'] for s in access_policy.get('Statement')])
 
     def test_elasticsearch_remove_matched(self):

@@ -180,14 +180,12 @@ class RemovePolicyStatement(RemovePolicyBase):
             'conjunction with `cross-account` filter on %s' % (self.manager.data,))
 
     def process(self, resources):
-        results = []
         client = local_session(self.manager.session_factory).client('es')
         for r in resources:
             try:
-                results += filter(None, [self.process_resource(client, r)])
+                self.process_resource(client, r)
             except Exception:
                 self.log.exception("Error processing es:%s", r['ARN'])
-        return results
 
     def process_resource(self, client, resource):
         p = resource.get('c7n:Policy')
@@ -198,17 +196,13 @@ class RemovePolicyStatement(RemovePolicyBase):
         statements, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
-        if not found:
-            return
+        if found:
+            client.update_elasticsearch_domain_config(
+                DomainName=resource['DomainName'],
+                AccessPolicies=json.dumps(p)
+            )
 
-        client.update_elasticsearch_domain_config(
-            DomainName=resource['DomainName'],
-            AccessPolicies=json.dumps(p)
-        )
-
-        return {'Name': resource['ARN'],
-                'State': 'PolicyRemoved',
-                'Statements': found}
+        return
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')
