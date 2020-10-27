@@ -62,7 +62,7 @@ class VirtualMachine(ArmResourceManager):
     .. code-block:: yaml
 
         policies:
-          - name: stop-running-vms
+          - name: delete-vm
             resource: azure.vm
             filters:
               - type: value
