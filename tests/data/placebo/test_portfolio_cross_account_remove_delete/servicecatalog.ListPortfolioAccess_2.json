@@ -1,9 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "AccountIds": [
-            "644160558196"
-        ],
+        "AccountIds": [],
         "ResponseMetadata": {}
     }
 }

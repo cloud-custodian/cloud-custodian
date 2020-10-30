@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "PortfolioDetail": {
-            "Id": "port-cpxttnlqoph32",
-            "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-cpxttnlqoph32",
+            "Id": "port-t24m4nifknphk",
+            "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-t24m4nifknphk",
             "DisplayName": "c7n-test",
             "CreatedTime": {
                 "__class__": "datetime",
@@ -11,9 +11,9 @@
                 "month": 10,
                 "day": 30,
                 "hour": 17,
-                "minute": 57,
-                "second": 6,
-                "microsecond": 223000
+                "minute": 53,
+                "second": 44,
+                "microsecond": 22000
             },
             "ProviderName": "pratyush"
         },
