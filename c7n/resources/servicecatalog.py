@@ -81,7 +81,7 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
 
     schema = type_schema(
         'cross-account',
-        whitelist_accounts_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     permissions = ('servicecatalog:ListPortfolioAccess',)
