@@ -90,11 +90,12 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
     def check_access(self, client, accounts, resources):
         results = []
         for r in resources:
-            shared_accounts = set(self.manager.retry(
+            shared_accounts = self.manager.retry(
                 client.list_portfolio_access, PortfolioId=r['Id'], ignore_err_codes=(
-                    'ResourceNotFoundException',)).get('AccountIds'))
+                    'ResourceNotFoundException',)).get('AccountIds')
             if not shared_accounts:
                 continue
+            shared_accounts = set(shared_accounts)
             delta_accounts = shared_accounts.difference(accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
