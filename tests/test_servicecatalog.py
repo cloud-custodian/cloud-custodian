@@ -67,3 +67,19 @@ class TestServiceCatalog(BaseTest):
             PortfolioId='port-srkytozjwbzpc').get('AccountIds'))
         self.assertTrue('644160558196' in client.list_portfolio_access(
             PortfolioId='port-cpxttnlqoph32').get('AccountIds'))
+
+    def test_portfolio_cross_account_whitelist(self):
+        session_factory = self.replay_flight_data("test_portfolio_cross_account_whitelist")
+        client = session_factory().client("servicecatalog")
+        accounts = client.list_portfolio_access(PortfolioId='port-cpxttnlqoph32').get('AccountIds')
+        self.assertEqual(len(accounts), 1)
+        self.assertEqual(accounts, ['644160558196'])
+        p = self.load_policy(
+            {
+                "name": "servicecatalog-portfolio-cross-account",
+                "resource": "catalog-portfolio",
+                "filters": [{"type": "cross-account", "whitelist": ["644160558196"]}]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
