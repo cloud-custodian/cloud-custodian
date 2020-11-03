@@ -51,7 +51,7 @@ deploy_resource() {
         fi
 
         azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
-        az group deployment create --resource-group $rgName --template-file $file \
+        az deployment group create --resource-group $rgName --template-file $file \
             --parameters "userObjectId=$azureAdUserObjectId" --output None
 
         vault_name=$(az keyvault list --resource-group $rgName --query [0].name --output tsv)
@@ -70,7 +70,7 @@ deploy_resource() {
 
     elif [[ "$fileName" == "aks.json" ]]; then
 
-        az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
+        az deployment group create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
 
     elif [[ "$fileName" == "cost-management-export.json" ]]; then
 
@@ -80,7 +80,7 @@ deploy_resource() {
         fi
 
         # Deploy storage account required for the export
-        az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
+        az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
 
         token=$(az account get-access-token --query accessToken --output tsv)
         storage_id=$(az storage account list --resource-group $rgName --query [0].id --output tsv)
@@ -94,7 +94,7 @@ deploy_resource() {
         rm -f cost-management.body
 
     else
-        az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
+        az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
     fi
 
     echo "Deployment for ${filenameNoExtension} complete"

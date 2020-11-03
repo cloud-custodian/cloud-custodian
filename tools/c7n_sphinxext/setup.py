@@ -14,9 +14,9 @@ install_requires = \
  'Sphinx>=3.0,<3.1',
  'argcomplete (>=1.12.1,<2.0.0)',
  'attrs (>=20.2.0,<21.0.0)',
- 'boto3 (>=1.15.11,<2.0.0)',
- 'botocore (>=1.18.11,<2.0.0)',
- 'c7n (>=0.9.6,<0.10.0)',
+ 'boto3 (>=1.16.6,<2.0.0)',
+ 'botocore (>=1.19.6,<2.0.0)',
+ 'c7n (>=0.9.7,<0.10.0)',
  'click>=7.1.2,<8.0.0',
  'importlib-metadata (>=1.7.0,<2.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
@@ -31,15 +31,15 @@ install_requires = \
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'sphinx_rtd_theme>=0.4.3,<0.5.0',
  'tabulate (>=0.8.7,<0.9.0)',
- 'urllib3 (>=1.25.10,<2.0.0)',
- 'zipp (>=3.3.0,<4.0.0)']
+ 'urllib3 (>=1.25.11,<2.0.0)',
+ 'zipp (>=3.4.0,<4.0.0)']
 
 entry_points = \
 {'console_scripts': ['c7n-sphinxext = c7n_sphinxext.docgen:main']}
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.6',
+    'version': '1.1.7',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'long_description': '# Sphinx Extensions\n\nCustom sphinx extensions for use with Cloud Custodian.\n\n',
     'long_description_content_type': 'text/markdown',

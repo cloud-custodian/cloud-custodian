@@ -1,11 +1,12 @@
 attrs==20.2.0
-boto3==1.15.11
-botocore==1.18.11
+boto3==1.16.6
+botocore==1.19.6
 certifi==2020.6.20
 chardet==3.0.4
 datadog==0.34.1
 decorator==4.4.2
 idna==2.10
+importlib-metadata==2.0.0; python_version < "3.8"
 jinja2==2.11.2
 jmespath==0.10.0
 jsonpatch==1.26
@@ -24,5 +25,5 @@ s3transfer==0.3.3
 sendgrid==6.4.7
 six==1.15.0
 starkbank-ecdsa==1.1.0
-urllib3==1.25.10
-zipp==3.3.0; python_version < "3.8"
+urllib3==1.25.11
+zipp==3.4.0; python_version < "3.8"

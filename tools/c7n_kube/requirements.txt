@@ -1,14 +1,9 @@
-aiohttp==3.6.2; python_version >= "3.6"
-async-timeout==3.0.1; python_version >= "3.6"
-attrs==20.2.0
 cachetools==4.1.1
 certifi==2020.6.20
 chardet==3.0.4
-google-auth==1.22.0
+google-auth==1.22.1
 idna==2.10
-idna-ssl==1.1.0; python_version >= "3.6" and python_version < "3.7"
 kubernetes==10.0.1
-multidict==4.7.6; python_version >= "3.6"
 oauthlib==3.1.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
@@ -18,7 +13,5 @@ requests==2.24.0
 requests-oauthlib==1.3.0
 rsa==4.6; python_version >= "3.5"
 six==1.15.0
-typing-extensions==3.7.4.3; python_version >= "3.6" and python_version < "3.8" or python_version >= "3.6" and python_version < "3.7"
-urllib3==1.25.10
+urllib3==1.25.11
 websocket-client==0.57.0
-yarl==1.6.0; python_version >= "3.6"
