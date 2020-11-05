@@ -41,7 +41,7 @@ Interior class that defines the aws metadata for resource
 - ``arn_type`` is a required field, part of the request to AWS resource,
     The name of the AWS service.
 -  ``id`` is a required field,
-	It's a field name of the response field that has to be used as a resource identifier. The id value is used for filtering.
+	It's a field name of the response field that has to be used as a resource identifier. The `id` value is used for filtering.
 - ``enum_spec`` is a required field,
     It has a tuple of (enum_operation, list_operation, extra_args).
 
@@ -84,7 +84,7 @@ then import the new service module in ``resource_map.py``:
 
 .. code-block:: python
 
-    "aws.<name of resource>": "c7n.resources.<name of a resource class>"
+    "aws.<name of resource>": "c7n.resources.<name of file>.<name of resource class>"
 
 
 Add New Filter
