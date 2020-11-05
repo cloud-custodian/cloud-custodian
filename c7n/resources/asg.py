@@ -1735,3 +1735,88 @@ class LaunchConfigDelete(Action):
             if e.response['Error']['Code'] == 'ValidationError':
                 return
             raise
+
+@resources.register('scaling-policies')
+class ScalingPolicies(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'autoscaling'
+        arn_type = "scalingPolicy"
+        id = name = 'PolicyName'
+        date = 'CreatedTime'
+        enum_spec = (
+            'describe_policies', 'ScalingPolicies', None
+        )
+        filter_name = 'PolicyNames'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::AutoScaling::ScalingPolicy'
+
+
+class PolicyInfo:
+
+    permissions = ("autoscaling:DescribePolicies",)
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    def initialize(self, asgs):
+        self.policies = self.get_scaling_policies(asgs)
+        return self
+
+    def get_scaling_policies(self, asgs):
+        policy_mgr = self.manager.get_resource_manager('scaling-policies')
+
+        policies = policy_mgr.resources()
+
+        if not policies:
+            return {}
+        policy_dict = {}
+        for policy in policies:
+            if policy['AutoScalingGroupName'] in policy_dict.keys():
+                policy_dict[policy['AutoScalingGroupName']].append(policy)
+            else:
+                policy_dict[policy['AutoScalingGroupName']] = [policy]
+
+        return policy_dict
+
+    def get(self, asg):
+
+        return self.policies.get(asg['AutoScalingGroupName'])
+        
+
+@ASG.filter_registry.register('scaling-policies')
+class ScalingPoliciesFilter(ValueFilter):
+
+    """Filter asg by scaling-policies attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: scaling-policies-with-target-tracking
+            resource: asg
+            filters:
+              - type: scaling-policies
+                key: PolicyType
+                value: "TargetTrackingScaling"
+
+    """
+
+    schema = type_schema(
+        'scaling-policies', rinherit=ValueFilter.schema
+    )
+    schema_alias = False
+    permissions = ("autoscaling:DescribePolicies",)
+
+    def process(self, asgs, event=None):
+        self.policy_info = PolicyInfo(self.manager).initialize(asgs)
+        return super(ScalingPoliciesFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        asg_policies = self.policy_info.get(asg)
+        matched = False
+        if asg_policies is not None:
+            for policy in asg_policies:
+                matched = self.match(policy) or matched
+        return matched
