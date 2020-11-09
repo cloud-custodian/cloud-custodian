@@ -45,7 +45,7 @@ Interior class that defines the aws metadata for resource
 - ``enum_spec`` is a required field,
     It has a tuple of (enum_operation, list_operation, extra_args).
 
-    - `enum_opration`: the name of the AWS resource method used to retrieve the list of resources,
+    - `enum_operation`: the name of the AWS resource method used to retrieve the list of resources,
 
     - `list_operation`: the JMESPath of the field name which contains the resources list in the JSON response body,
 
