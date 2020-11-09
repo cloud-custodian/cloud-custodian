@@ -288,13 +288,16 @@ class AutoScalingTest(BaseTest):
                 "name": "asg-sp-filter",
                 "resource": "asg",
                 "filters": [
-                    {"type": "scaling-policies", "key": "PolicyType", "value": "TargetTrackingScaling"}
+                    {
+                        "type": "scaling-policies",
+                        "key": "PolicyType",
+                        "value": "TargetTrackingScaling"}
                 ],
             },
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1) 
+        self.assertEqual(len(resources), 1)
 
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data("test_asg_vpc_filter")
@@ -973,6 +976,7 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
 
 class AutoScalingPolicy(BaseTest):
 

@@ -1736,6 +1736,7 @@ class LaunchConfigDelete(Action):
                 return
             raise
 
+
 @resources.register('scaling-policies')
 class ScalingPolicies(query.QueryResourceManager):
 
@@ -1780,9 +1781,8 @@ class PolicyInfo:
         return policy_dict
 
     def get(self, asg):
-
         return self.policies.get(asg['AutoScalingGroupName'])
-        
+
 
 @ASG.filter_registry.register('scaling-policies')
 class ScalingPoliciesFilter(ValueFilter):
