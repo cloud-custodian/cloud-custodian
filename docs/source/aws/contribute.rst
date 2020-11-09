@@ -3,7 +3,7 @@
 Developer Guide
 =================
 
-Cloud Custodian is a Python application and supports Python 3 on MacOS, Linux and Windows. It is recommended 
+Cloud Custodian is a Python application and supports Python 3 on MacOS, Linux, and Windows. It is recommended 
 using Python 3.7 or higher.
 
 Run the following commands in the root directory after cloning Cloud Custodian:
@@ -36,20 +36,111 @@ An outer class defining the reference in resource mapping: ``class <resource_typ
 Interior class that defines the aws metadata for resource
 ``class resource_type(query.TypeInfo)``:
 
-- ``service``  is a required field, part of the request to AWS resource,
-	The name of the AWS service.
-- ``arn_type`` is a required field, part of the request to AWS resource,
-    The name of the AWS service.
--  ``id`` is a required field,
-	It's a field name of the response field that has to be used as a resource identifier. The `id` value is used for filtering.
-- ``enum_spec`` is a required field,
-    It has a tuple of (enum_operation, list_operation, extra_args).
+.. code-block:: python
 
-    - `enum_operation`: the name of the AWS resource method used to retrieve the list of resources,
+    """Resource Type Metadata"""
 
-    - `list_operation`: the JMESPath of the field name which contains the resources list in the JSON response body,
+    ###########
+    # Required
 
-    - `extra_args`: can be used to set up additional params for a request to AWS.
+    # id field, should be the identifier used for apis
+    id = None
+
+    # name field, used for display
+    name = None
+
+    # which aws service (per sdk) has the api for this resource.
+    service = None
+
+    # used to query the resource by describe-sources
+    enum_spec = None
+
+    ###########
+    # Optional
+
+    ############
+    # Permissions
+
+    # Permission string prefix if not service
+    permission_prefix = None
+
+    # Permissions for resource enumeration/get. Normally we autogen
+    # but in some cases we need to specify statically
+    permissions_enum = None
+
+    # Permissions for resourcee augment
+    permissions_augment = None
+
+    ###########
+    # Arn handling / generation metadata
+
+    # arn resource attribute, when describe format has arn
+    arn = None
+
+    # type, used for arn construction, also required for universal tag augment
+    arn_type = None
+
+    # how arn type is separated from rest of arn
+    arn_separator = "/"
+
+    # for services that need custom labeling for arns
+    arn_service = None
+
+    ##########
+    # Resource retrieval
+
+    # filter_name, when fetching a single resource via enum_spec
+    # technically optional, but effectively required for serverless
+    # event policies else we have to enumerate the population.
+    filter_name = None
+
+    # filter_type, scalar or list
+    filter_type = None
+
+    # used to enrich the resource descriptions returned by enum_spec
+    detail_spec = None
+
+    # used when the api supports getting resource details enmasse
+    batch_detail_spec = None
+
+    ##########
+    # Misc
+
+    # used for reporting, array of fields
+    default_report_fields = ()
+
+    # date, latest date associated to resource, generally references
+    # either create date or modified date.
+    date = None
+
+    # dimension, defines that resource has cloud watch metrics and the
+    # resource id can be passed as this value. further customizations
+    # of dimensions require subclass metrics filter.
+    dimension = None
+
+    # AWS Cloudformation type
+    cfn_type = None
+
+    # AWS Config Service resource type name
+    config_type = None
+
+    # Whether or not resource group tagging api can be used, in which
+    # case we'll automatically register tag actions/filters.
+    #
+    # Note values of True will register legacy tag filters/actions, values
+    # of object() will just register current standard tag/filters/actions.
+    universal_taggable = False
+
+    # Denotes if this resource exists across all regions (iam, cloudfront, r53)
+    global_resource = False
+
+    # Generally we utilize a service to namespace mapping in the metrics filter
+    # however some resources have a type specific namespace (ig. ebs)
+    metrics_namespace = None
+
+    # specific to ec2 service resources used to disambiguate a resource by its id
+    id_prefix = None
+
 
 An example that adds a new resource:
 
