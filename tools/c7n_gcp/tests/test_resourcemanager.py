@@ -122,6 +122,25 @@ class FolderTest(BaseTest):
 
 class ProjectTest(BaseTest):
 
+    def test_project_delete(self):
+        factory = self.replay_flight_data('project-delete')
+        p = self.load_policy({
+            'name': 'p-delete',
+            'resource': 'gcp.project',
+            'query': [
+                {'filter': 'id:hautomation'}],
+            'filters': [{
+                'lifecycleState': 'ACTIVE'}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['projectId'] == 'hautomation'
+        client = p.resource_manager.get_client()
+        project = client.execute_query(
+            'get', {'projectId': 'hautomation'})
+        assert project['lifecycleState'] != 'ACTIVE'
+
     def test_project_label(self):
         factory = self.replay_flight_data('project-set-labels')
         p = self.load_policy({
