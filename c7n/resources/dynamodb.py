@@ -22,8 +22,8 @@ class ConfigTable(query.ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
         resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
-        if 'BillingModeSummary' in resource and 
-            'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
+        if ('BillingModeSummary' in resource and
+            'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']):
             resource['BillingModeSummary'][
                 'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
                     resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
