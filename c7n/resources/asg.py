@@ -1753,37 +1753,6 @@ class ScalingPolicy(query.QueryResourceManager):
         cfn_type = config_type = 'AWS::AutoScaling::ScalingPolicy'
 
 
-class PolicyInfo:
-
-    permissions = ("autoscaling:DescribePolicies",)
-
-    def __init__(self, manager):
-        self.manager = manager
-
-    def initialize(self, asgs):
-        self.policies = self.get_scaling_policies(asgs)
-        return self
-
-    def get_scaling_policies(self, asgs):
-        policy_mgr = self.manager.get_resource_manager('scaling-policies')
-
-        policies = policy_mgr.resources()
-
-        if not policies:
-            return {}
-        policy_dict = {}
-        for policy in policies:
-            if policy['AutoScalingGroupName'] in policy_dict.keys():
-                policy_dict[policy['AutoScalingGroupName']].append(policy)
-            else:
-                policy_dict[policy['AutoScalingGroupName']] = [policy]
-
-        return policy_dict
-
-    def get(self, asg):
-        return self.policies.get(asg['AutoScalingGroupName'])
-
-
 @ASG.filter_registry.register('scaling-policy')
 class ScalingPolicyFilter(ValueFilter):
 
@@ -1809,8 +1778,31 @@ class ScalingPolicyFilter(ValueFilter):
     schema_alias = False
     permissions = ("autoscaling:DescribePolicies",)
 
+    def initialize(self, asgs):
+        self.policies = self.get_scaling_policies(asgs)
+        return self
+
+    def get_scaling_policies(self, asgs):
+        policy_mgr = self.manager.get_resource_manager('scaling-policy')
+
+        policies = policy_mgr.resources()
+
+        if not policies:
+            return {}
+        policy_dict = {}
+        for policy in policies:
+            if policy['AutoScalingGroupName'] in policy_dict.keys():
+                policy_dict[policy['AutoScalingGroupName']].append(policy)
+            else:
+                policy_dict[policy['AutoScalingGroupName']] = [policy]
+
+        return policy_dict
+
+    def get(self, asg):
+        return self.policies.get(asg['AutoScalingGroupName'])
+
     def process(self, asgs, event=None):
-        self.policy_info = PolicyInfo(self.manager).initialize(asgs)
+        self.policy_info = self.initialize(asgs)
         return super(ScalingPolicyFilter, self).process(asgs, event)
 
     def __call__(self, asg):
