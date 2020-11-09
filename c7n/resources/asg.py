@@ -1737,8 +1737,8 @@ class LaunchConfigDelete(Action):
             raise
 
 
-@resources.register('scaling-policies')
-class ScalingPolicies(query.QueryResourceManager):
+@resources.register('scaling-policy')
+class ScalingPolicy(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'autoscaling'
@@ -1784,8 +1784,8 @@ class PolicyInfo:
         return self.policies.get(asg['AutoScalingGroupName'])
 
 
-@ASG.filter_registry.register('scaling-policies')
-class ScalingPoliciesFilter(ValueFilter):
+@ASG.filter_registry.register('scaling-policy')
+class ScalingPolicyFilter(ValueFilter):
 
     """Filter asg by scaling-policies attributes.
 
@@ -1797,21 +1797,21 @@ class ScalingPoliciesFilter(ValueFilter):
           - name: scaling-policies-with-target-tracking
             resource: asg
             filters:
-              - type: scaling-policies
+              - type: scaling-policy
                 key: PolicyType
                 value: "TargetTrackingScaling"
 
     """
 
     schema = type_schema(
-        'scaling-policies', rinherit=ValueFilter.schema
+        'scaling-policy', rinherit=ValueFilter.schema
     )
     schema_alias = False
     permissions = ("autoscaling:DescribePolicies",)
 
     def process(self, asgs, event=None):
         self.policy_info = PolicyInfo(self.manager).initialize(asgs)
-        return super(ScalingPoliciesFilter, self).process(asgs, event)
+        return super(ScalingPolicyFilter, self).process(asgs, event)
 
     def __call__(self, asg):
         asg_policies = self.policy_info.get(asg)
