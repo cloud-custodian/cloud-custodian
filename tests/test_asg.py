@@ -289,7 +289,7 @@ class AutoScalingTest(BaseTest):
                 "resource": "asg",
                 "filters": [
                     {
-                        "type": "scaling-policies",
+                        "type": "scaling-policy",
                         "key": "PolicyType",
                         "value": "TargetTrackingScaling"}
                 ],
@@ -985,7 +985,7 @@ class AutoScalingPolicy(BaseTest):
         p = self.load_policy(
             {
                 "name": "asg-sp-enabled",
-                "resource": "scaling-policies",
+                "resource": "scaling-policy",
                 "filters": [
                     {"type": "value", "key": "PolicyName", "value": "Target Tracking Policy"}
                 ],
