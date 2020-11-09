@@ -3,7 +3,7 @@
 Developer Guide
 =================
 
-Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows. It is recommended 
+Cloud Custodian is a Python application and supports Python 3 on MacOS, Linux and Windows. It is recommended 
 using Python 3.6 or higher.
 
 Run the following commands in the root directory after cloning Cloud Custodian:
