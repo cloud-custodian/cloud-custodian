@@ -380,7 +380,8 @@ class AnnotationSweeper:
         ra_map = {}
         resource_map = {}
         for r in resources:
-            ra_map[r[id_key]] = {k: v for k, v in r.items() if k.startswith('c7n')}
+            if id_key in r:
+                ra_map[r[id_key]] = {k: v for k, v in r.items() if k.startswith('c7n')}
             resource_map[r[id_key]] = r
         # We keep a full copy of the annotation keys to allow restore.
         self.ra_map = copy.deepcopy(ra_map)
