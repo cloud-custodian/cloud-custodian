@@ -310,8 +310,7 @@ class Or(BooleanGroupFilter):
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
-        if rtype_id in r:
-            resource_map = {r[rtype_id]: r for r in resources}
+        resource_map = {r[rtype_id]: r for r in resources if rtype_id in r} 
         results = set()
         for f in self.filters:
             results = results.union([
