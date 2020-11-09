@@ -15,8 +15,8 @@ Run the following commands in the root directory after cloning Cloud Custodian:
 
 This creates a virtual env in your enlistment and installs all packages as editable.
 
-Now you may run ``python3 c7n/cli.py`` with any flags in order to directly test changes to the source files.  For example, 
-``python3 c7n/cli.py schema aws.<resource_type>`` will return schema for resource type.
+Now you may run ``custodian`` with any flags in order to directly test changes to the source files.  For example, 
+``custodian schema aws.<resource_type>`` will return schema for resource type.
 
 
 Adding New AWS Resources
