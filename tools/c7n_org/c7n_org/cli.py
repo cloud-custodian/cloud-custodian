@@ -395,6 +395,7 @@ def _get_env_creds(account, session, region):
         env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
         env['AWS_SESSION_TOKEN'] = creds.token
         env['AWS_DEFAULT_REGION'] = region
+        env['AWS_ACCOUNT_ID'] = account["account_id"]
     elif account["provider"] == 'azure':
         env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
     elif account["provider"] == 'gcp':
