@@ -189,9 +189,10 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     return accounts_config, custodian_config, executor
 
 
-def resolve_regions(regions):
+def resolve_regions(regions, account):
     if 'all' in regions:
-        client = boto3.client('ec2')
+        session = get_session(account, 'c7n-org', "us-east-1")
+        client = session.client('ec2')
         return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
@@ -340,7 +341,7 @@ def report(config, output, use, output_dir, accounts,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     report_account,
                     a, r,
@@ -457,7 +458,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[
                     w.submit(run_account_script, a, r, output_dir,
                              serial, script_args)] = (a, r)
@@ -638,7 +639,7 @@ def run(config, use, output_dir, accounts, tags, region,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     run_account,
                     a, r,
