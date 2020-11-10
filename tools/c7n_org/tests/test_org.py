@@ -4,7 +4,6 @@ import copy
 import mock
 import os
 import yaml
-import unittest
 
 from c7n.testing import TestUtils
 from click.testing import CliRunner
