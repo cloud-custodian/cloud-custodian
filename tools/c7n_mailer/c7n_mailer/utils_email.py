@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 from email.mime.text import MIMEText
 from email.utils import parseaddr

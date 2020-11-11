@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
