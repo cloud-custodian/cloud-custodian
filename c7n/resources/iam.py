@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import OrderedDict
@@ -10,6 +9,7 @@ import io
 from datetime import timedelta
 import itertools
 import time
+from xml.etree import ElementTree
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
@@ -2270,3 +2270,85 @@ class UserGroupDelete(BaseAction):
             pass
         if error:
             raise error
+
+
+class SamlProviderDescribe(DescribeSource):
+
+    def augment(self, resources):
+        super().augment(resources)
+        for r in resources:
+            md = r.get('SAMLMetadataDocument')
+            if not md:
+                continue
+            root = sso_metadata(md)
+            r['IDPSSODescriptor'] = root['IDPSSODescriptor']
+        return resources
+
+    def get_permissions(self):
+        return ('iam:GetSAMLProvider', 'iam:ListSAMLProviders')
+
+
+def sso_metadata(md):
+    root = ElementTree.fromstringlist(md)
+    d = {}
+    _sso_recurse(root, d)
+    return d
+
+
+def _sso_recurse(node, d):
+    d.update(node.attrib)
+    for c in node:
+        k = c.tag.split('}', 1)[-1]
+        cd = {}
+        if k in d:
+            if not isinstance(d[k], list):
+                d[k] = [d[k]]
+            d[k].append(cd)
+        else:
+            d[k] = cd
+        _sso_recurse(c, cd)
+    if node.text and node.text.strip():
+        d['Value'] = node.text.strip()
+
+
+@resources.register('iam-saml-provider')
+class SamlProvider(QueryResourceManager):
+    """SAML SSO Provider
+
+    we parse and expose attributes of the SAML Metadata XML Document
+    as resources attribute for use with custodian's standard value filter.
+    """
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_saml_providers', 'SAMLProviderList', None)
+        detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'saml-provider'
+        global_resource = True
+
+    source_mapping = {'describe': SamlProviderDescribe}
+
+
+class OpenIdDescribe(DescribeSource):
+
+    def get_permissions(self):
+        return ('iam:GetOpenIDConnectProvider', 'iam:ListOpenIDConnectProviders')
+
+
+@resources.register('iam-oidc-provider')
+class OpenIdProvider(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
+        detail_spec = ('get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'oidc-provider'
+        global_resource = True
+
+    source_mapping = {'describe': OpenIdDescribe}

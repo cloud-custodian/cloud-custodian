@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "aws.account": "c7n.resources.account.Account",
     "aws.acm-certificate": "c7n.resources.acm.Certificate",
@@ -95,6 +97,8 @@ ResourceMap = {
     "aws.iam-profile": "c7n.resources.iam.InstanceProfile",
     "aws.iam-role": "c7n.resources.iam.Role",
     "aws.iam-user": "c7n.resources.iam.User",
+    "aws.iam-saml-provider": "c7n.resources.iam.SamlProvider",
+    "aws.iam-oidc-provider": "c7n.resources.iam.OpenIdProvider",
     "aws.identity-pool": "c7n.resources.cognito.CognitoIdentityPool",
     "aws.insight-rule": "c7n.resources.cw.InsightRule",
     "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
