@@ -18,7 +18,6 @@ from concurrent.futures import (
     as_completed)
 import yaml
 
-import boto3
 from botocore.compat import OrderedDict
 from botocore.exceptions import ClientError
 import click
