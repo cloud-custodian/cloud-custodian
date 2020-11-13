@@ -51,7 +51,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    aws/lambda
    aws/topics/index
    aws/resources/index
-   aws/contribute
 
 .. toctree::
    :maxdepth: 2
