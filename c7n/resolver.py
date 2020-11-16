@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import csv
@@ -165,6 +164,8 @@ class ValuesFrom:
             data = json.loads(contents)
             if 'expr' in self.data:
                 return self._get_resource_values(data)
+            else:
+                return data
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':

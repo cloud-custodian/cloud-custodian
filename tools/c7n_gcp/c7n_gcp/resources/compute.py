@@ -1,4 +1,3 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -142,6 +141,52 @@ class DetachDisks(MethodAction):
         for disk in resource.get('disks', []):
             params = dict(base_params, deviceName=disk['deviceName'])
             self.invoke_api(client, op_name, params)
+
+
+@Instance.action_registry.register('create-machine-image')
+class CreateMachineImage(MethodAction):
+    """
+    `Creates <https://cloud.google.com/compute/docs/reference/rest/beta/machineImages/insert>`_
+     Machine Image from instance.
+
+    The `name_format` specifies name of image in python `format string <https://pyformat.info/>`
+
+    Inside format string there are defined variables:
+      - `now`: current time
+      - `instance`: whole instance resource
+
+    Default name format is `{instance[name]}`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-create-machine-image
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: name
+                value: instance-create-to-make-image
+            actions:
+              - type: create-machine-image
+                name_format: "{instance[name]:.50}-{now:%Y-%m-%d}"
+
+    """
+    schema = type_schema('create-machine-image', name_format={'type': 'string'})
+    method_spec = {'op': 'insert'}
+    permissions = ('compute.machineImages.create',)
+
+    def get_resource_params(self, model, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, _, _ = path_param_re.match(resource['selfLink']).groups()
+        name_format = self.data.get('name_format', '{instance[name]}')
+        name = name_format.format(instance=resource, now=datetime.now())
+
+        return {'project': project, 'sourceInstance': resource['selfLink'], 'body': {'name': name}}
+
+    def get_client(self, session, model):
+        return session.client(model.service, "beta", "machineImages")
 
 
 @resources.register('image')

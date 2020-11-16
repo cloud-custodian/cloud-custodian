@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -1822,6 +1821,23 @@ class SetRolePolicyAction(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertIn('test-role-us-east-1', resources[0]['RoleName'])
+
+
+class SAMLProviderTests(BaseTest):
+
+    def test_saml_provider(self):
+        factory = self.replay_flight_data('test_saml_provider')
+        p = self.load_policy({
+            'name': 'aws-saml',
+            'resource': 'aws.iam-saml-provider'},
+            session_factory=factory)
+
+        resources = p.run()
+        assert len(resources) == 1
+        self.assertJmes(
+            'IDPSSODescriptor.SingleSignOnService[0].Location',
+            resources[0],
+            'https://portal.sso.us-east-1.amazonaws.com/saml/assertion/MDMwNTk1ODQ3MDk5X2lucy')
 
 
 class DeleteRoleAction(BaseTest):

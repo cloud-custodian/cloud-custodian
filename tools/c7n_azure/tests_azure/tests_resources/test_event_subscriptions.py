@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
@@ -76,5 +75,6 @@ class AzureEventSubscriptionsTest(BaseTest):
         }, validate=True)
 
         p_delete.run()
+        self.sleep_in_live_mode(5)
         resources_post_delete = p_get.run()
         self.assertEqual(len(resources_post_delete), 0)
