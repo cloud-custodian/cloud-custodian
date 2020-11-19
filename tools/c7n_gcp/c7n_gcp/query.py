@@ -215,8 +215,19 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
             if error_reason is None and error_code is None:
                 raise
-            if error_code == 403 and 'disabled' in error_message:
-                log.warning(error_message)
+            if error_code == 403:
+                log.warning(
+                    "%s: %s",
+                    error_code,
+                    error_message)
+                return []
+            if error_code == 404:
+                log.warning(
+                    "%s: %s -> %s not found in %s",
+                    error_code,
+                    error_message,
+                    self.type,
+                    local_session(self.session_factory).get_default_project())
                 return []
             elif error_reason == 'accessNotConfigured':
                 log.warning(
