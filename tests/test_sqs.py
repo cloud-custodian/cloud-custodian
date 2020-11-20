@@ -5,6 +5,7 @@ from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
 import json
+import logging
 import pytest
 import time
 
@@ -550,6 +551,21 @@ class QueueTests(BaseTest):
         self.assertEqual(resources[0]["QueueUrl"], url1)
         resources = p.resource_manager.get_resources([url2])
         self.assertEqual(resources[0]["QueueUrl"], url1)
+
+    def test_sqs_access_denied(self):
+        session_factory = self.replay_flight_data("test_sqs_access_denied")
+        p = self.load_policy(
+            {
+                "name": "sqs-list",
+                "resource": "sqs",
+            },
+            session_factory=session_factory
+        )
+        log_output = self.capture_logging("custodian.resources.sqs", level=logging.WARNING)
+
+        resources = p.run()
+        assert len(resources) == 0
+        assert "Denied access to sqs" in log_output.getvalue()
 
     @functional
     def test_sqs_kms_alias(self):
