@@ -543,6 +543,9 @@ class QueueTests(BaseTest):
         )
         url1 = "https://us-east-2.queue.amazonaws.com/644160558196/BrickHouse"
         url2 = "https://sqs.us-east-2.amazonaws.com/644160558196/BrickHouse"
+        *_, enum_extra_args = p.resource_manager.resource_type.enum_spec
+        # MaxResults arg is required to enable list_queues pagination
+        self.assertIn("MaxResults", enum_extra_args)
         resources = p.resource_manager.get_resources([url1])
         self.assertEqual(resources[0]["QueueUrl"], url1)
         resources = p.resource_manager.get_resources([url2])
