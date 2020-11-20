@@ -33,7 +33,7 @@ class DescribeQueue(DescribeSource):
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
+                    self.manager.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
             return queue
@@ -57,7 +57,7 @@ class SQS(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'sqs'
         arn_type = ""
-        enum_spec = ('list_queues', 'QueueUrls', None)
+        enum_spec = ('list_queues', 'QueueUrls', {'MaxResults': 1000})
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
