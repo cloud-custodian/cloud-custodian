@@ -211,32 +211,19 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         try:
             return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
-            error_reason, error_code, error_message = extract_errors(e)
+            error_code, error_message = extract_errors(e)
 
-            if error_reason is None and error_code is None:
+            if error_code is None and error_message is None:
                 raise
-            if error_code == 403:
+            else:
                 log.warning(
-                    "%s: %s",
-                    error_code,
-                    error_message)
-                return []
-            if error_code == 404:
-                log.warning(
-                    "%s: %s -> %s not found in %s",
+                    "%s: %s -> Resource:%s Service:%s Project:%s",
                     error_code,
                     error_message,
-                    self.type,
-                    local_session(self.session_factory).get_default_project())
-                return []
-            elif error_reason == 'accessNotConfigured':
-                log.warning(
-                    "Resource:%s not available -> Service:%s not enabled on %s",
                     self.type,
                     self.resource_type.service,
                     local_session(self.session_factory).get_default_project())
                 return []
-            raise
 
     def augment(self, resources):
         return resources
@@ -359,7 +346,6 @@ class ChildTypeInfo(TypeInfo):
         return 'c7n:{}'.format(parent_resource)
 
 
-ERROR_REASON = jmespath.compile('error.errors[0].reason')
 ERROR_CODE = jmespath.compile('error.code')
 ERROR_MESSAGE = jmespath.compile('error.message')
 
@@ -370,7 +356,7 @@ def extract_errors(e):
     except Exception:
         edata = None
 
-    return ERROR_REASON.search(edata), ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
+    return ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
 
 class GcpLocation:
