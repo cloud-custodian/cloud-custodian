@@ -5,6 +5,7 @@ CloudWatch Metrics suppport for resources
 """
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from functools import reduce
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter, OPERATORS
@@ -220,9 +221,23 @@ class MetricsFilter(Filter):
                            rvalue * 100)
                 if self.op(percent, self.value):
                     matched.append(r)
-            elif self.op(collected_metrics[key][0][self.statistics], self.value):
+            elif self.op(self.metricsValue(collected_metrics[key]), self.value):
                 matched.append(r)
         return matched
+
+    def metricsValue(self, metrics):
+        if len(metrics) == 0:
+            return 0
+        if self.statistics == 'Maximum':
+            return max(metrics, key=lambda x: x[self.statistics])[self.statistics]
+        elif self.statistics == 'Minimum':
+            return min(metrics, key=lambda x: x[self.statistics])[self.statistics]
+        elif self.statistics == 'Average':
+            total = reduce(lambda a, b: a[self.statistics] + b[self.statistics], metrics)[self.statistics]
+            return total / len(metrics)
+
+        # default case
+        return metrics[0][self.statistics]
 
 
 class ShieldMetrics(MetricsFilter):
