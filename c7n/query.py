@@ -328,8 +328,8 @@ class ConfigSource:
         else:
             _c = None
 
-        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
-            self.manager.resource_type.config_type)
+        s = ("select resourceId, configuration, supplementaryConfiguration "
+             "where resourceType = '{}'").format(self.manager.resource_type.config_type)
 
         if _c:
             s += "AND {}".format(_c)
