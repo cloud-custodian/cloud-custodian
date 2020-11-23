@@ -233,7 +233,8 @@ class MetricsFilter(Filter):
         elif self.statistics == 'Minimum':
             return min(metrics, key=lambda x: x[self.statistics])[self.statistics]
         elif self.statistics == 'Average':
-            total = reduce(lambda a, b: a[self.statistics] + b[self.statistics], metrics)[self.statistics]
+            total = reduce(lambda a, b: a[self.statistics] + b[self.statistics],
+                metrics)[self.statistics]
             return total / len(metrics)
 
         # default case
