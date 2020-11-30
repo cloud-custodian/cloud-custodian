@@ -18,7 +18,7 @@
                         "no-store, no-cache"
                     ],
                     "date": [
-                        "Sat, 31 Oct 2020 04:39:15 GMT"
+                        "Sat, 31 Oct 2020 04:40:24 GMT"
                     ],
                     "content-type": [
                         "application/json"
@@ -115,6 +115,37 @@
                             }
                         ]
                     }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://api.ipify.org/",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sat, 31 Oct 2020 04:40:25 GMT"
+                    ],
+                    "content-length": [
+                        "13"
+                    ],
+                    "content-type": [
+                        "text/plain"
+                    ],
+                    "via": [
+                        "1.1 vegur"
+                    ]
+                },
+                "body": {
+                    "string": "67.185.99.110"
                 }
             }
         }

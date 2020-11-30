@@ -4,6 +4,37 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://checkip.amazonaws.com/",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sat, 31 Oct 2020 04:40:25 GMT"
+                    ],
+                    "content-length": [
+                        "13"
+                    ],
+                    "content-type": [
+                        "text/plain"
+                    ],
+                    "via": [
+                        "1.1 vegur"
+                    ]
+                },
+                "body": {
+                    "string": "67.185.99.110"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2019-08-01",
                 "body": null,
                 "headers": {}
@@ -18,7 +49,7 @@
                         "no-store, no-cache"
                     ],
                     "date": [
-                        "Sat, 31 Oct 2020 04:39:15 GMT"
+                        "Sat, 31 Oct 2020 04:40:25 GMT"
                     ],
                     "content-type": [
                         "application/json"
@@ -115,6 +146,37 @@
                             }
                         ]
                     }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://checkip.amazonaws.com/",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sat, 31 Oct 2020 04:40:26 GMT"
+                    ],
+                    "content-length": [
+                        "13"
+                    ],
+                    "content-type": [
+                        "text/plain"
+                    ],
+                    "via": [
+                        "1.1 vegur"
+                    ]
+                },
+                "body": {
+                    "string": "67.185.99.110"
                 }
             }
         }

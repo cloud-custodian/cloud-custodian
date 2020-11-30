@@ -76,6 +76,48 @@ class DiagnosticSettingsFilterTest(BaseTest):
         resources_logs_not_enabled = p2.run()
         self.assertEqual(len(resources_logs_not_enabled), 0)
 
+    @arm_template('diagnostic-settings.json')
+    def test_filter_diagnostic_settings_absent(self):
+        """Verifies absent operation works with a diagnostic setting
+        on an azure resource.
+        """
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.publicip',
+            'filters': [
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[?category == 'DDoSProtectionNotifications'][].enabled",
+                    'value': 'absent'
+                }
+            ]
+        })
+
+        resources_logs_enabled = p.run()
+        self.assertEqual(len(resources_logs_enabled), 1)
+
+    @arm_template('diagnostic-settings.json')
+    def test_filter_diagnostic_settings_present(self):
+        """Verifies present operation works with a diagnostic setting
+        on an azure resource.
+        """
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.loadbalancer',
+            'filters': [
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled",
+                    'value': 'present'
+                }
+            ]
+        })
+
+        resources_logs_enabled = p.run()
+        self.assertEqual(len(resources_logs_enabled), 1)
+
     @arm_template('vm.json')
     def test_filter_diagnostic_settings_not_enabled(self):
         """Verifies validation fails if the resource type
