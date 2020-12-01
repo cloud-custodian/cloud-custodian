@@ -1,11 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.config import Bag
 from c7n.resources import load_resources
-from c7n_gcp.query import GcpLocation
+from c7n_gcp.query import GcpLocation, extract_errors
 from c7n_gcp.provider import GoogleCloud
 
 from gcp_common import BaseTest
+
+
+def test_extract_errors():
+    e = Bag(content=None)
+    assert extract_errors(e) == (None, None)
 
 
 def test_gcp_resource_metadata_asset_type():
