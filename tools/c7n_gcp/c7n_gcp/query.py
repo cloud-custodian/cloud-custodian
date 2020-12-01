@@ -217,12 +217,12 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 raise
             else:
                 log.warning(
-                    "%s: %s -> Resource:%s Service:%s Project:%s",
-                    error_code,
-                    error_message,
+                    "Project:%s Resource:%s unavailable Service:%s Error:%s \n Message:%s",
+                    local_session(self.session_factory).get_default_project(),
                     self.type,
                     self.resource_type.service,
-                    local_session(self.session_factory).get_default_project())
+                    error_code,
+                    error_message)
                 return []
 
     def augment(self, resources):
@@ -354,7 +354,7 @@ def extract_errors(e):
     try:
         edata = json.loads(e.content)
     except Exception:
-        edata = None
+        edata = ""
 
     return ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
