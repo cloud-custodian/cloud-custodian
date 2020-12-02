@@ -156,6 +156,51 @@ class TestMetricFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_metric_filter_max(self):
+        session_factory = self.replay_flight_data("test_ec2_metric_max")
+        policy = self.load_policy(
+            {
+                "name": "ec2-max-utilization",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "value": 30,
+                        "period": 86400,
+                        "statistics": "Maximum",
+                        "op": "less-than"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_filter_min(self):
+        session_factory = self.replay_flight_data("test_ec2_metric_min")
+        policy = self.load_policy(
+            {
+                "name": "ec2-max-utilization",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "value": 5,
+                        "period": 86400,
+                        "statistics": "Minimum",
+                        "op": "less-than"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
 
 class TestPropagateSpotTags(BaseTest):
 
