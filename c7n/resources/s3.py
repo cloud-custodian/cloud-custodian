@@ -3115,7 +3115,8 @@ class KMSKeyResolverMixin:
                     KeyId=self.data.get('key')
                 ).get('KeyMetadata').get('Arn')
                 if self.data.get('key').startswith('alias/aws'):
-                    self.arns[r] = client.list_aliases(KeyId=self.arns[r]).get('Aliases')[0].get('AliasArn')
+                    self.arns[r] = client.list_aliases(KeyId=self.arns[r]
+                                                       ).get('Aliases')[0].get('AliasArn')
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))
