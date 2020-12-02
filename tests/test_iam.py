@@ -1062,8 +1062,8 @@ def test_iam_delete_certificate_action(test, iam_delete_certificate):
     # data in the 'tf_resources.json' file inside the
     # 'tests/terraform/iam_delete_certificate' directory.  Here's how
     # we access the cert's name using a 'dotted' notation:
-    iam_cert_name = iam_delete_certificate[
-        'aws_iam_server_certificate.test_cert_alt.name']
+    iam_cert_name = iam_delete_certificate['aws_iam_server_certificate.test_cert_alt.name']
+    iam_cert_arn = iam_delete_certificate['aws_iam_server_certificate.test_cert_alt.arn']
 
     # Uncomment to following line when you're recording the first time:
     # session_factory = test.record_flight_data('iam_delete_certificate')
@@ -1101,7 +1101,7 @@ def test_iam_delete_certificate_action(test, iam_delete_certificate):
     # Here's the number of resources that the policy resolved,
     # i.e. the resources that passed the filters:
     assert len(resources) == 1
-    assert resources[0]['Arn'] == 'arn:aws:iam::644160558196:server-certificate/alt_test_cert'
+    assert resources[0]['Arn'] == iam_cert_arn
 
     # We're testing that our delete action worked because the iam
     # certificate now no longer exists:

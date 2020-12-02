@@ -13,7 +13,7 @@ class ServiceTest(BaseTest):
              'resource': 'gcp.service'},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 26)
+        self.assertEqual(len(resources), 16)
 
     def test_service_disable(self):
         factory = self.replay_flight_data('service-disable')
@@ -21,14 +21,12 @@ class ServiceTest(BaseTest):
             {'name': 'disable-service',
              'resource': 'gcp.service',
              'filters': [
-                 {'serviceName': 'deploymentmanager.googleapis.com'}],
+                 {'config.name': 'deploymentmanager.googleapis.com'}],
              'actions': ['disable']},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['serviceName'],
-            'deploymentmanager.googleapis.com')
+        self.assertJmes('config.name', resources[0], 'deploymentmanager.googleapis.com')
 
     def test_service_get(self):
         factory = self.replay_flight_data('service-get')
@@ -36,9 +34,5 @@ class ServiceTest(BaseTest):
             {'name': 'one-service', 'resource': 'gcp.service'},
             session_factory=factory)
         service = p.resource_manager.get_resource(
-            {'resourceName': (
-                'projects/604150802624/'
-                'services/[deploymentmanager.googleapis.com]')})
-        self.assertEqual(
-            service, {
-                'serviceName': 'deploymentmanager.googleapis.com'})
+            {'resourceName': 'projects/stacklet-sam/services/deploymentmanager.googleapis.com'})
+        self.assertJmes('config.name', service, 'deploymentmanager.googleapis.com')
