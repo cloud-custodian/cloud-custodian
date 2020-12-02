@@ -484,6 +484,73 @@ class AppELBDeleteAction(BaseAction):
                 alb['LoadBalancerArn'], e)
 
 
+@AppELB.action_registry.register('modify-attributes')
+class AppELBModifyAttributes(BaseAction):
+    """Modify load balancer attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: turn-on-elb-deletion-protection
+                resource: app-elb
+                filters:
+                  - type: attributes
+                    key: "deletion_protection.enabled"
+                    value: false
+                actions:
+                  - type: modify-attributes
+                    attributes:
+                      "deletion_protection.enabled": "true"
+                      "idle_timeout.timeout_seconds": 120
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {
+                'enum': ['modify-attributes']},
+            'attributes': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'access_logs.s3.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'access_logs.s3.bucket': {'type': 'string'},
+                    'access_logs.s3.prefix': {'type': 'string'},
+                    'deletion_protection.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'idle_timeout.timeout_seconds': {'type': 'number'},
+                    'routing.http.desync_mitigation_mode': {
+                        'enum': ['monitor', 'defensive', 'strictest']},
+                    'routing.http.drop_invalid_header_fields.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'routing.http2.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'load_balancing.cross_zone.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                },
+            },
+        },
+    }
+    permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for appelb in resources:
+            self.manager.retry(
+                client.modify_load_balancer_attributes,
+                LoadBalancerArn=appelb['LoadBalancerArn'],
+                Attributes=[
+                    {'Key': key, 'Value': serialize_attribute_value(value)}
+                    for (key, value) in self.data['attributes'].items()
+                ],
+                ignore_err_codes=('LoadBalancerNotFoundException',),
+            )
+        return resources
+
+
 class AppELBListenerFilterBase:
     """ Mixin base class for filters that query LB listeners.
     """
@@ -508,6 +575,16 @@ def parse_attribute_value(v):
         v = True
     elif v == 'false':
         v = False
+    return v
+
+
+def serialize_attribute_value(v):
+    if v is True:
+        return 'true'
+    elif v is False:
+        return 'false'
+    elif isinstance(v, int):
+        return str(v)
     return v
 
 
