@@ -198,7 +198,7 @@ class BucketEncryption(BaseTest):
         client.create_bucket(Bucket=bname)
         self.addCleanup(client.delete_bucket, Bucket=bname)
 
-        aws_alias = "arn:aws:kms:us-east-1:108891588060:alias/aws/s3"
+        aws_alias = "arn:aws:kms:us-east-1:108891588060:key/079a6f7d-5f8a-4da1-a465-30aa099b9688"
         enc = {
             "Rules": [
                 {
