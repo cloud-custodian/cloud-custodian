@@ -334,6 +334,104 @@ class SnapshotTrimTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class SnapshotSetPermissions(BaseTest):
+    # The precondition to these tests in here is that we have an EBS
+    # snapshot with create volume permissions for accounts
+    # 112233445566 and 665544332211
+
+    def test_reset(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_reset")
+        p = self.load_policy(
+            {
+                "name": "reset-permissions",
+                "resource": "ebs-snapshot",
+                "filters": ["cross-account"],
+                "actions": ["set-permissions"],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert sorted(
+            resources[0]['c7n:CrossAccountViolations']) == sorted(
+                ['112233445566', '665544332211'])
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == []
+
+    def test_add(self):
+        # For this test, we assume only 665544332211 has permissions,
+        # and we test adding 112233445566 and removing 665544332211
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_add")
+        p = self.load_policy(
+            {
+                "name": "set-permissions",
+                "resource": "ebs-snapshot",
+                "filters": ["cross-account"],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "add": ["112233445566"],
+                        "remove": ["665544332211"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == [
+            {"UserId": "112233445566"},
+        ]
+
+    def test_matched(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_matched")
+        p = self.load_policy(
+            {
+                "name": "set-permissions",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["112233445566"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "remove": "matched",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['665544332211'])
+
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == [{"UserId": "112233445566"}]
+
+
 class AttachedInstanceTest(BaseTest):
 
     def test_ebs_instance_filter(self):

@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
-
+import json
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 
 
@@ -279,6 +280,79 @@ class ElasticSearch(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
+    def test_elasticsearch_cross_account(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_cross_account")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-cross-account",
+                "resource": "elasticsearch",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        access_policy = json.loads(resources[0]['AccessPolicies'])
+        self.assertEqual(resources[0]['c7n:Policy'], access_policy)
+        assert resources[0]['CrossAccountViolations'] == [
+            {'Action': 'es:ESHttpGet',
+             'Effect': 'Allow',
+             'Principal': '*',
+             'Resource': 'arn:aws:es:us-east-1:644160558196:domain/test-es/*',
+             'Sid': 'CrossAccount'}]
+
+        self.assertIn("*", [s['Principal'] for s in access_policy.get('Statement')])
+
+    def test_elasticsearch_remove_matched(self):
+        session_factory = self.replay_flight_data("test_elasticsearch_remove_matched")
+        client = session_factory().client("es")
+        client.update_elasticsearch_domain_config(DomainName='test-es', AccessPolicies=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                        "Action": "es:*",
+                        "Resource": "arn:aws:es:us-east-1:644160558196:domain/test-es/*"
+                    },
+                    {
+                        "Sid": "CrossAccount",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "es:ESHttpGet",
+                        "Resource": "arn:aws:es:us-east-1:644160558196:domain/test-es/*"
+                    },
+                ]
+            }))
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-rm-matched",
+                "resource": "elasticsearch",
+                "filters": [{"type": "cross-account"}],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = client.describe_elasticsearch_domain_config(DomainName=resources[0]['DomainName'])
+        access_policy = json.loads(data['DomainConfig']['AccessPolicies']['Options'])
+        self.assertEqual(len(access_policy.get('Statement')), 1)
+        self.assertEqual([s['Sid'] for s in access_policy.get('Statement')], ["SpecificAllow"])
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "elasticsearch-remove-matched",
+                "resource": "elasticsearch",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )
 
 
 class TestReservedInstances(BaseTest):
