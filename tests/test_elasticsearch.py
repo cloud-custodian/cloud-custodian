@@ -296,6 +296,13 @@ class ElasticSearch(BaseTest):
         self.assertEqual(len(resources), 1)
         access_policy = json.loads(resources[0]['AccessPolicies'])
         self.assertEqual(resources[0]['c7n:Policy'], access_policy)
+        assert resources[0]['CrossAccountViolations'] == [
+            {'Action': 'es:ESHttpGet',
+             'Effect': 'Allow',
+             'Principal': '*',
+             'Resource': 'arn:aws:es:us-east-1:644160558196:domain/test-es/*',
+             'Sid': 'CrossAccount'}]
+
         self.assertIn("*", [s['Principal'] for s in access_policy.get('Statement')])
 
     def test_elasticsearch_remove_matched(self):
