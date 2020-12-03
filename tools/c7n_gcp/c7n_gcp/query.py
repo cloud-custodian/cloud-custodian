@@ -215,7 +215,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
             if error_code is None and error_message is None:
                 raise
-            else:
+            elif error_code == 403 and 'disabled' in error_message:
                 log.warning(
                     "Project:%s Resource:%s unavailable Service:%s Error:%s \n Message:%s",
                     local_session(self.session_factory).get_default_project(),
@@ -224,6 +224,16 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                     error_code,
                     error_message)
                 return []
+            elif error_code == 404 and self.resource_type.service == "appengine":
+                log.warning(
+                    "Project:%s Resource:%s not found Service:%s Error:%s \n Message:%s",
+                    local_session(self.session_factory).get_default_project(),
+                    self.type,
+                    self.resource_type.service,
+                    error_code,
+                    error_message)
+                return []
+            raise
 
     def augment(self, resources):
         return resources
