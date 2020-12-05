@@ -1,16 +1,6 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
@@ -67,12 +57,31 @@ class VirtualMachine(ArmResourceManager):
 
     :example:
 
+    Resize specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-vm
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: resize
+                vmSize: Standard_A2_v2
+
+    :example:
+
     Delete specific VM by name
 
     .. code-block:: yaml
 
         policies:
-          - name: stop-running-vms
+          - name: delete-vm
             resource: azure.vm
             filters:
               - type: value
@@ -227,3 +236,52 @@ class VmRestartAction(AzureBaseAction):
 
     def _process_resource(self, resource):
         self.client.virtual_machines.restart(resource['resourceGroup'], resource['name'])
+
+
+@VirtualMachine.action_registry.register('resize')
+class VmResizeAction(AzureBaseAction):
+
+    """Change a VM's size
+
+    :example:
+
+    Resize specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-vm
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: resize
+                vmSize: Standard_A2_v2
+    """
+
+    schema = type_schema(
+        'resize',
+        required=['vmSize'],
+        **{
+            'vmSize': {'type': 'string'}
+        })
+
+    def __init__(self, data, manager=None):
+        super(VmResizeAction, self).__init__(data, manager)
+        self.vm_size = self.data['vmSize']
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        hardware_profile = HardwareProfile(vm_size=self.vm_size)
+
+        self.client.virtual_machines.update(
+            resource['resourceGroup'],
+            resource['name'],
+            VirtualMachineUpdate(hardware_profile=hardware_profile)
+        )

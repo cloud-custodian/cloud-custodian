@@ -1,22 +1,12 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
+from c7n.filters.core import parse_date
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
@@ -164,16 +154,107 @@ class LogGroup(QueryResourceManager):
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
 
-    def augment(self, resources):
-        resources = universal_augment(self, resources)
-        for r in resources:
-            r['creationTime'] = r['creationTime'] / 1000.0
-        return resources
-
     def get_arns(self, resources):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
         return [r['arn'][:-2] for r in resources]
+
+
+@resources.register('insight-rule')
+class InsightRule(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudwatch'
+        arn_type = 'insight-rule'
+        enum_spec = ('describe_insight_rules', 'InsightRules', None)
+        name = id = 'Name'
+        universal_taggable = object()
+        permission_augment = ('cloudWatch::ListTagsForResource',)
+        cfn_type = 'AWS::CloudWatch::InsightRule'
+
+    def augment(self, rules):
+        client = local_session(self.session_factory).client('cloudwatch')
+
+        def _add_tags(r):
+            arn = self.generate_arn(r['Name'])
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceARN=arn).get('Tags', [])
+            return r
+
+        return list(map(_add_tags, rules))
+
+
+@InsightRule.action_registry.register('disable')
+class InsightRuleDisable(BaseAction):
+    """Disable a cloudwatch contributor insight rule.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-disable-insight-rule
+                resource: insight-rule
+                filters:
+                  - type: value
+                    key: State
+                    value: ENABLED
+                    op: eq
+                actions:
+                  - disable
+    """
+
+    schema = type_schema('disable')
+    permissions = ('cloudwatch:DisableInsightRules',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.disable_insight_rules,
+                RuleNames=[r['Name'] for r in resource_set])
+
+
+@InsightRule.action_registry.register('delete')
+class InsightRuleDelete(BaseAction):
+    """Delete a cloudwatch contributor insight rule
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-insight-rule
+                resource: insight-rule
+                filters:
+                  - type: value
+                    key: State
+                    value: ENABLED
+                    op: eq
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteInsightRules',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_insight_rules,
+                RuleNames=[r['Name'] for r in resource_set])
+
+
+@LogGroup.filter_registry.register('metrics')
+class LogGroupMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
 
 @LogGroup.action_registry.register('retention')
@@ -258,7 +339,7 @@ class LastWriteDays(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('logs')
-        self.date_threshold = datetime.utcnow() - timedelta(
+        self.date_threshold = parse_date(datetime.utcnow()) - timedelta(
             days=self.data['days'])
         return [r for r in resources if self.check_group(client, r)]
 
@@ -272,12 +353,12 @@ class LastWriteDays(Filter):
         group['streams'] = streams
         if not streams:
             last_timestamp = group['creationTime']
-        elif streams[0]['storedBytes'] == 0:
-            last_timestamp = streams[0]['creationTime']
-        else:
+        elif 'lastIngestionTime' in streams[0]:
             last_timestamp = streams[0]['lastIngestionTime']
+        else:
+            last_timestamp = streams[0]['creationTime']
 
-        last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
+        last_write = parse_date(last_timestamp)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write
 

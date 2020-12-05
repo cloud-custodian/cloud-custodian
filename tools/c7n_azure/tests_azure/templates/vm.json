@@ -15,7 +15,7 @@
     "publicIPAddressName": "myPublicIP",
     "publicIPAddressType": "Dynamic",
     "vmName": "cctestvm",
-    "vmSize": "Standard_A1",
+    "vmSize": "Standard_A1_v2",
     "virtualNetworkName": "MyVNET",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
@@ -106,7 +106,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Basic_A0"
+          "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
           "computerName": "[concat('vm', uniqueString(resourceGroup().id))]",

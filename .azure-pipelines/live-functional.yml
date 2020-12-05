@@ -119,17 +119,17 @@ stages:
               containerRegistry: dockerServiceConnection
 
           # cli
-          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i cli -i cli-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i cli
             displayName: build, test, push custodian cli nightlies
 
           # cli-org
-          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i org -i org-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i org
             displayName: build, test, push custodian org nightlies
 
           # mailer
-          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i mailer -i mailer-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i mailer
             displayName: build, test, push custodian mailer nightlies
 
           # mailer
-          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i policystream -i policystream-distroless
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i policystream
             displayName: build, test, push custodian policystream nightlies

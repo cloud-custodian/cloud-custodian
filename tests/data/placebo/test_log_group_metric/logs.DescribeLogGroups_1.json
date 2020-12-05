@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/myIOTFunction",
+                "creationTime": 6441605581965,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/myIOTFunction:*",
+                "storedBytes": 857324
+            },
+            {
+                "logGroupName": "devlog",
+                "creationTime": 6441605581968,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:devlog:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

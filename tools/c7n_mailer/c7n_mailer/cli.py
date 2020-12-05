@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import argparse
 import functools
 import logging
@@ -59,6 +61,16 @@ CONFIG_SCHEMA = {
         # Azure Function Config
         'function_properties': {
             'type': 'object',
+            'identity': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'type': {'enum': [
+                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'client_id': {'type': 'string'},
+                    'id': {'type': 'string'},
+                },
+            },
             'appInsights': {
                 'type': 'object',
                 'oneOf': [

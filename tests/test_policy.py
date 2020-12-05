@@ -1,21 +1,11 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
 import mock
+import os
 import shutil
 import tempfile
 
@@ -223,6 +213,26 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q4 2020
+            'AwsApiGatewayRestApi',
+            'AwsApiGatewayStage',
+            'AwsApiGatewayV2Api',
+            'AwsApiGatewayV2Stage',
+            'AwsCertificateManagerCertificate',
+            'AwsCloudTrailTrail',
+            'AwsElbLoadBalancer',
+            'AwsIamGroup',
+            'AwsRedshiftCluster',
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
@@ -241,7 +251,6 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
-            'AWS::EC2::Host',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
@@ -276,7 +285,8 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio'}
+            'AWS::SSM::FileData',
+            'AWS::SecretsManager::Secret'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -440,7 +450,7 @@ class PolicyMetaLint(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in list(v.filter_registry.items()):
-                if n in ("and", "or", "not", "missing"):
+                if n in ("and", "or", "not", "missing", "reduce"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -639,6 +649,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
@@ -992,6 +1003,24 @@ class TestPolicy(BaseTest):
 
 class PolicyConditionsTest(BaseTest):
 
+    def test_value_from(self):
+        tmp_dir = self.change_cwd()
+        p = self.load_policy({
+            'name': 'fx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account_id',
+                'op': 'in',
+                'value_from': {
+                    'url': 'file:///{}/accounts.txt'.format(tmp_dir),
+                    'type': 'txt'}
+            }]
+        })
+        with open(os.path.join(tmp_dir, 'accounts.txt'), 'w') as fh:
+            fh.write(p.ctx.options.account_id)
+        self.assertTrue(p.is_runnable())
+
     def test_env_var_extension(self):
         p = self.load_policy({
             'name': 'profx',
@@ -1194,7 +1223,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',

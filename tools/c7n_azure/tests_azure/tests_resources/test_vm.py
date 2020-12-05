@@ -1,18 +1,8 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 
+from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
 from ..azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
 from dateutil import tz as tzutils
@@ -42,6 +32,7 @@ class VMTest(BaseTest):
                     {'type': 'poweroff'},
                     {'type': 'stop'},
                     {'type': 'start'},
+                    {'type': 'resize', 'vmSize': 'Standard_A1_v2'},
                     {'type': 'restart'},
                     {'type': 'poweroff'}
                 ]
@@ -85,8 +76,8 @@ class VMTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     fake_running_vms = [{
-        'resourceGroup': 'test_vm',
-        'name': 'test_vm'
+        'resourceGroup': 'TEST_VM',
+        'name': 'cctestvm'
     }]
 
     @arm_template('vm.json')
@@ -199,6 +190,34 @@ class VMTest(BaseTest):
             restart_action_mock.assert_called_with(
                 self.fake_running_vms[0]['resourceGroup'],
                 self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    def test_resize(self, resize_action_mock):
+        with patch(self._get_vm_client_string() + '.update') as resize_action_mock:
+            p = self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}],
+                'actions': [
+                    {'type': 'resize',
+                     'vmSize': 'Standard_A2_v2'}
+                ]
+            })
+            p.run()
+
+        expected_hardware_profile = HardwareProfile(vm_size='Standard_A2_v2')
+
+        resize_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'],
+            VirtualMachineUpdate(hardware_profile=expected_hardware_profile)
+        )
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)

@@ -1,0 +1,48 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_route53_record": {
+            "test_r53_record": {
+                "alias": [],
+                "allow_overwrite": null,
+                "failover_routing_policy": [],
+                "fqdn": "test.custodian.net",
+                "geolocation_routing_policy": [],
+                "health_check_id": null,
+                "id": "Z016061795MC0AU0Z2UW_test.custodian.net_A",
+                "latency_routing_policy": [],
+                "multivalue_answer_routing_policy": null,
+                "name": "test.custodian.net",
+                "records": [
+                    "1.1.1.1"
+                ],
+                "set_identifier": null,
+                "ttl": 300,
+                "type": "A",
+                "weighted_routing_policy": [],
+                "zone_id": "Z016061795MC0AU0Z2UW"
+            }
+        },
+        "aws_route53_zone": {
+            "test_hosted_zone": {
+                "comment": "Managed by Terraform",
+                "delegation_set_id": "",
+                "force_destroy": false,
+                "id": "Z016061795MC0AU0Z2UW",
+                "name": "custodian.net",
+                "name_servers": [
+                    "ns-1361.awsdns-42.org",
+                    "ns-194.awsdns-24.com",
+                    "ns-1994.awsdns-57.co.uk",
+                    "ns-992.awsdns-60.net"
+                ],
+                "tags": {
+                    "TestTag": "yes"
+                },
+                "vpc": [],
+                "zone_id": "Z016061795MC0AU0Z2UW"
+            }
+        }
+    }
+}

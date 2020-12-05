@@ -1,20 +1,10 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import itertools
 import operator
 import zlib
 import jmespath
+import re
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -22,7 +12,7 @@ from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
-from c7n.filters.related import RelatedResourceFilter
+from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
@@ -458,6 +448,34 @@ class VpcPostFinding(PostFinding):
         return envelope
 
 
+class DescribeSubnets(query.DescribeSource):
+
+    def get_resources(self, resource_ids):
+        while resource_ids:
+            try:
+                return super().get_resources(resource_ids)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidSubnetID.NotFound':
+                    raise
+                sid = extract_subnet_id(e)
+                if sid:
+                    resource_ids.remove(sid)
+                else:
+                    return []
+
+
+RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
+
+
+def extract_subnet_id(state_error):
+    "Extract an subnet id from an error"
+    subnet_id = None
+    match = RE_ERROR_SUBNET_ID.search(str(state_error))
+    if match:
+        subnet_id = match.groupdict().get('subnet_id')
+    return subnet_id
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
@@ -470,6 +488,10 @@ class Subnet(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
+
+    source_mapping = {
+        'describe': DescribeSubnets,
+        'config': query.ConfigSource}
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
@@ -729,7 +751,8 @@ class SGUsage(Filter):
             ("sg-perm-refs", self.get_sg_refs),
             ('lambdas', self.get_lambda_sgs),
             ("launch-configs", self.get_launch_config_sgs),
-            ("ecs-cwe", self.get_ecs_cwe_sgs)
+            ("ecs-cwe", self.get_ecs_cwe_sgs),
+            ("codebuild", self.get_codebuild_sgs),
         )
 
     def scan_groups(self):
@@ -769,6 +792,12 @@ class SGUsage(Filter):
         for nic in self.manager.get_resource_manager('eni').resources():
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
+        return sg_ids
+
+    def get_codebuild_sgs(self):
+        sg_ids = set()
+        for cb in self.manager.get_resource_manager('codebuild').resources():
+            sg_ids |= set(cb.get('vpcConfig', {}).get('securityGroupIds', []))
         return sg_ids
 
     def get_sg_refs(self):
@@ -1004,13 +1033,15 @@ class SGPermission(Filter):
 
     .. code-block:: yaml
 
-      - type: ingress
-        Ports: [22, 3389]
-        Cidr:
-          value:
-            - "0.0.0.0/0"
-            - "::/0"
-          op: in
+      - or:
+        - type: ingress
+          Ports: [22, 3389]
+          Cidr:
+            value: "0.0.0.0/0"
+        - type: ingress
+          Ports: [22, 3389]
+          CidrV6:
+            value: "::/0"
 
     `SGReferences` can be used to filter out SG references in rules.
     In this example we want to block ingress rules that reference a SG
@@ -1957,6 +1988,12 @@ class AclAwsS3Cidrs(Filter):
         return results
 
 
+class DescribeElasticIp(query.DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if self.manager.resource_type.id in r]
+
+
 @resources.register('elastic-ip', aliases=('network-addr',))
 class NetworkAddress(query.QueryResourceManager):
 
@@ -1969,6 +2006,11 @@ class NetworkAddress(query.QueryResourceManager):
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
+
+    source_mapping = {
+        'describe': DescribeElasticIp,
+        'config': query.ConfigSource
+    }
 
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
@@ -2105,6 +2147,8 @@ class NATGateway(query.QueryResourceManager):
         filter_name = 'NatGatewayIds'
         filter_type = 'list'
         date = 'CreateTime'
+        dimension = 'NatGatewayId'
+        metrics_namespace = 'AWS/NATGateway'
         id_prefix = "nat-"
         cfn_type = config_type = 'AWS::EC2::NatGateway'
 
@@ -2189,6 +2233,57 @@ class EndpointSubnetFilter(net_filters.SubnetFilter):
 class EndpointVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
+
+@Vpc.filter_registry.register("vpc-endpoint")
+class VPCEndpointFilter(RelatedResourceByIdFilter):
+    """Filters vpcs based on their vpc-endpoints
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-vpc-endpoint-enabled
+                resource: vpc
+                filters:
+                  - type: vpc-endpoint
+                    key: ServiceName
+                    value: com.amazonaws.us-east-1.s3
+    """
+    RelatedResource = "c7n.resources.vpc.VpcEndpoint"
+    RelatedIdsExpression = "VpcId"
+    AnnotationKey = "matched-vpc-endpoint"
+
+    schema = type_schema(
+        'vpc-endpoint',
+        rinherit=ValueFilter.schema)
+
+
+@Subnet.filter_registry.register("vpc-endpoint")
+class SubnetEndpointFilter(RelatedResourceByIdFilter):
+    """Filters subnets based on their vpc-endpoints
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: athena-endpoint-enabled
+                resource: subnet
+                filters:
+                  - type: vpc-endpoint
+                    key: ServiceName
+                    value: com.amazonaws.us-east-1.athena
+    """
+    RelatedResource = "c7n.resources.vpc.VpcEndpoint"
+    RelatedIdsExpression = "SubnetId"
+    RelatedResourceByIdExpression = "SubnetIds"
+    AnnotationKey = "matched-vpc-endpoint"
+
+    schema = type_schema(
+        'vpc-endpoint',
+        rinherit=ValueFilter.schema)
 
 
 @resources.register('key-pair')
