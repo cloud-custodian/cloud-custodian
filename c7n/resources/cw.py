@@ -684,7 +684,7 @@ class EncryptLogGroup(BaseAction):
         key = local_session(
             self.manager.session_factory).client(
                 'kms').describe_key(
-                    KeyId=key)['KeyMetadata']['Arn']
+                    KeyId=key)['KeyMetadata']['KeyArn']
         return key
 
     def process(self, resources):

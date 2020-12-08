@@ -87,7 +87,7 @@ class Key(QueryResourceManager):
         enum_spec = ('list_keys', 'Keys', None)
         detail_spec = ('describe_key', 'KeyId', 'Arn', 'KeyMetadata')  # overriden
         name = id = "KeyId"
-        arn = 'Arn'
+        arn = 'KeyArn'
         universal_taggable = True
         cfn_type = config_type = 'AWS::KMS::Key'
 
