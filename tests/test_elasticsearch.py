@@ -280,6 +280,31 @@ class ElasticSearch(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
 
+    def test_elasticsearch_cross_cluster_search_connections(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-elasticsearch-cross-cluster-search-connections',
+                'resource': 'elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster-search-connections',
+                        'key': 'SourceDomainInfo.OwnerId',
+                        'value': '0123456789012',
+                        'op': 'ne'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        es = session_factory().client('es')
+        search_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
 
 class TestReservedInstances(BaseTest):
 

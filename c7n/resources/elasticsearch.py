@@ -3,7 +3,7 @@
 import jmespath
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter
+from c7n.filters import MetricsFilter, ValueFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -112,6 +112,47 @@ class KmsFilter(KmsRelatedFilter):
                 op: regex
     """
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
+
+
+@ElasticSearchDomain.filter_registry.register('cross-cluster-search-connections')
+class ElasticSearchSearchConnections(ValueFilter):
+    """Check for Cloudfront distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: elasticsearch-cross-cluster-search-connections
+            resource: elasticsearch
+            filters:
+              - type: cross-cluster-search-connections
+                key: SourceDomainInfo.OwnerId
+                value: 123456789012
+   """
+
+    schema = type_schema(
+        'elasticsearch', rinherit=ValueFilter.schema,)
+    schema_alias = False
+    annotation_key = "c7n:SearchConnections"
+    annotate = False
+    permissions = ('es:ESCrossClusterGet',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+
+        def _augment(r):
+            try:
+                r[self.annotation_key] = self.manager.retry(
+                    client.describe_outbound_cross_cluster_search_connections)
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.ResourceNotFoundExecption:
+                return
+            return r
+
+        with self.executor_factory(max_workers=3) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+            return super(ElasticSearchSearchConnections, self).process(resources, event)
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')

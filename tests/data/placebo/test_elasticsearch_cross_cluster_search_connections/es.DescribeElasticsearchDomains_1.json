@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "644160558196/test-es-dest",
+                "DomainName": "test-es-dest",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/test-es-dest"
+            },
+            {
+                "DomainId": "644160558196/test-es",
+                "DomainName": "test-es",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/test-es"
+            }
+        ]
+    }
+}

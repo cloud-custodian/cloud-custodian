@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CrossClusterSearchConnections": [
+            {
+                "SourceDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "test-es",
+                    "Region": "us-east-1"
+                },
+                "DestinationDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "test-es-dest",
+                    "Region": "us-east-1"
+                },
+                "CrossClusterSearchConnectionId": "ccs-d623f7d0-d27e-456d-8e67-c9792adf1cc7",
+                "ConnectionAlias": "test-connection"
+            }
+        ]
+    }
+}
