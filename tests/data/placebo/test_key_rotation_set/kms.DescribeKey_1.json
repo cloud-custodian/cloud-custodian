@@ -19,7 +19,7 @@
                 "day": 15, 
                 "minute": 28
             }, 
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b", 
+            "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b",
             "AWSAccountId": "644160558196"
         }, 
         "ResponseMetadata": {

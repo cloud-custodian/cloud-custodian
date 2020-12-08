@@ -4,7 +4,7 @@
         "KeyMetadata": {
             "AWSAccountId": "644160558196",
             "KeyId": "6f13fc53-8da0-46f2-9c69-c1f9fbf471d7",
-            "Arn": "arn:aws:kms:us-west-2:644160558196:key/6f13fc53-8da0-46f2-9c69-c1f9fbf471d7",
+            "KeyArn": "arn:aws:kms:us-west-2:644160558196:key/6f13fc53-8da0-46f2-9c69-c1f9fbf471d7",
             "CreationDate": {
                 "__class__": "datetime",
                 "year": 2018,

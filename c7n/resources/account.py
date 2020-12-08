@@ -1305,7 +1305,7 @@ class XrayEncrypted(Filter):
         k = self.data.get('key')
         if k not in ['default', 'kms']:
             kmsclient = self.manager.session_factory().client('kms')
-            keyid = kmsclient.describe_key(KeyId=k)['KeyMetadata']['Arn']
+            keyid = kmsclient.describe_key(KeyId=k)['KeyMetadata']['KeyArn']
             rc = resources if (gec_result['KeyId'] == keyid) else []
         else:
             kv = 'KMS' if self.data.get('key') == 'kms' else 'NONE'

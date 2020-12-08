@@ -90,6 +90,21 @@ class KMSTest(BaseTest):
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
 
+    def test_access_denied(self):
+        session_factory = self.replay_flight_data("test_kms_access_denied")
+        p = self.load_policy(
+            {
+                "name": "survive-access-denied",
+                "resource": "kms-key",
+                "filters": [
+                    {"tag:Name": "CMK-Access-Denied-Test"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     @functional
     def test_kms_remove_matched(self):
         session_factory = self.replay_flight_data("test_kms_remove_matched")
@@ -307,7 +322,7 @@ class KMSTagging(BaseTest):
         if aliases['Aliases'][0]['AliasName'] == 'alias/aws/dms':
             target_key_id = aliases['Aliases'][0].get('TargetKeyId')
             target_key_arn = client.describe_key(
-                KeyId=target_key_id).get('KeyMetadata').get('Arn')
+                KeyId=target_key_id).get('KeyMetadata').get('KeyArn')
         self.assertEqual(resources[0]['KmsKeyId'], target_key_arn)
 
     def test_kms_post_finding(self):

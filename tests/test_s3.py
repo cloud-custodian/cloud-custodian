@@ -3322,7 +3322,7 @@ class S3Test(BaseTest):
             response = client.get_bucket_encryption(Bucket=bname)
 
         key = kms_client.list_keys()["Keys"][0]
-        key_arn = kms_client.describe_key(KeyId=key["KeyId"])["KeyMetadata"]["Arn"]
+        key_arn = kms_client.describe_key(KeyId=key["KeyId"])["KeyMetadata"]["KeyArn"]
         p = self.load_policy(
             {
                 "name": "s3-enable-bucket-encryption",
@@ -3366,7 +3366,7 @@ class S3Test(BaseTest):
         self.addCleanup(destroyBucket, client, bname)
 
         kms_alias = "alias/some-key"
-        kms_alias_id = kms_client.describe_key(KeyId=kms_alias)["KeyMetadata"]["Arn"]
+        kms_alias_id = kms_client.describe_key(KeyId=kms_alias)["KeyMetadata"]["KeyArn"]
         p = self.load_policy(
             {
                 "name": "s3-enable-bucket-encryption-alias",
