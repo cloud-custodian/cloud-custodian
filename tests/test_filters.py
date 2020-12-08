@@ -13,6 +13,7 @@ from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
+from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import ValueRegex, parse_date as core_parse_date
@@ -993,7 +994,7 @@ class TestFilterRegistry(unittest.TestCase):
         self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
 
 
-class TestMissingMetrics(BaseTest):
+class TestMetricsFilter(BaseTest):
 
     def test_missing_metrics(self):
         self.patch(ELB, "executor_factory", MainThreadExecutor)
@@ -1053,6 +1054,40 @@ class TestMissingMetrics(BaseTest):
             (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"][0].get("c7n:detail")
                 for res in resources)
         )
+
+    def test_metric_period_rounding(self):
+        """Round the start time for metrics queries to the top of the previous hour"""
+
+        factory = self.replay_flight_data("test_metric_period_rounding")
+
+        p = self.load_policy(
+            {
+                "name": "sqs-no-messages",
+                "resource": "sqs",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "NumberOfMessagesSent",
+                        "statistics": "Sum",
+                        "days": 90,
+                        "value": 0,
+                        "op": "eq"
+                    }
+                ]
+            },
+            config={"region": "us-east-2"},
+            session_factory=factory
+        )
+        metrics_filter = p.resource_manager.filters[0]
+
+        # Set a fixed end time for the metrics filter with a non-zero minute component.
+        with mock_datetime_now(parse_date("2020-12-03T04:45:00+00:00"), base_filters.metrics):
+            resources = p.run()
+            datapoints = resources[0]["c7n.metrics"]["AWS/SQS.NumberOfMessagesSent.Sum"]
+
+        self.assertEqual(metrics_filter.start.strftime("%H:%M"), "04:00")
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(datapoints), 1)
 
 
 class TestReduceFilter(BaseFilterTest):
