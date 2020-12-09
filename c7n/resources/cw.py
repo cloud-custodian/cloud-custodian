@@ -154,6 +154,8 @@ class LogGroup(QueryResourceManager):
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
 
+    augment = universal_augment
+
     def get_arns(self, resources):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
