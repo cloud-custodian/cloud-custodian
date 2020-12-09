@@ -70,8 +70,9 @@ actions = ActionRegistry('rds.actions')
 class DescribeRDS(DescribeSource):
 
     def augment(self, dbs):
-        return universal_augment(
-            self.manager, super(DescribeRDS, self).augment(dbs))
+        for d in dbs:
+            d['Tags'] = d.pop('TagList', ())
+        return dbs
 
 
 @resources.register('rds')
@@ -953,8 +954,9 @@ class RDSSubscriptionDelete(BaseAction):
 class DescribeRDSSnapshot(DescribeSource):
 
     def augment(self, snaps):
-        return universal_augment(
-            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
+        for s in snaps:
+            s['Tags'] = s.pop('TagList', ())
+        return snaps
 
 
 @resources.register('rds-snapshot')

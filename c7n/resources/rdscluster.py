@@ -12,7 +12,6 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
-from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
@@ -24,7 +23,9 @@ log = logging.getLogger('custodian.rds-cluster')
 class DescribeCluster(DescribeSource):
 
     def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
 
 
 @resources.register('rds-cluster')
@@ -355,7 +356,9 @@ class DescribeClusterSnapshot(DescribeSource):
                 'Values': resource_ids}]).get('DBClusterSnapshots', ())
 
     def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
 
 
 class ConfigClusterSnapshot(ConfigSource):
