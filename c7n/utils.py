@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import copy
 from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 import json
 import itertools
 import ipaddress
@@ -16,7 +17,7 @@ from urllib import parse as urlparse
 from urllib.request import getproxies
 
 
-from dateutil.parser import ParserError, parse as parse_date
+from dateutil.parser import ParserError, parse
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -104,6 +105,56 @@ def filter_empty(d):
         if not v:
             del d[k]
     return d
+
+
+# We need a minimum floor when examining possible timestamp
+# values to distinguish from other numeric time usages. Use
+# the S3 Launch Date.
+DATE_FLOOR = time.mktime((2006, 3, 19, 0, 0, 0, 0, 0, 0))
+
+
+def parse_date(v, tz=None):
+    """Handle various permutations of a datetime serialization
+    to a datetime with the given timezone.
+
+    Handles strings, seconds since epoch, and milliseconds since epoch.
+    """
+
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime):
+        if v.tzinfo is None:
+            return v.astimezone(tz)
+        return v
+
+    if isinstance(v, str) and not v.isdigit():
+        try:
+            return parse(v).astimezone(tz)
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
+
+    if isinstance(v, (int, float, str)):
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v)).astimezone(tz)
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float, str)):
+        # try interpreting as milliseconds epoch
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
+        except exceptions:
+            pass
+
+    return isinstance(v, datetime) and v or None
 
 
 def type_schema(
@@ -215,12 +266,12 @@ def camelResource(obj, implicitDate=False):
             # we implicitly sniff keys which look like datetimes, and have an
             # isoformat marker ('T').
             kn = k.lower()
-            if isinstance(v, str) and ('time' in kn or 'date' in kn) and "T" in v:
+            if isinstance(v, (str, int)) and ('time' in kn or 'date' in kn):
                 try:
                     dv = parse_date(v)
                 except ParserError:
-                    pass
-                else:
+                    dv = None
+                if dv:
                     obj["%s%s" % (k[0].upper(), k[1:])] = dv
         if isinstance(v, dict):
             camelResource(v)

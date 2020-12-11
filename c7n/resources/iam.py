@@ -416,8 +416,7 @@ class InstanceProfile(QueryResourceManager):
         service = 'iam'
         arn_type = 'instance-profile'
         enum_spec = ('list_instance_profiles', 'InstanceProfiles', None)
-        id = 'InstanceProfileId'
-        name = 'InstanceProfileId'
+        name = id = 'InstanceProfileName'
         date = 'CreateDate'
         # Denotes this resource type exists across regions
         global_resource = True
@@ -433,7 +432,7 @@ class ServerCertificate(QueryResourceManager):
         enum_spec = ('list_server_certificates',
                      'ServerCertificateMetadataList',
                      None)
-        id = 'ServerCertificateId'
+        name = id = 'ServerCertificateName'
         name = 'ServerCertificateName'
         date = 'Expiration'
         # Denotes this resource type exists across regions
@@ -1139,8 +1138,9 @@ class RoleDelete(BaseAction):
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
-                    "Role:%s cannot be deleted, set force to detach policy and delete"
-                    % r['Arn'])
+                    ("Role:%s cannot be deleted, set force "
+                     "to detach policy and delete, error: %s") % (
+                         r['Arn'], str(e)))
                 error = e
             except (client.exceptions.NoSuchEntityException,
                     client.exceptions.UnmodifiableEntityException):

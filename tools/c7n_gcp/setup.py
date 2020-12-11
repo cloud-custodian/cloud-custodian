@@ -10,10 +10,10 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete (>=1.12.1,<2.0.0)',
+['argcomplete (>=1.12.2,<2.0.0)',
  'attrs (>=20.3.0,<21.0.0)',
- 'boto3 (>=1.16.19,<2.0.0)',
- 'botocore (>=1.19.19,<2.0.0)',
+ 'boto3 (>=1.16.32,<2.0.0)',
+ 'botocore (>=1.19.32,<2.0.0)',
  'c7n (>=0.9.8,<0.10.0)',
  'google-api-python-client>=1.7,<2.0',
  'google-auth>=1.11.0,<2.0.0',
@@ -37,7 +37,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-gcp',
-    'version': '0.4.7',
+    'version': '0.4.8',
     'description': 'Cloud Custodian - Google Cloud Provider',
     'long_description': '# Custodian GCP Support\n\nStatus - Alpha\n\n# Features\n\n - Serverless ✅\n - Api Subscriber ✅\n - Metrics ✅\n - Resource Query ✅\n - Multi Account (c7n-org) ✅\n\n# Getting Started\n\n\n## via pip\n\n```\npip install c7n_gcp\n```\n\nBy default custodian will use credentials associated to the gcloud cli, which will generate\nwarnings per google.auth (https://github.com/googleapis/google-auth-library-python/issues/292)\n\nThe recommended authentication form for production usage is to create a service account and\ncredentials, which will be picked up via by the custodian cli via setting the\n*GOOGLE_APPLICATION_CREDENTIALS* environment variable.\n\n\n# Serverless\n\nCustodian supports both periodic and api call events for serverless policy execution.\n',
     'long_description_content_type': 'text/markdown',

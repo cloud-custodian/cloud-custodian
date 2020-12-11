@@ -87,6 +87,11 @@ class DiagnosticSettingsFilterTest(BaseTest):
             'resource': 'azure.publicip',
             'filters': [
                 {
+                    'type': 'value',
+                    'key': "name",
+                    'value': 'cctestdiagnostic_loadbalancer_public_ip'
+                },
+                {
                     'type': 'diagnostic-settings',
                     'key': "logs[?category == 'DDoSProtectionNotifications'][].enabled",
                     'value': 'absent'

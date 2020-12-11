@@ -22,7 +22,8 @@ class Alarm(QueryResourceManager):
         service = 'cloudwatch'
         arn_type = 'alarm'
         enum_spec = ('describe_alarms', 'MetricAlarms', None)
-        id = 'AlarmArn'
+        id = 'AlarmName'
+        arn = 'AlarmArn'
         filter_name = 'AlarmNames'
         filter_type = 'list'
         name = 'AlarmName'
@@ -145,8 +146,8 @@ class LogGroup(QueryResourceManager):
         service = 'logs'
         arn_type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
-        name = 'logGroupName'
-        id = 'arn'
+        id = name = 'logGroupName'
+        arn = 'arn'  # see get-arns override re attribute usage
         filter_name = 'logGroupNamePrefix'
         filter_type = 'scalar'
         dimension = 'LogGroupName'

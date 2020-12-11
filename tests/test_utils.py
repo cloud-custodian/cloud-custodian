@@ -446,3 +446,11 @@ class UtilTest(BaseTest):
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
              'b': '21'})
+
+
+def test_parse_date_floor():
+    # bulk of parse date tests are actually in test_filters
+    assert utils.parse_date(30) is None
+    assert utils.parse_date(1) is None
+    assert utils.parse_date('3000') is None
+    assert utils.parse_date('30') is None

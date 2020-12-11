@@ -1,8 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional, event_data
+from datetime import datetime
+from dateutil.tz import tzutc
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
+
 
 import json
 import logging
@@ -24,9 +27,11 @@ def test_sqs_config_translate(test):
     resource = config.load_resource(event['detail']['configurationItem'])
     Arn.parse(resource['QueueArn']).resource == 'config-changes'
     assert resource == {
-        'CreatedTimestamp': '1602023249',
+        'CreatedTimestamp': datetime(
+            2020, 10, 6, 22, 27, 29, tzinfo=tzutc()),
         'DelaySeconds': '0',
-        'LastModifiedTimestamp': '1602023249',
+        'LastModifiedTimestamp': datetime(
+            2020, 10, 6, 22, 27, 29, tzinfo=tzutc()),
         'MaximumMessageSize': '262144',
         'MessageRetentionPeriod': '345600',
         'Policy': '{"Version":"2012-10-17","Statement":[{"Sid":"","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sqs:SendMessage","Resource":"arn:aws:sqs:us-east-1:644160558196:config-changes"}]}', # noqa
