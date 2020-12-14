@@ -5,17 +5,21 @@
         "CrossClusterSearchConnections": [
             {
                 "SourceDomainInfo": {
-                    "OwnerId": "644160558196",
+                    "OwnerId": "0123456789012",
                     "DomainName": "test-es",
                     "Region": "us-east-1"
                 },
                 "DestinationDomainInfo": {
-                    "OwnerId": "644160558196",
+                    "OwnerId": "0123456789012",
                     "DomainName": "test-es-dest",
                     "Region": "us-east-1"
                 },
                 "CrossClusterSearchConnectionId": "ccs-d623f7d0-d27e-456d-8e67-c9792adf1cc7",
-                "ConnectionAlias": "test-connection"
+                "ConnectionAlias": "test-connection",
+                "ConnectionStatus": {
+                    "StatusCode": "DELETED",
+                    "Message": "Destination domain is not available. Please validate if the domain status is Active."
+                }
             }
         ]
     }

@@ -290,9 +290,9 @@ class ElasticSearch(BaseTest):
                 'filters': [
                     {
                         'type': 'cross-cluster-search-connections',
-                        'key': 'SourceDomainInfo.OwnerId',
+                        'key': 'outbound[].SourceDomainInfo.OwnerId',
                         'value': '0123456789012',
-                        'op': 'ne'
+                        'op': 'contains'
                     }
                 ]
             },
@@ -303,7 +303,7 @@ class ElasticSearch(BaseTest):
         es = session_factory().client('es')
         search_connections = es.describe_outbound_cross_cluster_search_connections()
         self.assertEqual(search_connections['CrossClusterSearchConnections'][0]
-        ['SourceDomainInfo']['OwnerId'], '644160558196')
+        ['SourceDomainInfo']['OwnerId'], '0123456789012')
 
 
 class TestReservedInstances(BaseTest):

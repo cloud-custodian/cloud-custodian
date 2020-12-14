@@ -127,8 +127,9 @@ class ElasticSearchSearchConnections(ValueFilter):
             resource: elasticsearch
             filters:
               - type: cross-cluster-search-connections
-                key: SourceDomainInfo.OwnerId
-                value: 123456789012
+                key: outbound[].SourceDomainInfo.OwnerId
+                value: 0123456789012
+                op: contains
    """
 
     schema = type_schema(
@@ -140,19 +141,31 @@ class ElasticSearchSearchConnections(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('es')
+        results = []
 
-        def _augment(r):
+        for r in resources:
             try:
-                r[self.annotation_key] = self.manager.retry(
-                    client.describe_outbound_cross_cluster_search_connections)
-                r[self.annotation_key].pop('ResponseMetadata')
+                inbound = self.manager.retry(
+                    client.describe_inbound_cross_cluster_search_connections,
+                    Filters=[{'Name': 'destination-domain-info.domain-name',
+                              'Values': [r['DomainName']]}])
+                inbound.pop('ResponseMetadata')
             except client.exceptions.ResourceNotFoundExecption:
                 return
-            return r
-
-        with self.executor_factory(max_workers=3) as w:
-            resources = list(filter(None, w.map(_augment, resources)))
-            return super(ElasticSearchSearchConnections, self).process(resources, event)
+            try:
+                outbound = self.manager.retry(
+                    client.describe_outbound_cross_cluster_search_connections,
+                    Filters=[{'Name': 'source-domain-info.domain-name',
+                              'Values': [r['DomainName']]}])
+                outbound.pop('ResponseMetadata')
+            except client.exceptions.ResourceNotFoundExecption:
+                return
+            r[self.annotation_key] = {'inbound': inbound['CrossClusterSearchConnections'],
+                                      'outbound': outbound['CrossClusterSearchConnections']}
+            print(r[self.annotation_key])
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')

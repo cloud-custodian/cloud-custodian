@@ -4,14 +4,18 @@
         "ResponseMetadata": {},
         "DomainStatusList": [
             {
-                "DomainId": "644160558196/test-es-dest",
+                "DomainId": "0123456789012/test-es-dest",
                 "DomainName": "test-es-dest",
-                "ARN": "arn:aws:es:us-east-1:644160558196:domain/test-es-dest"
+                "ARN": "arn:aws:es:us-east-1:0123456789012:domain/test-es-dest",
+                "Created": true,
+                "Deleted": false
             },
             {
-                "DomainId": "644160558196/test-es",
+                "DomainId": "0123456789012/test-es",
                 "DomainName": "test-es",
-                "ARN": "arn:aws:es:us-east-1:644160558196:domain/test-es"
+                "ARN": "arn:aws:es:us-east-1:0123456789012:domain/test-es",
+                "Created": true,
+                "Deleted": false
             }
         ]
     }
