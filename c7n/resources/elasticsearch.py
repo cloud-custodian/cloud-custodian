@@ -150,21 +150,19 @@ class ElasticSearchSearchConnections(ValueFilter):
                     Filters=[{'Name': 'destination-domain-info.domain-name',
                               'Values': [r['DomainName']]}])
                 inbound.pop('ResponseMetadata')
-            except client.exceptions.ResourceNotFoundExecption:
-                return
-            try:
                 outbound = self.manager.retry(
                     client.describe_outbound_cross_cluster_search_connections,
                     Filters=[{'Name': 'source-domain-info.domain-name',
                               'Values': [r['DomainName']]}])
                 outbound.pop('ResponseMetadata')
             except client.exceptions.ResourceNotFoundExecption:
-                return
+                continue
+
             r[self.annotation_key] = {'inbound': inbound['CrossClusterSearchConnections'],
                                       'outbound': outbound['CrossClusterSearchConnections']}
-            print(r[self.annotation_key])
             if self.match(r[self.annotation_key]):
                 results.append(r)
+
         return results
 
 
