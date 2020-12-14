@@ -286,7 +286,7 @@ class ElasticSearch(BaseTest):
         p = self.load_policy(
             {
                 'name': 'test-elasticsearch-elasticsearch-cross-cluster-search-connections',
-                'resource': 'elasticsearch',
+                'resource': 'aws.elasticsearch',
                 'filters': [
                     {
                         'type': 'cross-cluster-search-connections',

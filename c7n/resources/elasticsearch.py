@@ -124,7 +124,7 @@ class ElasticSearchSearchConnections(ValueFilter):
 
         policies:
           - name: elasticsearch-cross-cluster-search-connections
-            resource: elasticsearch
+            resource: aws.elasticsearch
             filters:
               - type: cross-cluster-search-connections
                 key: outbound[].SourceDomainInfo.OwnerId
@@ -133,7 +133,7 @@ class ElasticSearchSearchConnections(ValueFilter):
    """
 
     schema = type_schema(
-        'elasticsearch', rinherit=ValueFilter.schema,)
+        'cross-cluster-search-connections', rinherit=ValueFilter.schema,)
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     annotate = False
