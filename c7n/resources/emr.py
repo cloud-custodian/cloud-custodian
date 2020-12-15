@@ -369,10 +369,7 @@ class EmrSecurityConfigurationKmsFilter(KmsRelatedFilter):
             related_ids = [r[model.id] for r in related]
             normalized_ids = []
             for rid in related_ids:
-                if rid.startswith('arn:'):
-                    normalized_ids.append(rid.rsplit('/', 1)[-1])
-                else:
-                    normalized_ids.append(rid)
+                normalized_ids.append(rid.rsplit('/', 1)[-1])
             self.related_ids = normalized_ids
             return related_ids
         else:
