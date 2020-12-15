@@ -8,6 +8,7 @@ import jmespath
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import (
@@ -330,6 +331,52 @@ class EMRSecurityConfiguration(QueryResourceManager):
         for r in resources:
             r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
         return resources
+
+
+@EMRSecurityConfiguration.filter_registry.register('kms-key')
+class EmrSecurityConfigurationKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+    :example:
+    .. code-block:: yaml
+        policies:
+          - name: emr-security-configuration-kms-key
+            resource: aws.emr-security-configuration
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/)"
+                op: regex
+    """
+
+    RelatedIdsExpression = 'SecurityConfiguration.EncryptionConfiguration.AtRestEncryptionConfiguration.\
+                            LocalDiskEncryptionConfiguration.AwsKmsKey'
+
+    related_ids = []
+
+    def get_related_ids(self, resources):
+        if not self.related_ids:
+            alias_names = set(jmespath.search(
+                "[].%s" % self.RelatedIdsExpression, resources))
+            resource_manager = self.get_resource_manager()
+            model = resource_manager.get_model()
+            if len(alias_names) < self.FetchThreshold:
+                related = resource_manager.get_resources(alias_names)
+            else:
+                related = resource_manager.resources()
+
+            related_ids = [r[model.id] for r in related]
+            normalized_ids = []
+            for rid in related_ids:
+                if rid.startswith('arn:'):
+                    normalized_ids.append(rid.rsplit('/', 1)[-1])
+                else:
+                    normalized_ids.append(rid)
+            self.related_ids = normalized_ids
+            return related_ids
+        else:
+            return self.related_ids
 
 
 @EMRSecurityConfiguration.action_registry.register('delete')

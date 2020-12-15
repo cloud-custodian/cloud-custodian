@@ -255,6 +255,30 @@ class TestEMRSecurityConfiguration(BaseTest):
         self.assertEqual(resources[0]["SecurityConfiguration"]['EncryptionConfiguration']
              ['EnableInTransitEncryption'], False)
 
+    def test_emr_security_configuration_kms_key(self):
+        session_factory = self.replay_flight_data("test_emr_security_configuration_kms_key")
+        p = self.load_policy(
+            {
+                "name": "emr-security-configuration-kms-alias",
+                "resource": "emr-security-configuration",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/test)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['SecurityConfiguration']
+                        ['EncryptionConfiguration']['AtRestEncryptionConfiguration']
+                        ['LocalDiskEncryptionConfiguration']['AwsKmsKey'],
+                        'arn:aws:kms:us-east-1:644160558196:alias/test')
+
     def test_emr_security_configuration_delete(self):
         session_factory = self.replay_flight_data("test_emr_security_configuration_delete")
         p = self.load_policy(

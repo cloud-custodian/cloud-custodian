@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "test",
+                "CreationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 47,
+                    "second": 4,
+                    "microsecond": 624000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
