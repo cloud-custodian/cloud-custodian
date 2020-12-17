@@ -805,7 +805,7 @@ class IamUserTest(BaseTest):
                 {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
             ],
             'actions': [
-                {'type': 'remove-ssh-keys', 'disable': True},
+                {'type': 'delete-ssh-keys', 'disable': True},
             ]},
             session_factory=factory)
         resources = p.run()
@@ -828,7 +828,7 @@ class IamUserTest(BaseTest):
                 {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
             ],
             'actions': [
-                {'type': 'remove-ssh-keys'},
+                {'type': 'delete-ssh-keys'},
             ]},
             session_factory=factory)
         resources = p.run()
@@ -848,7 +848,7 @@ class IamUserTest(BaseTest):
                 {'UserName': user_name},
             ],
             'actions': [
-                {'type': 'remove-ssh-keys', 'age': 0},
+                {'type': 'delete-ssh-keys', 'age': 0},
             ]},
             session_factory=factory)
         resources = p.run()
@@ -869,7 +869,7 @@ class IamUserTest(BaseTest):
                 {'type': 'ssh-key', 'key': 'Status', 'value': 'Inactive'},
             ],
             'actions': [
-                {'type': 'remove-ssh-keys', 'matched': True},
+                {'type': 'delete-ssh-keys', 'matched': True},
             ]},
             session_factory=factory)
         resources = p.run()

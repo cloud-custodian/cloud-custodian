@@ -2226,9 +2226,9 @@ class UserRemoveAccessKey(BaseAction):
                         AccessKeyId=k['AccessKeyId'])
 
 
-@User.action_registry.register('remove-ssh-keys')
-class UserRemoveSSHKey(BaseAction):
-    """Delete or disable user's SSH keys.
+@User.action_registry.register('delete-ssh-keys')
+class UserDeleteSSHKey(BaseAction):
+    """Delete or disable a user's SSH keys.
 
     For example to delete keys after 90 days:
 
@@ -2239,12 +2239,12 @@ class UserRemoveSSHKey(BaseAction):
          - name: iam-delete-old-ssh-keys
            resource: iam-user
            actions:
-             - type: remove-ssh-keys
+             - type: delete-ssh-keys
                age: 90
     """
 
     schema = type_schema(
-        'remove-ssh-keys',
+        'delete-ssh-keys',
         matched={'type': 'boolean'},
         age={'type': 'number'},
         disable={'type': 'boolean'})
