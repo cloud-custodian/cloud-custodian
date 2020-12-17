@@ -766,6 +766,120 @@ class IamUserTest(BaseTest):
         self.assertEqual(
             resources[0]['c7n:matched-keys'][0]['c7n:match-type'], 'access')
 
+    def test_iam_user_ssh_key_filter(self):
+        factory = self.replay_flight_data('test_iam_user_ssh_key_filter')
+        p = self.load_policy({
+            'name': 'iam-user-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+
+    def test_iam_user_ssh_key_age_filter(self):
+        factory = self.replay_flight_data('test_iam_user_ssh_key_age_filter')
+        p = self.load_policy({
+            'name': 'iam-user-old-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+                {'type': 'ssh-key', 'key': 'UploadDate',
+                 'value_type': 'age', 'value': 90, 'op': 'greater-than'},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+
+    def test_iam_user_disable_ssh_keys(self):
+        factory = self.replay_flight_data('test_iam_user_disable_ssh_keys')
+        user_name = 'test2'
+        p = self.load_policy({
+            'name': 'iam-user-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': user_name},
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+            ],
+            'actions': [
+                {'type': 'remove-ssh-keys', 'disable': True},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 2)
+        client = p.session_factory().client('iam')
+        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
+        self.assertTrue(all(
+            key['Status'] == 'Inactive' for key in keys
+        ))
+
+    def test_iam_user_delete_ssh_keys(self):
+        factory = self.replay_flight_data('test_iam_user_delete_ssh_keys')
+        user_name = 'test2'
+        p = self.load_policy({
+            'name': 'iam-user-delete-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': user_name},
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+            ],
+            'actions': [
+                {'type': 'remove-ssh-keys'},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 2)
+        client = p.session_factory().client('iam')
+        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
+        self.assertEqual(len(keys), 0)
+
+    def test_iam_user_delete_old_ssh_keys(self):
+        factory = self.replay_flight_data('test_iam_user_delete_old_ssh_keys')
+        user_name = 'test2'
+        p = self.load_policy({
+            'name': 'iam-user-delete-old-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': user_name},
+            ],
+            'actions': [
+                {'type': 'remove-ssh-keys', 'age': 0},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:SSHKeys']), 2)
+        client = p.session_factory().client('iam')
+        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
+        self.assertEqual(len(keys), 1)
+
+    def test_iam_user_delete_matched_ssh_keys(self):
+        factory = self.replay_flight_data('test_iam_user_delete_matched_ssh_keys')
+        user_name = 'test2'
+        p = self.load_policy({
+            'name': 'iam-user-delete-ssh-keys',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': user_name},
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Inactive'},
+            ],
+            'actions': [
+                {'type': 'remove-ssh-keys', 'matched': True},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:SSHKeys']), 2)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+        client = p.session_factory().client('iam')
+        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
+        self.assertEqual(len(keys), 1)
+
     def test_iam_user_delete_some_access(self):
         # TODO: this test could use a rewrite
         factory = self.replay_flight_data("test_iam_user_delete_options")
