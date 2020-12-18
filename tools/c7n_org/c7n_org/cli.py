@@ -426,6 +426,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
+            # Delete 'AWS_SESSION_TOKEN' env when equal to None to avoid
+            # subprocess TypeError exception.
+            if env.get("AWS_SESSION_TOKEN", False) is None:
+                env.pop("AWS_SESSION_TOKEN")
             return subprocess.call(
                 args=script_args, env=env, stdout=stdout, stderr=stderr)
 
