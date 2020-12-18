@@ -426,7 +426,9 @@ class DiagnosticSettingsFilter(ValueFilter):
         for resource in resources:
             settings = client.diagnostic_settings.list(resource['id'])
             settings = [s.as_dict() for s in settings.value]
-
+            # put an empty item in when no diag settings, so the absent operator can function
+            if not settings:
+                settings = [{}]
             filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
             if filtered_settings:

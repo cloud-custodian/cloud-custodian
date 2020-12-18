@@ -328,8 +328,8 @@ class ConfigSource:
         else:
             _c = None
 
-        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
-            self.manager.resource_type.config_type)
+        s = ("select resourceId, configuration, supplementaryConfiguration "
+             "where resourceType = '{}'").format(self.manager.resource_type.config_type)
 
         if _c:
             s += "AND {}".format(_c)
@@ -744,9 +744,10 @@ class RetryPageIterator(PageIterator):
 class TypeMeta(type):
 
     def __repr__(cls):
-        identifier = None
         if cls.config_type:
             identifier = cls.config_type
+        elif cls.cfn_type:
+            identifier = cls.cfn_type
         elif cls.arn_type:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
         elif cls.enum_spec:

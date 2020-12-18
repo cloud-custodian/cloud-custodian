@@ -79,7 +79,8 @@ class Webhook(EventAction):
             'region': self.manager.config.region,
             'execution_id': self.manager.ctx.execution_id,
             'execution_start': self.manager.ctx.start_time,
-            'policy': self.manager.data
+            'policy': self.manager.data,
+            'event': event
         }
 
         self.http = self._build_http_manager()

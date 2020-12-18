@@ -120,7 +120,7 @@ class ConfigSourceTest(BaseTest):
         # default query construction
         self.assertTrue(
             source.get_query_params(None)['expr'].startswith(
-                'select configuration, supplementaryConfiguration where resourceType'))
+                'select resourceId, configuration, supplementaryConfiguration where resourceType'))
 
         p.data['query'] = [{'clause': "configuration.imageId = 'xyz'"}]
         self.assertIn("imageId = 'xyz'", source.get_query_params(None)['expr'])

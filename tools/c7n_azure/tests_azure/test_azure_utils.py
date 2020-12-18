@@ -238,6 +238,23 @@ class UtilsTest(BaseTest):
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
 
+    @patch('c7n_azure.utils.send_logger.debug')
+    @patch('c7n_azure.utils.send_logger.warning')
+    def test_custodian_azure_send_override_429_missingheader(self, logger_debug, logger_warning):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
+
+        response_dict = {
+            'headers': {},
+            'status_code': 429
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+        mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 3)
+        self.assertEqual(logger_debug.call_count, 3)
+        self.assertEqual(logger_warning.call_count, 3)
+
     managed_group_return_value = Bag({
         'properties': {
             'name': 'dev',

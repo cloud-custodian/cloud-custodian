@@ -130,6 +130,24 @@ class EmailTest(unittest.TestCase):
         self.assertEqual(items[0][0], to_emails)
         self.assertEqual(items[0][1]['to'], ', '.join(to_emails))
 
+    def test_email_to_email_message_map_additional_headers(self):
+        conf = dict(MAILER_CONFIG)
+        conf['additional_email_headers'] = {
+            'X-Foo': 'X-Foo-Value',
+            'X-Bar': '1234'
+        }
+        email_delivery = MockEmailDelivery(
+            conf, self.aws_session, logger
+        )
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['policy']['actions'][1].pop('email_ldap_username_manager', None)
+        email_addrs_to_email_message_map = email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
+        )
+        for _, mimetext_msg in email_addrs_to_email_message_map.items():
+            self.assertEqual(mimetext_msg['X-Foo'], 'X-Foo-Value')
+            self.assertEqual(mimetext_msg['X-Bar'], '1234')
+
     def test_smtp_called_once(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
         to_addrs_to_email_messages_map = self.email_delivery.get_to_addrs_email_messages_map(

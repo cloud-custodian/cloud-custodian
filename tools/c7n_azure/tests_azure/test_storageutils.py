@@ -14,6 +14,7 @@ from .azure_common import BaseTest, arm_template, requires_arm_polling
 
 
 @requires_arm_polling
+@pytest.mark.skiplive
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()

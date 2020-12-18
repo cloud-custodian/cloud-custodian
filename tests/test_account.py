@@ -9,7 +9,7 @@ from c7n.resources import account
 from c7n.testing import mock_datetime_now
 
 import datetime
-from dateutil import parser
+from dateutil import parser, tz
 import json
 import mock
 import time
@@ -20,6 +20,37 @@ TRAIL = "nosetest"
 
 
 class AccountTests(BaseTest):
+
+    def test_macie(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie')
+        p = self.load_policy({
+            'name': 'macie-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'or': [
+                    {'type': 'check-macie',
+                     'value': 'absent',
+                     'key': 'master.accountId'},
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['c7n:macie'] == {
+            'createdAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+            'findingPublishingFrequency': 'FIFTEEN_MINUTES',
+            'master': {},
+            'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
+                            'macie.amazonaws.com/'
+                            'AWSServiceRoleForAmazonMacie').format(
+                                p.options.account_id),
+            'status': 'ENABLED',
+            'updatedAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+        }
 
     def test_missing(self):
         session_factory = self.replay_flight_data(
