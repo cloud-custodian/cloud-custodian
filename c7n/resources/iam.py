@@ -2276,16 +2276,23 @@ class GroupInlinePolicyDelete(BaseAction):
             - type: delete-inline-policies
     """
     schema = type_schema('delete-inline-policies')
+    permissions = ('iam:ListGroupPolicies', 'iam:DeleteGroupPolicies',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         for r in resources:
-            if 'c7n:InlinePolicies' not in r:
-                r['c7n:InlinePolicies'] = client.list_group_policies(
-                    GroupName=r['GroupName'])['PolicyNames']
-            for policy in r.get('c7n:InlinePolicies', []):
-                client.delete_group_policy(
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        if 'c7n:InlinePolicies' not in r:
+            r['c7n:InlinePolicies'] = client.list_group_policies(
+                GroupName=r['GroupName'])['PolicyNames']
+        for policy in r.get('c7n:InlinePolicies', []):
+            try:
+                self.manager.retry(client.delete_group_policy,
                     GroupName=r['GroupName'], PolicyName=policy)
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 @Group.action_registry.register('delete')
