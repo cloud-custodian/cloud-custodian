@@ -2276,7 +2276,7 @@ class GroupInlinePolicyDelete(BaseAction):
             - type: delete-inline-policies
     """
     schema = type_schema('delete-inline-policies')
-    permissions = ('iam:ListGroupPolicies', 'iam:DeleteGroupPolicies',)
+    permissions = ('iam:ListGroupPolicies', 'iam:DeleteGroupPolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
