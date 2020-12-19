@@ -1338,6 +1338,27 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertFalse(resources[0]["c7n:InlinePolicies"])
 
+    def test_iam_group_delete_inline_policies(self):
+        session_factory = self.replay_flight_data("test_iam_group_delete_inline_policies")
+        p = self.load_policy(
+            {
+                "name": "iam-delete-group-policies",
+                "resource": "aws.iam-group",
+                "actions": [{
+                    "type": "delete-inline-policies"
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = {r["GroupName"]: r for r in p.run()}
+        noncompliant_group = "test1"
+        self.assertIn(noncompliant_group, resources)
+        self.assertEqual(len(resources[noncompliant_group]["c7n:InlinePolicies"]), 1)
+
+        client = session_factory().client("iam")
+        inline_policies_after = client.list_group_policies(GroupName=noncompliant_group)
+        self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
+
 
 class KMSCrossAccount(BaseTest):
 
