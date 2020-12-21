@@ -2236,37 +2236,22 @@ class UserDeleteSSHKey(BaseAction):
 
         .. code-block:: yaml
 
-         - name: iam-delete-old-ssh-keys
+         - name: iam-user-delete-ssh-keys
            resource: iam-user
            actions:
              - type: delete-ssh-keys
-               age: 90
     """
 
     schema = type_schema(
         'delete-ssh-keys',
         matched={'type': 'boolean'},
-        age={'type': 'number'},
         disable={'type': 'boolean'})
     annotation_key = 'c7n:SSHKeys'
     permissions = ('iam:ListSSHPublicKeys', 'iam:UpdateSSHPublicKey',
                    'iam:DeleteSSHPublicKey')
 
-    def validate(self):
-        if self.data.get('matched') and self.data.get('age'):
-            raise PolicyValidationError(
-                "policy:%s cant mix matched and age parameters")
-        return self
-
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-
-        age = self.data.get('age')
-        disable = self.data.get('disable')
-        matched = self.data.get('matched')
-
-        if age:
-            threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
 
         for r in resources:
             if self.annotation_key not in r:
@@ -2274,13 +2259,10 @@ class UserDeleteSSHKey(BaseAction):
                     UserName=r['UserName'])['SSHPublicKeys']
 
             keys = (r.get(UserSSHKeyFilter.matched_annotation_key, [])
-                    if matched else r[self.annotation_key])
+                    if self.data.get('matched') else r[self.annotation_key])
 
             for k in keys:
-                if age:
-                    if not k['UploadDate'] < threshold_date:
-                        continue
-                if disable:
+                if self.data.get('disable'):
                     client.update_ssh_public_key(
                         UserName=r['UserName'],
                         SSHPublicKeyId=k['SSHPublicKeyId'],
