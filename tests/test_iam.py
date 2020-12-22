@@ -8,7 +8,7 @@ import tempfile
 import time
 
 from unittest import TestCase
-from .common import load_data, BaseTest, functional
+from .common import ConfigTest, load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 import pytest
@@ -794,29 +794,6 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
 
-    def test_iam_user_disable_ssh_keys(self):
-        factory = self.replay_flight_data('test_iam_user_disable_ssh_keys')
-        user_name = 'test2'
-        p = self.load_policy({
-            'name': 'iam-user-ssh-keys',
-            'resource': 'iam-user',
-            'filters': [
-                {'UserName': user_name},
-                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
-            ],
-            'actions': [
-                {'type': 'delete-ssh-keys', 'disable': True},
-            ]},
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 2)
-        client = p.session_factory().client('iam')
-        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
-        self.assertTrue(all(
-            key['Status'] == 'Inactive' for key in keys
-        ))
-
     def test_iam_user_delete_ssh_keys(self):
         factory = self.replay_flight_data('test_iam_user_delete_ssh_keys')
         user_name = 'test2'
@@ -929,6 +906,41 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
+
+
+@terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_user_disable_ssh_keys(test, iam_user):
+    factory = test.replay_flight_data('test_iam_user_disable_ssh_keys')
+    username = iam_user['aws_iam_user.user.name']
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy({
+        'name': 'iam-user-ssh-keys',
+        'resource': 'iam-user',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'UserName',
+                'value': username
+            },
+            {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+        ],
+        'actions': [
+            {'type': 'delete-ssh-keys', 'disable': True, 'matched': True},
+        ]},
+        session_factory=factory)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+
+    client = p.session_factory().client('iam')
+    keys = client.list_ssh_public_keys(UserName=username)['SSHPublicKeys']
+    test.assertTrue(all(
+        key['Status'] == 'Inactive' for key in keys
+    ))
 
 
 class IamUserGroupMembership(BaseTest):

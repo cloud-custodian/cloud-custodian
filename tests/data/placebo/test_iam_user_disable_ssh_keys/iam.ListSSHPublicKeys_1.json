@@ -3,32 +3,32 @@
     "data": {
         "SSHPublicKeys": [
             {
-                "UserName": "test2",
-                "SSHPublicKeyId": "APKAY5Y4D45RED32ZSFH",
+                "UserName": "testuser-8aa8c470",
+                "SSHPublicKeyId": "APKAY5Y4D45RIUTJRHG5",
                 "Status": "Active",
                 "UploadDate": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 12,
-                    "day": 17,
-                    "hour": 14,
-                    "minute": 44,
-                    "second": 23,
+                    "day": 22,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 4,
                     "microsecond": 0
                 }
             },
             {
-                "UserName": "test2",
-                "SSHPublicKeyId": "APKAY5Y4D45RF5LMJPUX",
-                "Status": "Active",
+                "UserName": "testuser-8aa8c470",
+                "SSHPublicKeyId": "APKAY5Y4D45RD4AB6MY4",
+                "Status": "Inactive",
                 "UploadDate": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 12,
-                    "day": 17,
-                    "hour": 14,
-                    "minute": 44,
-                    "second": 32,
+                    "day": 22,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 4,
                     "microsecond": 0
                 }
             }
