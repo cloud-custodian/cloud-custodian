@@ -1,0 +1,126 @@
+# All the Cloud Providers
+cloud/aws:
+  - '(aws|AWS|Aws|Amazon Web Services)'
+cloud/azure:
+  - '(azure|Azure|microsoft|Microsoft)'
+cloud/gcp:
+  - '(gcp|GCP|Gcp|Google|Google Cloud Platform)'
+cloud/k8s:
+  - '(k8s|K8s|kubernetes|Kubernetes)'
+cloud/openstack:
+  - '(openstack|Openstack|OpenStack)'
+cloud/oracle:
+  - '(oracle|Oracle)'
+cloud/ibm:
+  - '(ibm|IBM|Ibm)'
+cloud/alibaba:
+  - '(alibaba|Alibaba)'
+
+# All the c7n Tools
+c7n/tool/c7n-mailer:
+  - 'mailer|Mailer'
+c7n/tool/c7n-org:
+  - 'c7n-org|c7n_org'
+c7n/tool/mugc:
+  - 'mugc|Mugc'
+c7n/tool/cask:
+  - 'cask|Cask'
+c7n/tool/logexporter:
+  - 'logexporter|log_exporter'
+c7n/tool/guardian:
+  - 'logexporter|log_exporter'
+c7n/tool/guardian:
+  - 'guardian|GUARDIAN|Guardian'
+c7n/tool/policystream:
+  - 'policystream|POLICYSTREAM|Policystream'
+c7n/tool/salactus:
+  - 'salactus|SALACTUS|Salactus'
+c7n/tool/sentry:
+  - 'sentry|SENTRY|Sentry'
+c7n/tool/traildb:
+  - 'traildb|TRAILDB|Traildb'
+c7n/tool/trailcreator:
+  - 'trailcreator|TRAILCREATOR|Trailcreator'
+c7n/tool/omnissm:
+  - 'omnissm|OMNISSM|Omnissm'
+
+# Integrations
+c7n/integrations/securityhub:
+  - 'securityhub|SecurityHub|Securityhub|security hub|Security Hub'
+
+# Core Objects
+c7n/policies/policy:
+  - 'policy|Policy|policies|Policies'
+c7n/policies/filter:
+  - 'filter|Filter'
+c7n/policies/action:
+  - 'action|Action'
+c7n/policies/releng:
+  - 'releng|Releng|RelEng'
+
+# Documentation
+c7n/docs:
+  - 'docs|Docs|documentation|Documentation'
+
+# AWS Resources
+c7n/resource/aws/iam:
+  - 'iam|IAM|Iam'
+c7n/resource/aws/s3:
+  - 's3|S3|S3'
+c7n/resource/aws/sqs:
+  - 'sqs|SQS|Sqs'
+c7n/resource/aws/dynamodb:
+  - 'dynamodb|DYNAMODB|Dynamodb'
+c7n/resource/aws/transfer:
+  - 'transfer|TRANSFER|Transfer|sftp|Sftp'
+c7n/resource/aws/ec2:
+  - 'ec2|EC2|Ec2'
+c7n/resource/aws/ebs:
+  - 'ebs|EBS|Ebs'
+c7n/resource/aws/rds:
+  - 'rds|RDS|Rds'
+c7n/resource/aws/route53:
+  - 'route53|ROUTE53|Route53|route 53|Route 53'
+c7n/resource/aws/api-gateway:
+  - 'api-gateway|API-GATEWAY|Api-Gateway|apig|Apig|Apig|Apigw'
+c7n/resource/aws/cloudtrail:
+  - 'cloudtrail|CLOUDTRAIL|Cloudtrail'
+c7n/resource/aws/security-group:
+  - 'security-group|SECURITY-GROUP|Security-Group'
+c7n/resource/aws/vpc:
+  - 'vpc|VPC|Vpc'
+c7n/resource/aws/lambda:
+  - 'lambda|LAMBDA|Lambda'
+c7n/resource/aws/redshift:
+  - 'redshift|REDSHIFT|Redshift'
+c7n/resource/aws/eks:
+  - 'eks|EKS|Eks'
+c7n/resource/aws/ecs:
+  - 'ecs|ECS|Ecs'
+c7n/resource/aws/mfa:
+  - 'mfa|MFA|Mfa'
+c7n/resource/aws/kms:
+  - 'kms|KMS|Kms'
+c7n/resource/aws/alb:
+  - 'alb|ALB|Alb'
+c7n/resource/aws/sns:
+  - 'sns|SNS|Sns'
+c7n/resource/aws/asg:
+  - 'asg|ASG|Asg'
+c7n/resource/aws/mfa:
+  - 'mfa|MFA|Mfa'
+c7n/resource/aws/cloudfront:
+  - 'cloudfront|Cloudfront|CloudFront'
+c7n/resource/aws/sagemaker:
+  - 'sagemaker|SageMaker|Sagemaker'
+
+# GCP Resources
+c7n/resource/gcp/gke:
+  - 'gke|GKE|Gke'
+
+# Azure Resources
+c7n/resource/azure/aks:
+  - 'aks|AKS|Aks'
+c7n/resource/azure/cosmos:
+  - 'cosmos|COSMOS|Cosmos'
+
