@@ -406,6 +406,17 @@ class RestApiVpcLink(query.QueryResourceManager):
         cfn_type = 'AWS::ApiGateway::VpcLink'
 
 
+@resources.register('rest-client-certificate')
+class RestClientCertificate(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigateway'
+        enum_spec = ('get_client_certificates', 'items', None)
+        id = 'clientCertificateId'
+        permissions_enum = ('apigateway:GET',)
+        cfn_type = 'AWS::ApiGateway::ClientCertificate'
+
+
 @RestResource.filter_registry.register('rest-integration')
 class FilterRestIntegration(ValueFilter):
     """Filter rest resources based on a key value for the rest method integration of the api

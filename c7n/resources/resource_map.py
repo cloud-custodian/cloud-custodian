@@ -148,6 +148,7 @@ ResourceMap = {
     "aws.rest-resource": "c7n.resources.apigw.RestResource",
     "aws.rest-stage": "c7n.resources.apigw.RestStage",
     "aws.rest-vpclink": "c7n.resources.apigw.RestApiVpcLink",
+    "aws.rest-client-certificate": "c7n.resources.apigw.RestClientCertificate",
     "aws.route-table": "c7n.resources.vpc.RouteTable",
     "aws.rrset": "c7n.resources.route53.ResourceRecordSet",
     "aws.s3": "c7n.resources.s3.S3",
