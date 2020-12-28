@@ -8,7 +8,7 @@ import tempfile
 import time
 
 from unittest import TestCase
-from .common import ConfigTest, load_data, BaseTest, functional
+from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 import pytest
@@ -569,7 +569,7 @@ class IamRoleTest(BaseTest):
             'Role'].get('PermissionsBoundary', {}) == {}
 
 
-class IamUserTest(ConfigTest):
+class IamUserTest(BaseTest):
 
     def test_iam_user_set_boundary(self):
         factory = self.replay_flight_data('test_iam_user_set_boundary')
