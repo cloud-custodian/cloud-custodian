@@ -430,8 +430,9 @@ class RestClientCertificate(query.QueryResourceManager):
         service = 'apigateway'
         enum_spec = ('get_client_certificates', 'items', None)
         id = 'clientCertificateId'
+        name = 'client_certificate_id'
         permissions_enum = ('apigateway:GET',)
-        cfn_type = config_type = 'AWS::ApiGateway::ClientCertificate'
+        cfn_type = 'AWS::ApiGateway::ClientCertificate'
 
 
 @RestStage.filter_registry.register('client-certificate')
