@@ -210,6 +210,47 @@ class StreamTest(TestUtils):
              ('add', 'lambda-check', 'switch'),
              ('remove', 'lambda-check', 'remove file')])
 
+    def test_stream_move_subdir(self):
+        git = GitRepo(self.get_temp_dir())
+        git.init()
+        git.change('aws/ec2.yml', {'policies': [
+            {'name': 'ec2-check',
+             'resource': 'aws.ec2'}]})
+        git.change('lambda.yml', {'policies': [
+            {'name': 'lambda-check',
+             'resource': 'aws.lambda'}]})
+        git.commit('init')
+        git.move('lambda.yml', 'aws/lambda.yml')
+        git.change('aws/ec2.yml', {'policies': [
+            {'name': 'ec2-check',
+             'resource': 'aws.ec2'},
+            {'name': 'ec2-ami-check',
+             'resource': 'aws.ec2'}]})
+        git.commit('move')
+        git.rm('aws/ec2.yml')
+        git.rm('aws/lambda.yml')
+        git.change('aws/all.yml', {'policies': [
+            {'name': 'lambda-check',
+             'resource': 'aws.lambda'},
+            {'name': 'ec2-check',
+             'resource': 'aws.ec2'}]})
+        git.commit('consolidate')
+        policy_repo = policystream.PolicyRepo(git.repo_path, git.repo())
+        changes = [c.data() for c in policy_repo.delta_stream(
+            sort=pygit2.GIT_SORT_TOPOLOGICAL | pygit2.GIT_SORT_REVERSE)]
+        self.assertEqual(
+            [(c['change'],
+              c['policy']['data']['name'],
+              c['commit']['message'].strip()) for c in changes],
+            [('add', 'ec2-check', 'init'),
+             ('add', 'lambda-check', 'init'),
+             ('add', 'ec2-ami-check', 'move'),
+             ('moved', 'lambda-check', 'move'),
+             ('remove', 'ec2-ami-check', 'consolidate'),
+             ('moved', 'ec2-check', 'consolidate'),
+             ('moved', 'lambda-check', 'consolidate')]
+        )
+
     def test_stream_move_policy(self):
         git = self.setup_basic_repo()
         git.change('newfile.yml', {
