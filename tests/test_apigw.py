@@ -390,3 +390,70 @@ class TestRestStage(BaseTest):
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
+
+
+class TestRestClientCertificate(BaseTest):
+
+    def test_rest_client_certificate_resource(self):
+        session_factory = self.replay_flight_data('test_rest_client_certificate_resource',
+            region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'list-rest-client-certificates',
+                'resource': 'rest-client-certificate',
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['description'], 'Test certificate')
+
+    def test_rest_stage_client_certificate_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_client_certificate_filter', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+    def test_rest_stage_certificate_filter_config_source(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_certificate_filter_config_source', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'source': 'config',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
