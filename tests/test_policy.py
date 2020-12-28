@@ -393,7 +393,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
