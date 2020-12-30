@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBSnapshots": [
+            {
+                "DBSnapshotIdentifier": "testing",
+                "DBInstanceIdentifier": "demodb",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 30,
+                    "hour": 5,
+                    "minute": 34,
+                    "second": 38,
+                    "microsecond": 901000
+                },
+                "Engine": "mysql",
+                "AllocatedStorage": 5,
+                "Status": "available",
+                "Port": 3306,
+                "AvailabilityZone": "us-east-2b",
+                "VpcId": "vpc-00e3a582e54e7f09a",
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 16,
+                    "hour": 17,
+                    "minute": 34,
+                    "second": 24,
+                    "microsecond": 37000
+                },
+                "MasterUsername": "user",
+                "EngineVersion": "5.7.19",
+                "LicenseModel": "general-public-license",
+                "SnapshotType": "manual",
+                "OptionGroupName": "demodb-20201216173045036600000003",
+                "PercentProgress": 100,
+                "StorageType": "gp2",
+                "Encrypted": false,
+                "DBSnapshotArn": "arn:aws:rds:us-east-2:644160558196:snapshot:testing",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ProcessorFeatures": [],
+                "DbiResourceId": "db-YOIV3STYJIHNL2ASADGMMJI3TA",
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
