@@ -1242,7 +1242,7 @@ class RemoveRestorePermissions(BaseAction):
         if 'matched' in self.data.get('accounts'):
             found = False
             for f in self.manager.iter_filters():
-                if isinstance(f, CrossAccountAccess):
+                if isinstance(f, CrossAccountAccessFilter):
                     found = True
                     break
             if not found:

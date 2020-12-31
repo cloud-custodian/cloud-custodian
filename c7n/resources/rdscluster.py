@@ -10,6 +10,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
+from c7n.resources import rds
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
@@ -421,6 +422,7 @@ class RDSClusterSnapshot(QueryResourceManager):
 class CrossAccountSnapshot(CrossAccountAccessFilter):
 
     permissions = ('rds:DescribeDBClusterSnapshotAttributes',)
+    annotation_key = 'c7n:CrossAccountViolations'
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
@@ -447,7 +449,7 @@ class CrossAccountSnapshot(CrossAccountAccessFilter):
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
-                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                r[self.annotation_key] = list(delta_accounts)
                 results.append(r)
         return results
 
@@ -474,6 +476,50 @@ class RDSSnapshotAge(AgeFilter):
         op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
+
+
+@RDSClusterSnapshot.action_registry.register('remove-restore-permissions')
+class RemoveRestorePermissions(rds.RemoveRestorePermissions):
+    """Remove cross-account copy/restore permissions
+
+    Note: The scope of removal can be controlled with the `accounts`
+    key, which accepts a list containing:
+
+    - Explicit account IDs
+    - `all`, to remove public copy/restore permissions
+    - `matched`, to remove permissions matched by the `cross-account` filter
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-snapshot-remove-cross-account
+                resource: rds-cluster-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist_from:
+                      url: s3://mybucket/myaccounts.csv
+                      format: csv2dict
+                actions:
+                  - type: remove-restore-permissions
+                    accounts:
+                      - matched
+    """
+
+    permissions = ('rds:ModifyDBClusterSnapshotAttribute',)
+
+    def process_snapshot(self, client, snapshot, accounts):
+        if 'matched' in accounts:
+            remove = (accounts - {'matched'}).union(
+                snapshot.get(CrossAccountSnapshot.annotation_key), [])
+        else:
+            remove = accounts
+
+        client.modify_db_cluster_snapshot_attribute(
+            DBClusterSnapshotIdentifier=snapshot['DBClusterSnapshotIdentifier'],
+            AttributeName='restore',
+            ValuesToRemove=list(remove))
 
 
 @RDSClusterSnapshot.action_registry.register('delete')
