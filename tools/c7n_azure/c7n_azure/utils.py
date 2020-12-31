@@ -383,8 +383,8 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
-    def build_ports_dict(nsg, direction_key, ip_protocol, 
-            source_address=None, destination_address=None):
+    def build_ports_dict(nsg, direction_key, ip_protocol,
+                         source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
             based on the provided Network Security Group object, direction and protocol.
         """
@@ -412,7 +412,7 @@ class PortsRangeHelper:
                     source = rule['properties']['sourceAddressPrefix']
                     if not StringUtils.equal(source, source_address):
                         continue
-                except Exception as e:
+                except:
                     # print(str(e))
                     source = rule['properties']['sourceAddressPrefixes']
                     if source_address not in source:
@@ -426,7 +426,7 @@ class PortsRangeHelper:
                     destination = rule['properties']['destinationAddressPrefix']
                     if not StringUtils.equal(destination, destination_address):
                         continue
-                except Exception as e:
+                except:
                     # print(str(e))
                     destination = rule['properties']['destinationAddressPrefixes']
                     if destination_address not in destination:
