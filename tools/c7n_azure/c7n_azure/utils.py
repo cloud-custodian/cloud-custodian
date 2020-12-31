@@ -417,9 +417,10 @@ class PortsRangeHelper:
                     source = rule['properties']['sourceAddressPrefixes']
                     if source_address not in source:
                         continue
-            
+
             # Check the Destination: possible values are IP Address, CIDR, '*' (Any)
-            # If destinationAddressPrefix value is not available, check for destinationAddressPrefixes value
+            # If destinationAddressPrefix value is not available, check for
+            # destinationAddressPrefixes value
             if destination_address:
                 try:
                     destination = rule['properties']['destinationAddressPrefix']

@@ -118,6 +118,7 @@ PRIORITY_STEP = 10
 SOURCE = 'source'
 DESTINATION = 'destination'
 
+
 class NetworkSecurityGroupFilter(Filter):
     """
     Filter Network Security Groups using opened/closed ports configuration
@@ -169,8 +170,9 @@ class NetworkSecurityGroupFilter(Filter):
         return nsgs
 
     def _check_nsg(self, nsg):
-        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol, 
-                self.source_address, self.destination_address)
+        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,
+                                                      self.source_address,
+                                                      self.destination_address)
 
         num_allow_ports = len([p for p in self.ports if nsg_ports.get(p)])
         num_deny_ports = len(self.ports) - num_allow_ports
