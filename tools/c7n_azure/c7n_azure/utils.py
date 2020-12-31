@@ -412,8 +412,9 @@ class PortsRangeHelper:
                     source = rule['properties']['sourceAddressPrefix']
                     if not StringUtils.equal(source, source_address):
                         continue
-                except:
+                except Exception as e:
                     # print(str(e))
+                    send_logger.warning('property not found ' + str(e))
                     source = rule['properties']['sourceAddressPrefixes']
                     if source_address not in source:
                         continue
@@ -426,8 +427,9 @@ class PortsRangeHelper:
                     destination = rule['properties']['destinationAddressPrefix']
                     if not StringUtils.equal(destination, destination_address):
                         continue
-                except:
+                except Exception as e:
                     # print(str(e))
+                    send_logger.warning('property not found ' + str(e))
                     destination = rule['properties']['destinationAddressPrefixes']
                     if destination_address not in destination:
                         continue
