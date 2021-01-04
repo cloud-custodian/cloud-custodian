@@ -359,24 +359,24 @@ class EmrSecurityConfigurationKmsFilter(KmsRelatedFilter):
     related_ids = []
 
     def get_related_ids(self, resources):
-        if not self.related_ids:
-            alias_names = set(jmespath.search(
-                "[].%s" % self.RelatedIdsExpression, resources))
-            resource_manager = self.get_resource_manager()
-            model = resource_manager.get_model()
-            if len(alias_names) < self.FetchThreshold:
-                related = resource_manager.get_resources(alias_names)
-            else:
-                related = resource_manager.resources()
-
-            related_ids = [r[model.id] for r in related]
-            normalized_ids = []
-            for rid in related_ids:
-                normalized_ids.append(rid.rsplit('/', 1)[-1])
-            self.related_ids = normalized_ids
-            return related_ids
-        else:
+        if self.related_ids:
             return self.related_ids
+
+        alias_names = set(jmespath.search(
+            "[].%s" % self.RelatedIdsExpression, resources))
+        resource_manager = self.get_resource_manager()
+        model = resource_manager.get_model()
+        if len(alias_names) < self.FetchThreshold:
+            related = resource_manager.get_resources(alias_names)
+        else:
+            related = resource_manager.resources()
+
+        related_ids = [r[model.id] for r in related]
+        normalized_ids = []
+        for rid in related_ids:
+            normalized_ids.append(rid.rsplit('/', 1)[-1])
+        self.related_ids = normalized_ids
+        return related_ids
 
 
 @EMRSecurityConfiguration.action_registry.register('delete')
