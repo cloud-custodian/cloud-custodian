@@ -144,6 +144,8 @@ class ElasticSearchSearchConnections(ValueFilter):
         results = []
 
         for r in resources:
+            if self.annotation_key in r:
+                continue
             try:
                 inbound = self.manager.retry(
                     client.describe_inbound_cross_cluster_search_connections,
