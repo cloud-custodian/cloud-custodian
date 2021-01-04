@@ -29,7 +29,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps
+from c7n.utils import CONN_CACHE, dumps, filter_empty
 
 from c7n_org.utils import environ, account_tags
 
@@ -400,7 +400,7 @@ def _get_env_creds(account, session, region):
     elif account["provider"] == 'gcp':
         env['GOOGLE_CLOUD_PROJECT'] = account["account_id"]
         env['CLOUDSDK_CORE_PROJECT'] = account["account_id"]
-    return env
+    return filter_empty(env)
 
 
 def run_account_script(account, region, output_dir, debug, script_args):

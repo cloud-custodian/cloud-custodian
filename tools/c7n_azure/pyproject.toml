@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_azure"
-version = "0.7.8"
+version = "0.7.9"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"

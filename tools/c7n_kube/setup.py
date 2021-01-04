@@ -16,10 +16,10 @@ package_data = \
 install_requires = \
 ['argcomplete (>=1.12.2,<2.0.0)',
  'attrs (>=20.3.0,<21.0.0)',
- 'boto3 (>=1.16.32,<2.0.0)',
- 'botocore (>=1.19.32,<2.0.0)',
- 'c7n (>=0.9.8,<0.10.0)',
- 'importlib-metadata (>=1.7.0,<2.0.0)',
+ 'boto3 (>=1.16.42,<2.0.0)',
+ 'botocore (>=1.19.42,<2.0.0)',
+ 'c7n (>=0.9.10,<0.10.0)',
+ 'importlib-metadata (>=3.3.0,<4.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jsonpickle (>=1.3,<2.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
@@ -30,12 +30,13 @@ install_requires = \
  's3transfer (>=0.3.3,<0.4.0)',
  'six (>=1.15.0,<2.0.0)',
  'tabulate (>=0.8.7,<0.9.0)',
+ 'typing-extensions (>=3.7.4.3,<4.0.0.0)',
  'urllib3 (>=1.26.2,<2.0.0)',
  'zipp (>=3.4.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.8',
+    'version': '0.2.9',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'long_description': '# Custodian Kubernetes Support\n\n\nWork in Progress - Not Ready For Use.\n\n',
     'long_description_content_type': 'text/markdown',
