@@ -15,11 +15,9 @@ class NetworkSecurityGroupTest(BaseTest):
                 'filters': [
                     {'type': 'ingress',
                      'ports': '80',
-                     'source': '*',
                      'access': 'Allow'},
                     {'type': 'egress',
                      'ports': '22',
-                     'destination': '*',
                      'ipProtocol': 'TCP',
                      'access': 'Allow'}
                 ],
@@ -64,6 +62,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'value': 'c7n-nsg'},
                 {'type': 'ingress',
                  'ports': '80',
+                 'source': '*',
                  'access': 'Allow'}],
         })
 
@@ -143,6 +142,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'egress',
                  'ports': '22',
                  'ipProtocol': 'TCP',
+                 'destination': '*',
                  'access': 'Allow'}],
         })
 
