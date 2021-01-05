@@ -411,13 +411,13 @@ class PortsRangeHelper:
                not StringUtils.equal(protocol, ip_protocol):
                 continue
 
-            if not PortsHelper.check_address(
+            if not PortsRangeHelper.check_address(
                 source_address,
                 rule['properties'].get('sourceAddressPrefixes', (
                     rule['properties'].get('sourceAddressPrefix'),))):
                 continue
 
-            if not PortsHelper.check_address(
+            if not PortsRangeHelper.check_address(
                 destination_address,
                 rule['properties'].get('destinationAddressPrefixes', (
                     rule['properties']['destinationAddressPrefix'],))):
