@@ -15,9 +15,11 @@ class NetworkSecurityGroupTest(BaseTest):
                 'filters': [
                     {'type': 'ingress',
                      'ports': '80',
+                     'source': '*',
                      'access': 'Allow'},
                     {'type': 'egress',
                      'ports': '22',
+                     'destination': '*',
                      'ipProtocol': 'TCP',
                      'access': 'Allow'}
                 ],
