@@ -383,10 +383,10 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
-    def check_address(self, target_address, address_set):
+    def check_address(target_address, address_set, address):
         if not target_address:
             return True
-        return target_address in address_set
+        return target_address in address_set or target_address == address
 
     @staticmethod
     def build_ports_dict(nsg, direction_key, ip_protocol,
@@ -412,15 +412,15 @@ class PortsRangeHelper:
                 continue
 
             if not PortsRangeHelper.check_address(
-                source_address,
-                rule['properties'].get('sourceAddressPrefixes', (
-                    rule['properties'].get('sourceAddressPrefix'),))):
+                    source_address,
+                    rule['properties'].get('sourceAddressPrefixes'),
+                    rule['properties'].get('sourceAddressPrefix')):
                 continue
 
             if not PortsRangeHelper.check_address(
-                destination_address,
-                rule['properties'].get('destinationAddressPrefixes', (
-                    rule['properties']['destinationAddressPrefix'],))):
+                    destination_address,
+                    rule['properties'].get('destinationAddressPrefixes'),
+                    rule['properties'].get('destinationAddressPrefix')):
                 continue
 
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')
