@@ -165,6 +165,9 @@ class ArnResolver:
 
     @staticmethod
     def resolve_type(arn):
+        if not isinstance(arn, Arn):
+            arn = Arn.parse(arn)
+
         for type_name, klass in AWS.resources.items():
             if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
                 continue
