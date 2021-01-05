@@ -430,6 +430,7 @@ class ValueFilter(BaseValueFilter):
     schema_alias = True
     annotate = True
     required_keys = {'value', 'key'}
+    value_resolver_class = ValuesFrom
 
     def _validate_resource_count(self):
         """ Specific validation for `resource_count` type
@@ -544,7 +545,8 @@ class ValueFilter(BaseValueFilter):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             if 'value_from' in self.data:
-                values = ValuesFrom(self.data['value_from'], self.manager)
+                values = self.value_resolver_class(
+                    self.data['value_from'], self.manager)
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
