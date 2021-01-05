@@ -383,6 +383,12 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
+    def check_address(self, target_address, address_set):
+        if not target_address:
+            return True
+        return target_address in address_set
+
+    @staticmethod
     def build_ports_dict(nsg, direction_key, ip_protocol,
                          source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
@@ -405,34 +411,17 @@ class PortsRangeHelper:
                not StringUtils.equal(protocol, ip_protocol):
                 continue
 
-            # Check the Source: possible values are IP Address, CIDR, '*' (Any)
-            # If sourceAddressPrefix value is not available, check for sourceAddressPrefixes value
-            if source_address:
-                try:
-                    source = rule['properties']['sourceAddressPrefix']
-                    if not StringUtils.equal(source, source_address):
-                        continue
-                except Exception as e:
-                    # print(str(e))
-                    send_logger.warning('property not found ' + str(e))
-                    source = rule['properties']['sourceAddressPrefixes']
-                    if source_address not in source:
-                        continue
+            if not PortsHelper.check_address(
+                source_address,
+                rule['properties'].get('sourceAddressPrefixes', (
+                    rule['properties'].get('sourceAddressPrefix'),))):
+                continue
 
-            # Check the Destination: possible values are IP Address, CIDR, '*' (Any)
-            # If destinationAddressPrefix value is not available, check for
-            # destinationAddressPrefixes value
-            if destination_address:
-                try:
-                    destination = rule['properties']['destinationAddressPrefix']
-                    if not StringUtils.equal(destination, destination_address):
-                        continue
-                except Exception as e:
-                    # print(str(e))
-                    send_logger.warning('property not found ' + str(e))
-                    destination = rule['properties']['destinationAddressPrefixes']
-                    if destination_address not in destination:
-                        continue
+            if not PortsHelper.check_address(
+                destination_address,
+                rule['properties'].get('destinationAddressPrefixes', (
+                    rule['properties']['destinationAddressPrefix'],))):
+                continue
 
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')
             ports_set = PortsRangeHelper.get_ports_set_from_rule(rule)
