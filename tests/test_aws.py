@@ -85,7 +85,7 @@ class ArnResolverTest(BaseTest):
             Account='662108712480',
             FunctionName='func',
             Version='1.1',
-            VersionId='1.1',        
+            VersionId='1.1',
             ClusterName='abc',
             AutomationDefinitionName='adf',
             TaskDefinitionFamilyName='abc',
@@ -122,9 +122,10 @@ class ArnResolverTest(BaseTest):
             log=("arn:{Partition}:logs:{Region}:{Account}:log-group:{LogGroupName}",
                  "log-group"),
             # ssm_adoc=(("arn:{Partition}:ssm:{Region}:{Account}:automation-definition"
-            #           "/{AutomationDefinitionName}:{VersionId}"), 
+            #           "/{AutomationDefinitionName}:{VersionId}"),
             batch_job_def=(
-                "arn:{Partition}:batch:{Region}:{Account}:job-definition/{JobDefinitionName}:{Revision}",
+                ("arn:{Partition}:batch:{Region}:{Account}:job-definition"
+                 "/{JobDefinitionName}:{Revision}"),
                 "batch-definition"),
             batch_queue=("arn:{Partition}:batch:{Region}:{Account}:job-queue/{JobQueueName}",
                          "batch-queue"),
