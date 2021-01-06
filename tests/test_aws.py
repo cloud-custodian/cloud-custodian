@@ -61,6 +61,23 @@ class ArnResolverTest(BaseTest):
         ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
     ]
 
+    def test_arn_resolve_resources(self):
+        arns = [
+            'arn:aws:sqs:us-east-1:644160558196:origin-dev',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-tag-creator:$LATEST',
+        ]
+
+        factory = self.replay_flight_data('test_arn_resolve_resources')
+        p = self.load_policy(
+            {'name': 'resolve', 'resource': 'aws.ec2'},
+            session_factory=factory)
+        resolver = aws.ArnResolver(p.resource_manager)
+        load_resources(('aws.sqs', 'aws.lambda'))
+        arn_map = resolver.resolve(arns)
+        assert len(arn_map) == 3
+        assert None not in arn_map.values()
+
     def test_arn_meta(self):
 
         legacy = set()
@@ -69,7 +86,7 @@ class ArnResolverTest(BaseTest):
                 legacy.add(k)
         self.assertFalse(legacy)
 
-    def test_arn_resolver(self):
+    def test_arn_resolve_type(self):
         for value, expected in self.table:
             # load the resource types to enable resolution.
             aws.AWS.get_resource_types(("aws.%s" % expected,))
