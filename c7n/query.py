@@ -279,6 +279,7 @@ class ConfigSource:
 
     def __init__(self, manager):
         self.manager = manager
+        self.titleCase = self.manager.resource_type.id[0].isupper()
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -338,7 +339,8 @@ class ConfigSource:
 
     def load_resource(self, item):
         item_config = self._load_item_config(item)
-        resource = camelResource(item_config, implicitDate=True)
+        resource = camelResource(
+            item_config, implicitDate=True, implicitTitle=self.titleCase)
         self._load_resource_tags(resource, item)
         return resource
 

@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import sys
+import time
 import types
 
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
@@ -249,7 +250,9 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+
+        with patch('time.sleep', new_callable=time.sleep(0)):
+            mock.send('')
 
         self.assertEqual(mock.orig_send.call_count, 3)
         self.assertEqual(logger_debug.call_count, 3)

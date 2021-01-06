@@ -1,0 +1,91 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "item": [
+            {
+                "deploymentId": "fvliur",
+                "clientCertificateId": "3kxqri",
+                "stageName": "dev",
+                "cacheClusterEnabled": false,
+                "cacheClusterSize": "0.5",
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {
+                    "*/*": {
+                        "metricsEnabled": false,
+                        "dataTraceEnabled": false,
+                        "throttlingBurstLimit": 5000,
+                        "throttlingRateLimit": 10000.0,
+                        "cachingEnabled": false,
+                        "cacheTtlInSeconds": 300,
+                        "cacheDataEncrypted": false,
+                        "requireAuthorizationForCacheControl": true,
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+                    }
+                },
+                "variables": {},
+                "tracingEnabled": false,
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 54,
+                    "second": 52,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 1,
+                    "second": 19,
+                    "microsecond": 0
+                }
+            },
+            {
+                "deploymentId": "fvliur",
+                "stageName": "prod",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {
+                    "mytestresource/GET": {
+                        "metricsEnabled": true,
+                        "dataTraceEnabled": false,
+                        "throttlingBurstLimit": -1,
+                        "throttlingRateLimit": -1.0,
+                        "cachingEnabled": false,
+                        "cacheTtlInSeconds": 300,
+                        "cacheDataEncrypted": false,
+                        "requireAuthorizationForCacheControl": true,
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+                    }
+                },
+                "tracingEnabled": false,
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 54,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 23,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

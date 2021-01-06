@@ -59,6 +59,38 @@ class NetworkSecurityGroup(ArmResourceManager):
               - type: open
                 ports: '443'
 
+
+    :example:
+
+    This policy will find all NSGs with port 22 opened from 'Any' source
+
+    .. code-block:: yaml
+
+         policies:
+           - name: find-ingress-SSH-from-any-source
+             resource: azure.networksecuritygroup
+             filters:
+              - type: ingress
+                ports: '22'
+                access: 'Allow'
+                source: '*'
+
+
+    :example:
+
+    This policy will find all NSGs with port 8080 enabled to 'Any' destination
+
+    .. code-block:: yaml
+
+         policies:
+           - name: find-egress-HTTP-to-any-destination
+             resource: azure.networksecuritygroup
+             filters:
+              - type: egress
+                ports: '8080'
+                access: 'Allow'
+                destination: '*'
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
@@ -83,6 +115,9 @@ DENY_OPERATION = 'Deny'
 
 PRIORITY_STEP = 10
 
+SOURCE = 'source'
+DESTINATION = 'destination'
+
 
 class NetworkSecurityGroupFilter(Filter):
     """
@@ -98,6 +133,8 @@ class NetworkSecurityGroupFilter(Filter):
             EXCEPT_PORTS: {'type': 'string'},
             IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
+            SOURCE: {'type': 'string'},
+            DESTINATION: {'type': 'string'},
         },
         'required': ['type', ACCESS]
     }
@@ -126,12 +163,16 @@ class NetworkSecurityGroupFilter(Filter):
         ports_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
         except_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
         self.ports = ports_set.difference(except_set)
+        self.source_address = self.data.get(SOURCE, None)
+        self.destination_address = self.data.get(DESTINATION, None)
 
         nsgs = [nsg for nsg in network_security_groups if self._check_nsg(nsg)]
         return nsgs
 
     def _check_nsg(self, nsg):
-        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol)
+        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,
+                                                      self.source_address,
+                                                      self.destination_address)
 
         num_allow_ports = len([p for p in self.ports if nsg_ports.get(p)])
         num_deny_ports = len(self.ports) - num_allow_ports

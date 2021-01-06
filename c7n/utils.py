@@ -245,7 +245,7 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def camelResource(obj, implicitDate=False):
+def camelResource(obj, implicitDate=False, implicitTitle=True):
     """Some sources from apis return lowerCased where as describe calls
 
     always return TitleCase, this function turns the former to the later
@@ -257,7 +257,12 @@ def camelResource(obj, implicitDate=False):
         return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
-        obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if implicitTitle:
+            ok = "%s%s" % (k[0].upper(), k[1:])
+        else:
+            ok = k
+        obj[ok] = v
+
         if implicitDate:
             # config service handles datetime differently then describe sdks
             # the sdks use knowledge of the shape to support language native
@@ -272,11 +277,12 @@ def camelResource(obj, implicitDate=False):
                 except ParserError:
                     dv = None
                 if dv:
-                    obj["%s%s" % (k[0].upper(), k[1:])] = dv
+                    obj[ok] = dv
         if isinstance(v, dict):
-            camelResource(v)
+            camelResource(v, implicitDate, implicitTitle)
         elif isinstance(v, list):
-            list(map(camelResource, v))
+            for e in v:
+                camelResource(e, implicitDate, implicitTitle)
     return obj
 
 

@@ -58,15 +58,15 @@ azure-storage-queue==2.1.0
 bcrypt==3.2.0; python_version >= "3.6" and python_full_version >= "3.6.0"
 certifi==2020.12.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 cffi==1.14.4; python_version >= "3.6" and python_full_version >= "3.6.0"
-chardet==3.0.4; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
+chardet==4.0.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 click==7.1.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 colorama==0.4.4; python_full_version >= "3.6.0"
-cryptography==3.3; python_full_version >= "3.6.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0")
+cryptography==3.3.1; python_full_version >= "3.6.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0")
 distlib==0.3.1
 humanfriendly==8.2; python_full_version >= "3.6.0"
 idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-importlib-metadata==1.7.0; python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0"
-importlib-resources==3.3.0; python_version >= "2.7" and python_full_version < "3.0.0" and python_version < "3.7" or python_full_version >= "3.6.0" and python_version < "3.7"
+importlib-metadata==3.3.0; python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0"
+importlib-resources==3.3.1; python_version >= "2.7" and python_full_version < "3.0.0" and python_version < "3.7" or python_full_version >= "3.6.0" and python_version < "3.7"
 isodate==0.6.0
 jmespath==0.10.0; python_full_version >= "3.6.0"
 jsonpickle==1.3
@@ -84,16 +84,17 @@ pycparser==2.20; python_version >= "2.7" and python_full_version < "3.0.0" or py
 pygments==2.7.3; python_version >= "3.5" and python_full_version >= "3.6.0"
 pyjwt==1.7.1
 pynacl==1.4.0; python_full_version >= "3.6.0"
-pyopenssl==20.0.0; python_full_version >= "3.6.0"
+pyopenssl==20.0.1; python_full_version >= "3.6.0"
 pyreadline==2.1; sys_platform == "win32" and python_full_version >= "3.6.0"
 python-dateutil==2.8.1; python_full_version >= "3.6.0"
 pytz==2020.4
 pywin32==300; platform_system == "Windows" and python_full_version >= "3.6.0"
 pyyaml==5.3.1; python_full_version >= "3.6.0"
 requests-oauthlib==1.3.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
-requests==2.25.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+requests==2.25.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 six==1.15.0; python_version >= "3.6" and python_full_version >= "3.6.0"
 tabulate==0.8.7; python_full_version >= "3.6.0"
+typing-extensions==3.7.4.3; python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0"
 tzlocal==2.1
 urllib3==1.26.2; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 zipp==3.4.0; python_full_version >= "3.6.0" and python_version == "3.6"
