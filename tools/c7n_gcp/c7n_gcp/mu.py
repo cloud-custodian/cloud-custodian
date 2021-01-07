@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import base64
 from collections import namedtuple
 import json
 import logging
@@ -470,7 +471,7 @@ class PubSubSource(EventSource):
 
         client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
-    def add(self):
+    def add(self, func):
         self.ensure_topic()
 
     def remove(self):
@@ -590,6 +591,7 @@ class PeriodicEvent(EventSource):
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
                 'topicName': target.get_topic_param(),
+                'data': base64.b64encode("{\"schedule\": true}".encode('utf-8')).decode('utf-8'),
             }
         return job
 

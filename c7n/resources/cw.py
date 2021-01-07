@@ -22,7 +22,8 @@ class Alarm(QueryResourceManager):
         service = 'cloudwatch'
         arn_type = 'alarm'
         enum_spec = ('describe_alarms', 'MetricAlarms', None)
-        id = 'AlarmArn'
+        id = 'AlarmName'
+        arn = 'AlarmArn'
         filter_name = 'AlarmNames'
         filter_type = 'list'
         name = 'AlarmName'
@@ -65,6 +66,27 @@ class AlarmDelete(BaseAction):
             self.manager.retry(
                 client.delete_alarms,
                 AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
+@resources.register('event-bus')
+class EventBus(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'events'
+        arn_type = 'event-bus'
+        arn = 'Arn'
+        enum_spec = ('list_event_buses', 'EventBuses', None)
+        id = name = 'Name'
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@EventBus.filter_registry.register('cross-account')
+class EventBusCrossAccountFilter(CrossAccountAccessFilter):
+
+    # dummy permission
+    permissions = ('events:ListEventBuses',)
 
 
 @resources.register('event-rule')
@@ -145,14 +167,16 @@ class LogGroup(QueryResourceManager):
         service = 'logs'
         arn_type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
-        name = 'logGroupName'
-        id = 'arn'
+        id = name = 'logGroupName'
+        arn = 'arn'  # see get-arns override re attribute usage
         filter_name = 'logGroupNamePrefix'
         filter_type = 'scalar'
         dimension = 'LogGroupName'
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
+
+    augment = universal_augment
 
     def get_arns(self, resources):
         # log group arn in resource describe has ':*' suffix, not all

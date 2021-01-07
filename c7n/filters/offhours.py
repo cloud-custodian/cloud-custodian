@@ -26,7 +26,7 @@ We provide an `onhour` and `offhour` time filter, each should be used in a
 different policy, they support the same configuration options:
 
  - **weekends**: default true, whether to leave resources off for the weekend
- - **weekend-only**: default false, whether to turn the resource off only on
+ - **weekends-only**: default false, whether to turn the resource off only on
    the weekend
  - **default_tz**: which timezone to utilize when evaluating time **(REQUIRED)**
  - **tag**: which resource tag name to use for per-resource configuration

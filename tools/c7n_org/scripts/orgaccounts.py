@@ -2,11 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import click
+import logging
 import os
+from c7n.config import Bag, Config
+from c7n.resources.aws import ApiStats
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import yaml_dump
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
+
+log = logging.getLogger('orgaccounts')
 
 
 @click.command()
@@ -23,7 +28,7 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
 @click.option(
     '-f', '--output', type=click.File('w'),
     help="File to store the generated config (default stdout)")
-@click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
+@click.option('-a', '--active', is_flag=True, default=False, help="Get only active accounts")
 @click.option('-i', '--ignore', multiple=True,
   help="list of accounts that won't be added to the config file")
 def main(role, ou, assume, profile, output, regions, active, ignore):
@@ -32,8 +37,9 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
     With c7n-org you can then run policies or arbitrary scripts across
     accounts.
     """
+    logging.basicConfig(level=logging.INFO)
 
-    session = get_session(assume, 'c7n-org', profile)
+    stats, session = get_session(assume, 'c7n-org', profile)
     client = session.client('organizations')
     accounts = []
     for path in ou:
@@ -43,12 +49,13 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
     results = []
     for a in accounts:
         tags = []
+
         path_parts = a['Path'].strip('/').split('/')
         for idx, _ in enumerate(path_parts):
             tags.append("path:/%s" % "/".join(path_parts[:idx + 1]))
 
-        for tag in list_tags_for_account(client, a['Id']):
-            tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
+        for k, v in a.get('Tags', {}).items():
+            tags.append("{}:{}".format(k, v))
 
         if not role.startswith('arn'):
             arn_role = "arn:aws:iam::{}:role/{}".format(a['Id'], role)
@@ -62,17 +69,24 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
             'role': arn_role}
         if regions:
             ainfo['regions'] = list(regions)
+        if 'Tags' in a and a['Tags']:
+            ainfo['vars'] = a['Tags']
+
         results.append(ainfo)
 
+    # log.info('api calls {}'.format(stats.get_metadata()))
     print(yaml_dump({'accounts': results}), file=output)
 
 
 def get_session(role, session_name, profile):
     region = os.environ.get('AWS_DEFAULT_REGION', 'eu-west-1')
+    stats = ApiStats(Bag(), Config.empty())
     if role:
-        return assumed_session(role, session_name, region=region)
+        s = assumed_session(role, session_name, region=region)
     else:
-        return SessionFactory(region, profile)()
+        s = SessionFactory(region, profile)()
+    stats(s)
+    return stats, s
 
 
 def get_ou_from_path(client, path):
@@ -124,7 +138,9 @@ def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=()):
             ParentId=ou['Id']).build_full_result().get(
                 'Accounts', []):
             a['Path'] = ou['Path']
-
+            a['Tags'] = {
+                t['Key']: t['Value'] for t in
+                client.list_tags_for_resource(ResourceId=a['Id']).get('Tags', ())}
             if a['Id'] in ignoredAccounts:
                 continue
 
@@ -133,17 +149,6 @@ def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=()):
                     results.append(a)
             else:
                 results.append(a)
-    return results
-
-
-def list_tags_for_account(client, id):
-    results = []
-
-    tags_pager = client.get_paginator('list_tags_for_resource')
-    for tag in tags_pager.paginate(
-        ResourceId=id).build_full_result().get(
-            'Tags', []):
-        results.append(tag)
     return results
 
 

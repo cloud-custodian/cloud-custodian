@@ -86,6 +86,7 @@ DEFAULT_CHUNK_SIZE = 20
 Custom Retry Code Variables
 """
 DEFAULT_MAX_RETRY_AFTER = 30
+DEFAULT_RETRY_AFTER = 5
 
 """
 KeyVault url templates

@@ -10,7 +10,7 @@ from dateutil.parser import parse
 import itertools
 import time
 
-from c7n.actions import Action
+from c7n.actions import Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
@@ -742,6 +742,22 @@ class AsgPostFinding(PostFinding):
         return envelope
 
 
+@ASG.action_registry.register('auto-tag-user')
+class AutoScaleAutoTagUser(AutoTagUser):
+
+    schema = type_schema(
+        'auto-tag-user',
+        propagate={'type': 'boolean'},
+        rinherit=AutoTagUser.schema)
+    schema_alias = False
+
+    def set_resource_tags(self, tags, resources):
+        tag_action = self.manager.action_registry.get('tag')
+        tag_action(
+            {'tags': tags, 'propagate': self.data.get('propagate', False)},
+            self.manager).process(resources)
+
+
 @ASG.action_registry.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
@@ -1131,7 +1147,7 @@ class Tag(Action):
         error = None
 
         client = self.get_client()
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
@@ -1160,6 +1176,7 @@ class Tag(Action):
                 atags['ResourceType'] = 'auto-scaling-group'
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
+                a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
     def get_client(self):
@@ -1170,11 +1187,13 @@ class Tag(Action):
 class PropagateTags(Action):
     """Propagate tags to an asg instances.
 
-    In AWS changing an asg tag does not propagate to instances.
+    In AWS changing an asg tag does not automatically propagate to
+    extant instances even if the tag is set to propagate. It only
+    is applied to new instances.
 
-    This action exists to do that, and can also trim older tags
-    not present on the asg anymore that are present on instances.
-
+    This action exists to ensure that extant instances also have these
+    propagated tags set, and can also trim older tags not present on
+    the asg anymore that are present on instances.
 
     :example:
 
@@ -1189,6 +1208,7 @@ class PropagateTags(Action):
                   - type: propagate-tags
                     tags:
                       - OwnerName
+
     """
 
     schema = type_schema(
@@ -1212,7 +1232,6 @@ class PropagateTags(Action):
             self.log.info("Applied tags to %d instances" % instance_count)
 
     def process_asg(self, asg):
-        client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
                    if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
@@ -1222,11 +1241,19 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
+        if not tag_map and not self.get('trim', False):
+            self.log.error(
+                'No tags found to propagate on asg:{} tags configured:{}'.format(
+                    asg['AutoScalingGroupName'], self.data.get('tags')))
+
         tag_set = set(tag_map)
+        client = local_session(self.manager.session_factory).client('ec2')
+
         if self.data.get('trim', False):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
-        if not self.manager.config.dryrun and instances:
+
+        if not self.manager.config.dryrun and instance_ids and tag_map:
             client.create_tags(
                 Resources=instance_ids,
                 Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])

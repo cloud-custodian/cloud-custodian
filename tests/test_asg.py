@@ -3,6 +3,9 @@
 from datetime import datetime
 from dateutil import tz as tzutil
 
+import jmespath
+from pytest_terraform import terraform
+
 from .common import BaseTest
 
 from c7n.resources.asg import LaunchInfo
@@ -100,6 +103,32 @@ class AutoScalingTemplateTest(BaseTest):
             [("lt-0877401c93c294001", "4")])
         self.assertEqual(
             LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
+
+
+@terraform('aws_asg')
+def test_asg_propagate_tag_action(test, aws_asg):
+
+    factory = test.replay_flight_data('test_asg_propagate_tag_action')
+    p = test.load_policy({
+        'name': 'asg-tagger',
+        'resource': 'aws.asg',
+        'filters': [
+            {'AutoScalingGroupName': aws_asg['aws_autoscaling_group.bar.id']},
+            {'tag:Owner': 'absent'}
+        ],
+        'actions': [
+            {'type': 'tag', 'key': 'Owner', 'value': 'Kapil', 'propagate': True},
+            {'type': 'propagate-tags', 'tags': ['Owner']}]},
+        session_factory=factory)
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory().client('ec2')
+    itags = {t['Key']: t['Value'] for t in jmespath.search(
+        'Reservations[0].Instances[0].Tags',
+        client.describe_instances(
+            InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
+    assert 'Owner' in itags
+    assert itags['Owner'] == 'Kapil'
 
 
 class AutoScalingTest(BaseTest):

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"AIDAY5Y4D45RHPXL7YGMM\",\"configuration\":{\"path\":\"/\",\"attachedManagedPolicies\":[],\"groupList\":[],\"userPolicyList\":[],\"userName\":\"test2\",\"arn\":\"arn:aws:iam::644160558196:user/test2\",\"userId\":\"AIDAY5Y4D45RHPXL7YGMM\",\"createDate\":\"2020-12-22T03:06:14.000Z\",\"tags\":[]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,10 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional, event_data
+from datetime import datetime
+from dateutil.tz import tzutc
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
+
 import json
+import logging
 import pytest
 import time
 
@@ -23,9 +27,11 @@ def test_sqs_config_translate(test):
     resource = config.load_resource(event['detail']['configurationItem'])
     Arn.parse(resource['QueueArn']).resource == 'config-changes'
     assert resource == {
-        'CreatedTimestamp': '1602023249',
+        'CreatedTimestamp': datetime(
+            2020, 10, 6, 22, 27, 29, tzinfo=tzutc()),
         'DelaySeconds': '0',
-        'LastModifiedTimestamp': '1602023249',
+        'LastModifiedTimestamp': datetime(
+            2020, 10, 6, 22, 27, 29, tzinfo=tzutc()),
         'MaximumMessageSize': '262144',
         'MessageRetentionPeriod': '345600',
         'Policy': '{"Version":"2012-10-17","Statement":[{"Sid":"","Effect":"Allow","Principal":{"Service":"events.amazonaws.com"},"Action":"sqs:SendMessage","Resource":"arn:aws:sqs:us-east-1:644160558196:config-changes"}]}', # noqa
@@ -543,10 +549,28 @@ class QueueTests(BaseTest):
         )
         url1 = "https://us-east-2.queue.amazonaws.com/644160558196/BrickHouse"
         url2 = "https://sqs.us-east-2.amazonaws.com/644160558196/BrickHouse"
+        *_, enum_extra_args = p.resource_manager.resource_type.enum_spec
+        # MaxResults arg is required to enable list_queues pagination
+        self.assertIn("MaxResults", enum_extra_args)
         resources = p.resource_manager.get_resources([url1])
         self.assertEqual(resources[0]["QueueUrl"], url1)
         resources = p.resource_manager.get_resources([url2])
         self.assertEqual(resources[0]["QueueUrl"], url1)
+
+    def test_sqs_access_denied(self):
+        session_factory = self.replay_flight_data("test_sqs_access_denied")
+        p = self.load_policy(
+            {
+                "name": "sqs-list",
+                "resource": "sqs",
+            },
+            session_factory=session_factory
+        )
+        log_output = self.capture_logging("custodian.resources.sqs", level=logging.WARNING)
+
+        resources = p.run()
+        assert len(resources) == 0
+        assert "Denied access to sqs" in log_output.getvalue()
 
     @functional
     def test_sqs_kms_alias(self):

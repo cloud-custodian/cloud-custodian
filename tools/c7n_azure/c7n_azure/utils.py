@@ -6,6 +6,7 @@ import enum
 import hashlib
 import itertools
 import logging
+import random
 import re
 import time
 import uuid
@@ -140,13 +141,17 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
                 send_logger.debug(k + ':' + v)
 
         # Retry codes from urllib3/util/retry.py
-        if response.status_code in [413, 429, 503]:
+        if response.status_code in [429, 503]:
             retry_after = None
             for k in response.headers.keys():
                 if StringUtils.equal('retry-after', k):
                     retry_after = int(response.headers[k])
-
-            if retry_after is not None and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+            if retry_after is None:
+                # we want to attempt retries even when azure fails to send a header
+                # this has been a constant source of instability in larger environments
+                retry_after = (constants.DEFAULT_RETRY_AFTER * retries) + \
+                    random.randint(1, constants.DEFAULT_RETRY_AFTER)
+            if retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
                 send_logger.warning('Received retriable error code %i. Retry-After: %i'
                                     % (response.status_code, retry_after))
                 time.sleep(retry_after)
@@ -378,7 +383,14 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
-    def build_ports_dict(nsg, direction_key, ip_protocol):
+    def check_address(target_address, address_set, address):
+        if not target_address:
+            return True
+        return target_address in address_set or target_address == address
+
+    @staticmethod
+    def build_ports_dict(nsg, direction_key, ip_protocol,
+                         source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
             based on the provided Network Security Group object, direction and protocol.
         """
@@ -397,6 +409,18 @@ class PortsRangeHelper:
             if not StringUtils.equal(protocol, "*") and \
                not StringUtils.equal(ip_protocol, "*") and \
                not StringUtils.equal(protocol, ip_protocol):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    source_address,
+                    rule['properties'].get('sourceAddressPrefixes'),
+                    rule['properties'].get('sourceAddressPrefix')):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    destination_address,
+                    rule['properties'].get('destinationAddressPrefixes'),
+                    rule['properties'].get('destinationAddressPrefix')):
                 continue
 
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')

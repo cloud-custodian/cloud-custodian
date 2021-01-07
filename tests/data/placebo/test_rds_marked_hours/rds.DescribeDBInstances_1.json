@@ -93,7 +93,18 @@
                 "StorageEncrypted": false, 
                 "DBInstanceClass": "db.t2.micro", 
                 "DbInstancePort": 0, 
-                "DBInstanceIdentifier": "db1"
+                "DBInstanceIdentifier": "db1",
+                "TagList": [
+                    {
+                        "Value": "Resource does not meet policy: delete@2018/05/09 1520 UTC", 
+                        "Key": "maid_status"
+                    }, 
+                    {
+                        "Value": "other", 
+                        "Key": "workload-type"
+                    }
+                ]
+		
             }
         ], 
         "ResponseMetadata": {

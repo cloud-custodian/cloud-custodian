@@ -445,8 +445,8 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         service = 'dax'
         arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
+        arn = 'ClusterArn'
+        id = name = 'ClusterName'
         cfn_type = 'AWS::DAX::Cluster'
 
     permissions = ('dax:ListTags',)

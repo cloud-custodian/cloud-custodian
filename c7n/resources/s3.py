@@ -350,7 +350,8 @@ class S3(query.QueryResourceManager):
         service = 's3'
         arn_type = ''
         enum_spec = ('list_buckets', 'Buckets[]', None)
-        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        # not used but we want some consistency on the metadata
+        detail_spec = ('get_bucket_location', 'Bucket', 'Name', 'LocationConstraint')
         name = id = 'Name'
         date = 'CreationDate'
         dimension = 'BucketName'
@@ -587,6 +588,7 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
          https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
 
         Redshift Accounts by region
+        https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html#db-auditing-manage-log-files
          https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html#rs-db-auditing-cloud-trail-rs-acct-ids
 
         Cloudtrail Accounts by region
@@ -598,36 +600,52 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
                 # ELB accounts
                 '127311923021',  # us-east-1
                 '033677994240',  # us-east-2
-                '797873946194',  # us-west-2
                 '027434742980',  # us-west-1
+                '797873946194',  # us-west-2
+                '098369216593',  # af-south-1
                 '985666609251',  # ca-central-1
-                '156460612806',  # eu-west-1
                 '054676820928',  # eu-central-1
+                '897822967062',  # eu-north-1
+                '635631232127',  # eu-south-1
+                '156460612806',  # eu-west-1
                 '652711504416',  # eu-west-2
+                '009996457667',  # eu-west-3
+                '754344448648',  # ap-east-1
                 '582318560864',  # ap-northeast-1
                 '600734575887',  # ap-northeast-2
+                '383597477331',  # ap-northeast-3
                 '114774131450',  # ap-southeast-1
                 '783225319266',  # ap-southeast-2
                 '718504428378',  # ap-south-1
+                '076674570225',  # me-south-1
                 '507241528517',  # sa-east-1
                 '048591011584',  # us-gov-west-1 or gov-cloud-1
+                '190560391635',  # us-gov-east-1
                 '638102146993',  # cn-north-1
+                '037604701340',  # cn-northwest-1
 
-                # Redshift accounts
-                '368064434614',  # us-east-1
-                '790247189693',  # us-east-2
-                '703715109447',  # us-east-1
-                '473191095985',  # us-west-2
-                '408097707231',  # ap-south-1
-                '713597048934',  # ap-northeast-2
-                '960118270566',  # ap-southeast-1
-                '485979073181',  # ap-southeast-2
-                '615915377779',  # ap-northeast-1
-                '764870610256',  # ca-central-1
-                '434091160558',  # eu-central-1
-                '246478207311',  # eu-west-1
-                '885798887673',  # eu-west-2
-                '392442076723',  # sa-east-1
+                # Redshift audit logging
+                '193672423079',  # us-east-1
+                '391106570357',  # us-east-2
+                '262260360010',  # us-west-1
+                '902366379725',  # us-west-2
+                '365689465814',  # af-south-1
+                '313564881002',  # ap-east-1
+                '865932855811',  # ap-south-1
+                '090321488786',  # ap-northeast-3
+                '760740231472',  # ap-northeast-2
+                '361669875840',  # ap-southeast-1
+                '762762565011',  # ap-southeast-2
+                '404641285394',  # ap-northeast-1
+                '907379612154',  # ca-central-1
+                '053454850223',  # eu-central-1
+                '210876761215',  # eu-west-1
+                '307160386991',  # eu-west-2
+                '945612479654',  # eu-south-1
+                '915173422425',  # eu-west-3
+                '729911121831',  # eu-north-1
+                '013126148197',  # me-south-1
+                '075028567923',  # sa-east-1
 
                 # Cloudtrail accounts (psa. folks should be using
                 # cloudtrail service in bucket policies)
