@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "data": {
+    "Classifiers": [
+      {
+        "CsvClassifier": {
+          "Name": "test",
+          "Version": 1,
+          "Delimiter": ",",
+          "QuoteSymbol": "\"",
+          "ContainsHeader": "UNKNOWN",
+          "DisableValueTrimming": false,
+          "AllowSingleColumn": false
+        }
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

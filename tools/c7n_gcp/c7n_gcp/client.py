@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2017 The Forseti Security Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,13 +23,13 @@
 # todo:
 # - consider forking googleapiclient to get rid of httplib2
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+import http.client
 import logging
 import threading
 import os
 import socket
 import ssl
+from urllib.error import URLError
 
 from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
@@ -39,8 +41,6 @@ import httplib2
 from ratelimiter import RateLimiter
 from retrying import retry
 
-from six.moves import http_client
-from six.moves.urllib.error import URLError
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
 
@@ -58,13 +58,20 @@ log = logging.getLogger('c7n_gcp.client')
 NUM_HTTP_RETRIES = 5
 
 RETRYABLE_EXCEPTIONS = (
-    http_client.ResponseNotReady,
-    http_client.IncompleteRead,
+    http.client.ResponseNotReady,
+    http.client.IncompleteRead,
     httplib2.ServerNotFoundError,
     socket.error,
     ssl.SSLError,
     URLError,  # include "no network connection"
 )
+
+
+def get_default_project():
+    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+              'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
+        if k in os.environ:
+            return os.environ[k]
 
 
 class PaginationNotSupported(Exception):
@@ -139,7 +146,7 @@ def _build_http(http=None):
     return set_user_agent(http, user_agent)
 
 
-class Session(object):
+class Session:
     """Base class for API repository for a specified Cloud API."""
 
     def __init__(self,
@@ -190,10 +197,10 @@ class Session(object):
     def get_default_project(self):
         if self.project_id:
             return self.project_id
-        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
-                  'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
-            if k in os.environ:
-                return os.environ[k]
+        default_project = get_default_project()
+        if default_project:
+            return default_project
+
         raise ValueError("No GCP Project ID set - set CLOUDSDK_CORE_PROJECT")
 
     def get_default_region(self):
@@ -234,7 +241,7 @@ class Session(object):
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments
-class ServiceClient(object):
+class ServiceClient:
     """Base class for GCP APIs."""
 
     def __init__(self, gcp_service, credentials, component=None,

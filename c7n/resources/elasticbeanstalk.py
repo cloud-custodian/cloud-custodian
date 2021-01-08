@@ -1,21 +1,10 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n import utils
 from c7n import tags
 from c7n.utils import local_session, type_schema
@@ -41,6 +30,13 @@ class ElasticBeanstalk(QueryResourceManager):
         )
         filter_name = 'ApplicationNames'
         filter_type = 'list'
+        cfn_type = config_type = 'AWS::ElasticBeanstalk::Application'
+
+
+class DescribeEnvironment(DescribeSource):
+
+    def augment(self, resources):
+        return _eb_env_tags(resources, self.manager.session_factory, self.manager.retry)
 
 
 @resources.register('elasticbeanstalk-environment')
@@ -61,11 +57,13 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         )
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
+        cfn_type = config_type = 'AWS::ElasticBeanstalk::Environment'
 
     permissions = ('elasticbeanstalk:ListTagsForResource',)
-
-    def augment(self, envs):
-        return _eb_env_tags(envs, self.session_factory, self.retry)
+    source_mapping = {
+        'describe': DescribeEnvironment,
+        'config': ConfigSource
+    }
 
 
 ElasticBeanstalkEnvironment.filter_registry.register(

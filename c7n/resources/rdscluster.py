@@ -1,35 +1,44 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n import tags
+from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
+
+
+class DescribeCluster(DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+class ConfigCluster(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource.pop('TagList', None)  # we pull tags from supplementary config
+        for k in list(resource.keys()):
+            if k.startswith('Dbc'):
+                resource["DBC%s" % (k[3:])] = resource.pop(k)
+            elif k.startswith('Iamd'):
+                resource['IAMD%s' % (k[4:])] = resource.pop(k)
+            elif k.startswith('Dbs'):
+                resource["DBS%s" % (k[3:])] = resource.pop(k)
+        return resource
 
 
 @resources.register('rds-cluster')
@@ -48,8 +57,12 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
+        cfn_type = config_type = 'AWS::RDS::DBCluster'
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'config': ConfigCluster,
+        'describe': DescribeCluster
+    }
 
 
 RDSCluster.filter_registry.register('offhour', OffHour)
@@ -66,12 +79,20 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
+    groups = None
 
     def get_permissions(self):
         return self.manager.get_resource_manager(
             'rds-subnet-group').get_permissions()
 
+    def get_subnet_groups(self):
+        return {
+            r['DBSubnetGroupName']: r for r in
+            self.manager.get_resource_manager('rds-subnet-group').resources()}
+
     def get_related_ids(self, resources):
+        if not self.groups:
+            self.groups = self.get_subnet_groups()
         group_ids = set()
         for r in resources:
             group_ids.update(
@@ -80,9 +101,8 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        self.groups = {
-            r['DBSubnetGroupName']: r for r in
-            self.manager.get_resource_manager('rds-subnet-group').resources()}
+        if not self.groups:
+            self.groups = self.get_subnet_groups()
         return super(SubnetFilter, self).process(resources, event)
 
 
@@ -338,13 +358,47 @@ class ModifyDbCluster(BaseAction):
                 **self.data['attributes'])
 
 
+class DescribeClusterSnapshot(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('rds')
+        return self.manager.retry(
+            client.describe_db_cluster_snapshots,
+            Filters=[{
+                'Name': 'db-cluster-snapshot-id',
+                'Values': resource_ids}]).get('DBClusterSnapshots', ())
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+class ConfigClusterSnapshot(ConfigSource):
+
+    def load_resource(self, item):
+
+        resource = super(ConfigClusterSnapshot, self).load_resource(item)
+        # db cluster snapshots are particularly mangled on keys
+        for k, v in list(resource.items()):
+            if k.startswith('Dbcl'):
+                resource.pop(k)
+                k = 'DBCl%s' % k[4:]
+                resource[k] = v
+            elif k.startswith('Iamd'):
+                resource.pop(k)
+                k = 'IAMD%s' % k[4:]
+                resource[k] = v
+        resource['Tags'] = [{'Key': k, 'Value': v} for k, v in item['tags'].items()]
+        return resource
+
+
 @resources.register('rds-cluster-snapshot')
 class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
     class resource_type(TypeInfo):
-
         service = 'rds'
         arn_type = 'cluster-snapshot'
         arn_separator = ':'
@@ -353,10 +407,49 @@ class RDSClusterSnapshot(QueryResourceManager):
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        universal_tagging = object()
+        universal_taggable = object()
+        config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'describe': DescribeClusterSnapshot,
+        'config': ConfigClusterSnapshot
+    }
+
+
+@RDSClusterSnapshot.filter_registry.register('cross-account')
+class CrossAccountSnapshot(CrossAccountAccessFilter):
+
+    permissions = ('rds:DescribeDBClusterSnapshotAttributes',)
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(
+                    self.process_resource_set, resource_set))
+            for f in as_completed(futures):
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resource_set:
+            attrs = {t['AttributeName']: t['AttributeValues']
+             for t in self.manager.retry(
+                client.describe_db_cluster_snapshot_attributes,
+                     DBClusterSnapshotIdentifier=r['DBClusterSnapshotIdentifier'])[
+                         'DBClusterSnapshotAttributesResult']['DBClusterSnapshotAttributes']}
+            r['c7n:attributes'] = attrs
+            shared_accounts = set(attrs.get('restore', []))
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
 
 
 @RDSClusterSnapshot.filter_registry.register('age')

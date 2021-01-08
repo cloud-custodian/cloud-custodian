@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2017 The Forseti Security Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +23,7 @@ from kubernetes.client import Configuration, ApiClient
 log = logging.getLogger('custodian.k8s.client')
 
 
-class Session(object):
+class Session:
     def __init__(self, config_file=None):
         self.config_file = config_file
         self.http_proxy = os.getenv('HTTPS_PROXY')

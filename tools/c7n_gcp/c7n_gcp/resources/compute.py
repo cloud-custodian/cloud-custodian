@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
@@ -34,8 +23,10 @@ class Instance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
+        asset_type = "compute.googleapis.com/Instance"
 
         @staticmethod
         def get(client, resource_info):
@@ -129,6 +120,9 @@ class DetachDisks(MethodAction):
     """
     schema = type_schema('detach-disks')
     attr_filter = ('status', ('TERMINATED',))
+    method_spec = {'op': 'detachDisk'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
 
     def validate(self):
         pass
@@ -139,14 +133,60 @@ class DetachDisks(MethodAction):
 
     def process_resource(self, client, resource):
         op_name = 'detachDisk'
-        path_param_re = re.compile(
-            '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-        project, zone, instance = path_param_re.match(resource['selfLink']).groups()
+
+        project, zone, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
 
         base_params = {'project': project, 'zone': zone, 'instance': instance}
         for disk in resource.get('disks', []):
             params = dict(base_params, deviceName=disk['deviceName'])
             self.invoke_api(client, op_name, params)
+
+
+@Instance.action_registry.register('create-machine-image')
+class CreateMachineImage(MethodAction):
+    """
+    `Creates <https://cloud.google.com/compute/docs/reference/rest/beta/machineImages/insert>`_
+     Machine Image from instance.
+
+    The `name_format` specifies name of image in python `format string <https://pyformat.info/>`
+
+    Inside format string there are defined variables:
+      - `now`: current time
+      - `instance`: whole instance resource
+
+    Default name format is `{instance[name]}`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-create-machine-image
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: name
+                value: instance-create-to-make-image
+            actions:
+              - type: create-machine-image
+                name_format: "{instance[name]:.50}-{now:%Y-%m-%d}"
+
+    """
+    schema = type_schema('create-machine-image', name_format={'type': 'string'})
+    method_spec = {'op': 'insert'}
+    permissions = ('compute.machineImages.create',)
+
+    def get_resource_params(self, model, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, _, _ = path_param_re.match(resource['selfLink']).groups()
+        name_format = self.data.get('name_format', '{instance[name]}')
+        name = name_format.format(instance=resource, now=datetime.now())
+
+        return {'project': project, 'sourceInstance': resource['selfLink'], 'body': {'name': name}}
+
+    def get_client(self, session, model):
+        return session.client(model.service, "beta", "machineImages")
 
 
 @resources.register('image')
@@ -156,7 +196,11 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "sourceType", "status", "creationTimestamp",
+            "storageLocation", "diskSizeGb", "family"]
+        asset_type = "compute.googleapis.com/Image"
 
         @staticmethod
         def get(client, resource_info):
@@ -187,8 +231,10 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ["name", "sizeGb", "status", "zone"]
+        asset_type = "compute.googleapis.com/Disk"
 
         @staticmethod
         def get(client, resource_info):
@@ -286,7 +332,9 @@ class Snapshot(QueryResourceManager):
         version = 'v1'
         component = 'snapshots'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
+        asset_type = "compute.googleapis.com/Snapshot"
 
         @staticmethod
         def get(client, resource_info):
@@ -319,7 +367,11 @@ class InstanceTemplate(QueryResourceManager):
         component = 'instanceTemplates'
         scope = 'zone'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp",
+            "properties.machineType", "properties.description"]
+        asset_type = "compute.googleapis.com/InstanceTemplate"
 
         @staticmethod
         def get(client, resource_info):
@@ -365,8 +417,11 @@ class Autoscaler(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'autoscalers'
-        id = 'name'
+        name = id = 'name'
         enum_spec = ('aggregatedList', 'items.*.autoscalers[]', None)
+        default_report_fields = [
+            "name", "description", "status", "target", "recommendedSize"]
+        asset_type = "compute.googleapis.com/Autoscaler"
 
         @staticmethod
         def get(client, resource_info):
@@ -461,6 +516,7 @@ class AutoscalerSet(MethodAction):
                          })
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/autoscalers/(.*)')
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         project, zone, autoscaler = self.path_param_re.match(resource['selfLink']).groups()

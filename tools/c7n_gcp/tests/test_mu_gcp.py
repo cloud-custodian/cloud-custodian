@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import time
@@ -59,7 +48,7 @@ class FunctionTest(BaseTest):
         self.assertEqual(func_info['status'], 'DEPLOY_IN_PROGRESS')
         self.assertEqual(
             func_info['name'],
-            'projects/custodian-1291/locations/us-central1/functions/custodian-dev')
+            'projects/cloud-custodian/locations/us-central1/functions/custodian-dev')
 
     def test_handler_run(self):
         func_cwd = self.get_temp_dir()
@@ -95,8 +84,7 @@ class FunctionTest(BaseTest):
 
     def test_abstract_gcp_mode(self):
         # this will fetch a discovery
-        factory = self.replay_flight_data(
-            'mu-gcp-abstract', project_id='test-226520')
+        factory = self.replay_flight_data('mu-gcp-abstract')
         p = self.load_policy({
             'name': 'instance', 'resource': 'gcp.instance'},
             session_factory=factory)
@@ -104,6 +92,23 @@ class FunctionTest(BaseTest):
         self.assertRaises(NotImplementedError, exec_mode.run)
         self.assertRaises(NotImplementedError, exec_mode.provision)
         self.assertEqual(None, exec_mode.validate())
+
+    def test_policy_context_deps(self):
+        p = self.load_policy({
+            'name': 'check',
+            'resource': 'gcp.instance',
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours'}},
+            output_dir='gs://somebucket/some-prefix',
+            log_group='gcp',
+            config={'metrics': 'gcp'})
+        pf = mu.PolicyFunction(p, archive=True)
+        self.assertEqual(
+            pf.get_output_deps(),
+            ['google-cloud-monitoring',
+             'google-cloud-storage',
+             'google-cloud-logging'])
 
     def test_periodic_validate_tz(self):
         self.assertRaises(
@@ -116,10 +121,9 @@ class FunctionTest(BaseTest):
                       'tz': 'zulugold'}})
 
     def test_periodic_update_schedule(self):
-        factory = self.replay_flight_data(
-            'mu-perodic-update-schedule', project_id='test-226520')
+        factory = self.replay_flight_data('mu-perodic-update-schedule')
         session = factory()
-        project_id = session.get_default_project()
+        project_id = 'cloud-custodian'
         region = 'us-central1'
 
         sched_client = session.client('cloudscheduler', 'v1beta1', 'projects.locations.jobs')
@@ -144,7 +148,7 @@ class FunctionTest(BaseTest):
 
     @functional
     def test_periodic_subscriber(self):
-        factory = self.replay_flight_data('mu-perodic', project_id='test-226520')
+        factory = self.replay_flight_data('mu-perodic')
         p = self.load_policy({
             'name': 'instance-off',
             'resource': 'gcp.instance',
@@ -154,7 +158,7 @@ class FunctionTest(BaseTest):
         p.provision()
 
         session = factory()
-        project_id = session.get_default_project()
+        project_id = 'cloud-custodian'
         region = 'us-central1'
 
         func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
@@ -213,7 +217,7 @@ class FunctionTest(BaseTest):
         p.provision()
 
         session = factory()
-        project_id = session.get_default_project()
+        project_id = 'cloud-custodian'
         region = 'us-central1'
         func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
         pubsub_client = session.client('pubsub', 'v1', 'projects.topics')

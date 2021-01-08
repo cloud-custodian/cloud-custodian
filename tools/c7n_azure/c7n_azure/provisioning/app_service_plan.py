@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 from azure.mgmt.web.models import AppServicePlan, SkuDescription
 from c7n_azure.provisioning.autoscale import AutoScaleUnit

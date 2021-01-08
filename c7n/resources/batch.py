@@ -1,18 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
@@ -33,6 +20,7 @@ class ComputeEnvironment(QueryResourceManager):
         arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
+        cfn_type = 'AWS::Batch::ComputeEnvironment'
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
@@ -59,33 +47,11 @@ class JobDefinition(QueryResourceManager):
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)
-
-
-class StateTransitionFilter(object):
-    """Filter resources by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the resource states
-    they are valid for.
-    """
-    valid_origin_states = ()
-
-    def filter_resource_state(self, resources, key, states=None):
-        states = states or self.valid_origin_states
-        if not states:
-            return resources
-        orig_length = len(resources)
-        results = [r for r in resources if r[key] in states]
-        if orig_length != len(results):
-            self.log.warn(
-                "%s implicitly filtered %d of %d resources with valid %s" % (
-                    self.__class__.__name__,
-                    len(results), orig_length, key.lower()))
-        return results
+        cfn_type = 'AWS::Batch::JobDefinition'
 
 
 @ComputeEnvironment.action_registry.register('update-environment')
-class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
+class UpdateComputeEnvironment(BaseAction):
     """Updates an AWS batch compute environment
 
     :example:
@@ -125,8 +91,7 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
     valid_origin_status = ('VALID', 'INVALID')
 
     def process(self, resources):
-        resources = self.filter_resource_state(
-            resources, 'status', self.valid_origin_status)
+        resources = self.filter_resources(resources, 'status', self.valid_origin_status)
         client = local_session(self.manager.session_factory).client('batch')
         params = dict(self.data)
         params.pop('type')
@@ -136,7 +101,7 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
 
 
 @ComputeEnvironment.action_registry.register('delete')
-class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
+class DeleteComputeEnvironment(BaseAction):
     """Delete an AWS batch compute environment
 
     :example:
@@ -161,8 +126,8 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             computeEnvironment=r['computeEnvironmentName'])
 
     def process(self, resources):
-        resources = self.filter_resource_state(
-            self.filter_resource_state(
+        resources = self.filter_resources(
+            self.filter_resources(
                 resources, 'state', self.valid_origin_states),
             'status', self.valid_origin_status)
         client = local_session(self.manager.session_factory).client('batch')
@@ -171,7 +136,7 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
 
 
 @JobDefinition.action_registry.register('deregister')
-class DefinitionDeregister(BaseAction, StateTransitionFilter):
+class DefinitionDeregister(BaseAction):
     """Deregisters a batch definition
 
     :example:
@@ -196,9 +161,23 @@ class DefinitionDeregister(BaseAction, StateTransitionFilter):
                                      r['revision']))
 
     def process(self, resources):
-        resources = self.filter_resource_state(
-            resources, 'status', self.valid_origin_states)
+        resources = self.filter_resources(resources, 'status', self.valid_origin_states)
         self.client = local_session(
             self.manager.session_factory).client('batch')
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.deregister_definition, resources))
+
+
+@resources.register('batch-queue')
+class BatchJobQueue(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'batch'
+        filter_name = 'jobQueues'
+        filter_type = 'list'
+        id = name = 'jobQueueName'
+        arn = 'jobQueueArn'
+        arn_type = 'job-queue'
+        enum_spec = (
+            'describe_job_queues', 'jobQueues', None)
+        cfn_type = 'AWS::Batch::JobQueue'

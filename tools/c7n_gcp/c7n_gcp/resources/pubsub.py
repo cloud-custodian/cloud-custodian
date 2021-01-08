@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
@@ -32,7 +21,9 @@ class PubSubTopic(QueryResourceManager):
         component = 'projects.topics'
         enum_spec = ('list', 'topics[]', None)
         scope_template = "projects/{}"
-        id = "name"
+        name = id = "name"
+        default_report_fields = ["name", "kmsKeyName"]
+        asset_type = "pubsub.googleapis.com/Topic"
 
         @staticmethod
         def get(client, resource_info):
@@ -60,7 +51,11 @@ class PubSubSubscription(QueryResourceManager):
         component = 'projects.subscriptions'
         enum_spec = ('list', 'subscriptions[]', None)
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "topic", "ackDeadlineSeconds",
+            "retainAckedMessages", "messageRetentionDuration"]
+        asset_type = "pubsub.googleapis.com/Subscription"
 
         @staticmethod
         def get(client, resource_info):
@@ -88,7 +83,9 @@ class PubSubSnapshot(QueryResourceManager):
         component = 'projects.snapshots'
         enum_spec = ('list', 'snapshots[]', None)
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "topic", "expireTime"]
 
 
 @PubSubSnapshot.action_registry.register('delete')

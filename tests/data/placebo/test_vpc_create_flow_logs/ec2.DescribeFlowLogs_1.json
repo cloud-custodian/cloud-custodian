@@ -1,18 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "FlowLogs": [], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "a0cd7ea9-229e-4d62-9ab9-fbb6793c95e6", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 06 Apr 2018 16:51:44 GMT"
-            }
-        }
+        "FlowLogs": [],
+        "ResponseMetadata": {}
     }
 }

@@ -1,24 +1,12 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 from mock import patch
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
+from c7n.resources.aws import shape_validate
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
 
@@ -156,6 +144,24 @@ class LambdaLayerTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_check_permission(self):
+        # lots of pre-conditions, iam role with iam read only policy attached
+        # and a permission boundary with deny on iam read access.
+        factory = self.replay_flight_data('test_lambda_check_permission')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'filters': [
+                    {'FunctionName': 'custodian-log-age'},
+                    {'type': 'check-permissions',
+                     'match': 'allowed',
+                     'actions': ['iam:ListUsers']}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        assert not resources
+
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
@@ -176,6 +182,48 @@ class LambdaTest(BaseTest):
             resources[0]["Tags"], [{"Key": "lambda:createdBy", "Value": "SAM"}]
         )
         self.assertTrue("c7n:Policy" in resources[0])
+
+    def test_post_finding(self):
+        factory = self.replay_flight_data('test_lambda_post_finding')
+        p = self.load_policy({
+            'name': 'lambda',
+            'resource': 'aws.lambda',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        functions = p.resource_manager.get_resources([
+            'custodian-ec2-ssm-query'])
+        rfinding = p.resource_manager.actions[0].format_resource(functions[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsLambdaFunction': {
+                'CodeSha256': 'Pq32lM46RbVovW/Abh14XfrFHIeUM/cAEC51fwkf+tk=',
+                'Code': {
+                    'S3Bucket': 'awslambda-us-west-2-tasks',
+                    'S3Key': 'snapshots/644160558196/custodian-ec2-ssm-query-c3bed681-aa99-4bb2-a155-2f5897de20d2',  # noqa
+                    'S3ObjectVersion': 'Nupr9wOmyG9eZbta8NGFUV9lslQ5NI7m'},
+                'Handler': 'custodian_policy.run',
+                'LastModified': '2019-07-29T22:37:20.844+0000',
+                'MemorySize': 512,
+                'RevisionId': '8bbaf510-0ae1-40a5-8980-084bebd3f9c6',
+                'Role': 'arn:aws:iam::644160558196:role/CloudCustodianRole',
+                'Runtime': 'python3.7',
+                'Timeout': 900,
+                'TracingConfig': {'Mode': 'PassThrough'},
+                'Version': '$LATEST',
+                'VpcConfig': {'SecurityGroupIds': [],
+                              'SubnetIds': []}}},
+             'Id': 'arn:aws:lambda:us-west-2:644160558196:function:custodian-ec2-ssm-query',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Tags': {'custodian-info': 'mode=config-rule:version=0.8.44.2'},
+             'Type': 'AwsLambdaFunction'})
+        shape_validate(
+            rfinding['Details']['AwsLambdaFunction'],
+            'AwsLambdaFunctionDetails', 'securityhub')
 
     def test_delete(self):
         factory = self.replay_flight_data("test_aws_lambda_delete")
@@ -284,7 +332,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
-            {r["c7n:EventSources"][0] for r in resources}, set(["iot.amazonaws.com"])
+            {r["c7n:EventSources"][0] for r in resources}, {"iot.amazonaws.com"}
         )
 
     def test_sg_filter(self):
@@ -510,3 +558,28 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
                 groups = ['sg-12121212', 'sg-34343434']
                 updatefunc(FunctionName='badname', VpcConfig={'SecurityGroupIds': groups})
                 updatefunc.assert_called_once()
+
+    def test_lambda_kms_alias(self):
+        session_factory = self.replay_flight_data("test_lambda_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "lambda-kms-alias",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        'FunctionName': "test"
+                    },
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')

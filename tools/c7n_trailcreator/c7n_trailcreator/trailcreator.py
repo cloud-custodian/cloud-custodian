@@ -1,16 +1,5 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS AutoTag Resource Creators
 
 See readme for details
@@ -266,7 +255,7 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
 
     if account_id:
         q += "and records.recipientaccountid = '{}'".format(
-            account_id=account_id)
+            account_id)
 
     date_format, date_value = None, None
     if year:
@@ -296,10 +285,14 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     while True:
         qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
-            stats['QueryExecutionTime'] = qexec['Statistics'][
-                'EngineExecutionTimeInMillis'] / 1000.0
-            stats['DataScannedInBytes'] = qexec['Statistics'][
-                'DataScannedInBytes']
+            stats['QueryExecutionTime'] = qexec['Statistics'].get(
+                'EngineExecutionTimeInMillis',
+                qexec['Statistics'].get(
+                    'TotalExecutionTimeInMillis',
+                    1000
+                )
+            ) / 1000.0
+            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
                 format_bytes(
@@ -337,7 +330,7 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     return {'stats': dict(stats)}
 
 
-class TrailDB(object):
+class TrailDB:
 
     def __init__(self, path):
         self.path = path
@@ -440,7 +433,7 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
     log.info("Finished %0.2f seconds stats:%s", time.time() - t, stats)
 
 
-class ResourceTagger(object):
+class ResourceTagger:
 
     def __init__(self, trail_db, exec_config, creator_tag, user_suffix, dryrun, types):
         self.trail_db = trail_db
@@ -708,7 +701,7 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     tag_org_account, a, r, db,
                     creator_tag, user_suffix, dryrun, type)] = (a, r)
@@ -763,7 +756,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
-    load_resources()
+    load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(

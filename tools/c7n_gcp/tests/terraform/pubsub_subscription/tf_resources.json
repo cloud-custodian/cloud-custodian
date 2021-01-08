@@ -1,0 +1,37 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_pubsub_subscription": {
+            "c7n": {
+                "ack_deadline_seconds": 10,
+                "expiration_policy": [
+                    {
+                        "ttl": "2678400s"
+                    }
+                ],
+                "id": "projects/cloud-custodian/subscriptions/c7n-subscription",
+                "labels": null,
+                "message_retention_duration": "604800s",
+                "name": "c7n-subscription",
+                "path": "projects//subscriptions/c7n-subscription",
+                "project": "c7n-test-target",
+                "push_config": [],
+                "retain_acked_messages": false,
+                "timeouts": null,
+                "topic": "projects/cloud-custodian/topics/c7n-topic"
+            }
+        },
+        "google_pubsub_topic": {
+            "c7n": {
+                "id": "projects/cloud-custodian/topics/c7n-topic",
+                "kms_key_name": "",
+                "labels": null,
+                "message_storage_policy": [],
+                "name": "c7n-topic",
+                "project": "c7n-test-target",
+                "timeouts": null
+            }
+        }
+    }
+}

@@ -1,19 +1,7 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
+from pytest_terraform import terraform
 from unittest import TestCase
 
 from .common import event_data, BaseTest
@@ -21,7 +9,46 @@ from .common import event_data, BaseTest
 from c7n.cwe import CloudWatchEvents
 
 
-class CloudWatchRuleTarget(BaseTest):
+@terraform('event_bridge_bus')
+def test_event_bus_describe(test, event_bridge_bus):
+    factory = test.replay_flight_data('test_cwe_bus_xaccount')
+    p = test.load_policy({
+        'name': 'bus-xaccount',
+        'resource': 'aws.event-bus',
+        'filters': [
+            {'tag:Env': 'Sandbox'},
+            'cross-account'
+        ],
+    }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['Name'] == event_bridge_bus[
+        'aws_cloudwatch_event_bus.messenger.name']
+    assert 'CrossAccountViolations' in resources[0]
+
+
+class CloudWatchEventTest(BaseTest):
+
+    def test_event_rule_tags(self):
+        factory = self.replay_flight_data('test_cwe_rule_tags')
+        client = factory().client('events')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-rule',
+                'resource': 'aws.event-rule',
+                'filters': [
+                    {'tag:App': 'absent'},
+                    {'Name': 'cloud-custodian-mailer'}],
+                'actions': [
+                    {'type': 'tag', 'tags': {'App': 'Custodian'}}]
+            }, session_factory=factory, config={'region': 'us-west-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        tags = {t['Key']: t['Value'] for t in
+                client.list_tags_for_resource(
+                    ResourceARN=policy.resource_manager.get_arns(resources)[0]).get(
+                        'Tags')}
+        self.assertEqual(tags, {'App': 'Custodian'})
 
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")

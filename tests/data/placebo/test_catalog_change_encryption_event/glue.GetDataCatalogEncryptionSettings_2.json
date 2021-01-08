@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "DataCatalogEncryptionSettings": {
+            "EncryptionAtRest": {
+                "CatalogEncryptionMode": "SSE-KMS",
+                "SseAwsKmsKeyId": "alias/aws/glue"
+            },
+            "ConnectionPasswordEncryption": {
+                "ReturnConnectionPasswordEncrypted": false
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

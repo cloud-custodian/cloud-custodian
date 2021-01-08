@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import isodate
 import operator
@@ -18,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
 from datetime import timedelta
 
-import six
 from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryComparisonExpression,
                                               QueryDataset, QueryDefinition,
@@ -124,8 +112,8 @@ class MetricFilter(Filter):
         'average': Math.mean,
         'total': Math.sum,
         'count': Math.sum,
-        'minimum': Math.max,
-        'maximum': Math.min
+        'minimum': Math.min,
+        'maximum': Math.max
     }
 
     schema = {
@@ -141,7 +129,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
-            'no_data_action': {'enum': ['include', 'exclude']},
+            'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'}
         }
     }
@@ -208,6 +196,12 @@ class MetricFilter(Filter):
                 for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
+        if self.no_data_action == "to_zero":
+            if m is None:
+                m = [0]
+            else:
+                m = [0 if v is None else v for v in m]
 
         self._write_metric_to_resource(resource, metrics_data, m)
 
@@ -371,7 +365,7 @@ class DiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-load-balancers-with-logs-enabled
             resource: azure.loadbalancer
             filters:
@@ -392,7 +386,7 @@ class DiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-keyvaults-with-logs-enabled
             resource: azure.keyvault
             filters:
@@ -432,7 +426,9 @@ class DiagnosticSettingsFilter(ValueFilter):
         for resource in resources:
             settings = client.diagnostic_settings.list(resource['id'])
             settings = [s.as_dict() for s in settings.value]
-
+            # put an empty item in when no diag settings, so the absent operator can function
+            if not settings:
+                settings = [{}]
             filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
             if filtered_settings:
@@ -526,8 +522,7 @@ class AzureOnHour(OnHour):
         return tag_value
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallRulesFilter(Filter):
+class FirewallRulesFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall rules
 
     Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
@@ -642,8 +637,7 @@ class FirewallRulesFilter(Filter):
             raise FilterValidationError("Internal error.")
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallBypassFilter(Filter):
+class FirewallBypassFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall bypass rules
     """
 

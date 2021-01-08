@@ -1,21 +1,7 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import abc
-import six
 import importlib
 
 from c7n.registry import PluginRegistry
@@ -24,8 +10,7 @@ from c7n.registry import PluginRegistry
 clouds = PluginRegistry('c7n.providers')
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Provider(object):
+class Provider(metaclass=abc.ABCMeta):
     """Provider Base Class"""
 
     @abc.abstractproperty
@@ -121,14 +106,16 @@ def get_resource_class(resource_type):
         provider_name, resource = resource_type.split('.', 1)
     else:
         provider_name, resource = 'aws', resource_type
+        resource_type = '%s.%s' % (provider_name, resource_type)
 
     provider = clouds.get(provider_name)
     if provider is None:
         raise KeyError(
             "Invalid cloud provider: %s" % provider_name)
 
-    factory = provider.resources.get(resource)
-    if factory is None:
+    if resource_type not in provider.resource_map:
         raise KeyError("Invalid resource: %s for provider: %s" % (
             resource, provider_name))
+    factory = provider.resources.get(resource)
+    assert factory, "Resource:%s not loaded" % resource_type
     return factory

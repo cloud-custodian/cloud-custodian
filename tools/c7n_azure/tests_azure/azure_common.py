@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import email.utils as eut
 import json
@@ -410,13 +399,6 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self._now_patch.start()
             self.addCleanup(self._now_patch.stop)
 
-        if not self._requires_polling:
-            # Patch Poller with constructor that always disables polling
-            # This breaks blocking on long running operations (resource creation).
-            self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
-            self._lro_patch.start()
-            self.addCleanup(self._lro_patch.stop)
-
         if self.is_playback():
             if self._requires_polling:
                 # If using polling we need to monkey patch the timeout during playback
@@ -424,6 +406,14 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 Session._old_client = Session.client
                 Session.client = BaseTest.session_client_wrapper
                 self.addCleanup(BaseTest.session_client_cleanup)
+            else:
+                # Patch Poller with constructor that always disables polling
+                # This breaks blocking on long running operations (resource creation).
+                self._lro_patch = patch.object(msrest.polling.LROPoller,
+                                               '__init__',
+                                               BaseTest.lro_init)
+                self._lro_patch.start()
+                self.addCleanup(self._lro_patch.stop)
 
             if constants.ENV_ACCESS_TOKEN in os.environ:
                 self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',

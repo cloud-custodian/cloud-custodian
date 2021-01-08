@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -27,7 +16,11 @@ class LoadBalancingAddress(QueryResourceManager):
         component = 'addresses'
         enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "address", "status", "region", "addressType"
+        ]
+        asset_type = "compute.googleapis.com/Address"
 
         @staticmethod
         def get(client, resource_info):
@@ -62,7 +55,11 @@ class LoadBalancingUrlMap(QueryResourceManager):
         component = 'urlMaps'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "defaultService"
+        ]
+        asset_type = "compute.googleapis.com/UrlMap"
 
         @staticmethod
         def get(client, resource_info):
@@ -82,7 +79,11 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         component = 'targetTcpProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "service"
+        ]
+        asset_type = " compute.googleapis.com/TargetTcpProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -102,7 +103,11 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
         component = 'targetSslProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "service", "sslPolicy"
+        ]
+        asset_type = "compute.googleapis.com/TargetSslProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -122,7 +127,10 @@ class LoadBalancingSslPolicy(QueryResourceManager):
         component = 'sslPolicies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "profile", "minTlsVersion"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -172,7 +180,11 @@ class LoadBalancingSslCertificate(QueryResourceManager):
         component = 'sslCertificates'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "type", "region", "expireTime"
+        ]
+        asset_type = "compute.googleapis.com/SslCertificate"
 
         @staticmethod
         def get(client, resource_info):
@@ -191,7 +203,11 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
         component = 'targetHttpsProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp", "sslPolicy", "urlMap"
+        ]
+        asset_type = "compute.googleapis.com/TargetHttpsProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -211,7 +227,11 @@ class LoadBalancingBackendBucket(QueryResourceManager):
         component = 'backendBuckets'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "bucketName", "enableCdn"
+        ]
+        asset_type = "compute.googleapis.com/BackendBucket"
 
         @staticmethod
         def get(client, resource_info):
@@ -261,7 +281,10 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
         component = 'httpsHealthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "host", "port", "requestPath", "checkIntervalSec"]
+        asset_type = "compute.googleapis.com/HttpsHealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -281,7 +304,10 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
         component = 'httpHealthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "host", "port", "requestPath", "checkIntervalSec"]
+        asset_type = "compute.googleapis.com/HttpHealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -301,7 +327,11 @@ class LoadBalancingHealthCheck(QueryResourceManager):
         component = 'healthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "checkIntervalSec",
+            "healthyThreshold", "unhealthyThreshold", "timeoutSec"]
+        asset_type = "compute.googleapis.com/HealthCheck"
 
         @staticmethod
         def get(client, resource_info):
@@ -321,7 +351,10 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
         component = 'targetHttpProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "urlMap"]
+        asset_type = "compute.googleapis.com/TargetHttpProxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -341,7 +374,10 @@ class LoadBalancingBackendService(QueryResourceManager):
         component = 'backendServices'
         enum_spec = ('aggregatedList', 'items.*.backendServices[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "network"]
+        asset_type = "compute.googleapis.com/BackendService"
 
         @staticmethod
         def get(client, resource_info):
@@ -361,7 +397,10 @@ class LoadBalancingTargetInstance(QueryResourceManager):
         component = 'targetInstances'
         enum_spec = ('aggregatedList', 'items.*.targetInstances[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp", "zone", "natPolicy", "instance"]
+        asset_type = "compute.googleapis.com/TargetInstance"
 
         @staticmethod
         def get(client, resource_info):
@@ -382,7 +421,12 @@ class LoadBalancingTargetPool(QueryResourceManager):
         component = 'targetPools'
         enum_spec = ('aggregatedList', 'items.*.targetPools[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "region",
+            "failoverRatio", "sessionAffinity", "backupPool"
+        ]
+        asset_type = "compute.googleapis.com/TargetPool"
 
         @staticmethod
         def get(client, resource_info):
@@ -403,7 +447,12 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         component = 'forwardingRules'
         enum_spec = ('aggregatedList', 'items.*.forwardingRules[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "region", "IPAddress", "IPProtocol", "target",
+            "loadBalancerScheme", "serviceName",
+        ]
+        asset_type = "compute.googleapis.com/ForwardingRule"
 
         @staticmethod
         def get(client, resource_info):
@@ -423,7 +472,12 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         component = 'globalForwardingRules'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "network",
+            "networkTier", "loadBalancerScheme", "subnetwork", "allowGlobalAccess"
+        ]
+        asset_type = "compute.googleapis.com/GlobalForwardingRule"
 
         @staticmethod
         def get(client, resource_info):
@@ -442,7 +496,11 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         component = 'globalAddresses'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "status", "creationTimestamp", "address", "region"
+        ]
+        asset_type = "compute.googleapis.com/GlobalAddress"
 
         @staticmethod
         def get(client, resource_info):

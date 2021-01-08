@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "E2V8K6F94HTIC5",
+        "DistributionConfig": {
+            "Comment": "",
+            "Enabled": true,
+            "Logging": {
+                "Enabled": true,
+                "IncludeCookies": true,
+                "Bucket": "test.s3.amazonaws.com",
+                "Prefix": ""
+            }
+        }
+    }
+}

@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "Test SG with a rule referencing another SG, which is tagged with SampleTagKey=SampleTagValue",
+                "GroupName": "egress-sg-reference",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "123456789123",
+                "GroupId": "sg-065fad86f90aae701",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-0f9585dc91c9c9655",
+                                "UserId": "123456789123"
+                            }
+                        ]
+                    }
+                ],
+                "VpcId": "vpc-94d1d1ee"
+            },
+            {
+                "Description": "Test SG tagged with SampleTagKey=SampleTagValue",
+                "GroupName": "test-referenced-sg",
+                "IpPermissions": [
+                    {
+                        "FromPort": 60000,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 62000,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "123456789123",
+                "GroupId": "sg-0f9585dc91c9c9655",
+                "IpPermissionsEgress": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "SampleTagKey",
+                        "Value": "SampleTagValue"
+                    }
+                ],
+                "VpcId": "vpc-94d1d1ee"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

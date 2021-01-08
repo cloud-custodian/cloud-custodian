@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Reporting Tools
 ---------------
@@ -39,10 +28,9 @@ CLI Usage
 
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from concurrent.futures import as_completed
 
+import csv
 from datetime import datetime
 import gzip
 import io
@@ -52,21 +40,19 @@ import logging
 import os
 from tabulate import tabulate
 
-import six
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session, dumps
-from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('custodian.reports')
 
 
 def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
-    regions = set([p.options.region for p in policies])
-    policy_names = set([p.name for p in policies])
+    regions = {p.options.region for p in policies}
+    policy_names = {p.name for p in policies}
     formatter = Formatter(
         policies[0].resource_manager.resource_type,
         extra_fields=options.field,
@@ -99,7 +85,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     rows = formatter.to_csv(records)
 
     if options.format == 'csv':
-        writer = UnicodeWriter(output_fh, formatter.headers())
+        writer = csv.writer(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     elif options.format == 'json':
@@ -139,13 +125,13 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, six.text_type):
-                value = six.text_type(value)
+            if not isinstance(value, str):
+                value = str(value)
         vals.append(value)
     return vals
 
 
-class Formatter(object):
+class Formatter:
 
     def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
                  include_region=False, include_policy=False, fields=()):

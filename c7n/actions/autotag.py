@@ -1,17 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import six
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from .core import EventAction
 from c7n.exceptions import PolicyValidationError
@@ -92,9 +80,7 @@ class AutoTagUser(EventAction):
                 "auto-tag action requires 'tag'")
         return self
 
-    def process(self, resources, event):
-        if event is None:
-            return
+    def get_tag_value(self, event):
         event = event['detail']
         utype = event['userIdentity']['type']
         if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser', 'FederatedUser']):
@@ -114,9 +100,16 @@ class AutoTagUser(EventAction):
             # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
-        if user is None:
-            return
+
         # if the auto-tag-user policy set update to False (or it's unset) then we
+        return {'user': user, 'id': principal_id_value}
+
+    def process(self, resources, event):
+        if event is None:
+            return
+
+        user_info = self.get_tag_value(event)
+
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
             untagged_resources = []
@@ -134,17 +127,23 @@ class AutoTagUser(EventAction):
         else:
             untagged_resources = resources
 
-        tag_action = self.manager.action_registry.get('tag')
-        new_tags = {
-            self.data['tag']: user
-        }
+        new_tags = {}
+        if user_info['user']:
+            new_tags[self.data['tag']] = user_info['user']
+
         # if principal_id_key is set (and value), we'll set the principalId tag.
         principal_id_key = self.data.get('principal_id_tag', None)
-        if principal_id_key and principal_id_value:
-            new_tags[principal_id_key] = principal_id_value
-        for key, value in six.iteritems(new_tags):
-            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        if principal_id_key and user_info['id']:
+            new_tags[principal_id_key] = user_info['id']
+
+        if new_tags:
+            self.set_resource_tags(new_tags, untagged_resources)
         return new_tags
+
+    def set_resource_tags(self, tags, resources):
+        tag_action = self.manager.action_registry.get('tag')
+        for key, value in tags.items():
+            tag_action({'key': key, 'value': value}, self.manager).process(resources)
 
     @classmethod
     def register_resource(cls, registry, resource_class):

@@ -1,0 +1,33 @@
+{
+  "body": {
+    "status": "RUNNING", 
+    "kind": "compute#operation", 
+    "name": "operation-1561135893143-58bd8465b5e43-0c372f2d-07516a9c", 
+    "startTime": "2019-06-21T09:51:33.568-07:00", 
+    "insertTime": "2019-06-21T09:51:33.560-07:00", 
+    "targetId": "380115736164649363", 
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets/custodian-backend-bucket-3", 
+    "operationType": "delete", 
+    "progress": 0, 
+    "id": "1663262538971788794", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1561135893143-58bd8465b5e43-0c372f2d-07516a9c", 
+    "user": "eshaliov-custodian-1@custodian-test-project-0.iam.gserviceaccount.com"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "710", 
+    "x-xss-protection": "1; mode=block", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "pragma": "no-cache", 
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate", 
+    "date": "Fri, 21 Jun 2019 16:51:33 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Actions to perform on Azure resources
 """
@@ -18,7 +7,6 @@ import abc
 import logging
 import sys
 
-import six
 from c7n_azure import constants
 from c7n_azure.utils import ThreadHelper
 from msrestazure.azure_exceptions import CloudError
@@ -26,8 +14,7 @@ from msrestazure.azure_exceptions import CloudError
 from c7n.actions import BaseAction, EventAction
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AzureBaseAction(BaseAction):
+class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
     session = None
     max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
     chunk_size = constants.DEFAULT_CHUNK_SIZE
@@ -102,8 +89,7 @@ class AzureBaseAction(BaseAction):
             "Base action class does not implement this behavior")
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AzureEventAction(EventAction, AzureBaseAction):
+class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
 
     def _process_resources(self, resources, event):
         self._prepare_processing()

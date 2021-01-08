@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 try:
@@ -18,7 +7,6 @@ try:
 except ImportError:
     from collections import Iterable
 
-import six
 from c7n_azure import constants
 from c7n_azure.actions.logic_app import LogicAppAction
 from azure.mgmt.resourcegraph.models import QueryRequest
@@ -36,7 +24,7 @@ from c7n.utils import local_session
 log = logging.getLogger('custodian.azure.query')
 
 
-class ResourceQuery(object):
+class ResourceQuery:
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
@@ -77,7 +65,7 @@ class ResourceQuery(object):
 
 
 @sources.register('describe-azure')
-class DescribeSource(object):
+class DescribeSource:
     resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
@@ -98,7 +86,7 @@ class DescribeSource(object):
 
 
 @sources.register('resource-graph')
-class ResourceGraphSource(object):
+class ResourceGraphSource:
 
     def __init__(self, manager):
         self.manager = manager
@@ -185,8 +173,7 @@ class TypeMeta(type):
             cls.client)
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo(metaclass=TypeMeta):
     doc_groups = None
 
     """api client construction information"""
@@ -203,8 +190,7 @@ class TypeInfo(object):
         return {}
 
 
-@six.add_metaclass(TypeMeta)
-class ChildTypeInfo(TypeInfo):
+class ChildTypeInfo(TypeInfo, metaclass=TypeMeta):
     """api client construction information for child resources"""
     parent_manager_name = ''
     annotate_parent = True
@@ -230,8 +216,7 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         pass
 
@@ -261,7 +246,9 @@ class QueryResourceManager(ResourceManager):
         return self.get_session().client(service)
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type,
+                'query': query,
+                'resource': str(self.__class__.__name__)}
 
     @classmethod
     def get_model(cls):
@@ -327,8 +314,7 @@ class QueryResourceManager(ResourceManager):
         self.source.validate()
 
 
-@six.add_metaclass(QueryMeta)
-class ChildResourceManager(QueryResourceManager):
+class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
 

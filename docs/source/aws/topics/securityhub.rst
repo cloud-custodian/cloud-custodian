@@ -1,3 +1,5 @@
+.. _aws-securityhub:
+
 Security Hub
 ------------
 
@@ -19,6 +21,15 @@ Custodian supports deep integration with security hub to support the following u
    security hub actions work against both findings and insights.
    `mode: hub-action`
 
+Getting Started
++++++++++++++++
+
+To post findings with cloud-custodian (v0.9+) you need to enable the
+product integration from the security hub console. From the left side
+menu click integrations, search for Cloud Custodian, and enable the
+Cloud Custodian integration.
+
+.. image:: hub-integration.png
 
 Modes
 +++++
@@ -138,6 +149,9 @@ The Amazon Security Finding Format is documented at https://docs.aws.amazon.com/
    * - Hardcoded Fixed Value: "2018-10-08"
      - SchemaVersion
      - Only Valid value
+   * - metadata.json policy.actions.severity_label
+     - Severity.Label
+     - User supplied value in policy configuration
    * - metadata.json policy.actions.severity_normalized
      - Severity.Normalized
      - User supplied value in policy configuration

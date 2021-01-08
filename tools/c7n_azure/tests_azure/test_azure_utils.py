@@ -1,19 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import sys
+import time
 import types
 
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
@@ -113,11 +101,11 @@ class UtilsTest(BaseTest):
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag3', True), 'VALUE3')
 
     def test_get_ports(self):
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), set([4, 5, 9]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), {4, 5, 9})
         rule = {'properties': {'destinationPortRange': '10-12'}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12})
         rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12, 80]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
 
     def test_validate_ports_string(self):
         self.assertEqual(PortsRangeHelper.validate_ports_string('80'), True)
@@ -251,19 +239,46 @@ class UtilsTest(BaseTest):
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
 
-    managed_group_return_value = ([
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-1',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-2',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': DEFAULT_SUBSCRIPTION_ID,
-             'type': '/subscriptions'}),
-        Bag({'name': GUID,
-             'type': '/subscriptions'}),
-    ])
+    @patch('c7n_azure.utils.send_logger.debug')
+    @patch('c7n_azure.utils.send_logger.warning')
+    def test_custodian_azure_send_override_429_missingheader(self, logger_debug, logger_warning):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
 
-    @patch('azure.mgmt.managementgroups.operations.EntitiesOperations.list',
-           return_value=managed_group_return_value)
+        response_dict = {
+            'headers': {},
+            'status_code': 429
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+
+        with patch('time.sleep', new_callable=time.sleep(0)):
+            mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 3)
+        self.assertEqual(logger_debug.call_count, 3)
+        self.assertEqual(logger_warning.call_count, 3)
+
+    managed_group_return_value = Bag({
+        'properties': {
+            'name': 'dev',
+            'type': '/providers/Micrsoft.Management/managementGroups',
+            'children': [
+                Bag({'name': DEFAULT_SUBSCRIPTION_ID,
+                     'type': '/subscriptions'}),
+                Bag({'name': 'east',
+                     'type': '/providers/Microsoft.Management/managementGroups',
+                     'children': [{
+                         'type': '/subscriptions',
+                         'name': GUID}]})
+            ],
+        }
+    })
+    managed_group_return_value['serialize'] = lambda self=managed_group_return_value: self
+
+    @patch((
+        'azure.mgmt.managementgroups.operations'
+        '.management_groups_operations.ManagementGroupsOperations.get'),
+        return_value=managed_group_return_value)
     def test_managed_group_helper(self, _1):
         sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
         self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])

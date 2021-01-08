@@ -99,7 +99,7 @@ There are several environment variables specific to the container host:
 | ``AZURE_CONTAINER_OUTPUT_DIR``          |          | The URL of the storage account blob container to send log output to. In the format: ``azure://<storage_account_name>.blob.core.windows.net/<blob_container_name>``.                                          |
 +-----------------------------------------+----------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-In additiona to the above environment variables, authentication must be provided to the container host.
+In addition to the above environment variables, authentication must be provided to the container host.
 See :ref:`azure_authentication` for authenticating the container host with an azure identity.
 
 Once an identity has been established, it will need the following roles in azure:

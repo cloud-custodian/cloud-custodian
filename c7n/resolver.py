@@ -1,28 +1,15 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import csv
 import io
 import jmespath
 import json
 import os.path
 import logging
+import itertools
+from urllib.request import Request, urlopen
+from urllib.parse import parse_qsl, urlparse
 import zlib
-from six import text_type
-from six.moves.urllib.request import Request, urlopen
-from six.moves.urllib.parse import parse_qsl, urlparse
 from contextlib import closing
 
 from c7n.utils import format_string_values
@@ -32,13 +19,18 @@ log = logging.getLogger('custodian.resolver')
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
-class URIResolver(object):
+class URIResolver:
 
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
         self.cache = cache
 
     def resolve(self, uri):
+        if self.cache:
+            contents = self.cache.get(("uri-resolver", uri))
+            if contents is not None:
+                return contents
+
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
@@ -48,7 +40,8 @@ class URIResolver(object):
             with closing(urlopen(req)) as response:
                 contents = self.handle_response_encoding(response)
 
-        self.cache.save(("uri-resolver", uri), contents)
+        if self.cache:
+            self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def handle_response_encoding(self, response):
@@ -75,7 +68,7 @@ class URIResolver(object):
             return body.decode('utf-8')
 
 
-class ValuesFrom(object):
+class ValuesFrom:
     """Retrieve values from a url.
 
     Supports json, csv and line delimited text files and expressions
@@ -95,7 +88,7 @@ class ValuesFrom(object):
          url: s3://bucket/xyz/foo.json
          expr: [].AppId
 
-      values_from:
+      value_from:
          url: http://foobar.com/mydata
          format: json
          expr: Region."us-east-1"[].ImageId
@@ -131,6 +124,7 @@ class ValuesFrom(object):
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
+        self.cache = manager._cache
         self.resolver = URIResolver(manager.session_factory, manager._cache)
 
     def get_contents(self):
@@ -145,32 +139,58 @@ class ValuesFrom(object):
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = text_type(self.resolver.resolve(self.data['url']))
+        contents = str(self.resolver.resolve(self.data['url']))
         return contents, format
 
     def get_values(self):
+        if self.cache:
+            # use these values as a key to cache the result so if we have
+            # the same filter happening across many resources, we can reuse
+            # the results.
+            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
+            contents = self.cache.get(("value-from", key))
+            if contents is not None:
+                return contents
+
+        contents = self._get_values()
+        if self.cache:
+            self.cache.save(("value-from", key), contents)
+        return contents
+
+    def _get_values(self):
         contents, format = self.get_contents()
 
         if format == 'json':
             data = json.loads(contents)
             if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
-                return res
+                return self._get_resource_values(data)
+            else:
+                return data
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
                 data = {x[0]: list(x[1:]) for x in zip(*data)}
+                if 'expr' in self.data:
+                    return self._get_resource_values(data)
+                else:
+                    combined_data = set(itertools.chain.from_iterable(data.values()))
+                    return combined_data
             else:
                 if isinstance(self.data.get('expr'), int):
-                    return [d[self.data['expr']] for d in data]
+                    return set([d[self.data['expr']] for d in data])
                 data = list(data)
-            if 'expr' in self.data:
-                res = jmespath.search(self.data['expr'], data)
-                if res is None:
-                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
-                return res
-            return data
+                if 'expr' in self.data:
+                    return self._get_resource_values(data)
+                else:
+                    combined_data = set(itertools.chain.from_iterable(data))
+                    return combined_data
         elif format == 'txt':
-            return [s.strip() for s in io.StringIO(contents).readlines()]
+            return set([s.strip() for s in io.StringIO(contents).readlines()])
+
+    def _get_resource_values(self, data):
+        res = jmespath.search(self.data['expr'], data)
+        if res is None:
+            log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
+        if isinstance(res, list):
+            res = set(res)
+        return res

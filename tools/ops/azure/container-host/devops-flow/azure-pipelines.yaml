@@ -1,0 +1,56 @@
+# Syncs files from repository to blob storage
+trigger:
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Needed pipeline variables
+#   AZURE_SERVICE_CONNECTION: name of service connection to the storage account
+#   STORAGE_ACCOUNT_NAME: name of the storage account
+#   STORAGE_CONTAINER_NAME: name of the storage container for the policies
+#   POLICY_FILE_PATH: path to the directory of files to copy
+
+steps:
+  - task: AzureCLI@1
+    displayName: Get SAS Token
+    inputs:
+      azureSubscription: $(AZURE_SERVICE_CONNECTION)
+      scriptLocation: inlineScript
+      inlineScript: |
+        # Gets expiration date 10 minutes in the future
+        # On a mac this is: end=`date -u -v +10M '+%Y-%m-%dT%H:%MZ'`
+        end=`date -u -d "10 minutes" '+%Y-%m-%dT%H:%M:%SZ'`
+        start=`date -u '+%Y-%m-%dT%H:%M:%SZ'`
+        
+        # Checks if the storage account exists
+        blobexists=`az storage container exists --account-name $(STORAGE_ACCOUNT_NAME) --name $(STORAGE_CONTAINER_NAME) | grep false | wc -l`
+        if [ $blobexists -eq 1 ]; then
+          echo "##vso[task.logissue type=error]The container $(STORAGE_CONTAINER_NAME) does not exist in storage account $(STORAGE_ACCOUNT_NAME)"
+          exit 1
+        fi
+
+        # DevOps will not set environment variables that have '&' so 
+        # it gets base64 encoded before passing to the next step
+        sastoken=`az storage account generate-sas --permissions acdlpruw --account-name $(STORAGE_ACCOUNT_NAME) --services bfqt --resource-types sco --expiry $end --start $start --https-only -o tsv | base64 -w 0`
+        echo "##vso[task.setvariable variable=STORAGE_SAS_TOKEN;]$sastoken"
+
+  - task: Bash@3
+    displayName: Synchronize Files
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Gets azcopy on a linux box
+        echo 'Getting version 10.0.8 of azcopy'
+        wget -O azcopyv10.tar https://azcopyvnext.azureedge.net/release20190301/azcopy_linux_amd64_10.0.8.tar.gz 
+        echo 'Unpacking azcopy'
+        tar -xf azcopyv10.tar --strip-components=1
+        
+        echo 'Making azcopy executable'
+        chmod 744 ./azcopy
+
+        # Decodes the sas token
+        sastoken=`echo $(STORAGE_SAS_TOKEN) | base64 -d`
+
+        echo 'Synchronizing the files with blob storage'
+        ./azcopy sync --delete-destination true "$(POLICY_FILE_PATH)" "https://$(STORAGE_ACCOUNT_NAME).blob.core.windows.net/$(STORAGE_CONTAINER_NAME)?$sastoken"

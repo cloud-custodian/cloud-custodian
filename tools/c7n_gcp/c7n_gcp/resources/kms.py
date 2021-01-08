@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
@@ -29,7 +18,10 @@ class KmsKeyRing(QueryResourceManager):
         component = 'projects.locations.keyRings'
         enum_spec = ('list', 'keyRings[]', None)
         scope = None
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "createTime"]
+        asset_type = "cloudkms.googleapis.com/KeyRing"
 
         @staticmethod
         def get(client, resource_info):
@@ -63,7 +55,9 @@ class KmsKeyRing(QueryResourceManager):
 
 @resources.register('kms-cryptokey')
 class KmsCryptoKey(ChildResourceManager):
-
+    """GCP Resource
+    https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys
+    """
     def _get_parent_resource_info(self, child_instance):
         project_id, location, key_ring_id = re.match(
             'projects/(.*?)/locations/(.*?)/keyRings/(.*?)/cryptoKeys/.*',
@@ -83,7 +77,9 @@ class KmsCryptoKey(ChildResourceManager):
         component = 'projects.locations.keyRings.cryptoKeys'
         enum_spec = ('list', 'cryptoKeys[]', None)
         scope = None
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "purpose", "createTime", "nextRotationTime", "rotationPeriod"]
         parent_spec = {
             'resource': 'kms-keyring',
             'child_enum_params': [
@@ -91,6 +87,7 @@ class KmsCryptoKey(ChildResourceManager):
             ],
             'use_child_query': True
         }
+        asset_type = "cloudkms.googleapis.com/CryptoKey"
 
         @staticmethod
         def get(client, resource_info):
@@ -104,7 +101,9 @@ class KmsCryptoKey(ChildResourceManager):
 
 @resources.register('kms-cryptokey-version')
 class KmsCryptoKeyVersion(ChildResourceManager):
-
+    """GCP Resource
+    https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys.cryptoKeyVersions
+    """
     def _get_parent_resource_info(self, child_instance):
         path = 'projects/(.*?)/locations/(.*?)/keyRings/(.*?)/cryptoKeys/(.*?)/cryptoKeyVersions/.*'
         project_id, location, key_ring_id, crypto_key_id = \
@@ -125,7 +124,9 @@ class KmsCryptoKeyVersion(ChildResourceManager):
         component = 'projects.locations.keyRings.cryptoKeys.cryptoKeyVersions'
         enum_spec = ('list', 'cryptoKeyVersions[]', None)
         scope = None
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "state", "protectionLevel", "algorithm", "createTime", "destroyTime"]
         parent_spec = {
             'resource': 'kms-cryptokey',
             'child_enum_params': [
@@ -133,6 +134,7 @@ class KmsCryptoKeyVersion(ChildResourceManager):
             ],
             'use_child_query': True
         }
+        asset_type = "cloudkms.googleapis.com/CryptoKeyVersion"
 
         @staticmethod
         def get(client, resource_info):

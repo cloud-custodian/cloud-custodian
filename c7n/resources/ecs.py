@@ -1,18 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -59,6 +46,8 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
+        arn_type = 'cluster'
+        cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)
@@ -165,6 +154,7 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
+        cfn_type = 'AWS::ECS::Service'
 
     @property
     def source_type(self):
@@ -394,6 +384,7 @@ class Task(query.ChildResourceManager):
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
+        cfn_type = 'AWS::ECS::TaskSet'
 
     @property
     def source_type(self):
@@ -465,6 +456,8 @@ class TaskDefinition(query.QueryResourceManager):
         service = 'ecs'
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
+        cfn_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
 
     def get_resources(self, ids, cache=True):
         if cache:
@@ -482,7 +475,8 @@ class TaskDefinition(query.QueryResourceManager):
         results = []
         client = local_session(self.session_factory).client('ecs')
         for task_def_set in resources:
-            response = client.describe_task_definition(
+            response = self.retry(
+                client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
             r = response['taskDefinition']
@@ -526,7 +520,7 @@ class ContainerInstance(query.ChildResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'containerInstance'
+        id = name = 'containerInstanceArn'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         arn = "containerInstanceArn"

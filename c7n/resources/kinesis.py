@@ -1,25 +1,19 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters.kms import KmsRelatedFilter
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('kinesis')
@@ -37,10 +31,12 @@ class KinesisStream(QueryResourceManager):
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
+        cfn_type = 'AWS::Kinesis::Stream'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(KinesisStream, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeStream,
+        'config': ConfigSource
+    }
 
 
 @KinesisStream.action_registry.register('encrypt')
@@ -90,6 +86,18 @@ class Delete(Action):
                 StreamName=r['StreamName'])
 
 
+@KinesisStream.filter_registry.register('kms-key')
+class KmsFilterDataStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KeyId'
+
+
+class DescribeDeliveryStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
@@ -104,10 +112,18 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
+        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(DeliveryStream, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeDeliveryStream,
+        'config': ConfigSource
+    }
+
+
+@DeliveryStream.filter_registry.register('kms-key')
+class KmsFilterDeliveryStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'DeliveryStreamEncryptionConfiguration.KeyARN'
 
 
 @DeliveryStream.action_registry.register('delete')
@@ -215,6 +231,12 @@ class FirehoseEncryptS3Destination(Action):
                 client.update_destination(**params)
 
 
+class DescribeApp(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
@@ -227,10 +249,12 @@ class AnalyticsApp(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
+        cfn_type = 'AWS::KinesisAnalytics::Application'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(AnalyticsApp, self).augment(resources))
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeApp
+    }
 
 
 @AnalyticsApp.action_registry.register('delete')

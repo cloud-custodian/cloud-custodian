@@ -1,7 +1,7 @@
 Cloud SQL - List Unsucessful Backups Older Than N Days
 =======================================================
 
-The following example demonstates ability of Cloud Custodian to track backup runs of Cloud SQL instances and list unsucessful backups (if any) older than 5 days.
+The following example demonstrates ability of Cloud Custodian to track backup runs of Cloud SQL instances and list unsuccessful backups (if any) older than 5 days.
 
 .. code-block:: yaml
 

@@ -1,28 +1,17 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import collections
 import datetime
 import enum
 import hashlib
 import itertools
 import logging
+import random
 import re
 import time
 import uuid
 from concurrent.futures import as_completed
 
-import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.keyvault import KeyVaultAuthentication, AccessToken
 from azure.keyvault import KeyVaultClient, KeyVaultId
@@ -34,6 +23,7 @@ from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+from json import JSONEncoder
 
 from c7n.utils import chunks, local_session
 
@@ -47,7 +37,7 @@ resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)
                                   re.IGNORECASE)
 
 
-class ResourceIdParser(object):
+class ResourceIdParser:
 
     @staticmethod
     def get_namespace(resource_id):
@@ -94,11 +84,11 @@ def is_resource_group(resource):
     return resource['type'] == constants.RESOURCE_GROUPS_TYPE
 
 
-class StringUtils(object):
+class StringUtils:
 
     @staticmethod
     def equal(a, b, case_insensitive=True):
-        if isinstance(a, six.string_types) and isinstance(b, six.string_types):
+        if isinstance(a, str) and isinstance(b, str):
             if case_insensitive:
                 return a.strip().lower() == b.strip().lower()
             else:
@@ -113,7 +103,7 @@ class StringUtils(object):
 
     @staticmethod
     def naming_hash(val, length=8):
-        if isinstance(val, six.string_types):
+        if isinstance(val, str):
             val = val.encode('utf8')
         return hashlib.sha256(val).hexdigest().lower()[:length]
 
@@ -151,13 +141,17 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
                 send_logger.debug(k + ':' + v)
 
         # Retry codes from urllib3/util/retry.py
-        if response.status_code in [413, 429, 503]:
+        if response.status_code in [429, 503]:
             retry_after = None
             for k in response.headers.keys():
                 if StringUtils.equal('retry-after', k):
                     retry_after = int(response.headers[k])
-
-            if retry_after is not None and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+            if retry_after is None:
+                # we want to attempt retries even when azure fails to send a header
+                # this has been a constant source of instability in larger environments
+                retry_after = (constants.DEFAULT_RETRY_AFTER * retries) + \
+                    random.randint(1, constants.DEFAULT_RETRY_AFTER)
+            if retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
                 send_logger.warning('Received retriable error code %i. Retry-After: %i'
                                     % (response.status_code, retry_after))
                 time.sleep(retry_after)
@@ -210,7 +204,7 @@ class ThreadHelper:
         return results, list(set(exceptions))
 
 
-class Math(object):
+class Math:
 
     @staticmethod
     def mean(numbers):
@@ -233,7 +227,7 @@ class Math(object):
         return float(min(clean_numbers))
 
 
-class GraphHelper(object):
+class GraphHelper:
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
 
     @staticmethod
@@ -291,7 +285,7 @@ class GraphHelper(object):
         return ''
 
 
-class PortsRangeHelper(object):
+class PortsRangeHelper:
 
     PortsRange = collections.namedtuple('PortsRange', 'start end')
 
@@ -333,7 +327,7 @@ class PortsRangeHelper(object):
         """ Converts array of port ranges to the set of integers
             Example: [(10-12), (20,20)] -> {10, 11, 12, 20}
         """
-        return set([i for r in ranges for i in range(r.start, r.end + 1)])
+        return {i for r in ranges for i in range(r.start, r.end + 1)}
 
     @staticmethod
     def validate_ports_string(ports):
@@ -389,7 +383,14 @@ class PortsRangeHelper(object):
         return result
 
     @staticmethod
-    def build_ports_dict(nsg, direction_key, ip_protocol):
+    def check_address(target_address, address_set, address):
+        if not target_address:
+            return True
+        return target_address in address_set or target_address == address
+
+    @staticmethod
+    def build_ports_dict(nsg, direction_key, ip_protocol,
+                         source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
             based on the provided Network Security Group object, direction and protocol.
         """
@@ -410,6 +411,18 @@ class PortsRangeHelper(object):
                not StringUtils.equal(protocol, ip_protocol):
                 continue
 
+            if not PortsRangeHelper.check_address(
+                    source_address,
+                    rule['properties'].get('sourceAddressPrefixes'),
+                    rule['properties'].get('sourceAddressPrefix')):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    destination_address,
+                    rule['properties'].get('destinationAddressPrefixes'),
+                    rule['properties'].get('destinationAddressPrefix')):
+                continue
+
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')
             ports_set = PortsRangeHelper.get_ports_set_from_rule(rule)
 
@@ -420,7 +433,7 @@ class PortsRangeHelper(object):
         return ports
 
 
-class IpRangeHelper(object):
+class IpRangeHelper:
 
     @staticmethod
     def parse_ip_ranges(data, key):
@@ -447,7 +460,7 @@ class IpRangeHelper(object):
         return result
 
 
-class AppInsightsHelper(object):
+class AppInsightsHelper:
     log = logging.getLogger('custodian.azure.utils.AppInsightsHelper')
 
     @staticmethod
@@ -477,21 +490,41 @@ class AppInsightsHelper(object):
             return ''
 
 
-class ManagedGroupHelper(object):
+class ManagedGroupHelper:
+    class serialize(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
+
+    @staticmethod
+    def filter_subscriptions(key, dictionary):
+        for k, v in dictionary.items():
+            if k == key:
+                if v == '/subscriptions':
+                    yield dictionary
+            elif isinstance(v, dict):
+                for result in ManagedGroupHelper.filter_subscriptions(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in ManagedGroupHelper.filter_subscriptions(key, d):
+                        yield result
 
     @staticmethod
     def get_subscriptions_list(managed_resource_group, credentials):
         client = ManagementGroupsAPI(credentials)
-        entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
-
-        return [e.name for e in entities if e.type == '/subscriptions']
+        groups = client.management_groups.get(
+            group_id=managed_resource_group, recurse=True,
+            expand="children").serialize()["properties"]
+        subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
+        subscriptions = [subscription['name'] for subscription in subscriptions]
+        return subscriptions
 
 
 def generate_key_vault_url(name):
     return constants.TEMPLATE_KEYVAULT_URL.format(name)
 
 
-class RetentionPeriod(object):
+class RetentionPeriod:
 
     PATTERN = re.compile("^P([1-9][0-9]*)([DWMY])$")
 

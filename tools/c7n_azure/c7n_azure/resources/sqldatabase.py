@@ -1,4 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +17,6 @@ import abc
 import enum
 import logging
 
-import six
 from azure.mgmt.sql.models import BackupLongTermRetentionPolicy, DatabaseUpdate, Sku
 from msrestazure.azure_exceptions import CloudError
 
@@ -74,7 +74,7 @@ class SqlDatabase(ChildArmResourceManager):
                     'server_name': parent_resource['name']}
 
 
-class BackupRetentionPolicyHelper(object):
+class BackupRetentionPolicyHelper:
 
     SHORT_TERM_SQL_OPERATIONS = 'backup_short_term_retention_policies'
     LONG_TERM_SQL_OPERATIONS = 'backup_long_term_retention_policies'
@@ -135,8 +135,7 @@ class BackupRetentionPolicyHelper(object):
         return retention_policy
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BackupRetentionPolicyBaseFilter(Filter):
+class BackupRetentionPolicyBaseFilter(Filter, metaclass=abc.ABCMeta):
 
     schema = type_schema(
         'backup-retention-policy',
@@ -305,8 +304,7 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
         return actual_duration
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BackupRetentionPolicyBaseAction(AzureBaseAction):
+class BackupRetentionPolicyBaseAction(AzureBaseAction, metaclass=abc.ABCMeta):
 
     def __init__(self, operations_property, *args, **kwargs):
         super(BackupRetentionPolicyBaseAction, self).__init__(*args, **kwargs)
