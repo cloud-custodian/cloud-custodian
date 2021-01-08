@@ -14,6 +14,7 @@ NAME_TEMPLATE = "{Name}"
 
 log = logging.getLogger('orgaccounts')
 
+
 @click.command()
 @click.option(
     '--role',
