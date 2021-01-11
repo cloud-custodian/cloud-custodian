@@ -1776,7 +1776,7 @@ class ScalingPolicy(query.QueryResourceManager):
         )
         filter_name = 'PolicyNames'
         filter_type = 'list'
-        cfn_type = config_type = 'AWS::AutoScaling::ScalingPolicy'
+        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
 
 
 @ASG.filter_registry.register('scaling-policy')
