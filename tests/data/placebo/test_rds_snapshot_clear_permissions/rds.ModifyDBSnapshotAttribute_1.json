@@ -6,9 +6,7 @@
             "DBSnapshotAttributes": [
                 {
                     "AttributeName": "restore",
-                    "AttributeValues": [
-                        "644160558196"
-                    ]
+                    "AttributeValues": []
                 }
             ]
         },

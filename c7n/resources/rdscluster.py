@@ -422,6 +422,7 @@ class RDSClusterSnapshot(QueryResourceManager):
 class CrossAccountSnapshot(CrossAccountAccessFilter):
 
     permissions = ('rds:DescribeDBClusterSnapshotAttributes',)
+    attributes_key = 'c7n:attributes'
     annotation_key = 'c7n:CrossAccountViolations'
 
     def process(self, resources, event=None):
@@ -445,7 +446,7 @@ class CrossAccountSnapshot(CrossAccountAccessFilter):
                 client.describe_db_cluster_snapshot_attributes,
                      DBClusterSnapshotIdentifier=r['DBClusterSnapshotIdentifier'])[
                          'DBClusterSnapshotAttributesResult']['DBClusterSnapshotAttributes']}
-            r['c7n:attributes'] = attrs
+            r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
@@ -478,48 +479,59 @@ class RDSSnapshotAge(AgeFilter):
     date_attribute = 'SnapshotCreateTime'
 
 
-@RDSClusterSnapshot.action_registry.register('remove-restore-permissions')
-class RemoveRestorePermissions(rds.RemoveRestorePermissions):
-    """Remove cross-account copy/restore permissions
+@RDSClusterSnapshot.action_registry.register('set-permissions')
+class SetPermissions(rds.SetPermissions):
+    """Set permissions for copying or restoring an RDS cluster snapshot
 
-    Note: The scope of removal can be controlled with the `accounts`
-    key, which accepts a list containing:
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove, respectively.  The default is to remove any
+    permissions granted to other AWS accounts.
 
-    - Explicit account IDs
-    - `all`, to remove public copy/restore permissions
-    - `matched`, to remove permissions matched by the `cross-account` filter
+    Use `remove: matched` in combination with the `cross-account` filter
+    for more flexible removal options such as preserving access for
+    a set of whitelisted accounts:
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: rds-cluster-snapshot-remove-cross-account
+              - name: rds-cluster-snapshot-prune-permissions
                 resource: rds-cluster-snapshot
                 filters:
                   - type: cross-account
-                    whitelist_from:
-                      url: s3://mybucket/myaccounts.csv
-                      format: csv2dict
+                    whitelist:
+                      - '112233445566'
                 actions:
-                  - type: remove-restore-permissions
-                    accounts:
-                      - matched
+                  - type: set-permissions
+                    remove: matched
     """
-
     permissions = ('rds:ModifyDBClusterSnapshotAttribute',)
 
-    def process_snapshot(self, client, snapshot, accounts):
-        if 'matched' in accounts:
-            remove = (accounts - {'matched'}).union(
-                snapshot.get(CrossAccountSnapshot.annotation_key), [])
-        else:
-            remove = accounts
+    def process_snapshot(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
 
-        client.modify_db_cluster_snapshot_attribute(
-            DBClusterSnapshotIdentifier=snapshot['DBClusterSnapshotIdentifier'],
-            AttributeName='restore',
-            ValuesToRemove=list(remove))
+        if not (add_accounts or remove_accounts):
+            if CrossAccountSnapshot.attributes_key not in snapshot:
+                attrs = {
+                    t['AttributeName']: t['AttributeValues']
+                    for t in self.manager.retry(
+                        client.describe_db_cluster_snapshot_attributes,
+                        DBClusterSnapshotIdentifier=snapshot['DBClusterSnapshotIdentifier']
+                    )['DBClusterSnapshotAttributesResult']['DBClusterSnapshotAttributes']
+                }
+                snapshot[CrossAccountSnapshot.attributes_key] = attrs
+            remove_accounts = snapshot[CrossAccountSnapshot.attributes_key].get('restore', [])
+        elif remove_accounts == 'matched':
+            remove_accounts = snapshot.get(CrossAccountSnapshot.annotation_key, [])
+
+        if add_accounts or remove_accounts:
+            client.modify_db_cluster_snapshot_attribute(
+                DBClusterSnapshotIdentifier=snapshot['DBClusterSnapshotIdentifier'],
+                AttributeName='restore',
+                ValuesToRemove=remove_accounts,
+                ValuesToAdd=add_accounts)
 
 
 @RDSClusterSnapshot.action_registry.register('delete')

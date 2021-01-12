@@ -1243,7 +1243,7 @@ class RDSSnapshotTest(BaseTest):
             ]
         )
 
-    def _get_effective_restore_permissions(self, client, snapshot_id):
+    def _get_effective_permissions(self, client, snapshot_id):
         attributes = client.describe_db_snapshot_attributes(
             DBSnapshotIdentifier=snapshot_id
         )["DBSnapshotAttributesResult"]["DBSnapshotAttributes"]
@@ -1253,30 +1253,31 @@ class RDSSnapshotTest(BaseTest):
         }
         return set(attr_map.get("restore", []))
 
-    def test_rds_remove_restore_permissions(self):
+    def test_set_permissions(self):
         session_factory = self.replay_flight_data(
-            "test_rds_remove_restore_permissions",
+            "test_rds_snapshot_set_permissions",
             region="us-east-2"
         )
         target_snapshot_id = "testing"
         keep = "644160558196"
         remove = "123456789012"
+        add = "234567890123"
         policy = self.load_policy(
             {
-                "name": "rds-snapshot-remove-cross-account",
+                "name": "rds-snapshot-remove-permissions",
                 "resource": "rds-snapshot",
                 "filters": [
                     {"DBSnapshotIdentifier": target_snapshot_id}
                 ],
                 "actions": [
-                    {"type": "remove-restore-permissions", "accounts": [remove, "all"]}
+                    {"type": "set-permissions", "add": [add], "remove": [remove, "all"]}
                 ]
             },
             session_factory=session_factory,
             config={"region": "us-east-2"},
         )
         client = session_factory().client("rds")
-        restore_permissions_before = self._get_effective_restore_permissions(
+        restore_permissions_before = self._get_effective_permissions(
             client,
             target_snapshot_id,
         )
@@ -1284,16 +1285,16 @@ class RDSSnapshotTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        restore_permissions_after = self._get_effective_restore_permissions(
+        restore_permissions_after = self._get_effective_permissions(
             client,
             target_snapshot_id,
         )
-        self.assertIn(keep, restore_permissions_after)
+        self.assertTrue({keep, add}.issubset(restore_permissions_after))
         self.assertEqual({remove, "all"}.intersection(restore_permissions_after), set())
 
-    def test_rds_remove_matched_restore_permissions(self):
+    def test_remove_matched_permissions(self):
         session_factory = self.replay_flight_data(
-            "test_rds_remove_matched_restore_permissions",
+            "test_rds_snapshot_remove_matched_permissions",
             region="us-east-2"
         )
         target_snapshot_id = "testing"
@@ -1301,14 +1302,14 @@ class RDSSnapshotTest(BaseTest):
         remove = "123456789012"
         policy = self.load_policy(
             {
-                "name": "rds-snapshot-remove-cross-account",
+                "name": "rds-snapshot-remove-matched-permissions",
                 "resource": "rds-snapshot",
                 "filters": [
                     {"DBSnapshotIdentifier": target_snapshot_id},
                     {"type": "cross-account", "whitelist": [keep]},
                 ],
                 "actions": [
-                    {"type": "remove-restore-permissions", "accounts": ["matched"]}
+                    {"type": "set-permissions", "remove": "matched"}
                 ]
             },
             session_factory=session_factory,
@@ -1319,21 +1320,52 @@ class RDSSnapshotTest(BaseTest):
         restore_permissions_before = set(resources[0]["c7n:attributes"]["restore"])
         self.assertTrue({keep, remove}.issubset(restore_permissions_before))
 
-        restore_permissions_after = self._get_effective_restore_permissions(
+        restore_permissions_after = self._get_effective_permissions(
             session_factory().client("rds"),
             resources[0]["DBSnapshotIdentifier"]
         )
         self.assertIn(keep, restore_permissions_after)
         self.assertNotIn(remove, restore_permissions_after)
 
-    def test_rds_remove_restore_permissions_invalid(self):
+    def test_clear_permissions(self):
+        session_factory = self.replay_flight_data(
+            "test_rds_snapshot_clear_permissions",
+            region="us-east-2"
+        )
+        target_snapshot_id = "testing"
+        policy = self.load_policy(
+            {
+                "name": "rds-snapshot-clear-permissions",
+                "resource": "rds-snapshot",
+                "filters": [
+                    {"DBSnapshotIdentifier": target_snapshot_id},
+                ],
+                "actions": [
+                    {"type": "set-permissions"}
+                ]
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        restore_permissions_before = set(resources[0]["c7n:attributes"]["restore"])
+        self.assertGreater(len(restore_permissions_before), 0)
+
+        restore_permissions_after = self._get_effective_permissions(
+            session_factory().client("rds"),
+            resources[0]["DBSnapshotIdentifier"]
+        )
+        self.assertEqual(len(restore_permissions_after), 0)
+
+    def test_set_permissions_invalid(self):
         with self.assertRaises(PolicyValidationError) as err:
             self.load_policy(
                 {
-                    "name": "rds-snapshot-remove-cross-account",
+                    "name": "rds-snapshot-set-permissions-invalid",
                     "resource": "rds-snapshot",
                     "actions": [
-                        {"type": "remove-restore-permissions", "accounts": ["matched"]}
+                        {"type": "set-permissions", "remove": "matched"}
                     ]
                 },
             )

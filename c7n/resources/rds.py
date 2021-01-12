@@ -1158,6 +1158,7 @@ class RestoreInstance(BaseAction):
 class CrossAccountAccess(CrossAccountAccessFilter):
 
     permissions = ('rds:DescribeDBSnapshotAttributes',)
+    attributes_key = 'c7n:attributes'
     annotation_key = 'c7n:CrossAccountViolations'
 
     def process(self, resources, event=None):
@@ -1186,7 +1187,7 @@ class CrossAccountAccess(CrossAccountAccessFilter):
                 client.describe_db_snapshot_attributes,
                 DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
-            r['c7n:attributes'] = attrs
+            r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
@@ -1195,16 +1196,17 @@ class CrossAccountAccess(CrossAccountAccessFilter):
         return results
 
 
-@RDSSnapshot.action_registry.register('remove-restore-permissions')
-class RemoveRestorePermissions(BaseAction):
-    """Remove cross-account copy/restore permissions
+@RDSSnapshot.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Set permissions for copying or restoring an RDS snapshot
 
-    Note: The scope of removal can be controlled with the `accounts`
-    key, which accepts a list containing:
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove, respectively.  The default is to remove any
+    permissions granted to other AWS accounts.
 
-    - Explicit account IDs
-    - `all`, to remove public copy/restore permissions
-    - `matched`, to remove permissions matched by the `cross-account` filter
+    Use `remove: matched` in combination with the `cross-account` filter
+    for more flexible removal options such as preserving access for
+    a set of whitelisted accounts:
 
     :example:
 
@@ -1215,31 +1217,37 @@ class RemoveRestorePermissions(BaseAction):
                 resource: rds-snapshot
                 filters:
                   - type: cross-account
-                    whitelist_from:
-                      url: s3://mybucket/myaccounts.csv
-                      format: csv2dict
+                    whitelist:
+                      - '112233445566'
                 actions:
-                  - type: remove-restore-permissions
-                    accounts:
-                      - matched
+                  - type: set-permissions
+                    remove: matched
     """
-
     schema = type_schema(
-        'remove-restore-permissions',
-        accounts={
-            'type': 'array',
-            'items': {
+        'set-permissions',
+        remove={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {
                 'oneOf': [
-                    {'enum': ['matched', 'all']},
                     {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
+                ],
+            }}
+        ]},
+        add={
+            'type': 'array', 'items': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
                 ]
             }
-        })
+        }
+    )
 
     permissions = ('rds:ModifyDBSnapshotAttribute',)
 
     def validate(self):
-        if 'matched' in self.data.get('accounts'):
+        if self.data.get('remove') == 'matched':
             found = False
             for f in self.manager.iter_filters():
                 if isinstance(f, CrossAccountAccessFilter):
@@ -1252,21 +1260,33 @@ class RemoveRestorePermissions(BaseAction):
 
     def process(self, snapshots):
         client = local_session(self.manager.session_factory).client('rds')
-        accounts = set(self.data.get('accounts'))
         for s in snapshots:
-            self.process_snapshot(client, s, accounts)
+            self.process_snapshot(client, s)
 
-    def process_snapshot(self, client, snapshot, accounts):
-        if 'matched' in accounts:
-            remove = (accounts - {'matched'}).union(
-                snapshot.get(CrossAccountAccess.annotation_key), [])
-        else:
-            remove = accounts
+    def process_snapshot(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
 
-        client.modify_db_snapshot_attribute(
-            DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'],
-            AttributeName='restore',
-            ValuesToRemove=list(remove))
+        if not (add_accounts or remove_accounts):
+            if CrossAccountAccess.attributes_key not in snapshot:
+                attrs = {
+                    t['AttributeName']: t['AttributeValues']
+                    for t in self.manager.retry(
+                        client.describe_db_snapshot_attributes,
+                        DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier']
+                    )['DBSnapshotAttributesResult']['DBSnapshotAttributes']
+                }
+                snapshot[CrossAccountAccess.attributes_key] = attrs
+            remove_accounts = snapshot[CrossAccountAccess.attributes_key].get('restore', [])
+        elif remove_accounts == 'matched':
+            remove_accounts = snapshot.get(CrossAccountAccess.annotation_key, [])
+
+        if add_accounts or remove_accounts:
+            client.modify_db_snapshot_attribute(
+                DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'],
+                AttributeName='restore',
+                ValuesToRemove=remove_accounts,
+                ValuesToAdd=add_accounts)
 
 
 @RDSSnapshot.action_registry.register('region-copy')

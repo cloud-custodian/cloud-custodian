@@ -7,6 +7,8 @@
                 {
                     "AttributeName": "restore",
                     "AttributeValues": [
+                        "all",
+                        "644160558196",
                         "644160558196"
                     ]
                 }
