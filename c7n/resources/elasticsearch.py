@@ -150,7 +150,7 @@ class ElasticSearchSearchConnections(Filter):
                 'value_from': {'$ref': '#/definitions/filters_common/value_from'},
                 'value': {'$ref': '#/definitions/filters_common/value'},
                 'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
-        }},
+            }},
         outbound={
             'type': 'object',
             'additionalProperties': False,
@@ -162,12 +162,11 @@ class ElasticSearchSearchConnections(Filter):
                 'value_from': {'$ref': '#/definitions/filters_common/value_from'},
                 'value': {'$ref': '#/definitions/filters_common/value'},
                 'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
-        }})
+            }})
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     annotate = False
     permissions = ('es:ESCrossClusterGet',)
-
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('es')
