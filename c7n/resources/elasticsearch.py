@@ -138,11 +138,36 @@ class ElasticSearchSearchConnections(Filter):
    """
 
     schema = type_schema(
-        'cross-cluster', inbound=ValueFilter.schema, outbound=ValueFilter.schema)
+        'cross-cluster',
+        inbound={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'key': {'type': 'string'},
+                'value_type': {'$ref': '#/definitions/filters_common/value_types'},
+                'default': {'type': 'object'},
+                'value_regex': {'type': 'string'},
+                'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+                'value': {'$ref': '#/definitions/filters_common/value'},
+                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+        }},
+        outbound={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'key': {'type': 'string'},
+                'value_type': {'$ref': '#/definitions/filters_common/value_types'},
+                'default': {'type': 'object'},
+                'value_regex': {'type': 'string'},
+                'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+                'value': {'$ref': '#/definitions/filters_common/value'},
+                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+        }})
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     annotate = False
     permissions = ('es:ESCrossClusterGet',)
+
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('es')
