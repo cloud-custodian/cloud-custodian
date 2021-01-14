@@ -39,16 +39,19 @@ class KmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
+
     :example:
-        .. code-block:: yaml
-            policies:
-                - name: message-broker-kms-key-filter
-                  resource: message-broker
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/mq)"
-                      op: regex
+
+    .. code-block:: yaml
+
+        policies:
+          - name: message-broker-kms-key-filter
+            resource: message-broker
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/mq)"
+                op: regex
     """
     RelatedIdsExpression = 'EncryptionOptions.KmsKeyId'
 
