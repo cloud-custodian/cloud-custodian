@@ -390,7 +390,6 @@ class ConfigClusterSnapshot(ConfigSource):
                 resource.pop(k)
                 k = 'IAMD%s' % k[4:]
                 resource[k] = v
-        resource['Tags'] = [{'Key': k, 'Value': v} for k, v in item['tags'].items()]
         return resource
 
 
