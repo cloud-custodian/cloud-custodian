@@ -525,7 +525,7 @@ class RDSClusterSnapshotTest(BaseTest):
 
     def test_set_permissions(self):
         session_factory = self.replay_flight_data(
-            "test_rdscluster_set_permissions",
+            "test_rdscluster_snapshot_set_permissions",
             region="us-east-2"
         )
         target_snapshot_id = "test"
@@ -536,9 +536,9 @@ class RDSClusterSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-remove-cross-account",
                 "resource": "rds-cluster-snapshot",
-                "filters": [
-                    {"DBClusterSnapshotIdentifier": target_snapshot_id}
-                ],
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "actions": [
                     {"type": "set-permissions", "add": [add], "remove": [remove, "all"]}
                 ]
@@ -564,7 +564,7 @@ class RDSClusterSnapshotTest(BaseTest):
 
     def test_remove_matched_permissions(self):
         session_factory = self.replay_flight_data(
-            "test_rdscluster_remove_matched_permissions",
+            "test_rdscluster_snapshot_remove_matched_permissions",
             region="us-east-2"
         )
         target_snapshot_id = "test"
@@ -574,8 +574,10 @@ class RDSClusterSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-remove-cross-account",
                 "resource": "rds-cluster-snapshot",
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "filters": [
-                    {"DBClusterSnapshotIdentifier": target_snapshot_id},
                     {"type": "cross-account", "whitelist": [keep]},
                 ],
                 "actions": [
@@ -599,7 +601,7 @@ class RDSClusterSnapshotTest(BaseTest):
 
     def test_clear_permissions(self):
         session_factory = self.replay_flight_data(
-            "test_rdscluster_clear_permissions",
+            "test_rdscluster_snapshot_clear_permissions",
             region="us-east-2"
         )
         target_snapshot_id = "test"
@@ -607,9 +609,9 @@ class RDSClusterSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-remove-cross-account",
                 "resource": "rds-cluster-snapshot",
-                "filters": [
-                    {"DBClusterSnapshotIdentifier": target_snapshot_id},
-                ],
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "actions": [
                     {"type": "set-permissions"}
                 ]

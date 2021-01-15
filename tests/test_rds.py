@@ -1266,9 +1266,9 @@ class RDSSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-remove-permissions",
                 "resource": "rds-snapshot",
-                "filters": [
-                    {"DBSnapshotIdentifier": target_snapshot_id}
-                ],
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "actions": [
                     {"type": "set-permissions", "add": [add], "remove": [remove, "all"]}
                 ]
@@ -1304,8 +1304,10 @@ class RDSSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-remove-matched-permissions",
                 "resource": "rds-snapshot",
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "filters": [
-                    {"DBSnapshotIdentifier": target_snapshot_id},
                     {"type": "cross-account", "whitelist": [keep]},
                 ],
                 "actions": [
@@ -1337,9 +1339,9 @@ class RDSSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-clear-permissions",
                 "resource": "rds-snapshot",
-                "filters": [
-                    {"DBSnapshotIdentifier": target_snapshot_id},
-                ],
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
                 "actions": [
                     {"type": "set-permissions"}
                 ]
