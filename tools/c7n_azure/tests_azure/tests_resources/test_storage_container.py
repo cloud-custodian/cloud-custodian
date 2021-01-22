@@ -1,8 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from ..azure_common import BaseTest, arm_template, cassette_name
+from ..azure_common import BaseTest, arm_template, cassette_name, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.storage_utils import StorageUtilities
 from mock import patch
+from c7n_azure.constants import CONTAINER_EVENT_TRIGGER_MODE
 from c7n_azure.session import Session
 from c7n_azure.utils import local_session
 
@@ -71,6 +72,27 @@ class StorageContainerTest(BaseTest):
             self.assertEqual('test_storage', args[0])
             self.assertTrue(args[1].startswith('cctstorage'))
             self.assertEqual('None', kwargs['public_access'])
+
+    @arm_template('storage.json')
+    def test_event(self):
+        p = self.load_policy({
+            'name': 'test-azure-container-event',
+            'mode':
+                {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                 'events': ['StorageContainerWrite']},
+            'resource': 'azure.storage-container'})
+
+        account = self.setup_account()
+
+        event = {"subject": "/subscriptions/" + DEFAULT_SUBSCRIPTION_ID + "/resourceGroups/"
+                            "test_storage/providers/Microsoft.Storage/storageAccounts"
+                            "/" + account.name + "/blobServices/default/containers/containerone",
+                "eventTime": "2019-07-16T18:30:43.3595255Z",
+                "id": "619d2674-b396-4356-9619-6c5a52fe4e88"}
+
+        resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'containerone')
 
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\

@@ -60,6 +60,7 @@ install_requires = \
  'azure-mgmt-storage>=7.1.0,<8.0.0',
  'azure-mgmt-subscription>=0.5.0,<0.6.0',
  'azure-mgmt-web>=0.44.0,<0.45.0',
+ 'azure-mgmt-msi>=1.0.0',
  'azure-storage-blob>=2.1,<2.2',
  'azure-storage-file>=2.1.0,<3.0.0',
  'azure-storage-queue>=2.1,<2.2',
