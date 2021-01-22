@@ -83,6 +83,7 @@ class ConfigRule(QueryResourceManager):
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'
         cfn_type = 'AWS::Config::ConfigRule'
+        universal_taggable = True
 
 
 @ConfigRule.filter_registry.register('status')
