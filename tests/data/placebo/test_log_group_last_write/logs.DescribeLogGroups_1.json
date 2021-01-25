@@ -1,74 +1,15 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "dc1f3c1e-a41d-11e6-a2a7-1fd802fe6512", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "dc1f3c1e-a41d-11e6-a2a7-1fd802fe6512", 
-                "date": "Sun, 06 Nov 2016 12:38:02 GMT", 
-                "content-length": "1621", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
         "logGroups": [
             {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/C7N-c7nRun:*", 
-                "creationTime": 1476975252441, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/C7N-c7nRun", 
-                "storedBytes": 1167
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/C7N_Cleanup:*", 
-                "creationTime": 1476976332320, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/C7N_Cleanup", 
-                "storedBytes": 386
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/c7n-cleanup:*", 
-                "creationTime": 1476984664699, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/c7n-cleanup", 
-                "storedBytes": 2166
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/c7n-s3-encrypt:*", 
-                "creationTime": 1477488193880, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/c7n-s3-encrypt", 
-                "storedBytes": 34507
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/custodian-ec2-compliance:*", 
-                "creationTime": 1475673487726, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/custodian-ec2-compliance", 
-                "storedBytes": 108297
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/ec2-instance-type:*", 
-                "creationTime": 1470652575943, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/ec2-instance-type", 
-                "storedBytes": 142043
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/myIOTFunction:*", 
-                "creationTime": 1476796549845, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/myIOTFunction", 
-                "storedBytes": 4661
-            }, 
-            {
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/process_resources:*", 
-                "creationTime": 1466943945968, 
-                "metricFilterCount": 0, 
-                "logGroupName": "/aws/lambda/process_resources", 
-                "storedBytes": 4904
+                "logGroupName": "test-log-group",
+                "creationTime": 1598337789561,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-log-group:*",
+                "storedBytes": 0
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

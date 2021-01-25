@@ -1,0 +1,132 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "tf-asg-20201028163034137800000003",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:cf96ea8b-d649-4df2-b3f3-6dded4a9f4e0:autoScalingGroupName/tf-asg-20201028163034137800000003",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0ab53d9b5207ff8c0",
+                    "LaunchTemplateName": "foobar20201028163033674600000001",
+                    "Version": "$Latest"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-07f09bcc2aa483036",
+                        "InstanceType": "t3.medium",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0ab53d9b5207ff8c0",
+                            "LaunchTemplateName": "foobar20201028163033674600000001",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 16,
+                    "minute": 30,
+                    "second": 35,
+                    "microsecond": 324000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "tf-asg-20201028163034137800000003",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "App",
+                        "Value": "Testing",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            {
+                "AutoScalingGroupName": "tf-asg-20201029190753469500000003",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:ad585834-87aa-4f66-a277-093a61179761:autoScalingGroupName/tf-asg-20201029190753469500000003",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-05f6f9c818fbd5b1f",
+                    "LaunchTemplateName": "foobar20201029190752843100000001",
+                    "Version": "$Latest"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-0cbf71d8ed0854b1b",
+                        "InstanceType": "t3.medium",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-05f6f9c818fbd5b1f",
+                            "LaunchTemplateName": "foobar20201029190752843100000001",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 19,
+                    "minute": 7,
+                    "second": 54,
+                    "microsecond": 677000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "tf-asg-20201029190753469500000003",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "App",
+                        "Value": "Testing",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

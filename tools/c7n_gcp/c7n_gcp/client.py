@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2017 The Forseti Security Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,6 +65,13 @@ RETRYABLE_EXCEPTIONS = (
     ssl.SSLError,
     URLError,  # include "no network connection"
 )
+
+
+def get_default_project():
+    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+              'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
+        if k in os.environ:
+            return os.environ[k]
 
 
 class PaginationNotSupported(Exception):
@@ -188,10 +197,10 @@ class Session:
     def get_default_project(self):
         if self.project_id:
             return self.project_id
-        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
-                  'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
-            if k in os.environ:
-                return os.environ[k]
+        default_project = get_default_project()
+        if default_project:
+            return default_project
+
         raise ValueError("No GCP Project ID set - set CLOUDSDK_CORE_PROJECT")
 
     def get_default_region(self):

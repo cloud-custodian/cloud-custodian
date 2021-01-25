@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from copy import deepcopy
 from datetime import datetime, timedelta
 import json
@@ -89,6 +78,19 @@ class PolicyMetaLint(BaseTest):
                 "kinesis:DeleteStream",
             },
         )
+
+    def test_resource_type_repr_with_arn_type(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})
+        # check the repr absent a config type and cfn type but with an arn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert policy.resource_manager.resource_type.cfn_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
+
+    def test_resource_type_repr(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ecr'})
+        # check the repr absent a config type but with a cfn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::ECR::Repository>'
 
     def test_schema_plugin_name_mismatch(self):
         # todo iterate over all clouds not just aws resources
@@ -224,6 +226,26 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q4 2020
+            'AwsApiGatewayRestApi',
+            'AwsApiGatewayStage',
+            'AwsApiGatewayV2Api',
+            'AwsApiGatewayV2Stage',
+            'AwsCertificateManagerCertificate',
+            'AwsCloudTrailTrail',
+            'AwsElbLoadBalancer',
+            'AwsIamGroup',
+            'AwsRedshiftCluster',
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
@@ -242,7 +264,9 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
-            'AWS::EC2::Host',
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
@@ -277,9 +301,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio',
-            'AWS::SSM::FileData',
-            'AWS::SecretsManager::Secret'}
+            'AWS::SSM::FileData'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -373,7 +395,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
@@ -642,6 +664,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
@@ -1215,7 +1238,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',

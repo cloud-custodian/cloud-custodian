@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 RDS Resource Manager
 ====================
@@ -81,16 +70,18 @@ actions = ActionRegistry('rds.actions')
 class DescribeRDS(DescribeSource):
 
     def augment(self, dbs):
-        return universal_augment(
-            self.manager, super(DescribeRDS, self).augment(dbs))
+        for d in dbs:
+            d['Tags'] = d.pop('TagList', ())
+        return dbs
 
 
 class ConfigRDS(ConfigSource):
 
     def load_resource(self, item):
-        resource = super(ConfigRDS, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
+        resource = super().load_resource(item)
+        for k in list(resource.keys()):
+            if k.startswith('Db'):
+                resource["DB%s" % k[2:]] = resource[k]
         return resource
 
 
@@ -973,18 +964,9 @@ class RDSSubscriptionDelete(BaseAction):
 class DescribeRDSSnapshot(DescribeSource):
 
     def augment(self, snaps):
-        return universal_augment(
-            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
-
-
-class ConfigRDSSnapshot(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDSSnapshot, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        # TODO: Load DBSnapshotAttributes into annotation
-        return resource
+        for s in snaps:
+            s['Tags'] = s.pop('TagList', ())
+        return snaps
 
 
 @resources.register('rds-snapshot')
@@ -1006,7 +988,7 @@ class RDSSnapshot(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRDSSnapshot,
-        'config': ConfigRDSSnapshot
+        'config': ConfigSource
     }
 
 

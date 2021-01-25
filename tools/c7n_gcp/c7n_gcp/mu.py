@@ -1,17 +1,7 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
+import base64
 from collections import namedtuple
 import json
 import logging
@@ -481,7 +471,7 @@ class PubSubSource(EventSource):
 
         client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
-    def add(self):
+    def add(self, func):
         self.ensure_topic()
 
     def remove(self):
@@ -601,6 +591,7 @@ class PeriodicEvent(EventSource):
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
                 'topicName': target.get_topic_param(),
+                'data': base64.b64encode("{\"schedule\": true}".encode('utf-8')).decode('utf-8'),
             }
         return job
 

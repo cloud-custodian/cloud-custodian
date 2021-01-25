@@ -1,30 +1,31 @@
-alabaster==0.7.12
-babel==2.8.0
-certifi==2020.6.20
-chardet==3.0.4
-colorama==0.4.3; sys_platform == "win32"
+alabaster==0.7.12; python_version >= "3.5"
+babel==2.9.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.5"
+certifi==2020.12.5; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+chardet==4.0.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+click==7.1.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+colorama==0.4.4; python_version >= "3.5" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.5" and python_full_version >= "3.5.0"
 commonmark==0.9.1
-docutils==0.15.2
-idna==2.10
-imagesize==1.2.0
-jinja2==2.11.2
-markdown==3.0.1
-markupsafe==1.1.1
-packaging==20.4
-pygments==2.6.1
-pyparsing==2.4.7
-pytz==2020.1
+docutils==0.16; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+idna==2.10; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+imagesize==1.2.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.5"
+jinja2==2.11.2; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+markdown==3.0.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
+markupsafe==1.1.1; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+packaging==20.8; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.5"
+pygments==2.7.3; python_version >= "3.5"
+pyparsing==2.4.7; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.5"
+pytz==2020.4; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.5"
 recommonmark==0.6.0
-requests==2.24.0
-six==1.15.0
-snowballstemmer==2.0.0
-sphinx==3.0.4
+requests==2.25.1; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+snowballstemmer==2.0.0; python_version >= "3.5"
 sphinx-markdown-tables==0.0.12
 sphinx-rtd-theme==0.4.3
-sphinxcontrib-applehelp==1.0.2
-sphinxcontrib-devhelp==1.0.2
-sphinxcontrib-htmlhelp==1.0.3
-sphinxcontrib-jsmath==1.0.1
-sphinxcontrib-qthelp==1.0.3
-sphinxcontrib-serializinghtml==1.1.4
-urllib3==1.25.10
+sphinx==3.0.4; python_version >= "3.5"
+sphinxcontrib-applehelp==1.0.2; python_version >= "3.5"
+sphinxcontrib-devhelp==1.0.2; python_version >= "3.5"
+sphinxcontrib-htmlhelp==1.0.3; python_version >= "3.5"
+sphinxcontrib-jsmath==1.0.1; python_version >= "3.5"
+sphinxcontrib-qthelp==1.0.3; python_version >= "3.5"
+sphinxcontrib-serializinghtml==1.1.4; python_version >= "3.5"
+typing-extensions==3.7.4.3
+urllib3==1.26.2; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.5"

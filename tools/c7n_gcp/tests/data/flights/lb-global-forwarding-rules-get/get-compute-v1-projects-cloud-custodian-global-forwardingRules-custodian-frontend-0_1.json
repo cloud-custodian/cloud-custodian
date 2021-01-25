@@ -1,0 +1,35 @@
+{
+  "body": {
+    "kind": "compute#forwardingRule", 
+    "description": "", 
+    "creationTimestamp": "2019-04-30T01:56:20.992-07:00", 
+    "ipVersion": "IPV4", 
+    "networkTier": "PREMIUM", 
+    "loadBalancingScheme": "EXTERNAL", 
+    "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/custodian-load-balancer-0-target-proxy", 
+    "portRange": "80-80", 
+    "IPProtocol": "TCP", 
+    "IPAddress": "34.96.96.217", 
+    "id": "3743124679949661019", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/custodian-frontend-0", 
+    "name": "custodian-frontend-0"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "618", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 16:25:39 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 16:25:39 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/forwardingRules/custodian-frontend-0?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"nm2G0nPKF2rvfdUOXjmXfdSPbVQ=/HtBdFNSU5v8eZjwzfA19sinILFw=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

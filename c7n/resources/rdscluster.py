@@ -1,21 +1,8 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 
 from concurrent.futures import as_completed
-from datetime import datetime
-from dateutil.tz import tzutc
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter, CrossAccountAccessFilter
@@ -23,7 +10,6 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
-from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
@@ -35,7 +21,24 @@ log = logging.getLogger('custodian.rds-cluster')
 class DescribeCluster(DescribeSource):
 
     def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+class ConfigCluster(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource.pop('TagList', None)  # we pull tags from supplementary config
+        for k in list(resource.keys()):
+            if k.startswith('Dbc'):
+                resource["DBC%s" % (k[3:])] = resource.pop(k)
+            elif k.startswith('Iamd'):
+                resource['IAMD%s' % (k[4:])] = resource.pop(k)
+            elif k.startswith('Dbs'):
+                resource["DBS%s" % (k[3:])] = resource.pop(k)
+        return resource
 
 
 @resources.register('rds-cluster')
@@ -57,7 +60,7 @@ class RDSCluster(QueryResourceManager):
         cfn_type = config_type = 'AWS::RDS::DBCluster'
 
     source_mapping = {
-        'config': ConfigSource,
+        'config': ConfigCluster,
         'describe': DescribeCluster
     }
 
@@ -76,12 +79,20 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
+    groups = None
 
     def get_permissions(self):
         return self.manager.get_resource_manager(
             'rds-subnet-group').get_permissions()
 
+    def get_subnet_groups(self):
+        return {
+            r['DBSubnetGroupName']: r for r in
+            self.manager.get_resource_manager('rds-subnet-group').resources()}
+
     def get_related_ids(self, resources):
+        if not self.groups:
+            self.groups = self.get_subnet_groups()
         group_ids = set()
         for r in resources:
             group_ids.update(
@@ -90,9 +101,8 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        self.groups = {
-            r['DBSubnetGroupName']: r for r in
-            self.manager.get_resource_manager('rds-subnet-group').resources()}
+        if not self.groups:
+            self.groups = self.get_subnet_groups()
         return super(SubnetFilter, self).process(resources, event)
 
 
@@ -359,7 +369,9 @@ class DescribeClusterSnapshot(DescribeSource):
                 'Values': resource_ids}]).get('DBClusterSnapshots', ())
 
     def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
 
 
 class ConfigClusterSnapshot(ConfigSource):
@@ -378,12 +390,6 @@ class ConfigClusterSnapshot(ConfigSource):
                 k = 'IAMD%s' % k[4:]
                 resource[k] = v
         resource['Tags'] = [{'Key': k, 'Value': v} for k, v in item['tags'].items()]
-
-        utc = tzutc()
-        resource['SnapshotCreateTime'] = datetime.fromtimestamp(
-            resource['SnapshotCreateTime'] / 1000, tz=utc)
-        resource['ClusterCreateTime'] = datetime.fromtimestamp(
-            resource['ClusterCreateTime'] / 1000, tz=utc)
         return resource
 
 
