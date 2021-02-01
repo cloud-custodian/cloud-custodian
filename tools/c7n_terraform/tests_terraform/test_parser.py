@@ -12,7 +12,7 @@
 # limitations under the License.
 
 from c7n_terraform.parser import (
-    HclLocator, TerraformVisitor, Parser)
+    HclLocator, TerraformVisitor, Parser, VariableResolver)
 from .tf_common import data_dir
 
 
@@ -45,3 +45,33 @@ def test_visitor():
     myvar = blocks[0]
     assert myvar.name == "mybucket"
     assert myvar.default == "mybucket2"
+
+
+def test_variable_resolver():
+    path = data_dir / "aws-s3-bucket"
+    data = Parser().parse_module(path)
+    visitor = TerraformVisitor(data, path)
+    visitor.visit()
+    resolver = VariableResolver(visitor)
+    resolver.resolve()
+
+    resource_blocks = list(visitor.iter_blocks(tf_kind="resource"))
+    assert len(resource_blocks) == 1
+    resource = resource_blocks[0]
+
+    assert 'bindings' in resource
+    bindings = resource['bindings']
+    assert len(bindings) == 1
+    binding = bindings[0]
+
+    variable_blocks = list(visitor.iter_blocks(tf_kind="variable"))
+    assert len(variable_blocks) == 1
+    variable = variable_blocks[0]
+
+    assert binding['expr_path'] == ['bucket', 0]
+    assert binding['source'] == 'default'
+    assert binding['expr'] == '${var.mybucket}'
+    assert binding['var']['path'] == variable['path']
+    assert binding['var']['default'] == variable['default']
+    assert binding['var']['type'] == variable['type']
+    assert binding['var']['value_type'] == variable['value_type']
