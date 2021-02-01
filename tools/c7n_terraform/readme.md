@@ -48,7 +48,7 @@ wrt to the iaac provider we can either operate loosely typed or strongly typed. 
 
 Loose typing would enable working out of the box with extant providers, but policy authors would have to consult reference docs for their respective providers on available attributes or even provider resource type existence. From a custodian perspective we would use a common resource implementation across provider resource types.
 
-z#  Examples
+#  Examples
 
 ```yaml
 - resource: terraform.aws_dynamodb_table
