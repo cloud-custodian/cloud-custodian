@@ -10,7 +10,7 @@ from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import yaml_dump
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
-NAME_TEMPLATE = "{Name}"
+NAME_TEMPLATE = "{name}"
 
 log = logging.getLogger('orgaccounts')
 
@@ -71,10 +71,11 @@ def main(role, name, ou, assume, profile, output, regions, active, ignore):
             'account_id': a['Id'],
             'email': a['Email'],
             'display_name': a['Name'],
-            'organization_id': a['OrgId'],
-            'name': name.format(**a),
+            'name': a['Name'],
+            'org_id': a['OrgId'],
             'tags': tags,
             'role': arn_role}
+        ainfo['name'] = name.format(**ainfo)
         if regions:
             ainfo['regions'] = list(regions)
         if 'Tags' in a and a['Tags']:
