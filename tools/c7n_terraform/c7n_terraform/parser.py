@@ -173,7 +173,6 @@ class HclLocator:
 
         if not (start_line and end_line):
             return None
-        #        assert start_line and end_line
         return {
             "start": start_line,
             "end": end_line,
