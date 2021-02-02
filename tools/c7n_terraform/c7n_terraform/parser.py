@@ -337,7 +337,9 @@ class TerraformVisitor:
             source=self.hcl_locator.resolve_source(path, data_path),
             value_type=(
                 "type" in data_block[name]
-                and data_block[name].get("type",)[0]
+                and data_block[name].get(
+                    "type",
+                )[0]
                 or infer_type(default)
             ),
             default=default,
