@@ -13,7 +13,7 @@
 
 from c7n_terraform.parser import (
     HclLocator, TerraformVisitor, Parser, VariableResolver)
-from .tf_common import data_dir
+from .tf_common import data_dir, build_visitor
 
 
 def test_parser_eof():
@@ -47,15 +47,9 @@ def test_visitor():
     assert myvar.default == "mybucket2"
 
 
-def test_variable_resolver():
-    path = data_dir / "aws-s3-bucket"
-    data = Parser().parse_module(path)
-    visitor = TerraformVisitor(data, path)
-    visitor.visit()
-    resolver = VariableResolver(visitor)
-    resolver.resolve()
+def test_variable_resolver(aws_s3_bucket):
 
-    resource_blocks = list(visitor.iter_blocks(tf_kind="resource"))
+    resource_blocks = list(aws_s3_bucket.iter_blocks(tf_kind="resource"))
     assert len(resource_blocks) == 1
     resource = resource_blocks[0]
 
@@ -64,7 +58,7 @@ def test_variable_resolver():
     assert len(bindings) == 1
     binding = bindings[0]
 
-    variable_blocks = list(visitor.iter_blocks(tf_kind="variable"))
+    variable_blocks = list(aws_s3_bucket.iter_blocks(tf_kind="variable"))
     assert len(variable_blocks) == 1
     variable = variable_blocks[0]
 
