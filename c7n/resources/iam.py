@@ -216,6 +216,19 @@ class RoleSetBoundary(SetBoundary):
 
 class DescribeUser(DescribeSource):
 
+    def augment(self, resources):
+        # iam has a race condition, where listing will potentially return a
+        # new user prior it to its availability to get user
+        client = local_session(self.manager.session_factory).client('iam')
+        results = []
+        for r in resources:
+            ru = self.manager.retry(
+                client.get_user, UserName=r['UserName'],
+                ignore_err_codes=client.exceptions.NoSuchEntityException)
+            if ru:
+                results.append(ru['User'])
+        return list(filter(None, results))
+
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.manager.session_factory).client('iam')
         results = []
