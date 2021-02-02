@@ -266,7 +266,7 @@ class Host:
 
             for name in periodic_to_remove:
                 self.scheduler.remove_job(job_id=name)
-        except AttributeError as exc:
+        except (AttributeError, KeyError) as exc:
             log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
 
         os.unlink(path)
