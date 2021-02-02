@@ -376,7 +376,9 @@ class TerraformVisitor:
         self.log.debug("terraform %s", data_block)
         data_path = ["terraform", next(iter(data_block))]
         source = self.hcl_locator.resolve_source(path, data_path[:1])
-        return self._block(path, data_block, type="terraform", source=source)
+        return self._block(
+            path, data_block, data_path=["terraform"], type="terraform", source=source
+        )
 
     def visit_output(self, path, data_block):
         self.log.debug("output %s", data_block)

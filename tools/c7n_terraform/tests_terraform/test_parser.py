@@ -101,3 +101,9 @@ def test_visitor_module(aws_complete):
     blocks = list(aws_complete.iter_blocks(tf_kind="module"))
     assert len(blocks) == 1
     assert blocks[0].name == "atlantis"
+
+
+def test_visitor_terraform(aws_complete):
+    blocks = list(aws_complete.iter_blocks(tf_kind="terraform"))
+    assert len(blocks) == 1
+    assert blocks[0].name == "terraform"
