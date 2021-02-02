@@ -107,3 +107,15 @@ def test_visitor_terraform(aws_complete):
     blocks = list(aws_complete.iter_blocks(tf_kind="terraform"))
     assert len(blocks) == 1
     assert blocks[0].name == "terraform"
+
+
+def test_visitor_output(aws_complete):
+    blocks = list(aws_complete.iter_blocks(tf_kind="output"))
+    assert len(blocks) == 1
+    assert blocks[0].name == "bucket_arn"
+
+
+def test_visitor_data(aws_complete):
+    blocks = list(aws_complete.iter_blocks(tf_kind="data"))
+    assert len(blocks) == 1
+    assert blocks[0].name == "current"
