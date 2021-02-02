@@ -11,6 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import functools
+
 from c7n_terraform.parser import (
     HclLocator, TerraformVisitor, Parser, VariableResolver)
 from .tf_common import data_dir, build_visitor
@@ -69,3 +72,32 @@ def test_variable_resolver(aws_s3_bucket):
     assert binding['var']['default'] == variable['default']
     assert binding['var']['type'] == variable['type']
     assert binding['var']['value_type'] == variable['value_type']
+
+
+def test_variable_resolver_value_map():
+    variable_resolver = functools.partial(VariableResolver, value_map={"mybucket": "mybucket3"})
+    visitor = build_visitor(data_dir / "aws-s3-bucket", resolver=variable_resolver)
+
+    blocks = list(visitor.iter_blocks(tf_kind="resource"))
+    assert len(blocks) == 1
+    assert blocks[0]['data']['bucket'] == ['mybucket3']
+
+
+def test_visitor_dump(aws_s3_bucket, tmpdir):
+    visitor_json = tmpdir.join('dump.json')
+    aws_s3_bucket.dump(visitor_json)
+
+    with open(visitor_json) as f:
+        json.load(f)
+
+
+def test_visitor_provider(aws_complete):
+    providers = list(aws_complete.iter_blocks(tf_kind="provider"))
+    assert len(providers) == 1
+    assert providers[0].name == "aws"
+
+
+def test_visitor_module(aws_complete):
+    blocks = list(aws_complete.iter_blocks(tf_kind="module"))
+    assert len(blocks) == 1
+    assert blocks[0].name == "atlantis"
