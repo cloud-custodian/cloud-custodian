@@ -60,6 +60,8 @@ CONFIG_SCHEMA = {
             ],
             'properties': {
                 'name': {'type': 'string'},
+                'display_name': {'type': 'string'},
+                'org_id': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {
                     'type': 'string',
