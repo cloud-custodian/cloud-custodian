@@ -38,7 +38,7 @@ def test_vpc_flow_logs(test, vpc_flow_logs):
             "name": "net-find",
             "resource": "vpc",
             "filters": [
-                {"VpcId": vpc_id}, 
+                {"VpcId": vpc_id},
                 "flow-logs"
             ],
         },
