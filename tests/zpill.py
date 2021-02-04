@@ -178,7 +178,6 @@ class ZippedPill(pill.Pill):
             self.archive.close()
 
     def save_response(self, service, operation, response_data, http_response=200):
-
         filepath = self.get_new_file_path(service, operation)
         pill.LOG.debug("save_response: path=%s", filepath)
         json_data = {"status_code": http_response, "data": response_data}
@@ -257,6 +256,10 @@ class RedPill(pill.Pill):
         """
         Override to sanitize response metadata and account_ids
         """
+        # aws sso setups involve a short lived credential transfer
+        if service == "portal.sso":
+            return
+
         if 'ResponseMetadata' in response_data:
             response_data['ResponseMetadata'] = {}
 

@@ -15,10 +15,10 @@ class SecretsManager(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'secretsmanager'
         enum_spec = ('list_secrets', 'SecretList', None)
-        detail_spec = ('describe_secret', 'SecretId', 'ARN', None)
-        cfn_type = 'AWS::SecretsManager::Secret'
-        arn = id = 'ARN'
-        name = 'Name'
+        detail_spec = ('describe_secret', 'SecretId', 'Name', None)
+        config_type = cfn_type = 'AWS::SecretsManager::Secret'
+        name = id = 'Name'
+        arn = 'ARN'
 
 
 SecretsManager.filter_registry.register('marked-for-op', TagActionFilter)

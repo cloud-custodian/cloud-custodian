@@ -279,6 +279,7 @@ class ConfigSource:
 
     def __init__(self, manager):
         self.manager = manager
+        self.titleCase = self.manager.resource_type.id[0].isupper()
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -328,8 +329,8 @@ class ConfigSource:
         else:
             _c = None
 
-        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
-            self.manager.resource_type.config_type)
+        s = ("select resourceId, configuration, supplementaryConfiguration "
+             "where resourceType = '{}'").format(self.manager.resource_type.config_type)
 
         if _c:
             s += "AND {}".format(_c)
@@ -337,27 +338,34 @@ class ConfigSource:
         return {'expr': s}
 
     def load_resource(self, item):
+        item_config = self._load_item_config(item)
+        resource = camelResource(
+            item_config, implicitDate=True, implicitTitle=self.titleCase)
+        self._load_resource_tags(resource, item)
+        return resource
+
+    def _load_item_config(self, item):
         if isinstance(item['configuration'], str):
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
-        resource = camelResource(item_config, implicitDate=True)
+        return item_config
+
+    def _load_resource_tags(self, resource, item):
         # normalized tag loading across the many variants of config's inconsistencies.
-        if ((item.get('tags') or item['supplementaryConfiguration'].get('Tags'))
-                and 'Tags' not in resource):
-            if item.get('tags'):
-                resource['Tags'] = [
-                    {u'Key': k, u'Value': v} for k, v in item['tags'].items()]
-            else:
-                # config has a bit more variation on tags (serialized json, list, dict, etc)
-                stags = item['supplementaryConfiguration']['Tags']
-                if isinstance(stags, str):
-                    stags = json.loads(stags)
-                if isinstance(stags, list):
-                    resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']} for t in stags]
-                elif isinstance(stags, dict):
-                    resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
-        return resource
+        if 'Tags' in resource:
+            return
+        elif item.get('tags'):
+            resource['Tags'] = [
+                {u'Key': k, u'Value': v} for k, v in item['tags'].items()]
+        elif item['supplementaryConfiguration'].get('Tags'):
+            stags = item['supplementaryConfiguration']['Tags']
+            if isinstance(stags, str):
+                stags = json.loads(stags)
+            if isinstance(stags, list):
+                resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']} for t in stags]
+            elif isinstance(stags, dict):
+                resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
 
     def get_listed_resources(self, client):
         # fallback for when config decides to arbitrarily break select
@@ -738,9 +746,10 @@ class RetryPageIterator(PageIterator):
 class TypeMeta(type):
 
     def __repr__(cls):
-        identifier = None
         if cls.config_type:
             identifier = cls.config_type
+        elif cls.cfn_type:
+            identifier = cls.cfn_type
         elif cls.arn_type:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
         elif cls.enum_spec:

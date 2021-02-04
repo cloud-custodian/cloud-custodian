@@ -17,7 +17,6 @@ from concurrent.futures import (
     as_completed)
 import yaml
 
-import boto3
 from botocore.compat import OrderedDict
 from botocore.exceptions import ClientError
 import click
@@ -30,7 +29,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps
+from c7n.utils import CONN_CACHE, dumps, filter_empty
 
 from c7n_org.utils import environ, account_tags
 
@@ -61,6 +60,8 @@ CONFIG_SCHEMA = {
             ],
             'properties': {
                 'name': {'type': 'string'},
+                'display_name': {'type': 'string'},
+                'org_id': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {
                     'type': 'string',
@@ -188,9 +189,10 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     return accounts_config, custodian_config, executor
 
 
-def resolve_regions(regions):
+def resolve_regions(regions, account):
     if 'all' in regions:
-        client = boto3.client('ec2')
+        session = get_session(account, 'c7n-org', "us-east-1")
+        client = session.client('ec2')
         return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
@@ -339,7 +341,7 @@ def report(config, output, use, output_dir, accounts,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     report_account,
                     a, r,
@@ -400,7 +402,7 @@ def _get_env_creds(account, session, region):
     elif account["provider"] == 'gcp':
         env['GOOGLE_CLOUD_PROJECT'] = account["account_id"]
         env['CLOUDSDK_CORE_PROJECT'] = account["account_id"]
-    return env
+    return filter_empty(env)
 
 
 def run_account_script(account, region, output_dir, debug, script_args):
@@ -457,7 +459,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[
                     w.submit(run_account_script, a, r, output_dir,
                              serial, script_args)] = (a, r)
@@ -639,7 +641,7 @@ def run(config, use, output_dir, accounts, tags, region,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     run_account,
                     a, r,

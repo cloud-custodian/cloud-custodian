@@ -8,7 +8,7 @@ from mock import Mock
 
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError
-from c7n.resources import aws
+from c7n.resources import aws, load_resources
 from c7n import output
 
 from .common import BaseTest
@@ -61,6 +61,23 @@ class ArnResolverTest(BaseTest):
         ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
     ]
 
+    def test_arn_resolve_resources(self):
+        arns = [
+            'arn:aws:sqs:us-east-1:644160558196:origin-dev',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-tag-creator:$LATEST',
+        ]
+
+        factory = self.replay_flight_data('test_arn_resolve_resources')
+        p = self.load_policy(
+            {'name': 'resolve', 'resource': 'aws.ec2'},
+            session_factory=factory)
+        resolver = aws.ArnResolver(p.resource_manager)
+        load_resources(('aws.sqs', 'aws.lambda'))
+        arn_map = resolver.resolve(arns)
+        assert len(arn_map) == 3
+        assert None not in arn_map.values()
+
     def test_arn_meta(self):
 
         legacy = set()
@@ -69,13 +86,86 @@ class ArnResolverTest(BaseTest):
                 legacy.add(k)
         self.assertFalse(legacy)
 
-    def test_arn_resolver(self):
+    def test_arn_resolve_type(self):
         for value, expected in self.table:
             # load the resource types to enable resolution.
             aws.AWS.get_resource_types(("aws.%s" % expected,))
             arn = aws.Arn.parse(value)
             result = aws.ArnResolver.resolve_type(arn)
             self.assertEqual(result, expected)
+
+    def test_arn_cwe_resolver(self):
+
+        evars = dict(
+            Partition='aws',
+            Region='us-east-1',
+            Account='662108712480',
+            FunctionName='func',
+            Version='1.1',
+            VersionId='1.1',
+            ClusterName='abc',
+            AutomationDefinitionName='adf',
+            TaskDefinitionFamilyName='abc',
+            TaskDefinitionRevisionNumber='yz',
+            StreamName='kstream',
+            AutomationDefinition='abc',
+            LogGroupName='loggroup',
+            JobQueueName='batchq',
+            JobDefinitionName='jobdef',
+            Revision='1.1',
+            QueueName='inboundq',
+            TopicName='outboundt',
+            ProjectName="buildstuff",
+            PipelineName='pushit',
+            StateMachineName='sfxorch'
+        )
+
+        event_targets = dict(
+            sqs=("arn:{Partition}:sqs:{Region}:{Account}:{QueueName}", 'sqs'),
+            function=("arn:{Partition}:lambda:{Region}:{Account}:function:{FunctionName}",
+                      'lambda'),
+            function_qual=(
+                "arn:{Partition}:lambda:{Region}:{Account}:function:{FunctionName}:{Version}",
+                "lambda"),
+            ecs_cluster=(
+                "arn:{Partition}:ecs:{Region}:{Account}:cluster/{ClusterName}",
+                "ecs"),
+            ecs_task=(
+                ("arn:{Partition}:ecs:{Region}:{Account}:task-definition/"
+                "{TaskDefinitionFamilyName}:{TaskDefinitionRevisionNumber}"),
+                "ecs-task-definition"),
+            kinesis=("arn:{Partition}:kinesis:{Region}:{Account}:stream/{StreamName}",
+                     "kinesis"),
+            log=("arn:{Partition}:logs:{Region}:{Account}:log-group:{LogGroupName}",
+                 "log-group"),
+            # ssm_adoc=(("arn:{Partition}:ssm:{Region}:{Account}:automation-definition"
+            #           "/{AutomationDefinitionName}:{VersionId}"),
+            batch_job_def=(
+                ("arn:{Partition}:batch:{Region}:{Account}:job-definition"
+                 "/{JobDefinitionName}:{Revision}"),
+                "batch-definition"),
+            batch_queue=("arn:{Partition}:batch:{Region}:{Account}:job-queue/{JobQueueName}",
+                         "batch-queue"),
+            step_func=(
+                "arn:{Partition}:states:{Region}:{Account}:stateMachine:{StateMachineName}",
+                "step-machine"),
+            code_pipe=(
+                "arn:{Partition}:codepipeline:{Region}:{Account}:{PipelineName}",
+                "codepipeline"),
+            code_build=(
+                "arn:{Partition}:codebuild:{Region}:{Account}:project/{ProjectName}",
+                "codebuild"),
+            sns_topics=(
+                "arn:{Partition}:sns:{Region}:{Account}:{TopicName}",
+                "sns"),
+            sqs_queue=(
+                "arn:{Partition}:sqs:{Region}:{Account}:{QueueName}",
+                "sqs")
+        )
+        load_resources(('aws.*',))
+        for k, (arn_template, rtype) in event_targets.items():
+            rarn = arn_template.format(**evars)
+            assert aws.ArnResolver.resolve_type(rarn) == rtype
 
 
 class ArnTest(BaseTest):

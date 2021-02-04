@@ -32,8 +32,8 @@ class ECR(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
-        name = "repositoryName"
-        arn = id = "repositoryArn"
+        id = name = "repositoryName"
+        arn = "repositoryArn"
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'

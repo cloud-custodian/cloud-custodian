@@ -80,9 +80,7 @@ class AutoTagUser(EventAction):
                 "auto-tag action requires 'tag'")
         return self
 
-    def process(self, resources, event):
-        if event is None:
-            return
+    def get_tag_value(self, event):
         event = event['detail']
         utype = event['userIdentity']['type']
         if utype not in self.data.get('user-type', ['AssumedRole', 'IAMUser', 'FederatedUser']):
@@ -102,9 +100,16 @@ class AutoTagUser(EventAction):
             # lambda function (old style)
             elif user.startswith('awslambda'):
                 return
-        if user is None:
-            return
+
         # if the auto-tag-user policy set update to False (or it's unset) then we
+        return {'user': user, 'id': principal_id_value}
+
+    def process(self, resources, event):
+        if event is None:
+            return
+
+        user_info = self.get_tag_value(event)
+
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
             untagged_resources = []
@@ -122,17 +127,23 @@ class AutoTagUser(EventAction):
         else:
             untagged_resources = resources
 
-        tag_action = self.manager.action_registry.get('tag')
-        new_tags = {
-            self.data['tag']: user
-        }
+        new_tags = {}
+        if user_info['user']:
+            new_tags[self.data['tag']] = user_info['user']
+
         # if principal_id_key is set (and value), we'll set the principalId tag.
         principal_id_key = self.data.get('principal_id_tag', None)
-        if principal_id_key and principal_id_value:
-            new_tags[principal_id_key] = principal_id_value
-        for key, value in new_tags.items():
-            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        if principal_id_key and user_info['id']:
+            new_tags[principal_id_key] = user_info['id']
+
+        if new_tags:
+            self.set_resource_tags(new_tags, untagged_resources)
         return new_tags
+
+    def set_resource_tags(self, tags, resources):
+        tag_action = self.manager.action_registry.get('tag')
+        for key, value in tags.items():
+            tag_action({'key': key, 'value': value}, self.manager).process(resources)
 
     @classmethod
     def register_resource(cls, registry, resource_class):
