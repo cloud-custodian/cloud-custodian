@@ -147,6 +147,10 @@ class PolicyChecker:
                 continue
             elif pid.startswith('arn:aws:iam::cloudfront:user'):
                 continue
+            # deleted iam roles/users
+            # extant unique ids convert themselves to ARN automatically
+            elif pid.startswith(('AROA', 'AIDA')):
+                continue
             else:
                 account_id = _account(pid)
                 if account_id not in self.allowed_accounts:
