@@ -482,7 +482,7 @@ class Parser:
         return data
 
     def _resolve_modules(self, path, tf_data):
-        for m in tf_data.get("modules", ()):
+        for m in tf_data.get("module", ()):
             for module in m.values():
                 mpath = (path / module["source"][0]).resolve()
                 yield mpath
