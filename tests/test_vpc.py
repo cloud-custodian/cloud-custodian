@@ -28,7 +28,7 @@ def test_codebuild_unused(test, aws_code_build_vpc):
     assert 'example1' not in sg_names
 
 
-@terraform('vpc_flow_logs', teardown=terraform.TEARDOWN_IGNORE)
+@terraform('vpc_flow_logs')
 def test_vpc_flow_logs(test, vpc_flow_logs):
     factory = test.replay_flight_data("test_vpc_flow_logs")
 
