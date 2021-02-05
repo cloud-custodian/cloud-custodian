@@ -451,7 +451,7 @@ class KmsFilter(KmsRelatedFilter):
             filters:
               - type: kms-key
                 key: c7n:AliasName
-                value: "^(alias/aws/cw)"
+                value: "^(alias/cw)"
                 op: regex
     """
     RelatedIdsExpression = 'kmsKeyId'
