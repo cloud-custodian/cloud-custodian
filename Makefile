@@ -84,7 +84,10 @@ test:
 	./bin/tox -e py38
 
 ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
+
+ttest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
 
 sphinx:
 # if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
