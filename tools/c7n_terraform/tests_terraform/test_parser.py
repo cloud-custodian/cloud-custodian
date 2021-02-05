@@ -119,3 +119,11 @@ def test_visitor_data(aws_complete):
     blocks = list(aws_complete.iter_blocks(tf_kind="data"))
     assert len(blocks) == 1
     assert blocks[0].name == "current"
+
+
+def test_tf_json_parsing():
+    path = data_dir / "tfjson-tf"
+    tf_data = Parser().parse_module(path / "tf")
+    tfjson_data = Parser().parse_module(path / "tfjson")
+
+    assert tf_data[path / "tf" / "main.tf"] == tfjson_data[path / "tfjson" / "main.tf.json"]

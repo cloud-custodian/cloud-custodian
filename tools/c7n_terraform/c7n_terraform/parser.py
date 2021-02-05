@@ -434,6 +434,11 @@ class Parser:
 
     log = logging.getLogger("c7n_terraform.hcl.parser")
 
+    _parser_map = {
+        TF_HCL_SUFFIX: "_parse_hcl_file",
+        TF_JSON_SUFFIX: "_parse_json_file",
+    }
+
     def __init__(self):
         self.seen_dirs = set()
         self.errors = {}
@@ -445,7 +450,27 @@ class Parser:
 
     def _parse_json_file(self, tf_file):
         with open(tf_file) as fp:
-            return self._parse_tf_data(json.load(fp))
+            return self._parse_tf_json_data(json.load(fp))
+
+    def _parse_tf_json_data(self, data):
+        def larkify(instance):
+            """Emulate output performed during hcl2.load for JSON loaded data"""
+            if isinstance(instance, list):
+                return [larkify(el) if isinstance(el, dict) else el for el in instance]
+
+            if isinstance(instance, dict):
+                return {k: larkify(v) for k, v in instance.items()}
+
+            return [instance]
+
+        output = {}
+
+        for block in data:
+            output[block] = [
+                {resource: larkify(instance)} for resource, instance in data.get(block, {}).items()
+            ]
+
+        return output
 
     def _parse_tf_data(self, data):
         for resource_type in data.get("resource", ()):
@@ -470,7 +495,8 @@ class Parser:
             for f in file_iter(pattern):
                 self.seen_dirs.add(f.parent)
                 try:
-                    self.tf_resources[f] = tf_data = self._parse_hcl_file(f)
+                    file_parser = getattr(self, self._parser_map.get(pattern.replace("*", "")))
+                    self.tf_resources[f] = tf_data = file_parser(f)
                     modules.update(self._resolve_modules(f.parent, tf_data))
                 except Exception as e:
                     self.log.info(f"error parsing {f}", exc_info=e)
