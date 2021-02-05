@@ -108,6 +108,34 @@ class UserCredentialReportTest(BaseTest):
             p.resource_manager.get_arns(resources),
             ["arn:aws:iam::644160558196:user/kapil"])
 
+    def test_credential_access_key_multifilter_delete_noop(self):
+        factory = self.replay_flight_data('test_iam_user_credential_multi_delete_noop')
+        p = self.load_policy({
+            'name': 'user-cred-multi-noop',
+            'resource': 'iam-user',
+            'source': 'config',
+            'filters': [
+                {'UserName': 'test1'},
+                {"type": "credential",
+                 "key": "access_keys.last_rotated",
+                 "value": 30,
+                 'op': 'gt',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "key": "access_keys.active",
+                 "value": True,
+                 "op": "eq"}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 0)
+        client = factory().client('iam')
+        keys = client.list_access_keys(UserName='test1').get('AccessKeyMetadata')
+        self.assertEqual(len(keys), 2)
+
     def test_credential_access_key_reverse_filter_delete(self):
         factory = self.replay_flight_data(
             'test_iam_user_credential_reverse_filter_delete'
