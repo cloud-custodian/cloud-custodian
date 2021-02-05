@@ -108,11 +108,15 @@ class AzureTest(unittest.TestCase):
         self.assertIn('adal', reqs)
         self.assertIn('azure-storage-common', reqs)
         self.assertIn('azure-common', reqs)
+        self.assertIn('azure-mgmt-managementgroups', reqs)
+        self.assertIn('azure-mgmt-web', reqs)
+        self.assertIn('azure-graphrbac', reqs)
         self.assertIn('msrestazure', reqs)
         self.assertIn('jmespath', reqs)
         self.assertIn('jinja2', reqs)
         self.assertIn('sendgrid', reqs)
         self.assertIn('ldap3', reqs)
+        self.assertIn('netaddr', reqs)
 
     @patch('c7n_mailer.azure_mailer.deploy.FunctionPackage')
     def test_build_function_package(self, package_mock):

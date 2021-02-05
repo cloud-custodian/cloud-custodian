@@ -38,6 +38,7 @@ azure-mgmt-keyvault==1.1.0
 azure-mgmt-logic==3.0.0
 azure-mgmt-managementgroups==0.2.0
 azure-mgmt-monitor==0.7.0
+azure-mgmt-msi==1.0.0
 azure-mgmt-network==9.0.0
 azure-mgmt-nspkg==3.0.2
 azure-mgmt-policyinsights==0.4.0

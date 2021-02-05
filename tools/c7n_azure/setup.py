@@ -49,6 +49,7 @@ install_requires = \
  'azure-mgmt-logic>=3.0.0,<4.0.0',
  'azure-mgmt-managementgroups>=0.2.0,<0.3.0',
  'azure-mgmt-monitor>=0.7.0,<0.8.0',
+ 'azure-mgmt-msi==1.0.0',
  'azure-mgmt-network>=9.0.0,<10.0.0',
  'azure-mgmt-policyinsights>=0.4.0,<0.5.0',
  'azure-mgmt-rdbms>=1.9.0,<2.0.0',
