@@ -31,7 +31,7 @@ from .common import (
 )
 
 
-@terraform('s3_tag', teardown=terraform.TEARDOWN_IGNORE)
+@terraform('s3_tag')
 def test_s3_tag(test, s3_tag):
     test.patch(s3.S3, "executor_factory", MainThreadExecutor)
     test.patch(s3.EncryptExtantKeys, "executor_factory", MainThreadExecutor)
