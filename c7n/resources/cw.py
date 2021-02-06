@@ -457,6 +457,7 @@ class KmsFilter(KmsRelatedFilter):
                 value: "^(alias/cw)"
                 op: regex
     """
+
     RelatedIdsExpression = 'kmsKeyId'
 
 
