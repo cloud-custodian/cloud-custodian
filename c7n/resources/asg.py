@@ -872,6 +872,32 @@ class UserDataFilter(ValueFilter):
         return results
 
 
+@ASG.filter_registry.register('age')
+class AsgAgeFilter(AgeFilter):
+    """Filter ASG by age (in days, hours, minutes)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: asg-old
+                resource: asg
+                filters:
+                  - type: age
+                    days: 90
+                    op: ge
+    """
+
+    date_attribute = "CreatedTime"
+    schema = type_schema(
+        'age',
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
+
+
 @ASG.action_registry.register('resize')
 class Resize(Action):
     """Action to resize the min/max/desired instances in an ASG
@@ -1676,7 +1702,7 @@ class LaunchConfig(query.QueryResourceManager):
 
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
-    """Filter ASG launch configuration by age (in days)
+    """Filter ASG launch configuration by age (in days, hours, minutes)
 
     :example:
 
@@ -1695,7 +1721,9 @@ class LaunchConfigAge(AgeFilter):
     schema = type_schema(
         'age',
         op={'$ref': '#/definitions/filters_common/comparison_operators'},
-        days={'type': 'number'})
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
 
 
 @LaunchConfig.filter_registry.register('unused')
