@@ -84,7 +84,10 @@ jobs:
         run: |
           ./.tox/${{ matrix.tox-target }}/bin/coverage xml && \
           bash <(curl -s https://codecov.io/bash) -Z \
-          -v -f coverage.xml -g "*json*" -g "*yml"
+          -v -f coverage.xml -g "**/*.json" \
+          -U --retry 5 --connect-timeout 5 \
+          -A --retry 5 --connect-timeout 5 \
+          -X xcode
 
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
