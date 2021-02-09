@@ -60,6 +60,7 @@ class AWSLambda(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'lambda'
+        arn = 'FunctionArn'
         arn_type = 'function'
         arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)

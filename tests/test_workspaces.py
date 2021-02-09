@@ -61,3 +61,25 @@ class WorkspacesTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('LastKnownUserConnectionTimestamp',
             annotation(resources[0], filters.ANNOTATION_KEY))
+
+    def test_workspaces_kms_filter(self):
+        session_factory = self.replay_flight_data('test_workspaces_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-kms-filter',
+                'resource': 'workspaces',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/workspaces'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['VolumeEncryptionKey'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/workspaces')

@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AuthenticationStrategy": "simple",
+        "AutoMinorVersionUpgrade": true,
+        "BrokerArn": "arn:aws:mq:us-east-1:alias/aws/mq:broker:test:b-1d171add-07ff-4f34-9cc1-78d3d9d55ed0",
+        "BrokerId": "b-1d171add-07ff-4f34-9cc1-78d3d9d55ed0",
+        "EncryptionOptions": {
+            "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955",
+            "UseAwsOwnedKey": false
+        }
+    }
+}

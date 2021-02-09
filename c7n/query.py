@@ -279,6 +279,7 @@ class ConfigSource:
 
     def __init__(self, manager):
         self.manager = manager
+        self.titleCase = self.manager.resource_type.id[0].isupper()
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -328,8 +329,8 @@ class ConfigSource:
         else:
             _c = None
 
-        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
-            self.manager.resource_type.config_type)
+        s = ("select resourceId, configuration, supplementaryConfiguration "
+             "where resourceType = '{}'").format(self.manager.resource_type.config_type)
 
         if _c:
             s += "AND {}".format(_c)
@@ -338,7 +339,8 @@ class ConfigSource:
 
     def load_resource(self, item):
         item_config = self._load_item_config(item)
-        resource = camelResource(item_config, implicitDate=True)
+        resource = camelResource(
+            item_config, implicitDate=True, implicitTitle=self.titleCase)
         self._load_resource_tags(resource, item)
         return resource
 
@@ -744,9 +746,10 @@ class RetryPageIterator(PageIterator):
 class TypeMeta(type):
 
     def __repr__(cls):
-        identifier = None
         if cls.config_type:
             identifier = cls.config_type
+        elif cls.cfn_type:
+            identifier = cls.cfn_type
         elif cls.arn_type:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
         elif cls.enum_spec:

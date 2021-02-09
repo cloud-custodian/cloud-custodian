@@ -64,7 +64,7 @@ class PeriodicMode(FunctionMode, PullMode):
         'gcp-periodic',
         rinherit=FunctionMode.schema,
         required=['schedule'],
-        **{'trigger-type': {'enum': ['http', 'pubsub']},
+        **{'target-type': {'enum': ['http', 'pubsub']},
            'tz': {'type': 'string'},
            'schedule': {'type': 'string'}})
 

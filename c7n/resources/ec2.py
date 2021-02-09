@@ -189,7 +189,7 @@ class ComputePermissions(CheckPermissions):
                 [p[0] for p in profile_arns],
                 self.manager.get_resource_manager(
                     'iam-profile').get_resources(
-                        [p[1] for p in profile_arns]))}
+                        [p[0].split('/', 1)[-1] for p in profile_arns]))}
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]

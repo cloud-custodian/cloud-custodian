@@ -1,11 +1,30 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+from pytest_terraform import terraform
 from unittest import TestCase
 
 from .common import event_data, BaseTest
 
 from c7n.cwe import CloudWatchEvents
+
+
+@terraform('event_bridge_bus')
+def test_event_bus_describe(test, event_bridge_bus):
+    factory = test.replay_flight_data('test_cwe_bus_xaccount')
+    p = test.load_policy({
+        'name': 'bus-xaccount',
+        'resource': 'aws.event-bus',
+        'filters': [
+            {'tag:Env': 'Sandbox'},
+            'cross-account'
+        ],
+    }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['Name'] == event_bridge_bus[
+        'aws_cloudwatch_event_bus.messenger.name']
+    assert 'CrossAccountViolations' in resources[0]
 
 
 class CloudWatchEventTest(BaseTest):

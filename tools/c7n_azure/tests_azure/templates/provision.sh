@@ -97,6 +97,15 @@ deploy_resource() {
         az deployment group create --resource-group $rgName --template-file $file --mode Complete --output None
     fi
 
+    if [[ "$fileName" == "cosmosdb.json" ]]; then
+        ip=$(curl -s https://checkip.amazonaws.com)
+        allow_list="$ip,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26"
+        sub_id=$(az account show --query id --output tsv)
+        suffix="${sub_id:${#sub_id} - 12}"
+        echo "Adding local external IP (${ip}) and azure portals to cosmos firewall allow list..."
+        az cosmosdb update -g $rgName -n cctestcosmosdb$suffix --ip-range-filter $allow_list
+    fi
+
     echo "Deployment for ${filenameNoExtension} complete"
 }
 

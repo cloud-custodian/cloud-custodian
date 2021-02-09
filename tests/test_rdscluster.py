@@ -3,7 +3,10 @@
 from c7n.executor import MainThreadExecutor
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
 
-from .common import BaseTest
+from .common import BaseTest, event_data
+
+import pytest
+import sys
 
 
 class RDSClusterTest(BaseTest):
@@ -29,6 +32,32 @@ class RDSClusterTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    @pytest.mark.skipif(
+        (sys.version_info.major, sys.version_info.minor) < (3, 7) or sys.platform != 'linux',
+        reason="needs py 3.8")
+    def test_rdscluster_config(self):
+        factory = self.replay_flight_data('test_rdscluster_config')
+        p = self.load_policy(
+            {'name': 'foo', 'resource': 'aws.rds-cluster'},
+            session_factory=factory)
+        source = p.resource_manager.get_source('config')
+        describe_resource = p.resource_manager.get_resources(['database-1'])[0]
+        config_resource = source.load_resource(
+            event_data('rds-cluster.json', 'config')['configurationItems'][0])
+
+        assert {t['Key']: t['Value'] for t in config_resource['Tags']} == {
+            t['Key']: t['Value'] for t in describe_resource['Tags']}
+
+        known_keys = (
+            'ClusterCreateTime', 'CustomEndpoints', 'DBClusterOptionGroupMemberships',
+            'EnabledCloudwatchLogsExports', 'LatestRestorableTime',
+            'EarliestRestorableTime', 'Tags')
+        for kk in known_keys:
+            config_resource.pop(kk, None)
+            describe_resource.pop(kk, None)
+
+        assert describe_resource == config_resource
 
     def test_rdscluster_security_group(self):
         self.remove_augments()
@@ -483,3 +512,120 @@ class RDSClusterSnapshotTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def _get_effective_permissions(self, client, snapshot_id):
+        attributes = client.describe_db_cluster_snapshot_attributes(
+            DBClusterSnapshotIdentifier=snapshot_id
+        )["DBClusterSnapshotAttributesResult"]["DBClusterSnapshotAttributes"]
+        attr_map = {
+            attr["AttributeName"]: attr["AttributeValues"]
+            for attr in attributes
+        }
+        return set(attr_map.get("restore", []))
+
+    def test_set_permissions(self):
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_snapshot_set_permissions",
+            region="us-east-2"
+        )
+        target_snapshot_id = "test"
+        keep = "644160558196"
+        remove = "123456789012"
+        add = "234567890123"
+        policy = self.load_policy(
+            {
+                "name": "rds-snapshot-remove-cross-account",
+                "resource": "rds-cluster-snapshot",
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
+                "actions": [
+                    {"type": "set-permissions", "add": [add], "remove": [remove, "all"]}
+                ]
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        client = session_factory().client("rds")
+        restore_permissions_before = self._get_effective_permissions(
+            client,
+            target_snapshot_id,
+        )
+        self.assertTrue({keep, remove, "all"}.issubset(restore_permissions_before))
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        restore_permissions_after = self._get_effective_permissions(
+            client,
+            target_snapshot_id,
+        )
+        self.assertTrue({keep, add}.issubset(restore_permissions_after))
+        self.assertEqual({remove, "all"}.intersection(restore_permissions_after), set())
+
+    def test_remove_matched_permissions(self):
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_snapshot_remove_matched_permissions",
+            region="us-east-2"
+        )
+        target_snapshot_id = "test"
+        keep = "644160558196"
+        remove = "123456789012"
+        policy = self.load_policy(
+            {
+                "name": "rds-snapshot-remove-cross-account",
+                "resource": "rds-cluster-snapshot",
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
+                "filters": [
+                    {"type": "cross-account", "whitelist": [keep]},
+                ],
+                "actions": [
+                    {"type": "set-permissions", "remove": "matched"}
+                ]
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        restore_permissions_before = set(resources[0]["c7n:attributes"]["restore"])
+        self.assertTrue({keep, remove}.issubset(restore_permissions_before))
+
+        restore_permissions_after = self._get_effective_permissions(
+            session_factory().client("rds"),
+            resources[0]["DBClusterSnapshotIdentifier"]
+        )
+        self.assertIn(keep, restore_permissions_after)
+        self.assertNotIn(remove, restore_permissions_after)
+
+    def test_clear_permissions(self):
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_snapshot_clear_permissions",
+            region="us-east-2"
+        )
+        target_snapshot_id = "test"
+        policy = self.load_policy(
+            {
+                "name": "rds-snapshot-remove-cross-account",
+                "resource": "rds-cluster-snapshot",
+                "source": "config",
+                "query": [
+                    {"clause": f"resourceId = '{target_snapshot_id}'"}],
+                "actions": [
+                    {"type": "set-permissions"}
+                ]
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        restore_permissions_before = set(resources[0]["c7n:attributes"]["restore"])
+        self.assertGreater(len(restore_permissions_before), 0)
+
+        restore_permissions_after = self._get_effective_permissions(
+            session_factory().client("rds"),
+            resources[0]["DBClusterSnapshotIdentifier"]
+        )
+        self.assertEqual(len(restore_permissions_after), 0)

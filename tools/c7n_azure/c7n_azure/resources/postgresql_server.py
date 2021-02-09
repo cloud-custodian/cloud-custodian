@@ -3,6 +3,10 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.filters import FirewallRulesFilter
+from netaddr import IPRange, IPSet
+
+AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
 
 
 @resources.register('postgresql-server')
@@ -49,3 +53,19 @@ class PostgresqlServer(ArmResourceManager):
         client = 'PostgreSQLManagementClient'
         enum_spec = ('servers', 'list', None)
         resource_type = 'Microsoft.DBforPostgreSQL/servers'
+
+
+@PostgresqlServer.filter_registry.register('firewall-rules')
+class PostgresqlServerFirewallRulesFilter(FirewallRulesFilter):
+    def _query_rules(self, resource):
+        query = self.client.firewall_rules.list_by_server(
+            resource['resourceGroup'],
+            resource['name'])
+        resource_rules = IPSet()
+        for r in query:
+            rule = IPRange(r.start_ip_address, r.end_ip_address)
+            if rule == AZURE_SERVICES:
+                # Ignore 0.0.0.0 magic value representing Azure Cloud bypass
+                continue
+            resource_rules.add(rule)
+        return resource_rules

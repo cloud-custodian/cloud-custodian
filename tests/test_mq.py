@@ -46,6 +46,28 @@ class MessageQueue(BaseTest):
         self.assertEqual(resources[0]['BrokerName'], 'dev')
         self.assertTrue('c7n.metrics' in resources[0])
 
+    def test_mq_message_broker_kms_filter(self):
+        session_factory = self.replay_flight_data('test_mq_message_broker_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-message-broker-kms-filter',
+                'resource': 'message-broker',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/mq'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['EncryptionOptions']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/mq')
+
     def test_delete_mq(self):
         factory = self.replay_flight_data("test_mq_delete")
         p = self.load_policy(
