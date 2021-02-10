@@ -87,8 +87,6 @@ jobs:
           ./.tox/${{ matrix.tox-target }}/bin/coverage xml && \
           bash <(curl -s https://codecov.io/bash) -Z \
           -v -f coverage.xml
-           
-      
 
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
