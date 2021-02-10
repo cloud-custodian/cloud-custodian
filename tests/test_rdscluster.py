@@ -128,8 +128,8 @@ class RDSClusterTest(BaseTest):
                 "source": "config",
                 "filters": [
                     {
-                        "type": "kms-alias",
-                        "key": "AliasName",
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
                         "value": "^(alias/aws/)",
                         "op": "regex",
                     }

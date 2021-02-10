@@ -10,8 +10,8 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
-from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources import rds
+from c7n.filters.kms import KmsRelatedFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
@@ -111,11 +111,26 @@ class SubnetFilter(net_filters.SubnetFilter):
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-@RDSCluster.filter_registry.register('kms-alias')
-class KmsAliasFilter(ResourceKmsKeyAlias):
+@RDSCluster.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
 
-    def process(self, dbs, event=None):
-        return self.get_matching_aliases(dbs)
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: rdscluster-kms-key-filter
+                  resource: aws.rds-cluster
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/rds)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @RDSCluster.action_registry.register('delete')
