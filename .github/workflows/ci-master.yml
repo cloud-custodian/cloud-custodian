@@ -82,11 +82,17 @@ jobs:
       - name: Coverage Generate XML
         if: contains(matrix.tox-target, 'py38-cov')
         run: |
-          ./.tox/${{ matrix.tox-target }}/bin/coverage xml && \
-          bash <(curl -s https://codecov.io/bash) -Z \
-          -v -f coverage.xml \
-          -U --retry 5 --connect-timeout 5 \
-          -A --retry 5 --connect-timeout 5
+          ./.tox/${{ matrix.tox-target }}/bin/coverage xml
+          
+      - name: Coverage Upload
+        if: contains(matrix.tox-target, 'py38-cov')
+      - uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+           
+      
 
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
