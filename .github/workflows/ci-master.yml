@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v2
         with:
           python-version: 3.8
@@ -82,15 +84,9 @@ jobs:
       - name: Coverage Generate XML
         if: contains(matrix.tox-target, 'py38-cov')
         run: |
-          ./.tox/${{ matrix.tox-target }}/bin/coverage xml
-          
-      - name: Coverage Upload
-        if: contains(matrix.tox-target, 'py38-cov')
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
+          ./.tox/${{ matrix.tox-target }}/bin/coverage xml && \
+          bash <(curl -s https://codecov.io/bash) -Z \
+          -v -f coverage.xml
            
       
 
