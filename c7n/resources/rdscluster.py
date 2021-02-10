@@ -1,11 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import itertools
 
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -108,6 +109,62 @@ class SubnetFilter(net_filters.SubnetFilter):
 
 
 RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
+@RDSCluster.filter_registry.register('db-cluster-parameter')
+class ClusterParameterGroupsFilter(ValueFilter):
+    """
+    Applies value type filter on db cluster group's allowed values.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: neptune-clusters-enforce-ssl-required
+                resource: rds-cluster
+                filters:
+                  - type: db-cluster-parameter
+                    key: neptune_enforce_ssl
+                    op: eq
+                    value: 1
+    """
+
+    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBClusterParameterGroups', )
+
+    def process(self, resources, event=None):
+        results = []
+        paramcache = {}
+
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+
+        param_groups = {db['DBClusterParameterGroup'] for db in resources}
+
+        for pg in param_groups:
+            cache_key = {
+                'region': self.manager.config.region,
+                'account_id': self.manager.config.account_id,
+                'rds-pg': pg}
+            pg_values = self.manager._cache.get(cache_key)
+            if pg_values is not None:
+                paramcache[pg] = pg_values
+                continue
+            param_list = list(itertools.chain(*[p['Parameters']
+                for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+            paramcache[pg] = {
+                p['ParameterName']: p['AllowedValues']
+                for p in param_list if 'AllowedValues' in p}
+            self.manager._cache.save(cache_key, paramcache[pg])
+
+        for resource in resources:
+            pg_values = paramcache[resource['DBClusterParameterGroup']]
+            if self.match(pg_values):
+                resource.setdefault('c7n:MatchedDBParameter', []).append(
+                    self.data.get('key'))
+                results.append(resource)
+        return results
 
 
 @RDSCluster.action_registry.register('delete')

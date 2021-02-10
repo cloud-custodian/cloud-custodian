@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "neptune_enable_audit_log",
+                "ParameterValue": "0",
+                "Description": "Toggle audit logging for Neptune",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "neptune_enforce_ssl",
+                "ParameterValue": "0",
+                "Description": "Accept SSL/TLS connections only",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "neptune_lab_mode",
+                "ParameterValue": "",
+                "Description": "Enables Neptune engine experimental features",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "neptune_query_timeout",
+                "ParameterValue": "120000",
+                "Description": "Graph query timeout (ms).",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "10-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "neptune_streams",
+                "ParameterValue": "0",
+                "Description": "Enable or disable Neptune Streams feature",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
