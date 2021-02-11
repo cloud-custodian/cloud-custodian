@@ -1124,7 +1124,7 @@ class RoleDelete(BaseAction):
 
     """
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('iam:DeleteRole',)
+    permissions = ('iam:DeleteRole', 'iam:DeleteInstanceProfile',)
 
     def detach_inline_policies(self, client, r):
         policies = (self.manager.retry(
@@ -1135,6 +1135,22 @@ class RoleDelete(BaseAction):
                 client.delete_role_policy,
                 RoleName=r['RoleName'], PolicyName=p,
                 ignore_err_codes=('NoSuchEntityException',))
+
+    def delete_instance_profiles(self, client, r):
+        profiles = client.list_instance_profiles_for_role(RoleName=r['RoleName'])
+        if profiles:
+            profile_names = [p.get('InstanceProfileName') for p in profiles['InstanceProfiles']]
+        for p in profile_names:
+            try:
+                client.remove_role_from_instance_profile(
+                    RoleName=r['RoleName'],
+                    InstanceProfileName=p)
+            except client.exceptions.NoSuchEntityException:
+                continue
+            try:
+                client.delete_instance_profile(InstanceProfileName=p)
+            except client.exceptions.NoSuchEntityException:
+                continue
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1147,12 +1163,13 @@ class RoleDelete(BaseAction):
         for r in resources:
             if self.data.get('force', False):
                 self.detach_inline_policies(client, r)
+                self.delete_instance_profiles(client, r)
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
                     ("Role:%s cannot be deleted, set force "
-                     "to detach policy and delete, error: %s") % (
+                     "to detach policy, instance profile and delete, error: %s") % (
                          r['Arn'], str(e)))
                 error = e
             except (client.exceptions.NoSuchEntityException,
