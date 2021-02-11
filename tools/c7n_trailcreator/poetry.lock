@@ -28,20 +28,20 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "boto3"
-version = "1.17.0"
+version = "1.17.5"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
-botocore = ">=1.20.0,<1.21.0"
+botocore = ">=1.20.5,<1.21.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
 [[package]]
 name = "botocore"
-version = "1.20.0"
+version = "1.20.5"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
@@ -254,12 +254,12 @@ attrs = [
     {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
 ]
 boto3 = [
-    {file = "boto3-1.17.0-py2.py3-none-any.whl", hash = "sha256:b4860f56bc585d3d1fde90d288da5eb4d1198401d72201dc3e25de8887b080e2"},
-    {file = "boto3-1.17.0.tar.gz", hash = "sha256:2a39bd5e5f2d50ce9267d682cc92750f8771399665021f47e80f9c8d2fb812a6"},
+    {file = "boto3-1.17.5-py2.py3-none-any.whl", hash = "sha256:0d126d429a8a9ea2c8409a1ee36ce5a34e11db788d7730a714016264f10bbb89"},
+    {file = "boto3-1.17.5.tar.gz", hash = "sha256:d6aafb804fca2b67c65dda78ad8b4afed901e004071208b84c804d345ad9ebba"},
 ]
 botocore = [
-    {file = "botocore-1.20.0-py2.py3-none-any.whl", hash = "sha256:634b39ab0d55477cfbffb0e5dff31b7ab4bb171b04a0c69f8bcf65135f26ba94"},
-    {file = "botocore-1.20.0.tar.gz", hash = "sha256:a608d6d644b852f3c154fc433eaae52febbebc7c474fa8f4d666797d0931770a"},
+    {file = "botocore-1.20.5-py2.py3-none-any.whl", hash = "sha256:3c55f0db5e08920727f4fa24a87aed60060643f4b0b5665c62ec762f79e82d6b"},
+    {file = "botocore-1.20.5.tar.gz", hash = "sha256:04a1df759681f5f171accb354d863bfed0774d64a4e8ee35ff49835755660a4e"},
 ]
 c7n = []
 c7n-org = []
