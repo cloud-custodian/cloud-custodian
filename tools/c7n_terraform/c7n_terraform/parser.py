@@ -148,36 +148,8 @@ class HclLocator:
             self._get_lines(path)
 
         position = self._block_header_position(path, data_key)
-        if not position:
-            position = self._enclosure_position(path, data_key)
         assert position
         return position
-
-    def _enclosure_position(self, path, data_key):
-        start_line, end_line = 0, 0
-        token_queue = list(data_key)
-        for cache_idx, (idx, line) in enumerate(self.line_cache[path]):
-            tokens = [t.replace('"', "") for t in line.split()]
-            if not token_queue:
-                end_line = self._get_end_line(
-                    start_line, cache_idx, self.line_cache[path]
-                )
-                break
-            if token_queue[0] in tokens:
-                token_queue.pop(0)
-                continue
-            elif not tokens and len(tokens) <= 1:
-                continue
-            else:
-                token_queue = list(data_key)
-
-        if not (start_line and end_line):
-            return None
-        return {
-            "start": start_line,
-            "end": end_line,
-            "lines": self.file_cache[path][start_line - 1:end_line - 1],
-        }
 
     def _block_header_position(self, path, data_key):
         start_line, end_line = 0, 0
