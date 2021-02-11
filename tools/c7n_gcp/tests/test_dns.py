@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -40,6 +39,25 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_managed_zone_delete(self):
+        project_id = "cloud-custodian"
+        resource_name = "custodian-delete-test"
+
+        factory = self.replay_flight_data('dns-managed-zone-delete')
+        p = self.load_policy(
+            {'name': 'gcp-dns-managed-zone-delete',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'name': resource_name}],
+             'actions': ['delete']},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query('list', {"project": project_id})
+        self.assertNotIn(resource_name, result['managedZones'])
 
 
 class DnsPolicyTest(BaseTest):

@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
@@ -65,7 +64,7 @@ class PeriodicMode(FunctionMode, PullMode):
         'gcp-periodic',
         rinherit=FunctionMode.schema,
         required=['schedule'],
-        **{'trigger-type': {'enum': ['http', 'pubsub']},
+        **{'target-type': {'enum': ['http', 'pubsub']},
            'tz': {'type': 'string'},
            'schedule': {'type': 'string'}})
 

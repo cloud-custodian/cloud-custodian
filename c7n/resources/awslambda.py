@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
@@ -51,9 +50,6 @@ class ConfigLambda(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigLambda, self).load_resource(item)
-        resource['Tags'] = [
-            {u'Key': k, u'Value': v} for k, v in item[
-                'supplementaryConfiguration'].get('Tags', {}).items()]
         resource['c7n:Policy'] = item[
             'supplementaryConfiguration'].get('Policy')
         return resource
@@ -64,6 +60,7 @@ class AWSLambda(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'lambda'
+        arn = 'FunctionArn'
         arn_type = 'function'
         arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)

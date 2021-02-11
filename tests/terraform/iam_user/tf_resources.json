@@ -1,0 +1,50 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_user": {
+            "user": {
+                "arn": "arn:aws:iam::644160558196:user/testuser-8aa8c470",
+                "force_destroy": false,
+                "id": "testuser-8aa8c470",
+                "name": "testuser-8aa8c470",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "unique_id": "AIDAY5Y4D45RG3VTEMRNH"
+            }
+        },
+        "aws_iam_user_ssh_key": {
+            "key1": {
+                "encoding": "SSH",
+                "fingerprint": "d5:10:0e:15:e5:4e:d9:64:7e:9f:cc:df:79:26:6a:3f",
+                "id": "APKAY5Y4D45RD4AB6MY4",
+                "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuxTuI+dUrkxojQJdVa4s7G59corPjSHyFkZy4h4JCpkPLMPP4RJE+6KQWk9eEsUxE90YnI17WxJc6uHY56xVZsPGyTbSobEFk4poufQ2MpCj08slWYkfpMw2yOYIuBZoYtw6IbqYq4tuQLdSx9TOAC3C7hdp0OtNgaDelAha1jiNChwFGheXQCM5T+py/QPMJsEL7Iqf3O0DppXwfCWjV3nIjiqvPtgypxE5Zzj8xPu64cjqfd0GavPzmj/ukxOSinepkx7GRx31DWIJvk8FLF6xSjERy2Ooo7lAu1nFl9pFefOt4hJ5UUpdcbYO8MNZzYfrqu/E5wBd7sGSClY79",
+                "ssh_public_key_id": "APKAY5Y4D45RD4AB6MY4",
+                "status": "Inactive",
+                "username": "testuser-8aa8c470"
+            },
+            "key2": {
+                "encoding": "SSH",
+                "fingerprint": "16:8e:6e:00:2b:b7:7d:07:41:4b:b5:0d:9b:00:4f:a7",
+                "id": "APKAY5Y4D45RIUTJRHG5",
+                "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7ubAyrW3Ex0sbaK1T/pkOS5eUH2Cn0cHSWSmYj3+XNgLV+YpyVZ6JbAMIWDcqTSdiMmM7Eh1bQg/3n6G9MgAFRmcs66ZRqOWaVPALGNGY1uIsVYKcnDLM7ecPGm8Habh0tyCG8pYlL/qiwYyXjvVy2ECMfsZCZ5BSpmsfVet3u5Dw0ztCPkqztLLBzNtFKd47YTAhvAD7YH2jVDe6uhXWT2L8il64F+189RhRsdDzqHYKAZZEFvRJH8GJoPf6r9mdoGUhxzz0USQvqrSYQi3PBMELt7cUWUKx6gYq86C7tNkp9a6cMwKDqXqqJa4pZtlsq1JtaRgoErpcd/ORfOZn",
+                "ssh_public_key_id": "APKAY5Y4D45RIUTJRHG5",
+                "status": "Active",
+                "username": "testuser-8aa8c470"
+            }
+        },
+        "random_id": {
+            "user": {
+                "b64_std": "testuser-iqjEcA==",
+                "b64_url": "testuser-iqjEcA",
+                "byte_length": 4,
+                "dec": "testuser-2326316144",
+                "hex": "testuser-8aa8c470",
+                "id": "iqjEcA",
+                "keepers": null,
+                "prefix": "testuser-"
+            }
+        }
+    }
+}

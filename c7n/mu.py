@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -935,7 +934,35 @@ def zinfo(fname):
     return info
 
 
-class CloudWatchEventSource:
+class AWSEventBase:
+    """for AWS Event Sources that want to utilize lazy client initialization.
+
+    Primarily utilized by sources that support static rendering to
+    IAAC templates (tools/ops/policylambda.py) to do so in an account
+    agnostic fashion.
+    """
+    client_service = None
+
+    def __init__(self, data, session_factory):
+        self.session_factory = session_factory
+        self._session = None
+        self._client = None
+        self.data = data
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
+
+    @property
+    def client(self):
+        if not self._client:
+            self._client = self.session.client(self.client_service)
+        return self._client
+
+
+class CloudWatchEventSource(AWSEventBase):
     """Subscribe a lambda to cloud watch events.
 
     Cloud watch events supports a number of different event
@@ -971,23 +998,7 @@ class CloudWatchEventSource:
         'terminate-success': 'EC2 Instance Terminate Successful',
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
 
-    def __init__(self, data, session_factory):
-        self.session_factory = session_factory
-        self._session = None
-        self._client = None
-        self.data = data
-
-    @property
-    def session(self):
-        if not self._session:
-            self._session = self.session_factory()
-        return self._session
-
-    @property
-    def client(self):
-        if not self._client:
-            self._client = self.session.client('events')
-        return self._client
+    client_service = 'events'
 
     def get(self, rule_name):
         return resource_exists(self.client.describe_rule, Name=rule_name)
@@ -1060,10 +1071,11 @@ class CloudWatchEventSource:
             payload['detail-type'] = events
         elif event_type == 'phd':
             payload['source'] = ['aws.health']
+            payload.setdefault('detail', {})
             if self.data.get('events'):
-                payload['detail'] = {
+                payload['detail'].update({
                     'eventTypeCode': list(self.data['events'])
-                }
+                })
             if self.data.get('categories', []):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
         elif event_type == 'hub-finding':
@@ -1578,16 +1590,10 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
-class ConfigRule:
+class ConfigRule(AWSEventBase):
     """Use a lambda as a custom config rule.
-
     """
-
-    def __init__(self, data, session_factory):
-        self.data = data
-        self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('config')
+    client_service = 'config'
 
     def __repr__(self):
         return "<ConfigRule>"
@@ -1595,7 +1601,7 @@ class ConfigRule:
     def get_rule_params(self, func):
         # config does not support versions/aliases on lambda funcs
         func_arn = func.arn
-        if func_arn.count(':') > 6:
+        if isinstance(func_arn, str) and func_arn.count(':') > 6:
             func_arn, version = func_arn.rsplit(':', 1)
 
         params = dict(

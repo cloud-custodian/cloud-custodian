@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import deque
@@ -39,6 +38,7 @@ class ResourceManager:
     action_registry = None
     executor_factory = ThreadPoolExecutor
     retry = None
+    permissions = ()
 
     def __init__(self, ctx, data):
         self.ctx = ctx

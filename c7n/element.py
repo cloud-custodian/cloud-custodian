@@ -4,10 +4,34 @@
 
 import jmespath
 
+from c7n.executor import ThreadPoolExecutor
+
 
 class Element:
     """Parent base class for filters and actions.
     """
+
+    permissions = ()
+    metrics = ()
+
+    executor_factory = ThreadPoolExecutor
+
+    schema = {'type': 'object'}
+    # schema aliases get hoisted into a jsonschema definition
+    # location, and then referenced inline.
+    schema_alias = None
+
+    def get_permissions(self):
+        return self.permissions
+
+    def validate(self):
+        """Validate the current element's configuration.
+
+        Should raise a validation error if there are any configuration issues.
+
+        This method will always be called prior to element execution/process() method
+        being called and thus can act as a point of lazy initialization.
+        """
 
     def filter_resources(self, resources, key_expr, allowed_values=()):
         # many filters implementing a resource state transition only allow

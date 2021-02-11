@@ -1,21 +1,9 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sqs:Subscribe\"}]}"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "57471f27-9334-5587-9c3b-4d10f7c95518", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "57471f27-9334-5587-9c3b-4d10f7c95518", 
-                "content-length": "612", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:43:25 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"}]}"
+        },
+        "ResponseMetadata": {}
     }
 }

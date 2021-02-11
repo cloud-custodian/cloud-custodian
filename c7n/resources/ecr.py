@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -33,8 +32,8 @@ class ECR(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
-        name = "repositoryName"
-        arn = id = "repositoryArn"
+        id = name = "repositoryName"
+        arn = "repositoryArn"
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'

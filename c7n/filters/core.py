@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -12,7 +11,6 @@ import ipaddress
 import logging
 import operator
 import re
-import os
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -22,10 +20,9 @@ import jmespath
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
-from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr
+from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
 
 
@@ -182,27 +179,11 @@ def trim_runtime(filters):
 
 class Filter(Element):
 
-    executor_factory = ThreadPoolExecutor
-
     log = logging.getLogger('custodian.filters')
-
-    metrics = ()
-    permissions = ()
-    schema = {'type': 'object'}
-    # schema aliases get hoisted into a jsonschema definition
-    # location, and then referenced inline.
-    schema_alias = None
 
     def __init__(self, data, manager=None):
         self.data = data
         self.manager = manager
-
-    def get_permissions(self):
-        return self.permissions
-
-    def validate(self):
-        """validate filter config, return validation error or self"""
-        return self
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
@@ -741,42 +722,6 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
-
-
-def parse_date(v, tz=None):
-    if v is None:
-        return v
-
-    tz = tz or tzutc()
-
-    if isinstance(v, datetime.datetime):
-        if v.tzinfo is None:
-            return v.astimezone(tz)
-        return v
-
-    if isinstance(v, str):
-        try:
-            return parse(v).astimezone(tz)
-        except (AttributeError, TypeError, ValueError, OverflowError):
-            pass
-
-    # OSError on windows -- https://bugs.python.org/issue36439
-    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
-
-    if isinstance(v, (int, float, str)):
-        try:
-            v = datetime.datetime.fromtimestamp(float(v)).astimezone(tz)
-        except exceptions:
-            pass
-
-    if isinstance(v, (int, float, str)):
-        try:
-            # try interpreting as milliseconds epoch
-            v = datetime.datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
-        except exceptions:
-            pass
-
-    return isinstance(v, datetime.datetime) and v or None
 
 
 class ValueRegex:

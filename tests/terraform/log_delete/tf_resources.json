@@ -1,0 +1,20 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_log_group": {
+            "test_group": {
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:Yada",
+                "id": "Yada",
+                "kms_key_id": "",
+                "name": "Yada",
+                "name_prefix": null,
+                "retention_in_days": 0,
+                "tags": {
+                    "App": "Foie",
+                    "Environment": "production"
+                }
+            }
+        }
+    }
+}

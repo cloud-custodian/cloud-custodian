@@ -1,0 +1,45 @@
+{
+  "body": {
+    "items": {
+      "regions/us-central1": {
+        "routers": [
+          {
+            "kind": "compute#router",
+            "description": "",
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+            "bgp": {
+              "asn": 65000,
+              "advertiseMode": "DEFAULT"
+            },
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+            "creationTimestamp": "2019-03-03T13:07:45.540-08:00",
+            "id": "4254752054818503886",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/routers/test-router",
+            "name": "test-router"
+          }
+        ]
+      }
+    },
+    "kind": "compute#routerAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/routers",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/routers"
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "5465",
+    "transfer-encoding": "chunked",
+    "expires": "Tue, 05 Mar 2019 15:13:51 GMT",
+    "vary": "Origin, X-Origin",
+    "-content-encoding": "gzip",
+    "date": "Tue, 05 Mar 2019 15:13:51 GMT",
+    "x-xss-protection": "1; mode=block",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/routers?alt=json",
+    "x-content-type-options": "nosniff",
+    "server": "GSE",
+    "etag": "\"NKTCIMcBFhoTgQ6538AXjtAmxkE=/7nBsNhN3-w5WHCCqw3bJ8v1HM9M=\"",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

@@ -48,5 +48,5 @@ jobs:
       pip install docker click pytest pyyaml
   # build a docker image and sanity test
   - script: |
-      python tools/dev/dockerpkg.py build -t build --verbose --test -i cli-distroless
+      python tools/dev/dockerpkg.py build -t build --verbose --test -i cli
 

@@ -1,0 +1,29 @@
+{
+  "body": {
+    "kind": "compute#targetTcpProxy", 
+    "name": "target-tcp-proxy", 
+    "service": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/custodian-backend-service-2", 
+    "proxyHeader": "NONE", 
+    "creationTimestamp": "2019-04-30T10:47:08.971-07:00", 
+    "id": "2072806435336828147", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetTcpProxies/target-tcp-proxy"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "443", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 15:23:11 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 15:23:11 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetTcpProxies/target-tcp-proxy?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"ObJE3C7J6Zwn7nXO0gcc4JXNfa4=/wgdzbbFZQgIQaSmyN0AHzxvLlXc=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

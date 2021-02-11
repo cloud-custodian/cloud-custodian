@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
@@ -181,6 +180,7 @@ class PolicyExecutionMode:
     """Policy execution semantics"""
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+    permissions = ()
 
     def __init__(self, policy):
         self.policy = policy
@@ -198,6 +198,9 @@ class PolicyExecutionMode:
 
     def validate(self):
         """Validate configuration settings for execution mode."""
+
+    def get_permissions(self):
+        return self.permissions
 
     def get_metrics(self, start, end, period):
         """Retrieve any associated metrics for the policy."""
@@ -838,7 +841,7 @@ class ConfigRuleMode(LambdaMode):
         resources = []
 
         # TODO config resource type matches policy check
-        if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
+        if event.get('eventLeftScope') or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
                 "ResourceNotRecorded",
                 "ResourceDeletedNotRecorded"):
@@ -923,10 +926,13 @@ class PolicyConditions:
         self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
+        self.initialized = False
 
     def validate(self):
-        self.filters.extend(self.convert_deprecated())
-        self.filters = self.filter_registry.parse(self.filters, self)
+        if not self.initialized:
+            self.filters.extend(self.convert_deprecated())
+            self.filters = self.filter_registry.parse(self.filters, self)
+            self.initialized = True
 
     def evaluate(self, event=None):
         policy_vars = dict(self.env_vars)
@@ -936,7 +942,7 @@ class PolicyConditions:
             'resource': self.policy.resource_type,
             'provider': self.policy.provider_name,
             'account_id': self.policy.options.account_id,
-            'now': datetime.utcnow().replace(tzinfo=tzutil.tzutc()),
+            'now': datetime.now(tzutil.tzutc()),
             'policy': self.policy.data
         })
 
@@ -1129,7 +1135,7 @@ class Policy:
             if old_a.type == 'notify' and 'subject' in old_a.data:
                 new_a.data['subject'] = old_a.data['subject']
 
-    def push(self, event, lambda_ctx):
+    def push(self, event, lambda_ctx=None):
         mode = self.get_execution_mode()
         return mode.run(event, lambda_ctx)
 

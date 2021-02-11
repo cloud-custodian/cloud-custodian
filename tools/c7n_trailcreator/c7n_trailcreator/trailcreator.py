@@ -1,4 +1,3 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """AWS AutoTag Resource Creators
@@ -702,7 +701,7 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     tag_org_account, a, r, db,
                     creator_tag, user_suffix, dryrun, type)] = (a, r)

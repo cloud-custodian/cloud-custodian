@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -8,7 +7,6 @@ import logging
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 
 
@@ -47,26 +45,12 @@ class ActionRegistry(PluginRegistry):
 
 class Action(Element):
 
-    permissions = ()
-    metrics = ()
-
     log = logging.getLogger("custodian.actions")
-
-    executor_factory = ThreadPoolExecutor
-    permissions = ()
-    schema = {'type': 'object'}
-    schema_alias = None
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
-
-    def get_permissions(self):
-        return self.permissions
-
-    def validate(self):
-        return self
 
     @property
     def name(self):

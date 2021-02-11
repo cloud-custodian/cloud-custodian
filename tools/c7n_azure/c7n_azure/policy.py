@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -412,7 +411,7 @@ class AzureEventGridMode(AzureFunctionMode):
     def __init__(self, policy):
         super(AzureEventGridMode, self).__init__(policy)
         self.subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
+            self.policy.data['mode'].get('events', ()))
 
     def validate(self):
         super(AzureEventGridMode, self).validate()
@@ -439,7 +438,7 @@ class AzureEventGridMode(AzureFunctionMode):
         session = local_session(self.policy.session_factory)
 
         # queue name is restricted to lowercase letters, numbers, and single hyphens
-        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
+        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app['name'].lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         package = self.build_functions_package(queue_name=queue_name)

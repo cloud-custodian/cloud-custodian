@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
@@ -32,6 +31,7 @@ def get_mailer_requirements():
             'azure-storage-blob', 'sendgrid'] + list(CORE_DEPS)
     requirements = generate_requirements(
         deps, ignore=['boto3', 'botocore', 'pywin32'],
+        exclude=['pkg_resources'],
         include_self=True)
     return requirements
 

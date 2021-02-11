@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
@@ -230,6 +229,25 @@ class PolicyLambdaProvision(BaseTest):
             {'detail': {
                 'eventTypeCategory': ['scheduledChange'],
                 'eventTypeCode': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED']},
+             'source': ['aws.health']}
+        )
+
+    def test_phd_mode_account(self):
+        factory = self.replay_flight_data('test_phd_event_account')
+        p = self.load_policy(
+            {'name': 'ec2-retire',
+             'resource': 'account',
+             'mode': {
+                 'categories': ['issue', 'scheduledChange'],
+                 'statuses': ['open', 'upcoming'],
+                 'type': 'phd'}}, session_factory=factory)
+
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(factory)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'detail': {
+                'eventTypeCategory': ['issue', 'scheduledChange']},
              'source': ['aws.health']}
         )
 

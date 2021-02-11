@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved.
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
@@ -389,7 +388,7 @@ class PostFinding(Action):
             self.manager.session_factory).client(
                 "securityhub", region_name=region_name)
 
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        now = datetime.now(tzutc()).isoformat()
         # default batch size to one to work around security hub console issue
         # which only shows a single resource in a finding.
         batch_size = self.data.get('batch_size', 1)

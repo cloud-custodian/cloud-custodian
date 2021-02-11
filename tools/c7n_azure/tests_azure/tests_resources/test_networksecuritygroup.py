@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
@@ -63,6 +62,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'value': 'c7n-nsg'},
                 {'type': 'ingress',
                  'ports': '80',
+                 'source': '*',
                  'access': 'Allow'}],
         })
 
@@ -142,6 +142,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'egress',
                  'ports': '22',
                  'ipProtocol': 'TCP',
+                 'destination': '*',
                  'access': 'Allow'}],
         })
 

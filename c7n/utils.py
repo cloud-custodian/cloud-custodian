@@ -1,8 +1,8 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
 from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 import json
 import itertools
 import ipaddress
@@ -15,6 +15,9 @@ import threading
 import time
 from urllib import parse as urlparse
 from urllib.request import getproxies
+
+
+from dateutil.parser import ParserError, parse
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -104,6 +107,56 @@ def filter_empty(d):
     return d
 
 
+# We need a minimum floor when examining possible timestamp
+# values to distinguish from other numeric time usages. Use
+# the S3 Launch Date.
+DATE_FLOOR = time.mktime((2006, 3, 19, 0, 0, 0, 0, 0, 0))
+
+
+def parse_date(v, tz=None):
+    """Handle various permutations of a datetime serialization
+    to a datetime with the given timezone.
+
+    Handles strings, seconds since epoch, and milliseconds since epoch.
+    """
+
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime):
+        if v.tzinfo is None:
+            return v.astimezone(tz)
+        return v
+
+    if isinstance(v, str) and not v.isdigit():
+        try:
+            return parse(v).astimezone(tz)
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
+
+    if isinstance(v, (int, float, str)):
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v)).astimezone(tz)
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float, str)):
+        # try interpreting as milliseconds epoch
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
+        except exceptions:
+            pass
+
+    return isinstance(v, datetime) and v or None
+
+
 def type_schema(
         type_name, inherits=None, rinherit=None,
         aliases=None, required=None, **props):
@@ -139,6 +192,10 @@ def type_schema(
         s['additionalProperties'] = False
 
     s['properties'].update(props)
+
+    for k, v in props.items():
+        if v is None:
+            del s['properties'][k]
     if not required:
         required = []
     if isinstance(required, list):
@@ -188,20 +245,44 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def camelResource(obj):
+def camelResource(obj, implicitDate=False, implicitTitle=True):
     """Some sources from apis return lowerCased where as describe calls
 
     always return TitleCase, this function turns the former to the later
+
+    implicitDate ~ automatically sniff keys that look like isoformat date strings
+     and convert to python datetime objects.
     """
     if not isinstance(obj, dict):
         return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
-        obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if implicitTitle:
+            ok = "%s%s" % (k[0].upper(), k[1:])
+        else:
+            ok = k
+        obj[ok] = v
+
+        if implicitDate:
+            # config service handles datetime differently then describe sdks
+            # the sdks use knowledge of the shape to support language native
+            # date times, while config just turns everything into a serialized
+            # json with mangled keys without type info. to normalize to describe
+            # we implicitly sniff keys which look like datetimes, and have an
+            # isoformat marker ('T').
+            kn = k.lower()
+            if isinstance(v, (str, int)) and ('time' in kn or 'date' in kn):
+                try:
+                    dv = parse_date(v)
+                except ParserError:
+                    dv = None
+                if dv:
+                    obj[ok] = dv
         if isinstance(v, dict):
-            camelResource(v)
+            camelResource(v, implicitDate, implicitTitle)
         elif isinstance(v, list):
-            list(map(camelResource, v))
+            for e in v:
+                camelResource(e, implicitDate, implicitTitle)
     return obj
 
 

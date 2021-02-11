@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
@@ -15,6 +14,7 @@ from .azure_common import BaseTest, arm_template, requires_arm_polling
 
 
 @requires_arm_polling
+@pytest.mark.skiplive
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()

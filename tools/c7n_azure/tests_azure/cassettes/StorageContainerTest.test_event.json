@@ -1,0 +1,147 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 21 Jan 2021 15:02:33 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "12174"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "9b256834-1504-42cb-b5f8-5fe478cf9b0a",
+                        "8ab61285-d0d3-4764-887b-15861b354959",
+                        "0620e2eb-304a-49f2-90bf-53725ff7f053",
+                        "ddb9df54-47c7-409a-a8e4-52c570019aa3"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragevbnu36vrszu5c",
+                                "name": "cctstoragevbnu36vrszu5c",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": false,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-01-21T15:00:15.9211981Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-01-21T15:00:15.9211981Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-01-21T15:00:15.8261975Z",
+                                    "primaryEndpoints": {
+                                        "blob": "https://cctstoragevbnu36vrszu5c.blob.core.windows.net/",
+                                        "queue": "https://cctstoragevbnu36vrszu5c.queue.core.windows.net/",
+                                        "table": "https://cctstoragevbnu36vrszu5c.table.core.windows.net/",
+                                        "file": "https://cctstoragevbnu36vrszu5c.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragevbnu36vrszu5c/blobServices/default/containers/containerone?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 21 Jan 2021 15:02:33 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "etag": [
+                        "\"0x8D8BE1D525A6958\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "689"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragevbnu36vrszu5c/blobServices/default/containers/containerone",
+                        "name": "containerone",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                        "etag": "\"0x8D8BE1D525A6958\"",
+                        "properties": {
+                            "deleted": false,
+                            "remainingRetentionDays": 0,
+                            "defaultEncryptionScope": "$account-encryption-key",
+                            "denyEncryptionScopeOverride": false,
+                            "publicAccess": "Container",
+                            "leaseStatus": "Unlocked",
+                            "leaseState": "Available",
+                            "lastModifiedTime": "2021-01-21T15:00:41.0000000Z",
+                            "legalHold": {
+                                "hasLegalHold": false,
+                                "tags": []
+                            },
+                            "hasImmutabilityPolicy": false,
+                            "hasLegalHold": false
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

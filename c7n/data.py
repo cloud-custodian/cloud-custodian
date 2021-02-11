@@ -1,4 +1,3 @@
-# Copyright 2020 Kapil Thangavelu
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """Data Resource Provider implementation.

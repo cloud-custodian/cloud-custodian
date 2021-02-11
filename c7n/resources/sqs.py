@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
@@ -15,6 +14,7 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import PostFinding
 
 
@@ -34,7 +34,7 @@ class DescribeQueue(DescribeSource):
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
+                    self.manager.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
             return queue
@@ -44,13 +44,21 @@ class DescribeQueue(DescribeSource):
                 self.manager, list(filter(None, w.map(_augment, resources))))
 
 
+class QueueConfigSource(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['QueueUrl'] = item['resourceId']
+        return resource
+
+
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sqs'
         arn_type = ""
-        enum_spec = ('list_queues', 'QueueUrls', None)
+        enum_spec = ('list_queues', 'QueueUrls', {'MaxResults': 1000})
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
@@ -69,7 +77,7 @@ class SQS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeQueue,
-        'config': ConfigSource
+        'config': QueueConfigSource
     }
 
     def get_permissions(self):
@@ -84,7 +92,8 @@ class SQS(QueryResourceManager):
                 ids_normalized.append(i)
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
-        return super(SQS, self).get_resources(ids_normalized, cache)
+        resources = super(SQS, self).get_resources(ids_normalized, cache)
+        return [r for r in resources if Arn.parse(r['QueueArn']).resource in ids_normalized]
 
 
 @SQS.filter_registry.register('metrics')

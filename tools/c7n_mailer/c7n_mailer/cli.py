@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import argparse
 import functools
 import logging
@@ -39,6 +41,12 @@ CONFIG_SCHEMA = {
         'queue_url': {'type': 'string'},
         'endpoint_url': {'type': 'string'},
         'from_address': {'type': 'string'},
+        'additional_email_headers': {
+            'type': 'object',
+            'patternProperties': {
+                '': {'type': 'string'},
+            }
+        },
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
 
