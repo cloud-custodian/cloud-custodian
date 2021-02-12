@@ -3215,7 +3215,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 be = {}
             b[self.annotation_key] = be
         else:
-            be = [self.annotation_key]
+            be = b[self.annotation_key]
 
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True

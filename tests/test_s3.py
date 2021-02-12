@@ -3633,7 +3633,6 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
                         {
                             "type": "bucket-encryption",
                             "crypto": "aws:kms",
-                            "key": "alias/aws/s3",
                             "state": True,
                         },
                         {
@@ -3650,5 +3649,13 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
 
     resources = p.run()
 
-    assert len(resources) == 1
-    assert resources[0].get('Name') == 'c7n-aws-s3-encryption-audit-test-c'
+    assert len(resources) == 3
+
+    expected_names = [
+        'c7n-aws-s3-encryption-audit-test-a',
+        'c7n-aws-s3-encryption-audit-test-b',
+        'c7n-aws-s3-encryption-audit-test-c',
+    ]
+    actual_names = sorted([r.get('Name') for r in resources])
+
+    assert actual_names == expected_names
