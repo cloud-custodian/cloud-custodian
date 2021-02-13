@@ -398,3 +398,95 @@ class TestEcsContainerInstance(BaseTest):
             "status"
         ]
         self.assertEqual(state, "DRAINING")
+
+
+class TestEcs(BaseTest):
+
+    def test_deregister_container_instances(self):
+        session_factory = self.replay_flight_data("test_deregister_container_instances")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "test-cluster"}],
+                "actions": [
+                    {
+                        "type": "deregister-instances",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 0)
+
+    def test_delete_cluster(self):
+        session_factory = self.replay_flight_data("test_delete_cluster")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['c7n-cluster'])
+        cap_provider = client.describe_capacity_providers(
+            capacityProviders=response.get('clusters')[0].get(
+                'capacityProviders')).get('capacityProviders')
+        self.assertEqual(len(cap_provider), 1)
+        self.assertEqual(cap_provider[0].get('autoScalingGroupProvider').get(
+            'managedScaling').get('status'), 'ENABLED')
+        asg = cap_provider[0].get('autoScalingGroupProvider').get(
+            'autoScalingGroupArn').split('/')[-1]
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "c7n-cluster"}],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(90)
+        response = client.describe_clusters(clusters=['c7n-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'INACTIVE')
+        client = session_factory().client("autoscaling")
+        asg_details = client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg])
+        self.assertEqual(asg_details.get('AutoScalingGroups'), [])
+
+    def test_delete_cluster_not_force(self):
+        session_factory = self.replay_flight_data("test_delete_cluster_not_force")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "test-cluster"}],
+                "actions": [
+                    {
+                        "type": "delete"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with self.assertRaises(client.exceptions.ClusterContainsContainerInstancesException):
+            p.run()
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)

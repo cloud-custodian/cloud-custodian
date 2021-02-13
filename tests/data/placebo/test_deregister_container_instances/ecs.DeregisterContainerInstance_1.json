@@ -1,0 +1,53 @@
+{
+  "status_code": 200,
+  "data": {
+    "containerInstance": {
+      "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/d85c791f0a1f49d09e581cf61fabbdff",
+      "ec2InstanceId": "i-0a522a4f1a70a169c",
+      "version": 4,
+      "versionInfo": {
+        "agentVersion": "1.25.1",
+        "agentHash": "0c8913ba",
+        "dockerVersion": "DockerVersion: 18.06.1-ce"
+      },
+      "remainingResources": [
+        {
+          "name": "PORTS_UDP",
+          "type": "STRINGSET",
+          "doubleValue": 0.0,
+          "longValue": 0,
+          "integerValue": 0,
+          "stringSetValue": []
+        }
+      ],
+      "registeredResources": [
+        {
+          "name": "PORTS_UDP",
+          "type": "STRINGSET",
+          "doubleValue": 0.0,
+          "longValue": 0,
+          "integerValue": 0,
+          "stringSetValue": []
+        }
+      ],
+      "status": "INACTIVE",
+      "agentConnected": true,
+      "runningTasksCount": 0,
+      "pendingTasksCount": 0,
+      "attributes": [],
+      "registeredAt": {
+        "__class__": "datetime",
+        "year": 2020,
+        "month": 3,
+        "day": 25,
+        "hour": 20,
+        "minute": 41,
+        "second": 35,
+        "microsecond": 472000
+      },
+      "attachments": [],
+      "tags": []
+    },
+    "ResponseMetadata": {}
+  }
+}

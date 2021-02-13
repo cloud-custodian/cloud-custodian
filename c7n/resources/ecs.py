@@ -7,7 +7,7 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
-from c7n import query
+from c7n import query, utils
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
 
@@ -774,3 +774,119 @@ TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
 Service.action_registry.register('auto-tag-user', AutoTagUser)
 Task.action_registry.register('auto-tag-user', AutoTagUser)
 ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+@ECSCluster.action_registry.register('deregister-instances')
+class DeregisterInstances(BaseAction):
+    """Deregister container instances from an ECS Cluster.
+
+    Setting force = True will deregister the instance irrespective of task
+    running on it. Instances will still be running.
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: deregister-instances
+                resource: ecs
+                filters:
+                    - 'tag:Name': 'c7n'
+                actions:
+                    - type: deregister-instances
+                      include_provider: True
+                      force: True
+    """
+
+    schema = type_schema(
+        'deregister-instances',
+        force={'type': 'boolean'},
+        include_provider={'type': 'boolean'})
+    permissions = ('ecs:DeregisterContainerInstance', "autoscaling:DeleteAutoScalingGroup",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        error = None
+        for r in resources:
+            if self.data.get('include_provider', False):
+                self.delete_capacity_provider_asgs(client, self.data.get('force', False), r)
+            instance_arns = client.list_container_instances(
+                cluster=r['clusterArn']).get('containerInstanceArns')
+            for inst_arns in instance_arns:
+                try:
+                    client.deregister_container_instance(
+                        cluster=r['clusterArn'], containerInstance=inst_arns, force=self.data.get(
+                            'force', False))
+                except client.exceptions.ClusterNotFoundException:
+                    continue
+                except ClientError as e:
+                    error = e
+        if error:
+            raise error
+
+    def delete_capacity_provider_asgs(self, client, force, resource):
+        # returns 'capacityProviders': [] if it doesn't exist
+        cap_provider = client.describe_capacity_providers(
+            capacityProviders=resource.get('capacityProviders')).get('capacityProviders')
+        c = local_session(self.manager.session_factory).client('autoscaling')
+        for cp in cap_provider:
+            if cp.get('autoScalingGroupProvider'):
+                stats = cp.get('autoScalingGroupProvider').get('managedScaling').get('status')
+                if stats == "ENABLED":
+                    asg = (cp.get('autoScalingGroupProvider').get(
+                        'autoScalingGroupArn').split('/')[-1])
+                    try:
+                        c.delete_auto_scaling_group(
+                            AutoScalingGroupName=asg, ForceDelete=force)
+                    except ClientError:
+                        continue
+
+
+@ECSCluster.action_registry.register('delete')
+class DeleteEcsCluster(BaseAction):
+    """Delete an ECS Cluster.
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: ecs-delete-cluster
+                resource: ecs
+                filters:
+                    - 'tag:Name': 'c7n'
+                actions:
+                    - type: delete
+                      force: True
+
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ecs:DeleteCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        retryable = ('ClusterContainsContainerInstancesException')
+        retry = utils.get_retry(retryable, max_attempts=5)
+        error = None
+        if self.data.get('force', False):
+            dereg_instance = self.manager.action_registry['deregister-instances'](
+                {'force': True, 'include_provider': True}, self.manager)
+            dereg_instance.process(resources)
+        for r in resources:
+            if self.data.get('force', False):
+                try:
+                    retry(client.delete_cluster, cluster=r['clusterArn'])
+                except client.exceptions.ClusterNotFoundException:
+                    continue
+                except ClientError as e:
+                    error = e
+            else:
+                try:
+                    client.delete_cluster(cluster=r['clusterArn'])
+                except client.exceptions.ClusterNotFoundException:
+                    continue
+                except ClientError as e:
+                    error = e
+        if error:
+            raise error

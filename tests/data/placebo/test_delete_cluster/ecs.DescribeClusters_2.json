@@ -1,0 +1,30 @@
+{
+  "status_code": 200,
+  "data": {
+    "clusters": [
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-cluster",
+        "clusterName": "c7n-cluster",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 1,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "settings": [
+          {
+            "name": "containerInsights",
+            "value": "disabled"
+          }
+        ],
+        "capacityProviders": [
+          "test-123"
+        ],
+        "defaultCapacityProviderStrategy": []
+      }
+    ],
+    "failures": [],
+    "ResponseMetadata": {}
+  }
+}

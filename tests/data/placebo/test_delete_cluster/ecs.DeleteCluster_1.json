@@ -1,0 +1,45 @@
+{
+  "status_code": 200,
+  "data": {
+    "cluster": {
+      "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-cluster",
+      "clusterName": "c7n-cluster",
+      "status": "DEPROVISIONING",
+      "registeredContainerInstancesCount": 0,
+      "runningTasksCount": 0,
+      "pendingTasksCount": 0,
+      "activeServicesCount": 0,
+      "statistics": [],
+      "tags": [],
+      "settings": [
+        {
+          "name": "containerInsights",
+          "value": "disabled"
+        }
+      ],
+      "capacityProviders": [
+        "test-123"
+      ],
+      "defaultCapacityProviderStrategy": [],
+      "attachments": [
+        {
+          "id": "c78de75a-29f3-4eff-b4bf-f3db809ccd52",
+          "type": "asp",
+          "status": "DELETING",
+          "details": [
+            {
+              "name": "capacityProviderName",
+              "value": "test-123"
+            },
+            {
+              "name": "scalingPlanName",
+              "value": "ECSManagedAutoScalingPlan-1dded3e4-e4d0-4f8a-a49f-752241502989"
+            }
+          ]
+        }
+      ],
+      "attachmentsStatus": "UPDATE_IN_PROGRESS"
+    },
+    "ResponseMetadata": {}
+  }
+}
