@@ -1,0 +1,3 @@
+policies:
+  - name: multi-resources
+    resource: ["ec2","ebs"]

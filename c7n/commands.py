@@ -16,7 +16,7 @@ from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
+from c7n.utils import load_file, local_session, SafeLoader, yaml_dump, split_policies
 from c7n.config import Bag, Config
 from c7n.resources import (
     load_resources, load_available, load_providers, PROVIDER_NAMES)
@@ -212,6 +212,7 @@ def validate(options):
 
         try:
             structure.validate(data)
+            data["policies"] = split_policies(data["policies"])
         except PolicyValidationError as e:
             log.error("Configuration invalid: {}".format(config_file))
             log.error("%s" % e)

@@ -36,6 +36,8 @@ def load(options, path, format=None, validate=True, vars=None):
 
     structure = StructureParser()
     structure.validate(data)
+    data["policies"] = utils.split_policies(data["policies"])
+
     load_resources(structure.get_resource_types(data))
 
     if isinstance(data, list):
