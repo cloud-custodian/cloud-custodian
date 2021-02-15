@@ -212,7 +212,7 @@ def comma_expand(values):
         elif v:
             resolved_values.append(v)
     # unique the set
-    return list(dict.fromkeys(resolved_regions))
+    return list(dict.fromkeys(resolved_values))
 
 
 def get_session(account, session_name, region):
