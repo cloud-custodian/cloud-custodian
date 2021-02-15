@@ -1137,7 +1137,13 @@ class RoleDelete(BaseAction):
                 ignore_err_codes=('NoSuchEntityException',))
 
     def delete_instance_profiles(self, client, r):
-        profiles = client.list_instance_profiles_for_role(RoleName=r['RoleName'])
+        # An instance profile can contain only one IAM role,
+        # although a role can be included in multiple instance profiles
+        profile_names = []
+        try:
+            profiles = client.list_instance_profiles_for_role(RoleName=r['RoleName'])
+        except client.exceptions.NoSuchEntityException:
+            profiles = []
         if profiles:
             profile_names = [p.get('InstanceProfileName') for p in profiles['InstanceProfiles']]
         for p in profile_names:
