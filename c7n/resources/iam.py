@@ -1106,6 +1106,17 @@ class SetPolicy(BaseAction):
 class RoleDelete(BaseAction):
     """Delete an IAM Role.
 
+    To delete IAM Role you must first delete the policies
+    that are associated with the role. Also, you need to remove
+    the role from all instance profiles that the role is in.
+
+    https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html
+
+    For this case option 'force' is used. If you set it as 'true',
+    policies that are associated with the role would be detached
+    (inline policies would be removed) and all instance profiles
+    the role is in would be removed as well as the role.
+
     For example, if you want to automatically delete an unused IAM role.
 
     :example:
