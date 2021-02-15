@@ -163,6 +163,11 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
+    accounts = comma_expand(accounts)
+    policies = comma_expand(policies)
+    tags = comma_expand(tags)
+    policy_tags = comma_expand(policy_tags)
+
     # Filter out custodian log messages on console output if not
     # at warning level or higher, see LogFilter docs and #2674
     for h in logging.getLogger().handlers:
@@ -197,13 +202,15 @@ def resolve_regions(regions, account):
     if not regions:
         return ('us-east-1', 'us-west-2')
 
-    resolved_regions = []
-    # support a comma seperated list of regions as a single parameter
-    for r in regions:
-        if ',' in r:
-            resolved_regions.extend([n.strip() for n in r.split(',')])
-        else:
-            resolved_regions.append(r)
+    return comma_expand(regions)
+
+def comma_expand(values):
+    resolved_values = []
+    for v in values:
+        if ',' in v:
+            resolved_values.extend([n.strip() for n in v.split(',')])
+        elif v:
+            resolved_values.append(v)
     # unique the set
     return list(dict.fromkeys(resolved_regions))
 
@@ -237,6 +244,8 @@ def get_session(account, session_name, region):
 
 def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     filtered_accounts = []
+    accounts = comma_expand(accounts)
+    not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
         if not_accounts and a['name'] in not_accounts:
             continue
