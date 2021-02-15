@@ -196,7 +196,16 @@ def resolve_regions(regions, account):
         return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
-    return regions
+
+    resolved_regions = []
+    # support a comma seperated list of regions as a single parameter
+    for r in regions:
+        if ',' in r:
+            resolved_regions.extend([n.strip() for n in r.split(',')])
+        else:
+            resolved_regions.append(r)
+    # unique the set
+    return list(dict.fromkeys(resolved_regions))
 
 
 def get_session(account, session_name, region):
