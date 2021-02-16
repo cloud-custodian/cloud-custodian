@@ -258,7 +258,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def source_type(self):
         return self.data.get('source', 'describe-azure')
 
-    def resources(self, query=None):
+    def resources(self, query=None, augment=True):
         cache_key = self.get_cache_key(query)
 
         resources = None
@@ -271,11 +271,16 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                     len(resources)))
 
         if resources is None:
-            resources = self.augment(self.source.get_resources(query))
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.get_resources(query)
+            if augment:
+                with self.ctx.tracer.subsegment('resource-augment'):
+                    resources = self.augment(resources)
             self._cache.save(cache_key, resources)
 
-        resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resource_count = len(resources)
+            resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
         if self.data == self.ctx.policy.data:
