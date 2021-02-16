@@ -242,14 +242,15 @@ class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
     expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.subnets[]',
-                'deployments.networkConfiguration.awsvpcConfiguration.subnets[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.subnets[]',
                 'networkConfiguration.awsvpcConfiguration.subnets[]')
 
     def get_related_ids(self, resources):
         subnet_ids = set()
-        for r in resources:
-            for exp in self.expressions:
-                ids = jmespath.search(exp, r)
+        for exp in self.expressions:
+            cexp = jmespath.compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
                 if ids:
                     subnet_ids.update(ids)
         return list(subnet_ids)
