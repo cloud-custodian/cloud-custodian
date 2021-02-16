@@ -204,8 +204,11 @@ def resolve_regions(regions, account):
 
     return comma_expand(regions)
 
+
 def comma_expand(values):
     resolved_values = []
+    if not values:
+        return []
     for v in values:
         if ',' in v:
             resolved_values.extend([n.strip() for n in v.split(',')])
