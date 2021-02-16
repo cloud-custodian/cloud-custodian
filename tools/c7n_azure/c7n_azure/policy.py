@@ -316,11 +316,12 @@ class AzureModeCommon:
     def run_for_event(policy, event=None):
         s = time.time()
 
-        resources = policy.resource_manager.get_resources(
-            [AzureModeCommon.extract_resource_id(policy, event)])
+        with policy.ctx:
+            resources = policy.resource_manager.get_resources(
+                [AzureModeCommon.extract_resource_id(policy, event)])
 
-        resources = policy.resource_manager.filter_resources(
-            resources, event)
+            resources = policy.resource_manager.filter_resources(
+                resources, event)
 
         with policy.ctx:
             rt = time.time() - s
@@ -344,12 +345,16 @@ class AzureModeCommon:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
                     policy.name, action.name, len(resources))
-                if isinstance(action, EventAction):
-                    results = action.process(resources, event)
-                else:
-                    results = action.process(resources)
-                policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
+                with policy.ctx.tracer.subsegment('action:%s' % action.type):
+                    if isinstance(action, EventAction):
+                        results = action.process(resources, event)
+                    else:
+                        results = action.process(resources)
+                try:
+                    policy._write_file(
+                        "action-%s" % action.name, utils.dumps(results))
+                except (TypeError, OverflowError):
+                    pass
 
         policy.ctx.metrics.put_metric(
             "ActionTime", time.time() - at, "Seconds", Scope="Policy")
