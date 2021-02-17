@@ -36,14 +36,15 @@ def load(options, path, format=None, validate=True, vars=None):
 
     structure = StructureParser()
     structure.validate(data)
-    load_resources(structure.get_resource_types(data))
+    rtypes = structure.get_resource_types(data)
+    load_resources(rtypes)
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
         return None
 
     if validate:
-        errors = validate(data)
+        errors = validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
