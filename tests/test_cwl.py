@@ -47,6 +47,28 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
 
+    def test_kms_filter(self):
+        session_factory = self.replay_flight_data('test_log_group_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-log-group-kms-filter',
+                'resource': 'log-group',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/cw'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['kmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/cw')
+
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")
         p = self.load_policy({
