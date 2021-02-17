@@ -326,6 +326,10 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'asg-test-scaling-policy')
+        self.assertTrue('c7n:matched-policies' in resources[0])
+        self.assertTrue(
+            resources[0]['c7n:matched-policies'][0]['PolicyName'], 'Target Tracking Policy')
 
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data("test_asg_vpc_filter")

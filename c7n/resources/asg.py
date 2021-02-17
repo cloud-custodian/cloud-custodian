@@ -1803,38 +1803,27 @@ class ScalingPolicyFilter(ValueFilter):
     )
     schema_alias = False
     permissions = ("autoscaling:DescribePolicies",)
-
-    def initialize(self, asgs):
-        self.policies = self.get_scaling_policies(asgs)
-        return self
+    annotate = False  # no default value annotation on policy
+    annotation_key = 'c7n:matched-policies'
 
     def get_scaling_policies(self, asgs):
-        policy_mgr = self.manager.get_resource_manager('scaling-policy')
-
-        policies = policy_mgr.resources()
-
-        if not policies:
-            return {}
-        policy_dict = {}
+        policies = self.manager.get_resource_manager('scaling-policy').resources()
+        policy_map = {}
         for policy in policies:
-            if policy['AutoScalingGroupName'] in policy_dict.keys():
-                policy_dict[policy['AutoScalingGroupName']].append(policy)
-            else:
-                policy_dict[policy['AutoScalingGroupName']] = [policy]
-
-        return policy_dict
-
-    def get(self, asg):
-        return self.policies.get(asg['AutoScalingGroupName'])
+            policy_map.setdefault(
+                policy['AutoScalingGroupName'], []).append(policy)
+        return policy_map
 
     def process(self, asgs, event=None):
-        self.policy_info = self.initialize(asgs)
+        self.policy_map = self.get_scaling_policies(asgs)
         return super(ScalingPolicyFilter, self).process(asgs, event)
 
     def __call__(self, asg):
-        asg_policies = self.policy_info.get(asg)
-        matched = False
-        if asg_policies is not None:
-            for policy in asg_policies:
-                matched = self.match(policy) or matched
-        return matched
+        asg_policies = self.policy_map.get(asg['AutoScalingGroupName'], ())
+        matched = []
+        for policy in asg_policies:
+            if self.match(policy):
+                matched.append(policy)
+        if matched:
+            asg[self.annotation_key] = matched
+        return bool(matched)
