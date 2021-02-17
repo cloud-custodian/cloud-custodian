@@ -159,6 +159,7 @@ ResourceMap = {
     "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
     "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",
     "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
+    "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
     "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
     "aws.security-group": "c7n.resources.vpc.SecurityGroup",
     "aws.serverless-app": "c7n.resources.sar.ServerlessApp",
