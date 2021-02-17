@@ -15,7 +15,7 @@ from dateutil.tz import gettz, tzutc
 
 try:
     from botocore.exceptions import ClientError
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     pass  # Azure provider
 
 
