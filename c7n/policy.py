@@ -764,7 +764,7 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             self.policy.session_factory).client('config')
 
     def put_evaluations(self, client, token, evaluations):
-        for eval_set in utils.chunks(evalutions, 100):
+        for eval_set in utils.chunks(evaluations, 100):
             self.policy.resource_manager.retry(
                 client.put_evaluations,
                 Evaluations=eval_set,
@@ -795,7 +795,7 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
                 self.policy.name))
             for r in matched_resources]
         if evaluations and token:
-            self.put_evaluations(client, token, evalutions)
+            self.put_evaluations(client, token, evaluations)
 
         evaluations = [dict(
             ComplianceResourceType=resource_type,
