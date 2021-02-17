@@ -8,8 +8,10 @@ from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
+import c7n.filters.vpc as net_filters
 
 
 def ecs_tag_normalize(resources):
@@ -233,6 +235,25 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
            actions:
              - type: stop
     """
+
+
+@Service.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'networkConfiguration.awsvpcConfiguration.subnets[]')
+
+    def get_related_ids(self, resources):
+        subnet_ids = set()
+        for exp in self.expressions:
+            cexp = jmespath.compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
+                if ids:
+                    subnet_ids.update(ids)
+        return list(subnet_ids)
 
 
 @Service.action_registry.register('modify')

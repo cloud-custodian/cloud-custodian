@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "test",
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:123456789012:log-group:test:*",
+                "storedBytes": 0,
+                "kmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/beedfd51-5158-44ae-a95f-d514f61abfb3"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

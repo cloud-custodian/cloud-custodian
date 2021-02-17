@@ -15,7 +15,6 @@ from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import itertools
 import jmespath
 import time
 
@@ -84,19 +83,18 @@ def universal_augment(self, resources):
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
 
-    m = self.get_model()
-    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
+    rfetch = [r for r in resources if 'Tags' not in r]
 
-    resource_tag_map_list = list(itertools.chain(
-        *[p['ResourceTagMappingList'] for p in paginator.paginate(
-            ResourceTypeFilters=[resource_type])]))
-    resource_tag_map = {
-        r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
-
-    for arn, r in zip(self.get_arns(resources), resources):
-        if 'Tags' in r:
-            continue
-        r['Tags'] = resource_tag_map.get(arn, [])
+    for arn_resource_set in utils.chunks(
+            zip(self.get_arns(rfetch), rfetch), 100):
+        arn_resource_map = dict(arn_resource_set)
+        resource_tag_results = client.get_resources(
+            ResourceARNList=list(arn_resource_map.keys())).get(
+                'ResourceTagMappingList', ())
+        resource_tag_map = {
+            r['ResourceARN']: r['Tags'] for r in resource_tag_results}
+        for arn, r in arn_resource_map.items():
+            r['Tags'] = resource_tag_map.get(arn, [])
 
     return resources
 
@@ -1057,10 +1055,7 @@ class CopyRelatedResourceTag(Tag):
             return
         if not isinstance(tag_action, UniversalTag):
             tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        tag_action.process_resource_set(
-            client,
-            resource_set=[r],
-            tags=tags)
+        tag_action.process_resource_set(client, [r], tags)
         return True
 
     def get_resource_tag_map(self, r_type, ids):

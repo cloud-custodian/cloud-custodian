@@ -7,7 +7,8 @@ from c7n.utils import local_session
 
 
 class AzureEvents:
-    """A mapping of resource types to events."""
+    """A mapping of resource types to events.
+       Provides user friendly event names for common events."""
 
     azure_events = {
 
@@ -85,6 +86,10 @@ class AzureEvents:
 
         'StorageWrite': {
             'resource_provider': 'Microsoft.Storage/storageAccounts',
+            'event': 'write'},
+
+        'StorageContainerWrite': {
+            'resource_provider': 'Microsoft.Storage/storageAccounts/blobServices/containers',
             'event': 'write'},
 
         'VmWrite': {

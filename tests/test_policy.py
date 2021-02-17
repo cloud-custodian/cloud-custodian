@@ -226,6 +226,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q1 2021,
+            'AwsSsmPatchCompliance',
             # newer wave q4 2020
             'AwsApiGatewayRestApi',
             'AwsApiGatewayStage',

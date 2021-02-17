@@ -28,63 +28,51 @@ def test_codebuild_unused(test, aws_code_build_vpc):
     assert 'example1' not in sg_names
 
 
+@terraform('vpc_flow_logs')
+def test_vpc_flow_logs(test, vpc_flow_logs):
+    factory = test.replay_flight_data("test_vpc_flow_logs")
+
+    vpc_id = vpc_flow_logs['aws_vpc.example_no_flow_log.id']
+    p = test.load_policy(
+        {
+            "name": "net-find",
+            "resource": "vpc",
+            "filters": [
+                {"VpcId": vpc_id},
+                "flow-logs"
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["VpcId"], vpc_id)
+
+    vpc_id = vpc_flow_logs['aws_vpc.example.id']
+    log_destination = vpc_flow_logs['aws_flow_log.example.log_destination']
+    p = test.load_policy(
+        {
+            "name": "net-find",
+            "resource": "vpc",
+            "filters": [
+                {"VpcId": vpc_id},
+                {
+                    "type": "flow-logs",
+                    "enabled": True,
+                    "status": "active",
+                    "traffic-type": "all",
+                    "destination": log_destination,
+                },
+            ],
+        },
+        session_factory=factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+
 class VpcTest(BaseTest):
-
-    @functional
-    def test_flow_logs(self):
-        factory = self.replay_flight_data("test_vpc_flow_logs")
-
-        session = factory()
-        ec2 = session.client("ec2")
-        logs = session.client("logs")
-
-        vpc_id = ec2.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
-        self.addCleanup(ec2.delete_vpc, VpcId=vpc_id)
-
-        p = self.load_policy(
-            {
-                "name": "net-find",
-                "resource": "vpc",
-                "filters": [{"VpcId": vpc_id}, "flow-logs"],
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], vpc_id)
-
-        log_group = "vpc-logs"
-        logs.create_log_group(logGroupName=log_group)
-        self.addCleanup(logs.delete_log_group, logGroupName=log_group)
-
-        ec2.create_flow_logs(
-            ResourceIds=[vpc_id],
-            ResourceType="VPC",
-            TrafficType="ALL",
-            LogGroupName=log_group,
-            DeliverLogsPermissionArn="arn:aws:iam::644160558196:role/flowlogsRole",
-        )
-
-        p = self.load_policy(
-            {
-                "name": "net-find",
-                "resource": "vpc",
-                "filters": [
-                    {"VpcId": vpc_id},
-                    {
-                        "type": "flow-logs",
-                        "enabled": True,
-                        "status": "active",
-                        "traffic-type": "all",
-                        "log-group": log_group,
-                    },
-                ],
-            },
-            session_factory=factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
 
     def test_vpc_post_finding(self):
         # reusing extant test data
