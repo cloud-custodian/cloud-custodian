@@ -764,7 +764,7 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             self.policy.session_factory).client('config')
 
     def put_evaluations(self, client, token, evaluations):
-        for eval_set in chunks(evalutions):
+        for eval_set in utils.chunks(evalutions, 100):
             self.policy.resource_manager.retry(
                 client.put_evaluations,
                 Evaluations=eval_set,
