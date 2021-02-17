@@ -66,3 +66,4 @@ class DeleteAction(AzureBaseAction):
         else:
             self.client.resources.delete_by_id(resource['id'],
                                                self.session.resource_api_version(resource['id']))
+        return "deleted"
