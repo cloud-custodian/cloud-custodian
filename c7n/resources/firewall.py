@@ -35,7 +35,4 @@ class NetworkFirewall(QueryResourceManager):
         detail_spec = ('describe_firewall', 'FirewallArn', 'FirewallArn', '')
         id = name = 'FirewallName'
         cfn_type = config_type = 'AWS::Network::Firewall'
-        metrics_namespace = 'AWS/NetworkFirewall' 
-
-
-
+        metrics_namespace = 'AWS/NetworkFirewall'
