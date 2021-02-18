@@ -62,7 +62,7 @@ urllib3 = ">=1.25.4,<1.27"
 
 [[package]]
 name = "c7n"
-version = "0.9.10"
+version = "0.9.11"
 description = "Cloud Custodian - Policy Rules Engine"
 category = "dev"
 optional = false
