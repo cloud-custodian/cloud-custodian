@@ -331,7 +331,7 @@ class VersionTrim(Action):
            - name: lambda-gc
              resource: aws.lambda
              actions:
-               - type: trim-verisons
+               - type: trim-versions
                  exclude-aliases: true  # default true
                  older-than: 60 # default not-set
                  retain-latest: true # default false
