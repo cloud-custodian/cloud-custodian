@@ -18,19 +18,16 @@ from azure.keyvault import KeyVaultClient, KeyVaultId
 from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
-from c7n_azure.constants import RESOURCE_VAULT
 from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from netaddr import IPNetwork, IPRange, IPSet
 from json import JSONEncoder
 
 from c7n.utils import chunks, local_session
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
@@ -569,18 +566,19 @@ class RetentionPeriod:
 
 
 @lru_cache()
-def get_keyvault_secret(user_identity_id, keyvault_secret_id):
+def get_keyvault_secret(user_identity_id, keyvault_secret_id, cloud_endpoints=AZURE_PUBLIC_CLOUD):
     secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
     access_token = None
 
+    resource = get_keyvault_auth_endpoint(cloud_endpoints)
     # Use UAI if client_id is provided
     if user_identity_id:
         msi = MSIAuthentication(
             client_id=user_identity_id,
-            resource=RESOURCE_VAULT)
+            resource=resource)
     else:
         msi = MSIAuthentication(
-            resource=RESOURCE_VAULT)
+            resource=resource)
 
     access_token = AccessToken(token=msi.token['access_token'])
     credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
@@ -624,3 +622,7 @@ def resolve_service_tag_alias(rule):
         resource_name = p[1] if 1 < len(p) else None
         resource_region = p[2] if 2 < len(p) else None
         return IPSet(get_service_tag_ip_space(resource_name, resource_region))
+
+
+def get_keyvault_auth_endpoint(cloud_endpoints):
+    return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])

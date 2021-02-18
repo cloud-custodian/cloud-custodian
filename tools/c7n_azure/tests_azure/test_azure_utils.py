@@ -9,11 +9,12 @@ from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math, PortsRangeHelper,
                              ResourceIdParser, StringUtils, custodian_azure_send_override,
                              get_keyvault_secret, get_service_tag_ip_space, is_resource_group_id,
-                             is_resource_group)
+                             is_resource_group, get_keyvault_auth_endpoint)
 from mock import patch, Mock
 
 from c7n.config import Bag
 import pytest
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 try:
     from importlib import reload
@@ -294,7 +295,25 @@ class UtilsTest(BaseTest):
             reload(sys.modules['c7n_azure.utils'])
 
             result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412')
-            self.assertEqual(result, mock.value)
+            self.assertEqual(mock.value, result)
+            resource_auth = _1.call_args.kwargs.get('resource')
+            self.assertEqual('https://vault.azure.net', resource_auth)
+
+    @patch('msrestazure.azure_active_directory.MSIAuthentication')
+    def test_get_keyvault_secret_with_parameter(self, _1):
+        mock = Mock()
+        mock.value = '{"client_id": "client", "client_secret": "secret"}'
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   return_value=None), \
+                patch('azure.keyvault.v7_0.KeyVaultClient.get_secret', return_value=mock):
+
+            reload(sys.modules['c7n_azure.utils'])
+
+            result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412',
+                                         cloud_endpoints=AZURE_CHINA_CLOUD)
+            self.assertEqual(mock.value, result)
+            resource_auth = _1.call_args.kwargs.get('resource')
+            self.assertEqual('https://vault.azure.cn', resource_auth)
 
     # Test relies on substitute data in Azure Common, not designed for live data
     @pytest.mark.skiplive
@@ -334,3 +353,11 @@ class UtilsTest(BaseTest):
     def test_is_resource_group(self):
         self.assertTrue(is_resource_group({'type': 'resourceGroups'}))
         self.assertFalse(is_resource_group({'type': 'virtualMachines'}))
+
+    def test_get_keyvault_auth_public(self):
+        auth = get_keyvault_auth_endpoint(AZURE_PUBLIC_CLOUD)
+        self.assertEqual('https://vault.azure.net', auth)
+
+    def test_get_keyvault_auth_china(self):
+        auth = get_keyvault_auth_endpoint(AZURE_CHINA_CLOUD)
+        self.assertEqual('https://vault.azure.cn', auth)
