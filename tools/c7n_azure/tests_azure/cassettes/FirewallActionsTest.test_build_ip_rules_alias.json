@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/westus/serviceTags?api-version=2019-06-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/westus/serviceTags?api-version=2019-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Mon, 12 Aug 2019 14:20:56 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "x-ms-arm-service-request-id": [
-                        "c0f5f164-0155-440c-8fb9-ced0f8896513"
+                        "73634a35-fd05-41f6-9063-360507f06da8"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 Feb 2021 18:05:21 GMT"
+                    ],
                     "content-length": [
-                        "623145"
+                        "1508080"
                     ]
                 },
                 "body": {
