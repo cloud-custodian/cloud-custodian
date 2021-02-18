@@ -8,6 +8,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.core import parse_date
 from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
@@ -435,6 +436,29 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
             if found:
                 results.append(r)
         return results
+
+
+@LogGroup.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cw-log-group-kms-key-filter
+            resource: log-group
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/cw)"
+                op: regex
+    """
+
+    RelatedIdsExpression = 'kmsKeyId'
 
 
 @LogGroup.action_registry.register('set-encryption')

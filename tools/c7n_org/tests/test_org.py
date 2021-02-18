@@ -173,6 +173,13 @@ class OrgTest(TestUtils):
         self.assertEqual(
             [n['name'] for n in t4['policies']], ['find-ml'])
 
+    def test_resolve_regions_comma_separated(self):
+        self.assertEqual(
+            org.resolve_regions([
+                'us-west-2,eu-west-1,us-east-1,us-west-2',
+                'eu-west-1,us-east-2,us-east-1'], None),
+            ['us-west-2', 'eu-west-1', 'us-east-1', 'us-east-2'])
+
     def test_resolve_regions(self):
         account = {"name": "dev",
                    "account_id": "112233445566",

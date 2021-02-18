@@ -763,11 +763,19 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
         return utils.local_session(
             self.policy.session_factory).client('config')
 
+    def put_evaluations(self, client, token, evaluations):
+        for eval_set in utils.chunks(evaluations, 100):
+            self.policy.resource_manager.retry(
+                client.put_evaluations,
+                Evaluations=eval_set,
+                ResultToken=token)
+
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
         resource_id = self.policy.resource_manager.resource_type.id
         client = self._get_client()
+        token = event.get('resultToken')
 
         matched_resources = set()
         for r in PullMode.run(self):
@@ -786,11 +794,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             Annotation='The resource is not compliant with policy:%s.' % (
                 self.policy.name))
             for r in matched_resources]
-        if evaluations:
-            self.policy.resource_manager.retry(
-                client.put_evaluations,
-                Evaluations=evaluations,
-                ResultToken=event.get('resultToken', 'No token found.'))
+        if evaluations and token:
+            self.put_evaluations(client, token, evaluations)
 
         evaluations = [dict(
             ComplianceResourceType=resource_type,
@@ -800,11 +805,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             Annotation='The resource is compliant with policy:%s.' % (
                 self.policy.name))
             for r in unmatched_resources]
-        if evaluations:
-            self.policy.resource_manager.retry(
-                client.put_evaluations,
-                Evaluations=evaluations,
-                ResultToken=event.get('resultToken', 'No token found.'))
+        if evaluations and token:
+            self.put_evaluations(client, token, evaluations)
         return list(matched_resources)
 
 
