@@ -17,8 +17,6 @@ from c7n.executor import MainThreadExecutor
 
 from .common import BaseTest
 
-
-
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
 
@@ -80,8 +78,8 @@ class TestArnResolver:
         resolver = aws.ArnResolver(p.resource_manager)
         load_resources(('aws.sqs', 'aws.lambda'))
         test.patch(SQS, 'executor_factory', MainThreadExecutor)
-        arn_map = resolver.resolve([arns[0]])
-        # assert len(arn_map) == 3
+        arn_map = resolver.resolve(arns)
+        assert len(arn_map) == 3
         assert None not in arn_map.values()
 
     def test_arn_meta(self):
