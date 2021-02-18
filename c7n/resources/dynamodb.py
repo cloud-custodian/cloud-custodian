@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
