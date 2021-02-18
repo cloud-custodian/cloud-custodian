@@ -318,7 +318,31 @@ class LambdaPostFinding(PostFinding):
 class VersionTrim(Action):
     """Delete old versions of a function.
 
-    Will find non aliased versions of a function.
+    By default this will only remove the non $LATEST
+    version of a function that are not referenced by
+    an alias. Optionally it can delete only versions
+    older than a given age.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: lambda-gc
+             resource: aws.lambda
+             actions:
+               - type: trim-verisons
+                 exclude-aliases: true  # default true
+                 older-than: 60 # default not-set
+                 retain-latest: true # default false
+
+    retain-latest refers to whether the latest numeric
+    version will be retained, the $LATEST alias will
+    still point to the last revision even without this set,
+    so this is safe wrt to the function availability, its more
+    about desire to retain an explicit version of the current
+    code, rather than just the $LATEST alias pointer which will
+    be automatically updated.
     """
     permissions = ('lambda:ListAliases', 'lambda:ListVersionsByFunction',
                    'lambda:DeleteFunction',)
@@ -326,6 +350,7 @@ class VersionTrim(Action):
     schema = type_schema(
         'trim-versions',
         **{'exclude-aliases': {'default': True, 'type': 'boolean'},
+           'retain-latest': {'default': True, 'type': 'boolean'},
            'older-than': {'type': 'number'}})
 
     def process(self, resources):
@@ -352,6 +377,7 @@ class VersionTrim(Action):
 
     def process_lambda(self, client, r):
         exclude_aliases = self.data.get('exclude-aliases', True)
+        retain_latest = self.data.get('retain-latest', False)
         date_threshold = self.data.get('older-than')
         date_threshold = (
             date_threshold and
@@ -367,13 +393,22 @@ class VersionTrim(Action):
         pager = versions_pager.paginate(FunctionName=r['FunctionName'])
 
         matched = total = 0
+        latest_sha = None
+
         for page in pager:
             versions = page.get('Versions')
             for v in versions:
+                if v['Version'] == '$LATEST':
+                    latest_sha = v['CodeSha256']
+                    continue
                 total += v['CodeSize']
                 if v['FunctionArn'] in aliased_versions:
                     continue
                 if date_threshold and parse_date(v['LastModified']) > date_threshold:
+                    continue
+                # Retain numbered version, not required, but it feels like a good thing
+                # to do. else the latest alias will still point.
+                if retain_latest and latest_sha and v['CodeSha256'] == latest_sha:
                     continue
                 matched += v['CodeSize']
                 self.manager.retry(

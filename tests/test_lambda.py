@@ -144,6 +144,31 @@ class LambdaLayerTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_trim_versions(self):
+        factory = self.replay_flight_data('test_lambda_trim_versions')
+        client = factory().client('lambda')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'actions': [{
+                    'type': 'trim-versions',
+                    'retain-latest': True
+                }]
+            },
+            session_factory=factory)
+        p.resource_manager.actions[0].process(
+            [{'FunctionName': 'custodian-ec2-check'}])
+        versions = {v['Version']: v for v in
+                    client.list_versions_by_function(
+                        FunctionName='custodian-ec2-check').get('Versions')}
+        aliases = client.list_aliases(
+            FunctionName='custodian-ec2-check').get('Aliases')
+        assert len(aliases) == 1
+        assert aliases[0]['FunctionVersion'] in versions
+        assert '$LATEST' in versions
+        assert set(versions) == {'$LATEST', '6', '12'}
+
     def test_lambda_check_permission(self):
         # lots of pre-conditions, iam role with iam read only policy attached
         # and a permission boundary with deny on iam read access.
