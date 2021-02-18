@@ -7,7 +7,7 @@ try:
 except ImportError:
     from collections import Iterable
 
-from c7n_azure import constants
+from c7n_azure.constants import DEFAULT_RESOURCE_AUTH_ENDPOINT
 from c7n_azure.actions.logic_app import LogicAppAction
 from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n_azure.actions.notify import Notify
@@ -180,10 +180,9 @@ class TypeInfo(metaclass=TypeMeta):
     service = ''
     client = ''
 
+    resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
     # Default id field, resources should override if different (used for meta filters, report etc)
     id = 'id'
-
-    resource = constants.RESOURCE_ACTIVE_DIRECTORY
 
     @classmethod
     def extra_args(cls, resource_manager):
@@ -339,7 +338,7 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     def get_session(self):
         if self._session is None:
             session = super(ChildResourceManager, self).get_session()
-            if self.resource_type.resource != constants.RESOURCE_ACTIVE_DIRECTORY:
+            if self.resource_type.resource != DEFAULT_RESOURCE_AUTH_ENDPOINT:
                 session = session.get_session_for_resource(self.resource_type.resource)
             self._session = session
 
