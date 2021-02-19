@@ -969,6 +969,16 @@ class DescribeRDSSnapshot(DescribeSource):
         return snaps
 
 
+class ConfigSnapshotRDS(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        for k in list(resource.keys()):
+            if k.startswith('Db'):
+                resource["DB%s" % k[2:]] = resource[k]
+        return resource
+
+
 @resources.register('rds-snapshot')
 class RDSSnapshot(QueryResourceManager):
     """Resource manager for RDS DB snapshots.
@@ -988,7 +998,7 @@ class RDSSnapshot(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRDSSnapshot,
-        'config': ConfigSource
+        'config': ConfigSnapshotRDS
     }
 
 
