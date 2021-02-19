@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sys
+import pytest
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from msrestazure.azure_active_directory import MSIAuthentication
@@ -292,6 +293,9 @@ class SessionTest(BaseTest):
         client._client.send()
         self.assertTrue(mock.called)
 
+    # This test won't run with real credentials unless the
+    # tenant is actually in Azure China cloud.
+    @pytest.mark.skiplive
     def test_get_client_non_default_base_url(self):
         s = Session(cloud_endpoints=AZURE_CHINA_CLOUD)
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
