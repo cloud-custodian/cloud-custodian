@@ -101,7 +101,7 @@ class DeleteAppFlowResource(BaseAction):
                     force: true
     """
 
-    permissions = ("appflow:DeleteFlow,")
+    permissions = ('appflow:DeleteFlow',)
     schema = type_schema('delete', force={'type': 'boolean'})
 
     def process(self, resources):
