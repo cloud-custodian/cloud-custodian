@@ -17,7 +17,6 @@ class AppFlow(QueryResourceManager):
         id = name = 'flowName'
         arn = 'flowArn'
         detail_spec = ('describe_flow', 'flowName', 'flowName', None)
-        not_found_err = 'ResourceNotFoundException'
 
     def augment(self, resources):
         resources = super(AppFlow, self).augment(resources)
@@ -115,5 +114,5 @@ class DeleteAppFlowResource(BaseAction):
                     flowName=r['flowName'],
                     forceDelete=force_delete
                 )
-            except self.manager.resource_type.not_found_err:
+            except client.exceptions.ResourceNotFoundException:
                 continue

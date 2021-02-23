@@ -10,7 +10,7 @@
             "connectorType": "S3",
             "sourceConnectorProperties": {
                 "S3": {
-                    "bucketName": "test-bucket",
+                    "bucketName": "stacklet-alfred",
                     "bucketPrefix": "preflow"
                 }
             }
@@ -20,7 +20,7 @@
                 "connectorType": "S3",
                 "destinationConnectorProperties": {
                     "S3": {
-                        "bucketName": "test-bucket",
+                        "bucketName": "stacklet-alfred",
                         "s3OutputFormatConfig": {
                             "fileType": "JSON",
                             "prefixConfig": {},
@@ -87,22 +87,24 @@
             "__class__": "datetime",
             "year": 2021,
             "month": 2,
-            "day": 19,
-            "hour": 15,
-            "minute": 28,
-            "second": 49,
-            "microsecond": 668000
+            "day": 23,
+            "hour": 10,
+            "minute": 42,
+            "second": 44,
+            "microsecond": 373000
         },
         "lastUpdatedAt": {
             "__class__": "datetime",
             "year": 2021,
             "month": 2,
-            "day": 19,
-            "hour": 16,
-            "minute": 28,
-            "second": 45,
-            "microsecond": 730000
+            "day": 23,
+            "hour": 10,
+            "minute": 42,
+            "second": 44,
+            "microsecond": 373000
         },
+        "createdBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_6174fa96e8e88f12/alfred@stacklet.io",
+        "lastUpdatedBy": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_6174fa96e8e88f12/alfred@stacklet.io",
         "tags": {}
     }
 }
