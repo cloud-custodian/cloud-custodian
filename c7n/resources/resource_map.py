@@ -7,6 +7,7 @@ ResourceMap = {
     "aws.ami": "c7n.resources.ami.AMI",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
     "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
+    "aws.app-flow": "c7n.resources.appflow.AppFlow",
     "aws.asg": "c7n.resources.asg.ASG",
     "aws.backup-plan": "c7n.resources.backup.BackupPlan",
     "aws.backup-vault": "c7n.resources.backup.BackupVault",
