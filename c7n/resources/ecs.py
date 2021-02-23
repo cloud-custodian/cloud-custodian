@@ -418,6 +418,12 @@ class Task(query.ChildResourceManager):
         return super(Task, self).get_resources(ids, cache, augment=False)
 
 
+@Task.filter_registry.register('subnet')
+class TaskSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "attachments[].details[?name == 'subnetId'].value[]"
+
+
 @Task.filter_registry.register('task-definition')
 class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """Filter tasks by their task definition.
