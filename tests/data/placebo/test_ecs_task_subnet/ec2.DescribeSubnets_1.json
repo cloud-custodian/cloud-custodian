@@ -46,10 +46,6 @@
                     {
                         "Key": "Name",
                         "Value": "testing-subnet"
-                    },
-                    {
-                        "Key": "Owner",
-                        "Value": "faizan.ahmed@capitalone.com"
                     }
                 ],
                 "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-07c118e47bb84cee7"
