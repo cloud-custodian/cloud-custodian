@@ -3,6 +3,7 @@
 
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
@@ -242,7 +243,7 @@ class WhiteListFilter(Filter):
             return access_policies
 
         if self.graph_client is None:
-            s = Session(resource='https://graph.windows.net')
+            s = Session(resource_endpoint_type=GRAPH_AUTH_ENDPOINT)
             self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         # Retrieve graph objects for all object_id

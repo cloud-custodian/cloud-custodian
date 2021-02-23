@@ -1,4 +1,4 @@
 boto3
 pyyaml>=4.2b4
-jinja2==2.10.3
+jinja2>=2.11.3
 jsonschema
