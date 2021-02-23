@@ -69,5 +69,5 @@ class AppFlowTests(BaseTest):
         self.assertEqual(1, len(resources))
 
         appflow = session_factory().client('appflow')
-        call = appflow.list_flows(maxResults=100)
+        call = appflow.list_flows(maxResults=1)
         self.assertEqual([], call.get('flows'))

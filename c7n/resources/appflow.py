@@ -108,11 +108,9 @@ class DeleteAppFlowResource(BaseAction):
             self.manager.session_factory).client('appflow')
         force_delete = self.data.get('force', False)
         for r in resources:
-            try:
-                self.manager.retry(
-                    client.delete_flow,
-                    flowName=r['flowName'],
-                    forceDelete=force_delete
-                )
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            self.manager.retry(
+                client.delete_flow,
+                flowName=r['flowName'],
+                forceDelete=force_delete,
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
