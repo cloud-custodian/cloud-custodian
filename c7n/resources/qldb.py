@@ -50,14 +50,14 @@ class Delete(Action):
                     client.update_ledger(
                         Name=r['Name'],
                         DeletionProtection=False)
-                except client.exceptions.ResourceNotFoundException:
+                except client.exceptions.ResourceNotFoundException: # pragma: no cover
                     continue
             elif r.get('DeletionProtection'):
                 protected += 1
                 continue
             try:
                 client.delete_ledger(Name=r['Name'])
-            except client.exceptions.ResourceNotFoundException:
+            except client.exceptions.ResourceNotFoundException: # pragma: no cover
                 continue
         if protected:
             self.log.warning((
