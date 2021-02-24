@@ -99,8 +99,11 @@ class KmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: elasticsearch-kms-key
             resource: aws.elasticsearch
@@ -116,8 +119,11 @@ class KmsFilter(KmsRelatedFilter):
 @ElasticSearchDomain.filter_registry.register('cross-cluster')
 class ElasticSearchSearchConnections(Filter):
     """Check for Cloudfront distribution config values
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: elasticsearch-cross-cluster
             resource: aws.elasticsearch
@@ -215,8 +221,11 @@ class ElasticSearchSearchConnections(Filter):
 class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
     """
     Filter to return all elasticsearch domains with cross account access permissions
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: check-elasticsearch-cross-account
             resource: aws.elasticsearch
@@ -245,8 +254,11 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
 class RemovePolicyStatement(RemovePolicyBase):
     """
     Action to remove policy statements from elasticsearch
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: elasticsearch-cross-account
             resource: aws.elasticsearch
@@ -367,8 +379,11 @@ class Delete(Action):
 @ElasticSearchDomain.action_registry.register('tag')
 class ElasticSearchAddTag(Tag):
     """Action to create tag(s) on an existing elasticsearch domain
+
     :example:
+
     .. code-block:: yaml
+
                 policies:
                   - name: es-add-tag
                     resource: elasticsearch
@@ -392,8 +407,11 @@ class ElasticSearchAddTag(Tag):
 @ElasticSearchDomain.action_registry.register('remove-tag')
 class ElasticSearchRemoveTag(RemoveTag):
     """Removes tag(s) on an existing elasticsearch domain
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: es-remove-tag
             resource: elasticsearch
@@ -416,8 +434,11 @@ class ElasticSearchRemoveTag(RemoveTag):
 @ElasticSearchDomain.action_registry.register('mark-for-op')
 class ElasticSearchMarkForOp(TagDelayedAction):
     """Tag an elasticsearch domain for action later
+
     :example:
+
     .. code-block:: yaml
+
                 policies:
                   - name: es-delete-missing
                     resource: elasticsearch
