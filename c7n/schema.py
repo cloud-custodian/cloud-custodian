@@ -37,9 +37,9 @@ from c7n.filters.core import (
 from c7n.structure import StructureParser # noqa
 
 
-def validate(data, schema=None):
+def validate(data, schema=None, resource_types=()):
     if schema is None:
-        schema = generate()
+        schema = generate(resource_types)
         JsonSchemaValidator.check_schema(schema)
 
     validator = JsonSchemaValidator(schema)

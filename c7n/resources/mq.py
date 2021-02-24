@@ -3,6 +3,7 @@
 from c7n.actions import Action
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
@@ -31,6 +32,28 @@ class MessageBroker(QueryResourceManager):
         for r in resources:
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
+
+
+@MessageBroker.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: message-broker-kms-key-filter
+            resource: message-broker
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/mq)"
+                op: regex
+    """
+    RelatedIdsExpression = 'EncryptionOptions.KmsKeyId'
 
 
 @MessageBroker.filter_registry.register('marked-for-op')

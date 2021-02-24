@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
@@ -20,13 +19,6 @@ class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
-        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
-        if ('BillingModeSummary' in resource and
-                'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']):
-            resource['BillingModeSummary'][
-                'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
-                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
-
         sse_info = resource.pop('Ssedescription', None)
         if sse_info is None:
             return resource
@@ -445,8 +437,8 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         service = 'dax'
         arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
+        arn = 'ClusterArn'
+        id = name = 'ClusterName'
         cfn_type = 'AWS::DAX::Cluster'
 
     permissions = ('dax:ListTags',)

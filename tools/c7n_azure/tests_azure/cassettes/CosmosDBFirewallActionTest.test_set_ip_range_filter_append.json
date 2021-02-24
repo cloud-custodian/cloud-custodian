@@ -121,7 +121,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://api.ipify.org/",
+                "uri": "https://checkip.amazonaws.com/",
                 "body": null,
                 "headers": {}
             },
@@ -145,7 +145,7 @@
                     ]
                 },
                 "body": {
-                    "string": "67.185.99.110"
+                    "string": "67.185.99.110\n"
                 }
             }
         }

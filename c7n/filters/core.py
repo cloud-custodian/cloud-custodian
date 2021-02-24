@@ -11,7 +11,6 @@ import ipaddress
 import logging
 import operator
 import re
-import os
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -23,7 +22,7 @@ from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr
+from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
 from c7n.manager import iter_filters
 
 
@@ -723,42 +722,6 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
-
-
-def parse_date(v, tz=None):
-    if v is None:
-        return v
-
-    tz = tz or tzutc()
-
-    if isinstance(v, datetime.datetime):
-        if v.tzinfo is None:
-            return v.astimezone(tz)
-        return v
-
-    if isinstance(v, str):
-        try:
-            return parse(v).astimezone(tz)
-        except (AttributeError, TypeError, ValueError, OverflowError):
-            pass
-
-    # OSError on windows -- https://bugs.python.org/issue36439
-    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
-
-    if isinstance(v, (int, float, str)):
-        try:
-            v = datetime.datetime.fromtimestamp(float(v)).astimezone(tz)
-        except exceptions:
-            pass
-
-    if isinstance(v, (int, float, str)):
-        try:
-            # try interpreting as milliseconds epoch
-            v = datetime.datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
-        except exceptions:
-            pass
-
-    return isinstance(v, datetime.datetime) and v or None
 
 
 class ValueRegex:

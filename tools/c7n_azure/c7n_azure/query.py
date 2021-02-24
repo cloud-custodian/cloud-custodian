@@ -7,7 +7,7 @@ try:
 except ImportError:
     from collections import Iterable
 
-from c7n_azure import constants
+from c7n_azure.constants import DEFAULT_RESOURCE_AUTH_ENDPOINT
 from c7n_azure.actions.logic_app import LogicAppAction
 from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n_azure.actions.notify import Notify
@@ -180,10 +180,9 @@ class TypeInfo(metaclass=TypeMeta):
     service = ''
     client = ''
 
+    resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
     # Default id field, resources should override if different (used for meta filters, report etc)
     id = 'id'
-
-    resource = constants.RESOURCE_ACTIVE_DIRECTORY
 
     @classmethod
     def extra_args(cls, resource_manager):
@@ -258,7 +257,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def source_type(self):
         return self.data.get('source', 'describe-azure')
 
-    def resources(self, query=None):
+    def resources(self, query=None, augment=True):
         cache_key = self.get_cache_key(query)
 
         resources = None
@@ -271,11 +270,16 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                     len(resources)))
 
         if resources is None:
-            resources = self.augment(self.source.get_resources(query))
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.get_resources(query)
+            if augment:
+                with self.ctx.tracer.subsegment('resource-augment'):
+                    resources = self.augment(resources)
             self._cache.save(cache_key, resources)
 
-        resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resource_count = len(resources)
+            resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
         if self.data == self.ctx.policy.data:
@@ -334,7 +338,7 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     def get_session(self):
         if self._session is None:
             session = super(ChildResourceManager, self).get_session()
-            if self.resource_type.resource != constants.RESOURCE_ACTIVE_DIRECTORY:
+            if self.resource_type.resource != DEFAULT_RESOURCE_AUTH_ENDPOINT:
                 session = session.get_session_for_resource(self.resource_type.resource)
             self._session = session
 

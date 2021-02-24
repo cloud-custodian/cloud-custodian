@@ -14,6 +14,7 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import PostFinding
 
 
@@ -91,7 +92,8 @@ class SQS(QueryResourceManager):
                 ids_normalized.append(i)
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
-        return super(SQS, self).get_resources(ids_normalized, cache)
+        resources = super(SQS, self).get_resources(ids_normalized, cache)
+        return [r for r in resources if Arn.parse(r['QueueArn']).resource in ids_normalized]
 
 
 @SQS.filter_registry.register('metrics')

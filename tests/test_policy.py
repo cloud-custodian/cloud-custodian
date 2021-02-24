@@ -79,6 +79,19 @@ class PolicyMetaLint(BaseTest):
             },
         )
 
+    def test_resource_type_repr_with_arn_type(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})
+        # check the repr absent a config type and cfn type but with an arn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert policy.resource_manager.resource_type.cfn_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
+
+    def test_resource_type_repr(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ecr'})
+        # check the repr absent a config type but with a cfn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::ECR::Repository>'
+
     def test_schema_plugin_name_mismatch(self):
         # todo iterate over all clouds not just aws resources
         for k, v in manager.resources.items():
@@ -213,6 +226,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q1 2021,
+            'AwsSsmPatchCompliance',
             # newer wave q4 2020
             'AwsApiGatewayRestApi',
             'AwsApiGatewayStage',
@@ -251,6 +266,9 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
@@ -285,8 +303,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::SSM::FileData',
-            'AWS::SecretsManager::Secret'}
+            'AWS::SSM::FileData'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -380,7 +397,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',

@@ -25,6 +25,7 @@ class StorageTestFirewallActions(BaseTest):
                 rg_name,
                 resource.name,
                 StorageAccountUpdateParameters(network_rule_set=resource.network_rule_set))
+        super(StorageTestFirewallActions, self).tearDown()
 
     @arm_template('storage.json')
     def test_network_ip_rules_action(self):

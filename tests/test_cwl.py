@@ -5,6 +5,31 @@ import time
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
+from pytest_terraform import terraform
+
+
+@terraform('log_delete', teardown=terraform.TEARDOWN_IGNORE)
+def test_tagged_log_group_delete(test, log_delete):
+    factory = test.replay_flight_data(
+        'test_log_group_tag_delete', region="us-west-2")
+
+    p = test.load_policy({
+        'name': 'group-delete',
+        'resource': 'aws.log-group',
+        'filters': [{
+            'tag:App': 'Foie'}],
+        'actions': ['delete']},
+        session_factory=factory, config={'region': 'us-west-2'})
+
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['logGroupName'] == log_delete[
+        'aws_cloudwatch_log_group.test_group.name']
+    client = factory().client('logs')
+    assert client.describe_log_groups(
+        logGroupNamePrefix=resources[0]['logGroupName']).get(
+            'logGroups') == []
+
 
 class LogGroupTest(BaseTest):
 
@@ -21,6 +46,28 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
+
+    def test_kms_filter(self):
+        session_factory = self.replay_flight_data('test_log_group_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-log-group-kms-filter',
+                'resource': 'log-group',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/cw'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['kmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/cw')
 
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")

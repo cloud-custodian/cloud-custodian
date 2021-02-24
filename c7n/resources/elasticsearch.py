@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+import json
 
-from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter, ValueFilter, Filter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
+from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
+from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, type_schema
@@ -97,11 +99,8 @@ class KmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
-
     :example:
-
     .. code-block:: yaml
-
         policies:
           - name: elasticsearch-kms-key
             resource: aws.elasticsearch
@@ -117,11 +116,8 @@ class KmsFilter(KmsRelatedFilter):
 @ElasticSearchDomain.filter_registry.register('cross-cluster')
 class ElasticSearchSearchConnections(Filter):
     """Check for Cloudfront distribution config values
-
     :example:
-
     .. code-block:: yaml
-
         policies:
           - name: elasticsearch-cross-cluster
             resource: aws.elasticsearch
@@ -215,6 +211,88 @@ class ElasticSearchSearchConnections(Filter):
         return results
 
 
+@ElasticSearchDomain.filter_registry.register('cross-account')
+class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """
+    Filter to return all elasticsearch domains with cross account access permissions
+    :example:
+    .. code-block:: yaml
+        policies:
+          - name: check-elasticsearch-cross-account
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-account
+    """
+    policy_attribute = 'c7n:Policy'
+    permissions = ('es:DescribeElasticsearchDomainConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            if self.policy_attribute not in r:
+                result = self.manager.retry(
+                    client.describe_elasticsearch_domain_config,
+                    DomainName=r['DomainName'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                if result:
+                    r[self.policy_attribute] = json.loads(
+                        result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    )
+        return super().process(resources)
+
+
+@ElasticSearchDomain.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """
+    Action to remove policy statements from elasticsearch
+    :example:
+    .. code-block:: yaml
+        policies:
+          - name: elasticsearch-cross-account
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-account
+            actions:
+              - type: remove-statements
+                statement_ids: matched
+    """
+
+    permissions = ('es:DescribeElasticsearchDomainConfig', 'es:UpdateElasticsearchDomainConfig',)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, ElasticSearchCrossAccountAccessFilter):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            try:
+                self.process_resource(client, r)
+            except Exception:
+                self.log.exception("Error processing es:%s", r['ARN'])
+
+    def process_resource(self, client, resource):
+        p = resource.get('c7n:Policy')
+
+        if p is None:
+            return
+
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if found:
+            client.update_elasticsearch_domain_config(
+                DomainName=resource['DomainName'],
+                AccessPolicies=json.dumps(p)
+            )
+
+        return
+
+
 @ElasticSearchDomain.action_registry.register('post-finding')
 class ElasticSearchPostFinding(PostFinding):
 
@@ -289,11 +367,8 @@ class Delete(Action):
 @ElasticSearchDomain.action_registry.register('tag')
 class ElasticSearchAddTag(Tag):
     """Action to create tag(s) on an existing elasticsearch domain
-
     :example:
-
     .. code-block:: yaml
-
                 policies:
                   - name: es-add-tag
                     resource: elasticsearch
@@ -317,11 +392,8 @@ class ElasticSearchAddTag(Tag):
 @ElasticSearchDomain.action_registry.register('remove-tag')
 class ElasticSearchRemoveTag(RemoveTag):
     """Removes tag(s) on an existing elasticsearch domain
-
     :example:
-
     .. code-block:: yaml
-
         policies:
           - name: es-remove-tag
             resource: elasticsearch
@@ -344,11 +416,8 @@ class ElasticSearchRemoveTag(RemoveTag):
 @ElasticSearchDomain.action_registry.register('mark-for-op')
 class ElasticSearchMarkForOp(TagDelayedAction):
     """Tag an elasticsearch domain for action later
-
     :example:
-
     .. code-block:: yaml
-
                 policies:
                   - name: es-delete-missing
                     resource: elasticsearch

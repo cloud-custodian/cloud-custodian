@@ -493,7 +493,8 @@ class ContainerHostTest(BaseTest):
         with open(file_path, 'w') as f:
             f.write("bad yaml file")
 
-        host.unload_policy_file(file_path, None)
+        host.load_policy(file_path, host.policies)
+        host.unload_policy_file(file_path, host.policies)
         os_unlink.assert_called()
 
         # Clean up the file
@@ -535,6 +536,34 @@ class ContainerHostTest(BaseTest):
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
     @patch('os.unlink')
+    def test_unload_policy_file_without_name(self,
+            os_unlink, yaml_safe_load, _1, _2, _3, _4):
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+
+        # Create a bad yaml file (no name field)
+        file_path = tempfile.mktemp(suffix=".yaml")
+        with open(file_path, 'w') as f:
+            f.write("""
+                        policies:
+                          - mode:
+                              type: container-periodic
+                              schedule: '* * * * *'
+                            resource: azure.resourcegroup
+                        """)
+
+        host.load_policy(file_path, host.policies)
+        host.unload_policy_file(file_path, host.policies)
+        os_unlink.assert_called()
+
+        # Clean up the file
+        os.remove(file_path)
+
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    @patch('os.unlink')
     def test_unload_policy_file_with_bad_schema(self,
             os_unlink, _1, _2, _3, _4, _5):
         host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
@@ -554,7 +583,8 @@ class ContainerHostTest(BaseTest):
         with open(file_path, 'w') as f:
             f.write(policy_string)
 
-        host.unload_policy_file(file_path, {})
+        host.load_policy(file_path, host.policies)
+        host.unload_policy_file(file_path, host.policies)
         os_unlink.assert_called()
 
         # Clean up the file

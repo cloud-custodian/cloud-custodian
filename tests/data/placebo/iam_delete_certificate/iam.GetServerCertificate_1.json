@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The Server Certificate with name alt_test_cert cannot be found."
+        },
+        "ResponseMetadata": {}
+    }
+}
