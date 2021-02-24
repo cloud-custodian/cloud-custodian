@@ -165,6 +165,7 @@ class ElasticSearchSearchConnections(Filter):
             }})
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
+    matched_key = "c7n:MatchedConnections"
     annotate = False
     permissions = ('es:ESCrossClusterGet',)
 
@@ -173,27 +174,28 @@ class ElasticSearchSearchConnections(Filter):
         results = []
 
         for r in resources:
-            if self.annotation_key in r:
-                continue
-            try:
-                inbound = self.manager.retry(
-                    client.describe_inbound_cross_cluster_search_connections,
-                    Filters=[{'Name': 'destination-domain-info.domain-name',
-                              'Values': [r['DomainName']]}])
-                inbound.pop('ResponseMetadata')
-                outbound = self.manager.retry(
-                    client.describe_outbound_cross_cluster_search_connections,
-                    Filters=[{'Name': 'source-domain-info.domain-name',
-                              'Values': [r['DomainName']]}])
-                outbound.pop('ResponseMetadata')
-            except client.exceptions.ResourceNotFoundExecption:
-                continue
+            if self.annotation_key not in r:
+                try:
+                    inbound = self.manager.retry(
+                        client.describe_inbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'destination-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    inbound.pop('ResponseMetadata')
+                    outbound = self.manager.retry(
+                        client.describe_outbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'source-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    outbound.pop('ResponseMetadata')
+                    r[self.annotation_key] = {'inbound': inbound,
+                                              'outbound': outbound}
+                except client.exceptions.ResourceNotFoundExecption:
+                    continue
 
             inboundMatcher = self.data.get('inbound')
             inboundValueFilter = ValueFilter(inboundMatcher)
             inboundValueFilter.annotate = False
             matchedInbound = []
-            for conn in inbound['CrossClusterSearchConnections']:
+            for conn in r[self.annotation_key]['inbound']['CrossClusterSearchConnections']:
                 if inboundValueFilter(conn):
                     matchedInbound.append(conn)
 
@@ -201,12 +203,12 @@ class ElasticSearchSearchConnections(Filter):
             outboundValueFilter = ValueFilter(outboundMatcher)
             outboundValueFilter.annotate = False
             matchedOutbound = []
-            for conn in outbound['CrossClusterSearchConnections']:
+            for conn in r[self.annotation_key]['outbound']['CrossClusterSearchConnections']:
                 if outboundValueFilter(conn):
                     matchedOutbound.append(conn)
 
-            r[self.annotation_key] = {'inbound': matchedInbound,
-                                      'outbound': matchedOutbound}
+            r[self.matched_key] = {'inbound': matchedInbound,
+                                   'outbound': matchedOutbound}
             if matchedInbound or matchedOutbound:
                 results.append(r)
 
