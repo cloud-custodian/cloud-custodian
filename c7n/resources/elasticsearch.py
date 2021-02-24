@@ -3,7 +3,7 @@
 import jmespath
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter, ValueFilter
+from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
