@@ -289,10 +289,12 @@ class ElasticSearch(BaseTest):
                 'resource': 'aws.elasticsearch',
                 'filters': [
                     {
-                        'type': 'cross-cluster-search-connections',
-                        'key': 'outbound[].SourceDomainInfo.OwnerId',
-                        'value': '0123456789012',
-                        'op': 'contains'
+                        'type': 'cross-cluster',
+                        'outbound': {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '0123456789012',
+                            'op': 'contains'
+                        }
                     }
                 ]
             },

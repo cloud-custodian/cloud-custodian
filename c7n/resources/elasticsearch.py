@@ -114,8 +114,8 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
 
 
-@ElasticSearchDomain.filter_registry.register('cross-cluster-search-connections')
-class ElasticSearchSearchConnections(ValueFilter):
+@ElasticSearchDomain.filter_registry.register('cross-cluster')
+class ElasticSearchSearchConnections(Filter):
     """Check for Cloudfront distribution config values
 
     :example:
@@ -123,17 +123,22 @@ class ElasticSearchSearchConnections(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: elasticsearch-cross-cluster-search-connections
+          - name: elasticsearch-cross-cluster
             resource: aws.elasticsearch
             filters:
-              - type: cross-cluster-search-connections
-                key: outbound[].SourceDomainInfo.OwnerId
-                value: 0123456789012
-                op: contains
+              - type: cross-cluster
+                inbound:
+                    key: SourceDomainInfo.OwnerId
+                    value: 0123456789012
+                    op: contains
+                outbound:
+                    key: SourceDomainInfo.OwnerId
+                    value: 0123456789012
+                    op: contains
    """
 
     schema = type_schema(
-        'cross-cluster-search-connections', rinherit=ValueFilter.schema,)
+        'cross-cluster', inbound=ValueFilter.schema, outbound=ValueFilter.schema)
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     annotate = False
@@ -160,9 +165,25 @@ class ElasticSearchSearchConnections(ValueFilter):
             except client.exceptions.ResourceNotFoundExecption:
                 continue
 
-            r[self.annotation_key] = {'inbound': inbound['CrossClusterSearchConnections'],
-                                      'outbound': outbound['CrossClusterSearchConnections']}
-            if self.match(r[self.annotation_key]):
+            inboundMatcher = self.data.get('inbound')
+            inboundValueFilter = ValueFilter(inboundMatcher)
+            inboundValueFilter.annotate = False
+            matchedInbound = []
+            for conn in inbound['CrossClusterSearchConnections']:
+                if inboundValueFilter(conn):
+                    matchedInbound.append(conn)
+
+            outboundMatcher = self.data.get('outbound')
+            outboundValueFilter = ValueFilter(outboundMatcher)
+            outboundValueFilter.annotate = False
+            matchedOutbound = []
+            for conn in outbound['CrossClusterSearchConnections']:
+                if outboundValueFilter(conn):
+                    matchedOutbound.append(conn)
+
+            r[self.annotation_key] = {'inbound': matchedInbound,
+                                      'outbound': matchedOutbound}
+            if matchedInbound or matchedOutbound:
                 results.append(r)
 
         return results
