@@ -6,6 +6,7 @@ import re
 
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
@@ -108,7 +109,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = self.get_session().get_session_for_resource('https://graph.windows.net')
+        s = self.get_session().get_session_for_resource(GRAPH_AUTH_ENDPOINT)
         graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(

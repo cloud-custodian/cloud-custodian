@@ -54,6 +54,7 @@ class TagHelper:
         if tags_exist:
             resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
             TagHelper.update_resource_tags(tag_action, resource, resource_tags)
+            return list(tags_to_delete)
 
     @staticmethod
     def add_tags(tag_action, resource, tags_to_add):
@@ -77,6 +78,7 @@ class TagHelper:
         # call the arm resource update method if there are new or updated tags
         if new_or_updated_tags:
             TagHelper.update_resource_tags(tag_action, resource, tags)
+            return tags_to_add
 
     @staticmethod
     def get_tag_value(resource, tag, utf_8=False):

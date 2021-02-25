@@ -4,7 +4,7 @@
 # }
 
 resource "aws_iam_role" "example" {
-  name = "example"
+  name = "example-code-build-unused"
 
   assume_role_policy = <<EOF
 {

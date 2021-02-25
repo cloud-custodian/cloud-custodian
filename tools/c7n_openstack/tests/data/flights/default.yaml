@@ -1,0 +1,220 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:5000/
+  response:
+    body: {string: '{"versions": {"values": [{"id": "v3.14", "status": "stable", "updated": "2020-04-07T00:00:00Z", "links": [{"rel": "self", "href": "http://127.0.0.1:5000/v3/"}], "media-types": [{"base": "application/json", "type": "application/vnd.openstack.identity-v3+j
+son"}]}]}}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: POST
+    uri: http://keystone:5000/v3/auth/tokens
+  response:
+    body: {string: '{"token": {"methods": ["password"], "user": {"domain": {"id": "default", "name": "Default"}, "id": "0ca05c20ee48419bb171707560ad793b", "name": "admin", "password_expires_at": null}, "audit_ids": ["EisDtEpHTcu-_VxIz4jP8w"], "expires_at": "2020-11-26T04:43:09.000000Z", "issued_at": "2020-11-26T03:43:09.000000Z", "project": {"domain": {"id": "default", "name": "Default"}, "id": "3d1d9e8cf44143abbd582e026fa507a3", "name": "admin"}, "is_domain": false, "roles": [{"id": "6135c43502b64aafb105bab98efd8595", "name": "admin"}, {"id": "13df80fdc9064e0482e1485a6294adfd", "name": "reader"}, {"id": "0988d05f27434167b372588bff13f967", "name": "member"}], "catalog": [{"endpoints": [{"id": "0c167064c60b4d31adaac7b9f9e695a4", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8080/v1/AUTH_3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "a72dda2f782e4350a41aad1d6d85ce5a", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8080/v1/AUTH_3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "b18e9aff73af4b57b456b58b800e99bf", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8080/v1/AUTH_3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}], "id": "31375fead0d346a68ee168ce9ef6ff48", "type": "object-store", "name": "swift"}, {"endpoints": [{"id": "042b6cf9048c4f63baf576de2d69cd48", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8042", "region": "RegionOne"}, {"id": "396ae5a7a9cc48fe8baca3d0f2216fe4", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8042", "region": "RegionOne"}, {"id": "4824a2fd92ca418dbdf7c3660dbe1d21", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8042", "region": "RegionOne"}], "id": "3f40fed5c6274bb9a59dea54628412f5", "type": "alarming", "name": "aodh"}, {"endpoints": [{"id": "119020311c48489f87025fc48eaf581b", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "2b2c5d0336f340649c73aae455336ac0", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "7a54f1f96fb2448c8c6311376fd2ec79", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}], "id": "4b27a00dfcf94873a722fbf2b2998642", "type": "compute", "name": "nova"}, {"endpoints": [{"id": "4003b4daea5c4f70af92fd6400d33ace", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:5000", "region": "RegionOne"}, {"id": "938c74331a1b47e8b7aa78ad7c9ee732", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:5000", "region": "RegionOne"}, {"id": "9ed2d867c48649c4bc6d255d587c2f52", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:5000", "region": "RegionOne"}], "id": "58b849d76f45497e9db8bba2d300e344", "type": "identity", "name": "keystone"}, {"endpoints": [{"id": "61a72ea2fba54dc1a45803ac3277fc9a", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8777", "region": "RegionOne"}, {"id": "f86dcc5035fb4473b1850ebd6fcd221c", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8777", "region": "RegionOne"}, {"id": "f8e194657e354f52a98808352d81a0a0", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8777", "region": "RegionOne"}], "id": "6b48671f1315400ea4cf177d13b6e186", "type": "metering", "name": "ceilometer"}, {"endpoints": [{"id": "6095ce8254bb45b1b8aed529696b0ab3", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8776/v3/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "671156be632b477fa4f075a919375bc2", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8776/v3/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "85f9742e2e004fbc82a93af08c104dc6", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8776/v3/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}], "id": "6c534f6b3152422fad61ceaacdfd2d8f", "type": "volumev3", "name": "cinderv3"}, {"endpoints": [{"id": "71a1a6b39c9e4e5a8124b4b5094fd053", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8041", "region": "RegionOne"}, {"id": "cc214c3b987848d08d79befabe948863", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8041", "region": "RegionOne"}, {"id": "d4edaf8639c84489b7a6d6ea6008b0ae", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8041", "region": "RegionOne"}], "id": "831cb70d2d244cada780895245c0847c", "type": "metric", "name": "gnocchi"}, {"endpoints": [{"id": "1380f800fe5a4c6785c3f0abbd12e65d", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:9292", "region": "RegionOne"}, {"id": "332f3119d5da4291960abd615faca249", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:9292", "region": "RegionOne"}, {"id": "a49b45320fc543ae9d890ab46e60c481", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:9292", "region": "RegionOne"}], "id": "aae882bc60a84408859f0012ff78c584", "type": "image", "name": "glance"}, {"endpoints": [{"id": "4b5088db5d564c9c8c5f3eac11e4aa5d", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8776/v2/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "63f25449f6764500bf5a7213f23083ec", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8776/v2/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}, {"id": "ac191ab78c6a4d30afe43b3635f7a704", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8776/v2/3d1d9e8cf44143abbd582e026fa507a3", "region": "RegionOne"}], "id": "b764ed8b7aa4422b858d8d0624d1040f", "type": "volumev2", "name": "cinderv2"}, {"endpoints": [{"id": "0709743b3a4c4b22884f7d811edb3614", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:9696", "region": "RegionOne"}, {"id": "8d5316efc34b460381e9e61975af3418", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:9696", "region": "RegionOne"}, {"id": "ca381ed0a9b44224b5cc931e0098f88c", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:9696", "region": "RegionOne"}], "id": "c9880ff58de14965ab9acd8e3d5dc73e", "type": "network", "name": "neutron"}, {"endpoints": [{"id": "20d58a19e9204b0b983fefa5c2bb02bb", "interface": "admin", "region_id": "RegionOne", "url": "http://keystone:8778/placement", "region": "RegionOne"}, {"id": "aa5f7d1ad8bd489aae40750479ebb46c", "interface": "public", "region_id": "RegionOne", "url": "http://keystone:8778/placement", "region": "RegionOne"}, {"id": "ed99a782cdef4cda908b7e55156862d2", "interface": "internal", "region_id": "RegionOne", "url": "http://keystone:8778/placement", "region": "RegionOne"}], "id": "cea3b185e75e4cb4a9e8f6d6feded397", "type": "placement", "name": "placement"}]}}'}
+    headers:
+      X-Subject-Token: "test-token"
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/servers/detail
+  response:
+    body: {string: '{"servers": [{"id": "6adf8322-e7d4-40e4-8f60-66b22eca6798", "name": "c7n-test-1", "status": "ACTIVE", "tenant_id": "3d1d9e8cf44143abbd582e026fa507a3", "user_id": "0ca05c20ee48419bb171707560ad793b", "metadata": {"name": "name", "en": "123", "name1": "test033", "name2": "test033", "name3": "test033", "name4": "test034", "name5": "test035", "name6": "test036"}, "hostId": "665cf485a8bf692d8f0feec5fbeba68343775ea6d40362c39a534b0f", "image": {"id": "d436429c-905a-4fe2-8c76-d7bcd677c879", "links": [{"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/images/d436429c-905a-4fe2-8c76-d7bcd677c879"}]}, "flavor": {"vcpus": 1, "ram": 512, "disk": 1, "ephemeral": 0, "swap": 0, "original_name": "m1.tiny", "extra_specs": {}}, "created": "2020-11-19T12:18:10Z", "updated": "2020-11-26T03:41:58Z", "addresses": {"MSKJ_PROD_NETWORK": [{"version": 4, "addr": "192.168.100.100", "OS-EXT-IPS:type": "fixed", "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:cb:e3:8d"}]}, "accessIPv4": "", "accessIPv6": "", "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/servers/6adf8322-e7d4-40e4-8f60-66b22eca6798"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/servers/6adf8322-e7d4-40e4-8f60-66b22eca6798"}], "OS-DCF:diskConfig": "MANUAL", "progress": 0, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "key_name": null, "OS-SRV-USG:launched_at": "2020-11-19T12:18:19.000000", "OS-SRV-USG:terminated_at": null, "OS-EXT-SRV-ATTR:host": "ip-192-168-193-40.cn-northwest-1.compute.internal", "OS-EXT-SRV-ATTR:instance_name": "instance-0000001a", "OS-EXT-SRV-ATTR:hypervisor_hostname": "ip-192-168-193-40.cn-northwest-1.compute.internal", "OS-EXT-SRV-ATTR:reservation_id": "r-3feknjtl", "OS-EXT-SRV-ATTR:launch_index": 0, "OS-EXT-SRV-ATTR:hostname": "c7n-test-1", "OS-EXT-SRV-ATTR:kernel_id": "", "OS-EXT-SRV-ATTR:ramdisk_id": "", "OS-EXT-SRV-ATTR:root_device_name": "/dev/vda", "OS-EXT-SRV-ATTR:user_data": "", "OS-EXT-STS:task_state": null, "OS-EXT-STS:vm_state": "active", "OS-EXT-STS:power_state": 0, "os-extended-volumes:volumes_attached": [], "locked": false, "locked_reason": null, "description": "c7n-test-1", "tags": ["name0=3", "name13333333=35", "name1=33", "name1=35", "name2=2", "name2=333333333"], "trusted_image_certificates": null, "host_status": "UP", "security_groups": [{"name": "MSKJ_BASE_SG"}]}, {"id": "4533efe6-e108-4552-857a-26fe297ca45e", "name": "c7n-test-2", "status": "ACTIVE", "tenant_id": "3d1d9e8cf44143abbd582e026fa507a3", "user_id": "0ca05c20ee48419bb171707560ad793b", "metadata": {}, "hostId": "665cf485a8bf692d8f0feec5fbeba68343775ea6d40362c39a534b0f", "image": {"id": "415f7db5-2d3b-411e-a5f5-80321dbfec0b", "links": [{"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/images/415f7db5-2d3b-411e-a5f5-80321dbfec0b"}]}, "flavor": {"vcpus": 1, "ram": 1024, "disk": 20, "ephemeral": 0, "swap": 0, "original_name": "m1.micro", "extra_specs": {}}, "created": "2020-11-05T03:48:57Z", "updated": "2020-11-24T07:19:45Z", "addresses": {"external_network": [{"version": 4, "addr": "192.168.193.77", "OS-EXT-IPS:type": "fixed", "OS-EXT-IPS-MAC:mac_addr": "02:97:2b:98:2e:5c"}]}, "accessIPv4": "", "accessIPv6": "", "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/servers/4533efe6-e108-4552-857a-26fe297ca45e"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/servers/4533efe6-e108-4552-857a-26fe297ca45e"}], "OS-DCF:diskConfig": "MANUAL", "progress": 0, "OS-EXT-AZ:availability_zone": "nova", "config_drive": "", "key_name": "default", "OS-SRV-USG:launched_at": "2020-11-05T03:49:23.000000", "OS-SRV-USG:terminated_at": null, "OS-EXT-SRV-ATTR:host": "ip-192-168-193-40.cn-northwest-1.compute.internal", "OS-EXT-SRV-ATTR:instance_name": "instance-00000018", "OS-EXT-SRV-ATTR:hypervisor_hostname": "ip-192-168-193-40.cn-northwest-1.compute.internal", "OS-EXT-SRV-ATTR:reservation_id": "r-rh305at8", "OS-EXT-SRV-ATTR:launch_index": 0, "OS-EXT-SRV-ATTR:hostname": "int32bit-test-1", "OS-EXT-SRV-ATTR:kernel_id": "", "OS-EXT-SRV-ATTR:ramdisk_id": "", "OS-EXT-SRV-ATTR:root_device_name": "/dev/vda", "OS-EXT-SRV-ATTR:user_data": null, "OS-EXT-STS:task_state": null, "OS-EXT-STS:vm_state": "active", "OS-EXT-STS:power_state": 1, "os-extended-volumes:volumes_attached": [{"id": "2ef1004e-013b-4b77-9e54-b115869a6504", "delete_on_termination": false}], "locked": false, "locked_reason": null, "description": null, "tags": ["a=a", "b=b", "c=c"], "trusted_image_certificates": null, "host_status": "UP", "security_groups": [{"name": "default"}]}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/ports.json?device_id=6adf8322-e7d4-40e4-8f60-66b22eca6798
+  response:
+    body: {string: ' {"ports":[{"id":"2940edf7-7dda-4dee-a05e-9c385c4c0b6b","name":"port1","network_id":"2590b53d-2282-4fa5-9251-2b9fbd8e3cec","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","mac_address":"fa:16:3e:cb:e3:8d","admin_state_up":true,"status":"DOWN","device_id":"6adf8322-e7d4-40e4-8f60-66b22eca6798","device_owner":"compute:nova","fixed_ips":[{"subnet_id":"267a0c4b-fcdd-4b33-9ac6-409cbd8cda3c","ip_address":"192.168.100.100"}],"allowed_address_pairs":[],"extra_dhcp_opts":[],"security_groups":["74e09d96-1ae7-497d-a6d2-ac212277de1b"],"description":"","binding:vnic_type":"normal","binding:profile":{},"binding:host_id":"ip-192-168-193-40.cn-northwest-1.compute.internal","binding:vif_type":"ovs","binding:vif_details":{"port_filter":true},"port_security_enabled":true,"qos_policy_id":null,"qos_network_policy_id":null,"resource_request":null,"tags":["123","blue"],"created_at":"2020-11-19T12:17:57Z","updated_at":"2020-11-26T02:40:10Z","revision_number":33,"project_id":"3d1d9e8cf44143abbd582e026fa507a3"}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/ports.json?device_id=4533efe6-e108-4552-857a-26fe297ca45e
+  response:
+    body: {string: '{"ports":[{"id":"695c8e70-ae94-4c39-86f0-c15dcaea7dd2","name":"","network_id":"1addba70-cc5e-40aa-a630-6806d68201c6","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","mac_address":"02:97:2b:98:2e:5c","admin_state_up":true,"status":"ACTIVE","device_id":"4533efe6-e108-4552-857a-26fe297ca45e","device_owner":"compute:nova","fixed_ips":[{"subnet_id":"ee781473-a79c-4a40-a33d-01ae100f0d79","ip_address":"192.168.193.77"}],"allowed_address_pairs":[],"extra_dhcp_opts":[],"security_groups":["bd4cfd7d-be5d-48f0-a85e-48e212c5dde2"],"description":"","binding:vnic_type":"normal","binding:profile":{},"binding:host_id":"ip-192-168-193-40.cn-northwest-1.compute.internal","binding:vif_type":"ovs","binding:vif_details":{"port_filter":true},"port_security_enabled":true,"qos_policy_id":null,"qos_network_policy_id":null,"resource_request":null,"tags":[],"created_at":"2020-11-04T11:54:11Z","updated_at":"2020-11-19T01:04:09Z","revision_number":31,"project_id":"3d1d9e8cf44143abbd582e026fa507a3"}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/networks.json
+  response:
+    body: {string: '{"networks":[{"id":"1addba70-cc5e-40aa-a630-6806d68201c6","name":"external_network","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","admin_state_up":true,"mtu":1500,"status":"ACTIVE","subnets":["ee781473-a79c-4a40-a33d-01ae100f0d79"],"shared":false,"availability_zone_hints":[],"availability_zones":[],"ipv4_address_scope":null,"ipv6_address_scope":null,"router:external":true,"description":"","port_security_enabled":true,"qos_policy_id":null,"is_default":false,"tags":[],"created_at":"2020-11-04T10:45:01Z","updated_at":"2020-11-05T03:36:23Z","revision_number":5,"project_id":"3d1d9e8cf44143abbd582e026fa507a3","provider:network_type":"flat","provider:physical_network":"extnet","provider:segmentation_id":null},{"id":"2590b53d-2282-4fa5-9251-2b9fbd8e3cec","name":"MSKJ_PROD_NETWORK","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","admin_state_up":true,"mtu":1442,"status":"ACTIVE","subnets":["267a0c4b-fcdd-4b33-9ac6-409cbd8cda3c"],"shared":false,"availability_zone_hints":[],"availability_zones":[],"ipv4_address_scope":null,"ipv6_address_scope":null,"router:external":false,"description":"","port_security_enabled":true,"qos_policy_id":null,"tags":["1122","11=2","1122k"],"created_at":"2020-11-19T12:12:28Z","updated_at":"2020-11-26T06:54:09Z","revision_number":5,"project_id":"3d1d9e8cf44143abbd582e026fa507a3","provider:network_type":"geneve","provider:physical_network":null,"provider:segmentation_id":2000}]}' }
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/floatingips.json?port_id=2940edf7-7dda-4dee-a05e-9c385c4c0b6b
+  response:
+    body: {string: '{"floatingips": []}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/floatingips.json?port_id=695c8e70-ae94-4c39-86f0-c15dcaea7dd2
+  response:
+    body: {string: '{"floatingips": []}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:9696/v2.0/subnets.json
+  response:
+    body: {string: '{"subnets":[{"id":"267a0c4b-fcdd-4b33-9ac6-409cbd8cda3c","name":"MSKJ_PROD_PRIVATE_SUBNET_1","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","network_id":"2590b53d-2282-4fa5-9251-2b9fbd8e3cec","ip_version":4,"subnetpool_id":null,"enable_dhcp":true,"ipv6_ra_mode":null,"ipv6_address_mode":null,"gateway_ip":"192.168.100.1","cidr":"192.168.100.0/24","allocation_pools":[{"start":"192.168.100.2","end":"192.168.100.254"}],"host_routes":[],"dns_nameservers":[],"description":"","service_types":[],"tags":[],"created_at":"2020-11-19T12:12:35Z","updated_at":"2020-11-19T12:12:35Z","revision_number":0,"project_id":"3d1d9e8cf44143abbd582e026fa507a3"},{"id":"ee781473-a79c-4a40-a33d-01ae100f0d79","name":"public_subnet","tenant_id":"3d1d9e8cf44143abbd582e026fa507a3","network_id":"1addba70-cc5e-40aa-a630-6806d68201c6","ip_version":4,"subnetpool_id":null,"enable_dhcp":true,"ipv6_ra_mode":null,"ipv6_address_mode":null,"gateway_ip":"192.168.193.1","cidr":"192.168.193.0/25","allocation_pools":[{"start":"192.168.193.77","end":"192.168.193.79"}],"host_routes":[],"dns_nameservers":[],"description":"","service_types":[],"tags":[],"created_at":"2020-11-04T10:46:10Z","updated_at":"2020-11-05T03:36:23Z","revision_number":3,"project_id":"3d1d9e8cf44143abbd582e026fa507a3"}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/detail?is_public=None
+  response:
+    body: {string: '{"flavors": [{"id": "1", "name": "m1.tiny", "ram": 512, "disk": 1, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 1, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/1"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/1"}], "description": "tt", "extra_specs": {}}, {"id": "2", "name": "m1.small", "ram": 2048, "disk": 20, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 1, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/2"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/2"}], "description": null, "extra_specs": {}}, {"id": "3", "name": "m1.medium", "ram": 4096, "disk": 40, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 2, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/3"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/3"}], "description": null, "extra_specs": {}}, {"id": "4", "name": "m1.large", "ram": 8192, "disk": 80, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 4, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/4"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/4"}], "description": null, "extra_specs": {}}, {"id": "5", "name": "m1.xlarge", "ram": 16384, "disk": 160, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 8, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/5"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/5"}], "description": null, "extra_specs": {}}, {"id": "2", "name": "m1.small", "ram": 1024, "disk": 20, "swap": 0, "OS-FLV-EXT-DATA:ephemeral": 0, "OS-FLV-DISABLED:disabled": false, "vcpus": 1, "os-flavor-access:is_public": true, "rxtx_factor": 1.0, "links": [{"rel": "self", "href": "http://192.168.193.40:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/2"}, {"rel": "bookmark", "href": "http://192.168.193.40:8774/3d1d9e8cf44143abbd582e026fa507a3/flavors/2"}], "description": null, "extra_specs": {}}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/1/os-extra_specs
+  response:
+    body: {string: '{"extra_specs":[]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/2/os-extra_specs
+  response:
+    body: {string: '{"extra_specs":[]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/3/os-extra_specs
+  response:
+    body: {string: '{"extra_specs":[]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/5/os-extra_specs
+  response:
+    body: {string: '{"extra_specs":[]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8774/v2.1/3d1d9e8cf44143abbd582e026fa507a3/flavors/4/os-extra_specs
+  response:
+    body: {string: '{"extra_specs":[]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:5000/v3/projects
+  response:
+    body: {string: '{"projects": [{"id": "3d1d9e8cf44143abbd582e026fa507a3", "name": "admin", "domain_id": "default", "description": "Bootstrap project for initializing the cloud.", "enabled": true, "parent_id": "default", "is_domain": false, "tags": [], "options": {}, "links": {"self": "http://127.0.0.1:5000/v3/projects/3d1d9e8cf44143abbd582e026fa507a3"}}, {"id": "57626756800343fd8474e0654f67c89a", "name": "demo", "domain_id": "default", "description": "default tenant", "enabled": true, "parent_id": "default", "is_domain": false, "tags": [], "options": {}, "links": {"self": "http://127.0.0.1:5000/v3/projects/57626756800343fd8474e0654f67c89a"}}, {"id": "cdf7c8b6db234a3695420f45b42e603b", "name": "services", "domain_id": "default", "description": "", "enabled": true, "parent_id": "default", "is_domain": false, "tags": [], "options": {}, "links": {"self": "http://127.0.0.1:5000/v3/projects/cdf7c8b6db234a3695420f45b42e603b"}}], "links": {"next": null, "self": "http://127.0.0.1:5000/v3/projects", "previous": null}}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:8776/v3/3d1d9e8cf44143abbd582e026fa507a3/volumes/detail
+  response:
+    body: {string: '{"volumes": [{"id": "7f64ece8-e8bf-4d0e-b358-8028e9769b42", "status": "available", "size": 1, "availability_zone": "nova", "created_at": "2020-11-27T04:26:03.000000", "updated_at": "2020-11-27T04:26:04.000000", "attachments": [], "name": "c7n-test-1", "description": null, "volume_type": "iscsi", "snapshot_id": null, "source_volid": null, "metadata": {}, "links": [{"rel": "self", "href": "http://192.168.193.40:8776/v3/3d1d9e8cf44143abbd582e026fa507a3/volumes/7f64ece8-e8bf-4d0e-b358-8028e9769b42"}, {"rel": "bookmark", "href": "http://192.168.193.40:8776/3d1d9e8cf44143abbd582e026fa507a3/volumes/7f64ece8-e8bf-4d0e-b358-8028e9769b42"}], "user_id": "0ca05c20ee48419bb171707560ad793b", "bootable": "false", "encrypted": false, "replication_status": null, "consistencygroup_id": null, "multiattach": false, "migration_status": null, "group_id": null, "provider_id": null, "shared_targets": false, "service_uuid": "e3e266a0-510e-43bd-9386-d292672909ca", "os-vol-tenant-attr:tenant_id": "3d1d9e8cf44143abbd582e026fa507a3", "os-vol-mig-status-attr:migstat": null, "os-vol-mig-status-attr:name_id": null, "os-vol-host-attr:host": "ip-192-168-193-40.cn-northwest-1.compute.internal@lvm#lvm"}, {"id": "2ef1004e-013b-4b77-9e54-b115869a6504", "status": "in-use", "size": 1, "availability_zone": "nova", "created_at": "2020-11-24T13:54:37.000000", "updated_at": "2020-11-24T14:01:59.000000", "attachments": [{"id": "2ef1004e-013b-4b77-9e54-b115869a6504", "attachment_id": "56cd49b2-9e50-4084-b08c-060247c7af81", "volume_id": "2ef1004e-013b-4b77-9e54-b115869a6504", "server_id": "4533efe6-e108-4552-857a-26fe297ca45e", "host_name": "ip-192-168-193-40.cn-northwest-1.compute.internal", "device": "/dev/vdb", "attached_at": "2020-11-24T14:01:58.000000"}], "name": "gaoyan-test-volume01", "description": null, "volume_type": "iscsi", "snapshot_id": null, "source_volid": null, "metadata": {}, "links": [{"rel": "self", "href": "http://192.168.193.40:8776/v3/3d1d9e8cf44143abbd582e026fa507a3/volumes/2ef1004e-013b-4b77-9e54-b115869a6504"}, {"rel": "bookmark", "href": "http://192.168.193.40:8776/3d1d9e8cf44143abbd582e026fa507a3/volumes/2ef1004e-013b-4b77-9e54-b115869a6504"}], "user_id": "0ca05c20ee48419bb171707560ad793b", "bootable": "false", "encrypted": false, "replication_status": null, "consistencygroup_id": null, "multiattach": false, "migration_status": null, "group_id": null, "provider_id": null, "shared_targets": false, "service_uuid": "e3e266a0-510e-43bd-9386-d292672909ca", "os-vol-tenant-attr:tenant_id": "3d1d9e8cf44143abbd582e026fa507a3", "os-vol-mig-status-attr:migstat": null, "os-vol-mig-status-attr:name_id": null, "os-vol-host-attr:host": "ip-192-168-193-40.cn-northwest-1.compute.internal@lvm#lvm"}]}'}
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: DELETE
+    uri: http://keystone:8776/v3/3d1d9e8cf44143abbd582e026fa507a3/volumes/7f64ece8-e8bf-4d0e-b358-8028e9769b42
+  response:
+    body: {string: ''}
+    headers:
+      Content-Type: [test/html]
+    status: {code: 200, message: OK}
+version: 1

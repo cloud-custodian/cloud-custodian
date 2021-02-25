@@ -38,7 +38,7 @@ class KeyVaultCertificate(ChildResourceManager):
     class resource_type(ChildTypeInfo):
         doc_groups = ['Security']
 
-        resource = constants.RESOURCE_VAULT
+        resource = constants.VAULT_AUTH_ENDPOINT
         service = 'azure.keyvault'
         client = 'KeyVaultClient'
         enum_spec = (None, 'get_certificates', None)

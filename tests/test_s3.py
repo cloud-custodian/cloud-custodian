@@ -3610,3 +3610,52 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(len(lifecycle["Rules"]), 1)
         self.assertEqual(lifecycle["Rules"][0]["ID"], lifecycle_id2)
+
+
+@terraform('aws_s3_encryption_audit')
+def test_s3_encryption_audit(test, aws_s3_encryption_audit):
+    test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+    test.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+    test.patch(s3, "S3_AUGMENT_TABLE", [])
+    session_factory = test.replay_flight_data("test_s3_encryption_audit")
+
+    p = test.load_policy(
+        {
+            "name": "s3-audit",
+            "resource": "s3",
+            "filters": [
+                {
+                    "or": [
+                        {
+                            "type": "bucket-encryption",
+                            "state": False,
+                        },
+                        {
+                            "type": "bucket-encryption",
+                            "crypto": "aws:kms",
+                            "state": True,
+                        },
+                        {
+                            "type": "bucket-encryption",
+                            "crypto": "AES256",
+                            "state": True,
+                        },
+                    ]
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+
+    assert len(resources) == 3
+
+    expected_names = [
+        'c7n-aws-s3-encryption-audit-test-a',
+        'c7n-aws-s3-encryption-audit-test-b',
+        'c7n-aws-s3-encryption-audit-test-c',
+    ]
+    actual_names = sorted([r.get('Name') for r in resources])
+
+    assert actual_names == expected_names

@@ -24,10 +24,7 @@ from netaddr import IPSet
 from c7n.filters import ValueFilter
 from c7n.utils import type_schema
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
