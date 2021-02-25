@@ -1151,23 +1151,21 @@ class RoleDelete(BaseAction):
         # An instance profile can contain only one IAM role,
         # although a role can be included in multiple instance profiles
         profile_names = []
-        try:
-            profiles = client.list_instance_profiles_for_role(RoleName=r['RoleName'])
-        except client.exceptions.NoSuchEntityException:
-            profiles = []
+        profiles = self.manager.retry(
+            client.list_instance_profiles_for_role,
+            RoleName=r['RoleName'],
+            ignore_err_codes=('NoSuchEntityException',))
         if profiles:
             profile_names = [p.get('InstanceProfileName') for p in profiles['InstanceProfiles']]
         for p in profile_names:
-            try:
-                client.remove_role_from_instance_profile(
-                    RoleName=r['RoleName'],
-                    InstanceProfileName=p)
-            except client.exceptions.NoSuchEntityException:
-                continue
-            try:
-                client.delete_instance_profile(InstanceProfileName=p)
-            except client.exceptions.NoSuchEntityException:
-                continue
+            self.manager.retry(
+                client.remove_role_from_instance_profile,
+                RoleName=r['RoleName'], InstanceProfileName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+            self.manager.retry(
+                client.delete_instance_profile,
+                InstanceProfileName=p,
+                ignore_err_codes=('NoSuchEntityException',))
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
