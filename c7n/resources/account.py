@@ -6,6 +6,7 @@ import json
 import time
 import datetime
 from botocore.exceptions import ClientError
+from concurrent.futures import as_completed
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
@@ -1426,7 +1427,7 @@ class EbsEncryption(Filter):
                 value: AWS_KMS
               state: true
     """
-    permissions = ('ec2:GetEbsEncryptionByDefault',)
+    permissions = ('ec2:GetEbsEncryptionByDefault', 'ec2:DescribeRegions')
     schema = type_schema(
         'default-ebs-encryption',
         state={'type': 'boolean'},
@@ -1435,12 +1436,35 @@ class EbsEncryption(Filter):
             {'type': 'string'}]})
 
     def process(self, resources, event=None):
-        state = self.data.get('state', False)
         client = local_session(self.manager.session_factory).client('ec2')
+        regions = self.manager.config.get('regions')
+        if 'all' in regions:
+            regions = [r.get('RegionName') for r in client.describe_regions().get('Regions')]
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            results = set()
+            for region in regions:
+                futures.append(
+                    w.submit(self.process_region, region)
+                )
+            for f in as_completed(futures):
+                print(f.result())
+                if f.exception():
+                    self.log.error(
+                        "Exception checking EBS encryption in region %s \n %s" % (
+                            region, f.exception()))
+                    continue
+                results.add(f.result())
+        return resources if any(results) else []
+
+    def process_region(self, region):
+        client = local_session(self.manager.session_factory).client(
+            'ec2', region_name=region)
+        state = self.data.get('state', False)
         account_state = client.get_ebs_encryption_by_default().get(
             'EbsEncryptionByDefault')
         if account_state != state:
-            return []
+            return False
         if state and 'key' in self.data:
             vfd = (isinstance(self.data['key'], dict) and
                    self.data['key'] or {'c7n:AliasName': self.data['key']})
@@ -1449,8 +1473,8 @@ class EbsEncryption(Filter):
             vf.annotate = False
             key = client.get_ebs_default_kms_key_id().get('KmsKeyId')
             if not vf.process([{'KmsKeyId': key}]):
-                return []
-        return resources
+                return False
+        return True
 
 
 @actions.register('set-ebs-encryption')
@@ -1473,7 +1497,8 @@ class SetEbsEncryption(BaseAction):
               key: alias/aws/ebs
     """
     permissions = ('ec2:EnableEbsEncryptionByDefault',
-                   'ec2:DisableEbsEncryptionByDefault')
+                   'ec2:DisableEbsEncryptionByDefault',
+                   'ec2:DescribeRegions')
 
     schema = type_schema(
         'set-ebs-encryption',
@@ -1483,6 +1508,26 @@ class SetEbsEncryption(BaseAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('ec2')
+        regions = self.manager.config.get('regions')
+        if 'all' in regions:
+            regions = [r.get('RegionName') for r in client.describe_regions().get('Regions')]
+
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for region in regions:
+                futures.append(
+                    w.submit(self.process_region, region)
+                )
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception setting EBS encryption in region %s \n %s" % (
+                            region, f.exception()))
+                    continue
+
+    def process_region(self, region):
+        client = local_session(self.manager.session_factory).client(
+            'ec2', region_name=region)
         state = self.data.get('state')
         key = self.data.get('key')
         if state:

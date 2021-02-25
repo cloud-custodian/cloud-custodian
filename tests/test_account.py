@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -103,6 +104,14 @@ class AccountTests(BaseTest):
 
     def test_enable_encryption_by_default(self):
         factory = self.replay_flight_data('test_account_ebs_encrypt')
+        iad = local_session(factory).client('ec2', region_name='us-east-1')
+        self.assertTrue(
+            iad.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
+        cmh = local_session(factory).client('ec2', region_name='us-east-2')
+        self.assertFalse(
+            cmh.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
         p = self.load_policy({
             'name': 'account',
             'resource': 'account',
@@ -113,16 +122,28 @@ class AccountTests(BaseTest):
                 'type': 'set-ebs-encryption',
                 'state': True,
                 'key': 'alias/aws/ebs'}]},
-            session_factory=factory)
+            session_factory=factory,
+            config=Config.empty(regions=["us-east-1", "us-east-2"])
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = local_session(factory).client('ec2')
         self.assertTrue(
-            client.get_ebs_encryption_by_default().get(
+            iad.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
+        self.assertTrue(
+            cmh.get_ebs_encryption_by_default().get(
                 'EbsEncryptionByDefault'))
 
     def test_disable_encryption_by_default(self):
         factory = self.replay_flight_data('test_account_disable_ebs_encrypt')
+        iad = local_session(factory).client('ec2', region_name='us-east-1')
+        self.assertTrue(
+            iad.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
+        cmh = local_session(factory).client('ec2', region_name='us-east-2')
+        self.assertFalse(
+            cmh.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
         p = self.load_policy({
             'name': 'account',
             'resource': 'account',
@@ -133,12 +154,16 @@ class AccountTests(BaseTest):
             'actions': [{
                 'type': 'set-ebs-encryption',
                 'state': False}]},
-            session_factory=factory)
+            session_factory=factory,
+            config=Config.empty(regions=["us-east-1", "us-east-2"])
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = local_session(factory).client('ec2')
         self.assertFalse(
-            client.get_ebs_encryption_by_default().get(
+            iad.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
+        self.assertFalse(
+            cmh.get_ebs_encryption_by_default().get(
                 'EbsEncryptionByDefault'))
 
     def test_guard_duty_filter(self):

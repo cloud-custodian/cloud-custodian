@@ -3,25 +3,193 @@
     "data": {
         "Aliases": [
             {
+                "AliasName": "alias/aws/appflow",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/appflow",
+                "TargetKeyId": "5a53ba7b-bcae-442d-8f6a-b2e78315d6d3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 2,
+                    "second": 34,
+                    "microsecond": 148000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 2,
+                    "second": 34,
+                    "microsecond": 148000
+                }
+            },
+            {
+                "AliasName": "alias/aws/cloud9",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/cloud9",
+                "TargetKeyId": "1dcc4b81-53ca-4bbf-b840-a47a33c072c2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 1,
+                    "hour": 9,
+                    "minute": 41,
+                    "second": 30,
+                    "microsecond": 315000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 1,
+                    "hour": 9,
+                    "minute": 41,
+                    "second": 30,
+                    "microsecond": 315000
+                }
+            },
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/dynamodb"
+            },
+            {
                 "AliasName": "alias/aws/ebs",
                 "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ebs",
-                "TargetKeyId": "798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0"
+                "TargetKeyId": "e21f5af6-e81a-4e71-8595-97064276207b",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 36,
+                    "microsecond": 127000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 36,
+                    "microsecond": 127000
+                }
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/elasticfilesystem"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/es"
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/kinesisvideo"
+            },
+            {
+                "AliasName": "alias/aws/lambda",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lambda",
+                "TargetKeyId": "cc85a362-dc9d-40eb-b87e-cdb9eff85865",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 53,
+                    "second": 9,
+                    "microsecond": 413000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 53,
+                    "second": 9,
+                    "microsecond": 413000
+                }
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/rds",
+                "TargetKeyId": "cf8b4bf5-8cd8-4245-ae14-b16a6b2708ae",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 47,
+                    "second": 42,
+                    "microsecond": 966000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 47,
+                    "second": 42,
+                    "microsecond": 966000
+                }
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/redshift"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3"
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ssm"
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/xray"
+            },
+            {
+                "AliasName": "alias/local-management-trail-cmk",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/local-management-trail-cmk",
+                "TargetKeyId": "ec400731-1827-4745-915b-8db82d545ee4",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 19,
+                    "microsecond": 716000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 19,
+                    "microsecond": 716000
+                }
             }
         ],
         "Truncated": false,
-        "ResponseMetadata": {
-            "RequestId": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
-                "cache-control": "no-cache, no-store, must-revalidate, private",
-                "expires": "0",
-                "pragma": "no-cache",
-                "date": "Wed, 10 Jul 2019 11:05:17 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "192"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }
