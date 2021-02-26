@@ -176,6 +176,9 @@ There are several ways to get a list of possible keys for each resource.
   - ``swap`` - swap the value and the evaluated key
   - ``date`` - parse the filter's value as a date.
 
+  Note that the `age` and `expiration` transformations expect a value given as
+  a number of days. Use a floating point value to match time periods shorter than
+  a day.
 
   Examples:
 
@@ -214,6 +217,13 @@ There are several ways to get a list of possible keys for each resource.
        op: less-than
        value_type: age
        value: 32
+
+     # Find instances launched within the past 12 hours
+     - type: value
+       key: LaunchTime
+       op: less-than
+       value_type: age
+       value: 0.5
 
      # Use `resource_count` to filter resources based on the number that matched
      # Note that no `key` is used for this value_type since it is matching on
