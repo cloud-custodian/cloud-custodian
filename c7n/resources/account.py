@@ -1448,12 +1448,10 @@ class EbsEncryption(Filter):
                     w.submit(self.process_region, region)
                 )
             for f in as_completed(futures):
-                print(f.result())
-                if f.exception():
+                if f.exception():  # pragma: no cover
                     self.log.error(
                         "Exception checking EBS encryption in region %s \n %s" % (
                             region, f.exception()))
-                    continue
                 results.add(f.result())
         return resources if any(results) else []
 
@@ -1519,11 +1517,10 @@ class SetEbsEncryption(BaseAction):
                     w.submit(self.process_region, region)
                 )
             for f in as_completed(futures):
-                if f.exception():
+                if f.exception():  # pragma: no cover
                     self.log.error(
                         "Exception setting EBS encryption in region %s \n %s" % (
                             region, f.exception()))
-                    continue
 
     def process_region(self, region):
         client = local_session(self.manager.session_factory).client(
