@@ -762,7 +762,7 @@ class IamUserTest(BaseTest):
                  'value_type': 'age',
                  'key': 'CreateDate',
                  'op': 'greater-than',
-                 'value': 400},
+                 'value': 10000},
             ],
             'actions': [
                 {'type': 'remove-keys',
