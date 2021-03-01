@@ -302,6 +302,18 @@ class KinesisVideoStream(QueryResourceManager):
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
+    """Delete a Kinesis Video stream
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-kinesis-video
+            resource: kinesis-video
+            actions:
+              - type: delete
+    """
 
     schema = type_schema('delete')
     permissions = ("kinesisvideo:DeleteStream",)
@@ -325,8 +337,11 @@ class KmsFilterVideoStream(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the alias name
     of the kms key by using 'c7n:AliasName'
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: kinesis-video-stream-kms-key
                 resource: aws.kinesis-video
