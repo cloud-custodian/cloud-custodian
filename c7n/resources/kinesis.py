@@ -292,7 +292,6 @@ class KinesisVideoStream(QueryResourceManager):
         arn = 'StreamARN'
         dimension = 'StreamName'
         universal_taggable = True
-        cfn_type = 'AWS::Kinesis::VideoStream'
 
     source_mapping = {
         'describe': DescribeVideoStream,
