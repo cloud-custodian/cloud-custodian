@@ -270,3 +270,71 @@ class AppDelete(Action):
             client.delete_application(
                 ApplicationName=r['ApplicationName'],
                 CreateTimestamp=r['CreateTimestamp'])
+
+
+class DescribeVideoStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('kinesis-video')
+class KinesisVideoStream(QueryResourceManager):
+    retry = staticmethod(
+        get_retry((
+            'LimitExceededException',)))
+
+    class resource_type(TypeInfo):
+        service = 'kinesisvideo'
+        arn_type = 'stream'
+        enum_spec = ('list_streams', 'StreamInfoList', None)
+        name = id = 'StreamName'
+        arn = 'StreamARN'
+        dimension = 'StreamName'
+        universal_taggable = True
+        cfn_type = 'AWS::Kinesis::VideoStream'
+
+    source_mapping = {
+        'describe': DescribeVideoStream,
+        'config': ConfigSource
+    }
+
+
+@KinesisVideoStream.action_registry.register('delete')
+class DeleteVideoStream(Action):
+
+    schema = type_schema('delete')
+    permissions = ("kinesisvideo:DeleteStream",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kinesisvideo')
+        not_active = [r['StreamName'] for r in resources
+                      if r['Status'] != 'ACTIVE']
+        self.log.warning(
+            "The following streams cannot be deleted (wrong state): %s" % (
+                ", ".join(not_active)))
+        for r in resources:
+            if not r['Status'] == 'ACTIVE':
+                continue
+            client.delete_stream(
+                StreamARN=r['StreamARN'])
+
+
+@KinesisVideoStream.filter_registry.register('kms-key')
+class KmsFilterVideoStream(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: kinesis-video-stream-kms-key
+                resource: aws.kinesis-video
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
+    """
+
+    RelatedIdsExpression = 'KmsKeyId'
