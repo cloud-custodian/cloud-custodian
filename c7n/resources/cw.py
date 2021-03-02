@@ -142,10 +142,6 @@ class EventRuleTargetFilter(ChildResourceFilter):
     schema = type_schema('event-rule-target', rinherit=ValueFilter.schema)
     permissions = ('events:ListTargetsByRule',)
 
-    def process(self, resources, event=None):
-        resources = super(EventRuleTargetFilter, self).process(resources, event)
-        return resources
-
 
 @EventRule.action_registry.register('delete')
 class EventRuleDelete(BaseAction):
