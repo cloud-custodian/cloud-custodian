@@ -79,7 +79,7 @@ class CloudWatchEventTest(BaseTest):
                 {
                     "type": "event-rule-target",
                     "key": "[].Arn",
-                    "value": "arn:aws:lambda:us-east-1:532725030595:function:test",
+                    "value": "arn:aws:lambda:us-east-1:644160558196:function:test",
                     "op": "in",
                     "value_type": "swap"
                 }
@@ -101,7 +101,7 @@ class CloudWatchEventTest(BaseTest):
                 {
                     "type": "event-rule-target",
                     "key": "[].Arn",
-                    "value": "arn:aws:lambda:us-east-1:532725030595:function:test",
+                    "value": "arn:aws:lambda:us-east-1:644160558196:function:test",
                     "op": "in",
                     "value_type": "swap"
                 }
@@ -114,10 +114,8 @@ class CloudWatchEventTest(BaseTest):
             ]
         }, session_factory=session_factory)
         resources = policy.run()
-        self.assertRaises(
-            client.describe_rule(Name=resources[0]["Name"]),
-            client.exceptions.ResourceNotFoundException
-        )
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.describe_rule(Name=resources[0]["Name"])
         self.assertEqual(len(resources), 1)
 
 
