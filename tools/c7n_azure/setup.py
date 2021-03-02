@@ -74,7 +74,6 @@ install_requires = \
  'click>=7.0,<8.0',
  'cryptography>=3.4.6,<4.0.0',
  'distlib>=0.3.0,<0.4.0',
- 'importlib-metadata (>=3.7.2,<4.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jmespath>=0.10.0,<0.11.0',
  'jsonpickle (>=1.3,<2.0)',
