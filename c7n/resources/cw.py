@@ -158,7 +158,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
             - name: find-event-rules-with-invalid-targets
               resource: aws.event-rule
               filters:
-                - type: invalid-target
+                - type: invalid-targets
     """
 
     RelatedResource = "c7n.resources.cw.EventRuleTarget"
