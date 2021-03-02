@@ -5,6 +5,7 @@ import importlib
 import jmespath
 
 from .core import ValueFilter, OPERATORS
+from c7n.query import ChildResourceQuery
 
 
 class RelatedResourceFilter(ValueFilter):
@@ -79,6 +80,11 @@ class RelatedResourceFilter(ValueFilter):
                     resource[model.id],
                     self.RelatedResource.rsplit('.', 1)[-1],
                     rid)
+                # in the event that the filter is looking specifically for absent values, we can
+                # safely assume that the non-existant related resource will have an absent value at
+                # any given key
+                if self.data['value'] == 'absent':
+                    found.append(rid)
                 continue
             if self.match(robj):
                 found.append(rid)
@@ -162,3 +168,31 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
         elif op == 'and' and len(found) == len(related_ids):
             return True
         return False
+
+
+class ChildResourceFilter(RelatedResourceFilter):
+    ChildResource = None
+    RelatedIdsExpression = None
+    ChildResourceParentKey = "c7n:parent-id"
+
+    def get_related(self, resources):
+        self.child_resources = {}
+
+        parent_ids = self.get_related_ids(resources)
+
+        child_resource_manager = self.get_resource_manager()
+        child_query = ChildResourceQuery(
+            child_resource_manager.session_factory,
+            child_resource_manager,
+        )
+        children = child_query.filter(child_resource_manager, parent_ids=list(parent_ids))
+        for r in children:
+            self.child_resources.setdefault(r[self.ChildResourceParentKey], []).append(r)
+
+        return self.child_resources
+
+    def _add_annotations(self, related_ids, resource):
+        if self.AnnotationKey is not None:
+            model = self.manager.get_model()
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = self.child_resources.get(resource[model.id], [])

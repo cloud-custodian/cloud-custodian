@@ -3,11 +3,14 @@
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
+import botocore.exceptions
+
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
-from c7n.filters.core import parse_date
+from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
@@ -112,6 +115,75 @@ class EventRuleMetrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': 'RuleName', 'Value': resource['Name']}]
+
+
+@EventRule.filter_registry.register('event-rule-target')
+class EventRuleTargetFilter(ChildResourceFilter):
+    """
+    Filter event rules by their targets
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-event-rules-with-no-targets
+              resource: aws.event-rule
+              filters:
+                - type: event-rule-target
+                  key: Arn
+                  value: absent
+    """
+
+    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedIdsExpression = 'Name'
+    AnnotationKey = "EventRuleTargets"
+
+    schema = type_schema('event-rule-target', rinherit=ValueFilter.schema)
+    permissions = ('events:ListTargetsByRule',)
+
+    def process(self, resources, event=None):
+        resources = super(EventRuleTargetFilter, self).process(resources, event)
+        return resources
+
+
+@EventRule.action_registry.register('delete')
+class EventRuleDelete(BaseAction):
+    """
+    Delete an event rule, force target removal with the `force` option
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: force-delete-rules
+              resource: aws.event-rule
+              filters:
+                - Name: my-event-rule
+              actions:
+                - type: delete
+                  force: true
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('events:DeleteRule', 'events:RemoveTargets', 'events:ListTargetsByRule',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('events')
+        children = {}
+        target_error_msg = "Rule can't be deleted since it has targets."
+        for r in resources:
+            try:
+                client.delete_rule(Name=r['Name'])
+            except botocore.exceptions.ClientError as e:
+                if self.data.get('force') and e.response['Error']['Message'] == target_error_msg:
+                    child_manager = EventRuleTarget(self.manager.ctx, {})
+                    if not children:
+                        children = EventRuleTargetFilter({}, child_manager).get_related(resources)
+                    targets = list(set([t['Id'] for t in children.get(r['Name'])]))
+                    client.remove_targets(Rule=r['Name'], Ids=targets)
+                    client.delete_rule(Name=r['Name'])
 
 
 @resources.register('event-rule-target')
