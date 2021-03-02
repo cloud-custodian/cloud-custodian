@@ -69,28 +69,6 @@ class CloudWatchEventTest(BaseTest):
         )
         self.assertEqual(targets, [])
 
-    def test_event_rule_target_filter(self):
-        session_factory = self.replay_flight_data("test_cwe_rule_target_filter")
-        client = session_factory().client('events')
-        policy = self.load_policy({
-            "name": "cwe-filter-on-target",
-            "resource": "aws.event-rule",
-            "filters": [
-                {
-                    "type": "event-rule-target",
-                    "key": "[].Arn",
-                    "value": "arn:aws:lambda:us-east-1:644160558196:function:test",
-                    "op": "in",
-                    "value_type": "swap"
-                }
-            ]
-        }, session_factory=session_factory)
-        resources = policy.run()
-        targets = client.list_targets_by_rule(
-            Rule=resources[0]["Name"]).get("Targets")
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]["c7n:EventRuleTargets"]), len(targets))
-
     def test_event_rule_force_delete(self):
         session_factory = self.replay_flight_data("test_cwe_rule_force_delete")
         client = session_factory().client('events')
