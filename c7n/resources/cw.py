@@ -15,6 +15,8 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
+from c7n.resources import load_resources
+from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
 
@@ -141,6 +143,70 @@ class EventRuleTargetFilter(ChildResourceFilter):
 
     schema = type_schema('event-rule-target', rinherit=ValueFilter.schema)
     permissions = ('events:ListTargetsByRule',)
+
+
+@EventRule.filter_registry.register('invalid-targets')
+class ValidEventRuleTargetFilter(ChildResourceFilter):
+    """
+    Filter event rules for invalid targets
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-event-rules-with-invalid-targets
+              resource: aws.event-rule
+              filters:
+                - type: invalid-target
+    """
+
+    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedIdsExpression = 'Name'
+    AnnotationKey = "EventRuleTargets"
+
+    schema = type_schema('valid-target',)
+    permissions = ('events:ListTargetsByRule',)
+
+    def _get_arns(self, resources):
+        arn_map = {}
+        r_map = {}
+        child_resources = self.get_related(resources)
+        for r in resources:
+            r_map[r['Name']] = r
+        for k, v in child_resources.items():
+            for r in v:
+                arn_map.setdefault(k, {}).setdefault('Arns', []).append(r['Arn'])
+                arn_map[k]['data'] = r_map[v[0]['c7n:parent-id']]
+        return arn_map
+
+    def process(self, resources, event=None):
+        # Due to lazy loading of resources, we need to explicilty load the following
+        # potential targets for a event rule target:
+        load_resources(
+            [
+                "aws.sqs",
+                "aws.lambda",
+                "aws.ecs-cluster",
+                "aws.ecs-task",
+                "aws.kinesis",
+                "aws.sns",
+                "aws.ssm-parameter",
+                "aws.batch-compute",
+                "aws.codepipeline",
+            ]
+        )
+        arn_resolver = ArnResolver(self.manager)
+        arn_map = self._get_arns(resources)
+        results = []
+        for k, v in arn_map.items():
+            resolved = arn_resolver.resolve(v['Arns'])
+            if not all(resolved.values()):
+                for i, j in resolved.items():
+                    if not j:
+                        v['data'].setdefault('c7n:InvalidTargets', []).append(i)
+                results.append(v['data'])
+        return results
 
 
 @EventRule.action_registry.register('delete')
