@@ -165,7 +165,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     RelatedIdsExpression = 'Name'
     AnnotationKey = "EventRuleTargets"
 
-    schema = type_schema('valid-target',)
+    schema = type_schema('invalid-targets',)
     permissions = ('events:ListTargetsByRule',)
 
     def _get_arns(self, resources):
