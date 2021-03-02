@@ -319,16 +319,12 @@ class DeleteVideoStream(Action):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesisvideo')
-        not_active = [r['StreamName'] for r in resources
-                      if r['Status'] != 'ACTIVE']
-        self.log.warning(
-            "The following streams cannot be deleted (wrong state): %s" % (
-                ", ".join(not_active)))
+        resources = self.filter_resources(resources, 'Status', ('ACTIVE',))
         for r in resources:
-            if not r['Status'] == 'ACTIVE':
+            try:
+                client.delete_stream(StreamARN=r['StreamARN'])
+            except client.exceptions.ResourceNotFoundException:
                 continue
-            client.delete_stream(
-                StreamARN=r['StreamARN'])
 
 
 @KinesisVideoStream.filter_registry.register('kms-key')
