@@ -19,6 +19,7 @@ arm_tags_unsupported = ['microsoft.network/dnszones',
                         'microsoft.sql/servers/databases',
                         'microsoft.storage/storageaccounts/blobservices/containers']
 
+
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
     # api client construction information for ARM resources
     id = 'id'
