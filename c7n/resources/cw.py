@@ -271,6 +271,11 @@ class EventRuleDelete(BaseAction):
             except botocore.exceptions.ClientError as e:
                 if not self.data.get('force') and e.response['Error']['Message'] != target_error_msg:
                     raise
+                if not self.data.get('force') and e.response['Error']['Message'] == target_error_msg:
+                    self.log.warning(
+                        'Unable to delete %s event rule due to attached rule targets,'
+                        'set force to true to remove targets' % r['Name'])
+                    raise
                 child_manager = self.manager.get_resource_manager('aws.event-rule-target')
                 if not children:
                     children = EventRuleTargetFilter({}, child_manager).get_related(resources)
