@@ -148,7 +148,10 @@ class EventRuleTargetFilter(ChildResourceFilter):
 @EventRule.filter_registry.register('invalid-targets')
 class ValidEventRuleTargetFilter(ChildResourceFilter):
     """
-    Filter event rules for invalid targets
+    Filter event rules for invalid targets, Use the `all` option to
+    find any event rules that have all invalid targets, otherwise
+    defaults to filtering any event rule with at least one invalid
+    target.
 
     :example:
 
@@ -159,26 +162,45 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
               resource: aws.event-rule
               filters:
                 - type: invalid-targets
+                  all: true # defaults to false
     """
 
     RelatedResource = "c7n.resources.cw.EventRuleTarget"
     RelatedIdsExpression = 'Name'
     AnnotationKey = "EventRuleTargets"
 
-    schema = type_schema('invalid-targets',)
+    schema = type_schema(
+        'invalid-targets',
+        **{
+            'all': {
+                'type': 'boolean',
+                'default': False
+            }
+        }
+    )
+
     permissions = ('events:ListTargetsByRule',)
 
-    def _get_arns(self, resources):
-        arn_map = {}
-        r_map = {}
+    def validate(self):
+        pass
+
+    def get_rules_with_children(self, resources):
+        """
+        Augments resources by adding the c7n:ChildArns to the resource dict
+        """
+
+        results = []
+
+        # returns a map of {parent_reosurce_id: [{child_resource}, {child_resource2}, etc.]}
         child_resources = self.get_related(resources)
+
+        # maps resources by their name to their data
         for r in resources:
-            r_map[r['Name']] = r
-        for k, v in child_resources.items():
-            for r in v:
-                arn_map.setdefault(k, {}).setdefault('Arns', []).append(r['Arn'])
-                arn_map[k]['data'] = r_map[v[0]['c7n:parent-id']]
-        return arn_map
+            if child_resources.get(r['Name']):
+                for c in child_resources[r['Name']]:
+                    r.setdefault('c7n:ChildArns', []).append(c['Arn'])
+                results.append(r)
+        return results
 
     def process(self, resources, event=None):
         # Due to lazy loading of resources, we need to explicilty load the following
@@ -197,15 +219,23 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
             ]
         )
         arn_resolver = ArnResolver(self.manager)
-        arn_map = self._get_arns(resources)
+        resources = self.get_rules_with_children(resources)
         results = []
-        for k, v in arn_map.items():
-            resolved = arn_resolver.resolve(v['Arns'])
-            if not all(resolved.values()):
+
+        if self.data.get('all'):
+            op = any
+        else:
+            op = all
+
+        for r in resources:
+            resolved = arn_resolver.resolve(r['c7n:ChildArns'])
+            if not op(resolved.values()):
                 for i, j in resolved.items():
-                    if not j:
-                        v['data'].setdefault('c7n:InvalidTargets', []).append(i)
-                results.append(v['data'])
+                    if self.data.get('all'):
+                        r.setdefault('c7n:InvalidTargets', []).append(i)
+                    elif not self.data.get('all') and not j:
+                        r.setdefault('c7n:InvalidTargets', []).append(i)
+                results.append(r)
         return results
 
 
@@ -239,13 +269,14 @@ class EventRuleDelete(BaseAction):
             try:
                 client.delete_rule(Name=r['Name'])
             except botocore.exceptions.ClientError as e:
-                if self.data.get('force') and e.response['Error']['Message'] == target_error_msg:
-                    child_manager = EventRuleTarget(self.manager.ctx, {})
-                    if not children:
-                        children = EventRuleTargetFilter({}, child_manager).get_related(resources)
-                    targets = list(set([t['Id'] for t in children.get(r['Name'])]))
-                    client.remove_targets(Rule=r['Name'], Ids=targets)
-                    client.delete_rule(Name=r['Name'])
+                if not self.data.get('force') and e.response['Error']['Message'] != target_error_msg:
+                    raise
+                child_manager = self.manager.get_resource_manager('aws.event-rule-target')
+                if not children:
+                    children = EventRuleTargetFilter({}, child_manager).get_related(resources)
+                targets = list(set([t['Id'] for t in children.get(r['Name'])]))
+                client.remove_targets(Rule=r['Name'], Ids=targets)
+                client.delete_rule(Name=r['Name'])
 
 
 @resources.register('event-rule-target')

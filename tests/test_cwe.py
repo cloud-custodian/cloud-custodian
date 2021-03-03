@@ -96,7 +96,7 @@ class CloudWatchEventTest(BaseTest):
             client.describe_rule(Name=resources[0]["Name"])
         self.assertEqual(len(resources), 1)
 
-    def test_event_rule_invalid_targets(self):
+    def test_event_rule_invalid_targets_any(self):
         session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
         lambda_client = session_factory().client('lambda')
         sns_client = session_factory().client('sns')
@@ -114,10 +114,27 @@ class CloudWatchEventTest(BaseTest):
             "arn:aws:lambda:us-east-1:644160558196:function:test",
             "arn:aws:sns:us-east-1:644160558196:foo"])
         self.assertEqual(set(resources[0]["c7n:InvalidTargets"]), invalid_targets)
-        with self.assertRaises(Exception):
+        with self.assertRaises(lambda_client.exceptions.ClientError):
             lambda_client.get_function(FunctionName="test")
-        with self.assertRaises(Exception):
+        with self.assertRaises(sns_client.exceptions.NotFoundException):
             sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:foo")
+        res = sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:test2")
+        self.assertTrue(res)
+
+    def test_event_rule_invalid_targets_all(self):
+        session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
+        policy = self.load_policy({
+            "name": "cwe-filter-on-invalid-target",
+            "resource": "aws.event-rule",
+            "filters": [
+                {
+                    "type": "invalid-targets",
+                    "all": True
+                }
+            ],
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
 
 
 class CloudWatchEventsFacadeTest(TestCase):

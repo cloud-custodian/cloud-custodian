@@ -9,6 +9,10 @@
             {
                 "Id": "Id1934612621092",
                 "Arn": "arn:aws:sns:us-east-1:644160558196:foo"
+            },
+            {
+                "Id": "Id1997611391379",
+                "Arn": "arn:aws:sns:us-east-1:644160558196:test2"
             }
         ],
         "ResponseMetadata": {}
