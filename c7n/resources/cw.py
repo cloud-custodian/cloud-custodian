@@ -269,9 +269,9 @@ class EventRuleDelete(BaseAction):
             try:
                 client.delete_rule(Name=r['Name'])
             except botocore.exceptions.ClientError as e:
-                if not self.data.get('force') and e.response['Error']['Message'] != target_error_msg:
+                if e.response['Error']['Message'] != target_error_msg:
                     raise
-                if not self.data.get('force') and e.response['Error']['Message'] == target_error_msg:
+                if not self.data.get('force'):
                     self.log.warning(
                         'Unable to delete %s event rule due to attached rule targets,'
                         'set force to true to remove targets' % r['Name'])
