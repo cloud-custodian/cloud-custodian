@@ -49,4 +49,4 @@ class ProviderTest(BaseTest):
             }, config=Config.empty(regions=['us-east-1']))
             self.assertIn('mock_filter', p.resource_manager.filter_registry.keys())
             self.assertIn('mock_action', p.resource_manager.action_registry.keys())
-            mock_aws.reset_mock()
+            mock_aws.reset_mock(side_effect=True)
