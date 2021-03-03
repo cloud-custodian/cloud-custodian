@@ -46,6 +46,11 @@ class Provider(metaclass=abc.ABCMeta):
     def get_session_factory(self, options):
         """Get a credential/session factory for api usage."""
 
+    @staticmethod
+    def initialize_resource(resource_class):
+        """Perform registrations of general filter/action registry.
+        """
+
     @classmethod
     def get_resource_types(cls, resource_types):
         """Return the resource classes for the given type names"""

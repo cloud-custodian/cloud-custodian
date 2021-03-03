@@ -336,7 +336,7 @@ class XrayContext(Context):
     execution for api concurrency. Default xray semantics would use
     thread local storage and treat each of those as separate trace
     executions. We want to aggregate/associate all thread pool api
-    executions to the custoidan policy execution. XRay sdk supports
+    executions to the custodian policy execution. XRay sdk supports
     this via manual code for every thread pool usage, but we don't
     want to explicitly couple xray integration everywhere across the
     codebase. Instead we use a context that is aware of custodian
@@ -565,6 +565,11 @@ class AWS(Provider):
             options.profile,
             options.assume_role,
             options.external_id)
+
+    @staticmethod
+    def initialize_resource(resource_class):
+        """Static method to initialize AWS specific filters and actions"""
+        super(AWS, AWS).initialize_resource(resource_class)
 
     def initialize_policies(self, policy_collection, options):
         """Return a set of policies targetted to the given regions.

@@ -1196,7 +1196,9 @@ class Policy:
 
     def load_resource_manager(self):
         factory = get_resource_class(self.data.get('resource'))
-        return factory(self.ctx, self.data)
+        resource_manager = factory(self.ctx, self.data)
+        clouds[self.provider_name]().initialize_resource(resource_manager)
+        return resource_manager
 
     def validate_policy_start_stop(self):
         policy_name = self.data.get('name')
