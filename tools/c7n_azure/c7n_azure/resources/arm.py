@@ -54,7 +54,11 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
         return self.augment([r.serialize(True) for r in data])
 
     def tag_operation_enabled(self, resource_type):
-        return not self.resource_type.resource_type.lower().startswith(tuple(arm_tags_unsupported))
+        return ArmResourceManager.generic_resource_supports_tagging(resource_type)
+
+    @staticmethod
+    def generic_resource_supports_tagging(resource_type):
+        return not resource_type.lower().startswith(tuple(arm_tags_unsupported))
 
     @staticmethod
     def register_arm_specific(registry, resource_class):
@@ -63,7 +67,8 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
             return
 
         # Register tag actions for everything except a few non-compliant resources
-        if resource_class.tag_operation_enabled:
+        if ArmResourceManager.generic_resource_supports_tagging(
+                resource_class.resource_type.resource_type):
             resource_class.action_registry.register('tag', Tag)
             resource_class.action_registry.register('untag', RemoveTag)
             resource_class.action_registry.register('auto-tag-user', AutoTagUser)
