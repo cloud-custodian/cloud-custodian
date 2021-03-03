@@ -4,7 +4,7 @@
 from c7n_azure.constants import RESOURCE_GROUPS_TYPE
 from c7n_azure.provider import resources
 from c7n_azure.query import DescribeSource, ResourceQuery
-from c7n_azure.resources.arm import ArmResourceManager, arm_resource_types
+from c7n_azure.resources.arm import ArmResourceManager, arm_tags_unsupported
 
 from c7n.filters.core import Filter, type_schema
 from c7n.query import sources
@@ -56,7 +56,6 @@ class GenericArmResource(ArmResourceManager):
         client = 'ResourceManagementClient'
 
         resource_type = 'armresource'
-        enable_tag_operations = True
         diagnostic_settings_enabled = False
 
         default_report_fields = (
@@ -82,9 +81,9 @@ class GenericArmResource(ArmResourceManager):
         return self.augment([r.serialize(True) for r in result])
 
     def tag_operation_enabled(self, resource_type):
-        if resource_type.lower() in arm_resource_types:
-            return arm_resource_types[resource_type.lower()].enable_tag_operations
-        return False
+        # Tag operations work on nearly all generic arm resources
+        # but we need to exclude known unsupported.
+        return resource_type.lower().startswith(tuple(arm_tags_unsupported))
 
     @property
     def source_type(self):
