@@ -231,9 +231,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
             resolved = arn_resolver.resolve(r['c7n:ChildArns'])
             if not op(resolved.values()):
                 for i, j in resolved.items():
-                    if self.data.get('all'):
-                        r.setdefault('c7n:InvalidTargets', []).append(i)
-                    elif not self.data.get('all') and not j:
+                    if not j:
                         r.setdefault('c7n:InvalidTargets', []).append(i)
                 results.append(r)
         return results
