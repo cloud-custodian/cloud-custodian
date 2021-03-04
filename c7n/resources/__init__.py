@@ -23,7 +23,9 @@ def load_resources(resource_types=('*',)):
         if '*' in pmap:
             p.get_resource_types(('*',))
         elif pname in pmap:
-            _, not_found = p.get_resource_types(pmap[pname])
+            resource_classes, not_found = p.get_resource_types(pmap[pname])
+            for resource in resource_classes:
+                p.initialize_resource(resource)
             missing.extend(not_found)
     return missing
 

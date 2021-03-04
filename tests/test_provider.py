@@ -1,11 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from mock import Mock, patch
+from mock import patch
 
 from .common import BaseTest
 
-from c7n.config import Config
+from c7n.actions import Notify
+from c7n.filters import ValueFilter
 from c7n.provider import get_resource_class, import_resource_classes
 from c7n.resources import aws, load_resources
 from c7n.resources.resource_map import ResourceMap
@@ -37,16 +38,17 @@ class ProviderTest(BaseTest):
         self.assertEqual(ec2.type, 'ec2')
 
     def _mock_initialize_resource(self, resource_class):
-        resource_class.filter_registry.register('mock_filter', Mock)
-        resource_class.action_registry.register('mock_action', Mock)
+        resource_class.filter_registry.register('mock_filter', ValueFilter)
+        resource_class.action_registry.register('mock_action', Notify)
 
     def test_provider_specific_registry(self):
         with patch.object(aws.AWS, 'initialize_resource') as mock_aws:
             mock_aws.side_effect = self._mock_initialize_resource
-            p = self.load_policy({
-                'name': 'foo',
-                'resource': 's3',
-            }, config=Config.empty(regions=['us-east-1']))
-            self.assertIn('mock_filter', p.resource_manager.filter_registry.keys())
-            self.assertIn('mock_action', p.resource_manager.action_registry.keys())
-            mock_aws.reset_mock(side_effect=True)
+            collection = self.load_policy_set({
+                'policies': [
+                    {'name': 'foo', 'resource': 's3'}
+                ]
+            })
+            for p in collection.policies:
+                self.assertIn('mock_filter', p.resource_manager.filter_registry.keys())
+                self.assertIn('mock_action', p.resource_manager.action_registry.keys())
