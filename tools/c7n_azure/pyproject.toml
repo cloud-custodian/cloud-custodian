@@ -48,7 +48,6 @@ azure-mgmt-storage = "^7.1.0"
 azure-mgmt-subscription = "^0.5.0"
 azure-mgmt-web = "^0.44.0"
 azure-mgmt-logic = "^3.0.0"
-azure-keyvault = "1.1.0"
 azure-storage-blob = "~2.1"
 azure-storage-queue = "~2.1"
 azure-cosmosdb-table = "^1.0.6"
@@ -71,6 +70,10 @@ azure-mgmt-monitor = "^0.7.0"
 click = "^7.0"
 azure-cosmos = "^3.1.2"
 azure-mgmt-redis = "^6.0.0"
+azure-keyvault-secrets = "^4.2.0"
+azure-keyvault-keys = "^4.3.1"
+azure-keyvault-certificates = "^4.2.1"
+azure-identity = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency

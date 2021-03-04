@@ -3,7 +3,7 @@
 
 import logging
 
-from azure.keyvault.key_vault_id import KeyVaultId
+from azure.keyvault.keys import KeyProperties
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
@@ -80,9 +80,9 @@ class KeyVaultKeys(ChildResourceManager):
         doc_groups = ['Security']
 
         resource = constants.VAULT_AUTH_ENDPOINT
-        service = 'azure.keyvault'
-        client = 'KeyVaultClient'
-        enum_spec = (None, 'get_keys', None)
+        service = 'azure.keyvault.keys'
+        client = 'KeyClient'
+        enum_spec = (None, 'list_properties_of_keys', None)
 
         parent_manager_name = 'keyvault'
         raise_on_exception = False
@@ -144,14 +144,14 @@ class KeyTypeFilter(Filter):
         return resources
 
     def _process_resource_set(self, resources, event):
-        client = self.manager.get_client()
+        client = self.manager.get_client(vault_url=generate_key_vault_url(parent_resource['name']))
 
         matched = []
         for resource in resources:
             try:
                 if 'c7n:kty' not in resource:
-                    id = KeyVaultId.parse_key_id(resource['kid'])
-                    key = client.get_key(id.vault, id.name, id.version)
+                    id = KeyProperties(key_id=resource['kid'])
+                    key = client.get_key(id.name, id.version)
 
                     resource['c7n:kty'] = key.key.kty.lower()
 
