@@ -2,6 +2,8 @@
 *.egg-info/
 *.swp
 .eggs/
+.terraform
+.terraform.lock.hcl
 # c7n/version.py
 src/
 deps/
@@ -43,3 +45,5 @@ docs/source/overview\.rst
 docs/source/tools/*\.md
 docs/source/*/resources
 docs/source/tools/assets/
+.tfcache
+.env

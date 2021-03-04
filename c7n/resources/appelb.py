@@ -1,16 +1,5 @@
-# Copyright 2016-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Application & Network Load Balancers
 """
@@ -61,15 +50,6 @@ class ConfigAppElb(ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigAppElb, self).load_resource(item)
-        item_tags = item['supplementaryConfiguration']['Tags']
-
-        # Config originally stored supplementaryconfig on elbv2 as json
-        # strings. Support that format for historical queries.
-        if isinstance(item_tags, str):
-            item_tags = json.loads(item_tags)
-        resource['Tags'] = [
-            {'Key': t['key'], 'Value': t['value']} for t in item_tags]
-
         item_attrs = item['supplementaryConfiguration'][
             'LoadBalancerAttributes']
         if isinstance(item_attrs, str):
@@ -504,6 +484,73 @@ class AppELBDeleteAction(BaseAction):
                 alb['LoadBalancerArn'], e)
 
 
+@AppELB.action_registry.register('modify-attributes')
+class AppELBModifyAttributes(BaseAction):
+    """Modify load balancer attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: turn-on-elb-deletion-protection
+                resource: app-elb
+                filters:
+                  - type: attributes
+                    key: "deletion_protection.enabled"
+                    value: false
+                actions:
+                  - type: modify-attributes
+                    attributes:
+                      "deletion_protection.enabled": "true"
+                      "idle_timeout.timeout_seconds": 120
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {
+                'enum': ['modify-attributes']},
+            'attributes': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'access_logs.s3.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'access_logs.s3.bucket': {'type': 'string'},
+                    'access_logs.s3.prefix': {'type': 'string'},
+                    'deletion_protection.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'idle_timeout.timeout_seconds': {'type': 'number'},
+                    'routing.http.desync_mitigation_mode': {
+                        'enum': ['monitor', 'defensive', 'strictest']},
+                    'routing.http.drop_invalid_header_fields.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'routing.http2.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'load_balancing.cross_zone.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                },
+            },
+        },
+    }
+    permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for appelb in resources:
+            self.manager.retry(
+                client.modify_load_balancer_attributes,
+                LoadBalancerArn=appelb['LoadBalancerArn'],
+                Attributes=[
+                    {'Key': key, 'Value': serialize_attribute_value(value)}
+                    for (key, value) in self.data['attributes'].items()
+                ],
+                ignore_err_codes=('LoadBalancerNotFoundException',),
+            )
+        return resources
+
+
 class AppELBListenerFilterBase:
     """ Mixin base class for filters that query LB listeners.
     """
@@ -528,6 +575,16 @@ def parse_attribute_value(v):
         v = True
     elif v == 'false':
         v = False
+    return v
+
+
+def serialize_attribute_value(v):
+    if v is True:
+        return 'true'
+    elif v is False:
+        return 'false'
+    elif isinstance(v, int):
+        return str(v)
     return v
 
 
@@ -774,7 +831,7 @@ class AppELBModifyListenerPolicy(BaseAction):
     schema = type_schema(
         'modify-listener',
         port={'type': 'integer'},
-        protocol={'enum': ['HTTP', 'HTTPS']},
+        protocol={'enum': ['HTTP', 'HTTPS', 'TCP', 'TLS', 'UDP', 'TCP_UDP', 'GENEVE']},
         sslpolicy={'type': 'string'},
         certificate={'type': 'string'}
     )

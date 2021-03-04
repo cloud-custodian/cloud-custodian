@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 from dateutil import parser
 
@@ -72,3 +61,25 @@ class WorkspacesTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('LastKnownUserConnectionTimestamp',
             annotation(resources[0], filters.ANNOTATION_KEY))
+
+    def test_workspaces_kms_filter(self):
+        session_factory = self.replay_flight_data('test_workspaces_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-kms-filter',
+                'resource': 'workspaces',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/workspaces'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['VolumeEncryptionKey'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/workspaces')

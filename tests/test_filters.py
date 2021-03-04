@@ -1,20 +1,10 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
+import random
 import unittest
 import os
 
@@ -23,6 +13,7 @@ from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
+from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import ValueRegex, parse_date as core_parse_date
@@ -426,7 +417,6 @@ class TestValueTypes(BaseFilterTest):
             else:
                 self.assertEqual(dt.year, y)
 
-        t("123456789", 1973)        # (1973, 11, 29, 13, 33, 9)
         t("1234567890", 2009)       # (2009, 2, 13, 15, 31, 30)
         t("1234567890123", 2009)    # (2009, 2, 13, 15, 31, 30, 123000)
 
@@ -1003,7 +993,7 @@ class TestFilterRegistry(unittest.TestCase):
         self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
 
 
-class TestMissingMetrics(BaseTest):
+class TestMetricsFilter(BaseTest):
 
     def test_missing_metrics(self):
         self.patch(ELB, "executor_factory", MainThreadExecutor)
@@ -1062,6 +1052,380 @@ class TestMissingMetrics(BaseTest):
             "Fill value for missing data",
             (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"][0].get("c7n:detail")
                 for res in resources)
+        )
+
+    def test_metric_period_rounding(self):
+        """Round the start time for metrics queries to the top of the previous hour"""
+
+        factory = self.replay_flight_data("test_metric_period_rounding")
+
+        p = self.load_policy(
+            {
+                "name": "sqs-no-messages",
+                "resource": "sqs",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "NumberOfMessagesSent",
+                        "statistics": "Sum",
+                        "days": 90,
+                        "value": 0,
+                        "op": "eq"
+                    }
+                ]
+            },
+            config={"region": "us-east-2"},
+            session_factory=factory
+        )
+        metrics_filter = p.resource_manager.filters[0]
+
+        # Set a fixed end time for the metrics filter with a non-zero minute component.
+        with mock_datetime_now(parse_date("2020-12-03T04:45:00+00:00"), base_filters.metrics):
+            resources = p.run()
+            datapoints = resources[0]["c7n.metrics"]["AWS/SQS.NumberOfMessagesSent.Sum"]
+
+        self.assertEqual(metrics_filter.start.strftime("%H:%M"), "04:00")
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(datapoints), 1)
+
+
+class TestReduceFilter(BaseFilterTest):
+
+    def instances(self):
+        return [
+            dict(InstanceId="A", Group="A", Foo="a", Bar="3", Date="2011/05/06"),
+            dict(InstanceId="B", Group="B", Foo="c", Bar="1", Date="2020/01/01"),
+            dict(InstanceId="C", Group="C", Foo="d", Date="2015-05-25T01:02:03"),
+            dict(InstanceId="D", Group="A", Foo="b", Date="1592870000"),  # 2020-06-22 23:53:20 UTC
+            dict(InstanceId="E", Group="B", Foo="e", Bar="23", Date="invalid"),
+            dict(InstanceId="F", Group="C", Foo="f"),
+        ]
+
+    def test_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+
+    def test_limit_no_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 0,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_negative_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": -2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B', 'C'])
+
+    def test_limit_percent_and_count(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+                "limit-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B'])
+
+    def test_discard(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+
+    def test_discard_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "discard-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['D', 'E', 'F'])
+
+    def test_discard_and_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['C', 'D'])
+
+    def test_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Foo",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['a', 'b', 'c', 'd', 'e', 'f'])
+
+    def test_sort_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['f', 'e', 'd', 'c', 'b', 'a'])
+
+    def test_group_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'C', 'E', 'B', 'D', 'A'])
+        ['D', 'A', 'E', 'B', 'F', 'C']
+
+    def test_group_sort_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Foo",
+                "order": "desc",
+                "limit": 1,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'E', 'D'])
+
+    def test_randomize(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "randomize",
+            }
+        )
+        # Set the rand seed to ensure that the random sets aren't accidentally
+        # the same.
+        random.seed(1234)
+        rs1 = f.process(resources)
+        rs2 = f.process(resources)
+        self.assertEqual(len(rs1), len(resources))
+        self.assertEqual(len(rs2), len(resources))
+        self.assertNotEqual(
+            [r['InstanceId'] for r in rs1],
+            [r['InstanceId'] for r in rs2]
+        )
+
+    def test_reverse(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "reverse",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            [r['InstanceId'] for r in resources[::-1]]
+        )
+
+    def test_sort_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Bar",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'E', 'A', 'C', 'D', 'F']
+        )
+
+    def test_sort_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'A', 'E', 'C', 'D', 'F']
+        )
+
+    def test_sort_date(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Date",
+                    "value_type": "date"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['A', 'C', 'B', 'D', 'E', 'F']
+        )
+
+    def test_group_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Bar",
+                "limit": 1,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'E', 'A', 'C']
+        )
+
+    def test_group_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                },
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'A', 'E', 'C']
+        )
+
+    def test_group_regex_date_asc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+                },
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['C', 'A']
+        )
+
+    def test_group_regex_date_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'C', 'A', 'D']
+        )
+
+    def test_group_regex_date_desc_null_first(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "null-order": "first",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['D', 'B', 'C', 'A']
         )
 
 

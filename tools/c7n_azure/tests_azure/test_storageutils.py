@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import pytest
 from azure.common import AzureHttpError
 from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
@@ -19,12 +8,16 @@ from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser
 from mock import patch
-
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from c7n.utils import local_session
 from .azure_common import BaseTest, arm_template, requires_arm_polling
 
+CHINA_STORAGE_ENDPOINT = AZURE_CHINA_CLOUD.suffixes.storage_endpoint
+CHINA_STORAGE_ACCOUNT = "https://chinasa.blob" + CHINA_STORAGE_ENDPOINT
+
 
 @requires_arm_polling
+@pytest.mark.skiplive
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
@@ -190,3 +183,25 @@ class StorageUtilsTest(BaseTest):
         client = local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient').storage_accounts
         return client.__module__ + '.' + client.__class__.__name__
+
+    @patch('azure.storage.blob.blockblobservice.BlockBlobService.create_container')
+    def test_get_blob_client_by_uri_china_cloud(self, mock_create):
+        url = CHINA_STORAGE_ACCOUNT + "/testcontainer/extrafolder"
+        blob_service, container_name, key_prefix = \
+            StorageUtilities.get_blob_client_by_uri(url, Session(cloud_endpoints=AZURE_CHINA_CLOUD))
+        self.assertIsNotNone(blob_service)
+        self.assertEqual(container_name, "testcontainer")
+        self.assertEqual(key_prefix, "extrafolder")
+        self.assertTrue(CHINA_STORAGE_ENDPOINT in blob_service.primary_endpoint)
+        self.assertTrue(mock_create.called_once())
+
+    @patch('azure.storage.queue.queueservice.QueueService.create_queue')
+    def test_get_queue_client_by_uri_china_cloud(self, mock_create):
+        url = CHINA_STORAGE_ACCOUNT + "/queuename"
+        queue_service, queue_name =\
+            StorageUtilities.get_queue_client_by_uri(url,
+                                                     Session(cloud_endpoints=AZURE_CHINA_CLOUD))
+        self.assertIsNotNone(queue_service)
+        self.assertEqual(queue_name, "queuename")
+        self.assertTrue(CHINA_STORAGE_ENDPOINT in queue_service.primary_endpoint)
+        self.assertTrue(mock_create.called_once())

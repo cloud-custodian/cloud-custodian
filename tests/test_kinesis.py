@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 
@@ -230,3 +219,43 @@ class Kinesis(BaseTest):
             ],
             "DELETING",
         )
+
+    def test_video_stream_delete(self):
+        factory = self.replay_flight_data("test_kinesis_video_stream_delete")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-delete",
+                "resource": "kinesis-video",
+                "filters": [{"StreamName": "test-video"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        stream = factory().client("kinesisvideo").describe_stream(StreamName="test-video")[
+            "StreamInfo"
+        ]
+        self.assertEqual(stream["Status"], "DELETING")
+
+    def test_kinesis_video_kms_key(self):
+        session_factory = self.replay_flight_data("test_kinesis_video_kms_key")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-kms-alias",
+                "resource": "kinesis-video",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/alias/aws/lambda)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['KmsKeyId'],
+            'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')

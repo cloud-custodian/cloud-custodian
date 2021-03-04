@@ -1,19 +1,7 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
@@ -31,12 +19,6 @@ class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
-        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
-        if 'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
-            resource['BillingModeSummary'][
-                'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
-                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
-
         sse_info = resource.pop('Ssedescription', None)
         if sse_info is None:
             return resource
@@ -455,8 +437,8 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         service = 'dax'
         arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
+        arn = 'ClusterArn'
+        id = name = 'ClusterName'
         cfn_type = 'AWS::DAX::Cluster'
 
     permissions = ('dax:ListTags',)

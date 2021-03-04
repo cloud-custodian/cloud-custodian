@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 import fnmatch
@@ -203,6 +192,26 @@ class TestEcsService(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')
 
+    def test_ecs_service_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_service_subnet")
+        p = self.load_policy(
+            {
+                "name": "ecs-service-subnets",
+                "resource": "ecs-service",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:Name",
+                        "value": "implied"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["serviceName"], "c7n-test")
+
 
 class TestEcsTaskDefinition(BaseTest):
 
@@ -323,6 +332,27 @@ class TestEcsTask(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 4)
+
+    def test_ecs_task_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_task_subnet")
+        p = self.load_policy(
+            {
+                "name": "ecs-task-fargate-subnets",
+                "resource": "ecs-task",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:Name",
+                        "value": "implied"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('attachments')[0].get(
+            'details')[0].get('value'), "subnet-05b58b4afe5124322")
 
     def test_task_delete(self):
         session_factory = self.replay_flight_data("test_ecs_task_delete")

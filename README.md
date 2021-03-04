@@ -11,6 +11,7 @@ Cloud Custodian
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
 Cloud Custodian is a rules engine for managing public cloud accounts and
 resources. It allows users to define policies to enable a well managed
@@ -33,17 +34,8 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian was originally developed at CapitalOne (by @kapilt et
-al). Since its inception, Cloud Custodian has grown beyond its original maintainers,
-and now Capital One represents
-one of many contributors to this project. Like many opensource
-projects, development is lead by a community of hundreds of
-contributors and several cloud providers have dedicated teams working
-on Custodian.
-
-"[Engineering the Next Generation of Cloud
-Governance](https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60)"
-by \@drewfirment
+Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+of contributors.
 
 Features
 --------
@@ -259,6 +251,15 @@ Contributing
 
 See <https://cloudcustodian.io/docs/contribute.html>
 
+Security
+--------
+
+If you've found a security related issue, a vulnerability, or a
+potential vulnerability in Cloud Custodian please let the Cloud
+[Custodian Security Team](mailto:security@cloudcustodian.io) know with
+the details of the vulnerability. We'll send a confirmation email to
+acknowledge your report, and we'll send an additional email when we've
+identified the issue positively or negatively.
 
 Code of Conduct
 ---------------

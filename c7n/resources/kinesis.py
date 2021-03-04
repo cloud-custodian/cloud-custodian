@@ -1,20 +1,10 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
@@ -96,6 +86,12 @@ class Delete(Action):
                 StreamName=r['StreamName'])
 
 
+@KinesisStream.filter_registry.register('kms-key')
+class KmsFilterDataStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KeyId'
+
+
 class DescribeDeliveryStream(DescribeSource):
 
     def augment(self, resources):
@@ -122,6 +118,12 @@ class DeliveryStream(QueryResourceManager):
         'describe': DescribeDeliveryStream,
         'config': ConfigSource
     }
+
+
+@DeliveryStream.filter_registry.register('kms-key')
+class KmsFilterDeliveryStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'DeliveryStreamEncryptionConfiguration.KeyARN'
 
 
 @DeliveryStream.action_registry.register('delete')
@@ -268,3 +270,81 @@ class AppDelete(Action):
             client.delete_application(
                 ApplicationName=r['ApplicationName'],
                 CreateTimestamp=r['CreateTimestamp'])
+
+
+class DescribeVideoStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('kinesis-video')
+class KinesisVideoStream(QueryResourceManager):
+    retry = staticmethod(
+        get_retry((
+            'LimitExceededException',)))
+
+    class resource_type(TypeInfo):
+        service = 'kinesisvideo'
+        arn_type = 'stream'
+        enum_spec = ('list_streams', 'StreamInfoList', None)
+        name = id = 'StreamName'
+        arn = 'StreamARN'
+        dimension = 'StreamName'
+        universal_taggable = True
+
+    source_mapping = {
+        'describe': DescribeVideoStream,
+        'config': ConfigSource
+    }
+
+
+@KinesisVideoStream.action_registry.register('delete')
+class DeleteVideoStream(Action):
+    """Delete a Kinesis Video stream
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-kinesis-video
+            resource: kinesis-video
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("kinesisvideo:DeleteStream",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kinesisvideo')
+        resources = self.filter_resources(resources, 'Status', ('ACTIVE',))
+        for r in resources:
+            try:
+                client.delete_stream(StreamARN=r['StreamARN'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@KinesisVideoStream.filter_registry.register('kms-key')
+class KmsFilterVideoStream(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-video-stream-kms-key
+                resource: aws.kinesis-video
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
+    """
+
+    RelatedIdsExpression = 'KmsKeyId'

@@ -1,23 +1,12 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from botocore.exceptions import ClientError
 import boto3
 import click
 import json
 from c7n.credentials import assumed_session
-from c7n.utils import get_retry, dumps, chunks
+from c7n.utils import get_retry, dumps, chunks, get_human_size
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc, tzlocal
@@ -491,18 +480,6 @@ def access(config, region, accounts=()):
     print(tabulate(accounts_report, headers='keys'))
 
 
-def GetHumanSize(size, precision=2):
-    # interesting discussion on 1024 vs 1000 as base
-    # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-    suffixIndex = 0
-    while size > 1024:
-        suffixIndex += 1
-        size = size / 1024.0
-
-    return "%.*f %s" % (precision, size, suffixes[suffixIndex])
-
-
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
@@ -551,7 +528,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
             account.pop('groups')
             total_size += size
             if human:
-                account['size'] = GetHumanSize(size)
+                account['size'] = get_human_size(size)
             else:
                 account['size'] = size
             account['count'] = count
@@ -559,7 +536,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
 
     accounts_report.sort(key=operator.itemgetter('count'), reverse=True)
     print(tabulate(accounts_report, headers='keys'))
-    log.info("total size:%s", GetHumanSize(total_size))
+    log.info("total size:%s", get_human_size(total_size))
 
 
 @cli.command()

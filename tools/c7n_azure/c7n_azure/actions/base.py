@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Actions to perform on Azure resources
 """
@@ -57,14 +46,15 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
         )
 
     def _log_modified_resource(self, resource, message):
-        template = "Action '{}' modified '{}' in resource group '{}'."
+        if resource.get('type', '').lower() == 'resourcegroups':
+            template = "Action '{action}' modified resource group '{name}'. {message}"
+        else:
+            template = "Action '{action}' modified '{name}' in resource group '{rg}'. {message}"
+
         name = resource.get('name', 'unknown')
         rg = resource.get('resourceGroup', 'unknown')
 
-        if message:
-            template += ' ' + message
-
-        self.log.info(template.format(self.type, name, rg),
+        self.log.info(template.format(action=self.type, name=name, rg=rg, message=message or ''),
                       extra=self._get_action_log_metadata(resource))
 
     def _get_action_log_metadata(self, resource):
@@ -76,8 +66,8 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
 
         for r in resources:
             try:
-                message = self._process_resource(r)
-                self._log_modified_resource(r, message)
+                result = self._process_resource(r)
+                self._log_modified_resource(r, result)
             except Exception as e:
                 # only executes during test runs
                 if "pytest" in sys.modules:
@@ -107,8 +97,8 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
 
         for r in resources:
             try:
-                message = self._process_resource(r, event)
-                self._log_modified_resource(r, message)
+                result = self._process_resource(r, event)
+                self._log_modified_resource(r, result)
             except Exception as e:
                 # only executes during test runs
                 if "pytest" in sys.modules:

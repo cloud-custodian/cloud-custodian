@@ -1,0 +1,30 @@
+{
+  "body": {
+    "name": "projects/cloud-custodian/instances/spanner-instance-0/operations/56dd41a50ca85469", 
+    "metadata": {
+      "instance": {
+        "nodeCount": 1, 
+        "displayName": "spanner-instance-0", 
+        "state": "READY", 
+        "config": "projects/cloud-custodian/instanceConfigs/regional-asia-east1", 
+        "name": "projects/cloud-custodian/instances/spanner-instance-0"
+      }, 
+      "@type": "type.googleapis.com/google.spanner.admin.instance.v1.UpdateInstanceMetadata", 
+      "startTime": "2019-07-09T13:36:49.474733Z"
+    }
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "549", 
+    "x-xss-protection": "0", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 09 Jul 2019 13:36:49 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

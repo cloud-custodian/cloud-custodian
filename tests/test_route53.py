@@ -1,16 +1,12 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import time
+import logging
+
+import pytest
+from pytest_terraform import terraform
+
+from botocore.exceptions import ClientError
 from .common import BaseTest
 
 
@@ -110,6 +106,36 @@ class Route53HostedZoneTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceType="hostedzone", ResourceId=_id)
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 2)
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
+
+
+@terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
+def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
+    session_factory = test.replay_flight_data("test_route53_hostedzone_delete")
+    client = session_factory().client("route53")
+    pdata = {
+        "name": "r53domain-delete-hostedzone",
+        "resource": "hostedzone",
+        "filters": [{"tag:TestTag": "present"}],
+        "actions": ["delete"]}
+
+    output = test.capture_logging('custodian.actions', level=logging.WARNING)
+
+    p = test.load_policy(pdata, session_factory=session_factory)
+    with pytest.raises(ClientError) as ecm:
+        p.run()
+    assert ecm.value.response['Error']['Code'] == 'HostedZoneNotEmpty'
+    assert "set force to remove all records in zone" in output.getvalue()
+
+    pdata['actions'] = [{'type': 'delete', 'force': True}]
+    p = test.load_policy(pdata, session_factory=session_factory)
+    p.run()
+
+    if test.recording:
+        time.sleep(3)
+
+    assert client.list_hosted_zones_by_name(
+        DNSName=route53_hostedzone_delete['aws_route53_zone.test_hosted_zone.name']
+    ).get('HostedZones') == []
 
 
 class Route53HealthCheckTest(BaseTest):

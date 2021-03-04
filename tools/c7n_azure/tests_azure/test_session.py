@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from adal import AdalError
 from knack.util import CLIError
 from msrest.exceptions import AuthenticationError
@@ -25,9 +14,11 @@ import json
 import os
 import re
 import sys
+import pytest
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from msrestazure.azure_active_directory import MSIAuthentication
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID
 from c7n_azure import constants
 from c7n_azure.session import Session
@@ -288,8 +279,8 @@ class SessionTest(BaseTest):
 
     def test_get_session_for_resource(self):
         s = Session()
-        resource_session = s.get_session_for_resource(constants.RESOURCE_STORAGE)
-        self.assertEqual(resource_session.resource_namespace, constants.RESOURCE_STORAGE)
+        resource_session = s.get_session_for_resource(constants.STORAGE_AUTH_ENDPOINT)
+        self.assertEqual(resource_session.resource_endpoint, constants.STORAGE_AUTH_ENDPOINT)
 
     @patch('c7n_azure.utils.custodian_azure_send_override')
     def test_get_client_overrides(self, mock):
@@ -301,6 +292,15 @@ class SessionTest(BaseTest):
         self.assertIsNotNone(client._client.orig_send)
         client._client.send()
         self.assertTrue(mock.called)
+
+    # This test won't run with real credentials unless the
+    # tenant is actually in Azure China cloud.
+    @pytest.mark.skiplive
+    def test_get_client_non_default_base_url(self):
+        s = Session(cloud_endpoints=AZURE_CHINA_CLOUD)
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        self.assertEqual(AZURE_CHINA_CLOUD.endpoints.resource_manager,
+                         client._client.config.base_url)
 
     @patch('c7n_azure.utils.get_keyvault_secret', return_value='{}')
     @patch('c7n_azure.session.jwt.decode', return_value={'tid': DEFAULT_TENANT_ID})
@@ -384,3 +384,18 @@ class SessionTest(BaseTest):
 
         mock_log.assert_called_once_with('Failed to authenticate with CLI credentials. '
                                          'Bad CLI credentials')
+
+    def test_get_auth_endpoint(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.DEFAULT_AUTH_ENDPOINT)
+        self.assertEqual('https://management.core.windows.net/', result)
+
+    def test_get_auth_endpoint_vault(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.VAULT_AUTH_ENDPOINT)
+        self.assertEqual('https://vault.azure.net', result)
+
+    def test_get_auth_endpoint_storage(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.STORAGE_AUTH_ENDPOINT)
+        self.assertEqual('https://storage.azure.com/', result)

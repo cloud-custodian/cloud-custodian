@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Query capability built on skew metamodel
 
@@ -290,6 +279,7 @@ class ConfigSource:
 
     def __init__(self, manager):
         self.manager = manager
+        self.titleCase = self.manager.resource_type.id[0].isupper()
 
     def get_permissions(self):
         return ["config:GetResourceConfigHistory",
@@ -339,8 +329,8 @@ class ConfigSource:
         else:
             _c = None
 
-        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
-            self.manager.resource_type.config_type)
+        s = ("select resourceId, configuration, supplementaryConfiguration "
+             "where resourceType = '{}'").format(self.manager.resource_type.config_type)
 
         if _c:
             s += "AND {}".format(_c)
@@ -348,11 +338,34 @@ class ConfigSource:
         return {'expr': s}
 
     def load_resource(self, item):
+        item_config = self._load_item_config(item)
+        resource = camelResource(
+            item_config, implicitDate=True, implicitTitle=self.titleCase)
+        self._load_resource_tags(resource, item)
+        return resource
+
+    def _load_item_config(self, item):
         if isinstance(item['configuration'], str):
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
-        return camelResource(item_config)
+        return item_config
+
+    def _load_resource_tags(self, resource, item):
+        # normalized tag loading across the many variants of config's inconsistencies.
+        if 'Tags' in resource:
+            return
+        elif item.get('tags'):
+            resource['Tags'] = [
+                {u'Key': k, u'Value': v} for k, v in item['tags'].items()]
+        elif item['supplementaryConfiguration'].get('Tags'):
+            stags = item['supplementaryConfiguration']['Tags']
+            if isinstance(stags, str):
+                stags = json.loads(stags)
+            if isinstance(stags, list):
+                resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']} for t in stags]
+            elif isinstance(stags, dict):
+                resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
 
     def get_listed_resources(self, client):
         # fallback for when config decides to arbitrarily break select
@@ -733,9 +746,10 @@ class RetryPageIterator(PageIterator):
 class TypeMeta(type):
 
     def __repr__(cls):
-        identifier = None
         if cls.config_type:
             identifier = cls.config_type
+        elif cls.cfn_type:
+            identifier = cls.cfn_type
         elif cls.arn_type:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
         elif cls.enum_spec:

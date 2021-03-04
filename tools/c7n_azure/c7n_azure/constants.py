@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 """
 Azure Functions
@@ -80,11 +69,13 @@ ENV_FUNCTION_MANAGEMENT_GROUP_NAME = 'AZURE_FUNCTION_MANAGEMENT_GROUP_NAME'
 ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION = 'CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION'
 
 """
-Authentication Resource
+Authentication Resource Endpoints
 """
-RESOURCE_ACTIVE_DIRECTORY = 'https://management.core.windows.net/'
-RESOURCE_STORAGE = 'https://storage.azure.com/'
-RESOURCE_VAULT = 'https://vault.azure.net'
+STORAGE_AUTH_ENDPOINT = 'https://storage.azure.com/'
+VAULT_AUTH_ENDPOINT = 'vault'
+DEFAULT_RESOURCE_AUTH_ENDPOINT = 'resource_manager'
+DEFAULT_AUTH_ENDPOINT = 'active_directory_resource_id'
+GRAPH_AUTH_ENDPOINT = 'active_directory_graph_resource_id'
 RESOURCE_GLOBAL_MGMT = 'https://management.azure.com/'
 
 """
@@ -97,6 +88,7 @@ DEFAULT_CHUNK_SIZE = 20
 Custom Retry Code Variables
 """
 DEFAULT_MAX_RETRY_AFTER = 30
+DEFAULT_RETRY_AFTER = 5
 
 """
 KeyVault url templates

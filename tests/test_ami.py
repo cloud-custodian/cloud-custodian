@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.exceptions import ClientError
@@ -37,7 +26,29 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_ami_ssq(self):
+    def test_ami_remove_launch_permissions(self):
+        factory = self.replay_flight_data('test_ami_remove_perms')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': ['cross-account'],
+            'actions': [{
+                'type': 'remove-launch-permissions',
+                'accounts': 'matched'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['112233445566', '665544332211'])
+
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == []
+
+    def test_ami_sse(self):
         factory = self.replay_flight_data('test_ami_sse')
         p = self.load_policy({
             'name': 'ubuntu-bionic',

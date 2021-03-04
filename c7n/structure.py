@@ -1,16 +1,5 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 
@@ -26,8 +15,8 @@ class StructureParser:
     allowed_file_keys = {'vars', 'policies'}
     required_policy_keys = {'name', 'resource'}
     allowed_policy_keys = {'name', 'resource', 'title', 'description', 'mode',
-         'tags', 'max-resources', 'source', 'query',
-         'filters', 'actions', 'source', 'tags', 'conditions',
+         'tags', 'max-resources', 'metadata', 'query',
+         'filters', 'actions', 'source', 'conditions',
          # legacy keys subject to deprecation.
          'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'}
@@ -36,7 +25,7 @@ class StructureParser:
         if not isinstance(data, dict):
             raise PolicyValidationError((
                 "Policy file top level data structure "
-                "should be a mapping/dict, instead found:%s""") % (
+                "should be a mapping/dict, instead found:%s") % (
                     type(data).__name__))
         dkeys = set(data.keys())
 

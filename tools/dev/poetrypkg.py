@@ -1,13 +1,16 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Supplemental tooling for managing custodian packaging.
 
 Has various workarounds for poetry
 """
+from collections import defaultdict
 import click
 import os
 import sys
-
-from collections import defaultdict
+import toml
+from pathlib import Path
 
 
 @click.group()
@@ -18,7 +21,11 @@ def cli():
     """
     # If there is a global installation of poetry, prefer that.
     poetry_python_lib = os.path.expanduser('~/.poetry/lib')
-    sys.path.append(os.path.realpath(poetry_python_lib))
+    sys.path.insert(0, os.path.realpath(poetry_python_lib))
+    # poetry env vendored deps
+    sys.path.insert(0,
+        os.path.join(poetry_python_lib, 'poetry', '_vendor', 'py{}.{}'.format(
+            sys.version_info.major, sys.version_info.minor)))
 
 
 # Override the poetry base template as all our readmes files
@@ -53,10 +60,21 @@ setup(**setup_kwargs)
 
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
+@click.option('-f', '--version-file', type=click.Path())
+def gen_version_file(package_dir, version_file):
+    data = toml.load(Path(str(package_dir)) / 'pyproject.toml')
+    version = data['tool']['poetry']['version']
+    with open(version_file, 'w') as fh:
+        fh.write('# Generated via tools/dev/poetrypkg.py\n')
+        fh.write('version = "{}"\n'.format(version))
+
+
+@cli.command()
+@click.option('-p', '--package-dir', type=click.Path())
 def gen_setup(package_dir):
     """Generate a setup suitable for dev compatibility with pip.
     """
-    from poetry.masonry.builders import sdist
+    from poetry.core.masonry.builders import sdist
     from poetry.factory import Factory
 
     factory = Factory()
@@ -93,7 +111,7 @@ def gen_setup(package_dir):
 def gen_frozensetup(package_dir, output):
     """Generate a frozen setup suitable for distribution.
     """
-    from poetry.masonry.builders import sdist
+    from poetry.core.masonry.builders import sdist
     from poetry.factory import Factory
 
     factory = Factory()
@@ -131,7 +149,7 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
     if not source_deps:
         return
 
-    from poetry.packages.dependency import Dependency
+    from poetry.core.packages.dependency import Dependency
 
     dep_map = {d['name']: d for d in poetry.locker.lock_data['package']}
     seen = set(source_deps)

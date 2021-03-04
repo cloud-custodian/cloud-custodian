@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import base64
 import json
@@ -98,6 +87,7 @@ class Host:
         # Configure scheduler
         self.scheduler = BlockingScheduler(Host.get_scheduler_config())
         logging.getLogger('apscheduler.executors.default').setLevel(logging.ERROR)
+        logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
         # Schedule recurring policy updates
         self.scheduler.add_job(self.update_policies,
@@ -261,7 +251,10 @@ class Host:
                 return path
 
         try:
-            removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
+            # Some policies might have bad format, so they have never been loaded
+            removed = [policies.pop(p['name'])
+                       for p in policy_config.get('policies', [])
+                       if p['name'] in policies]
             log.info('Removing policies %s' % removed)
 
             # update periodic
@@ -375,7 +368,7 @@ class Host:
             if not events:
                 continue
             events = AzureEvents.get_event_operations(events)
-            if operation_name in events:
+            if operation_name.upper() in (event.upper() for event in events):
                 self.scheduler.add_job(Host.run_policy,
                                        id=k + event['id'],
                                        name=k,
@@ -430,12 +423,17 @@ class Host:
 
     @staticmethod
     def get_scheduler_config():
+        if os.name == 'nt':
+            executor = "apscheduler.executors.pool:ThreadPoolExecutor"
+        else:
+            executor = "apscheduler.executors.pool:ProcessPoolExecutor"
+
         return {
             'apscheduler.jobstores.default': {
                 'type': 'memory'
             },
             'apscheduler.executors.default': {
-                'class': 'apscheduler.executors.pool:ProcessPoolExecutor',
+                'class': executor,
                 'max_workers': '4'
             },
             'apscheduler.executors.threadpool': {

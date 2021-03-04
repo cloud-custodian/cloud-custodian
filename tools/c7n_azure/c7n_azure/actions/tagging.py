@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import datetime
 import logging
@@ -80,7 +69,7 @@ class Tag(AzureBaseAction):
 
     def _process_resource(self, resource):
         new_tags = self._get_tags(resource)
-        TagHelper.add_tags(self, resource, new_tags)
+        return TagHelper.add_tags(self, resource, new_tags)
 
     def _get_tags(self, resource):
         return self.data.get('tags') or {Lookup.extract(
@@ -122,7 +111,7 @@ class RemoveTag(AzureBaseAction):
         self.tags_to_delete = self.data.get('tags')
 
     def _process_resource(self, resource):
-        TagHelper.remove_tags(self, resource, self.tags_to_delete)
+        return TagHelper.remove_tags(self, resource, self.tags_to_delete)
 
 
 class AutoTagBase(AzureEventAction):
@@ -181,7 +170,7 @@ class AutoTagBase(AzureEventAction):
         else:
             tag_value = self._get_tag_value_from_resource(resource) or tag_value
 
-        TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
+        return TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
 
     def _get_first_event(self, resource):
 
@@ -319,8 +308,12 @@ class AutoTagUser(AutoTagBase):
             return False
 
     def _get_tag_value_from_resource(self, resource):
-        first_op = self._get_first_event(resource).serialize(True)
-        return self._get_tag_value_from_event({'data': first_op})
+        first_op = self._get_first_event(resource)
+
+        if not first_op:
+            return None
+
+        return self._get_tag_value_from_event({'data': first_op.serialize(True)})
 
 
 class AutoTagDate(AutoTagBase):
@@ -463,7 +456,7 @@ class TagTrim(AzureBaseAction):
                 "Could not find any candidates to trim %s" % resource['id'])
             return
 
-        TagHelper.remove_tags(self, resource, candidates)
+        return TagHelper.remove_tags(self, resource, candidates)
 
 
 DEFAULT_TAG = "custodian_status"
@@ -499,8 +492,8 @@ class TagDelayedAction(AzureBaseAction):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
-        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
+        hours={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'})
     schema_alias = True
@@ -560,3 +553,4 @@ class TagDelayedAction(AzureBaseAction):
         tags[self.tag] = self.msg
 
         TagHelper.update_resource_tags(self, resource, tags)
+        return {self.tag: self.msg}

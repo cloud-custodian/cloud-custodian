@@ -1,0 +1,18 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_server_certificate": {
+            "test_cert_alt": {
+                "arn": "arn:aws:iam::644160558196:server-certificate/alt_test_cert",
+                "certificate_body": "-----BEGIN CERTIFICATE-----\nMIIDcTCCAlmgAwIBAgIUdyLoXxEg6f1q3xJTqhCFLFAjSFkwDQYJKoZIhvcNAQEL\nBQAwRzELMAkGA1UEBhMCREUxDzANBgNVBAcMBkJlcmxpbjEVMBMGA1UECgwMVGVz\ndCBDb21wYW55MRAwDgYDVQQDDAdmb28uY29tMCAXDTIwMTExODIxMTcwOVoYDzIy\nOTkxMjMxMjExNzA5WjBHMQswCQYDVQQGEwJERTEPMA0GA1UEBwwGQmVybGluMRUw\nEwYDVQQKDAxUZXN0IENvbXBhbnkxEDAOBgNVBAMMB2Zvby5jb20wggEiMA0GCSqG\nSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVDdEpgcXd2IflHcOx6lbQXpsNs4NH8LY8\nu0d7g8glWiyErHPz0DgiLEvy74h4pp1w5LAodpCnNflEqCky0QkWhYasc3F0xLbs\nAqNC6FFC/UtBkf6h5b08XxwJ2Iyg0wgWkKO9qEZCbX5iaKizimTs0fffRIN5FQXV\nAduk8/Nc9OYA2At4i3n+vd8tXDBLeeFUH8qA983Qjf2NnW1174cN8IXzY7bE46ax\nMZOpbhm3zvnqCKDrRQ12VblMH9gZZSc8dBs5eXaZ/L/I8bdL++SYX86jOiQoK6Gd\n0smwjbo5mpxDmMG8iBNC6GgSwLcbBXJrsHKb1eOjXPT9n7Odwu/lAgMBAAGjUzBR\nMB0GA1UdDgQWBBQTiVisMqW/SqBHDmADqp2FqqIuxjAfBgNVHSMEGDAWgBQTiVis\nMqW/SqBHDmADqp2FqqIuxjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUA\nA4IBAQB3bCghuy0a8BI+sObx3DhXDOeBpE4IZxOkJALu8/Z3Pnq7N6uC+LElzcu2\nNi4YU71w60gNQM8lFemIZlFeWnMPQYFx5OS+vxo2xiIXYxQhyOm1F4RnWyol3oYW\nqxyfrnwkOIfQ5kAg6EyxcV2Fyt2qzioafprpGUO5OPFcgspMrTnxSMWyz7ppXZ13\nO2r8eXjgVSggNk8P78j4JnrgJhJAm6879eA32Y2q994wmT9KUNhUbQrFgNPib8W2\nq1Fe/c7vH6Khp47X/tsmFGZpEVFhuRSi+YwApYO/s53TVu145N+WS/rBUxDsvUyD\nHGTJ6VP83qwWSWmnAIxfVpD67pO3\n-----END CERTIFICATE-----",
+                "certificate_chain": "",
+                "id": "ASCA37RXYDBA7MNL34R2J",
+                "name": "alt_test_cert",
+                "name_prefix": null,
+                "path": "/",
+                "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDVDdEpgcXd2Ifl\nHcOx6lbQXpsNs4NH8LY8u0d7g8glWiyErHPz0DgiLEvy74h4pp1w5LAodpCnNflE\nqCky0QkWhYasc3F0xLbsAqNC6FFC/UtBkf6h5b08XxwJ2Iyg0wgWkKO9qEZCbX5i\naKizimTs0fffRIN5FQXVAduk8/Nc9OYA2At4i3n+vd8tXDBLeeFUH8qA983Qjf2N\nnW1174cN8IXzY7bE46axMZOpbhm3zvnqCKDrRQ12VblMH9gZZSc8dBs5eXaZ/L/I\n8bdL++SYX86jOiQoK6Gd0smwjbo5mpxDmMG8iBNC6GgSwLcbBXJrsHKb1eOjXPT9\nn7Odwu/lAgMBAAECggEBALv4Vcq2GTmymasWSJsG8pMidNBwyenFwTLx1I5v5Ty3\nQ0HG2QKKeYwE4vkyRoiUD6IT0ivQ96zfHM5rQvX3oXoCUqCBtd7c07qEVUBpsZBV\n43i1cx+pjvzduOIi8WfO6HroH97rwRlIe1IdnoHRH1wln/iW/Rvt5VhaLExrgxJF\nzwBJhE+BFnPqz5nee3Ds+a3C0eeuTnkABFMCvaoOVDY3dty8hwhe1qQebYfZtoXT\n/FZMptzzsMXFZgpBXg3yyxoeEj/0rlYyR917w/Fabf4NpcRnKUQ9u2uYsK3yVPoM\n0ksMyVQ0fXPikOKNhscw+iDqyLjPv2Q2L2Zfm4nr8cECgYEA8Npe+99Khb7/FR83\nmeVnF6992WeXm/NlPfl9FlN4A6BZuGFAPQlZFxCltWH6dzv2RCu1sJBVZqg9o8s/\nDBPIX40yIOlK1pDFs8+eNKwbIfT7ISW2FS1JDS/pNTQG6UNqsvo4FasG2WsksIgT\nhvpwYyZOapdWiXENgQ+WRiBsJzUCgYEA4nPkv1DC3oF4PosF/g1zmaaPjTamMBHF\n3TUAizc5CU67K3esh0o3dSawbEQ0jhjtD+3zP16PTW9OTtKkgKJbvY4SuxNidMIV\nz0CdRRGt/3uPn/SQ6bL05Kzw81VBSa3UgmN/0C3C+abio6u2XnvnccF/i91Wxhbj\neStiNj3Py/ECgYASrEt66ZfkgKdUIuRzqQZyHqf6J/7oF1m9EU+yYGxIk7EBC4Eo\nekYO9Lp0MpFxlxODu4PNmZMVb2u//Cz6Kbp6Nf8x8AReWEELrMgOO12rJ0wlCMBy\nKd2lCRbiihMTGKf4ElAw1d6lEpp4mUQyTc5S0ZB40RzjcQFkBSpYa4EXFQKBgQCj\n7aV/4STQEgVLsTQrTu2KIwrz/MWdMqB7m6zDGrzNQhM4Si+42D8BLXq1RUKOQvkJ\neQWHsBoowhR79vxiqiWjOL/ScRvqzb0gBPRUVZIRyg6UimSE6KljCNZ8MBFNFusp\nYIHb3+Su+OJD/T/NcgB/VsXQJ/BzAYq14nP8NA7C4QKBgGKlORIJxE33Fx4i8ruP\nYQ71MLUSKSNlCE8OZ/grsP57tWCm/iDyaGYx4cptW/QWA1ROZgWw+tCG1cWKslpN\nSliuPMLJzAglf1vGi4BwT9yrsArO2q2oLoPbdfmrWonBXCy3+AUvxFELpQ8lP9Gl\nj3WTpA0xHl0ZtlX9iuFGn0r+\n-----END PRIVATE KEY-----"
+            }
+        }
+    }
+}

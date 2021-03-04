@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 import jmespath
 
@@ -85,6 +74,36 @@ class DescribeBuild(DescribeSource):
             super(DescribeBuild, self).augment(resources))
 
 
+class ConfigBuild(ConfigSource):
+
+    def load_resource(self, item):
+        item_config = item['configuration']
+        item_config['Tags'] = [
+            {'Key': t['key'], 'Value': t['value']} for t in item_config.get('tags')]
+
+        # AWS Config garbage mangle undo.
+
+        if 'queuedtimeoutInMinutes' in item_config:
+            item_config['queuedTimeoutInMinutes'] = int(item_config.pop('queuedtimeoutInMinutes'))
+
+        artifacts = item_config.pop('artifacts')
+        item_config['artifacts'] = artifacts.pop(0)
+        if artifacts:
+            item_config['secondaryArtifacts'] = artifacts
+        sources = item_config['source']
+        item_config['source'] = sources.pop(0)
+        if sources:
+            item_config['secondarySources'] = sources
+
+        if 'vpcConfig' in item_config and 'subnets' in item_config['vpcConfig']:
+            item_config['vpcConfig']['subnets'] = [
+                s['subnet'] for s in item_config['vpcConfig']['subnets']]
+
+        item_config['arn'] = 'arn:aws:codebuild:{}:{}:project/{}'.format(
+            self.manager.config.region, self.manager.config.account_id, item_config['name'])
+        return item_config
+
+
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
 
@@ -103,7 +122,7 @@ class CodeBuildProject(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeBuild,
-        'config': ConfigSource
+        'config': ConfigBuild
     }
 
 
@@ -196,6 +215,16 @@ class DeleteProject(BaseAction):
                 "Exception deleting project:\n %s" % e)
 
 
+class ConfigPipeline(ConfigSource):
+
+    def load_resource(self, item):
+        item_config = self._load_item_config(item)
+        resource = item_config.pop('pipeline')
+        resource.update(item_config['metadata'])
+        self._load_resource_tags(resource, item)
+        return resource
+
+
 class DescribePipeline(DescribeSource):
 
     def augment(self, resources):
@@ -219,7 +248,7 @@ class CodeDeployPipeline(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribePipeline,
-        'config': ConfigSource
+        'config': ConfigPipeline
     }
 
 

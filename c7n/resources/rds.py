@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 RDS Resource Manager
 ====================
@@ -81,16 +70,18 @@ actions = ActionRegistry('rds.actions')
 class DescribeRDS(DescribeSource):
 
     def augment(self, dbs):
-        return universal_augment(
-            self.manager, super(DescribeRDS, self).augment(dbs))
+        for d in dbs:
+            d['Tags'] = d.pop('TagList', ())
+        return dbs
 
 
 class ConfigRDS(ConfigSource):
 
     def load_resource(self, item):
-        resource = super(ConfigRDS, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
+        resource = super().load_resource(item)
+        for k in list(resource.keys()):
+            if k.startswith('Db'):
+                resource["DB%s" % k[2:]] = resource[k]
         return resource
 
 
@@ -926,33 +917,56 @@ class RDSSubscription(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subscription'
+        arn_type = 'es'
         cfn_type = 'AWS::RDS::EventSubscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
-        name = id = "EventSubscriptionArn"
+        name = id = "CustSubscriptionId"
+        arn = 'EventSubscriptionArn'
         date = "SubscriptionCreateTime"
-        # SubscriptionName isn't part of describe events results?! all the
-        # other subscription apis.
-        # filter_name = 'SubscriptionName'
-        # filter_type = 'scalar'
+        permissions_enum = ('rds:DescribeEventSubscriptions',)
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@RDSSubscription.action_registry.register('delete')
+class RDSSubscriptionDelete(BaseAction):
+    """Deletes a RDS snapshot resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-subscription-delete
+                resource: rds-subscription
+                filters:
+                  - type: value
+                    key: CustSubscriptionId
+                    value: xyz
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteEventSubscription',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            self.manager.retry(
+                client.delete_event_subscription, SubscriptionName=r['CustSubscriptionId'],
+                ignore_err_codes=('SubscriptionNotFoundFault',
+                'InvalidEventSubscriptionStateFault'))
 
 
 class DescribeRDSSnapshot(DescribeSource):
 
     def augment(self, snaps):
-        return universal_augment(
-            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
-
-
-class ConfigRDSSnapshot(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDSSnapshot, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        # TODO: Load DBSnapshotAttributes into annotation
-        return resource
+        for s in snaps:
+            s['Tags'] = s.pop('TagList', ())
+        return snaps
 
 
 @resources.register('rds-snapshot')
@@ -974,7 +988,7 @@ class RDSSnapshot(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRDSSnapshot,
-        'config': ConfigRDSSnapshot
+        'config': ConfigSource
     }
 
 
@@ -1144,6 +1158,8 @@ class RestoreInstance(BaseAction):
 class CrossAccountAccess(CrossAccountAccessFilter):
 
     permissions = ('rds:DescribeDBSnapshotAttributes',)
+    attributes_key = 'c7n:attributes'
+    annotation_key = 'c7n:CrossAccountViolations'
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
@@ -1171,13 +1187,106 @@ class CrossAccountAccess(CrossAccountAccessFilter):
                 client.describe_db_snapshot_attributes,
                 DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
-            r['c7n:attributes'] = attrs
+            r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
-                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                r[self.annotation_key] = list(delta_accounts)
                 results.append(r)
         return results
+
+
+@RDSSnapshot.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Set permissions for copying or restoring an RDS snapshot
+
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove, respectively.  The default is to remove any
+    permissions granted to other AWS accounts.
+
+    Use `remove: matched` in combination with the `cross-account` filter
+    for more flexible removal options such as preserving access for
+    a set of whitelisted accounts:
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-snapshot-remove-cross-account
+                resource: rds-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist:
+                      - '112233445566'
+                actions:
+                  - type: set-permissions
+                    remove: matched
+    """
+    schema = type_schema(
+        'set-permissions',
+        remove={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
+                ],
+            }}
+        ]},
+        add={
+            'type': 'array', 'items': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
+                ]
+            }
+        }
+    )
+
+    permissions = ('rds:ModifyDBSnapshotAttribute',)
+
+    def validate(self):
+        if self.data.get('remove') == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, CrossAccountAccessFilter):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
+
+    def process(self, snapshots):
+        client = local_session(self.manager.session_factory).client('rds')
+        for s in snapshots:
+            self.process_snapshot(client, s)
+
+    def process_snapshot(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+
+        if not (add_accounts or remove_accounts):
+            if CrossAccountAccess.attributes_key not in snapshot:
+                attrs = {
+                    t['AttributeName']: t['AttributeValues']
+                    for t in self.manager.retry(
+                        client.describe_db_snapshot_attributes,
+                        DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier']
+                    )['DBSnapshotAttributesResult']['DBSnapshotAttributes']
+                }
+                snapshot[CrossAccountAccess.attributes_key] = attrs
+            remove_accounts = snapshot[CrossAccountAccess.attributes_key].get('restore', [])
+        elif remove_accounts == 'matched':
+            remove_accounts = snapshot.get(CrossAccountAccess.annotation_key, [])
+
+        if add_accounts or remove_accounts:
+            client.modify_db_snapshot_attribute(
+                DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'],
+                AttributeName='restore',
+                ValuesToRemove=remove_accounts,
+                ValuesToAdd=add_accounts)
 
 
 @RDSSnapshot.action_registry.register('region-copy')
@@ -1376,14 +1485,16 @@ class RDSSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subnet-group'
+        arn_type = 'subgrp'
         id = name = 'DBSubnetGroupName'
+        arn_separator = ':'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
         permissions_enum = ('rds:DescribeDBSubnetGroups',)
         cfn_type = config_type = 'AWS::RDS::DBSubnetGroup'
+        universal_taggable = object()
 
     source_mapping = {
         'config': ConfigSource,
@@ -1698,6 +1809,9 @@ class ReservedRDS(QueryResourceManager):
             'describe_reserved_db_instances', 'ReservedDBInstances', None)
         filter_name = 'ReservedDBInstances'
         filter_type = 'list'
-        arn_type = "reserved-db"
+        arn_type = "ri"
         arn = "ReservedDBInstanceArn"
         permissions_enum = ('rds:DescribeReservedDBInstances',)
+        universal_taggable = object()
+
+    augment = universal_augment

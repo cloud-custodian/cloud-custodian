@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import base64
 import json
@@ -119,11 +108,15 @@ class AzureTest(unittest.TestCase):
         self.assertIn('adal', reqs)
         self.assertIn('azure-storage-common', reqs)
         self.assertIn('azure-common', reqs)
+        self.assertIn('azure-mgmt-managementgroups', reqs)
+        self.assertIn('azure-mgmt-web', reqs)
+        self.assertIn('azure-graphrbac', reqs)
         self.assertIn('msrestazure', reqs)
         self.assertIn('jmespath', reqs)
         self.assertIn('jinja2', reqs)
         self.assertIn('sendgrid', reqs)
         self.assertIn('ldap3', reqs)
+        self.assertIn('netaddr', reqs)
 
     @patch('c7n_mailer.azure_mailer.deploy.FunctionPackage')
     def test_build_function_package(self, package_mock):
@@ -140,6 +133,102 @@ class AzureTest(unittest.TestCase):
 
         package_mock.return_value.pkg.add_contents.assert_any_call(
             "test_mailer_sub/function.json", contents=ANY)
+
+    @patch('c7n_mailer.azure_mailer.deploy.build_function_package')
+    @patch('c7n_mailer.azure_mailer.deploy.FunctionAppUtilities')
+    @patch('c7n_mailer.azure_mailer.deploy.Session')
+    @patch('c7n_mailer.azure_mailer.deploy.local_session')
+    def test_provision_embedded_auth(self, mock_local_session, mock_session,
+                                     mock_func_utils, mock_build_pkg):
+        mock_session.get_subscription_id.return_value = 'mock-id'
+        mock_local_session.return_value = mock_session
+        mock_func_utils.get_function_name.return_value = 'mock-func-name'
+        mock_build_pkg.return_value = MagicMock()
+
+        deploy.provision(MAILER_CONFIG_AZURE)
+
+        mock_func_utils.FunctionAppInfrastructureParameters.assert_called_with(
+            app_insights=ANY,
+            service_plan=ANY,
+            storage_account=ANY,
+            function_app={
+                'resource_group_name': 'cloud-custodian',
+                'identity': {
+                    'type': 'Embedded'
+                },
+                'name': 'mock-func-name'
+            })
+
+        mock_func_utils.deploy_function_app.assert_called_once()
+        mock_func_utils.publish_functions_package.assert_called_once()
+
+    @patch('c7n_mailer.azure_mailer.deploy.build_function_package')
+    @patch('c7n_mailer.azure_mailer.deploy.FunctionAppUtilities')
+    @patch('c7n_mailer.azure_mailer.deploy.Session')
+    @patch('c7n_mailer.azure_mailer.deploy.local_session')
+    def test_provision_msi_auth(self, mock_local_session, mock_session,
+                                mock_func_utils, mock_build_pkg):
+        mock_session.get_subscription_id.return_value = 'mock-id'
+        mock_local_session.return_value = mock_session
+        mock_func_utils.get_function_name.return_value = 'mock-func-name'
+        mock_build_pkg.return_value = MagicMock()
+        system_assigned = {"identity": {"type": "SystemAssigned"}}
+
+        with patch.dict(MAILER_CONFIG_AZURE, {"function_properties": system_assigned}):
+            deploy.provision(MAILER_CONFIG_AZURE)
+
+            mock_func_utils.FunctionAppInfrastructureParameters.assert_called_with(
+                app_insights=ANY,
+                service_plan=ANY,
+                storage_account=ANY,
+                function_app={
+                    'resource_group_name': 'cloud-custodian',
+                    'identity': {
+                        'type': 'SystemAssigned'
+                    },
+                    'name': 'mock-func-name'
+                })
+
+            mock_func_utils.deploy_function_app.assert_called_once()
+            mock_func_utils.publish_functions_package.assert_called_once()
+
+    @patch('c7n_mailer.azure_mailer.deploy.build_function_package')
+    @patch('c7n_mailer.azure_mailer.deploy.FunctionAppUtilities')
+    @patch('c7n_mailer.azure_mailer.deploy.Session')
+    @patch('c7n_mailer.azure_mailer.deploy.local_session')
+    def test_provision_uai_auth(self, mock_local_session, mock_session,
+                                mock_func_utils, mock_build_pkg):
+        mock_session.get_subscription_id.return_value = 'mock-id'
+        mock_local_session.return_value = mock_session
+        mock_func_utils.get_function_name.return_value = 'mock-func-name'
+        mock_build_pkg.return_value = MagicMock()
+        user_assigned = {
+            "identity": {
+                "type": "UserAssigned",
+                "id": "mock-id",
+                "client_id": "mock-client-id"
+            }
+        }
+
+        with patch.dict(MAILER_CONFIG_AZURE, {"function_properties": user_assigned}):
+            deploy.provision(MAILER_CONFIG_AZURE)
+
+            mock_func_utils.FunctionAppInfrastructureParameters.assert_called_with(
+                app_insights=ANY,
+                service_plan=ANY,
+                storage_account=ANY,
+                function_app={
+                    'resource_group_name': 'cloud-custodian',
+                    'identity': {
+                        'type': 'UserAssigned',
+                        'id': 'mock-id',
+                        'client_id': 'mock-client-id'
+                    },
+                    'name': 'mock-func-name'
+                })
+
+            mock_func_utils.deploy_function_app.assert_called_once()
+            mock_func_utils.publish_functions_package.assert_called_once()
 
     @patch('c7n_mailer.azure_mailer.azure_queue_processor.SmtpDelivery')
     def test_smtp_delivery(self, mock_smtp):

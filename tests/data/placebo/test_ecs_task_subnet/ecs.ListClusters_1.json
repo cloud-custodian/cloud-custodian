@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-fargate-test",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-fargate-test-2"
+        ],
+        "ResponseMetadata": {}
+    }
+}

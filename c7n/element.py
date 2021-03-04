@@ -1,23 +1,37 @@
 # Copyright 2020 Cloud Custodian Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import jmespath
+
+from c7n.executor import ThreadPoolExecutor
 
 
 class Element:
     """Parent base class for filters and actions.
     """
+
+    permissions = ()
+    metrics = ()
+
+    executor_factory = ThreadPoolExecutor
+
+    schema = {'type': 'object'}
+    # schema aliases get hoisted into a jsonschema definition
+    # location, and then referenced inline.
+    schema_alias = None
+
+    def get_permissions(self):
+        return self.permissions
+
+    def validate(self):
+        """Validate the current element's configuration.
+
+        Should raise a validation error if there are any configuration issues.
+
+        This method will always be called prior to element execution/process() method
+        being called and thus can act as a point of lazy initialization.
+        """
 
     def filter_resources(self, resources, key_expr, allowed_values=()):
         # many filters implementing a resource state transition only allow

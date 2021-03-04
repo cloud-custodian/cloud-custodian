@@ -1,18 +1,7 @@
 #!/usr/bin/env python3
 #
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import click
 import contextlib
@@ -410,11 +399,7 @@ class PolicyRepo:
                     current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 if f in self.policy_files:
-                    # if the policies were moved, only add in policies
-                    # that are not already accounted for.
-                    current_policies += self.policy_files[f].select(
-                        set(current_policies.keys()).difference(
-                            self.policy_files[f].keys()))
+                    current_policies += self.policy_files[f]
                     removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)

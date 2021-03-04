@@ -1,0 +1,8 @@
+- `provider1.resource2` removed
+- [`provider1.resource3`](https://cloudcustodian.io/docs/provider1/resources/resource3.html) added
+- added common actions: [`action3`](https://cloudcustodian.io/docs/aws/resources/aws-common-actions.html#aws-common-actions-action3)
+- `provider1.resource1`
+  - added actions: [`action2`](https://cloudcustodian.io/docs/provider1/resources/resource1.html#provider1-resource1-actions-action2)
+  - removed actions: `action1`
+  - added filters: [`filter3`](https://cloudcustodian.io/docs/provider1/resources/resource1.html#provider1-resource1-filters-filter3), [`filter4`](https://cloudcustodian.io/docs/provider1/resources/resource1.html#provider1-resource1-filters-filter4)
+  - removed filters: `filter2`

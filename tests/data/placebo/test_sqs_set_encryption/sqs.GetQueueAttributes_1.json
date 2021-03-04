@@ -1,31 +1,19 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1509792347", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1509792347", 
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:sqs-test"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "51519ce5-5247-5c26-b707-ce92cefd4c0e", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "51519ce5-5247-5c26-b707-ce92cefd4c0e", 
-                "content-length": "1162", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 04 Nov 2017 10:46:18 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:4f300077-bffd-f1ce-7930-fc21b29cbf49",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1599099207",
+            "LastModifiedTimestamp": "1599099207",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
+        "ResponseMetadata": {}
     }
 }

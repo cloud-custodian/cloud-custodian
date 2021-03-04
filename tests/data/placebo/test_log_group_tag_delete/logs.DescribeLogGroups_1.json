@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/myIOTFunction",
+                "creationTime": 1607516251881,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/myIOTFunction:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "Yada",
+                "creationTime": 1607516375678,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:Yada:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

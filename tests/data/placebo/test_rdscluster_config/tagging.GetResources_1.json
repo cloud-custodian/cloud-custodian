@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster:database-1",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVMCNASTY"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Mc-Mcslice"
+                    },
+                    {
+                        "Key": "ResourceCreator",
+                        "Value": "john-hillegass"
+                    },
+                    {
+                        "Key": "c7n-ResourceCreatedTime",
+                        "Value": "2020-10-20 15:52:44.809783"
+                    },
+                    {
+                        "Key": "c7n-resource-classification",
+                        "Value": "net-new"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:cluster:cluster-ncsp75a6z36kofqrt4sdhyms3i",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVMCNASTY"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Mc-Mcslice"
+                    },
+                    {
+                        "Key": "ResourceCreator",
+                        "Value": "john-hillegass"
+                    },
+                    {
+                        "Key": "c7n-ResourceCreatedTime",
+                        "Value": "2020-10-20 15:52:44.809783"
+                    },
+                    {
+                        "Key": "c7n-resource-classification",
+                        "Value": "net-new"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

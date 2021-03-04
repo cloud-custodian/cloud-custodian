@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "k8s.config-map": "c7n_kube.resources.core.configmap.ConfigMap",
     "k8s.custom-cluster-resource": "c7n_kube.resources.crd.CustomResourceDefinition",

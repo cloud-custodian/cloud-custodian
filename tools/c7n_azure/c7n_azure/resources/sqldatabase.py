@@ -1,4 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,7 +59,6 @@ class SqlDatabase(ChildArmResourceManager):
         enum_spec = ('databases', 'list_by_server', None)
         parent_manager_name = 'sqlserver'
         resource_type = 'Microsoft.Sql/servers/databases'
-        enable_tag_operations = False  # GH Issue #4543
         default_report_fields = (
             'name',
             'location',

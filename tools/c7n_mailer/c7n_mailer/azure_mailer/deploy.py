@@ -1,26 +1,16 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 import json
 import logging
 import os
 
-
+import jmespath
 from c7n_mailer.deploy import CORE_DEPS
 
 try:
     from c7n.mu import generate_requirements
+    from c7n_azure.constants import AUTH_TYPE_EMBED
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
     from c7n_azure.policy import AzureFunctionMode
@@ -37,10 +27,12 @@ def cache_path():
 
 
 def get_mailer_requirements():
-    deps = ['azure-keyvault', 'azure-storage-queue',
-            'azure-storage-blob', 'sendgrid'] + list(CORE_DEPS)
+    deps = ['azure-mgmt-managementgroups', 'azure-mgmt-web',
+            'azure-graphrbac', 'azure-keyvault', 'azure-storage-queue',
+            'azure-storage-blob', 'netaddr', 'sendgrid', 'pyyaml'] + list(CORE_DEPS)
     requirements = generate_requirements(
         deps, ignore=['boto3', 'botocore', 'pywin32'],
+        exclude=['pkg_resources'],
         include_self=True)
     return requirements
 
@@ -59,9 +51,11 @@ def build_function_package(config, function_name, sub_id):
         target_sub_ids=[sub_id],
         cache_override_path=cache_override_path)
 
+    identity = jmespath.search('function_properties.identity', config)
     package.build(None,
                   modules=['c7n', 'c7n_azure', 'c7n_mailer'],
-                  requirements=get_mailer_requirements())
+                  requirements=get_mailer_requirements(),
+                  identity=identity)
 
     package.pkg.add_contents(
         function_path + '/function.json',
@@ -128,19 +122,22 @@ def provision(config):
     function_app_name = FunctionAppUtilities.get_function_name(
         '-'.join([service_plan['name'], function_name]), suffix)
     FunctionAppUtilities.validate_function_name(function_app_name)
+    identity = jmespath.search('function_properties.identity', config) or {
+        'type': AUTH_TYPE_EMBED}
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
-        function_app_resource_group_name=service_plan['resource_group_name'],
-        function_app_name=function_app_name)
+        function_app={'resource_group_name': service_plan['resource_group_name'],
+                      'identity': identity,
+                      'name': function_app_name})
 
     FunctionAppUtilities.deploy_function_app(params)
 
     log.info("Building function package for %s" % function_app_name)
     package = build_function_package(config, function_name, sub_id)
 
-    log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
+    log.info("Function package built, size is %0.2f MB" % (package.pkg.size / (1024 * 1024.0)))
 
     FunctionAppUtilities.publish_functions_package(params, package)
