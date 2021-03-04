@@ -5,11 +5,22 @@ from mock import patch
 
 from .common import BaseTest
 
-from c7n.actions import Notify
-from c7n.filters import ValueFilter
+from c7n.actions import Action
+from c7n.filters import Filter
 from c7n.provider import get_resource_class, import_resource_classes
 from c7n.resources import aws, load_resources
 from c7n.resources.resource_map import ResourceMap
+from c7n.utils import type_schema
+
+
+class MockFilter(Filter):
+    """Mock Filter"""
+    schema = type_schema('mock_filter')
+
+
+class MockAction(Action):
+    """Mock Action"""
+    schema = type_schema('mock_action')
 
 
 class ProviderTest(BaseTest):
@@ -38,8 +49,8 @@ class ProviderTest(BaseTest):
         self.assertEqual(ec2.type, 'ec2')
 
     def _mock_initialize_resource(self, resource_class):
-        resource_class.filter_registry.register('mock_filter', ValueFilter)
-        resource_class.action_registry.register('mock_action', Notify)
+        resource_class.filter_registry.register('mock_filter', MockFilter)
+        resource_class.action_registry.register('mock_action', MockAction)
 
     def test_provider_specific_registry(self):
         with patch.object(aws.AWS, 'initialize_resource') as mock_aws:
