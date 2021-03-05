@@ -14,14 +14,17 @@ from collections import namedtuple
 import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
-from azure.keyvault import KeyVaultAuthentication, AccessToken
-from c7n_azure import constants
-from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             ManagedGroupHelper, get_keyvault_secret, get_keyvault_auth_endpoint)
+from azure.identity import DefaultAzureCredential
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
+
+#from azure.keyvault import KeyVaultAuthentication, AccessToken
+from c7n_azure import constants
+from c7n_azure.utils import (ManagedGroupHelper, ResourceIdParser, StringUtils,
+                             custodian_azure_send_override,
+                             get_keyvault_auth_endpoint, get_keyvault_secret)
 
 try:
     from azure.cli.core._profile import Profile
@@ -74,8 +77,7 @@ class Session:
                     json.loads(
                         get_keyvault_secret(
                             keyvault_client_id,
-                            keyvault_secret_id,
-                            self.cloud_endpoints)
+                            keyvault_secret_id)
                     ))
         except HTTPError as e:
             e.message = 'Failed to retrieve SP credential ' \
@@ -148,11 +150,9 @@ class Session:
             log.error('Failed to authenticate.')
             sys.exit(1)
 
-        # Override credential type for KV auth
-        # https://github.com/Azure/azure-sdk-for-python/issues/5096
+        # Temporary until we switch rest of SDK to the new `azure.identity` creds
         if self.resource_endpoint_type == constants.VAULT_AUTH_ENDPOINT:
-            access_token = AccessToken(token=self.get_bearer_token())
-            self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
+            self.credentials = DefaultAzureCredential()
 
     def get_session_for_resource(self, resource):
         return Session(
@@ -162,7 +162,7 @@ class Session:
             resource_endpoint_type=resource)
 
     @lru_cache()
-    def client(self, client):
+    def client(self, client, vault_url=None):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
@@ -174,16 +174,19 @@ class Session:
             client = klass(credentials=self.credentials,
             subscription_id=self.subscription_id,
             base_url=self.cloud_endpoints.endpoints.resource_manager)
+        elif 'vault_url' in klass_parameters:
+            client = klass(vault_url=vault_url, credential=self.credentials)
         else:
             client = klass(credentials=self.credentials)
 
+        # TODO: Re-implement this override after update SDK
         # Override send() method to log request limits & custom retries
-        service_client = client._client
-        service_client.orig_send = service_client.send
-        service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+        # service_client = client._client
+        # service_client.orig_send = service_client.send
+        # service_client.send = types.MethodType(custodian_azure_send_override, service_client)
 
         # Don't respect retry_after_header to implement custom retries
-        service_client.config.retry_policy.policy.respect_retry_after_header = False
+        #service_client.config.retry_policy.policy.respect_retry_after_header = False
 
         return client
 

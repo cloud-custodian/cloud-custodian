@@ -3,6 +3,7 @@
 import collections
 import datetime
 import enum
+import json
 import hashlib
 import itertools
 import logging
@@ -13,9 +14,9 @@ import uuid
 from concurrent.futures import as_completed
 
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
-from azure.keyvault import KeyVaultAuthentication, AccessToken
-from azure.keyvault import KeyVaultClient, KeyVaultId
+from azure.keyvault.secrets import SecretClient, SecretProperties
 from azure.mgmt.managementgroups import ManagementGroupsAPI
+from azure.identity import ManagedIdentityCredential
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
 from msrestazure.azure_active_directory import MSIAuthentication
@@ -566,26 +567,11 @@ class RetentionPeriod:
 
 
 @lru_cache()
-def get_keyvault_secret(user_identity_id, keyvault_secret_id, cloud_endpoints=AZURE_PUBLIC_CLOUD):
-    secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
-    access_token = None
-
-    resource = get_keyvault_auth_endpoint(cloud_endpoints)
-    # Use UAI if client_id is provided
-    if user_identity_id:
-        msi = MSIAuthentication(
-            client_id=user_identity_id,
-            resource=resource)
-    else:
-        msi = MSIAuthentication(
-            resource=resource)
-
-    access_token = AccessToken(token=msi.token['access_token'])
-    credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
-
-    kv_client = KeyVaultClient(credentials)
-    return kv_client.get_secret(secret_id.vault, secret_id.name, secret_id.version).value
-
+def get_keyvault_secret(user_identity_id, keyvault_secret_id):
+    secret_id = SecretProperties(attributes=None, vault_id=keyvault_secret_id)
+    kv_client = SecretClient(vault_url=secret_id.vault_url, credential=ManagedIdentityCredential(client_id=user_identity_id))
+    return kv_client.get_secret(secret_id.name, secret_id.version).value
+0.
 
 @lru_cache()
 def get_service_tag_list():
@@ -626,3 +612,19 @@ def resolve_service_tag_alias(rule):
 
 def get_keyvault_auth_endpoint(cloud_endpoints):
     return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
+
+# This function is a workaround for Azure KeyVault objects that lack 
+# standard serialization method.
+# These objects store variables with an underscore prefix, so we strip it.
+def serialize(item):
+    d = {}
+    for k, v in vars(item).items():
+        if not callable(v) and hasattr(v, '__dict__'):
+            d[k.strip('_')] = serialize(v)
+        elif callable(v):
+            pass
+        elif isinstance(v, bytes):
+            d[k.strip('_')] = str(v)
+        else:
+            d[k.strip('_')] = v
+    return d
