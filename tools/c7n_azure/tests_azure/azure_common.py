@@ -218,7 +218,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
         if re.match('https://login.microsoftonline.com/([^/]+)', request.uri):
             return None
-        
+
         return request
 
     def _response_callback(self, response):
