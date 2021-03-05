@@ -216,10 +216,9 @@ class AzureVCRBaseTest(VCRTestCase):
         # Request headers serve no purpose as only URI is read during a playback.
         request.headers = None
 
-        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
+        if re.match('https://login.microsoftonline.com/([^/]+)', request.uri):
             return None
-        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
-            return None
+        
         return request
 
     def _response_callback(self, response):
