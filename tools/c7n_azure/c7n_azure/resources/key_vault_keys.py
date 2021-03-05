@@ -142,13 +142,12 @@ class KeyTypeFilter(Filter):
         return resources
 
     def _process_resource_set(self, resources, event):
-        client = self.manager.get_client(vault_url=generate_key_vault_url(parent_resource['name']))
-
         matched = []
         for resource in resources:
             try:
                 if 'c7n:kty' not in resource:
-                    id = KeyProperties(key_id=resource['kid'])
+                    id = KeyProperties(key_id=resource['id'])
+                    client = self.manager.get_client(vault_url=id.vault_url)
                     key = client.get_key(id.name, id.version)
 
                     resource['c7n:kty'] = key.key.kty.lower()
