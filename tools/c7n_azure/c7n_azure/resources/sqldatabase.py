@@ -59,7 +59,6 @@ class SqlDatabase(ChildArmResourceManager):
         enum_spec = ('databases', 'list_by_server', None)
         parent_manager_name = 'sqlserver'
         resource_type = 'Microsoft.Sql/servers/databases'
-        enable_tag_operations = False  # GH Issue #4543
         default_report_fields = (
             'name',
             'location',
