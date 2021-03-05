@@ -297,7 +297,25 @@ class SchemaTest(BaseTest):
 
     def test_metadata(self):
         data = {
-            "policies": [{"name": "test", "resource": "ec2", "metadata": {"createdBy": "Totoro"}}],
+            "policies": [
+                {
+                    "name": "object_test",
+                    "resource": "ec2",
+                    "metadata": {
+                        "createdBy": "Totoro",
+                        "version": 1988,
+                        "relatedTo": ['Ghibli', 'Classic', 'Miyazaki']
+                    }
+                },
+                {
+                    "name": "array_test",
+                    "resource": "ec2",
+                    "metadata": [
+                        {"createdBy": "Crimson Pig"},
+                        {"relatedTo": ['Porco', 'Rosso']}
+                    ]
+                }
+            ],
         }
         load_resources(('aws.ec2',))
         validator = self.get_validator(data)
