@@ -182,7 +182,11 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     permissions = ('events:ListTargetsByRule',)
 
     def validate(self):
-        pass
+        """
+        Empty validate here to bypass the validation found in the base value filter
+        as we're inheriting from the ChildResourceFilter/RelatedResourceFilter
+        """
+        return self
 
     def get_rules_with_children(self, resources):
         """
