@@ -197,7 +197,7 @@ class CosmosDBDatabase(CosmosDBChildResource):
 
     """
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         data_client = self.get_data_client(parent_resource)
 
         try:
@@ -277,7 +277,7 @@ class CosmosDBCollection(CosmosDBChildResource):
     def tag_operation_enabled(self, resource_type):
         return True
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         data_client = self.get_data_client(parent_resource)
 
         try:

@@ -3,7 +3,7 @@
 
 import logging
 
-from azure.keyvault.key_vault_id import StorageAccountId
+# from azure.keyvault.key_vault_id import StorageAccountId
 from c7n_azure import constants
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
@@ -57,7 +57,7 @@ class KeyVaultStorage(ChildResourceManager):
         extra_fields = ['autoRegenerateKey', 'regenerationPeriod', 'activeKeyName']
 
         for r in resources:
-            sid = StorageAccountId(r['id'])
+        #    sid = StorageAccountId(r['id'])
             data = client.get_storage_account(sid.vault, sid.name).serialize(True)
             r[gap('extra')] = {k: v for k, v in data.items() if k in extra_fields}
 
@@ -209,7 +209,7 @@ class KeyVaultStorageRegenerateKeyAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        sid = StorageAccountId(resource['id'])
+        #sid = StorageAccountId(resource['id'])
         self.client.regenerate_storage_account_key(sid.vault,
                                                    sid.name,
                                                    resource[gap('extra')]['activeKeyName'])
@@ -255,7 +255,7 @@ class KeyVaultStorageUpdateAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        sid = StorageAccountId(resource['id'])
+       # sid = StorageAccountId(resource['id'])
         self.client.update_storage_account(
             sid.vault,
             sid.name,

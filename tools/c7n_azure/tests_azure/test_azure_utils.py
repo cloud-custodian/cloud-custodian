@@ -284,36 +284,17 @@ class UtilsTest(BaseTest):
         sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
         self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])
 
-    @patch('msrestazure.azure_active_directory.MSIAuthentication')
-    def test_get_keyvault_secret(self, _1):
+    def test_get_keyvault_secret(self):
         mock = Mock()
         mock.value = '{"client_id": "client", "client_secret": "secret"}'
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
                    return_value=None), \
-                patch('azure.keyvault.v7_0.KeyVaultClient.get_secret', return_value=mock):
+                patch('azure.keyvault.secrets.SecretClient.get_secret', return_value=mock):
 
             reload(sys.modules['c7n_azure.utils'])
 
             result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412')
             self.assertEqual(mock.value, result)
-            resource_auth = _1.call_args.kwargs.get('resource')
-            self.assertEqual('https://vault.azure.net', resource_auth)
-
-    @patch('msrestazure.azure_active_directory.MSIAuthentication')
-    def test_get_keyvault_secret_with_parameter(self, _1):
-        mock = Mock()
-        mock.value = '{"client_id": "client", "client_secret": "secret"}'
-        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                   return_value=None), \
-                patch('azure.keyvault.v7_0.KeyVaultClient.get_secret', return_value=mock):
-
-            reload(sys.modules['c7n_azure.utils'])
-
-            result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412',
-                                         cloud_endpoints=AZURE_CHINA_CLOUD)
-            self.assertEqual(mock.value, result)
-            resource_auth = _1.call_args.kwargs.get('resource')
-            self.assertEqual('https://vault.azure.cn', resource_auth)
 
     # Test relies on substitute data in Azure Common, not designed for live data
     @pytest.mark.skiplive

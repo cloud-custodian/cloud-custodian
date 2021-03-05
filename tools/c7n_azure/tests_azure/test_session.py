@@ -282,17 +282,6 @@ class SessionTest(BaseTest):
         resource_session = s.get_session_for_resource(constants.STORAGE_AUTH_ENDPOINT)
         self.assertEqual(resource_session.resource_endpoint, constants.STORAGE_AUTH_ENDPOINT)
 
-    @patch('c7n_azure.utils.custodian_azure_send_override')
-    def test_get_client_overrides(self, mock):
-        # Reload the module to re-import patched function
-        reload(sys.modules['c7n_azure.session'])
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        self.assertFalse(client._client.config.retry_policy.policy.respect_retry_after_header)
-        self.assertIsNotNone(client._client.orig_send)
-        client._client.send()
-        self.assertTrue(mock.called)
-
     # This test won't run with real credentials unless the
     # tenant is actually in Azure China cloud.
     @pytest.mark.skiplive
