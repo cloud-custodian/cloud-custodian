@@ -258,7 +258,7 @@ def generate(resource_types=()):
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
-                'metadata': {'type': ['object', 'array']},
+                'metadata': {'type': 'object'},
                 'mode': {'$ref': '#/definitions/policy-mode'},
                 'source': {'enum': ['describe', 'config', 'inventory',
                                     'resource-graph', 'disk', 'static']},

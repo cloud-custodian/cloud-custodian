@@ -306,14 +306,6 @@ class SchemaTest(BaseTest):
                         "version": 1988,
                         "relatedTo": ['Ghibli', 'Classic', 'Miyazaki']
                     }
-                },
-                {
-                    "name": "array_test",
-                    "resource": "ec2",
-                    "metadata": [
-                        {"createdBy": "Crimson Pig"},
-                        {"relatedTo": ['Porco', 'Rosso']}
-                    ]
                 }
             ],
         }
