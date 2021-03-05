@@ -6,7 +6,6 @@ import logging
 from c7n_azure import constants
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
-from c7n_azure.utils import generate_key_vault_url
 
 log = logging.getLogger('custodian.azure.keyvault.certificates')
 

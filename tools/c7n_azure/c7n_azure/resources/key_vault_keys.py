@@ -11,7 +11,7 @@ from c7n.utils import type_schema
 from c7n_azure import constants
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
-from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_url
+from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 
 log = logging.getLogger('custodian.azure.keyvault.keys')

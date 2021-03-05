@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 import logging
 
 try:
@@ -147,7 +146,8 @@ class ChildResourceQuery(ResourceQuery):
                 vault_url = None
                 if m.keyvault_child:
                     vault_url = generate_key_vault_url(parent['name'])
-                subset = resource_manager.enumerate_resources(parent, m, vault_url=vault_url, **params)
+                subset = resource_manager.enumerate_resources(
+                    parent, m, vault_url=vault_url, **params)
 
                 if subset:
                     # If required, append parent resource ID to all child resources
@@ -248,7 +248,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def get_client(self, service=None, vault_url=None):
         if not service:
             return self.get_session().client(
-                "%s.%s" % (self.resource_type.service, self.resource_type.client), vault_url=vault_url)
+                "%s.%s" % (self.resource_type.service, self.resource_type.client),
+                vault_url=vault_url)
         return self.get_session().client(service, vault_url=vault_url)
 
     def get_cache_key(self, query):
@@ -374,7 +375,8 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
 
         if isinstance(result, Iterable):
             # KeyVault items don't have `serialize` method now
-            return [(r.serialize(True) if hasattr(r, 'serialize') else serialize(r)) for r in result]
+            return [(r.serialize(True) if hasattr(r, 'serialize') else serialize(r))
+                    for r in result]
         elif hasattr(result, 'value'):
             return [r.serialize(True) for r in result.value]
 

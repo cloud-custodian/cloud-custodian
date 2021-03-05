@@ -8,7 +8,6 @@ import json
 import logging
 import os
 import sys
-import types
 from collections import namedtuple
 
 import jwt
@@ -20,10 +19,8 @@ from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
 
-#from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ManagedGroupHelper, ResourceIdParser, StringUtils,
-                             custodian_azure_send_override,
                              get_keyvault_auth_endpoint, get_keyvault_secret)
 
 try:
@@ -186,7 +183,7 @@ class Session:
         # service_client.send = types.MethodType(custodian_azure_send_override, service_client)
 
         # Don't respect retry_after_header to implement custom retries
-        #service_client.config.retry_policy.policy.respect_retry_after_header = False
+        # service_client.config.retry_policy.policy.respect_retry_after_header = False
 
         return client
 

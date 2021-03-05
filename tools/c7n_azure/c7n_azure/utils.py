@@ -3,7 +3,6 @@
 import collections
 import datetime
 import enum
-import json
 import hashlib
 import itertools
 import logging
@@ -19,10 +18,8 @@ from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.identity import ManagedIdentityCredential
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
-from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
-from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from netaddr import IPNetwork, IPRange, IPSet
 from json import JSONEncoder
 
@@ -569,9 +566,10 @@ class RetentionPeriod:
 @lru_cache()
 def get_keyvault_secret(user_identity_id, keyvault_secret_id):
     secret_id = SecretProperties(attributes=None, vault_id=keyvault_secret_id)
-    kv_client = SecretClient(vault_url=secret_id.vault_url, credential=ManagedIdentityCredential(client_id=user_identity_id))
+    kv_client = SecretClient(vault_url=secret_id.vault_url,
+                             credential=ManagedIdentityCredential(client_id=user_identity_id))
     return kv_client.get_secret(secret_id.name, secret_id.version).value
-0.
+
 
 @lru_cache()
 def get_service_tag_list():
@@ -613,7 +611,8 @@ def resolve_service_tag_alias(rule):
 def get_keyvault_auth_endpoint(cloud_endpoints):
     return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
 
-# This function is a workaround for Azure KeyVault objects that lack 
+
+# This function is a workaround for Azure KeyVault objects that lack
 # standard serialization method.
 # These objects store variables with an underscore prefix, so we strip it.
 def serialize(item):
