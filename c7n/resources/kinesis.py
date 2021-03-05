@@ -1,25 +1,19 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters.kms import KmsRelatedFilter
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('kinesis')
@@ -37,10 +31,12 @@ class KinesisStream(QueryResourceManager):
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
+        cfn_type = 'AWS::Kinesis::Stream'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(KinesisStream, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeStream,
+        'config': ConfigSource
+    }
 
 
 @KinesisStream.action_registry.register('encrypt')
@@ -50,7 +46,9 @@ class Encrypt(Action):
                          key={'type': 'string'},
                          required=('key',))
 
-    permissions = ("kinesis:UpdateStream",)
+    # not see any documentation on what permission is actually neeeded.
+    # https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonkinesis.html
+    permissions = ("kinesis:UpdateShardCount",)
 
     def process(self, resources):
         # get KeyId
@@ -88,6 +86,18 @@ class Delete(Action):
                 StreamName=r['StreamName'])
 
 
+@KinesisStream.filter_registry.register('kms-key')
+class KmsFilterDataStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KeyId'
+
+
+class DescribeDeliveryStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
@@ -101,6 +111,19 @@ class DeliveryStream(QueryResourceManager):
         name = id = 'DeliveryStreamName'
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
+        universal_taggable = object()
+        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
+
+    source_mapping = {
+        'describe': DescribeDeliveryStream,
+        'config': ConfigSource
+    }
+
+
+@DeliveryStream.filter_registry.register('kms-key')
+class KmsFilterDeliveryStream(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'DeliveryStreamEncryptionConfiguration.KeyARN'
 
 
 @DeliveryStream.action_registry.register('delete')
@@ -208,6 +231,12 @@ class FirehoseEncryptS3Destination(Action):
                 client.update_destination(**params)
 
 
+class DescribeApp(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
@@ -218,6 +247,14 @@ class AnalyticsApp(QueryResourceManager):
                        'ApplicationName', 'ApplicationDetail')
         name = "ApplicationName"
         arn = id = "ApplicationARN"
+        arn_type = 'application'
+        universal_taggable = object()
+        cfn_type = 'AWS::KinesisAnalytics::Application'
+
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeApp
+    }
 
 
 @AnalyticsApp.action_registry.register('delete')
@@ -233,3 +270,81 @@ class AppDelete(Action):
             client.delete_application(
                 ApplicationName=r['ApplicationName'],
                 CreateTimestamp=r['CreateTimestamp'])
+
+
+class DescribeVideoStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('kinesis-video')
+class KinesisVideoStream(QueryResourceManager):
+    retry = staticmethod(
+        get_retry((
+            'LimitExceededException',)))
+
+    class resource_type(TypeInfo):
+        service = 'kinesisvideo'
+        arn_type = 'stream'
+        enum_spec = ('list_streams', 'StreamInfoList', None)
+        name = id = 'StreamName'
+        arn = 'StreamARN'
+        dimension = 'StreamName'
+        universal_taggable = True
+
+    source_mapping = {
+        'describe': DescribeVideoStream,
+        'config': ConfigSource
+    }
+
+
+@KinesisVideoStream.action_registry.register('delete')
+class DeleteVideoStream(Action):
+    """Delete a Kinesis Video stream
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-kinesis-video
+            resource: kinesis-video
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("kinesisvideo:DeleteStream",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kinesisvideo')
+        resources = self.filter_resources(resources, 'Status', ('ACTIVE',))
+        for r in resources:
+            try:
+                client.delete_stream(StreamARN=r['StreamARN'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@KinesisVideoStream.filter_registry.register('kms-key')
+class KmsFilterVideoStream(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-video-stream-kms-key
+                resource: aws.kinesis-video
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
+    """
+
+    RelatedIdsExpression = 'KmsKeyId'

@@ -1,0 +1,12 @@
+{
+    "status_code": 401,
+    "data": {
+        "Error": {
+            "Message": "AccountId: 644160558196 is not enabled for securityhub. Currentstate: false",
+            "Code": "InvalidAccessException"
+        },
+        "ResponseMetadata": {},
+        "Message": "AccountId: 644160558196 is not enabled for securityhub. Currentstate: false",
+        "Code": "InvalidAccessException"
+    }
+}

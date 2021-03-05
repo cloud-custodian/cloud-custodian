@@ -1,15 +1,17 @@
 Cloud Custodian
 =================
 
-<center><img src="https://cloudcustodian.io/img/logo_capone_devex_cloud_custodian.svg" alt="Cloud Custodian Logo" width="200px" height="200px" align_center/></center>
+<p align="center"><img src="https://cloudcustodian.io/img/logo_capone_devex_cloud_custodian.svg" alt="Cloud Custodian Logo" width="200px" height="200px" /></p>
 
 ---
 
 [![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
+[![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
+[![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
 Cloud Custodian is a rules engine for managing public cloud accounts and
 resources. It allows users to define policies to enable a well managed
@@ -32,9 +34,8 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-"[Engineering the Next Generation of Cloud
-Governance](https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60)"
-by \@drewfirment
+Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+of contributors.
 
 Features
 --------
@@ -94,8 +95,8 @@ As a quick walk through, below are some sample policies for AWS resources.
   1. will enforce that no S3 buckets have cross-account access enabled.
   1. will terminate any newly launched EC2 instance that do not have an encrypted EBS volume.
   1. will tag any EC2 instance that does not have the follow tags
-     "Environment", "AppId", and either "OwnerContact" or "DeptID" to be stopped
-	 in four days.
+     "Environment", "AppId", and either "OwnerContact" or "DeptID" to
+     be stopped in four days.
 
 ```yaml
 policies:
@@ -181,9 +182,6 @@ $ docker run -it \
 # NOTE: We mount the ``.aws/credentials`` and ``.aws/config`` directories to
 # the docker container to support authentication to AWS using the same credentials
 # credentials that are available to the local user if authenticating with STS.
-# This exposes your container to additional credentials than may be necessary,
-# i.e. additional credentials may be available inside of the container than is
-# minimally necessary.
 
 $ docker run -it \
   -v $(pwd)/output:/home/custodian/output \
@@ -194,9 +192,10 @@ $ docker run -it \
   cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 ```
 
-Custodian supports other useful subcommands and options, including
-outputs to S3, CloudWatch metrics, STS role assumption. Policies go
-together like Lego bricks with actions and filters.
+The [custodian cask
+tool](https://cloudcustodian.io/docs/tools/cask.html) is a go binary
+that provides a transparent front end to docker that mirors the regular
+custodian cli, but automatically takes care of mounting volumes.
 
 Consult the documentation for additional information, or reach out on gitter.
 
@@ -229,29 +228,42 @@ tools here
 
 - [**_PolicyStream_:**](https://cloudcustodian.io/docs/tools/c7n-policystream.html) Git history as stream of logical policy changes.
 
-- **_Salactus_:** Scale out s3 scanning.
+- [**_Salactus_:**](https://cloudcustodian.io/docs/tools/c7n-salactus.html) Scale out s3 scanning.
 
 - [**_Mailer_:**](https://cloudcustodian.io/docs/tools/c7n-mailer.html) A reference implementation of sending messages to users to notify them.
 
-- [**_Trail Creator_**](https://cloudcustodian.io/docs/tools/c7n-trailcreator.html) Retroactive tagging of resources creators from CloudTrail
+- [**_Trail Creator_:**](https://cloudcustodian.io/docs/tools/c7n-trailcreator.html) Retroactive tagging of resources creators from CloudTrail
 
 - **_TrailDB_:** Cloudtrail indexing and time series generation for dashboarding.
 
-- **_LogExporter_:** Cloud watch log exporting to s3
+- [**_LogExporter_:**](https://cloudcustodian.io/docs/tools/c7n-logexporter.html) Cloud watch log exporting to s3
 
-- **_Index_:** Indexing of custodian metrics and outputs for dashboarding
+- [**_Cask_:**](https://cloudcustodian.io/docs/tools/cask.html) Easy custodian exec via docker
 
-- **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
-    <https://sentry.io/welcome/>
+- [**_Guardian_:**](https://cloudcustodian.io/docs/tools/c7n-guardian.html) Automated multi-account Guard Duty setup
+
+- [**_Omni SSM_:**](https://cloudcustodian.io/docs/tools/omnissm.html) EC2 Systems Manager Automation
+
+- [**_Mugc_:**](https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/ops#mugc) A utility used to clean up Cloud Custodian Lambda policies that are deployed in an AWS environment.
 
 Contributing
 ------------
 
 See <https://cloudcustodian.io/docs/contribute.html>
 
+Security
+--------
+
+If you've found a security related issue, a vulnerability, or a
+potential vulnerability in Cloud Custodian please let the Cloud
+[Custodian Security Team](mailto:security@cloudcustodian.io) know with
+the details of the vulnerability. We'll send a confirmation email to
+acknowledge your report, and we'll send an additional email when we've
+identified the issue positively or negatively.
 
 Code of Conduct
 ---------------
 
 This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
 participating, you are expected to honor this code.
+

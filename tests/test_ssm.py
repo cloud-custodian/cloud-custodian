@@ -1,18 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import time
 
@@ -179,6 +166,51 @@ class TestSSM(BaseTest):
             InstanceId=resources[0]['InstanceId'],
             CommandId=resources[0]['c7n:SendCommand'][0])
         self.assertEqual(result['Status'], 'Success')
+
+    def test_ssm_parameter_delete(self):
+        session_factory = self.replay_flight_data("test_ssm_parameter_delete")
+        p = self.load_policy({
+            'name': 'ssm-param-tags',
+            'resource': 'ssm-parameter',
+            'actions': ['delete']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'not_secret')
+        client = session_factory().client('ssm')
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(
+            client.describe_parameters(
+                Filters=[{'Key': 'Name', 'Values': [resources[0]['Name']]}])['Parameters'],
+            [])
+
+    def test_ssm_parameter_delete_non_existant(self):
+        session_factory = self.replay_flight_data("test_ssm_parameter_delete_non_existant")
+        p = self.load_policy({
+            'name': 'ssm-param-tags',
+            'resource': 'ssm-parameter',
+            'actions': ['delete']},
+            session_factory=session_factory)
+
+        # if it raises the test fails
+        p.resource_manager.actions[0].process(
+            [{'Name': 'unicorn'}])
+
+    def test_ssm_parameter_tag_arn(self):
+        session_factory = self.replay_flight_data("test_ssm_parameter_tag_arn")
+        p = self.load_policy({
+            'name': 'ssm-param-tags',
+            'resource': 'ssm-parameter',
+            'filters': [{'tag:Env': 'present'}]},
+            config={'account_id': '123456789123'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(['/gittersearch/token'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'App', 'Value': 'GitterSearch'},
+             {'Key': 'Env', 'Value': 'Dev'}])
 
     @functional
     def test_ssm_parameter_not_secure(self):

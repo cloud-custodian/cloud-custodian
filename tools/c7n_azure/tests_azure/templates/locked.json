@@ -1,18 +1,16 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "diskName": {
-            "defaultValue": "[concat('cctestlockfilterdisk', uniqueString(resourceGroup().id))]",
-            "type": "string"
-        }
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "diskName": "[concat('cctestlockfilterdisk', uniqueString(resourceGroup().id))]",
+        "servers_cctestsqlserver_name": "[concat('cclockedsqlserver', variables('suffix'))]"
     },
-    "variables": {},
     "resources": [
         {
             "apiVersion": "2019-03-01",
             "type": "Microsoft.Compute/disks",
-            "name": "[parameters('diskName')]",
+            "name": "[variables('diskName')]",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Standard_LRS"
@@ -25,16 +23,47 @@
             },
             "dependsOn": []
         },
-        {	
-            "name": "cctestlockfilter",	
-            "type": "Microsoft.Authorization/locks",	
-            "apiVersion": "2016-09-01",	
-            "dependsOn": [	
-                "[resourceId('Microsoft.Compute/disks', parameters('diskName'))]"	
-            ],	
-            "properties": {	
-                "level": "CanNotDelete",	
-                "notes": "This lock is for the cc test_filter_resource_lock test"	
+        {
+            "name": "cctestlockfilter",
+            "type": "Microsoft.Authorization/locks",
+            "apiVersion": "2016-09-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/disks', variables('diskName'))]"
+            ],
+            "properties": {
+                "level": "CanNotDelete",
+                "notes": "This lock is for the cc test_filter_resource_lock test"
+            }
+        },
+        {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Sql/servers",
+            "location": "EastUS2",
+            "name": "[variables('servers_cctestsqlserver_name')]",
+            "properties": {
+                "administratorLogin": "custodian",
+                "administratorLoginPassword": "[guid(resourceGroup().id)]",
+                "version": "12.0"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2017-03-01-preview",
+            "name": "[concat(variables('servers_cctestsqlserver_name'), '/cclockeddb')]",
+            "location": "eastus2",
+            "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', variables('servers_cctestsqlserver_name'))]"
+            ],
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false
             }
         }
     ]

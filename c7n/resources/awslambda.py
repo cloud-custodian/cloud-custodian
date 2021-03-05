@@ -1,59 +1,27 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
-import six
+from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
+from datetime import timedelta, datetime
 
-from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
+from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date
+
+from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
-
-
-@resources.register('lambda')
-class AWSLambda(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'lambda'
-        arn_type = 'function'
-        arn_separator = ":"
-        enum_spec = ('list_functions', 'Functions', None)
-        name = id = 'FunctionName'
-        date = 'LastModified'
-        dimension = 'FunctionName'
-        config_type = "AWS::Lambda::Function"
-        universal_taggable = object()
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeLambda(self)
-        elif source_type == 'config':
-            return ConfigLambda(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
 
 
 class DescribeLambda(query.DescribeSource):
@@ -62,17 +30,55 @@ class DescribeLambda(query.DescribeSource):
         return universal_augment(
             self.manager, super(DescribeLambda, self).augment(resources))
 
+    def get_resources(self, ids):
+        client = local_session(self.manager.session_factory).client('lambda')
+        resources = []
+        for rid in ids:
+            try:
+                func = self.manager.retry(client.get_function, FunctionName=rid)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            config = func.pop('Configuration')
+            config.update(func)
+            if 'Tags' in config:
+                config['Tags'] = [
+                    {'Key': k, 'Value': v} for k, v in config['Tags'].items()]
+            resources.append(config)
+        return resources
+
 
 class ConfigLambda(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigLambda, self).load_resource(item)
-        resource['Tags'] = [
-            {u'Key': k, u'Value': v} for k, v in item[
-                'supplementaryConfiguration'].get('Tags', {}).items()]
         resource['c7n:Policy'] = item[
             'supplementaryConfiguration'].get('Policy')
         return resource
+
+
+@resources.register('lambda')
+class AWSLambda(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        arn = 'FunctionArn'
+        arn_type = 'function'
+        arn_separator = ":"
+        enum_spec = ('list_functions', 'Functions', None)
+        name = id = 'FunctionName'
+        date = 'LastModified'
+        dimension = 'FunctionName'
+        config_type = 'AWS::Lambda::Function'
+        cfn_type = 'AWS::Lambda::Function'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeLambda,
+        'config': ConfigLambda
+    }
+
+    def get_resources(self, ids, cache=True, augment=False):
+        return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
 @AWSLambda.filter_registry.register('security-group')
@@ -243,6 +249,173 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
             resources, event)
 
 
+@AWSLambda.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-kms-key-filters
+                  resource: aws.lambda
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/lambda)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.action_registry.register('post-finding')
+class LambdaPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaFunction'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        # security hub formatting beggars belief
+        details = self.filter_empty(select_keys(r,
+            ['CodeSha256',
+             'DeadLetterConfig',
+             'Environment',
+             'Handler',
+             'KMSKeyArn',
+             'LastModified',
+             'MemorySize',
+             'MasterArn',
+             'RevisionId',
+             'Role',
+             'Runtime',
+             'TracingConfig',
+             'Timeout',
+             'Version',
+             'VpcConfig']))
+        # do the brain dead parts Layers, Code, TracingConfig
+        if 'Layers' in r:
+            r['Layers'] = {
+                'Arn': r['Layers'][0]['Arn'],
+                'CodeSize': r['Layers'][0]['CodeSize']}
+        details.get('VpcConfig', {}).pop('VpcId', None)
+
+        if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
+            parsed = urlparse(r['Code']['Location'])
+            details['Code'] = {
+                'S3Bucket': parsed.netloc.split('.', 1)[0],
+                'S3Key': parsed.path[1:]}
+            params = parse_qs(parsed.query)
+            if params['versionId']:
+                details['Code']['S3ObjectVersion'] = params['versionId'][0]
+        payload.update(details)
+        return envelope
+
+
+@AWSLambda.action_registry.register('trim-versions')
+class VersionTrim(Action):
+    """Delete old versions of a function.
+
+    By default this will only remove the non $LATEST
+    version of a function that are not referenced by
+    an alias. Optionally it can delete only versions
+    older than a given age.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: lambda-gc
+             resource: aws.lambda
+             actions:
+               - type: trim-versions
+                 exclude-aliases: true  # default true
+                 older-than: 60 # default not-set
+                 retain-latest: true # default false
+
+    retain-latest refers to whether the latest numeric
+    version will be retained, the $LATEST alias will
+    still point to the last revision even without this set,
+    so this is safe wrt to the function availability, its more
+    about desire to retain an explicit version of the current
+    code, rather than just the $LATEST alias pointer which will
+    be automatically updated.
+    """
+    permissions = ('lambda:ListAliases', 'lambda:ListVersionsByFunction',
+                   'lambda:DeleteFunction',)
+
+    schema = type_schema(
+        'trim-versions',
+        **{'exclude-aliases': {'default': True, 'type': 'boolean'},
+           'retain-latest': {'default': True, 'type': 'boolean'},
+           'older-than': {'type': 'number'}})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('lambda')
+        matched = total = 0
+        for r in resources:
+            fmatched, ftotal = self.process_lambda(client, r)
+            matched += fmatched
+            total += ftotal
+        self.log.info('trim-versions cleaned %s of %s lambda storage' % (
+            get_human_size(matched), get_human_size(total)))
+
+    def get_aliased_versions(self, client, r):
+        aliases_pager = client.get_paginator('list_aliases')
+        aliases_pager.PAGE_ITERATOR_CLASS = query.RetryPageIterator
+        aliases = aliases_pager.paginate(
+            FunctionName=r['FunctionName']).build_full_result().get('Aliases')
+
+        aliased_versions = set()
+        for a in aliases:
+            aliased_versions.add("%s:%s" % (
+                a['AliasArn'].rsplit(':', 1)[0], a['FunctionVersion']))
+        return aliased_versions
+
+    def process_lambda(self, client, r):
+        exclude_aliases = self.data.get('exclude-aliases', True)
+        retain_latest = self.data.get('retain-latest', False)
+        date_threshold = self.data.get('older-than')
+        date_threshold = (
+            date_threshold and
+            parse_date(datetime.utcnow()) - timedelta(days=date_threshold) or
+            None)
+        aliased_versions = ()
+
+        if exclude_aliases:
+            aliased_versions = self.get_aliased_versions(client, r)
+
+        versions_pager = client.get_paginator('list_versions_by_function')
+        versions_pager.PAGE_ITERATOR_CLASS = query.RetryPageIterator
+        pager = versions_pager.paginate(FunctionName=r['FunctionName'])
+
+        matched = total = 0
+        latest_sha = None
+
+        for page in pager:
+            versions = page.get('Versions')
+            for v in versions:
+                if v['Version'] == '$LATEST':
+                    latest_sha = v['CodeSha256']
+                    continue
+                total += v['CodeSize']
+                if v['FunctionArn'] in aliased_versions:
+                    continue
+                if date_threshold and parse_date(v['LastModified']) > date_threshold:
+                    continue
+                # Retain numbered version, not required, but it feels like a good thing
+                # to do. else the latest alias will still point.
+                if retain_latest and latest_sha and v['CodeSha256'] == latest_sha:
+                    continue
+                matched += v['CodeSize']
+                self.manager.retry(
+                    client.delete_function, FunctionName=v['FunctionArn'])
+        return (matched, total)
+
+
 @AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy/permission statements from lambda functions.
@@ -309,7 +482,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
 
 @AWSLambda.action_registry.register('set-concurrency')
-class SetConcurrency(BaseAction):
+class SetConcurrency(Action):
     """Set lambda function concurrency to the desired level.
 
     Can be used to set the reserved function concurrency to an exact value,
@@ -330,7 +503,7 @@ class SetConcurrency(BaseAction):
                    'lambda:PutFunctionConcurrency')
 
     def validate(self):
-        if self.data.get('expr', False) and not isinstance(self.data['value'], six.text_type):
+        if self.data.get('expr', False) and not isinstance(self.data['value'], str):
             raise ValueError("invalid value expression %s" % self.data['value'])
         return self
 
@@ -364,7 +537,7 @@ class SetConcurrency(BaseAction):
 
 
 @AWSLambda.action_registry.register('delete')
-class Delete(BaseAction):
+class Delete(Action):
     """Delete a lambda function (including aliases and older versions).
 
     :example:
@@ -444,6 +617,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
         date = 'CreatedDate'
         arn = "LayerVersionArn"
         arn_type = "layer"
+        cfn_type = 'AWS::Lambda::LayerVersion'
 
     def augment(self, resources):
         versions = {}
@@ -542,7 +716,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 
 
 @LambdaLayerVersion.action_registry.register('delete')
-class DeleteLayerVersion(BaseAction):
+class DeleteLayerVersion(Action):
 
     schema = type_schema('delete')
     permissions = ('lambda:DeleteLayerVersion',)
@@ -559,3 +733,15 @@ class DeleteLayerVersion(BaseAction):
                     VersionNumber=r['Version'])
             except client.exceptions.ResourceNotFound:
                 continue
+
+
+@LambdaLayerVersion.action_registry.register('post-finding')
+class LayerPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaLayerVersion'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty(
+            select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
+        return envelope

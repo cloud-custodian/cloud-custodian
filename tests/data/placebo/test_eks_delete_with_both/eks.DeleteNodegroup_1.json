@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "nodegroup": {
+            "nodegroupName": "test",
+            "nodegroupArn": "arn:aws:eks:us-east-1:644160558196:nodegroup/test_f1/test/acb8dc29-f47c-d8b7-71f9-268f44fdbeb0",
+            "clusterName": "test_f1",
+            "version": "1.15",
+            "releaseVersion": "1.15.10-20200228",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 17,
+                "minute": 10,
+                "second": 39,
+                "microsecond": 731000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 17,
+                "minute": 32,
+                "second": 15,
+                "microsecond": 477000
+            },
+            "status": "DELETING",
+            "scalingConfig": {
+                "minSize": 1,
+                "maxSize": 1,
+                "desiredSize": 1
+            },
+            "instanceTypes": [
+                "t3.medium"
+            ],
+            "subnets": [
+                "subnet-023db907202d61c00"
+            ],
+            "remoteAccess": {
+                "ec2SshKey": "pikachus"
+            },
+            "amiType": "AL2_x86_64",
+            "nodeRole": "arn:aws:iam::644160558196:role/eksctl-devk8s-nodegroup-ng-2f0ad2-NodeInstanceRole-1P2388MLET9O",
+            "labels": {},
+            "resources": {
+                "autoScalingGroups": [
+                    {
+                        "name": "eks-acb8dc29-f47c-d8b7-71f9-268f44fdbeb0"
+                    }
+                ],
+                "remoteAccessSecurityGroup": "sg-029bee2954d1815fc"
+            },
+            "diskSize": 4,
+            "health": {
+                "issues": []
+            },
+            "tags": {}
+        }
+    }
+}

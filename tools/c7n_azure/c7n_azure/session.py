@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import abc
 import importlib
@@ -23,15 +12,15 @@ import types
 from collections import namedtuple
 
 import jwt
-import six
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
 from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             ManagedGroupHelper, get_keyvault_secret)
+                             ManagedGroupHelper, get_keyvault_secret, get_keyvault_auth_endpoint)
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_active_directory import MSIAuthentication
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
 
 try:
@@ -41,28 +30,33 @@ except Exception:
     Profile = None
     CLIError = ImportError  # Assign an exception that never happens because of Auth problems
 
+from functools import lru_cache
 
 log = logging.getLogger('custodian.azure.session')
 
 
-class Session(object):
+class Session:
 
     def __init__(self, subscription_id=None, authorization_file=None,
-                 resource=constants.RESOURCE_ACTIVE_DIRECTORY):
+                 cloud_endpoints=None, resource_endpoint_type=constants.DEFAULT_AUTH_ENDPOINT):
         """
         :param subscription_id: If provided overrides environment variables.
         :param authorization_file: Path to file populated from 'get_functions_auth_string'
-        :param resource: Resource endpoint for OAuth token.
+        :param cloud_endpoints: List of endpoints for specified Azure Cloud. Defaults to public.
+        :param auth_endpoint: Resource endpoint for OAuth token.
         """
-
         self._provider_cache = {}
         self.subscription_id_override = subscription_id
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
-        self.resource_namespace = resource
         self.authorization_file = authorization_file
         self._auth_params = {}
+
+        self.cloud_endpoints = cloud_endpoints or AZURE_PUBLIC_CLOUD
+        self.resource_endpoint_type = resource_endpoint_type
+        self.resource_endpoint = self.get_auth_endpoint(resource_endpoint_type)
+        self.storage_endpoint = self.cloud_endpoints.suffixes.storage_endpoint
 
     @property
     def auth_params(self):
@@ -78,7 +72,11 @@ class Session(object):
             if keyvault_secret_id:
                 self._auth_params.update(
                     json.loads(
-                        get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
+                        get_keyvault_secret(
+                            keyvault_client_id,
+                            keyvault_secret_id,
+                            self.cloud_endpoints)
+                    ))
         except HTTPError as e:
             e.message = 'Failed to retrieve SP credential ' \
                         'from Key Vault with client id: {0}'.format(keyvault_client_id)
@@ -92,7 +90,7 @@ class Session(object):
         ]
 
         for provider in token_providers:
-            instance = provider(self._auth_params, self.resource_namespace)
+            instance = provider(self._auth_params, self.resource_endpoint)
             if instance.is_available():
                 result = instance.authenticate()
                 self.subscription_id = result.subscription_id
@@ -152,7 +150,7 @@ class Session(object):
 
         # Override credential type for KV auth
         # https://github.com/Azure/azure-sdk-for-python/issues/5096
-        if self.resource_namespace == constants.RESOURCE_VAULT:
+        if self.resource_endpoint_type == constants.VAULT_AUTH_ENDPOINT:
             access_token = AccessToken(token=self.get_bearer_token())
             self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
 
@@ -160,22 +158,22 @@ class Session(object):
         return Session(
             subscription_id=self.subscription_id_override,
             authorization_file=self.authorization_file,
-            resource=resource)
+            cloud_endpoints=self.cloud_endpoints,
+            resource_endpoint_type=resource)
 
+    @lru_cache()
     def client(self, client):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
 
-        if sys.version_info[0] < 3:
-            import funcsigs
-            klass_parameters = funcsigs.signature(klass).parameters
-        else:
-            klass_parameters = inspect.signature(klass).parameters
+        klass_parameters = inspect.signature(klass).parameters
 
         if 'subscription_id' in klass_parameters:
-            client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
+            client = klass(credentials=self.credentials,
+            subscription_id=self.subscription_id,
+            base_url=self.cloud_endpoints.endpoints.resource_manager)
         else:
             client = klass(credentials=self.credentials)
 
@@ -256,17 +254,14 @@ class Session(object):
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
                 tenant=self.tenant_id,
-                resource=self.resource_namespace
+                resource=self.resource_endpoint
             ), data.get('subscription', None))
 
     def get_functions_auth_string(self, target_subscription_id):
-        """
-        Build auth json string for deploying
-        Azure Functions.  Look for dedicated
-        Functions environment variables or
-        fall back to normal Service Principal
-        variables.
+        """Build auth json string for deploying Azure Functions.
 
+        Look for dedicated Functions environment variables or fall
+        back to normal Service Principal variables.
         """
 
         self._initialize_session()
@@ -297,8 +292,17 @@ class Session(object):
 
         return json.dumps(function_auth_params, indent=2)
 
+    def get_auth_endpoint(self, endpoint):
+        if endpoint == constants.VAULT_AUTH_ENDPOINT:
+            return get_keyvault_auth_endpoint(self.cloud_endpoints)
 
-@six.add_metaclass(abc.ABCMeta)
+        elif endpoint == constants.STORAGE_AUTH_ENDPOINT:
+            # These endpoints are not Cloud specific, but the suffixes are
+            return constants.STORAGE_AUTH_ENDPOINT
+        else:
+            return getattr(self.cloud_endpoints.endpoints, endpoint)
+
+
 class TokenProvider:
     AuthenticationResult = namedtuple(
         'AuthenticationResult', 'credential, subscription_id, tenant_id')
@@ -306,7 +310,7 @@ class TokenProvider:
     def __init__(self, parameters, namespace):
         # type: (dict, str) -> None
         self.parameters = parameters
-        self.resource_namespace = namespace
+        self.resource_endpoint = namespace
 
     @abc.abstractmethod
     def is_available(self):
@@ -340,7 +344,7 @@ class CLIProvider(TokenProvider):
         try:
             (credential,
              subscription_id,
-             tenant_id) = Profile().get_login_credentials(resource=self.resource_namespace)
+             tenant_id) = Profile().get_login_credentials(resource=self.resource_endpoint)
         except CLIError as e:
             e.message = 'Failed to authenticate with CLI credentials. ' + e.args[0]
             raise
@@ -410,7 +414,7 @@ class ServicePrincipalProvider(TokenProvider):
             credential = ServicePrincipalCredentials(client_id=self.client_id,
                                                 secret=self.client_secret,
                                                 tenant=self.tenant_id,
-                                                resource=self.resource_namespace)
+                                                resource=self.resource_endpoint)
         except AuthenticationError as e:
             e.message = 'Failed to authenticate with service principal.\n'\
                         'Message: {0}'.format(
@@ -446,10 +450,10 @@ class MSIProvider(TokenProvider):
             if self.client_id:
                 credential = MSIAuthentication(
                     client_id=self.client_id,
-                    resource=self.resource_namespace)
+                    resource=self.resource_endpoint)
             else:
                 credential = MSIAuthentication(
-                    resource=self.resource_namespace)
+                    resource=self.resource_endpoint)
         except HTTPError as e:
             e.message = 'Failed to authenticate with MSI'
             raise

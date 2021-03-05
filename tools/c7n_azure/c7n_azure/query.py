@@ -1,28 +1,21 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
-import six
-from c7n_azure import constants
+from c7n_azure.constants import DEFAULT_RESOURCE_AUTH_ENDPOINT
 from c7n_azure.actions.logic_app import LogicAppAction
+from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n_azure.actions.notify import Notify
 from c7n_azure.filters import ParentFilter
 from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
@@ -31,7 +24,7 @@ from c7n.utils import local_session
 log = logging.getLogger('custodian.azure.query')
 
 
-class ResourceQuery(object):
+class ResourceQuery:
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
@@ -57,7 +50,7 @@ class ResourceQuery(object):
             log.error("Failed to query resource.\n"
                       "Type: azure.{0}.\n"
                       "Error: {1}".format(resource_manager.type, e))
-            six.raise_from(Exception('Failed to query resources.'), e)
+            raise
 
         raise TypeError("Enumerating resources resulted in a return"
                         "value which could not be iterated.")
@@ -72,15 +65,58 @@ class ResourceQuery(object):
 
 
 @sources.register('describe-azure')
-class DescribeSource(object):
+class DescribeSource:
     resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
         self.manager = manager
         self.query = self.resource_query_factory(self.manager.session_factory)
 
+    def validate(self):
+        pass
+
     def get_resources(self, query):
         return self.query.filter(self.manager)
+
+    def get_permissions(self):
+        return ()
+
+    def augment(self, resources):
+        return resources
+
+
+@sources.register('resource-graph')
+class ResourceGraphSource:
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    def validate(self):
+        if not hasattr(self.manager.resource_type, 'resource_type'):
+            raise PolicyValidationError(
+                "%s is not supported with the Azure Resource Graph source."
+                % self.manager.data['resource'])
+
+    def get_resources(self, _):
+        log.warning('The Azure Resource Graph source '
+                    'should not be used in production scenarios at this time.')
+
+        session = self.manager.get_session()
+        client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
+
+        # empty scope will return all resource
+        query_scope = ""
+        if self.manager.resource_type.resource_type != 'armresource':
+            query_scope = "where type =~ '%s'" % self.manager.resource_type.resource_type
+
+        query = QueryRequest(
+            query=query_scope,
+            subscriptions=[session.get_subscription_id()]
+        )
+        res = client.resources(query)
+        cols = [c['name'] for c in res.data['columns']]
+        data = [dict(zip(cols, r)) for r in res.data['rows']]
+        return data
 
     def get_permissions(self):
         return ()
@@ -137,26 +173,23 @@ class TypeMeta(type):
             cls.client)
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo(metaclass=TypeMeta):
     doc_groups = None
 
     """api client construction information"""
     service = ''
     client = ''
 
+    resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
     # Default id field, resources should override if different (used for meta filters, report etc)
     id = 'id'
-
-    resource = constants.RESOURCE_ACTIVE_DIRECTORY
 
     @classmethod
     def extra_args(cls, resource_manager):
         return {}
 
 
-@six.add_metaclass(TypeMeta)
-class ChildTypeInfo(TypeInfo):
+class ChildTypeInfo(TypeInfo, metaclass=TypeMeta):
     """api client construction information for child resources"""
     parent_manager_name = ''
     annotate_parent = True
@@ -182,8 +215,7 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         pass
 
@@ -213,7 +245,9 @@ class QueryResourceManager(ResourceManager):
         return self.get_session().client(service)
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type,
+                'query': query,
+                'resource': str(self.__class__.__name__)}
 
     @classmethod
     def get_model(cls):
@@ -223,7 +257,7 @@ class QueryResourceManager(ResourceManager):
     def source_type(self):
         return self.data.get('source', 'describe-azure')
 
-    def resources(self, query=None):
+    def resources(self, query=None, augment=True):
         cache_key = self.get_cache_key(query)
 
         resources = None
@@ -236,11 +270,16 @@ class QueryResourceManager(ResourceManager):
                     len(resources)))
 
         if resources is None:
-            resources = self.augment(self.source.get_resources(query))
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.get_resources(query)
+            if augment:
+                with self.ctx.tracer.subsegment('resource-augment'):
+                    resources = self.augment(resources)
             self._cache.save(cache_key, resources)
 
-        resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resource_count = len(resources)
+            resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
         if self.data == self.ctx.policy.data:
@@ -270,15 +309,16 @@ class QueryResourceManager(ResourceManager):
         return [r.serialize(True) for r in data]
 
     @staticmethod
-    def register_actions_and_filters(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('notify', Notify)
-            klass.action_registry.register('logic-app', LogicAppAction)
+    def register_actions_and_filters(registry, resource_class):
+        resource_class.action_registry.register('notify', Notify)
+        if 'logic-app' not in resource_class.action_registry:
+            resource_class.action_registry.register('logic-app', LogicAppAction)
+
+    def validate(self):
+        self.source.validate()
 
 
-@six.add_metaclass(QueryMeta)
-class ChildResourceManager(QueryResourceManager):
+class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
 
@@ -298,7 +338,7 @@ class ChildResourceManager(QueryResourceManager):
     def get_session(self):
         if self._session is None:
             session = super(ChildResourceManager, self).get_session()
-            if self.resource_type.resource != constants.RESOURCE_ACTIVE_DIRECTORY:
+            if self.resource_type.resource != DEFAULT_RESOURCE_AUTH_ENDPOINT:
                 session = session.get_session_for_resource(self.resource_type.resource)
             self._session = session
 
@@ -334,16 +374,15 @@ class ChildResourceManager(QueryResourceManager):
                         "value which could not be iterated.")
 
     @staticmethod
-    def register_child_specific(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            if issubclass(klass, ChildResourceManager):
+    def register_child_specific(registry, resource_class):
+        if not issubclass(resource_class, ChildResourceManager):
+            return
 
-                # If Child Resource doesn't annotate parent, there is no way to filter based on
-                # parent properties.
-                if klass.resource_type.annotate_parent:
-                    klass.filter_registry.register('parent', ParentFilter)
+        # If Child Resource doesn't annotate parent, there is no way to filter based on
+        # parent properties.
+        if resource_class.resource_type.annotate_parent:
+            resource_class.filter_registry.register('parent', ParentFilter)
 
 
-resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)
-resources.subscribe(resources.EVENT_FINAL, ChildResourceManager.register_child_specific)
+resources.subscribe(QueryResourceManager.register_actions_and_filters)
+resources.subscribe(ChildResourceManager.register_child_specific)

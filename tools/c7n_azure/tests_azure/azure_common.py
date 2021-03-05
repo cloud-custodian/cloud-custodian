@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import email.utils as eut
 import json
@@ -22,7 +11,7 @@ from functools import wraps
 from time import sleep
 
 import msrest.polling
-from .azure_serializer import AzureSerializer
+
 from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
@@ -34,11 +23,13 @@ from vcr_unittest import VCRTestCase
 
 from c7n.config import Config, Bag
 from c7n.policy import ExecutionContext
-from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
+from c7n.utils import local_session
+from .azure_serializer import AzureSerializer
 
-load_resources()
+# Ensure the azure provider is loaded.
+from c7n_azure import provider # noqa
 
 BASE_FOLDER = os.path.dirname(__file__)
 C7N_SCHEMA = generate()
@@ -49,6 +40,7 @@ DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
 DEFAULT_INSTRUMENTATION_KEY = '00000000-0000-0000-0000-000000000004'
 DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
                       '/MGFHKc+t+M20PxoraNCslng9w=='
+DEFAULT_AZURE_CLOUD = 'AzureCloud'
 
 GRAPH_RESPONSE = {
     "value": [
@@ -205,10 +197,12 @@ class AzureVCRBaseTest(VCRTestCase):
 
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
         r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
+        # Some APIs (e.g. lock) that receive scope seems to replace / with %2F
+        r1_path = r1_path.replace('%2F', '/').lower()
+        r2_path = r2_path.replace('%2F', '/').lower()
 
         r1_path = r1_path.replace('//', '/').lower()
         r2_path = r2_path.replace('//', '/').lower()
-
         return r1_path == r2_path
 
     def _request_callback(self, request):
@@ -406,13 +400,6 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self._now_patch.start()
             self.addCleanup(self._now_patch.stop)
 
-        if not self._requires_polling:
-            # Patch Poller with constructor that always disables polling
-            # This breaks blocking on long running operations (resource creation).
-            self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
-            self._lro_patch.start()
-            self.addCleanup(self._lro_patch.stop)
-
         if self.is_playback():
             if self._requires_polling:
                 # If using polling we need to monkey patch the timeout during playback
@@ -420,6 +407,14 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 Session._old_client = Session.client
                 Session.client = BaseTest.session_client_wrapper
                 self.addCleanup(BaseTest.session_client_cleanup)
+            else:
+                # Patch Poller with constructor that always disables polling
+                # This breaks blocking on long running operations (resource creation).
+                self._lro_patch = patch.object(msrest.polling.LROPoller,
+                                               '__init__',
+                                               BaseTest.lro_init)
+                self._lro_patch.start()
+                self.addCleanup(self._lro_patch.stop)
 
             if constants.ENV_ACCESS_TOKEN in os.environ:
                 self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
@@ -431,6 +426,8 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                                              return_value=DEFAULT_SUBSCRIPTION_ID)
             self._subscription_patch.start()
             self.addCleanup(self._subscription_patch.stop)
+
+        self.session = local_session(Session)
 
     def _get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \

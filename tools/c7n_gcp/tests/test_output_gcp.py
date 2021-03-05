@@ -1,23 +1,20 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-from datetime import datetime, timedelta
+import datetime
+from dateutil.parser import parse as date_parse
+from unittest import mock
+import shutil
 import time
 
-from c7n.config import Bag
+from c7n.ctx import ExecutionContext
+from c7n.config import Bag, Config
+from c7n.testing import mock_datetime_now
 from c7n.output import metrics_outputs
-from c7n_gcp.output import StackDriverMetrics
+from c7n.utils import parse_url_config, reset_session_cache
+
+from c7n_gcp.output import (
+    GCPStorageOutput, StackDriverLogging, StackDriverMetrics)
 
 from gcp_common import BaseTest
 
@@ -34,8 +31,10 @@ class MetricsOutputTest(BaseTest):
         factory = self.replay_flight_data('output-metrics', project_id=project_id)
         ctx = Bag(session_factory=factory,
                   policy=Bag(name='custodian-works', resource_type='gcp.function'))
-        metrics = StackDriverMetrics(ctx)
+        conf = Bag()
+        metrics = StackDriverMetrics(ctx, conf)
         metrics.put_metric('ResourceCount', 43, 'Count', Scope='Policy')
+        metrics.flush()
 
         if self.recording:
             time.sleep(42)
@@ -48,8 +47,9 @@ class MetricsOutputTest(BaseTest):
                 'filter': 'metric.type="custom.googleapis.com/custodian/policy/resourcecount"',
                 'pageSize': 3,
                 'interval_startTime': (
-                    datetime.utcnow() - timedelta(minutes=5)).isoformat('T') + 'Z',
-                'interval_endTime': datetime.utcnow().isoformat('T') + 'Z'
+                    datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+                ).isoformat('T') + 'Z',
+                'interval_endTime': datetime.datetime.utcnow().isoformat('T') + 'Z'
             })
         self.assertEqual(
             results['timeSeries'],
@@ -68,3 +68,68 @@ class MetricsOutputTest(BaseTest):
                   u'labels': {u'project_id': u'cloud-custodian'},
                   u'type': u'global'},
               u'valueType': u'INT64'}])
+
+    def test_metrics_output_set_write_project_id(self):
+        project_id = 'cloud-custodian-sub'
+        write_project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('output-metrics', project_id=project_id)
+        ctx = Bag(session_factory=factory,
+                  policy=Bag(name='custodian-works', resource_type='gcp.function'))
+        conf = Bag(project_id=write_project_id)
+        metrics = StackDriverMetrics(ctx, conf)
+        metrics.put_metric('ResourceCount', 43, 'Count', Scope='Policy')
+        metrics.flush()
+
+
+def get_log_output(request, output_url):
+    log = StackDriverLogging(
+        ExecutionContext(
+            lambda assume=False: mock.MagicMock(),
+            Bag(name="xyz", provider_name="gcp", resource_type='gcp.function'),
+            Config.empty(account_id='custodian-test')),
+        parse_url_config(output_url)
+    )
+    request.addfinalizer(reset_session_cache)
+    return log
+
+
+def get_blob_output(request, output_url=None, cleanup=True):
+    if output_url is None:
+        output_url = "gs://cloud-custodian/policies"
+    output = GCPStorageOutput(
+        ExecutionContext(
+            lambda assume=False: mock.MagicMock(),
+            Bag(name="xyz", provider_name="gcp"),
+            Config.empty(output_dir=output_url, account_id='custodian-test')),
+        parse_url_config(output_url)
+    )
+
+    if cleanup:
+        request.addfinalizer(lambda : shutil.rmtree(output.root_dir)) # noqa
+    request.addfinalizer(reset_session_cache)
+    return output
+
+
+@mock.patch('c7n_gcp.output.LogClient')
+@mock.patch('c7n_gcp.output.CloudLoggingHandler')
+def test_gcp_logging(handler, client, request):
+    output = get_log_output(request, 'gcp://')
+    with output:
+        assert 1
+
+    handler().transport.flush.assert_called_once()
+    handler().transport.worker.stop.assert_called_once()
+
+    output = get_log_output(request, 'gcp://apples')
+    assert output.get_log_group() == 'custodian-apples-xyz'
+
+
+@mock.patch('c7n_gcp.output.StorageClient')
+@mock.patch('c7n_gcp.output.Bucket')
+def test_output(bucket, client, request):
+    bucket().blob.return_value = key = mock.MagicMock()
+    with mock_datetime_now(date_parse('2020/06/10 13:00'), datetime):
+        output = get_blob_output(request)
+        assert output.key_prefix == 'policies/xyz/2020/06/10/13'
+        output.upload_file('resources.json', f"{output.key_prefix}/resources.json")
+        key.upload_from_filename.assert_called_once()

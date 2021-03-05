@@ -1,7 +1,6 @@
 {
     "status_code": 200, 
     "data": {
-        "Marker": "c3Fsc2VydmVyLWV4CjEyLjAwLjUwMDAuMC52MQ==", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 

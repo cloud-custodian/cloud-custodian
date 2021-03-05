@@ -1,22 +1,12 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "2763ef2a-a9cd-11e7-a860-153caedaf155", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "2763ef2a-a9cd-11e7-a860-153caedaf155", 
-                "date": "Thu, 05 Oct 2017 13:00:24 GMT", 
-                "content-length": "488", 
-                "content-type": "text/xml"
-            }
-        }, 
         "TagDescriptions": [
             {
-                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/testing/1e0e18b15fe2aefa", 
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:123456789123:loadbalancer/app/test/433ae0ba96204181",
                 "Tags": []
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

@@ -1,20 +1,10 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import json
+import time
 
-import json, time
 
+from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
 
 
@@ -33,6 +23,28 @@ class KMSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_kms_key_alias_augment(self):
+        session_factory = self.replay_flight_data("test_kms_key_alias")
+        p = self.load_policy(
+            {
+                "name": "kms-key-alias-filter",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AliasNames",
+                        "op": "in",
+                        "value": "alias/aws/dms",
+                        "value_type": "swap"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_key_rotation(self):
         session_factory = self.replay_flight_data("test_key_rotation")
@@ -297,3 +309,35 @@ class KMSTagging(BaseTest):
             target_key_arn = client.describe_key(
                 KeyId=target_key_id).get('KeyMetadata').get('Arn')
         self.assertEqual(resources[0]['KmsKeyId'], target_key_arn)
+
+    def test_kms_post_finding(self):
+        factory = self.replay_flight_data('test_kms_post_finding')
+        p = self.load_policy({
+            'name': 'kms',
+            'resource': 'aws.kms',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+
+        resources = p.resource_manager.get_resources([
+            'arn:aws:kms:us-west-2:644160558196:alias/c7n-test'])
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        rfinding['Details']['AwsKmsKey'].pop('CreationDate')
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsKmsKey': {
+                'KeyId': '44d25a5c-7efa-44ed-8436-b9511ea921b3',
+                'KeyManager': 'CUSTOMER',
+                'KeyState': 'Enabled',
+                'Origin': 'AWS_KMS'}},
+             'Id': 'arn:aws:kms:us-west-2:644160558196:alias/44d25a5c-7efa-44ed-8436-b9511ea921b3',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Type': 'AwsKmsKey'})
+
+        shape_validate(
+            rfinding['Details']['AwsKmsKey'], 'AwsKmsKeyDetails', 'securityhub')

@@ -1,18 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 from .common import BaseTest
@@ -117,6 +104,22 @@ class TestRestApi(BaseTest):
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/09/11'})
+
+    def test_rest_api_delete(self):
+        session_factory = self.replay_flight_data('test_rest_api_delete')
+        p = self.load_policy({
+            'name': 'tag-rest-api',
+            'resource': 'rest-api',
+            'filters': [{'tag:target-tag': 'pratyush'}],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertTrue(resources[0]['id'], 'am0c2fyskg')
+        client = session_factory().client("apigateway")
+        with self.assertRaises(ClientError) as e:
+            client.delete_rest_api(restApiId='am0c2fyskg')
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
 
 
 class TestRestResource(BaseTest):
@@ -358,3 +361,99 @@ class TestRestStage(BaseTest):
                 restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
             )
         self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+    def test_rest_stage_tag_untag_mark(self):
+        session_factory = self.replay_flight_data('test_rest_stage_tag_untag_mark')
+        client = session_factory().client("apigateway")
+        tags = client.get_tags(
+            resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
+        self.assertEqual(tags.get('tags', {}),
+            {'target-tag': 'pratyush'})
+        p = self.load_policy({
+            'name': 'tag-rest-stage',
+            'resource': 'rest-stage',
+            'filters': [{'tag:target-tag': 'pratyush'}],
+            "actions": [
+                {'type': 'tag',
+                'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                'tags': ['target-tag']},
+                {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
+                'op': 'update',
+                'days': 2}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        tags = client.get_tags(
+            resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
+        self.assertEqual(tags.get('tags', {}),
+            {'Env': 'Dev',
+            'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
+
+
+class TestRestClientCertificate(BaseTest):
+
+    def test_rest_client_certificate_resource(self):
+        session_factory = self.replay_flight_data('test_rest_client_certificate_resource',
+            region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'list-rest-client-certificates',
+                'resource': 'rest-client-certificate',
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['description'], 'Test certificate')
+
+    def test_rest_stage_client_certificate_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_client_certificate_filter', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+    def test_rest_stage_certificate_filter_config_source(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_certificate_filter_config_source', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'source': 'config',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])

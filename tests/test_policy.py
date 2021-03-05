@@ -1,36 +1,28 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
 import mock
+import os
 import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
-from c7n.resources import aws
-from c7n.resources.aws import AWS
+from c7n.resources import aws, load_available
+from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
+from c7n.policy import ConfigPollRuleMode, PullMode
+from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
 from c7n.version import version
 
-from .common import BaseTest, event_data, Bag, TestConfig as Config
+from .common import BaseTest, event_data, Bag, load_data
 
 
 class DummyResource(manager.ResourceManager):
@@ -41,7 +33,7 @@ class DummyResource(manager.ResourceManager):
     @property
     def actions(self):
 
-        class _a(object):
+        class _a:
 
             def name(self):
                 return self.f.__name__
@@ -61,7 +53,17 @@ class DummyResource(manager.ResourceManager):
         return [_a(p1), _a(p2)]
 
 
-class PolicyMeta(BaseTest):
+class PolicyMetaLint(BaseTest):
+
+    def setUp(self):
+        # we need to load all resources for the linting meta tests.
+        load_available()
+
+    def test_policy_missing_provider_session(self):
+        self.assertRaises(
+            RuntimeError,
+            policy.get_session_factory,
+            'nosuchthing', Bag())
 
     def test_policy_detail_spec_permissions(self):
         policy = self.load_policy(
@@ -70,45 +72,53 @@ class PolicyMeta(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "kinesis:DescribeStream",
-                    "kinesis:ListStreams",
-                    "kinesis:DeleteStream",
-                )
-            ),
+            {
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
         )
 
-    def test_policy_manager_custom_permissions(self):
-        policy = self.load_policy(
-            {
-                "name": "ec2-utilization",
-                "resource": "ec2",
-                "filters": [
-                    {
-                        "type": "metrics",
-                        "name": "CPUUtilization",
-                        "days": 3,
-                        "value": 1.5,
-                    }
-                ],
-            }
-        )
-        perms = policy.get_permissions()
-        self.assertEqual(
-            perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "cloudwatch:GetMetricStatistics",
-                )
-            ),
-        )
+    def test_resource_type_repr_with_arn_type(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})
+        # check the repr absent a config type and cfn type but with an arn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert policy.resource_manager.resource_type.cfn_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
+
+    def test_resource_type_repr(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ecr'})
+        # check the repr absent a config type but with a cfn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::ECR::Repository>'
+
+    def test_schema_plugin_name_mismatch(self):
+        # todo iterate over all clouds not just aws resources
+        for k, v in manager.resources.items():
+            for fname, f in v.filter_registry.items():
+                if fname in ("or", "and", "not"):
+                    continue
+                self.assertIn(fname, f.schema["properties"]["type"]["enum"])
+            for aname, a in v.action_registry.items():
+                self.assertIn(aname, a.schema["properties"]["type"]["enum"])
+
+    def test_schema(self):
+        try:
+            schema = generate()
+            JsonSchemaValidator.check_schema(schema)
+        except Exception:
+            self.fail("Invalid schema")
+
+    def test_schema_serialization(self):
+        try:
+            dumps(generate())
+        except Exception:
+            self.fail("Failed to serialize schema")
 
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
+        missing = []
         for k, v in manager.resources.items():
             if not getattr(v.resource_type, "universal_taggable", None):
                 continue
@@ -116,9 +126,28 @@ class PolicyMeta(BaseTest):
                 v.augment.__name__ == "universal_augment" and
                 getattr(v.resource_type, "detail_spec", None)
             ):
-                self.fail(
-                    "%s resource has universal augment masking resource augment" % k
-                )
+                missing.append(k)
+
+        if missing:
+            self.fail(
+                "%s resource has universal augment masking resource augment" % (
+                    ', '.join(missing))
+            )
+
+    def test_resource_universal_taggable_arn_type(self):
+        missing = []
+        for k, v in manager.resources.items():
+            if not getattr(v, 'augment', None):
+                continue
+            if (
+                v.augment.__name__ == "universal_augment" and
+                    v.resource_type.arn_type is None
+            ):
+                missing.append(k)
+
+        if missing:
+            self.fail("%s universal taggable resource missing arn_type" % (
+                ', '.join(missing)))
 
     def test_resource_shadow_source_augment(self):
         shadowed = []
@@ -157,8 +186,9 @@ class PolicyMeta(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference(set(
-            ('account', 's3', 'hostedzone', 'log-group', 'rest-api')))
+        overrides = overrides.difference(
+            {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
+             'rest-stage'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -169,6 +199,133 @@ class PolicyMeta(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_cfn_resource_validity(self):
+        # for resources which are annotated with cfn_type ensure that it is
+        # a valid type.
+        resource_cfn_types = set()
+        for k, v in manager.resources.items():
+            rtype = v.resource_type.cfn_type
+            if rtype is not None:
+                resource_cfn_types.add(rtype)
+        cfn_types = set(load_data('cfn-types.json'))
+        missing = set()
+        for rtype in resource_cfn_types:
+            if rtype not in cfn_types:
+                missing.add(rtype)
+        if missing:
+            raise AssertionError("Bad cfn types:\n %s" % (
+                "\n".join(sorted(missing))))
+
+    def test_securityhub_resource_support(self):
+        session = fake_session()._session
+        model = session.get_service_model('securityhub')
+        shape = model.shape_for('ResourceDetails')
+        mangled_hub_types = set(shape.members.keys())
+        resource_hub_types = set()
+
+        whitelist = set(('AwsS3Object', 'Container'))
+        todo = set((
+            # newer wave q1 2021,
+            'AwsSsmPatchCompliance',
+            # newer wave q4 2020
+            'AwsApiGatewayRestApi',
+            'AwsApiGatewayStage',
+            'AwsApiGatewayV2Api',
+            'AwsApiGatewayV2Stage',
+            'AwsCertificateManagerCertificate',
+            'AwsCloudTrailTrail',
+            'AwsElbLoadBalancer',
+            'AwsIamGroup',
+            'AwsRedshiftCluster',
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
+            'AwsRdsDbInstance',
+            'AwsElbv2LoadBalancer',
+            'AwsEc2SecurityGroup',
+            'AwsIamAccessKey',
+            'AwsEc2NetworkInterface',
+            'AwsWafWebAcl'))
+        mangled_hub_types = mangled_hub_types.difference(whitelist).difference(todo)
+        for k, v in manager.resources.items():
+            finding = v.action_registry.get('post-finding')
+            if finding:
+                resource_hub_types.add(finding.resource_type)
+        assert mangled_hub_types.difference(resource_hub_types) == set()
+
+    def test_config_resource_support(self):
+
+        # for several of these we express support as filter or action instead
+        # of a resource.
+        whitelist = {
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::NetworkFirewall::RuleGroup',
+            'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::EgressOnlyInternetGateway',
+            'AWS::EC2::VPCEndpointService',
+            'AWS::EC2::FlowLog',
+            'AWS::RDS::DBSecurityGroup',
+            'AWS::RDS::EventSubscription',
+            'AWS::S3::AccountPublicAccessBlock',
+            'AWS::Redshift::ClusterParameterGroup',
+            'AWS::Redshift::ClusterSecurityGroup',
+            'AWS::Redshift::EventSubscription',
+            'AWS::SSM::ManagedInstanceInventory',
+            'AWS::AutoScaling::ScalingPolicy',
+            'AWS::AutoScaling::ScheduledAction',
+            'AWS::WAF::RateBasedRule',
+            'AWS::WAF::Rule',
+            'AWS::WAF::RuleGroup',
+            'AWS::WAFRegional::RateBasedRule',
+            'AWS::WAFRegional::Rule',
+            'AWS::WAFRegional::RuleGroup',
+            'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::WAFv2::WebACL',
+            'AWS::WAFv2::RuleGroup',
+            'AWS::WAFv2::IPSet',
+            'AWS::WAFv2::RegexPatternSet',
+            'AWS::WAFv2::ManagedRuleSet',
+            'AWS::XRay::EncryptionConfig',
+            'AWS::SSM::AssociationCompliance',
+            'AWS::SSM::PatchCompliance',
+            'AWS::ShieldRegional::Protection',
+            'AWS::Config::ResourceCompliance',
+            'AWS::ApiGatewayV2::Stage',
+            'AWS::ApiGatewayV2::Api',
+            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
+            'AWS::ServiceCatalog::CloudFormationProduct',
+            'AWS::SSM::FileData'}
+
+        resource_map = {}
+        for k, v in manager.resources.items():
+            if not v.resource_type.config_type:
+                continue
+            resource_map[v.resource_type.config_type] = v
+        resource_config_types = set(resource_map)
+
+        session = fake_session()._session
+        model = session.get_service_model('config')
+        shape = model.shape_for('ResourceType')
+
+        config_types = set(shape.enum).difference(whitelist)
+        missing = config_types.difference(resource_config_types)
+        if missing:
+            raise AssertionError(
+                "Missing config types \n %s" % ('\n'.join(missing)))
+
+        bad_types = resource_config_types.difference(config_types)
+        if bad_types:
+            raise AssertionError(
+                "Invalid config types \n %s" % ('\n'.join(bad_types)))
 
     def test_resource_meta_with_class(self):
         missing = set()
@@ -239,16 +396,16 @@ class PolicyMeta(BaseTest):
 
     def test_resource_arn_info(self):
         missing = []
-        whitelist_missing = set((
-            'rest-stage', 'rest-resource', 'rest-vpclink'))
+        whitelist_missing = {
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
-        whitelist_explicit = set((
+        whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target',
-            'support-case', 'transit-attachment', 'config-recorder'))
+            'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -289,7 +446,7 @@ class PolicyMeta(BaseTest):
         missing = []
         cfg = Config.empty()
 
-        for k, v in manager.resources.items():
+        for k, v in list(manager.resources.items()):
             p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
 
@@ -298,7 +455,7 @@ class PolicyMeta(BaseTest):
             if not perms:
                 missing.append(k)
 
-            for n, a in v.action_registry.items():
+            for n, a in list(v.action_registry.items()):
                 p["actions"] = [n]
                 perms = a({}, mgr).get_permissions()
                 found = bool(perms)
@@ -309,8 +466,8 @@ class PolicyMeta(BaseTest):
                 if not found:
                     missing.append("%s.actions.%s" % (k, n))
 
-            for n, f in v.filter_registry.items():
-                if n in ("and", "or", "not", "missing"):
+            for n, f in list(v.filter_registry.items()):
+                if n in ("and", "or", "not", "missing", "reduce"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -356,6 +513,50 @@ class PolicyMeta(BaseTest):
             )
 
 
+class PolicyMeta(BaseTest):
+
+    def test_policy_detail_spec_permissions(self):
+        policy = self.load_policy(
+            {"name": "kinesis-delete",
+             "resource": "kinesis",
+             "actions": ["delete"]}
+        )
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            {
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
+        )
+
+    def test_policy_manager_custom_permissions(self):
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "value": 1.5,
+                    }
+                ],
+            }
+        )
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            {
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "cloudwatch:GetMetricStatistics",
+            },
+        )
+
+
 class TestPolicyCollection(BaseTest):
 
     def test_expand_partitions(self):
@@ -369,18 +570,6 @@ class TestPolicyCollection(BaseTest):
             sorted([p.options.region for p in collection]),
             ["cn-north-1", "us-gov-west-1", "us-west-2"],
         )
-
-    def test_policy_account_expand(self):
-        factory = self.replay_flight_data('test_aws_policy_region_expand')
-        self.patch(aws, '_profile_session', factory())
-
-        original = policy.PolicyCollection.from_data(
-            {"policies": [{"name": "foo", "resource": "account"}]},
-            Config.empty(regions=["us-east-1", "us-west-2"]),
-        )
-
-        collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
-        self.assertEqual(len(collection), 1)
 
     def test_policy_expand_group_region(self):
         cfg = Config.empty(regions=["us-east-1", "us-east-2", "us-west-2"])
@@ -407,18 +596,16 @@ class TestPolicyCollection(BaseTest):
     def test_policy_region_expand_global(self):
         factory = self.replay_flight_data('test_aws_policy_global_expand')
         self.patch(aws, '_profile_session', factory())
-
-        original = policy.PolicyCollection.from_data(
-            {
-                "policies": [
-                    {"name": "foo", "resource": "s3"},
-                    {"name": "iam", "resource": "iam-user"},
-                ]
-            },
-            Config.empty(regions=["us-east-1", "us-west-2"]),
+        original = self.policy_loader.load_data(
+            {"policies": [
+                {"name": "foo", "resource": "s3"},
+                {"name": "iam", "resource": "iam-user"}]},
+            'memory://',
+            config=Config.empty(regions=["us-east-1", "us-west-2"]),
         )
 
-        collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=["all"], output_dir="/test/output/"))
         self.assertEqual(len(collection.resource_types), 2)
         s3_regions = [p.options.region for p in collection if p.resource_type == "s3"]
         self.assertTrue("us-east-1" in s3_regions)
@@ -426,13 +613,23 @@ class TestPolicyCollection(BaseTest):
         iam = [p for p in collection if p.resource_type == "iam-user"]
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, "us-east-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/output/us-east-1")
+
+        # Don't append region when it's already in the path.
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=["all"], output_dir="/test/{region}/output/"))
+        self.assertEqual(len(collection.resource_types), 2)
+        iam = [p for p in collection if p.resource_type == "iam-user"]
+        self.assertEqual(iam[0].options.region, "us-east-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/{region}/output")
 
         collection = AWS().initialize_policies(
-            original, Config.empty(regions=["eu-west-1", "eu-west-2"])
+            original, Config.empty(regions=["eu-west-1", "eu-west-2"], output_dir="/test/output/")
         )
         iam = [p for p in collection if p.resource_type == "iam-user"]
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, "eu-west-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/output/eu-west-1")
         self.assertEqual(len(collection), 3)
 
 
@@ -469,6 +666,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
@@ -584,7 +782,7 @@ class TestPolicy(BaseTest):
         for p in collection:
             self.assertTrue(p.name is not None)
 
-        self.assertEqual(collection.resource_types, set(("s3", "ec2")))
+        self.assertEqual(collection.resource_types, {"s3", "ec2"})
         self.assertTrue("s3-remediate" in collection)
 
         self.assertEqual(
@@ -645,65 +843,6 @@ class TestPolicy(BaseTest):
 
     def test_file_not_found(self):
         self.assertRaises(IOError, policy.load, Config.empty(), "/asdf12")
-
-    def test_lambda_policy_metrics(self):
-        session_factory = self.replay_flight_data("test_lambda_policy_metrics")
-        p = self.load_policy(
-            {
-                "name": "ec2-tag-compliance-v6",
-                "resource": "ec2",
-                "mode": {"type": "ec2-instance-state", "events": ["running"]},
-                "filters": [
-                    {"tag:custodian_status": "absent"},
-                    {
-                        "or": [
-                            {"tag:App": "absent"},
-                            {"tag:Env": "absent"},
-                            {"tag:Owner": "absent"},
-                        ]
-                    },
-                ],
-            },
-            session_factory=session_factory,
-        )
-        end = datetime.utcnow()
-        start = end - timedelta(14)
-        period = 24 * 60 * 60 * 14
-        self.assertEqual(
-            json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
-            {
-                u"Durations": [],
-                u"Errors": [
-                    {
-                        u"Sum": 0.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"Invocations": [
-                    {
-                        u"Sum": 4.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"ResourceCount": [
-                    {
-                        u"Average": 1.0,
-                        u"Sum": 2.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"Throttles": [
-                    {
-                        u"Sum": 0.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-            },
-        )
 
     def test_policy_resource_limits(self):
         session_factory = self.replay_flight_data(
@@ -797,67 +936,6 @@ class TestPolicy(BaseTest):
         resources = p.run()
         self.assertTrue(resources)
 
-    def test_policy_metrics(self):
-        session_factory = self.replay_flight_data("test_policy_metrics")
-        p = self.load_policy(
-            {
-                "name": "s3-encrypt-keys",
-                "resource": "s3",
-                "actions": [{"type": "encrypt-keys"}],
-            },
-            session_factory=session_factory,
-        )
-
-        end = datetime.now().replace(hour=0, minute=0, microsecond=0)
-        start = end - timedelta(14)
-        period = 24 * 60 * 60 * 14
-        self.maxDiff = None
-        self.assertEqual(
-            json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
-            {
-                "ActionTime": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 8541.752702140668,
-                        "Sum": 128126.29053211001,
-                        "Unit": "Seconds",
-                    }
-                ],
-                "Total Keys": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 1575708.7333333334,
-                        "Sum": 23635631.0,
-                        "Unit": "Count",
-                    }
-                ],
-                "ResourceTime": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 8.682969363532667,
-                        "Sum": 130.24454045299,
-                        "Unit": "Seconds",
-                    }
-                ],
-                "ResourceCount": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 23.6,
-                        "Sum": 354.0,
-                        "Unit": "Count",
-                    }
-                ],
-                "Unencrypted": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 10942.266666666666,
-                        "Sum": 164134.0,
-                        "Unit": "Count",
-                    }
-                ],
-            },
-        )
-
     def test_get_resource_manager(self):
         collection = self.load_policy_set(
             {
@@ -872,28 +950,6 @@ class TestPolicy(BaseTest):
         )
         p = collection.policies[0]
         self.assertTrue(isinstance(p.load_resource_manager(), EC2))
-
-    def test_get_logs_from_group(self):
-        p_data = {
-            "name": "related-rds-test",
-            "resource": "rds",
-            "filters": [
-                {"key": "GroupName", "type": "security-group", "value": "default"}
-            ],
-            "actions": [{"days": 10, "type": "retention"}],
-        }
-        session_factory = self.replay_flight_data("test_logs_from_group")
-        config = {"log_group": "test-logs"}
-        policy = self.load_policy(p_data, config, session_factory)
-        logs = list(policy.get_logs("2016-11-01 00:00:00", "2016-11-30 11:59:59"))
-        self.assertEqual(len(logs), 6)
-        # entries look reasonable
-        entry = logs[1]
-        self.assertIn("timestamp", entry)
-        self.assertIn("message", entry)
-        # none in range
-        logs = list(policy.get_logs("2016-10-01 00:00:00", "2016-10-31 11:59:59"))
-        self.assertEqual(len(logs), 0)
 
     def xtest_policy_run(self):
         manager.resources.register("dummy", DummyResource)
@@ -931,7 +987,7 @@ class TestPolicy(BaseTest):
             'resource': 'ec2',
             'tz': 'asdf'
         }
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data)
 
         data = {
@@ -960,6 +1016,126 @@ class TestPolicy(BaseTest):
         p = self.load_policy(data)
         result = p.validate_policy_start_stop()
         self.assertEqual(result, None)
+
+
+class PolicyConditionsTest(BaseTest):
+
+    def test_value_from(self):
+        tmp_dir = self.change_cwd()
+        p = self.load_policy({
+            'name': 'fx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account_id',
+                'op': 'in',
+                'value_from': {
+                    'url': 'file:///{}/accounts.txt'.format(tmp_dir),
+                    'type': 'txt'}
+            }]
+        })
+        with open(os.path.join(tmp_dir, 'accounts.txt'), 'w') as fh:
+            fh.write(p.ctx.options.account_id)
+        self.assertTrue(p.is_runnable())
+
+    def test_env_var_extension(self):
+        p = self.load_policy({
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account.name',
+                'value': 'deputy'}]})
+        p.conditions.env_vars['account'] = {'name': 'deputy'}
+        self.assertTrue(p.is_runnable())
+        p.conditions.env_vars['account'] = {'name': 'mickey'}
+        self.assertFalse(p.is_runnable())
+
+    def test_event_filter(self):
+        p = self.load_policy({
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'event',
+                'key': 'detail.userIdentity.userName',
+                'value': 'deputy'}]})
+        self.assertTrue(
+            p.conditions.evaluate(
+                {'detail': {'userIdentity': {'userName': 'deputy'}}}))
+
+        # event filters pass if we don't have an event.
+        self.assertTrue(p.is_runnable())
+        self.assertFalse(p.is_runnable({}))
+        self.assertFalse(p.is_runnable(
+            {'detail': {'userIdentity': {'userName': 'mike'}}}))
+
+    def test_boolean_or_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'or': [
+                    {'region': 'us-east-1'},
+                    {'region': 'us-west-2'}]}]})
+        self.assertTrue(p.is_runnable())
+
+    def test_boolean_and_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'and': [
+                    {'region': 'us-east-1'},
+                    {'region': 'us-west-2'}]}]})
+        self.assertFalse(p.is_runnable())
+
+    def test_boolean_not_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'not': [
+                    {'region': 'us-east-1'}]}]})
+        self.assertFalse(p.is_runnable())
+
+    def test_dryrun_event_filter(self):
+        pdata = {
+            'name': 'manga',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'role': 'something'
+            },
+            'filters': [{
+                'not': [
+                    {'type': 'event'}
+                ]
+            }]
+        }
+        self.patch(PullMode, 'run', lambda self: [True])
+        p = self.load_policy(
+            deepcopy(pdata), config={'dryrun': True})
+        results = p.run()
+        self.assertEqual(results, [True])
+        self.assertTrue(p.is_runnable())
+        self.assertEqual(pdata, p.data)
+
+    def test_boolean_not_event(self):
+        # event is bound to execution evaluation, when
+        # evaluating conditions for provisioning we
+        # strip any event filters.
+        pdata = {
+            'name': 'manga',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'or': [
+                    {'not': [
+                        {'type': 'event'}]}]}]}
+        p = self.load_policy(pdata)
+        p._trim_runtime_filters()
+        self.assertTrue(p.is_runnable())
+        self.assertFalse(p.conditions.filters)
+        self.assertEqual(p.data, pdata)
 
 
 class PolicyExecutionModeTest(BaseTest):
@@ -1039,7 +1215,7 @@ class PullModeTest(BaseTest):
 
         lines = log_file.getvalue().strip().split("\n")
         self.assertIn(
-            "Skipping policy:{} target-region:us-east-1 current-region:us-west-2".format(
+            "Skipping policy:{} due to execution conditions".format(
                 policy_name
             ),
             lines,
@@ -1052,8 +1228,7 @@ class PullModeTest(BaseTest):
              'region': 'us-east-1'},
             config={'region': 'us-west-2', 'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
     def test_is_runnable_dates(self):
         p = self.load_policy(
@@ -1063,10 +1238,9 @@ class PullModeTest(BaseTest):
              'start': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',
@@ -1074,8 +1248,7 @@ class PullModeTest(BaseTest):
              'start': tomorrow_date},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'good-end-date',
@@ -1084,8 +1257,7 @@ class PullModeTest(BaseTest):
              'end': tomorrow_date},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'bad-end-date',
@@ -1094,8 +1266,7 @@ class PullModeTest(BaseTest):
              'end': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'bad-start-end-date',
@@ -1105,8 +1276,7 @@ class PullModeTest(BaseTest):
              'end': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
     def test_is_runnable_parse_dates(self):
         p = self.load_policy(
@@ -1116,8 +1286,7 @@ class PullModeTest(BaseTest):
              'start': 'March 3 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -1126,8 +1295,7 @@ class PullModeTest(BaseTest):
              'start': 'March 3rd 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -1136,8 +1304,59 @@ class PullModeTest(BaseTest):
              'start': '28 March 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
+
+
+class PhdModeTest(BaseTest):
+
+    def test_validation(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'xyz', 'resource': 'ec2',
+             'mode': {'type': 'phd'}})
+        self.load_policy(
+            {'name': 'abc', 'resource': 'account',
+             'mode': {'type': 'phd'}})
+
+
+class ConfigModeTest(BaseTest):
+
+    def test_config_poll(self):
+        factory = self.replay_flight_data('test_config_poll_rule_evaluation')
+        cmock = mock.MagicMock()
+        requests = []
+
+        def record_requests(Evaluations, ResultToken):
+            requests.append(Evaluations)
+
+        cmock.put_evaluations.side_effect = record_requests
+        cmock.put_evaluations.return_value = {}
+        self.patch(
+            ConfigPollRuleMode, '_get_client', lambda self: cmock)
+        p = self.load_policy({
+            'name': 'kin-poll',
+            'resource': 'aws.kinesis',
+            'filters': [{'tag:App': 'Dev'}],
+            'mode': {
+                'type': 'config-poll-rule',
+                'schedule': 'Three_Hours'}},
+            session_factory=factory)
+        event = event_data('poll-evaluation.json', 'config')
+        results = p.push(event, None)
+        self.assertEqual(results, ['dev2'])
+        self.assertEqual(
+            requests,
+            [[{'Annotation': 'The resource is not compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev2',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'NON_COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}],
+             [{'Annotation': 'The resource is compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev1',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
 
 
 class GuardModeTest(BaseTest):

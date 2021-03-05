@@ -1,20 +1,9 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import json
 import hashlib
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import local_session, type_schema
@@ -68,6 +57,16 @@ class PostFinding(MethodAction):
     ServiceVersion = 'v1beta1'
 
     _source = None
+
+    # security center permission model is pretty obtuse to correct
+    permissions = (
+        'securitycenter.findings.list',
+        'securitycenter.findings.update',
+        'resourcemanager.organizations.get',
+        'securitycenter.assetsecuritymarks.update',
+        'securitycenter.sources.update',
+        'securitycenter.sources.list'
+    )
 
     def validate(self):
         if not any([self.data.get(k) for k in ('source', 'org-domain', 'org-id')]):
@@ -155,9 +154,9 @@ class PostFinding(MethodAction):
             'category': self.data.get('category', self.DefaultCategory),
             'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
             'sourceProperties': {
-                'resource-type': self.manager.type,
+                'resource_type': self.manager.type,
                 'title': policy.data.get('title', policy.name),
-                'policy-name': policy.name,
+                'policy_name': policy.name,
                 'policy': json.dumps(policy.data)
             }
         }
@@ -169,13 +168,12 @@ class PostFinding(MethodAction):
         return request
 
     @classmethod
-    def register_resource(klass, registry, event):
-        for rtype, resource_manager in registry.items():
-            if resource_manager.resource_type.service not in ResourceNameAdapters:
-                continue
-            elif 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_manager.action_registry.register('post-finding', klass)
+    def register_resource(klass, registry, resource_class):
+        if resource_class.resource_type.service not in ResourceNameAdapters:
+            return
+        if 'post-finding' in resource_class.action_registry:
+            return
+        resource_class.action_registry.register('post-finding', klass)
 
 
 # CSCC uses its own notion of resource id, if we want our findings on
@@ -231,5 +229,4 @@ ResourceNameAdapters = {
     'storage': name_storage,
 }
 
-gcp_resources.subscribe(
-    gcp_resources.EVENT_FINAL, PostFinding.register_resource)
+gcp_resources.subscribe(PostFinding.register_resource)

@@ -1,23 +1,10 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import Tag, RemoveTag
+from c7n.tags import Tag, RemoveTag, universal_augment
 from c7n.utils import type_schema, local_session, dumps, chunks
 
 
@@ -27,14 +14,21 @@ class StepFunction(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'stepfunctions'
+        permission_prefix = 'states'
         enum_spec = ('list_state_machines', 'stateMachines', None)
         arn = id = 'stateMachineArn'
+        arn_service = 'states'
         arn_type = 'stateMachine'
+        cfn_type = 'AWS::StepFunctions::StateMachine'
         name = 'name'
         date = 'creationDate'
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self, resources)
 
 
 class InvokeStepFunction(Action):
@@ -82,7 +76,7 @@ class InvokeStepFunction(Action):
            'bulk': {'type': 'boolean'},
            'policy': {'type': 'boolean'}})
     schema_alias = True
-    permissions = ('stepfunctions:StartExecution',)
+    permissions = ('states:StartExecution',)
 
     def process(self, resources):
         client = local_session(
@@ -118,12 +112,12 @@ class InvokeStepFunction(Action):
                 r['c7n:execution-arn'] = exec_arn
 
     @classmethod
-    def register(cls, registry, key):
-        for _, r in registry.items():
-            r.action_registry.register('invoke-sfn', cls)
+    def register_resources(cls, registry, resource_class):
+        if 'invoke-sfn' not in resource_class.action_registry:
+            resource_class.action_registry.register('invoke-sfn', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, InvokeStepFunction.register)
+resources.subscribe(InvokeStepFunction.register_resources)
 
 
 @StepFunction.action_registry.register('tag')
@@ -143,7 +137,7 @@ class TagStepFunction(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('stepfunctions:TagResource',)
+    permissions = ('states:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
 
@@ -172,7 +166,7 @@ class UnTagStepFunction(RemoveTag):
                     tags: ["test"]
     """
 
-    permissions = ('stepfunctions:UntagResource',)
+    permissions = ('states:UntagResource',)
 
     def process_resource_set(self, client, resources, tag_keys):
 

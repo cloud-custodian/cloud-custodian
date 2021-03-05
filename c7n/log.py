@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Python Standard Logging integration with CloudWatch Logs
 
@@ -22,8 +11,6 @@ std logging does default lock acquisition around handler emit).
 also uses a single thread for all outbound. Background thread
 uses a separate session.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.exceptions import ClientError
 
 import itertools
@@ -45,7 +32,7 @@ SHUTDOWN_MARKER = object()
 EMPTY = Queue.Empty
 
 
-class Error(object):
+class Error:
 
     AlreadyAccepted = "DataAlreadyAcceptedException"
     InvalidToken = "InvalidSequenceTokenException"
@@ -82,7 +69,7 @@ class CloudWatchLogHandler(logging.Handler):
         # Logging module internally is tracking all handlers, for final
         # cleanup atexit, custodian is a bit more explicitly scoping shutdown to
         # each policy, so use a sentinel value to avoid deadlocks.
-        self.shutdown = False
+        self.shutdown = True
         retry = get_retry(('ThrottlingException',))
         try:
             client = self.session_factory().client('logs')
@@ -113,6 +100,7 @@ class CloudWatchLogHandler(logging.Handler):
 
         msg = self.format_message(message)
         if not self.transport:
+            self.shutdown = False
             self.start_transports()
         self.buf.append(msg)
         self.flush_buffers(
@@ -164,7 +152,7 @@ class CloudWatchLogHandler(logging.Handler):
         self.buf = []
 
 
-class Transport(object):
+class Transport:
 
     def __init__(self, queue, batch_size, batch_interval, session_factory):
         self.queue = queue

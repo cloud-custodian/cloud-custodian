@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
@@ -30,6 +19,11 @@ class AppEngineApp(QueryResourceManager):
         enum_spec = ('get', '[@]', None)
         scope = None
         id = 'id'
+        name = 'name'
+        default_report_fields = [
+            'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
+        asset_type = "appengine.googleapis.com/Application"
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -56,6 +50,7 @@ class AppEngineCertificate(ChildResourceManager):
         component = 'apps.authorizedCertificates'
         enum_spec = ('list', 'certificates[]', None)
         scope = None
+        name = 'displayName'
         id = 'id'
         parent_spec = {
             'resource': 'app-engine',
@@ -63,6 +58,8 @@ class AppEngineCertificate(ChildResourceManager):
                 ('id', 'appsId')
             }
         }
+        default_report_fields = ['displayName', 'expireTime']
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -75,7 +72,7 @@ class AppEngineCertificate(ChildResourceManager):
 @resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
     """GCP resource:
-    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains/list#AuthorizedDomain
     """
     class resource_type(ChildTypeInfo):
         service = 'appengine'
@@ -84,12 +81,15 @@ class AppEngineDomain(ChildResourceManager):
         enum_spec = ('list', 'domains[]', None)
         scope = None
         id = 'id'
+        name = "name"
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
         }
+        permissions = ('appengine.applications.get',)
 
 
 @resources.register('app-engine-domain-mapping')
@@ -107,13 +107,16 @@ class AppEngineDomainMapping(ChildResourceManager):
         component = 'apps.domainMappings'
         enum_spec = ('list', 'domainMappings[]', None)
         scope = None
+        name = "name"
         id = 'id'
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
         }
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):
@@ -138,13 +141,15 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
         component = 'apps.firewall.ingressRules'
         enum_spec = ('list', 'ingressRules[]', None)
         scope = None
-        id = 'priority'
+        name = id = 'priority'
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
         }
+        default_report_fields = ['priority', 'action', 'sourceRange', 'description']
+        permissions = ('appengine.applications.get',)
 
         @staticmethod
         def get(client, resource_info):

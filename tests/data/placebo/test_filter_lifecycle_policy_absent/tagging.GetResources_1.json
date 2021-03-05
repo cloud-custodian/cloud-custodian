@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [],
+        "ResponseMetadata": {
+            "RequestId": "122e7050-afaf-4df5-9bf4-d00147924030",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "122e7050-afaf-4df5-9bf4-d00147924030",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "50",
+                "date": "Wed, 05 Feb 2020 20:10:25 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

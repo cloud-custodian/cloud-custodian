@@ -1,0 +1,64 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Search/searchServices?api-version=2015-08-19",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "elapsed-time": [
+                        "155"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "request-id": [
+                        "8968bc7e-f9d9-11e9-a522-dc7196cbd828"
+                    ],
+                    "date": [
+                        "Mon, 28 Oct 2019 23:20:31 GMT"
+                    ],
+                    "content-length": [
+                        "512"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_search/providers/Microsoft.Search/searchServices/cctestsearchc129bfa71a47",
+                                "name": "cctestsearchc129bfa71a47",
+                                "type": "Microsoft.Search/searchServices",
+                                "location": "South Central US",
+                                "properties": {
+                                    "replicaCount": 1,
+                                    "partitionCount": 1,
+                                    "status": "running",
+                                    "statusDetails": "",
+                                    "provisioningState": "succeeded",
+                                    "hostingMode": "default",
+                                    "ETag": "W/\"datetime'2019-10-28T23%3A19%3A45.5972169Z'\""
+                                },
+                                "sku": {
+                                    "name": "free"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

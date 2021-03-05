@@ -1,25 +1,13 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 
 @resources.register('message-broker')
@@ -30,18 +18,42 @@ class MessageBroker(QueryResourceManager):
         enum_spec = ('list_brokers', 'BrokerSummaries', None)
         detail_spec = (
             'describe_broker', 'BrokerId', 'BrokerId', None)
-
+        cfn_type = 'AWS::AmazonMQ::Broker'
         id = 'BrokerId'
         arn = 'BrokerArn'
         name = 'BrokerName'
         dimension = 'Broker'
         metrics_namespace = 'AWS/AmazonMQ'
 
+    permissions = ('mq:ListTags',)
+
     def augment(self, resources):
         super(MessageBroker, self).augment(resources)
         for r in resources:
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
+
+
+@MessageBroker.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: message-broker-kms-key-filter
+            resource: message-broker
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/mq)"
+                op: regex
+    """
+    RelatedIdsExpression = 'EncryptionOptions.KmsKeyId'
 
 
 @MessageBroker.filter_registry.register('marked-for-op')
@@ -107,7 +119,7 @@ class TagMessageBroker(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('mq:TagMessageBroker',)
+    permissions = ('mq:CreateTags',)
 
     def process_resource_set(self, client, mq, new_tags):
         for r in mq:
@@ -137,7 +149,7 @@ class UntagMessageBroker(RemoveTag):
                     tags: ["OutdatedTag"]
     """
 
-    permissions = ('mq:UntagMessageBroker',)
+    permissions = ('mq:DeleteTags',)
 
     def process_resource_set(self, client, mq, tags):
         for r in mq:
@@ -167,3 +179,19 @@ class MarkForOpMessageBroker(TagDelayedAction):
                     op: delete
                     days: 7
     """
+
+
+@resources.register('message-config')
+class MessageConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'mq'
+        enum_spec = ('list_configurations', 'Configurations', None)
+        cfn_type = 'AWS::AmazonMQ::Configuration'
+        id = 'Id'
+        arn = 'Arn'
+        arn_type = 'configuration'
+        name = 'Name'
+        universal_taggable = object()
+
+    augment = universal_augment

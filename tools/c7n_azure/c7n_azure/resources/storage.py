@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import logging
@@ -159,7 +148,8 @@ class StorageSetFirewallAction(SetFirewallAction):
 
         # Add IP rules
         if self.data.get('ip-rules') is not None:
-            existing_ip = resource['properties']['networkAcls'].get('ipRules', [])
+            existing_ip = [r['value']
+                           for r in resource['properties']['networkAcls'].get('ipRules', [])]
             ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
             # If the user has too many rules raise exception
@@ -283,7 +273,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-load-balancers-with-logs-enabled
             resource: azure.loadbalancer
             filters:
@@ -304,7 +294,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-keyvaults-with-logs-enabled
             resource: azure.keyvault
             filters:
@@ -444,7 +434,7 @@ class SetLogSettingsAction(AzureBaseAction):
                                                     log_settings, self.session, self.token)
 
 
-class StorageSettingsUtilities(object):
+class StorageSettingsUtilities:
 
     @staticmethod
     def _get_blob_client_from_storage_account(storage_account, token):

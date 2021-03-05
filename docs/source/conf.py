@@ -16,6 +16,7 @@ import sys
 import os
 import shlex
 import sphinx_rtd_theme
+from sphinx.ext import autodoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -38,6 +39,17 @@ extensions = [
     'sphinx_markdown_tables'
 ]
 
+# Extract only a classes docstrings
+class DocsonlyMethodDocumenter(autodoc.MethodDocumenter):
+  objtype = "doconly"
+  content_indent = ""
+
+  def format_signature(self, **kwargs):
+    return ""
+
+  def add_directive_header(self, sig: str):
+    return None
+
 # Add any paths that contain templates here, relative to this directory.
 #templates_path = ['_templates']
 
@@ -54,7 +66,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Cloud Custodian'
-copyright = u'2017, Capital One Services, LLC'
 author = u'Kapil Thangavelu'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -123,6 +134,7 @@ html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
   'prev_next_buttons_location': 'both',
   'style_external_links': True,
+  'analytics_id': "UA-162730326-1",
   # Toc options
   'collapse_navigation': False,
   'sticky_navigation': True,
@@ -303,3 +315,4 @@ texinfo_documents = [
 def setup(app):
     app.add_javascript('js/expand.js')
     app.add_stylesheet('css/expand.css')
+    app.add_autodocumenter(DocsonlyMethodDocumenter)

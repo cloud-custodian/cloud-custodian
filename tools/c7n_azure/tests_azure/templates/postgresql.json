@@ -12,13 +12,20 @@
         {
             "apiVersion": "2017-12-01",
             "type": "Microsoft.DBforPostgreSQL/servers",
-            "location": "[resourceGroup().location]",
+            "location": "EastUS",
             "name": "[parameters('serverName')]",
             "properties": {
                 "version": "10",
                 "administratorLogin": "custodian",
                 "administratorLoginPassword": "Cust0dianPassw0rd",
                 "createMode": "Default"
+            },
+            "sku": {
+                "name": "GP_Gen5_2",
+                "tier": "GeneralPurpose",
+                "capacity": "2",
+                "size": "5120",
+                "family": "Gen5"
             },
             "resources": [
                 {

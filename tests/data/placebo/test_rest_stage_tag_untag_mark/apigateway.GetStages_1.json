@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "eae6f878-31f2-498c-86f7-8fb876164a78",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 02 Nov 2019 15:19:01 GMT",
+                "content-type": "application/json",
+                "content-length": "598",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "eae6f878-31f2-498c-86f7-8fb876164a78",
+                "x-amz-apigw-id": "CiWv0LrtoAMEcpQ="
+            },
+            "RetryAttempts": 0
+        },
+        "item": [
+            {
+                "deploymentId": "w7ymsp",
+                "stageName": "test",
+                "description": "c7n",
+                "cacheClusterEnabled": false,
+                "cacheClusterSize": "0.5",
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {
+                    "*/*": {
+                        "metricsEnabled": false,
+                        "dataTraceEnabled": false,
+                        "throttlingBurstLimit": 5000,
+                        "throttlingRateLimit": 10000.0,
+                        "cachingEnabled": false,
+                        "cacheTtlInSeconds": 300,
+                        "cacheDataEncrypted": false,
+                        "requireAuthorizationForCacheControl": true,
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+                    }
+                },
+                "tracingEnabled": false,
+                "tags": {
+                    "target-tag": "pratyush"
+                },
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 17,
+                    "minute": 50,
+                    "second": 4,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 17,
+                    "minute": 50,
+                    "second": 24,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

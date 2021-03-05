@@ -1,20 +1,13 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
-
+import os
+import sys
 import time
 
+import pytest
+
+from c7n_gcp.resources.resourcemanager import HierarchyAction
 from gcp_common import BaseTest
 from mock import mock
 
@@ -131,6 +124,128 @@ class FolderTest(BaseTest):
 
 
 class ProjectTest(BaseTest):
+
+    @pytest.mark.skipif(
+        sys.platform.startswith('win'), reason='windows file path fun')
+    def test_propagate_tags(self):
+        factory = self.replay_flight_data('project-propagate-tags')
+
+        label_path = os.path.join(
+            os.path.dirname(__file__), 'data', 'folder-labels.json')
+
+        p = self.load_policy({
+            'name': 'p-label',
+            'resource': 'gcp.project',
+            'query': [
+                {'filter': 'parent.id:389734459213 parent.type:folder'}],
+            'filters': [
+                {'tag:cost-center': 'absent'}],
+            'actions': [
+                {'type': 'propagate-labels',
+                 'folder-labels': {
+                     'url': 'file://%s' % label_path}}
+            ],
+        }, session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 3
+        # verify we successfully filtered out non active projects
+        assert {r['lifecycleState'] for r in resources} == {'ACTIVE', 'DELETE_REQUESTED'}
+        # verify tags
+        client = p.resource_manager.get_client()
+        project = client.execute_query(
+            'get', {'projectId': 'c7n-test-target'})
+        assert project['labels'] == {'app': 'c7n',
+                                     'cost-center': 'qa',
+                                     'env_type': 'dev',
+                                     'owner': 'testing'}
+
+    def test_project_hierarchy(self):
+        factory = self.replay_flight_data('project-hierarchy')
+        p = self.load_policy({
+            'name': 'p-parents',
+            'resource': 'gcp.project',
+            'query': [
+                {'filter': 'parent.id:389734459213 parent.type:folder'}],
+        }, session_factory=factory)
+        resources = p.run()
+        hierarchy = HierarchyAction({}, p.resource_manager)
+        hierarchy.load_hierarchy(resources)
+        assert hierarchy.folder_ids == set(('389734459213', '264112811077'))
+        hierarchy.load_folders()
+        assert hierarchy.folders == {
+            '264112811077': {'createTime': '2020-11-05T15:31:46.060Z',
+                             'displayName': 'apps',
+                             'lifecycleState': 'ACTIVE',
+                             'name': 'folders/264112811077',
+                             'parent': 'organizations/11144'},
+            '389734459213': {'createTime': '2020-11-05T15:32:49.681Z',
+                             'displayName': 'ftests',
+                             'lifecycleState': 'ACTIVE',
+                             'name': 'folders/389734459213',
+                             'parent': 'folders/264112811077'}}
+        self.assertRaises(NotImplementedError, hierarchy.load_metadata)
+        self.assertRaises(NotImplementedError, hierarchy.diff, [])
+
+    def test_project_hierarchy_no_op(self):
+
+        class Sub(HierarchyAction):
+            # dummy impl for coverage check
+            def load_hierarchy(self, resources):
+                pass
+
+            def diff(self, resources):
+                return ()
+
+            def load_metadata(self):
+                pass
+
+        factory = self.replay_flight_data('project-hierarchy')
+        p = self.load_policy({
+            'name': 'p-parents',
+            'resource': 'gcp.project'}, session_factory=factory)
+        hierarchy = Sub({}, p.resource_manager)
+        hierarchy.process([])
+
+    def test_project_delete(self):
+        factory = self.replay_flight_data('project-delete')
+        p = self.load_policy({
+            'name': 'p-delete',
+            'resource': 'gcp.project',
+            'query': [
+                {'filter': 'id:hautomation'}],
+            'filters': [{
+                'lifecycleState': 'ACTIVE'}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['projectId'] == 'hautomation'
+        client = p.resource_manager.get_client()
+        project = client.execute_query(
+            'get', {'projectId': 'hautomation'})
+        assert project['lifecycleState'] != 'ACTIVE'
+
+    def test_project_label(self):
+        factory = self.replay_flight_data('project-set-labels')
+        p = self.load_policy({
+            'name': 'p-set-labels',
+            'resource': 'gcp.project',
+            'query': [
+                {'filter': 'id:c7n-test-target'}],
+            'filters': [
+                {'tag:app': 'absent'}],
+            'actions': [{
+                'type': 'set-labels',
+                'labels': {
+                    'env_type': 'dev',
+                    'app': 'c7n'}
+            }]}, session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        client = p.resource_manager.get_client()
+        project = client.execute_query(
+            'get', {'projectId': 'c7n-test-target'})
+        assert project['labels'] == {'app': 'c7n', 'env_type': 'dev'}
 
     def test_project_set_iam_policy(self):
         resource_full_name = 'cloud-custodian'

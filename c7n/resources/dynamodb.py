@@ -1,71 +1,24 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import (
-    TagDelayedAction, RemoveTag, TagActionFilter, Tag, universal_augment,
-    register_universal_tags)
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag, universal_augment)
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-
-
-@resources.register('dynamodb-table')
-class Table(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'dynamodb'
-        arn_type = 'table'
-        enum_spec = ('list_tables', 'TableNames', None)
-        detail_spec = ("describe_table", "TableName", None, "Table")
-        id = 'TableName'
-        name = 'TableName'
-        date = 'CreationDateTime'
-        dimension = 'TableName'
-        config_type = 'AWS::DynamoDB::Table'
-
-    permissions = ('dynamodb:ListTagsOfResource',)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeTable(self)
-        elif source_type == 'config':
-            return ConfigTable(self)
-        raise ValueError('invalid source %s' % source_type)
-
-
-register_universal_tags(Table.filter_registry, Table.action_registry, False)
+from c7n.filters import ValueFilter
 
 
 class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
-        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
-        if 'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
-            resource['BillingModeSummary'][
-                'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
-                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
-
         sse_info = resource.pop('Ssedescription', None)
         if sse_info is None:
             return resource
@@ -85,26 +38,25 @@ class DescribeTable(query.DescribeSource):
             super(DescribeTable, self).augment(resources))
 
 
-class StatusFilter(object):
-    """Filter tables by status"""
+@resources.register('dynamodb-table')
+class Table(query.QueryResourceManager):
 
-    valid_states = ()
+    class resource_type(query.TypeInfo):
+        service = 'dynamodb'
+        arn_type = 'table'
+        enum_spec = ('list_tables', 'TableNames', None)
+        detail_spec = ("describe_table", "TableName", None, "Table")
+        id = 'TableName'
+        name = 'TableName'
+        date = 'CreationDateTime'
+        dimension = 'TableName'
+        cfn_type = config_type = 'AWS::DynamoDB::Table'
+        universal_taggable = object()
 
-    def filter_table_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['TableStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
-
-    def filter_backup_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['BackupStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
+    source_mapping = {
+        'describe': DescribeTable,
+        'config': ConfigTable
+    }
 
 
 @Table.filter_registry.register('kms-key')
@@ -115,22 +67,113 @@ class KmsFilter(KmsRelatedFilter):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
-                - name: dynamodb-kms-key-filters
-                  resource: dynamodb-table
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/dynamodb)"
-                      op: regex
+              - name: dynamodb-kms-key-filters
+                resource: dynamodb-table
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/dynamodb)"
+                    op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
+@Table.filter_registry.register('continuous-backup')
+class TableContinuousBackupFilter(ValueFilter):
+    """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-continuous-backups-disabled
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+              - name: dynamodb-pitr-disabled
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                    op: ne
+                    value: ENABLED
+    """
+
+    annotation_key = 'c7n:continuous-backup'
+    annotate = False
+    schema = type_schema('continuous-backup', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('dynamodb:DescribeContinuousBackups',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_continuous_backups(
+                    TableName=r['TableName']).get('ContinuousBackupsDescription', {})
+            except client.exceptions.TableNotFoundException:
+                continue
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@Table.action_registry.register('set-continuous-backup')
+class TableContinuousBackupAction(BaseAction):
+    """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-continuous-backups-disabled-set
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+                actions:
+                  - type: set-continuous-backup
+
+    """
+    valid_status = ('ACTIVE',)
+    schema = type_schema(
+        'set-continuous-backup',
+        state={'type': 'boolean', 'default': True})
+    permissions = ('dynamodb:UpdateContinuousBackups',)
+
+    def process(self, resources):
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
+        if not len(resources):
+            return
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                client.update_continuous_backups(
+                    TableName=r['TableName'],
+                    PointInTimeRecoverySpecification={
+                        'PointInTimeRecoveryEnabled': self.data.get('state', True)
+                    })
+            except client.exceptions.TableNotFoundException:
+                continue
+
+
 @Table.action_registry.register('delete')
-class DeleteTable(BaseAction, StatusFilter):
+class DeleteTable(BaseAction):
     """Action to delete dynamodb tables
 
     :example:
@@ -155,8 +198,8 @@ class DeleteTable(BaseAction, StatusFilter):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -174,7 +217,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('set-stream')
-class SetStream(BaseAction, StatusFilter):
+class SetStream(BaseAction):
     """Action to enable/disable streams on table.
 
     :example:
@@ -201,10 +244,9 @@ class SetStream(BaseAction, StatusFilter):
     permissions = ("dynamodb:UpdateTable",)
 
     def process(self, tables):
-        tables = self.filter_table_state(
-            tables, self.valid_status)
+        tables = self.filter_resources(
+            tables, 'TableStatus', self.valid_status)
         if not len(tables):
-            self.log.warning("Table not in ACTIVE state.")
             return
 
         state = self.data.get('state')
@@ -241,7 +283,7 @@ class SetStream(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('backup')
-class CreateBackup(BaseAction, StatusFilter):
+class CreateBackup(BaseAction):
     """Creates a manual backup of a DynamoDB table. Use of the optional
        prefix flag will attach a user specified prefix. Otherwise,
        the backup prefix will default to 'Backup'.
@@ -264,8 +306,8 @@ class CreateBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -303,7 +345,7 @@ class Backup(query.QueryResourceManager):
 
 
 @Backup.action_registry.register('delete')
-class DeleteBackup(BaseAction, StatusFilter):
+class DeleteBackup(BaseAction):
     """Deletes backups of a DynamoDB table
 
     :example:
@@ -328,8 +370,8 @@ class DeleteBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:DeleteBackup',)
 
     def process(self, backups):
-        backups = self.filter_backup_state(
-            backups, self.valid_status)
+        backups = self.filter_resources(
+            backups, 'BackupStatus', self.valid_status)
         if not len(backups):
             return
 
@@ -357,6 +399,7 @@ class Stream(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'dynamodbstreams'
+        permission_prefix = 'dynamodb'
         # Note max rate of 5 calls per second
         enum_spec = ('list_streams', 'Streams', None)
         # Note max rate of 10 calls per second.
@@ -368,33 +411,6 @@ class Stream(query.QueryResourceManager):
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
-
-
-@resources.register('dax')
-class DynamoDbAccelerator(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'dax'
-        arn_type = 'cluster'
-        enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
-        config_type = 'AWS::DAX::Cluster'
-
-    permissions = ('dax:ListTags',)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeDaxCluster(self)
-        elif source_type == 'config':
-            return query.ConfigSource(self)
-        raise ValueError('invalid source %s' % source_type)
-
-    def get_resources(self, ids, cache=True, augment=True):
-        """Override in order to disable the augment for serverless policies.
-           list_tags on dax resources always fail until the cluster is finished creating.
-        """
-        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
 
 class DescribeDaxCluster(query.DescribeSource):
@@ -412,6 +428,30 @@ class DescribeDaxCluster(query.DescribeSource):
             self.manager.session_factory,
             self.manager.retry,
             self.manager.log)))
+
+
+@resources.register('dax')
+class DynamoDbAccelerator(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'dax'
+        arn_type = 'cluster'
+        enum_spec = ('describe_clusters', 'Clusters', None)
+        arn = 'ClusterArn'
+        id = name = 'ClusterName'
+        cfn_type = 'AWS::DAX::Cluster'
+
+    permissions = ('dax:ListTags',)
+    source_mapping = {
+        'describe': DescribeDaxCluster,
+        'config': query.ConfigSource
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
+        """Override in order to disable the augment for serverless policies.
+           list_tags on dax resources always fail until the cluster is finished creating.
+        """
+        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
 
 def _dax_cluster_tags(tables, session_factory, retry, log):

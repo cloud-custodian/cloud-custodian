@@ -11,7 +11,7 @@ coverage:
   status:
     patch:
       default:
-        threshold: "10%"
+        threshold: "5%"
         only_pulls: true
     project:
       azure:
@@ -26,10 +26,13 @@ coverage:
       k8s:
         paths: "tools/c7n_kube"
         threshold: "1%"
+      tf:
+        paths: "tools/c7n_terraform"
+        threshold: "1%"
       # aws is weaved throughout core atm can't easily call it out separately
       custodian:
       # one of the tests is slightly variable coverage due to concurrency (0.01)
-        threshold: "0.05%"
+        threshold: "0.10%"
         paths:
           - "!tools"
       default: off

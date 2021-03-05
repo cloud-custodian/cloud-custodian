@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import BaseNotify
 from c7n import utils
@@ -71,12 +60,7 @@ class Notify(BaseNotify):
         }
     }
     schema_alias = True
-
-    @staticmethod
-    def register_notify_action(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('notify', Notify)
+    permissions = ('pubsub.topics.publish',)
 
     def process(self, resources, event=None):
         session = utils.local_session(self.manager.session_factory)
@@ -110,6 +94,9 @@ class Notify(BaseNotify):
             }
         })
 
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        resource_class.action_registry.register('notify', Notify)
 
-gcp_resources.subscribe(
-    gcp_resources.EVENT_FINAL, Notify.register_notify_action)
+
+gcp_resources.subscribe(Notify.register_resource)

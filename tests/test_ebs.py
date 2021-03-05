@@ -1,26 +1,13 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
-import sys
 
 from botocore.exceptions import ClientError
 import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n.resources.aws import shape_validate
 from c7n.resources.ebs import (
     CopyInstanceTags,
     EncryptInstanceVolumes,
@@ -30,7 +17,7 @@ from c7n.resources.ebs import (
     SnapshotQueryParser as QueryParser
 )
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class SnapshotQueryParse(BaseTest):
@@ -119,6 +106,66 @@ class SnapshotErrorHandler(BaseTest):
         snap = ErrorHandler.extract_bad_snapshot(e)
         self.assertEqual(snap, "snap-notfound")
 
+    def test_get_bad_volume_malformed(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "vol-malformedvolume"',
+                "Code": "InvalidVolumeID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-malformedvolume")
+
+    def test_get_bad_volume_notfound(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-notfound' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-notfound")
+
+    def test_snapshot_copy_related_tags_missing_volumes(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_copy_related_tags_missing_volumes")
+        p = self.load_policy(
+            {
+                "name": "copy-related-tags",
+                "resource": "aws.ebs-snapshot",
+                "filters": [{"tag:Test": "Test"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": "*"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        try:
+            resources = p.run()
+        except ClientError:
+            # it should filter missing volume and not throw an error
+            self.fail("This should have been handled in ErrorHandler.extract_bad_volume")
+        self.assertEqual(len(resources), 1)
+        try:
+            factory().client("ec2").describe_volumes(
+                VolumeIds=[resources[0]["VolumeId"]]
+            )
+        except ClientError as e:
+            # this should not filter missing volume and will throw an error
+            msg = e.response["Error"]["Message"]
+            err = e.response["Error"]["Code"]
+        self.assertEqual(err, "InvalidVolume.NotFound")
+        self.assertEqual(msg, f"The volume '{resources[0]['VolumeId']}' does not exist.")
+
 
 class SnapshotAccessTest(BaseTest):
 
@@ -134,7 +181,6 @@ class SnapshotAccessTest(BaseTest):
                 "resource": "ebs-snapshot",
                 "filters": ["cross-account"],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -159,7 +205,7 @@ class SnapshotDetachTest(BaseTest):
                         'type': 'detach'
                     }
                 ]
-            }, config=Config.empty(), session_factory=factory)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -194,7 +240,7 @@ class SnapshotCopyTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=factory,
         )
         resources = p.run()
@@ -288,6 +334,104 @@ class SnapshotTrimTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class SnapshotSetPermissions(BaseTest):
+    # The precondition to these tests in here is that we have an EBS
+    # snapshot with create volume permissions for accounts
+    # 112233445566 and 665544332211
+
+    def test_reset(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_reset")
+        p = self.load_policy(
+            {
+                "name": "reset-permissions",
+                "resource": "ebs-snapshot",
+                "filters": ["cross-account"],
+                "actions": ["set-permissions"],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert sorted(
+            resources[0]['c7n:CrossAccountViolations']) == sorted(
+                ['112233445566', '665544332211'])
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == []
+
+    def test_add(self):
+        # For this test, we assume only 665544332211 has permissions,
+        # and we test adding 112233445566 and removing 665544332211
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_add")
+        p = self.load_policy(
+            {
+                "name": "set-permissions",
+                "resource": "ebs-snapshot",
+                "filters": ["cross-account"],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "add": ["112233445566"],
+                        "remove": ["665544332211"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == [
+            {"UserId": "112233445566"},
+        ]
+
+    def test_matched(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_matched")
+        p = self.load_policy(
+            {
+                "name": "set-permissions",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["112233445566"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "remove": "matched",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['665544332211'])
+
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == [{"UserId": "112233445566"}]
+
+
 class AttachedInstanceTest(BaseTest):
 
     def test_ebs_instance_filter(self):
@@ -348,19 +492,12 @@ class ResizeTest(BaseTest):
         resources = p.run()
         self.assertEqual(
             {r["VolumeId"] for r in resources},
-            set(("vol-0073dcd216489ea1b", "vol-0e4cba7adc4764f79")),
+            {"vol-0073dcd216489ea1b", "vol-0e4cba7adc4764f79"},
         )
-
-        # normalizing on str/unicode repr output between versions.. punt
-        if sys.version_info[0] > 2:
-            return
-
         self.assertEqual(
             output.getvalue().strip(),
-            (
-                "filtered 4 of 6 volumes due to [(u'instance-type', 2), "
-                "(u'vol-mutation', 1), (u'vol-type', 1)]"
-            ),
+            ("filtered 4 of 6 volumes due to [('instance-type', 2), "
+             "('vol-mutation', 1), ('vol-type', 1)]")
         )
 
 
@@ -402,6 +539,42 @@ class CopyInstanceTagsTest(BaseTest):
         self.assertEqual(tags["Name"], "CompileLambda")
 
 
+class VolumePostFindingTest(BaseTest):
+
+    def test_volume_post_finding(self):
+        factory = self.replay_flight_data('test_ebs_snapshot')
+        p = self.load_policy({
+            'name': 'vol-finding',
+            'resource': 'aws.ebs',
+            'actions': [{
+                'type': 'post-finding',
+                'types': [
+                    'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsEc2Volume': {
+                    'Attachments': [{'AttachTime': '2017-03-28T14:55:28+00:00',
+                                     'DeleteOnTermination': True,
+                                     'InstanceId': 'i-0a0b51bcf11a8cdfb',
+                                     'Status': 'attached'}],
+                    'CreateTime': '2017-03-28T14:55:28.486000+00:00',
+                    'Size': 8,
+                    'SnapshotId': 'snap-037f1f9e6c8ea4d65'}},
+             'Id': 'arn:aws:ec2:us-east-1:644160558196:volume/vol-01adbb6a4f175941d',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Type': 'AwsEc2Volume'})
+        shape_validate(
+            rfinding['Details']['AwsEc2Volume'],
+            'AwsEc2VolumeDetails', 'securityhub')
+
+
 class VolumeSnapshotTest(BaseTest):
 
     def test_volume_snapshot(self):
@@ -420,6 +593,49 @@ class VolumeSnapshotTest(BaseTest):
             Filters=[{"Name": "volume-id", "Values": ["vol-01adbb6a4f175941d"]}]
         )
         self.assertEqual(len(snapshot_data["Snapshots"]), 1)
+
+    def test_volume_snapshot_copy_tags(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_copy_tags")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0252f61378ede9d01"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage']}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0252f61378ede9d01"]}]
+        )
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('DoNotCopy')
+        rtags['custodian_snapshot'] = ''
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+
+    def test_volume_snapshot_copy_volume_tags(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_copy_volume_tags")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0252f61378ede9d01"}],
+                "actions": [{"type": "snapshot",
+                             "copy-volume-tags": False,
+                             "tags": {'test-tag': 'custodian'}}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0252f61378ede9d01"]}]
+        )
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual({'test-tag': 'custodian'}, {t['Key']: t['Value'] for t in s['Tags']})
 
 
 class VolumeDeleteTest(BaseTest):

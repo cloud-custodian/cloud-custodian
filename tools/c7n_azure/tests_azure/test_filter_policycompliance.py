@@ -1,18 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest, arm_template
 from mock import patch
 
@@ -34,7 +21,7 @@ class PolicyCompliance(BaseTest):
             self.assertTrue(p)
 
     @arm_template('vm.json')
-    @patch("azure.mgmt.policyinsights.operations.policy_states_operations.PolicyStatesOperations."
+    @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     def test_find_by_name(self, policy_mock):
         policy_mock.return_value.value = []
@@ -70,7 +57,7 @@ class PolicyCompliance(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('emptyrg.json')
-    @patch("azure.mgmt.policyinsights.operations.policy_states_operations.PolicyStatesOperations."
+    @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     @patch("azure.mgmt.resource.policy.PolicyClient")
     def test_find_by_name_definition(self, client_mock, policy_mock):

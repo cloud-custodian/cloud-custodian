@@ -1,21 +1,9 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from .common import BaseTest, functional
+from c7n.resources.aws import shape_validate
 from c7n.utils import yaml_load
 
 
@@ -683,3 +671,72 @@ class TestSNS(BaseTest):
         client = session_factory().client("sns")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "custodian_cleanup")
+
+    def test_sns_post_finding(self):
+        factory = self.replay_flight_data('test_sns_post_finding')
+        p = self.load_policy({
+            'name': 'sns',
+            'resource': 'aws.sns',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = p.resource_manager.get_resources([
+            'arn:aws:sns:us-west-2:644160558196:config-topic'])
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsSnsTopic': {
+                'Owner': '644160558196',
+                'TopicName': 'config-topic'}},
+             'Id': 'arn:aws:sns:us-west-2:644160558196:config-topic',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Type': 'AwsSnsTopic'})
+        shape_validate(
+            rfinding['Details']['AwsSnsTopic'],
+            'AwsSnsTopicDetails', 'securityhub')
+
+    def test_sns_config(self):
+        session_factory = self.replay_flight_data("test_sns_config")
+        p = self.load_policy(
+            {"name": "sns-config",
+             "source": "config",
+             "resource": "sns"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['Tags'][0]['Value'], 'false')
+
+
+class TestSubscription(BaseTest):
+
+    def test_subscription_delete(self):
+        factory = self.replay_flight_data("test_subscription_delete")
+
+        p = self.load_policy(
+            {
+                "name": "external-owner-delete",
+                "resource": "sns-subscription",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Owner",
+                        "value": "123456789099",
+                        "op": "ne",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["Owner"], "123456789099")
+        client = factory().client("sns")
+        subs = client.list_subscriptions()
+        for s in subs.get("Subscriptions", []):
+            self.assertTrue("123456789099" == s.get("Owner"))

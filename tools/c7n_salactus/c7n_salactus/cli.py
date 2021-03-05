@@ -1,20 +1,7 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Salactus, eater of s3 buckets.
 """
-from __future__ import print_function
-
 from collections import Counter
 import csv
 from datetime import datetime
@@ -281,7 +268,7 @@ def format_accounts_csv(accounts, fh):
                    'size', 'bucket_count']
 
     totals = Counter()
-    skip = set(('name', 'percent_scanned'))
+    skip = {'name', 'percent_scanned'}
     for a in accounts:
         for n in field_names:
             if n in skip:
@@ -410,7 +397,7 @@ def format_csv(buckets, fh, keys=()):
         field_names.insert(0, k)
 
     totals = Counter()
-    skip = set(('account', 'name', 'region', 'percent', 'created', 'inventory'))
+    skip = {'account', 'name', 'region', 'percent', 'created', 'inventory'}
     skip.update(keys)
 
     for b in buckets:

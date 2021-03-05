@@ -1,18 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import hashlib
 import operator
@@ -22,6 +9,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
+from c7n.tags import universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
 from c7n.version import version
 
@@ -39,10 +27,27 @@ class SSMParameter(QueryResourceManager):
         id = "Name"
         universal_taggable = True
         arn_type = "parameter"
+        cfn_type = 'AWS::SSM::Parameter'
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
+
+    augment = universal_augment
+
+
+@SSMParameter.action_registry.register('delete')
+class DeleteParameter(Action):
+
+    schema = type_schema('delete')
+    permissions = ("ssm:DeleteParameter",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            self.manager.retry(
+                client.delete_parameter, Name=r['Name'],
+                ignore_err_codes=('ParameterNotFound',))
 
 
 @resources.register('ssm-managed-instance')
@@ -175,7 +180,7 @@ class OpsItem(QueryResourceManager):
             'Status', 'Title', 'LastModifiedTime',
             'CreatedBy', 'CreatedTime')
 
-    QueryKeys = set((
+    QueryKeys = {
         'Status',
         'CreatedBy',
         'Source',
@@ -188,8 +193,8 @@ class OpsItem(QueryResourceManager):
         'OperationalDataKey',
         'OperationalDataValue',
         'ResourceId',
-        'AutomationId'))
-    QueryOperators = set(('Equal', 'LessThan', 'GreaterThan', 'Contains'))
+        'AutomationId'}
+    QueryOperators = {'Equal', 'LessThan', 'GreaterThan', 'Contains'}
 
     def validate(self):
         self.query = self.resource_query()
@@ -214,7 +219,7 @@ class OpsItem(QueryResourceManager):
         filters = []
         for q in self.data.get('query', ()):
             if (not isinstance(q, dict) or
-                not set(q.keys()) == set(('Key', 'Values', 'Operator')) or
+                not set(q.keys()) == {'Key', 'Values', 'Operator'} or
                 q['Key'] not in self.QueryKeys or
                     q['Operator'] not in self.QueryOperators):
                 raise PolicyValidationError(
@@ -347,13 +352,12 @@ class OpsItemFilter(Filter):
         return {'OpsItemFilters': q}
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.filter_registry.register('ops-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'ops-item' not in resource_class.filter_registry:
+            resource_class.filter_registry.register('ops-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, OpsItemFilter.register)
+resources.subscribe(OpsItemFilter.register_resource)
 
 
 class PostItem(Action):
@@ -543,7 +547,8 @@ class PostItem(Action):
             self.manager.type,
             self.manager.config.region,
             self.manager.config.account_id)).encode('utf8')
-        dedup = hashlib.md5(dedup).hexdigest()
+        # size restrictions on this value is 4-20, digest is 32
+        dedup = hashlib.md5(dedup).hexdigest()[:20]
 
         i = dict(
             Title=title,
@@ -586,10 +591,9 @@ class PostItem(Action):
         return filter_empty(i)
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('post-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'post-item' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, PostItem.register)
+resources.subscribe(PostItem.register_resource)

@@ -21,6 +21,7 @@
                 "Status": "available",
                 "PercentProgress": 100,
                 "DBClusterSnapshotIdentifier": "aaa-final-snapshot",
+		"DBClusterSnapshotArn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:aaa-final-snapshot",
                 "KmsKeyId": "arn:aws:kms:us-east-1:123:key/k1",
                 "ClusterCreateTime": {
                     "hour": 10,
@@ -60,6 +61,7 @@
                 "LicenseModel": "aurora",
                 "Status": "available",
                 "PercentProgress": 100,
+		"DBClusterSnapshotArn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:bbb-final-snapshot",
                 "DBClusterSnapshotIdentifier": "bbb-final-snapshot",
                 "ClusterCreateTime": {
                     "hour": 19,

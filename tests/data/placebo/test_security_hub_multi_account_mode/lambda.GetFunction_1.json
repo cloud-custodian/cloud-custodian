@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "af166356-6774-490a-82c4-54d93b2ca7aa",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 15 Jan 2020 20:13:11 GMT",
+                "content-type": "application/json",
+                "content-length": "2966",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "af166356-6774-490a-82c4-54d93b2ca7aa"
+            },
+            "RetryAttempts": 0
+        },
+        "Configuration": {
+            "FunctionName": "custodian-enterprise-ec2-instances-no-elastic-ip-isolate",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-enterprise-ec2-instances-no-elastic-ip-isolate",
+            "Runtime": "python3.7",
+            "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+            "Handler": "custodian_policy.run",
+            "CodeSize": 544043,
+            "Description": "OPS9 - Instances should not have public ips.\n",
+            "Timeout": 60,
+            "MemorySize": 512,
+            "LastModified": "2019-06-21T19:13:22.979+0000",
+            "CodeSha256": "PiBNBRB/LSwwtLdczV1z822kUD1Aq1eVPlLyvIualE4=",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": ""
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "8b24c19d-972a-4254-9bd8-8c6a9accf695",
+            "State": "Active",
+            "LastUpdateStatus": "Successful"
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-enterprise-ec2-instances-no-elastic-ip-isolate-8adc3d46-6776-450a-8f10-bf32d6d6bb4a?versionId=9RgI8Cscav1QKif9yxPpnB4PwYAzfTxe&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIQDhBQM3WpjIA500j5MaM9LVnRLuXcyFKXJVkEs%2F8C%2FbkAIgCc%2Buvhe7iuakDc0zbkB%2BPx%2FwG5pmrK2lFqzYBNU2XlkqtAMIfBAAGgw3NDk2Nzg5MDI4MzkiDB8OxwZmGrWRGqAKCSqRA0RtKH%2FHWnqfrjWuP5B8BB3nN6%2BPsHNg1OAuB%2FZZskE9hTLxkHu8NKPVuVV0lN2iXzus5O6z7QoK4O3QBRNwJTOLDdWiXEsLiFAhCWeJ%2FuFFfcYmH9uqwTjgEC5bcNrOE3pP1cVUMO1GKQHSXTxgbrcra0HE5GryBQjoeAKCF4CsGQ0n%2F884rqe3Sw%2Budw6QxVr3yPCIbQIdv82BKyzQ8qnkcP9xJ1uvkABb%2FyW012kVm5Qglbll27fdEbD41aDKQQ6fSHuWKr0NBC%2BvDx67e1HzFgvW25uDGqHirUzFRR6fr0275CwJ5IN5DSTcv2xAMho5J2d0%2B6EGGLmDtvfu1ekM78I9mllJB%2BeZDv6hzckVSRI23ItEn8D67C4%2FfJnAmoBjNoIQ7jRF8HKCs%2BvmfhKjlH4QwqkP6xmOdAUTxGRpluM0UfXsU3NGQGPxEe0PsmkwUYAV4LkYbOqJNKCeTFGRreBoCe2%2FmvZHEoCTgC%2FP3M8ToSgB2DcvZxhRTBoA2%2Blu7y2CFMf8Tt3RJ4sPw6AhMN3J%2FfAFOusB8yqt5eQlhNLdn%2FAyjs%2Bi6LC8Y9RZRL5b8MQ4a%2BFuS5GM8YL2cvsUpbx3PWJVf0x0c%2Bbg8FZElDfSxshweZQHEJjODwgTcSHXEeGKWzrxW8x6uylY9Q3cHWj7qngdLCCxLXawCW02V9L%2F9CTqwit9J14xZAH8D%2ByoLKzbrtqe3t18wbV%2FJNjMQ6uTDkXzpoBprLRBp9mbrx%2FaJ0rQy4SHaRZSvh6M3V1V7ZVa6Q1c1wR0khp%2FP7f9qoCj4ZUzPjgOBkViOGdEKOxIbMQ7CT34GL7uaQ8k8FEYnNq3KN7UjNCu4tiK3Q4Nsv4I8w%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200115T201311Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3SZEDKWXZ%2F20200115%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=42c8ff4aa5c4feb39ef74c748954e36dab0355e361fc5fceded823322c4c42f6"
+        },
+        "Tags": {
+            "SecurityHubRemediated": "yeah",
+            "ASV": "ASVCLOUDCUSTODIAN",
+            "OwnerContact": "cloudmaid@capitalone.com",
+            "CMDBEnvironment": "ENVPRCLOUDMAID",
+            "c7n:FindingId:lambda-finding": "us-east-1/644160558196/356580e4704cf1222cbee13685416652/84a7b9799285262dbf00c7b214463dde:2020-01-15T15:55:49.624441+00:00"
+        }
+    }
+}

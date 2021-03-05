@@ -1,32 +1,26 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "TaggedResources": [
             {
-                "ResourceType": "snapshot", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n/c7n-snapshot", 
                 "Tag": {
-                    "Value": "testvalue", 
-                    "Key": "testkey"
-                }
-            },{
-                "ResourceType": "snapshot", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n/c7n-snapshot", 
-                "Tag": {
-                    "Value": "Resource does not meet policy: delete@2012/12/12", 
-                    "Key": "maid_status"
-                }
+                    "Key": "maid_status",
+                    "Value": "Resource does not meet policy: delete@2019/11/26"
+                },
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n-test-pratyush/c7n-test-snapshot",
+                "ResourceType": "snapshot"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "8b1d2a3f-7b85-11e6-9dd1-d733c704429d", 
+            "RequestId": "59d49880-f869-11e9-9da1-1b363167c356",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8b1d2a3f-7b85-11e6-9dd1-d733c704429d", 
-                "date": "Thu, 15 Sep 2016 20:46:57 GMT", 
-                "content-length": "589", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "59d49880-f869-11e9-9da1-1b363167c356",
+                "content-type": "text/xml",
+                "content-length": "651",
+                "date": "Sun, 27 Oct 2019 03:24:56 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

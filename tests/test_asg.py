@@ -1,22 +1,15 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 from dateutil import tz as tzutil
 
+import jmespath
+from pytest_terraform import terraform
+
 from .common import BaseTest
+
+from c7n.resources.asg import LaunchInfo
+from c7n.resources.aws import shape_validate
 
 
 class LaunchConfigTest(BaseTest):
@@ -71,6 +64,71 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
+
+
+class AutoScalingTemplateTest(BaseTest):
+
+    def test_asg_mixed_instance_templates(self):
+        d = {
+            "AutoScalingGroupName": "devx",
+            "MixedInstancesPolicy": {
+                "LaunchTemplate": {
+                    "LaunchTemplateSpecification": {
+                        "LaunchTemplateId": "lt-0877401c93c294001",
+                        "LaunchTemplateName": "test",
+                        "Version": "4"},
+                    "Overrides": [{"InstanceType": "t1.micro"},
+                                  {"InstanceType": "t2.small"}]
+                },
+                "InstancesDistribution": {
+                    "OnDemandAllocationStrategy": "prioritized",
+                    "OnDemandBaseCapacity": 1,
+                    "OnDemandPercentageAboveBaseCapacity": 0,
+                    "SpotAllocationStrategy": "capacity-optimized"
+                }
+            },
+            "MinSize": 1,
+            "MaxSize": 1,
+            "DesiredCapacity": 1,
+            "DefaultCooldown": 300,
+            "AvailabilityZones": ["us-east-1d", "us-east-1e"],
+            "HealthCheckType": "EC2",
+            "HealthCheckGracePeriod": 300,
+            "VPCZoneIdentifier": "subnet-3a334610,subnet-e3b194de"}
+
+        p = self.load_policy({"name": "mixed-instance", "resource": "asg"})
+        self.assertEqual(
+            list(p.resource_manager.get_resource_manager(
+                'launch-template-version').get_asg_templates([d]).keys()),
+            [("lt-0877401c93c294001", "4")])
+        self.assertEqual(
+            LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
+
+
+@terraform('aws_asg')
+def test_asg_propagate_tag_action(test, aws_asg):
+
+    factory = test.replay_flight_data('test_asg_propagate_tag_action')
+    p = test.load_policy({
+        'name': 'asg-tagger',
+        'resource': 'aws.asg',
+        'filters': [
+            {'AutoScalingGroupName': aws_asg['aws_autoscaling_group.bar.id']},
+            {'tag:Owner': 'absent'}
+        ],
+        'actions': [
+            {'type': 'tag', 'key': 'Owner', 'value': 'Kapil', 'propagate': True},
+            {'type': 'propagate-tags', 'tags': ['Owner']}]},
+        session_factory=factory)
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory().client('ec2')
+    itags = {t['Key']: t['Value'] for t in jmespath.search(
+        'Reservations[0].Instances[0].Tags',
+        client.describe_instances(
+            InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
+    assert 'Owner' in itags
+    assert itags['Owner'] == 'Kapil'
 
 
 class AutoScalingTest(BaseTest):
@@ -160,6 +218,82 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_image_age_filter_deleted_config(self):
+        factory = self.replay_flight_data("test_asg_image_age_filter_deleted_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-age-filter",
+                "resource": "asg",
+                "filters": [
+                    {"tag:Env": "present"},
+                    {"type": "image-age", "days": 5000, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('Env' in resources[0].get('Tags')[1].values())
+
+    def test_asg_image_filter_from_launch_template(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_template")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*CentOS7.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_launch_config(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*Ubuntu1804.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_lc_and_lt(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_lc_and_lt")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*AmazonLinux2.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
         p = self.load_policy(
@@ -174,6 +308,28 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_asg_scaling_policy_filter(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-filter",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "scaling-policy",
+                        "key": "PolicyType",
+                        "value": "TargetTrackingScaling"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'asg-test-scaling-policy')
+        self.assertTrue('c7n:matched-policies' in resources[0])
+        self.assertTrue(
+            resources[0]['c7n:matched-policies'][0]['PolicyName'], 'Target Tracking Policy')
 
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data("test_asg_vpc_filter")
@@ -267,6 +423,43 @@ class AutoScalingTest(BaseTest):
             t["Key"]: (t["Value"], t["PropagateAtLaunch"]) for t in result["Tags"]
         }
         self.assertFalse("CustomerId" in tag_map)
+
+    def test_asg_post_finding_format(self):
+        factory = self.replay_flight_data('test_asg_mark_for_op')
+        p = self.load_policy({
+            'name': 'asg-post',
+            'resource': 'aws.asg',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory)
+
+        resources = p.resource_manager.resources()
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsAutoScalingAutoScalingGroup': {
+                    'CreatedTime': '2016-05-16T18:31:32.276000+00:00',
+                    'HealthCheckGracePeriod': 300,
+                    'HealthCheckType': 'EC2',
+                    'LaunchConfigurationName': 'CustodianASGTestCopyCopy',
+                    'LoadBalancerNames': []}},
+             'Id': 'arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG',  # noqa
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'Platform': 'ubuntu',
+                      'custodian_action': (
+                          'AutoScaleGroup does not meet org tag policy: '
+                          'suspend@2016/05/21')},
+             'Type': 'AwsAutoScalingAutoScalingGroup'})
+
+        shape_validate(
+            rfinding['Details']['AwsAutoScalingAutoScalingGroup'],
+            'AwsAutoScalingAutoScalingGroupDetails', 'securityhub')
 
     def test_asg_mark_for_op(self):
         factory = self.replay_flight_data("test_asg_mark_for_op")
@@ -606,7 +799,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        s = set([x[0] for x in resources[0]["Invalid"]])
+        s = {x[0] for x in resources[0]["Invalid"]}
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
 
@@ -764,6 +957,28 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n-asg-np-missing")
 
+    def test_asg_propagate_tag_no_instances(self):
+        factory = self.replay_flight_data("test_asg_propagate_tag_no_instances")
+        p = self.load_policy(
+            {
+                "name": "asg-tag",
+                "resource": "asg",
+                "filters": [{"tag:Platform": "ubuntu"}],
+                "actions": [
+                    {
+                        "type": "propagate-tags",
+                        "trim": True,
+                        "tags": ["CustomerId", "Platform"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
+
     def test_asg_filter_capacity_delta_match(self):
         factory = self.replay_flight_data("test_asg_filter_capacity_delta_match")
         p = self.load_policy(
@@ -793,3 +1008,22 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class AutoScalingPolicy(BaseTest):
+
+    def test_asg_scaling_policy_enabled(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_enabled")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-enabled",
+                "resource": "scaling-policy",
+                "filters": [
+                    {"type": "value", "key": "PolicyName", "value": "Target Tracking Policy"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0].get('Enabled'))

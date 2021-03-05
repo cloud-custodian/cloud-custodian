@@ -1,20 +1,9 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from azure.mgmt.resource.locks.models import ManagementLockObject
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.utils import ResourceIdParser, is_resource_group
+from c7n_azure.utils import is_resource_group
 
 from c7n.utils import type_schema
 
@@ -96,15 +85,13 @@ class LockAction(AzureBaseAction):
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
         else:
-            self.client.management_locks.create_or_update_at_resource_level(
-                resource['resourceGroup'],
-                ResourceIdParser.get_namespace(resource['id']),
-                ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
-                ResourceIdParser.get_resource_type(resource['id']),
-                resource['name'],
+            self.client.management_locks.create_or_update_by_scope(
+                resource['id'],
                 lock_name,
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
+
+        return {"locked": self.lock_type}
 
     def _get_lock_name(self, resource):
         return self.data.get('lock-name', "c7n-policy-{}".format(self.manager.data['name']))

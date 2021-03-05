@@ -278,6 +278,7 @@
                     "minute": 40
                 }, 
                 "AttachmentCount": 0, 
+                "PermissionsBoundaryUsageCount": 1,
                 "IsAttachable": true, 
                 "PolicyId": "ANPAI3VAJF5ZCRZ7MCQE6", 
                 "DefaultVersionId": "v1", 

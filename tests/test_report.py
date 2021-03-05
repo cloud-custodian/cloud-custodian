@@ -1,28 +1,7 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import unittest
-
-from c7n.policy import Policy
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.reports.csvout import Formatter
-from .common import BaseTest, Config, load_data
-
-
-EC2_POLICY = Policy({"name": "report-test-ec2", "resource": "ec2"}, Config.empty())
-ASG_POLICY = Policy({"name": "report-test-asg", "resource": "asg"}, Config.empty())
-ELB_POLICY = Policy({"name": "report-test-elb", "resource": "elb"}, Config.empty())
+from .common import BaseTest, load_data
 
 
 class TestEC2Report(BaseTest):
@@ -32,17 +11,19 @@ class TestEC2Report(BaseTest):
         self.records = data["ec2"]["records"]
         self.headers = data["ec2"]["headers"]
         self.rows = data["ec2"]["rows"]
+        self.p = self.load_policy({"name": "report-test-ec2", "resource": "ec2"})
 
     def test_default_csv(self):
-        self.patch(EC2_POLICY.resource_manager.resource_type,
+        self.patch(self.p.resource_manager.resource_type,
                    'default_report_fields', ())
-        formatter = Formatter(EC2_POLICY.resource_manager.resource_type)
+        formatter = Formatter(self.p.resource_manager.resource_type)
         self.assertEqual(
             formatter.to_csv([self.records['full']]),
             [['InstanceId-1', '', 'LaunchTime-1']])
 
     def test_csv(self):
-        formatter = Formatter(EC2_POLICY.resource_manager.resource_type)
+        p = self.load_policy({"name": "report-test-ec2", "resource": "ec2"})
+        formatter = Formatter(p.resource_manager.resource_type)
         tests = [
             (["full"], ["full"]),
             (["minimal"], ["minimal"]),
@@ -64,7 +45,7 @@ class TestEC2Report(BaseTest):
 
         # First do a test with adding custom fields to the normal ones
         formatter = Formatter(
-            EC2_POLICY.resource_manager.resource_type, extra_fields=extra_fields
+            self.p.resource_manager.resource_type, extra_fields=extra_fields
         )
         recs = [self.records["full"]]
         rows = [self.rows["full_custom"]]
@@ -72,7 +53,7 @@ class TestEC2Report(BaseTest):
 
         # Then do a test with only having custom fields
         formatter = Formatter(
-            EC2_POLICY.resource_manager.resource_type,
+            self.p.resource_manager.resource_type,
             extra_fields=extra_fields,
             include_default_fields=False,
         )
@@ -81,7 +62,7 @@ class TestEC2Report(BaseTest):
         self.assertEqual(formatter.to_csv(recs), rows)
 
 
-class TestASGReport(unittest.TestCase):
+class TestASGReport(BaseTest):
 
     def setUp(self):
         data = load_data("report.json")
@@ -90,7 +71,8 @@ class TestASGReport(unittest.TestCase):
         self.rows = data["asg"]["rows"]
 
     def test_csv(self):
-        formatter = Formatter(ASG_POLICY.resource_manager.resource_type)
+        p = self.load_policy({"name": "report-test-asg", "resource": "asg"})
+        formatter = Formatter(p.resource_manager.resource_type)
         tests = [
             (["full"], ["full"]),
             (["minimal"], ["minimal"]),
@@ -103,7 +85,7 @@ class TestASGReport(unittest.TestCase):
             self.assertEqual(formatter.to_csv(recs), rows)
 
 
-class TestELBReport(unittest.TestCase):
+class TestELBReport(BaseTest):
 
     def setUp(self):
         data = load_data("report.json")
@@ -112,7 +94,8 @@ class TestELBReport(unittest.TestCase):
         self.rows = data["elb"]["rows"]
 
     def test_csv(self):
-        formatter = Formatter(ELB_POLICY.resource_manager.resource_type)
+        p = self.load_policy({"name": "report-test-elb", "resource": "elb"})
+        formatter = Formatter(p.resource_manager.resource_type)
         tests = [
             (["full"], ["full"]),
             (["minimal"], ["minimal"]),
@@ -125,7 +108,7 @@ class TestELBReport(unittest.TestCase):
             self.assertEqual(formatter.to_csv(recs), rows)
 
 
-class TestMultiReport(unittest.TestCase):
+class TestMultiReport(BaseTest):
 
     def setUp(self):
         data = load_data("report.json")
@@ -135,8 +118,9 @@ class TestMultiReport(unittest.TestCase):
 
     def test_csv(self):
         # Test the extra headers for multi-policy
+        p = self.load_policy({"name": "report-test-ec2", "resource": "ec2"})
         formatter = Formatter(
-            EC2_POLICY.resource_manager.resource_type,
+            p.resource_manager.resource_type,
             include_region=True,
             include_policy=True,
         )

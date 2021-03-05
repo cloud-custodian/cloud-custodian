@@ -1,0 +1,18 @@
+{
+    "status_code": 202,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "579b0dd7-ec2b-4fe5-b96c-2775b3271649",
+            "HTTPStatusCode": 202,
+            "HTTPHeaders": {
+                "date": "Fri, 18 Oct 2019 15:39:06 GMT",
+                "content-type": "application/json",
+                "content-length": "0",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "579b0dd7-ec2b-4fe5-b96c-2775b3271649",
+                "x-amz-apigw-id": "Bw9oHKh2IAMEdZw="
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

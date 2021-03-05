@@ -2,7 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {},
-  "variables": {},
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cclinuxappplan', variables('suffix'))]",
+        "storage_name": "[concat('cclastorage', variables('suffix'))]"
+    },
   "resources": [
     {
       "type": "Microsoft.Web/serverfarms",
@@ -24,21 +28,44 @@
       "dependsOn": []
     },
     {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2016-09-01",
-      "name": "cctest-consumption-linux",
-      "location": "West US",
+      "name": "[variables('storage_name')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
       "sku": {
-        "name": "Y1",
-        "tier": "Dynamic",
-        "size": "Y1",
-        "family": "Y",
-        "capacity": 0
+        "name": "Standard_LRS"
       },
-      "kind": "functionapp",
+      "kind": "Storage",
+      "location": "WestUS",
+      "tags": {},
+      "properties": {}
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('name')]",
+      "location": "WestUS",
+      "kind": "functionapp,linux",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+      ],
       "properties": {
-        "name": "cctest-consumption-linux",
-        "reserved": true
+          "siteConfig": {
+              "appSettings": [
+                  {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storage_name'), ';AccountKey=', listKeys(variables('storage_name'),'2015-05-01-preview').key1)]"
+                  },
+                  {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "python"
+                  },
+                  {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~2"
+                  }
+              ]
+          },
+          "reserved": true
       }
     }
   ]

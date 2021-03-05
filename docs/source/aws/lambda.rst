@@ -128,6 +128,41 @@ substituted so a policy can be used across accounts.
          schedule: "rate(1 day)"
          role: arn:aws:iam::{account_id}:role/some-role
 
+Event Pattern Filtering
++++++++++++++++++++++++
+
+Cloud Watch Events also support content/pattern filtering, see
+
+- https://docs.aws.amazon.com/eventbridge/latest/userguide/content-filtering-with-event-patterns.html
+- https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/
+
+In the context of a custodian policy you can define a 'pattern' key under mode, the pattern
+will be merged with the custodian generated default event pattern.
+
+If the pattern filtering does not match the event, the custodian policy lambda will not
+be invoked/executed.
+
+In the following example policy, an additional event pattern is supplied that ignores
+any create subnet call by the iam user named `deputy`.
+
+.. code-block:: yaml
+
+   policies:
+     - name: subnet-detect
+       resource: aws.subnet
+       mode:
+         type: cloudtrail
+         role: CustodianDemoRole
+         events:
+           - source: ec2.amazonaws.com
+             event: CreateSubnet
+             ids: responseElements.subnet.subnetId
+         pattern:
+           detail:
+             userIdentity:
+               userName: [{'anything-but': 'deputy'}]
+
+
 
 Config Rules
 ############
@@ -199,9 +234,9 @@ Lambda Configuration
 Custodian lambdas support configuring all lambda options via keys on the lambda
 mode in the YAML.  See AWS'
 `AWS Lambda Function Configuration <https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html>`_
-page for the full list of configuration options avaible on a Lambda.
+page for the full list of configuration options available on a Lambda.
 
-Refer to :ref:`aws-modes` for detailed explanation of the different ``type``
+Refer to :ref:`aws_modes` for detailed explanation of the different ``type``
 values and the corresponding additional configuration options each requires.
 
 Here is an example YAML fragment that shows the options you are most likely to want or need to configure on a

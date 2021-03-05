@@ -1,18 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
 from .common import BaseTest
 
@@ -78,3 +65,50 @@ class EKS(BaseTest):
         client = factory().client("eks")
         cluster = client.describe_cluster(name='dev').get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')
+
+    def test_delete_eks_with_both(self):
+        name = "test_f1"
+        factory = self.replay_flight_data("test_eks_delete_with_both")
+        client = factory().client("eks")
+        nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
+        self.assertEqual(len(nodegroupNames), 1)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=name)['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 1)
+        p = self.load_policy(
+            {
+                "name": "eks-delete",
+                "resource": "eks",
+                "filters": [{"name": name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
+        self.assertEqual(len(nodegroupNames), 0)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=resources[0]['name'])['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 0)
+        cluster = client.describe_cluster(name=name).get('cluster')
+        self.assertEqual(cluster['status'], 'DELETING')
+
+    def test_tag_and_remove_tag(self):
+        factory = self.replay_flight_data('test_eks_tag_and_remove_tag')
+        p = self.load_policy({
+            'name': 'eks-tag-and-remove',
+            'resource': 'aws.eks',
+            'filters': [{'tag:Env': 'Dev'}],
+            'actions': [
+                {'type': 'tag', 'tags': {'App': 'Custodian'}},
+                {'type': 'remove-tag', 'tags': ['Env']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'devx')
+        client = factory().client('eks')
+        self.assertEqual(
+            client.describe_cluster(
+                name='devx')['cluster']['tags'],
+            {'App': 'Custodian'})

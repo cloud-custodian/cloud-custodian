@@ -1,18 +1,5 @@
-# Copyright 2015-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import itertools
 import logging
 
@@ -20,42 +7,16 @@ from concurrent.futures import as_completed
 import jmespath
 
 from c7n.actions import BaseAction
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.filters import (
     AgeFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, merge_dict_list
 
 
 log = logging.getLogger('custodian.ami')
-
-
-@resources.register('ami')
-class AMI(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'ec2'
-        arn_type = 'image'
-        enum_spec = (
-            'describe_images', 'Images', None)
-        id = 'ImageId'
-        filter_name = 'ImageIds'
-        filter_type = 'list'
-        name = 'Name'
-        date = 'CreationDate'
-
-    def resources(self, query=None):
-        query = query or {}
-        if query.get('Owners') is None:
-            query['Owners'] = ['self']
-        return super(AMI, self).resources(query=query)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeImageSource(self)
-        return super(AMI, self).get_source(source_type)
 
 
 class DescribeImageSource(DescribeSource):
@@ -74,7 +35,35 @@ class DescribeImageSource(DescribeSource):
         return []
 
 
-class ErrorHandler(object):
+@resources.register('ami')
+class AMI(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ec2'
+        arn_type = 'image'
+        enum_spec = (
+            'describe_images', 'Images', None)
+        id = 'ImageId'
+        filter_name = 'ImageIds'
+        filter_type = 'list'
+        name = 'Name'
+        date = 'CreationDate'
+
+    source_mapping = {
+        'describe': DescribeImageSource
+    }
+
+    def resources(self, query=None):
+        if query is None and 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        if query.get('Owners') is None:
+            query['Owners'] = ['self']
+        return super(AMI, self).resources(query=query)
+
+
+class ErrorHandler:
 
     @staticmethod
     def extract_bad_ami(e):
@@ -162,8 +151,25 @@ class RemoveLaunchPermissions(BaseAction):
 
     """
 
-    schema = type_schema('remove-launch-permissions')
-    permissions = ('ec2:ResetImageAttribute',)
+    schema = type_schema(
+        'remove-launch-permissions',
+        accounts={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'string', 'minLength': 12, 'maxLength': 12}]})
+
+    permissions = ('ec2:ResetImageAttribute', 'ec2:ModifyImageAttribute',)
+
+    def validate(self):
+        if 'accounts' in self.data and self.data['accounts'] == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, AmiCrossAccountFilter):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -171,8 +177,25 @@ class RemoveLaunchPermissions(BaseAction):
             self.process_image(client, i)
 
     def process_image(self, client, image):
-        client.reset_image_attribute(
-            ImageId=image['ImageId'], Attribute="launchPermission")
+        accounts = self.data.get('accounts')
+        if not accounts:
+            return client.reset_image_attribute(
+                ImageId=image['ImageId'], Attribute="launchPermission")
+        if accounts == 'matched':
+            accounts = image.get(AmiCrossAccountFilter.annotation_key)
+        if not accounts:
+            return
+        remove = []
+        if 'all' in accounts:
+            remove.append({'Group': 'all'})
+            accounts.remove('all')
+        remove.extend([{'UserId': a} for a in accounts])
+        if not remove:
+            return
+        client.modify_image_attribute(
+            ImageId=image['ImageId'],
+            LaunchPermission={'Remove': remove},
+            OperationType='remove')
 
 
 @AMI.action_registry.register('copy')
@@ -299,7 +322,7 @@ class ImageUnusedFilter(Filter):
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')
-        return set([i['ImageId'] for i in ec2_manager.resources()])
+        return {i['ImageId'] for i in ec2_manager.resources()}
 
     def process(self, resources, event=None):
         images = self._pull_ec2_images().union(self._pull_asg_images())
@@ -318,6 +341,7 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     permissions = ('ec2:DescribeImageAttribute',)
+    annotation_key = 'c7n:CrossAccountViolations'
 
     def process_resource_set(self, client, accounts, resource_set):
         results = []
@@ -326,10 +350,11 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
                 client.describe_image_attribute,
                 ImageId=r['ImageId'],
                 Attribute='launchPermission')['LaunchPermissions']
+            r['c7n:LaunchPermissions'] = attrs
             image_accounts = {a.get('Group') or a.get('UserId') for a in attrs}
             delta_accounts = image_accounts.difference(accounts)
             if delta_accounts:
-                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                r[self.annotation_key] = list(delta_accounts)
                 results.append(r)
         return results
 

@@ -1,21 +1,9 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 from c7n.utils import local_session
+from unittest.mock import MagicMock
 
 
 class CloudFrontWaf(BaseTest):
@@ -219,6 +207,125 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['c7n:mismatched-s3-origin'][0], 'c7n-idontexist')
 
+    def test_distribution_check_logging_enabled(self):
+        factory = self.replay_flight_data("test_distribution_check_logging_enabled")
+
+        p = self.load_policy(
+            {
+                "name": "test_distribution_logging_enabled",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:distribution-config']['Logging']['Enabled'], True)
+
+    def test_distribution_check_logging_enabled_error(self):
+        factory = self.replay_flight_data("test_distribution_check_logging_enabled")
+
+        client = factory().client("cloudfront")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'cloudfront').exceptions.NoSuchDistribution = (
+                client.exceptions.NoSuchDistribution)
+
+        mock_factory().client('cloudfront').get_distribution_config.side_effect = (
+            client.exceptions.NoSuchDistribution(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='get_distribution_config'))
+        p = self.load_policy(
+            {
+                "name": "test_distribution_logging_enabled",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+
+        try:
+            p.resource_manager.filters[0].process(
+                [{'Id': 'abc'}])
+        except client.exceptions.NoSuchDistribution:
+            self.fail('should not raise')
+        mock_factory().client('cloudfront').get_distribution_config.assert_called_once()
+
+    def test_streaming_distribution_check_logging_enabled(self):
+        factory = self.replay_flight_data("test_streaming_distribution_check_logging_enabled")
+
+        p = self.load_policy(
+            {
+                "name": "test_streaming_distribution_logging_enabled",
+                "resource": "streaming-distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:distribution-config']['Logging']['Enabled'],
+            True)
+
+    def test_streaming_distribution_check_logging_enabled_error(self):
+        factory = self.replay_flight_data("test_streaming_distribution_check_logging_enabled")
+
+        client = factory().client("cloudfront")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'cloudfront').exceptions.NoSuchStreamingDistribution = (
+                client.exceptions.NoSuchStreamingDistribution)
+
+        mock_factory().client('cloudfront').get_streaming_distribution_config.side_effect = (
+            client.exceptions.NoSuchStreamingDistribution(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='get_streaming_distribution_config'))
+        p = self.load_policy(
+            {
+                "name": "test_streaming_distribution_logging_enabled",
+                "resource": "streaming-distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+
+        try:
+            p.resource_manager.filters[0].process(
+                [{'Id': 'abc'}])
+        except client.exceptions.NoSuchDistribution:
+            self.fail('should not raise')
+        mock_factory().client('cloudfront').get_streaming_distribution_config.assert_called_once()
+
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
 
@@ -229,7 +336,6 @@ class CloudFront(BaseTest):
                 "filters": [{"tag:abc": "present"}],
                 "actions": [{"type": "tag", "key": "123", "value": "456"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -277,7 +383,6 @@ class CloudFront(BaseTest):
                 "filters": [{"tag:123": "present"}],
                 "actions": [{"type": "tag", "key": "abc", "value": "123"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -295,7 +400,7 @@ class CloudFront(BaseTest):
                 "resource": "distribution",
                 "filters": [{"tag:tag": "present"}]
             },
-            config=Config.empty(region='us-east-1'),
+            config=dict(region='us-east-1'),
             session_factory=factory,
         )
 
@@ -305,7 +410,7 @@ class CloudFront(BaseTest):
                 "resource": "distribution",
                 "filters": [{"tag:tag": "present"}]
             },
-            config=Config.empty(region='us-west-2'),
+            config=dict(region='us-west-2'),
             session_factory=factory,
         )
 
@@ -313,3 +418,88 @@ class CloudFront(BaseTest):
         west_resources = west_p.run()
 
         self.assertEqual(east_resources, west_resources)
+
+    def test_cloudfront_update_distribution(self):
+        factory = self.replay_flight_data("test_distribution_update_distribution")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-tagging-us-east-1",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": False,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-attributes",
+                        "attributes": {
+                            "Comment": "",
+                            "Enabled": True,
+                            "Logging": {
+                                "Enabled": True,
+                                "IncludeCookies": False,
+                                "Bucket": 'test-logging.s3.amazonaws.com',
+                                "Prefix": '',
+                            }
+                        }
+                    }
+                ],
+            },
+            config=dict(region='us-east-1'),
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_distribution_config(Id=dist_id)
+        self.assertEqual(
+            resp['DistributionConfig']['Logging']['Enabled'], True
+        )
+
+    def test_cloudfront_update_streaming_distribution(self):
+        factory = self.replay_flight_data("test_distribution_update_streaming_distribution")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-tagging-us-east-1",
+                "resource": "streaming-distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": False,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-attributes",
+                        "attributes": {
+                            "Logging": {
+                                "Enabled": True,
+                                "Bucket": 'test-streaming-distribution-logging.s3.amazonaws.com',
+                                "Prefix": '',
+                            }
+                        }
+                    }
+                ],
+            },
+            config=dict(region='us-east-1'),
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_streaming_distribution_config(Id=dist_id)
+        self.assertEqual(
+            resp['StreamingDistributionConfig']['Logging']['Enabled'], True
+        )

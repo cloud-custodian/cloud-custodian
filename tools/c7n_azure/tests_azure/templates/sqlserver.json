@@ -16,7 +16,7 @@
          "name": "[parameters('servers_cctestsqlserver_name')]",
          "properties": {
             "administratorLogin": "custodian",
-            "administratorLoginPassword": "Cust0dianPassw0rd",
+            "administratorLoginPassword": "[guid(resourceGroup().id)]",
             "version": "12.0"
          }
       },
@@ -29,8 +29,8 @@
             "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
          ],
          "sku": {
-            "name": "Premium",
-            "tier": "Premium"
+            "name": "S0",
+            "tier": "Standard"
          },
          "kind": "v12.0,user",
          "properties": {

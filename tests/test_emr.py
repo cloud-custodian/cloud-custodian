@@ -1,43 +1,29 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import unittest
 
+from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
-from .common import BaseTest, Bag, TestConfig as Config
+from .common import BaseTest, Bag
 
 
 class TestEMR(BaseTest):
 
     def test_get_emr_by_ids(self):
         session_factory = self.replay_flight_data("test_emr_query_ids")
-
-        ctx = Bag(session_factory=session_factory, log_dir="", options=Config.empty())
-
-        mgr = emr.EMRCluster(ctx, {})
-        resources = mgr.get_resources(["j-1EJMJNTXC63JW"])
+        p = self.load_policy(
+            {'name': 'emr', 'resource': 'aws.emr'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(["j-1EJMJNTXC63JW"])
         self.assertEqual(resources[0]["Id"], "j-1EJMJNTXC63JW")
 
     def test_consolidate_query_filter(self):
         session_factory = self.replay_flight_data("test_emr_query_ids")
 
         ctx = Bag(session_factory=session_factory, log_dir="", options=Config.empty())
-
         query = {
             "query": [{"tag:foo": "val1"}, {"tag:foo": "val2"}, {"tag:bar": "val3"}]
         }
@@ -160,6 +146,26 @@ class TestEMR(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertFalse("test_tag" in old_tags)
 
+    def test_emr_sg(self):
+        session_factory = self.replay_flight_data("test_emr_sg")
+        p = self.load_policy(
+            {
+                "name": "emr-sg-tag",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:NetworkLocation",
+                        "value": "CustFacing,EntFacing"
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "pratyush-emr-test")
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 
@@ -233,3 +239,38 @@ class TestActions(unittest.TestCase):
     def test_action_construction(self):
 
         self.assertIsInstance(actions.factory("terminate", None), emr.Terminate)
+
+
+class TestEMRSecurityConfiguration(BaseTest):
+    def test_emr_security_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_security_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-security-configuration',
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        print(resources)
+        self.assertEqual(resources[0]["SecurityConfiguration"]['EncryptionConfiguration']
+             ['EnableInTransitEncryption'], False)
+
+    def test_emr_security_configuration_delete(self):
+        session_factory = self.replay_flight_data("test_emr_security_configuration_delete")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-security-configuration',
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory(region="us-east-1").client("emr")
+        resp = client.list_security_configurations()
+        self.assertFalse(
+            resp['SecurityConfigurations']
+        )

@@ -1,25 +1,29 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, Bag
 from botocore.exceptions import ClientError
+
+from c7n.exceptions import PolicyValidationError
+from c7n.resources.ecr import lifecycle_rule_validate
 
 
 class TestECR(BaseTest):
+
+    def test_rule_validation(self):
+        policy = Bag(name='xyz')
+        with self.assertRaises(PolicyValidationError) as ecm:
+            lifecycle_rule_validate(
+                policy, {'selection': {'tagStatus': 'tagged'}})
+        self.assertIn('tagPrefixList required', str(ecm.exception))
+        with self.assertRaises(PolicyValidationError) as ecm:
+            lifecycle_rule_validate(
+                policy, {'selection': {
+                    'tagStatus': 'untagged',
+                    'countNumber': 10, 'countUnit': 'days',
+                    'countType': 'imageCountMoreThan'}})
+        self.assertIn('countUnit invalid', str(ecm.exception))
 
     def create_repository(self, client, name):
         """ Create the named repository. Delete existing one first if applicable. """
@@ -32,6 +36,42 @@ class TestECR(BaseTest):
 
         client.create_repository(repositoryName=name)
         self.addCleanup(client.delete_repository, repositoryName=name)
+
+    def test_ecr_set_scanning(self):
+        factory = self.replay_flight_data('test_ecr_set_scanning')
+        p = self.load_policy({
+            'name': 'ecr-set-scanning',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'testrepo'},
+                {'imageScanningConfiguration.scanOnPush': False}],
+            'actions': ['set-scanning']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['repositoryName'], 'testrepo')
+        client = factory().client('ecr')
+        repo = client.describe_repositories(repositoryNames=['testrepo'])[
+            'repositories'][0]
+        self.assertJmes(
+            'imageScanningConfiguration.scanOnPush', repo, True)
+
+    def test_ecr_set_immutability(self):
+        factory = self.replay_flight_data('test_ecr_set_immutability')
+        p = self.load_policy({
+            'name': 'ecr-set-immutability',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'testrepo'},
+                {'imageTagMutability': 'MUTABLE'}],
+            'actions': [{'type': 'set-immutability'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['repositoryName'], 'testrepo')
+        client = factory().client('ecr')
+        repo = client.describe_repositories(repositoryNames=['testrepo'])[
+            'repositories'][0]
+        self.assertEqual(repo['imageTagMutability'], 'IMMUTABLE')
 
     def test_ecr_lifecycle_policy(self):
         session_factory = self.replay_flight_data('test_ecr_lifecycle_update')

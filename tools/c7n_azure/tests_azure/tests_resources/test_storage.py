@@ -1,20 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import pytest
 from azure.mgmt.storage.models import StorageAccountUpdateParameters
-from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter, \
     StorageFirewallBypassFilter
@@ -26,6 +13,7 @@ from parameterized import parameterized
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
+from ..azure_common import BaseTest, arm_template, cassette_name
 
 
 class StorageTest(BaseTest):
@@ -361,6 +349,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
@@ -410,6 +401,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
@@ -430,6 +424,7 @@ class StorageTest(BaseTest):
         self.assertTrue(table_settings.logging.delete)
 
     @arm_template('storage.json')
+    @pytest.mark.skiplive
     def test_disable_retention_log_settings(self):
         p = self.load_policy({
             'name': 'test-azure-storage',

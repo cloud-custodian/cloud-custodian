@@ -1,0 +1,8 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Account": "644160558196", 
+        "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+        "Arn": "arn:aws:iam::644160558196:user/kapil"
+    }
+}

@@ -14,14 +14,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Wed, 18 Sep 2019 23:45:59 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:23 GMT"
                     ],
                     "content-length": [
                         "428"
@@ -36,11 +36,11 @@
                                     "administratorLogin": "custodian",
                                     "version": "12.0",
                                     "state": "Ready",
-                                    "fullyQualifiedDomainName": "cctestsqlserverj6y6cbbtaphs4.database.windows.net"
+                                    "fullyQualifiedDomainName": "cclockedsqlserverc129bfa71a47.database.windows.net"
                                 },
                                 "location": "eastus2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
-                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47",
+                                "name": "cclockedsqlserverc129bfa71a47",
                                 "type": "Microsoft.Sql/servers"
                             }
                         ]
@@ -51,7 +51,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases?api-version=2017-10-01-preview",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/databases?api-version=2017-10-01-preview",
                 "body": null,
                 "headers": {}
             },
@@ -61,17 +61,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Wed, 18 Sep 2019 23:46:02 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:23 GMT"
                     ],
                     "content-length": [
-                        "2737"
+                        "1827"
                     ]
                 },
                 "body": {
@@ -79,97 +79,65 @@
                         "value": [
                             {
                                 "sku": {
-                                    "name": "Standard",
-                                    "tier": "Standard",
-                                    "capacity": 10
-                                },
-                                "kind": "v12.0,user",
-                                "properties": {
-                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
-                                    "maxSizeBytes": 268435456000,
-                                    "status": "Online",
-                                    "databaseId": "2f600512-4097-4584-bc5a-d9d82c74b458",
-                                    "creationDate": "2019-09-16T20:25:40.02Z",
-                                    "currentServiceObjectiveName": "S0",
-                                    "requestedServiceObjectiveName": "S0",
-                                    "defaultSecondaryLocation": "centralus",
-                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-                                    "zoneRedundant": false,
-                                    "earliestRestoreDate": "2019-09-16T20:34:01.13Z",
-                                    "readScale": "Disabled",
-                                    "readReplicaCount": 0,
-                                    "currentSku": {
-                                        "name": "Standard",
-                                        "tier": "Standard",
-                                        "capacity": 10
-                                    }
-                                },
-                                "location": "eastus2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cclongtermretentiondb",
-                                "name": "cclongtermretentiondb",
-                                "type": "Microsoft.Sql/servers/databases"
-                            },
-                            {
-                                "sku": {
-                                    "name": "Premium",
-                                    "tier": "Premium",
-                                    "capacity": 125
+                                    "name": "Basic",
+                                    "tier": "Basic",
+                                    "capacity": 5
                                 },
                                 "kind": "v12.0,user",
                                 "properties": {
                                     "collation": "SQL_Latin1_General_CP1_CI_AS",
                                     "maxSizeBytes": 2147483648,
                                     "status": "Online",
-                                    "databaseId": "33a4a37d-e57d-4beb-9f6a-9369ead1a3c7",
-                                    "creationDate": "2019-09-16T20:26:37.58Z",
-                                    "currentServiceObjectiveName": "P1",
-                                    "requestedServiceObjectiveName": "P1",
+                                    "databaseId": "d053a1ca-9b88-4b4b-8f5a-13db2a1d90c6",
+                                    "creationDate": "2019-12-07T23:27:15.883Z",
+                                    "currentServiceObjectiveName": "Basic",
+                                    "requestedServiceObjectiveName": "Basic",
                                     "defaultSecondaryLocation": "centralus",
                                     "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                                     "zoneRedundant": false,
-                                    "earliestRestoreDate": "2019-09-16T20:27:28.017Z",
-                                    "readScale": "Enabled",
-                                    "readReplicaCount": 1,
+                                    "earliestRestoreDate": "2019-12-07T23:33:55Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
                                     "currentSku": {
-                                        "name": "Premium",
-                                        "tier": "Premium",
-                                        "capacity": 125
+                                        "name": "Basic",
+                                        "tier": "Basic",
+                                        "capacity": 5
                                     }
                                 },
                                 "location": "eastus2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
-                                "name": "cctestdb",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/databases/cclockeddb",
+                                "name": "cclockeddb",
                                 "type": "Microsoft.Sql/servers/databases"
                             },
                             {
                                 "sku": {
-                                    "name": "System",
-                                    "tier": "System",
-                                    "capacity": 0
+                                    "name": "Basic",
+                                    "tier": "Basic",
+                                    "capacity": 5
                                 },
                                 "kind": "v12.0,system",
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47",
                                 "properties": {
                                     "collation": "SQL_Latin1_General_CP1_CI_AS",
-                                    "maxSizeBytes": 32212254720,
+                                    "maxSizeBytes": 2147483648,
                                     "status": "Online",
-                                    "databaseId": "c7b1f283-3f8f-40e2-8dd1-dabdf2903bb7",
-                                    "creationDate": "2019-09-16T20:24:22.38Z",
-                                    "currentServiceObjectiveName": "System2",
-                                    "requestedServiceObjectiveName": "System2",
+                                    "databaseId": "4bfb011b-2489-42c8-b63b-ca18f1035c2d",
+                                    "creationDate": "2019-12-07T23:25:42.947Z",
+                                    "currentServiceObjectiveName": "Basic",
+                                    "requestedServiceObjectiveName": "Basic",
                                     "defaultSecondaryLocation": "centralus",
                                     "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                                     "zoneRedundant": false,
                                     "readScale": "Disabled",
                                     "readReplicaCount": 0,
                                     "currentSku": {
-                                        "name": "System",
-                                        "tier": "System",
-                                        "capacity": 0
+                                        "name": "Basic",
+                                        "tier": "Basic",
+                                        "capacity": 5
                                     }
                                 },
                                 "location": "eastus2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/master",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/databases/master",
                                 "name": "master",
                                 "type": "Microsoft.Sql/servers/databases"
                             }
@@ -181,7 +149,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
+                "uri": "https://management.azure.com/%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2Ftest_locked%2Fproviders%2FMicrosoft.Sql%2Fservers%2Fcclockedsqlserverc129bfa71a47%2Fdatabases%2Fcclockeddb/providers/Microsoft.Authorization/locks/dblock?api-version=2016-09-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -191,8 +159,8 @@
                     "message": "Created"
                 },
                 "headers": {
-                    "date": [
-                        "Wed, 18 Sep 2019 23:46:09 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
@@ -200,22 +168,22 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "content-length": [
-                        "334"
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:23 GMT"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "content-length": [
+                        "326"
                     ]
                 },
                 "body": {
                     "data": {
                         "properties": {
-                            "level": "CanNotDelete",
+                            "level": "ReadOnly",
                             "notes": "testNotes"
                         },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/databases/cclockeddb/providers/Microsoft.Authorization/locks/dblock",
                         "type": "Microsoft.Authorization/locks",
-                        "name": "testLock"
+                        "name": "dblock"
                     }
                 }
             }
@@ -223,7 +191,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Sql%2Fservers/cclockedsqlserverc129bfa71a47/databases/cclockeddb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -233,17 +201,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Wed, 18 Sep 2019 23:46:13 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:23 GMT"
                     ],
                     "content-length": [
-                        "346"
+                        "651"
                     ]
                 },
                 "body": {
@@ -252,11 +220,20 @@
                             {
                                 "properties": {
                                     "level": "CanNotDelete",
+                                    "notes": "This lock is for the cc test_filter_resource_lock test"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "cctestlockfilter"
+                            },
+                            {
+                                "properties": {
+                                    "level": "ReadOnly",
                                     "notes": "testNotes"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/databases/cclockeddb/providers/Microsoft.Authorization/locks/dblock",
                                 "type": "Microsoft.Authorization/locks",
-                                "name": "testLock"
+                                "name": "dblock"
                             }
                         ]
                     }
@@ -266,7 +243,7 @@
         {
             "request": {
                 "method": "DELETE",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
+                "uri": "https://management.azure.com/%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2Ftest_locked%2Fproviders%2FMicrosoft.Sql%2Fservers%2Fcclockedsqlserverc129bfa71a47%2Fdatabases%2Fcclockeddb/providers/Microsoft.Authorization/locks/dblock?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -276,17 +253,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-deletes": [
                         "14999"
                     ],
                     "date": [
-                        "Wed, 18 Sep 2019 23:46:16 GMT"
+                        "Sun, 08 Dec 2019 00:48:23 GMT"
                     ],
                     "content-length": [
                         "0"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ]
                 },
                 "body": {

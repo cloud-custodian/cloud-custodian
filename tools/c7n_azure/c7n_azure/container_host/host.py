@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import base64
 import json
@@ -29,7 +18,7 @@ from azure.mgmt.eventgrid.models import (
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.resources import load_resources
+from c7n import resources
 from c7n.utils import local_session
 from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
@@ -61,7 +50,7 @@ class Host:
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
 
-        load_resources()
+        resources.load_available()
 
         self.session = local_session(Session)
         self.storage_session = self.session
@@ -98,6 +87,7 @@ class Host:
         # Configure scheduler
         self.scheduler = BlockingScheduler(Host.get_scheduler_config())
         logging.getLogger('apscheduler.executors.default').setLevel(logging.ERROR)
+        logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
         # Schedule recurring policy updates
         self.scheduler.add_job(self.update_policies,
@@ -258,22 +248,28 @@ class Host:
             except yaml.YAMLError as exc:
                 log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
                 os.unlink(path)
-                return
+                return path
 
-        removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
-        log.info('Removing policies %s' % removed)
+        try:
+            # Some policies might have bad format, so they have never been loaded
+            removed = [policies.pop(p['name'])
+                       for p in policy_config.get('policies', [])
+                       if p['name'] in policies]
+            log.info('Removing policies %s' % removed)
 
-        # update periodic
-        periodic_names = \
-            [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('schedule')]
-        periodic_to_remove = \
-            [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
+            # update periodic
+            periodic_names = \
+                [p['name'] for p in policy_config.get('policies', [])
+                 if p.get('mode', {}).get('schedule')]
+            periodic_to_remove = \
+                [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
 
-        for name in periodic_to_remove:
-            self.scheduler.remove_job(job_id=name)
+            for name in periodic_to_remove:
+                self.scheduler.remove_job(job_id=name)
+        except (AttributeError, KeyError) as exc:
+            log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
 
         os.unlink(path)
-
         return path
 
     def update_periodic(self, policy):
@@ -372,7 +368,7 @@ class Host:
             if not events:
                 continue
             events = AzureEvents.get_event_operations(events)
-            if operation_name in events:
+            if operation_name.upper() in (event.upper() for event in events):
                 self.scheduler.add_job(Host.run_policy,
                                        id=k + event['id'],
                                        name=k,
@@ -427,12 +423,17 @@ class Host:
 
     @staticmethod
     def get_scheduler_config():
+        if os.name == 'nt':
+            executor = "apscheduler.executors.pool:ThreadPoolExecutor"
+        else:
+            executor = "apscheduler.executors.pool:ProcessPoolExecutor"
+
         return {
             'apscheduler.jobstores.default': {
                 'type': 'memory'
             },
             'apscheduler.executors.default': {
-                'class': 'apscheduler.executors.pool:ProcessPoolExecutor',
+                'class': executor,
                 'max_workers': '4'
             },
             'apscheduler.executors.threadpool': {

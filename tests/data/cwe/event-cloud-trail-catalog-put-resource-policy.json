@@ -1,0 +1,46 @@
+{
+    "version": "0",
+    "id": "4186524f-4444-4444-4444-9c149bfbbbe2",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.glue",
+    "account": "644160558196",
+    "time": "2020-06-04T15:18:28Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+      "eventVersion": "1.05",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "qwefqffasdfdfsda",
+        "arn": "arn:aws:iam::644160558196:user/fake@fakeemail.com",
+        "accountId": "644160558196",
+        "accessKeyId": "1345351435",
+        "userName": "fake@fakeemail.com",
+        "sessionContext": {
+          "sessionIssuer": {},
+          "webIdFederationData": {},
+          "attributes": {
+            "mfaAuthenticated": "false",
+            "creationDate": "2020-06-04T15:06:07Z"
+          }
+        }
+      },
+      "eventTime": "2020-06-04T15:18:28Z",
+      "eventSource": "glue.amazonaws.com",
+      "eventName": "PutResourcePolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "99.99.99.99",
+      "userAgent": "console.amazonaws.com",
+      "requestParameters": {
+        "policyHashCondition": "qwerwqerewqrewqr==",
+        "policyInJson": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"glue:*\",\n    \"Resource\" : \"arn:aws:glue:us-east-1:644160558196:catalog\",\n    \"Condition\": {\n        \"StringEquals\": {\n            \"aws:PrincipalOrgID\": \"o-4amkskbcf3\"\n        }        \n    }\n  } ]\n}"
+      },
+      "responseElements": {
+        "policyHash": "eqwewrewqerwerewr=="
+      },
+      "requestID": "562ac246-0da8-4444-4444-7053b5ecf789",
+      "eventID": "1f5ed731-4444-4a5c-4444-57f55e636789",
+      "eventType": "AwsApiCall"
+    },
+    "debug": true
+  }

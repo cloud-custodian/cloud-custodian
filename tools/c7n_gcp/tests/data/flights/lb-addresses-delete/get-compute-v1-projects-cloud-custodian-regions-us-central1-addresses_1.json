@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "expires": "Tue, 05 Mar 2019 09:27:05 GMT",
+    "date": "Tue, 05 Mar 2019 09:27:05 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"rYPkhItTdpx_do5KgRCVkj15NeA=/RgOQS9vmqswMCiZmWLzM07OCRiM=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5592",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/addresses?alt=json"
+  },
+  "body": {
+    "kind": "compute#addressAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/addresses",
+    "items": {
+      "regions/us-central1": {
+        "addresses": [
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/decoded-pier-228312/aggregated/addresses"
+  }
+}

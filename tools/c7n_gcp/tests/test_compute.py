@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 import time
@@ -38,8 +27,8 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         instance = p.resource_manager.get_resource(
             {"instance_id": "2966820606951926687",
-             "project_id": "custodian-1291",
-             "resourceName": "projects/custodian-1291/zones/us-central1-b/instances/c7n-jenkins",
+             "project_id": "cloud-custodian",
+             "resourceName": "projects/cloud-custodian/zones/us-central1-b/instances/c7n-jenkins",
              "zone": "us-central1-b"})
         self.assertEqual(instance['status'], 'RUNNING')
 
@@ -104,17 +93,161 @@ class InstanceTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['status'], 'STOPPING')
 
+    def test_label_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'ilabel',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_mark_for_op_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'ilabel',
+             'resource': 'gcp.instance',
+             'filters': [{'type': 'marked-for-op',
+                          'op': 'stop'}],
+             'actions': [{'type': 'mark-for-op',
+                          'op': 'start'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertTrue(result['items'][0]['labels']['custodian_status']
+                        .startswith("resource_policy-start"))
+
+    def test_detach_disks_from_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-detach-disks', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'idetach',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'detach-disks'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertIsNone(result['items'][0].get("disks"))
+
+    def test_create_machine_instance_from_instance(self):
+        project_id = 'custodian-tests'
+        factory = self.replay_flight_data('instance-create-machine-instance', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'icmachineinstance',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'create-machine-image'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class DiskTest(BaseTest):
 
     def test_disk_query(self):
-        factory = self.replay_flight_data('disk-query')
+        factory = self.replay_flight_data('disk-query', project_id='cloud-custodian')
         p = self.load_policy(
             {'name': 'all-disks',
              'resource': 'gcp.disk'},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
+
+    def test_disk_snapshot(self):
+        factory = self.replay_flight_data('disk-snapshot', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-jenkins'}],
+             'actions': ['snapshot']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_disk_snapshot_add_date(self):
+        factory = self.replay_flight_data('disk-snapshot', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-jenkins'}],
+             'actions': [{'type': 'snapshot', 'name_format': "{disk[name]:.50}-{now:%Y-%m-%d}"}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_disk_delete(self):
+        project_id = 'cloud-custodian'
+        resource_name = 'c7n-jenkins'
+        factory = self.replay_flight_data('disk-delete', project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': resource_name}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_name)
+
+        client = policy.resource_manager.get_client()
+        zone = resources[0]['zone'].rsplit('/', 1)[-1]
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = instance-1',
+                     'zone': zone})
+
+        self.assertEqual(len(result['items']["zones/{}".format(zone)]['disks']), 0)
+
+    def test_label_disk(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'disk-label',
+             'resource': 'gcp.disk',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
 
 
 class SnapshotTest(BaseTest):
@@ -274,7 +407,7 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(resources[0]['name'], resource_name)
 
     def test_autoscaler_set(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('autoscaler-set', project_id=project_id)
 
         p = self.load_policy(

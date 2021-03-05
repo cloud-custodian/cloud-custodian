@@ -1,23 +1,12 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 import re
 
-import six
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
@@ -27,6 +16,7 @@ from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
+from c7n.resources import load_resources
 from c7n.query import sources
 from c7n.utils import local_session
 from c7n.utils import type_schema
@@ -119,7 +109,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = self.get_session().get_session_for_resource('https://graph.windows.net')
+        s = self.get_session().get_session_for_resource(GRAPH_AUTH_ENDPOINT)
         graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(
@@ -289,6 +279,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
     def __init__(self, data, manager=None):
         super(ResourceAccessFilter, self).__init__(data, manager)
         resource_type = self.data['relatedResource']
+        load_resources((resource_type,))
         self.factory = Azure.resources.get(
             resource_type.rsplit('.', 1)[-1])
 
@@ -385,7 +376,7 @@ class ScopeFilter(Filter):
         return [d for d in data if self.is_scope(d["properties"]["scope"], scope_value)]
 
     def is_scope(self, scope, scope_type):
-        if not isinstance(scope, six.string_types):
+        if not isinstance(scope, str):
             return False
 
         regex = ""

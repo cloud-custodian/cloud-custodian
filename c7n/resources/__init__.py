@@ -1,132 +1,91 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 # AWS resources to manage
 #
-from __future__ import absolute_import, division, print_function, unicode_literals
+from c7n.provider import clouds
 
-import time
-import os
-
-LOADED = False
+LOADED = set()
 
 
-def load_resources():
+def load_resources(resource_types=('*',)):
+    pmap = {}
+    for r in resource_types:
+        parts = r.split('.', 1)
+        # support aws.*
+        if parts[-1] == '*':
+            r = '*'
+        pmap.setdefault(parts[0], []).append(r)
 
+    load_providers(set(pmap))
+    missing = []
+    for pname, p in clouds.items():
+        if '*' in pmap:
+            p.get_resource_types(('*',))
+        elif pname in pmap:
+            _, not_found = p.get_resource_types(pmap[pname])
+            missing.extend(not_found)
+    return missing
+
+
+def should_load_provider(name, provider_types):
     global LOADED
-    if LOADED:
-        return
+    if (name not in LOADED and
+        ('*' in provider_types or
+         name in provider_types)):
+        return True
+    return False
 
-    import c7n.resources.account
-    import c7n.resources.acm
-    import c7n.resources.ami
-    import c7n.resources.apigw
-    import c7n.resources.appelb
-    import c7n.resources.asg
-    import c7n.resources.awslambda
-    import c7n.resources.backup
-    import c7n.resources.batch
-    import c7n.resources.cfn
-    import c7n.resources.cloudfront
-    import c7n.resources.cloudsearch
-    import c7n.resources.cloudtrail
-    import c7n.resources.code
-    import c7n.resources.cognito
-    import c7n.resources.config
-    import c7n.resources.cw
-    import c7n.resources.directory
-    import c7n.resources.directconnect
-    import c7n.resources.dlm
-    import c7n.resources.dms
-    import c7n.resources.dynamodb
-    import c7n.resources.datapipeline
-    import c7n.resources.ebs
-    import c7n.resources.ec2
-    import c7n.resources.ecr
-    import c7n.resources.ecs
-    import c7n.resources.efs
-    import c7n.resources.elasticache
-    import c7n.resources.elasticbeanstalk
-    import c7n.resources.elasticsearch
-    import c7n.resources.elb
-    import c7n.resources.eks
-    import c7n.resources.emr
-    import c7n.resources.gamelift
-    import c7n.resources.glacier
-    import c7n.resources.glue
-    import c7n.resources.health
-    import c7n.resources.hsm
-    import c7n.resources.iam
-    import c7n.resources.iot
-    import c7n.resources.kafka
-    import c7n.resources.kinesis
-    import c7n.resources.kms
-    import c7n.resources.lightsail
-    import c7n.resources.ml
-    import c7n.resources.mq
-    import c7n.resources.opsworks
-    import c7n.resources.rds
-    import c7n.resources.rdsparamgroup
-    import c7n.resources.rdscluster
-    import c7n.resources.redshift
-    import c7n.resources.route53
-    import c7n.resources.s3
-    import c7n.resources.sagemaker
-    import c7n.resources.secretsmanager
-    import c7n.resources.quotas
-    import c7n.resources.sfn
-    import c7n.resources.shield
-    import c7n.resources.simpledb
-    import c7n.resources.snowball
-    import c7n.resources.sns
-    import c7n.resources.storagegw
-    import c7n.resources.sqs
-    import c7n.resources.ssm
-    import c7n.resources.support
-    import c7n.resources.vpc
-    import c7n.resources.waf
-    import c7n.resources.fsx
-    import c7n.resources.workspaces  # NOQA
 
-    # Load external plugins (private sdks etc)
-    #
-    # We default to loading known cloud providers
-    # to avoid the runtime costs in serverless
-    # environments of scanning the entire python
-    # path for entry points.
-    from c7n.manager import resources
-    if 'C7N_EXTPLUGINS' in os.environ:
-        resources.load_plugins()
-    else:
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack')
+
+
+def load_available(resources=True):
+    """Load available installed providers
+
+    Unlike load_resources() this will catch ImportErrors on uninstalled
+    providers.
+    """
+    found = []
+    for provider in PROVIDER_NAMES:
         try:
-            from c7n_azure.entry import initialize_azure
-            initialize_azure()
-        except ImportError:
-            pass
+            load_providers((provider,))
+        except ImportError as e: # pragma: no cover
+            continue
+        else:
+            found.append(provider)
+    if resources:
+        load_resources(['%s.*' % s for s in found])
+    return found
 
-        try:
-            from c7n_gcp.entry import initialize_gcp
-            initialize_gcp()
-        except ImportError:
-            pass
 
-        try:
-            from c7n_kube.entry import initialize_kube
-            initialize_kube()
-        except ImportError:
-            pass
+def load_providers(provider_types):
+    global LOADED
 
-    resources.notify(resources.EVENT_FINAL)
+    # Even though we're lazy loading resources we still need to import
+    # those that are making available generic filters/actions
+    if should_load_provider('aws', provider_types):
+        import c7n.resources.securityhub
+        import c7n.resources.sfn
+        import c7n.resources.ssm # NOQA
 
-    LOADED = True
+    if should_load_provider('azure', provider_types):
+        from c7n_azure.entry import initialize_azure
+        initialize_azure()
+
+    if should_load_provider('gcp', provider_types):
+        from c7n_gcp.entry import initialize_gcp
+        initialize_gcp()
+
+    if should_load_provider('k8s', provider_types):
+        from c7n_kube.entry import initialize_kube
+        initialize_kube()
+
+    if should_load_provider('openstack', provider_types):
+        from c7n_openstack.entry import initialize_openstack
+        initialize_openstack()
+
+    if should_load_provider('c7n', provider_types):
+        from c7n import data  # noqa
+
+    LOADED.update(provider_types)

@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """A cloudwatch log subscriber that records error messages into getsentry.com
 
 Features
@@ -51,8 +40,6 @@ OrgMode
    to sentry projects
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import base64
 from datetime import datetime
@@ -61,6 +48,7 @@ import json
 import logging
 import os
 import time
+from urllib.parse import urlparse
 import uuid
 import zlib
 
@@ -70,7 +58,6 @@ from botocore.exceptions import ClientError
 from botocore.vendored import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
-from six.moves.urllib.parse import urlparse
 
 from c7n.config import Bag
 
@@ -376,8 +363,8 @@ def orgreplay(options):
         "@" in dsn.netloc and dsn.netloc.rsplit('@', 1)[1] or dsn.netloc)
 
     log.info("sentry endpoint: %s", endpoint)
-    teams = set([t['slug'] for t in sget(
-        endpoint + "organizations/%s/teams/" % options.sentry_org).json()])
+    teams = {t['slug'] for t in sget(
+             endpoint + "organizations/%s/teams/" % options.sentry_org).json()}
     projects = {p['name']: p for p in sget(endpoint + "projects/").json()}
 
     def process_account(a):
