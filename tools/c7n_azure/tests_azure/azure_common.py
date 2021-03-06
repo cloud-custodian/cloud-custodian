@@ -191,8 +191,8 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def _azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
-        if [k for k in set(r1.query) if k[0] != 'api-version'] != [
-                k for k in set(r2.query) if k[0] != 'api-version']:
+        if [(k[0].lower(), k[1].lower()) for k in set(r1.query) if k[0] != 'api-version'] != [
+            (k[0].lower(), k[1].lower()) for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
