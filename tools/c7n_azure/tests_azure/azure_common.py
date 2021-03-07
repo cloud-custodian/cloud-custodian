@@ -488,7 +488,8 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     @staticmethod
     def session_client_wrapper(self, client, vault_url=None):
         client = Session._old_client(self, client)
-        client.config.long_running_operation_timeout = 0
+        # TODO: Is there a way to override it properly instead of hijacking?
+        client._config.polling_interval = 0
         return client
 
 

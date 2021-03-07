@@ -810,7 +810,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
             [VirtualNetworkRule(id=r) for r in vnet_rules]
 
         # Update resource
-        self.client.database_accounts.create_or_update(
+        self.client.database_accounts.begin_create_or_update(
             resource['resourceGroup'],
             resource['name'],
             create_update_parameters=resource

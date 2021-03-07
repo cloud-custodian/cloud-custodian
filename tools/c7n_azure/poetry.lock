@@ -375,7 +375,7 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-containerregistry"
-version = "2.8.0"
+version = "8.0.0b1"
 description = "Microsoft Azure Container Registry Client Library for Python"
 category = "main"
 optional = false
@@ -383,8 +383,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-containerservice"
@@ -581,7 +581,7 @@ msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-monitor"
-version = "0.7.0"
+version = "2.0.0"
 description = "Microsoft Azure Monitor Client Library for Python"
 category = "main"
 optional = false
@@ -589,8 +589,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-network"
@@ -633,7 +633,7 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-redis"
-version = "6.0.0"
+version = "12.0.0"
 description = "Microsoft Azure Redis Cache Management Client Library for Python"
 category = "main"
 optional = false
@@ -641,8 +641,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-resource"
@@ -1483,7 +1483,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "d19c5de70af094e2c31eb8cd838bc4e7983893d1fd180ff22a15e896380566e6"
+content-hash = "15e2909b509ba23b8153c4644637f574f2186bc0735d247d1ee9745f72794130"
 
 [metadata.files]
 adal = [
@@ -1595,8 +1595,8 @@ azure-mgmt-containerinstance = [
     {file = "azure_mgmt_containerinstance-7.0.0-py2.py3-none-any.whl", hash = "sha256:a71800a72747ca5b1585c11ac4cde61f84dfcfe100239debf3b9a7ea649138d9"},
 ]
 azure-mgmt-containerregistry = [
-    {file = "azure-mgmt-containerregistry-2.8.0.zip", hash = "sha256:b24be1050d54f3158e8be7f6ad677f0c8888dddefd09fb8391ebfc73d40173a4"},
-    {file = "azure_mgmt_containerregistry-2.8.0-py2.py3-none-any.whl", hash = "sha256:7de7c542e29b441f3858447694c4e5ab933eeef74bce2dd5bdab32b6d521ecd3"},
+    {file = "azure-mgmt-containerregistry-8.0.0b1.zip", hash = "sha256:ae293a17f29f95554725abe5615bc239bf4e3161ccf753cc061edb5b9c645167"},
+    {file = "azure_mgmt_containerregistry-8.0.0b1-py2.py3-none-any.whl", hash = "sha256:34d0a789a8f81e3c0e980cfed12ff09d5ee8be73807f7409c741c462d9a9867b"},
 ]
 azure-mgmt-containerservice = [
     {file = "azure-mgmt-containerservice-15.0.0.zip", hash = "sha256:e205aada94bb630e1ba5ee57751849456e1535aec3f2173edf2cbf596b99c0d9"},
@@ -1659,8 +1659,8 @@ azure-mgmt-managementgroups = [
     {file = "azure_mgmt_managementgroups-0.2.0-py2.py3-none-any.whl", hash = "sha256:8194ee6274df865eccd1ed9d385ea625aeba9b8058b9e4fdf547f5207271a775"},
 ]
 azure-mgmt-monitor = [
-    {file = "azure-mgmt-monitor-0.7.0.zip", hash = "sha256:8216ab3ec57994303c47a0977e853a8a3fff4778e08dc3575e669522cadcf9de"},
-    {file = "azure_mgmt_monitor-0.7.0-py2.py3-none-any.whl", hash = "sha256:8b7267ff8c43f6504d83c9f8770fa27d9d422cbb2575fef2ff4db39c87c0bffe"},
+    {file = "azure-mgmt-monitor-2.0.0.zip", hash = "sha256:e7f7943fe8f0efe98b3b1996cdec47c709765257a6e09e7940f7838a0f829e82"},
+    {file = "azure_mgmt_monitor-2.0.0-py2.py3-none-any.whl", hash = "sha256:af4917df2fe685e3daf25750f3586f11ccd2e7c2da68df392ca093fc3b7b8089"},
 ]
 azure-mgmt-network = [
     {file = "azure-mgmt-network-17.1.0.zip", hash = "sha256:f47852836a5960447ab534784a9285696969f007744ba030828da2eab92621ab"},
@@ -1675,8 +1675,8 @@ azure-mgmt-rdbms = [
     {file = "azure_mgmt_rdbms-8.0.0-py2.py3-none-any.whl", hash = "sha256:910955a5517f44e81cd6b7ba03aba038f3e7105fd651df2f1452bd24625775bd"},
 ]
 azure-mgmt-redis = [
-    {file = "azure-mgmt-redis-6.0.0.zip", hash = "sha256:db999e104edeee3a13a8ceb1881e15196fe03a02635e0e20855eb52c1e2ecca1"},
-    {file = "azure_mgmt_redis-6.0.0-py2.py3-none-any.whl", hash = "sha256:756fd080868fd057fdaa4b7663985d8ffebd941ad06a4d9786fe4470e65a2114"},
+    {file = "azure-mgmt-redis-12.0.0.zip", hash = "sha256:8ae563e3df82a2f206d0483ae6f05d93d0d1835111c0bbca7236932521eed356"},
+    {file = "azure_mgmt_redis-12.0.0-py2.py3-none-any.whl", hash = "sha256:5f1a559ab6d342a4b476d80830086435161f5739bc2a5c2ee564ee0668ee974e"},
 ]
 azure-mgmt-resource = [
     {file = "azure-mgmt-resource-16.0.0.zip", hash = "sha256:0bdbdc9c1ed2ef975d8dff45f358d1e06dc6761eace5b6817f13993447e48a68"},

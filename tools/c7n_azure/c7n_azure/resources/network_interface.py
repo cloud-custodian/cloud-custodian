@@ -92,7 +92,7 @@ class EffectiveRouteTableFilter(ValueFilter):
                 if 'routes' not in resource:
                     route_table = (
                         client.network_interfaces
-                        .get_effective_route_table(resource['resourceGroup'], resource['name'])
+                        .begin_get_effective_route_table(resource['resourceGroup'], resource['name'])
                         .result()
                     )
 

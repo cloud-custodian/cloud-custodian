@@ -17,7 +17,7 @@ from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
-from msrest.exceptions import HttpOperationError
+from azure.core.exceptions import HttpResponseError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -186,7 +186,7 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.get_filter(resource)
             )
-        except HttpOperationError:
+        except HttpResponseError:
             self.log.exception("Could not get metric: %s on %s" % (
                 self.metric, resource['id']))
             return None
