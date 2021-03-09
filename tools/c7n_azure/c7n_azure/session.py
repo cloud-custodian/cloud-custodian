@@ -102,12 +102,8 @@ class AzureCredential:
             return AccessToken(self._auth_params['access_token'], expires_on=0)
         try:
             return self._credential.get_token(*scopes, **kwargs)
-        except CredentialUnavailableError as e:
-            log.error('Failed to authenticate.\nMessage: {}'.format(e))
-            exit(1)
         except Exception as e:
-            log.error('Failed to authenticate with service principal.\nMessage: {}'.format(
-                json.dumps(e.inner_exception.error_response, indent=2)))
+            log.error('Failed to authenticate.\nMessage: {}'.format(e))
             exit(1)
 
     @property
