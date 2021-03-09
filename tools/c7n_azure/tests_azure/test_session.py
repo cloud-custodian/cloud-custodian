@@ -10,6 +10,7 @@ import pytest
 from adal import AdalError
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
+from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ChainedTokenCredential,
                             ClientSecretCredential, ManagedIdentityCredential)
 from c7n_azure import constants
@@ -22,7 +23,6 @@ from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from requests import HTTPError
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
-
 
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 
@@ -167,7 +167,7 @@ class SessionTest(BaseTest):
 
             self.assertIsNone(s.get_credentials()._credential)
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
-            self.assertEqual(s.get_credentials().get_token(), 'token')
+            self.assertEqual(s.get_credentials().get_token(), AccessToken('token', 0))
 
     def test_get_functions_auth_string(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',

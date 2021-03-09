@@ -4,10 +4,12 @@
 import importlib
 import inspect
 import json
+import jwt
 import logging
 import os
 import sys
 
+from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ChainedTokenCredential,
                             ClientSecretCredential, CredentialUnavailableError,
                             ManagedIdentityCredential)
@@ -97,7 +99,7 @@ class AzureCredential:
         # KeyVault, Storage and mgmt plane requires separate tokens.
         # TODO: Should we scope this to tests only?
         if (self._auth_params['access_token']):
-            return self._auth_params['access_token']
+            return AccessToken(self._auth_params['access_token'], expires_on=0)
         try:
             return self._credential.get_token(*scopes, **kwargs)
         except CredentialUnavailableError as e:
