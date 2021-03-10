@@ -52,32 +52,6 @@ class StorageUtilsTest(BaseTest):
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "testcc")
 
-    def test_get_queue_client_expired_token(self):
-        """
-        Exception handler should deal with a bad token by clearing
-        cache and retrying.  So if we provide a bad token followed
-        by a real one in our mock, we expect it to end up getting
-        the real token.
-        """
-        real_token = StorageUtilities.get_storage_token(self.session)
-
-        with patch('c7n_azure.storage_utils.QueueService.create_queue') as create_mock:
-            with patch('c7n_azure.storage_utils.StorageUtilities.get_storage_token') as token_mock:
-                error = AzureHttpError('', 403)
-                error.error_code = 'AuthenticationFailed'
-
-                # Two side effects: one with a bad token and an error,
-                # and one with a good token and no error
-                create_mock.side_effect = [error, None]
-                token_mock.side_effect = [TokenCredential('fake'), real_token]
-
-                url = "https://fake.queue.core.windows.net/testcc"
-                queue_service, queue_name = \
-                    StorageUtilities.get_queue_client_by_uri(url, self.session)
-
-                # We end up with the real token (after a retry)
-                self.assertEqual(real_token, queue_service.authentication)
-
     @arm_template('storage.json')
     def test_create_delete_queue_from_storage_account(self):
         account = self.setup_account()
@@ -115,11 +89,6 @@ class StorageUtilsTest(BaseTest):
         messages = StorageUtilities.get_queue_messages(*queue_settings)
         self.assertEqual(len(messages), 0)
 
-    @arm_template('storage.json')
-    def test_get_storage_token(self):
-        token = StorageUtilities.get_storage_token(self.session)
-        self.assertIsNotNone(token.token)
-
     def test_get_storage_primary_key(self):
         key1 = StorageAccountKey()
         key1.key_name = "key1"
@@ -132,7 +101,7 @@ class StorageUtilsTest(BaseTest):
                 as list_keys_mock:
             primary_key = StorageUtilities.get_storage_primary_key(
                 'mock_rg_group', 'mock_account', self.session)
-            list_keys_mock.assert_called_with('mock_rg_group', 'mock_account')
+            list_keys_mock.assert_called_with('mock_rg_group', 'mock_account', expand=None)
             self.assertEqual(primary_key, data.keys[0].value)
 
     def _get_storage_client_string(self):
