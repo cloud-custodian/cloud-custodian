@@ -203,6 +203,11 @@ class Session:
 
         return client
 
+    @property
+    def subscription_id(self):
+        self._initialize_session()
+        return self.credentials.subscription_id
+
     def get_credentials(self):
         self._initialize_session()
         return self.credentials

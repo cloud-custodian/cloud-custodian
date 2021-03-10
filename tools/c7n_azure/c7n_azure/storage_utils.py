@@ -73,6 +73,10 @@ class OldQueueService:
         queue_service = self._get_service(queue_name)
         queue_service.delete_message(message)
 
+    def clear_messages(self, queue_name):
+        queue_service = self._get_service(queue_name)
+        queue_service.clear_messages()
+
     def _get_service(self, queue_name):
         return self.clients.get(queue_name, QueueClient(account_url=self.account_url,
                                                         queue_name=queue_name,

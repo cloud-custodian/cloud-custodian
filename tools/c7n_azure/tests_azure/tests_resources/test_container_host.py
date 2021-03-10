@@ -6,7 +6,7 @@ import tempfile
 
 import yaml
 from azure.common import AzureHttpError
-from azure.storage.queue.models import QueueMessage
+from azure.storage.queue import QueueMessage
 from mock import ANY, Mock, patch
 
 from ..azure_common import BaseTest
