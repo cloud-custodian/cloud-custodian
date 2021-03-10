@@ -36,7 +36,6 @@ class OldBlobServiceClient(BlobServiceClient):
 class OldQueueService:
 
     def __init__(self, account_url, credential):
-        print(account_url)
         self.account_url = account_url
         self.credential = credential
         self.clients = {}
