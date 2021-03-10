@@ -28,7 +28,7 @@ azure-mgmt-compute = "^19.0.0"
 azure-mgmt-cdn = "^10.0.0"
 azure-mgmt-containerregistry = {version = "8.0.0b1", allow-prereleases = true}
 azure-mgmt-containerservice = "^15.0.0"
-azure-mgmt-databricks = "^0.1.0"
+azure-mgmt-databricks = "1.0.0b1"
 azure-mgmt-datalake-store = "^1.0.0"
 azure-mgmt-datafactory = "^1.0.0"
 azure-mgmt-dns = "^3.0.0"
