@@ -821,13 +821,11 @@ class CostFilter(ValueFilter):
 
         - ``WeekToDate``
         - ``MonthToDate``
-        - ``YearToDate``
 
       - All days in the previous calendar period:
 
-        - ``TheLastWeek``
         - ``TheLastMonth``
-        - ``TheLastYear``
+        - ``TheLastBillingMonth``
 
     :examples:
 
@@ -925,7 +923,7 @@ class CostFilter(ValueFilter):
 
         client = manager.get_client('azure.mgmt.costmanagement.CostManagementClient')
 
-        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost')}
+        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost', function='Sum')}
 
         grouping = [QueryGrouping(type='Dimension',
                                   name='ResourceGroupName' if is_resource_group else 'ResourceId')]
@@ -950,7 +948,7 @@ class CostFilter(ValueFilter):
             timeframe = 'Custom'
             time_period = QueryTimePeriod(from_property=start_time, to=end_time)
 
-        definition = QueryDefinition(timeframe=timeframe, time_period=time_period, dataset=dataset)
+        definition = QueryDefinition(type='ActualCost', timeframe=timeframe, time_period=time_period, dataset=dataset)
 
         subscription_id = manager.get_session().get_subscription_id()
 

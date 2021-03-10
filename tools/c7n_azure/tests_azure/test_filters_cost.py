@@ -43,12 +43,12 @@ class CostFilterTest(BaseTest):
         resources = [self._get_resource('vm1', 2000),
                      self._get_resource('vm2', 20),
                      self._get_resource('vm3', 3000)]
-        f = self._get_filter({'timeframe': 'TheLastWeek', 'op': 'gt', 'value': 1000}, resources)
+        f = self._get_filter({'timeframe': 'TheLastMonth', 'op': 'gt', 'value': 1000}, resources)
 
         result = f.process(resources, None)
 
         usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'TheLastWeek', False)
+        self._verify_expected_call(usage_by_scope, 'TheLastMonth', False)
         self.assertEqual(len(result), 2)
 
     def test_rg(self):
@@ -67,12 +67,12 @@ class CostFilterTest(BaseTest):
         resources = [self._get_resource('vm1', 0),
                      self._get_resource('vm1/child1', 300),
                      self._get_resource('vm1/child2', 3000)]
-        f = self._get_filter({'timeframe': 'TheLastWeek', 'op': 'eq', 'value': 3300}, resources)
+        f = self._get_filter({'timeframe': 'WeekToDate', 'op': 'eq', 'value': 3300}, resources)
 
         result = f.process(resources, None)
 
         usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'TheLastWeek', False)
+        self._verify_expected_call(usage_by_scope, 'WeekToDate', False)
         self.assertEqual(len(result), 1)
 
     def _verify_expected_call(self, mock, timeframe, resource_group):

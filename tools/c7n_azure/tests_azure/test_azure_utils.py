@@ -185,7 +185,7 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.naming_hash(source, 10), '16aba5393a')
         self.assertNotEqual(StringUtils.naming_hash(source), StringUtils.naming_hash(source2))
 
-    @patch('azure.mgmt.applicationinsights.operations.ComponentsOperations.get',
+    @patch('azure.mgmt.applicationinsights.v2015_05_01.operations.ComponentsOperations.get',
            return_value=type(str('result_data'), (), {'instrumentation_key': GUID}))
     def test_app_insights_get_instrumentation_key(self, mock_handler_run):
         self.assertEqual(AppInsightsHelper.get_instrumentation_key('azure://' + GUID), GUID)
