@@ -1,122 +1,138 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import namedtuple
-from functools import wraps
+from functools import lru_cache, wraps
 from urllib.parse import urlparse
 
 from azure.common import AzureHttpError
+from azure.core.exceptions import ResourceExistsError
+from azure.storage.blob import BlobServiceClient
 from azure.storage.common import TokenCredential
-from azure.storage.blob import BlockBlobService
-from azure.storage.queue import QueueService
+from azure.storage.queue import QueueClient
+from types import MethodType
+
 from c7n_azure.constants import STORAGE_AUTH_ENDPOINT
 
-from functools import lru_cache
+
+class OldBlobServiceClient(BlobServiceClient):
+
+    def create_blob_from_path(self, container_name, blob_name, content):
+        client = self.get_blob_client(container_name, blob_name)
+        client.upload_blob(content, overwrite=True)
+
+    def get_blob_to_bytes(self, container_name, blob_name):
+        client = self.get_blob_client(container_name, blob_name)
+        return client.download_blob().content_as_bytes()
+
+    def create_blob_from_bytes(self, container_name, blob_name, content, validate_content):
+        client = self.get_blob_client(container_name, blob_name)
+        client.upload_blob(content, overwrite=True)
+
+    def get_blob_properties(self, container_name, blob_name):
+        client = self.get_blob_client(container_name, blob_name)
+        return client.get_blob_properties()
+
+
+class OldQueueService:
+
+    def __init__(self, account_url, credential):
+        print(account_url)
+        self.account_url = account_url
+        self.credential = credential
+        self.clients = {}
+
+    def create_queue(self, queue_name):
+        queue_service = self._get_service(queue_name)
+        try:
+            queue_service.create_queue()
+        except ResourceExistsError:
+            # Queue already exists
+            pass
+        except:
+            return False
+        return True
+
+    def delete_queue(self, queue_name):
+        queue_service = self._get_service(queue_name)
+        try:
+            queue_service.delete_queue()
+        except:
+            return False
+        return True
+
+    def put_message(self, queue_name, content):
+        queue_service = self._get_service(queue_name)
+        queue_service.send_message(content)
+
+    def get_messages(self, queue_name, num_messages=None, visibility_timeout=None):
+        queue_service = self._get_service(queue_name)
+        return [m for m in queue_service.receive_messages(number_of_messages=num_messages,
+                                                          visibility_timeout=visibility_timeout)]
+
+    def delete_message(self, queue_name, message):
+        queue_service = self._get_service(queue_name)
+        queue_service.delete_message(message)
+
+    def _get_service(self, queue_name):
+        return self.clients.get(queue_name, QueueClient(account_url=self.account_url,
+                                                        queue_name=queue_name,
+                                                        credential=self.credential))
 
 
 class StorageUtilities:
 
-    class Decorators:
-        @staticmethod
-        def handle_token_failure(func):
-            @wraps(func)
-            def wrapper(*a, **kw):
-                try:
-                    return func(*a, **kw)
-                except AzureHttpError as e:
-                    if e.error_code == 'AuthenticationFailed':
-                        StorageUtilities.get_storage_from_uri.cache_clear()
-                        StorageUtilities.get_storage_token.cache_clear()
-                        StorageUtilities.get_storage_primary_key.cache_clear()
-                        return func(*a, **kw)
-                    else:
-                        raise e
-            return wrapper
-
     @staticmethod
-    @Decorators.handle_token_failure
     def get_blob_client_by_uri(storage_uri, session):
-        storage = StorageUtilities.get_storage_from_uri(storage_uri, session)
+        storage = StorageUtilities.get_storage_from_uri(storage_uri)
 
-        blob_service = BlockBlobService(
-            account_name=storage.storage_name,
-            token_credential=storage.token,
-            endpoint_suffix=session.storage_endpoint
+        # Using our own wrapper to avoid major changes in existing code
+        blob_service = OldBlobServiceClient(
+            account_url=storage.account_url,
+            credential=session.get_credentials()
         )
-        blob_service.create_container(storage.container_name)
+        try:
+            blob_service.create_container(storage.container_name)
+        except ResourceExistsError:
+            # Container already exists
+            pass
+
         return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
-    @Decorators.handle_token_failure
-    def get_blob_client_from_storage_account(resource_group, name, session, sas_generation=False):
-        # sas tokens can only be generated from clients created from account keys
-        primary_key = token = None
-        if sas_generation:
-            primary_key = StorageUtilities.get_storage_primary_key(resource_group, name, session)
-        else:
-            token = StorageUtilities.get_storage_token(session)
-
-        return BlockBlobService(
-            account_name=name,
-            account_key=primary_key,
-            token_credential=token,
-            endpoint_suffix=session.storage_endpoint
-        )
-
-    @staticmethod
-    @Decorators.handle_token_failure
     def get_queue_client_by_uri(queue_uri, session):
-        storage = StorageUtilities.get_storage_from_uri(queue_uri, session)
+        storage = StorageUtilities.get_storage_from_uri(queue_uri)
 
-        queue_service = QueueService(
-            account_name=storage.storage_name,
-            token_credential=storage.token,
-            endpoint_suffix=session.storage_endpoint
+        queue_service = OldQueueService(
+            account_url=storage.account_url,
+            credential=session.get_credentials()
         )
         queue_service.create_queue(storage.container_name)
 
         return queue_service, storage.container_name
 
     @staticmethod
-    @Decorators.handle_token_failure
     def get_queue_client_by_storage_account(storage_account, session):
-        token = StorageUtilities.get_storage_token(session)
-        queue_service = QueueService(
-            account_name=storage_account.name,
-            token_credential=token,
-            endpoint_suffix=session.storage_endpoint
+        queue_service = OldQueueService(
+            account_url=storage_account.primary_endpoints.queue,
+            credential=session.get_credentials()
         )
         return queue_service
 
     @staticmethod
-    @Decorators.handle_token_failure
     def create_queue_from_storage_account(storage_account, name, session):
-        token = StorageUtilities.get_storage_token(session)
-
-        queue_service = QueueService(
-            account_name=storage_account.name,
-            token_credential=token,
-            endpoint_suffix=session.storage_endpoint
-        )
+        queue_service = StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
         return queue_service.create_queue(name)
 
     @staticmethod
-    @Decorators.handle_token_failure
     def delete_queue_from_storage_account(storage_account, name, session):
-        token = StorageUtilities.get_storage_token(session)
-        queue_service = QueueService(
-            account_name=storage_account.name,
-            token_credential=token,
-            endpoint_suffix=session.storage_endpoint
-        )
+        queue_service = StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
         return queue_service.delete_queue(name)
 
     @staticmethod
-    @Decorators.handle_token_failure
     def put_queue_message(queue_service, queue_name, content):
         return queue_service.put_message(queue_name, content)
 
     @staticmethod
-    @Decorators.handle_token_failure
     def get_queue_messages(queue_service, queue_name, num_messages=None, visibility_timeout=None):
         # Default message visibility timeout is 30 seconds
         # so you are expected to delete message within 30 seconds
@@ -126,9 +142,8 @@ class StorageUtilities:
                                           visibility_timeout=visibility_timeout)
 
     @staticmethod
-    @Decorators.handle_token_failure
     def delete_queue_message(queue_service, queue_name, message):
-        queue_service.delete_message(queue_name, message.id, message.pop_receipt)
+        queue_service.delete_message(queue_name, message)
 
     @staticmethod
     @lru_cache()
@@ -145,10 +160,9 @@ class StorageUtilities:
         return storage_keys.keys[0].value
 
     @staticmethod
-    @lru_cache()
-    def get_storage_from_uri(storage_uri, session):
+    def get_storage_from_uri(storage_uri):
         parts = urlparse(storage_uri)
-        storage_name = str(parts.netloc).partition('.')[0]
+        account_url = '{}://{}'.format(parts.scheme, parts.netloc)
 
         path_parts = parts.path.strip('/').split('/', 1)
         container_name = path_parts[0]
@@ -157,12 +171,9 @@ class StorageUtilities:
         else:
             prefix = ""
 
-        token = StorageUtilities.get_storage_token(session)
-
-        Storage = namedtuple('Storage', 'container_name, storage_name, token, file_prefix')
+        Storage = namedtuple('Storage', 'container_name, account_url, file_prefix')
 
         return Storage(
             container_name=container_name,
-            storage_name=storage_name,
-            token=token,
+            account_url=account_url,
             file_prefix=prefix)

@@ -22,7 +22,6 @@ class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
         self.session = Session()
-        StorageUtilities.get_storage_from_uri.cache_clear()
 
     @arm_template('storage.json')
     def test_get_storage_client_by_uri(self):
@@ -136,55 +135,12 @@ class StorageUtilsTest(BaseTest):
             list_keys_mock.assert_called_with('mock_rg_group', 'mock_account')
             self.assertEqual(primary_key, data.keys[0].value)
 
-    @arm_template('storage.json')
-    def test_get_blob_client_from_storage_account_without_sas(self):
-        account = self.setup_account()
-        resource_group = ResourceIdParser.get_resource_group(account.id)
-        blob_client = StorageUtilities.get_blob_client_from_storage_account(
-            resource_group,
-            account.name,
-            self.session)
-
-        self.assertIsNotNone(blob_client)
-
-    @arm_template('storage.json')
-    def test_get_blob_client_from_storage_account_without_sas_fails_sas_generation(self):
-        with self.assertRaises(ValueError):
-            account = self.setup_account()
-            resource_group = ResourceIdParser.get_resource_group(account.id)
-            blob_client = StorageUtilities.get_blob_client_from_storage_account(
-                resource_group,
-                account.name,
-                self.session)
-
-            # create container for package
-            blob_client.create_container('test')
-            blob_client.create_blob_from_text('test', 'test.txt', 'My test contents.')
-            blob_client.generate_blob_shared_access_signature('test', 'test.txt')
-
-    @arm_template('storage.json')
-    def test_get_blob_client_from_storage_account_with_sas(self):
-        account = self.setup_account()
-        resource_group = ResourceIdParser.get_resource_group(account.id)
-        blob_client = StorageUtilities.get_blob_client_from_storage_account(
-            resource_group,
-            account.name,
-            self.session,
-            True)
-
-        # create sas token for blob
-        blob_client.create_container('test')
-        blob_client.create_blob_from_text('test', 'test.txt', 'My test contents.')
-        sas = blob_client.generate_blob_shared_access_signature('test', 'test.txt')
-
-        self.assertIsNotNone(sas)
-
     def _get_storage_client_string(self):
         client = local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient').storage_accounts
         return client.__module__ + '.' + client.__class__.__name__
 
-    @patch('azure.storage.blob.blockblobservice.BlockBlobService.create_container')
+    @patch('azure.storage.blob.BlobServiceClient.create_container')
     def test_get_blob_client_by_uri_china_cloud(self, mock_create):
         url = CHINA_STORAGE_ACCOUNT + "/testcontainer/extrafolder"
         blob_service, container_name, key_prefix = \
@@ -195,7 +151,7 @@ class StorageUtilsTest(BaseTest):
         self.assertTrue(CHINA_STORAGE_ENDPOINT in blob_service.primary_endpoint)
         self.assertTrue(mock_create.called_once())
 
-    @patch('azure.storage.queue.queueservice.QueueService.create_queue')
+    @patch('azure.storage.queue.QueueClient.create_queue')
     def test_get_queue_client_by_uri_china_cloud(self, mock_create):
         url = CHINA_STORAGE_ACCOUNT + "/queuename"
         queue_service, queue_name =\
@@ -203,5 +159,5 @@ class StorageUtilsTest(BaseTest):
                                                      Session(cloud_endpoints=AZURE_CHINA_CLOUD))
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "queuename")
-        self.assertTrue(CHINA_STORAGE_ENDPOINT in queue_service.primary_endpoint)
+        self.assertTrue(CHINA_STORAGE_ENDPOINT in queue_service._get_service(queue_name).primary_endpoint)
         self.assertTrue(mock_create.called_once())
