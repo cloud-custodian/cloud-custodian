@@ -954,16 +954,15 @@ class CostFilter(ValueFilter):
 
         scope = '/subscriptions/' + subscription_id
 
-        query = client.query.usage_by_scope(scope, definition)
+        query = client.query.usage(scope, definition)
 
         if hasattr(query, '_derserializer'):
             original = query._derserializer._deserialize
             query._derserializer._deserialize = lambda target, data: \
                 original(target, self.fix_wrap_rest_response(data))
 
-        result_list = list(query)[0]
-        result_list = [{result_list.columns[i].name: v for i, v in enumerate(row)}
-                       for row in result_list.rows]
+        result_list = [{query.columns[i].name: v for i, v in enumerate(row)}
+                       for row in query.rows]
 
         for r in result_list:
             if 'ResourceGroupName' in r:

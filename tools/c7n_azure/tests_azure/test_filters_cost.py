@@ -47,8 +47,8 @@ class CostFilterTest(BaseTest):
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'TheLastMonth', False)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 'TheLastMonth', False)
         self.assertEqual(len(result), 2)
 
     def test_rg(self):
@@ -59,8 +59,8 @@ class CostFilterTest(BaseTest):
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 1, True)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 1, True)
         self.assertEqual(len(result), 1)
 
     def test_child_resources(self):
@@ -71,8 +71,8 @@ class CostFilterTest(BaseTest):
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'WeekToDate', False)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 'WeekToDate', False)
         self.assertEqual(len(result), 1)
 
     def _verify_expected_call(self, mock, timeframe, resource_group):
@@ -109,7 +109,7 @@ class CostFilterTest(BaseTest):
         manager = Mock()
         manager.get_session.return_value.get_subscription_id.return_value = \
             self.session.get_subscription_id()
-        manager.get_client.return_value.query.usage_by_scope.return_value = \
+        manager.get_client.return_value.query.usage.return_value = \
             self._get_costs(resources)
         if 'Microsoft.Compute/virtualMachines' in resources[0]['id']:
             manager.resource_type.resource_type = 'Microsoft.Compute/virtualMachines'
@@ -139,4 +139,4 @@ class CostFilterTest(BaseTest):
             'rows': rows
         }
         cost = namedtuple("Cost", cost.keys())(*cost.values())
-        return [cost]
+        return cost
