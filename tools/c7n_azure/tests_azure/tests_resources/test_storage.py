@@ -460,24 +460,40 @@ class StorageTest(BaseTest):
         self.assertFalse(queue_settings.logging.retention_policy.enabled)
         self.assertFalse(table_settings.logging.retention_policy.enabled)
 
-    @patch('azure.storage.blob.blockblobservice.BlockBlobService.get_blob_service_properties')
+    @patch('azure.storage.blob.BlobServiceClient.get_service_properties')
     def test_storage_settings_get_blob_settings(self, mock_blob_properties_call):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
-        mock_token = 'mock_token'
-        StorageSettingsUtilities.get_settings(BLOB_TYPE, mock_storage_account, token=mock_token)
+        mock_session = MagicMock()
+        StorageSettingsUtilities.get_settings(BLOB_TYPE, mock_storage_account, session=mock_session)
         mock_blob_properties_call.assert_called_once()
 
-    @patch('azure.storage.file.fileservice.FileService.get_file_service_properties')
+    @patch('azure.storage.file.FileService.get_file_service_properties')
     @patch('c7n_azure.storage_utils.StorageUtilities.get_storage_primary_key',
            return_value='mock_primary_key')
     def test_storage_settings_get_file_settings(self, mock_get_storage_key,
                                                 mock_file_properties_call):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
         mock_session = MagicMock()
         StorageSettingsUtilities.get_settings(FILE_TYPE, mock_storage_account, session=mock_session)
@@ -492,7 +508,15 @@ class StorageTest(BaseTest):
                                                  mock_get_table_properties):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
         mock_session = MagicMock()
         StorageSettingsUtilities.get_settings(
@@ -501,28 +525,44 @@ class StorageTest(BaseTest):
             'mock_resource_group', 'mock_storage_account', mock_session)
         mock_get_table_properties.assert_called_once()
 
-    @patch('azure.storage.queue.queueservice.QueueService.get_queue_service_properties')
+    @patch('azure.storage.queue.QueueServiceClient.get_service_properties')
     def test_storage_settings_get_queue_settings(self, mock_get_queue_properties):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
-        mock_token = 'mock_token'
+        mock_session = MagicMock()
         StorageSettingsUtilities.get_settings(
-            QUEUE_TYPE, mock_storage_account, token=mock_token)
+            QUEUE_TYPE, mock_storage_account, session=mock_session)
         mock_get_queue_properties.assert_called_once()
 
-    @patch('azure.storage.queue.queueservice.QueueService.set_queue_service_properties')
+    @patch('azure.storage.queue.QueueServiceClient.set_service_properties')
     def test_storage_settings_update_logging_queue(self, mock_set_queue_properties):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
-        mock_token = 'mock_token'
+        mock_session = MagicMock()
         log_settings = MagicMock()
 
         StorageSettingsUtilities.update_logging(
-            QUEUE_TYPE, mock_storage_account, log_settings, token=mock_token)
+            QUEUE_TYPE, mock_storage_account, log_settings, session=mock_session)
 
         mock_set_queue_properties.assert_called_once()
 
@@ -533,7 +573,15 @@ class StorageTest(BaseTest):
                                                    mock_set_table_properties):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
         mock_session = MagicMock()
         log_settings = MagicMock()
@@ -545,17 +593,25 @@ class StorageTest(BaseTest):
             'mock_resource_group', 'mock_storage_account', mock_session)
         mock_set_table_properties.assert_called_once()
 
-    @patch('azure.storage.blob.blockblobservice.BlockBlobService.set_blob_service_properties')
+    @patch('azure.storage.blob.BlobServiceClient.set_service_properties')
     def test_storage_settings_update_logging_blob(self, mock_set_blob_properties):
         mock_storage_account = {
             "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
+            "name": "mock_storage_account",
+            "properties": {
+                "primaryEndpoints": {
+                    "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                    "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                    "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                    "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                },
+            }
         }
-        mock_token = 'mock_token'
+        mock_session = MagicMock()
         log_settings = MagicMock()
 
         StorageSettingsUtilities.update_logging(
-            BLOB_TYPE, mock_storage_account, log_settings, token=mock_token)
+            BLOB_TYPE, mock_storage_account, log_settings, session=mock_session)
 
         mock_set_blob_properties.assert_called_once()
 

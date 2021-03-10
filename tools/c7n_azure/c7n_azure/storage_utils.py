@@ -159,7 +159,8 @@ class StorageUtilities:
     @lru_cache()
     def get_storage_primary_key(resource_group, name, session):
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
-        storage_keys = storage_client.storage_accounts.list_keys(resource_group, name)
+        # TODO: Is this Expand required? Do we need to re-record some cassettes because of it?
+        storage_keys = storage_client.storage_accounts.list_keys(resource_group, name, expand=None)
         return storage_keys.keys[0].value
 
     @staticmethod
