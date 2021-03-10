@@ -62,7 +62,7 @@ class OldQueueService:
 
     def put_message(self, queue_name, content):
         queue_service = self._get_service(queue_name)
-        queue_service.send_message(content)
+        return queue_service.send_message(content)
 
     def get_messages(self, queue_name, num_messages=None, visibility_timeout=None):
         queue_service = self._get_service(queue_name)
@@ -162,7 +162,7 @@ class StorageUtilities:
     @staticmethod
     def get_storage_from_uri(storage_uri):
         parts = urlparse(storage_uri)
-        account_url = '{}://{}'.format(parts.scheme, parts.netloc)
+        account_url = 'https://{}'.format(parts.netloc)
 
         path_parts = parts.path.strip('/').split('/', 1)
         container_name = path_parts[0]
