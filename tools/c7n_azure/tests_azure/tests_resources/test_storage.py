@@ -353,11 +353,10 @@ class StorageTest(BaseTest):
         self.sleep_in_live_mode(30)
 
         session = local_session(p.session_factory)
-        token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
-            BLOB_TYPE, resources[0], token=token)
+            BLOB_TYPE, resources[0], session=session)
         queue_settings = StorageSettingsUtilities.get_settings(
-            QUEUE_TYPE, resources[0], token=token)
+            QUEUE_TYPE, resources[0], session=session)
         table_settings = StorageSettingsUtilities.get_settings(
             TABLE_TYPE, resources[0], session=session)
 
@@ -405,11 +404,10 @@ class StorageTest(BaseTest):
         self.sleep_in_live_mode(30)
 
         session = local_session(p.session_factory)
-        token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
-            BLOB_TYPE, resources[0], token=token)
+            BLOB_TYPE, resources[0], session=session)
         queue_settings = StorageSettingsUtilities.get_settings(
-            QUEUE_TYPE, resources[0], token=token)
+            QUEUE_TYPE, resources[0], session=session)
         table_settings = StorageSettingsUtilities.get_settings(
             TABLE_TYPE, resources[0], session=session)
 
@@ -447,11 +445,10 @@ class StorageTest(BaseTest):
 
         resources = p.run()
         session = local_session(p.session_factory)
-        token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
-            BLOB_TYPE, resources[0], token=token)
+            BLOB_TYPE, resources[0], session=session)
         queue_settings = StorageSettingsUtilities.get_settings(
-            QUEUE_TYPE, resources[0], token=token)
+            QUEUE_TYPE, resources[0], session=session)
         table_settings = StorageSettingsUtilities.get_settings(
             TABLE_TYPE, resources[0], session=session)
 

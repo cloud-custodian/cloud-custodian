@@ -150,13 +150,6 @@ class StorageUtilities:
 
     @staticmethod
     @lru_cache()
-    def get_storage_token(session):
-        if session.resource_endpoint != STORAGE_AUTH_ENDPOINT:
-            session = session.get_session_for_resource(STORAGE_AUTH_ENDPOINT)
-        return TokenCredential(session.get_bearer_token())
-
-    @staticmethod
-    @lru_cache()
     def get_storage_primary_key(resource_group, name, session):
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
         # TODO: Is this Expand required? Do we need to re-record some cassettes because of it?
