@@ -145,3 +145,31 @@ class MessageQueue(BaseTest):
         self.assertEqual(
             tags,
             {'Env': 'Dev'})
+
+    def test_mq_message_broker_vpc_filter(self):
+        session_factory = self.replay_flight_data('test_message_broker_vpc_filter')
+        p = self.load_policy(
+            {
+                'name': 'test-message-broker-vpc-filter',
+                'resource': 'message-broker', 
+                'filters': [{'type': 'vpc', 'key': 'VpcId', 'value': 'vpc-0598080981e0332f9', 'op': 'eq'}]
+            },
+            session_factory=session_factory, 
+            cache=True
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    
+    def test_mq_message_broker_default_vpc(self):
+        session_factory = self.replay_flight_data('test_message_broker_vpc_default_filter')
+        p = self.load_policy(
+            {
+                "name": "mq-default-filters",
+                "resource": "message-broker",
+                "filters": [{"type": "default-vpc"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

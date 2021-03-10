@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "AWS created security group for d-90677cc91c directory controllers",
+                "GroupName": "d-90677cc91c_controllers",
+                "IpPermissions": [ 
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-08f62b8c3dd4669bc",
+                                "UserId": "012345678910"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "012345678910",
+                "GroupId": "sg-08f62b8c3dd4669bc",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-08f62b8c3dd4669bc",
+                                "UserId": "012345678910"
+                            }
+                        ]
+                    }
+                ],
+                "VpcId": "vpc-0598080981e0332f9"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

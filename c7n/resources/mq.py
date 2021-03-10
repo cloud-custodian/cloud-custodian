@@ -1,8 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import ClientError
 from c7n.actions import Action
 from c7n.filters.metrics import MetricsFilter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, DefaultVpcBase
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -81,6 +82,57 @@ class MQMetrics(MetricsFilter):
         # Fetching for Active broker instance only, https://amzn.to/2tLBhEB
         return [{'Name': self.model.dimension,
                  'Value': "{}-1".format(resource['BrokerName'])}]
+
+@MessageBroker.filter_registry.register('vpc')
+class VpcFilter(VpcFilter):
+
+    sg_vpc_dict = {}
+
+    def get_related_ids(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        related_ids = []
+        for r in resources:
+            sg_ids = r.get('SecurityGroups', [])
+            vpc_id = self.sg_vpc_dict.get(sg_ids[0])
+            if(vpc_id):
+                related_ids.append(vpc_id)
+                continue
+            try:
+                response = client.describe_security_groups(
+                    GroupIds=[sg_ids[0]],
+                )
+                vpc_id = response.get('SecurityGroups')[0].get('VpcId')
+                related_ids.append(vpc_id)
+                self.sg_vpc_dict[sg_ids[0]] = vpc_id
+            except ClientError: 
+                continue 
+        return set(related_ids)
+
+    RelatedIdsExpression = "VpcId"
+
+
+@MessageBroker.filter_registry.register('default-vpc')
+class DefaultVpc(DefaultVpcBase):
+    """ Matches if an mq broker is in the default vpc
+    """
+
+    schema = type_schema('default-vpc')
+
+    def retrieve_vpc_id(self, mq):
+        client = local_session(self.manager.session_factory).client('ec2')
+        sg_ids = mq.get('SecurityGroups',[])
+        try:
+            response = client.describe_security_groups(
+                GroupIds=[sg_ids[0]],
+            )
+            vpc_id = response.get('SecurityGroups')[0].get('VpcId')
+            return vpc_id
+        except IndexError: 
+            return 
+
+    def __call__(self, mq):
+        vpc_id = self.retrieve_vpc_id(mq)
+        return vpc_id and self.match(vpc_id) or False
 
 
 @MessageBroker.action_registry.register('delete')
