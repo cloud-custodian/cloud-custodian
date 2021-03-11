@@ -95,7 +95,7 @@ def universal_augment(self, resources):
         if LooseVersion(botocore.__version__) < LooseVersion('1.19.58'):
             resource_tag_results = list(itertools.chain(
                 *[p['ResourceTagMappingList'] for p in paginator.paginate(
-                    ResourceTypeFilters=[resource_type])]))        
+                    ResourceTypeFilters=[resource_type])]))
         else:
             resource_tag_results = client.get_resources(
                 ResourceARNList=list(arn_resource_map.keys())).get(
