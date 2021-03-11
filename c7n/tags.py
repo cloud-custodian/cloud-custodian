@@ -85,26 +85,25 @@ def universal_augment(self, resources):
     from c7n.query import RetryPageIterator
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+    m = self.get_model()
+    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
 
     rfetch = [r for r in resources if 'Tags' not in r]
     for arn_resource_set in utils.chunks(
             zip(self.get_arns(rfetch), rfetch), 100):
         arn_resource_map = dict(arn_resource_set)
-
-    if LooseVersion(botocore.__version__) < LooseVersion('1.19.58'):
-        m = self.get_model()
-        resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
-        resource_tag_results = list(itertools.chain(
-            *[p['ResourceTagMappingList'] for p in paginator.paginate(
-                ResourceTypeFilters=[resource_type])]))
-    else:
-        resource_tag_results = client.get_resources(
-            ResourceARNList=list(arn_resource_map.keys())).get(
-                'ResourceTagMappingList', ())
-    resource_tag_map = {
-        r['ResourceARN']: r['Tags'] for r in resource_tag_results}
-    for arn, r in arn_resource_map.items():
-        r['Tags'] = resource_tag_map.get(arn, [])
+        if LooseVersion(botocore.__version__) < LooseVersion('1.19.58'):
+            resource_tag_results = list(itertools.chain(
+                *[p['ResourceTagMappingList'] for p in paginator.paginate(
+                    ResourceTypeFilters=[resource_type])]))        
+        else:
+            resource_tag_results = client.get_resources(
+                ResourceARNList=list(arn_resource_map.keys())).get(
+                    'ResourceTagMappingList', ())
+        resource_tag_map = {
+            r['ResourceARN']: r['Tags'] for r in resource_tag_results}
+        for arn, r in arn_resource_map.items():
+            r['Tags'] = resource_tag_map.get(arn, [])
 
     return resources
 
