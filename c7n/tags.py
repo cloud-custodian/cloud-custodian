@@ -19,6 +19,7 @@ from dateutil.parser import parse
 import jmespath
 import time
 import botocore
+import itertools
 
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
@@ -92,14 +93,14 @@ def universal_augment(self, resources):
 
     if LooseVersion(botocore.__version__) < LooseVersion('1.19.58'):
         m = self.get_model()
-        resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)        
+        resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
         resource_tag_results = list(itertools.chain(
             *[p['ResourceTagMappingList'] for p in paginator.paginate(
                 ResourceTypeFilters=[resource_type])]))
-    else:   
-            resource_tag_results = client.get_resources(
-                ResourceARNList=list(arn_resource_map.keys())).get(
-                    'ResourceTagMappingList', ())
+    else:
+        resource_tag_results = client.get_resources(
+            ResourceARNList=list(arn_resource_map.keys())).get(
+                'ResourceTagMappingList', ())
     resource_tag_map = {
         r['ResourceARN']: r['Tags'] for r in resource_tag_results}
     for arn, r in arn_resource_map.items():
