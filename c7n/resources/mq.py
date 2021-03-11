@@ -8,21 +8,17 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import (
-    RemoveTag,
-    Tag,
-    TagDelayedAction,
-    TagActionFilter,
-    universal_augment,
-)
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 
 @resources.register('message-broker')
 class MessageBroker(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = 'mq'
         enum_spec = ('list_brokers', 'BrokerSummaries', None)
-        detail_spec = ('describe_broker', 'BrokerId', 'BrokerId', None)
+        detail_spec = (
+            'describe_broker', 'BrokerId', 'BrokerId', None)
         cfn_type = 'AWS::AmazonMQ::Broker'
         id = 'BrokerId'
         arn = 'BrokerArn'
@@ -82,14 +78,11 @@ class MQSGFilter(SecurityGroupFilter):
 
 @MessageBroker.filter_registry.register('metrics')
 class MQMetrics(MetricsFilter):
+
     def get_dimensions(self, resource):
         # Fetching for Active broker instance only, https://amzn.to/2tLBhEB
-        return [
-            {
-                'Name': self.model.dimension,
-                'Value': "{}-1".format(resource['BrokerName']),
-            }
-        ]
+        return [{'Name': self.model.dimension,
+                 'Value': "{}-1".format(resource['BrokerName'])}]
 
 
 @MessageBroker.filter_registry.register('vpc')
@@ -219,8 +212,7 @@ class TagMessageBroker(Tag):
             try:
                 client.create_tags(
                     ResourceArn=r['BrokerArn'],
-                    Tags={t['Key']: t['Value'] for t in new_tags},
-                )
+                    Tags={t['Key']: t['Value'] for t in new_tags})
             except client.exceptions.ResourceNotFound:
                 continue
 
@@ -277,6 +269,7 @@ class MarkForOpMessageBroker(TagDelayedAction):
 
 @resources.register('message-config')
 class MessageConfig(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = 'mq'
         enum_spec = ('list_configurations', 'Configurations', None)

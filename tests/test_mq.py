@@ -6,6 +6,7 @@ from .common import BaseTest
 
 
 class MessageQueue(BaseTest):
+
     def test_query_with_subnet_sg_filter(self):
         factory = self.replay_flight_data("test_mq_query")
         p = self.load_policy(
@@ -13,13 +14,12 @@ class MessageQueue(BaseTest):
                 "name": "mq",
                 "resource": "message-broker",
                 "filters": [
-                    {'type': 'subnet', 'key': 'tag:NetworkLocation', 'value': 'Public'},
-                    {
-                        'type': 'security-group',
-                        'key': 'tag:NetworkLocation',
-                        'value': 'Private',
-                    },
-                ],
+                    {'type': 'subnet',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Public'},
+                    {'type': 'security-group',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Private'}]
             },
             config={'region': 'us-east-1'},
             session_factory=factory,
@@ -31,22 +31,16 @@ class MessageQueue(BaseTest):
     def test_metrics(self):
         factory = self.replay_flight_data('test_mq_metrics')
         p = self.load_policy(
-            {
-                'name': 'mq-metrics',
-                'resource': 'message-broker',
-                'filters': [
-                    {
-                        'type': 'metrics',
-                        'name': 'CpuUtilization',
-                        'op': 'gt',
-                        'value': 0,
-                        'days': 1,
-                    }
-                ],
-            },
+            {'name': 'mq-metrics',
+             'resource': 'message-broker',
+             'filters': [{
+                 'type': 'metrics',
+                 'name': 'CpuUtilization',
+                 'op': 'gt',
+                 'value': 0,
+                 'days': 1}]},
             config={'region': 'us-east-1'},
-            session_factory=factory,
-        )
+            session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['BrokerName'], 'dev')
@@ -60,10 +54,14 @@ class MessageQueue(BaseTest):
                 'name': 'test-message-broker-kms-filter',
                 'resource': 'message-broker',
                 'filters': [
-                    {'type': 'kms-key', 'key': 'c7n:AliasName', 'value': 'alias/aws/mq'}
-                ],
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/mq'
+                    }
+                ]
             },
-            session_factory=session_factory,
+            session_factory=session_factory
         )
         resources = p.run()
         self.assertTrue(len(resources), 1)
@@ -96,11 +94,13 @@ class MessageQueue(BaseTest):
                 "resource": "message-broker",
                 'filters': [{'tag:Role': 'Dev'}],
                 "actions": [
-                    {'type': 'tag', 'tags': {'Env': 'Dev'}},
-                    {'type': 'remove-tag', 'tags': ['Role']},
-                    {'type': 'mark-for-op', 'op': 'delete', 'days': 2},
-                ],
-            },
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['Role']},
+                    {'type': 'mark-for-op',
+                     'op': 'delete',
+                     'days': 2}]},
             config={'region': 'us-east-1'},
             session_factory=factory,
         )
@@ -111,15 +111,12 @@ class MessageQueue(BaseTest):
             time.sleep(1)
         tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
         self.assertEqual(
-            {t['Key']: t['Value'] for t in resources[0]['Tags']}, {'Role': 'Dev'}
-        )
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
         self.assertEqual(
             tags,
-            {
-                'Env': 'Dev',
-                'maid_status': 'Resource does not meet policy: delete@2019/01/31',
-            },
-        )
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2019/01/31'})
 
     def test_mq_config_tagging(self):
         factory = self.replay_flight_data("test_mq_config_tagging")
@@ -129,10 +126,10 @@ class MessageQueue(BaseTest):
                 "resource": "message-config",
                 'filters': [{'tag:Role': 'Dev'}],
                 "actions": [
-                    {'type': 'tag', 'tags': {'Env': 'Dev'}},
-                    {'type': 'remove-tag', 'tags': ['Role']},
-                ],
-            },
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['Role']}]},
             config={'region': 'us-east-1'},
             session_factory=factory,
         )
@@ -143,9 +140,11 @@ class MessageQueue(BaseTest):
             time.sleep(1)
         tags = client.list_tags(ResourceArn=resources[0]["Arn"])["Tags"]
         self.assertEqual(
-            {t['Key']: t['Value'] for t in resources[0]['Tags']}, {'Role': 'Dev'}
-        )
-        self.assertEqual(tags, {'Env': 'Dev'})
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            tags,
+            {'Env': 'Dev'})
 
     def test_mq_message_broker_vpc_filter(self):
         session_factory = self.replay_flight_data('test_message_broker_vpc_filter')
@@ -163,7 +162,6 @@ class MessageQueue(BaseTest):
                 ],
             },
             session_factory=session_factory,
-            cache=True,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
