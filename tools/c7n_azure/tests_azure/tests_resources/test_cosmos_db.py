@@ -28,6 +28,11 @@ def get_azuredc_ip():
     # this means "azure datacenters only"
     return '0.0.0.0'
 
+def get_ip_rules(ip_str):
+    if ip_str == '':
+        return []
+    return [{'ipAddressOrRange': ip} for ip in ip_str.replace(' ', '').split(',')]
+
 
 class CosmosDBTest(BaseTest):
 
@@ -274,45 +279,45 @@ class CosmosDBTest(BaseTest):
 class CosmosDBFirewallFilterTest(BaseTest):
 
     def test_query_firewall_disabled(self):
-        resource = {'properties': {'ipRangeFilter': '', 'isVirtualNetworkFilterEnabled': False}}
+        resource = {'properties': {'ipRules': get_ip_rules(''), 'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['0.0.0.0/0'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_block_everything(self):
-        resource = {'properties': {'ipRangeFilter': '', 'isVirtualNetworkFilterEnabled': True}}
+        resource = {'properties': {'ipRules': get_ip_rules(''), 'isVirtualNetworkFilterEnabled': True}}
         expected = IPSet()
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_regular(self):
-        resource = {'properties': {'ipRangeFilter': '10.0.0.0/16,8.8.8.8',
+        resource = {'properties': {'ipRules': get_ip_rules('10.0.0.0/16,8.8.8.8'),
                                    'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_regular_plus_portal(self):
         extra = ','.join(PORTAL_IPS)
-        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+        resource = {'properties': {'ipRules': get_ip_rules(extra + ',10.0.0.0/16,8.8.8.8'),
                                    'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_regular_plus_cloud(self):
         extra = ', '.join(AZURE_CLOUD_IPS)
-        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+        resource = {'properties': {'ipRules': get_ip_rules(extra + ',10.0.0.0/16,8.8.8.8'),
                                    'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_regular_plus_portal_cloud(self):
         extra = ','.join(PORTAL_IPS + AZURE_CLOUD_IPS)
-        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+        resource = {'properties': {'ipRules': get_ip_rules(extra + ',10.0.0.0/16,8.8.8.8'),
                                    'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_regular_plus_partial_cloud(self):
         extra = ','.join(PORTAL_IPS[1:])
-        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+        resource = {'properties': {'ipRules': get_ip_rules(extra + ',10.0.0.0/16,8.8.8.8'),
                                    'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['10.0.0.0/16', '8.8.8.8'] + PORTAL_IPS[1:])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
@@ -325,20 +330,20 @@ class CosmosDBFirewallFilterTest(BaseTest):
 class CosmosDBFirewallBypassFilterTest(BaseTest):
 
     scenarios = [
-        ['', False, ['AzureCloud', 'Portal']],
-        ['', True, []],
-        ['1.0.0.0', True, []],
-        [','.join(AZURE_CLOUD_IPS), False, ['AzureCloud']],
-        [','.join(PORTAL_IPS), False, ['Portal']],
-        [','.join(AZURE_CLOUD_IPS + PORTAL_IPS), False, ['AzureCloud', 'Portal']],
-        [','.join(AZURE_CLOUD_IPS + ['10.0.0.8']), False, ['AzureCloud']],
-        [','.join(PORTAL_IPS + ['10.0.0.8']), False, ['Portal']],
-        [','.join(AZURE_CLOUD_IPS + PORTAL_IPS + ['10.0.0.8']), False, ['AzureCloud', 'Portal']],
+        [get_ip_rules(''), False, ['AzureCloud', 'Portal']],
+        [get_ip_rules(''), True, []],
+        [get_ip_rules('1.0.0.0'), True, []],
+        [get_ip_rules(','.join(AZURE_CLOUD_IPS)), False, ['AzureCloud']],
+        [get_ip_rules(','.join(PORTAL_IPS)), False, ['Portal']],
+        [get_ip_rules(','.join(AZURE_CLOUD_IPS + PORTAL_IPS)), False, ['AzureCloud', 'Portal']],
+        [get_ip_rules(','.join(AZURE_CLOUD_IPS + ['10.0.0.8'])), False, ['AzureCloud']],
+        [get_ip_rules(','.join(PORTAL_IPS + ['10.0.0.8'])), False, ['Portal']],
+        [get_ip_rules(','.join(AZURE_CLOUD_IPS + PORTAL_IPS + ['10.0.0.8'])), False, ['AzureCloud', 'Portal']],
     ]
 
     @parameterized.expand(scenarios)
     def test_run(self, ip_range, vnet_filter_enabled, expected):
-        resource = {'properties': {'ipRangeFilter': ip_range,
+        resource = {'properties': {'ipRules': ip_range,
                                    'isVirtualNetworkFilterEnabled': vnet_filter_enabled}}
         f = CosmosFirewallBypassFilter({'mode': 'equal', 'list': []}, Mock())
         self.assertEqual(expected, f._query_bypass(resource))
@@ -349,6 +354,7 @@ class CosmosDBFirewallActionTest(BaseTest):
     @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.begin_create_or_update')
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall_action')
     def test_set_ip_range_filter_append(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
@@ -374,7 +380,7 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())
-        actual = set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(','))
+        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -383,7 +389,9 @@ class CosmosDBFirewallActionTest(BaseTest):
     @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.begin_create_or_update')
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall_action')
     def test_set_ip_range_filter_replace(self, update_mock):
+        ext_ip = get_ext_ip()
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb',
@@ -396,7 +404,7 @@ class CosmosDBFirewallActionTest(BaseTest):
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
-                 'ip-rules': [get_ext_ip(), '11.12.13.14', '21.22.23.24']
+                 'ip-rules': [ext_ip, '11.12.13.14', '21.22.23.24']
                  }
             ]
         })
@@ -406,9 +414,9 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(1, len(update_mock.mock_calls))
         name, args, kwargs = update_mock.mock_calls[0]
 
-        expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
+        expected = set(['11.12.13.14', '21.22.23.24', ext_ip])
         expected.update(get_portal_ips())
-        actual = set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(','))
+        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -417,7 +425,9 @@ class CosmosDBFirewallActionTest(BaseTest):
     @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.begin_create_or_update')
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall_action')
     def test_set_ip_range_filter_replace_bypass(self, update_mock):
+        ext_ip = get_ext_ip()
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb',
@@ -431,7 +441,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 {'type': 'set-firewall-rules',
                  'append': False,
                  'bypass-rules': ['Portal', 'AzureCloud'],
-                 'ip-rules': [get_ext_ip(), '11.12.13.14', '21.22.23.24']
+                 'ip-rules': [ext_ip, '11.12.13.14', '21.22.23.24']
                  }
             ]
         })
@@ -441,9 +451,9 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(1, len(update_mock.mock_calls))
         name, args, kwargs = update_mock.mock_calls[0]
 
-        expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip(), get_azuredc_ip()])
+        expected = set(['11.12.13.14', '21.22.23.24', ext_ip, get_azuredc_ip()])
         expected.update(get_portal_ips())
-        actual = set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(','))
+        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -452,7 +462,9 @@ class CosmosDBFirewallActionTest(BaseTest):
     @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.begin_create_or_update')
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall_action')
     def test_set_ip_range_filter_remove_bypass(self, update_mock):
+        ext_ip = get_ext_ip()
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb',
@@ -466,7 +478,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 {'type': 'set-firewall-rules',
                  'append': False,
                  'bypass-rules': [],
-                 'ip-rules': [get_ext_ip(), '21.22.23.24']
+                 'ip-rules': [ext_ip, '21.22.23.24']
                  }
             ]
         })
@@ -479,14 +491,15 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
 
-        expected = set(['21.22.23.24', get_ext_ip()])
-        actual = set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(','))
+        expected = set(['21.22.23.24', ext_ip])
+        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(expected, actual)
 
     @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.begin_create_or_update')
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall_action')
     def test_set_vnet_append(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
@@ -512,7 +525,7 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())
-        actual = set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(','))
+        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])

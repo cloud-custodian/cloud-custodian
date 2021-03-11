@@ -80,15 +80,16 @@ class CosmosDB(ArmResourceManager):
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
     def _query_rules(self, resource):
-        ip_range_string = resource['properties']['ipRangeFilter']
+        ip_rules = resource['properties'].get('ipRules', [])
+
         is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
-        if not ip_range_string:
+        if ip_rules == []:
             if is_virtual_network_filter_enabled:
                 return IPSet()
             else:
                 return IPSet(['0.0.0.0/0'])
 
-        parts = set(ip_range_string.replace(' ', '').split(','))
+        parts = set([ipRule['ipAddressOrRange'] for ipRule in ip_rules])
 
         # Exclude magic strings representing Portal and Azure Cloud
         if set(PORTAL_IPS).issubset(parts):
@@ -97,8 +98,8 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
             parts = parts - set(AZURE_CLOUD_IPS)
 
         resource_rules = IPSet(filter(None, parts))
-
         return resource_rules
+
 
 
 @CosmosDB.filter_registry.register('firewall-bypass')
@@ -126,15 +127,16 @@ class CosmosFirewallBypassFilter(FirewallBypassFilter):
     schema = FirewallBypassFilter.schema(['AzureCloud', 'Portal'])
 
     def _query_bypass(self, resource):
-        ip_range_string = resource['properties']['ipRangeFilter']
+        ip_rules = resource['properties'].get('ipRules', [])
+
         is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
-        if not ip_range_string:
+        if ip_rules == []:
             if is_virtual_network_filter_enabled:
                 return []
             else:
                 return ['AzureCloud', 'Portal']
 
-        parts = set(ip_range_string.replace(' ', '').split(','))
+        parts = set([ipRule['ipAddressOrRange'] for ipRule in ip_rules])
 
         result = []
         if set(AZURE_CLOUD_IPS).issubset(parts):
@@ -756,7 +758,8 @@ class CosmosSetFirewallAction(SetFirewallAction):
     def _process_resource(self, resource):
 
         # IP rules
-        existing_ip = list(filter(None, resource['properties'].get('ipRangeFilter', '').split(',')))
+        existing_ip = [ip_rule['ipAddressOrRange']
+                       for ip_rule in resource['properties'].get('ipRules', [])]
         if self.data.get('ip-rules') is not None:
             ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
         else:
@@ -805,7 +808,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
                  'failover_priority': loc['failoverPriority'],
                  'is_zone_redundant': loc.get('isZoneRedundant', False)})
 
-        resource['properties']['ipRangeFilter'] = ','.join(ip_rules)
+        resource['properties']['ipRules'] = [{'ipAddressOrRange': ip} for ip in ip_rules]
         resource['properties']['virtualNetworkRules'] = \
             [VirtualNetworkRule(id=r) for r in vnet_rules]
 
