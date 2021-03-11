@@ -22,5 +22,5 @@ class ResourceGroupUnit(DeploymentUnit):
             return None
 
     def _provision(self, params):
-        return self.client.resource_groups.create_or_update(params['name'],
+        return self.client.resource_groups.begin_create_or_update(params['name'],
                       {'location': params['location']})

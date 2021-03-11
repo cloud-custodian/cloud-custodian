@@ -41,7 +41,7 @@ class DeploymentUnitsTest(BaseTest):
         super(DeploymentUnitsTest, cls).tearDownClass()
         try:
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
-            client.resource_groups.delete(cls.rg_name)
+            client.resource_groups.begin_delete(cls.rg_name)
         except CloudError:
             pass
 

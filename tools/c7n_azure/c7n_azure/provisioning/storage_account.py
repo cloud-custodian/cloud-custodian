@@ -28,6 +28,6 @@ class StorageAccountUnit(DeploymentUnit):
         sa_params = {'sku': {'name': 'Standard_LRS'},
                     'kind': 'Storage',
                     'location': params['location']}
-        return self.client.storage_accounts.create(params['resource_group_name'],
-                                                   params['name'],
-                                                   sa_params).result()
+        return self.client.storage_accounts.begin_create(params['resource_group_name'],
+                                                         params['name'],
+                                                         sa_params).result()
