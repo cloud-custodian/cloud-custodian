@@ -244,7 +244,7 @@ class WhiteListFilter(Filter):
 
         if self.graph_client is None:
             s = Session(resource_endpoint_type=GRAPH_AUTH_ENDPOINT)
-            self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
+            self.graph_client = s.client('azure.graphrbac.GraphRbacManagementClient')
 
         # Retrieve graph objects for all object_id
         object_ids = [p['objectId'] for p in access_policies]

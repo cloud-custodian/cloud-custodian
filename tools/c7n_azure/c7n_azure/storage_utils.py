@@ -65,8 +65,17 @@ class OldQueueService:
 
     def get_messages(self, queue_name, num_messages=None, visibility_timeout=None):
         queue_service = self._get_service(queue_name)
-        return [m for m in queue_service.receive_messages(number_of_messages=num_messages,
-                                                          visibility_timeout=visibility_timeout)]
+        messages = queue_service.receive_messages(number_of_messages=num_messages,
+                                                  visibility_timeout=visibility_timeout)
+        # This is an unexpected behavior of receive_messages function.
+        # Seems like there is no way to specify maximum # of messages to retrieve,
+        # so it will query the queue until it is empty..
+        # With some busy queue it will lead to an infinite loop.
+        # So we will query only first page of results and skip the rest as a workaround.
+        try:
+            return [m for m in messages.by_page().next()]
+        except StopIteration:
+            return []
 
     def delete_message(self, queue_name, message):
         queue_service = self._get_service(queue_name)

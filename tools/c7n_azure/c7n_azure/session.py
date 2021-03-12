@@ -4,11 +4,12 @@
 import importlib
 import inspect
 import json
-import jwt
 import logging
 import os
 import sys
 
+import jwt
+from azure.common.credentials import BasicTokenAuthentication
 from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ChainedTokenCredential,
                             ClientSecretCredential, CredentialUnavailableError,
@@ -106,6 +107,16 @@ class AzureCredential:
             log.error('Failed to authenticate.\nMessage: {}'.format(e))
             exit(1)
 
+    # This is temporary until all SDKs we use are upgraded to Track 2
+    # List of legacy users:
+    #  - DNS
+    #  - Record Set (uses DNS SDK)
+    #  - Azure Graph
+    def legacy_credentials(self, scope):
+        # Track 2 SDKs use tuple
+        token = self.get_token((scope))
+        return BasicTokenAuthentication(token={'access_token': token.token})
+
     @property
     def tenant_id(self):
         # type: (None) -> str
@@ -183,7 +194,15 @@ class Session:
 
         klass_parameters = inspect.signature(klass).parameters
 
-        if 'subscription_id' in klass_parameters:
+        if 'credentials' in klass_parameters and 'tenant_id' in klass_parameters:
+            client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
+                           tenant_id=self.credentials.tenant_id,
+                           base_url=self.resource_endpoint)
+        elif 'credentials' in klass_parameters:
+            client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
+                           subscription_id=self.credentials.subscription_id,
+                           base_url=self.resource_endpoint)
+        elif 'subscription_id' in klass_parameters:
             client = klass(credential=self.credentials,
                            subscription_id=self.credentials.subscription_id,
                            base_url=self.cloud_endpoints.endpoints.resource_manager)
