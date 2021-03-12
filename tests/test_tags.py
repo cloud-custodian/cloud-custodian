@@ -77,6 +77,36 @@ class UniversalTagTest(BaseTest):
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
 
+    def test_pre_1_19_58_tag(self):
+        # When recorded on 3-11-2021, the botocore package in the
+        # python lambda runtime is 1.19.31
+        session_factory = self.replay_flight_data('test_pre_1_19_58_tag')
+        queue_url = 'https://sqs.us-east-1.amazonaws.com/644160558196/mine'
+        client = session_factory().client('sqs')
+        policy = self.load_policy(
+            {
+                'name': 'sqs-new-tag',
+                'resource': 'sqs',
+                'mode': {
+                    'type': 'cloudtrail',
+                    "role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                    'events': [{
+                        'source': 'sqs.amazonaws.com',
+                        'event': 'CreateQueue',
+                        'ids': "responseElements.queueUrl"}]
+                },
+                'actions': [{'type': 'tag', 'key': 'tagged', 'value': 'true'}]
+            },
+            session_factory=session_factory,
+        )
+        event = {'detail': {
+            'eventSource': 'sqs.amazonaws.com', 'eventName': 'CreateQueue',
+            'responseElements': {'queueUrl': queue_url}}}
+        resources = policy.push(event, None)
+        self.assertEqual(len(resources[0]['Tags']), 0)
+        tags = client.list_queue_tags(QueueUrl=queue_url)
+        self.assertEqual(len(tags['Tags']), 1)
+
 
 class CoalesceCopyUserTags(BaseTest):
     def test_copy_bool_user_tags(self):
