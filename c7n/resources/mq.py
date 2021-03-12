@@ -136,7 +136,9 @@ class VpcFilter(VpcFilter):
 
 @MessageBroker.filter_registry.register('default-vpc')
 class DefaultVpc(DefaultVpcBase):
-    """Matches if an mq broker is in the default vpc
+    """Matches if an mq broker is in the default vpc. Helper function
+    retrieve_vpc_id returns an optional[str] which can be a VPC ID, or None
+    if there is an error in the API call.
 
     :example:
 
@@ -152,10 +154,7 @@ class DefaultVpc(DefaultVpcBase):
 
     def retrieve_vpc_id(self, mq):
         client = local_session(self.manager.session_factory).client('ec2')
-        try:
-            sg_ids = mq.get('SecurityGroups', [])
-        except IndexError:
-            return
+        sg_ids = mq.get('SecurityGroups', [])
         try:
             response = client.describe_security_groups(
                 GroupIds=[sg_ids[0]],
