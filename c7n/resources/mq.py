@@ -3,7 +3,7 @@
 from c7n.actions import Action
 from c7n.exceptions import ClientError
 from c7n.filters.metrics import MetricsFilter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, DefaultVpcBase
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -132,41 +132,6 @@ class VpcFilter(VpcFilter):
         return related_ids
 
     RelatedIdsExpression = "VpcId"
-
-
-@MessageBroker.filter_registry.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
-    """Matches if an mq broker is in the default vpc. Helper function
-    retrieve_vpc_id returns an optional[str] which can be a VPC ID, or None
-    if there is an error in the API call.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: mq-default-filters
-                resource: message-broker
-                filters: [{'type': 'default-vpc'}]
-    """
-
-    schema = type_schema('default-vpc')
-
-    def retrieve_vpc_id(self, mq):
-        client = local_session(self.manager.session_factory).client('ec2')
-        sg_ids = mq.get('SecurityGroups', [])
-        try:
-            response = client.describe_security_groups(
-                GroupIds=[sg_ids[0]],
-            )
-            vpc_id = response.get('SecurityGroups')[0].get('VpcId')
-            return vpc_id
-        except IndexError:
-            return
-
-    def __call__(self, mq):
-        vpc_id = self.retrieve_vpc_id(mq)
-        return vpc_id and self.match(vpc_id) or False
 
 
 @MessageBroker.action_registry.register('delete')

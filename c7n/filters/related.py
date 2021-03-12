@@ -82,6 +82,8 @@ class RelatedResourceFilter(ValueFilter):
                 continue
             if self.match(robj):
                 found.append(rid)
+            elif robj.get(self.data['key']) is True:
+                found.append(rid)
 
         if found:
             self._add_annotations(found, resource)

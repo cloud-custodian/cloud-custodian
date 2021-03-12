@@ -146,7 +146,7 @@ class MessageQueue(BaseTest):
             tags,
             {'Env': 'Dev'})
 
-    def test_mq_message_broker_vpc_filter(self):
+    def test_mq_message_broker_vpc_id_filter(self):
         session_factory = self.replay_flight_data('test_message_broker_vpc_filter')
         p = self.load_policy(
             {
@@ -157,7 +157,7 @@ class MessageQueue(BaseTest):
                         'type': 'vpc',
                         'key': 'VpcId',
                         'value': 'vpc-0598080981e0332f9',
-                        'op': 'eq',
+                        'op': 'eq'
                     }
                 ],
             },
@@ -166,15 +166,19 @@ class MessageQueue(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_mq_message_broker_default_vpc(self):
-        session_factory = self.replay_flight_data(
-            'test_message_broker_vpc_default_filter'
-        )
+    def test_mq_message_broker_vpc_default_filter(self):
+        session_factory = self.replay_flight_data('test_message_broker_vpc_default_filter')
         p = self.load_policy(
             {
-                "name": "mq-default-filters",
-                "resource": "message-broker",
-                "filters": [{"type": "default-vpc"}],
+                'name': 'test-message-broker-vpc-default-filter',
+                'resource': 'message-broker',
+                'filters': [
+                    {
+                        'type': 'vpc',
+                        'key': 'IsDefault',
+                        'value': 'True'
+                    }
+                ],
             },
             session_factory=session_factory,
         )
