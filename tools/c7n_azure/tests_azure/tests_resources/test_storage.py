@@ -361,22 +361,22 @@ class StorageTest(BaseTest):
             TABLE_TYPE, resources[0], session=session)
 
         # assert all logging settings are enabled
-        self.assertTrue(blob_settings.logging.delete and
-                        blob_settings.logging.read and blob_settings.logging.write)
-        self.assertTrue(queue_settings.logging.delete and
-                        queue_settings.logging.read and queue_settings.logging.write)
+        self.assertTrue(blob_settings['analytics_logging'].delete and
+                        blob_settings['analytics_logging'].read and blob_settings['analytics_logging'].write)
+        self.assertTrue(queue_settings['analytics_logging'].delete and
+                        queue_settings['analytics_logging'].read and queue_settings['analytics_logging'].write)
         self.assertTrue(table_settings.logging.delete and
                         table_settings.logging.read and table_settings.logging.write)
 
         # assert retention policy is enabled
-        self.assertTrue(blob_settings.logging.retention_policy.enabled)
-        self.assertTrue(queue_settings.logging.retention_policy.enabled)
+        self.assertTrue(blob_settings['analytics_logging'].retention_policy.enabled)
+        self.assertTrue(queue_settings['analytics_logging'].retention_policy.enabled)
         self.assertTrue(table_settings.logging.retention_policy.enabled)
 
         # assert retention days is set to 5
-        self.assertEqual(blob_settings.logging.retention_policy.days, 5)
+        self.assertEqual(blob_settings['analytics_logging'].retention_policy.days, 5)
+        self.assertEqual(queue_settings['analytics_logging'].retention_policy.days, 5)
         self.assertEqual(table_settings.logging.retention_policy.days, 5)
-        self.assertEqual(queue_settings.logging.retention_policy.days, 5)
 
     @arm_template('storage.json')
     def test_disable_log_settings(self):
@@ -412,13 +412,13 @@ class StorageTest(BaseTest):
             TABLE_TYPE, resources[0], session=session)
 
         # assert read and write logging settings are disabled
-        self.assertFalse(blob_settings.logging.read and blob_settings.logging.write)
-        self.assertFalse(queue_settings.logging.read and queue_settings.logging.write)
+        self.assertFalse(blob_settings['analytics_logging'].read and blob_settings['analytics_logging'].write)
+        self.assertFalse(queue_settings['analytics_logging'].read and queue_settings['analytics_logging'].write)
         self.assertFalse(table_settings.logging.read and table_settings.logging.write)
 
         # assert delete logging settings are enabled
-        self.assertTrue(blob_settings.logging.delete)
-        self.assertTrue(queue_settings.logging.delete)
+        self.assertTrue(blob_settings['analytics_logging'].delete)
+        self.assertTrue(queue_settings['analytics_logging'].delete)
         self.assertTrue(table_settings.logging.delete)
 
     @arm_template('storage.json')
@@ -453,8 +453,9 @@ class StorageTest(BaseTest):
             TABLE_TYPE, resources[0], session=session)
 
         # assert retention policy is disabled
-        self.assertFalse(blob_settings.logging.retention_policy.enabled)
-        self.assertFalse(queue_settings.logging.retention_policy.enabled)
+        print(blob_settings)
+        self.assertFalse(blob_settings['analytics_logging'].retention_policy.enabled)
+        self.assertFalse(queue_settings['analytics_logging'].retention_policy.enabled)
         self.assertFalse(table_settings.logging.retention_policy.enabled)
 
     @patch('azure.storage.blob.BlobServiceClient.get_service_properties')

@@ -337,7 +337,9 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
         matched = []
         for resource in resources:
             settings = self._get_settings(resource, session)
-            settings['logging'] = settings['analytics_logging']
+            # New SDK renamed the property, this code is to ensure back compat
+            if 'analytics_logging' in settings.keys():
+                settings['logging'] = settings.pop('analytics_logging')
             filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
                                                                                      event)
 
@@ -424,16 +426,27 @@ class SetLogSettingsAction(AzureBaseAction):
         return super(SetLogSettingsAction, self).process_in_parallel(resources, event)
 
     def _process_resource(self, resource, event=None):
-        if resource in [BLOB_TYPE, QUEUE_TYPE]:
-            retention = {'enabled':self.retention != 0, 'days':self.retention}
-            log_settings = {'delete': self.DELETE in self.logs_to_enable, 'read':self.READ in self.logs_to_enable,
-                            'write':self.WRITE in self.logs_to_enable, 'retention_policy':retention}
-        else:
-            retention = RetentionPolicy(enabled=self.retention != 0, days=self.retention)
-            log_settings = Logging(self.DELETE in self.logs_to_enable, self.READ in self.logs_to_enable,
-                                   self.WRITE in self.logs_to_enable, retention_policy=retention)
 
         for storage_type in self.storage_types:
+            if storage_type in [BLOB_TYPE, QUEUE_TYPE, FILE_TYPE]:
+                log_settings = {
+                    'delete': self.DELETE in self.logs_to_enable,
+                    'read': self.READ in self.logs_to_enable,
+                    'write': self.WRITE in self.logs_to_enable,
+                    'retention_policy': {
+                        'enabled':self.retention != 0,
+                        'days': self.retention if self.retention != 0 else None # Throws if 0
+                    },
+                    'version': '1.0'}
+            else:
+                log_settings = Logging(
+                    self.DELETE in self.logs_to_enable,
+                    self.READ in self.logs_to_enable,
+                    self.WRITE in self.logs_to_enable,
+                    retention_policy=RetentionPolicy(
+                        enabled=self.retention != 0,
+                        days=self.retention))
+
             StorageSettingsUtilities.update_logging(storage_type, resource,
                                                     log_settings, self.session)
 
