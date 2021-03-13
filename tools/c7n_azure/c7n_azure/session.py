@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+import types
 
 import jwt
 from azure.common.credentials import BasicTokenAuthentication
@@ -14,12 +15,16 @@ from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ChainedTokenCredential,
                             ClientSecretCredential, CredentialUnavailableError,
                             ManagedIdentityCredential)
+from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
 
 from c7n_azure import constants
-from c7n_azure.utils import (ManagedGroupHelper, ResourceIdParser, StringUtils,
-                             get_keyvault_auth_endpoint, get_keyvault_secret)
+from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
+                             ResourceIdParser, StringUtils,
+                             custodian_azure_send_override,
+                             get_keyvault_auth_endpoint, get_keyvault_secret,
+                             log_response_data)
 
 try:
     from azure.cli.core._profile import Profile
@@ -76,7 +81,8 @@ class AzureCredential:
             raise
 
         self._credential = None  # type: TokenCredential
-        if (self._auth_params.get('access_token') is not None):
+        self._subscription_id = self._auth_params['subscription_id']
+        if self._auth_params.get('access_token') is not None:
             pass
         elif (self._auth_params['client_id'] and
               self._auth_params['client_secret'] and
@@ -92,6 +98,10 @@ class AzureCredential:
                 client_id=self._auth_params.get('client_id'))
         elif self._auth_params.get('enable_cli_auth'):
             self._credential = AzureCliCredential()
+            self._subscription_id, error = _run_command('az account show --output tsv --query id')
+            self._subscription_id = self._subscription_id.strip('\n')
+            if error is not None:
+                raise Exception('Unable to query SubscriptionId')
 
     def get_token(self, *scopes, **kwargs):
         # type: (*str, **Any) -> AccessToken
@@ -130,7 +140,7 @@ class AzureCredential:
     @property
     def subscription_id(self):
         # type: (None) -> str
-        return self._auth_params['subscription_id']
+        return self._subscription_id
 
 
 class Session:
@@ -194,31 +204,39 @@ class Session:
 
         klass_parameters = inspect.signature(klass).parameters
 
+        legacy = False
+
         if 'credentials' in klass_parameters and 'tenant_id' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            tenant_id=self.credentials.tenant_id,
                            base_url=self.resource_endpoint)
+            legacy = True
         elif 'credentials' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            subscription_id=self.credentials.subscription_id,
                            base_url=self.resource_endpoint)
-        elif 'subscription_id' in klass_parameters:
-            client = klass(credential=self.credentials,
-                           subscription_id=self.credentials.subscription_id,
-                           base_url=self.cloud_endpoints.endpoints.resource_manager)
-        elif 'vault_url' in klass_parameters:
-            client = klass(vault_url=vault_url, credential=self.credentials)
+            legacy = True
         else:
-            client = klass(credential=self.credentials)
+            client_args = {
+                'credential': self.credentials,
+                'raw_response_hook': log_response_data,
+                'retry_policy': C7nRetryPolicy()
+            }
+            if 'subscription_id' in klass_parameters:
+                client_args['subscription_id'] = self.subscription_id
+                client_args['base_url'] = self.cloud_endpoints.endpoints.resource_manager
+            elif 'vault_url' in klass_parameters:
+                client_args['vault_url'] = vault_url
+            client = klass(**client_args)
 
-        # TODO: Re-implement this override after update SDK
-        # Override send() method to log request limits & custom retries
-        # service_client = client._client
-        # service_client.orig_send = service_client.send
-        # service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+        if legacy:
+            # Override send() method to log request limits & custom retries
+            service_client = client._client
+            service_client.orig_send = service_client.send
+            service_client.send = types.MethodType(custodian_azure_send_override, service_client)
 
-        # Don't respect retry_after_header to implement custom retries
-        # service_client.config.retry_policy.policy.respect_retry_after_header = False
+            # Don't respect retry_after_header to implement custom retries
+            service_client.config.retry_policy.policy.respect_retry_after_header = False
 
         return client
 

@@ -10,9 +10,16 @@ from distutils.util import strtobool
 from functools import wraps
 from time import sleep
 
+import azure.core.polling
 import msrest.polling
-
-from c7n_azure import utils, constants
+from c7n.config import Bag, Config
+from c7n.policy import ExecutionContext
+from c7n.schema import generate
+from c7n.testing import TestUtils
+from c7n.utils import local_session
+# Ensure the azure provider is loaded.
+from c7n_azure import provider  # noqa
+from c7n_azure import constants, utils
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
@@ -21,15 +28,7 @@ from msrest.serialization import Model
 from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
-from c7n.config import Config, Bag
-from c7n.policy import ExecutionContext
-from c7n.schema import generate
-from c7n.testing import TestUtils
-from c7n.utils import local_session
 from .azure_serializer import AzureSerializer
-
-# Ensure the azure provider is loaded.
-from c7n_azure import provider # noqa
 
 BASE_FOLDER = os.path.dirname(__file__)
 C7N_SCHEMA = generate()
@@ -409,11 +408,18 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             else:
                 # Patch Poller with constructor that always disables polling
                 # This breaks blocking on long running operations (resource creation).
-                self._lro_patch = patch.object(msrest.polling.LROPoller,
+                self._lro_patch = patch.object(azure.core.polling.LROPoller,
                                                '__init__',
                                                BaseTest.lro_init)
                 self._lro_patch.start()
                 self.addCleanup(self._lro_patch.stop)
+
+                # We still have a few legacy clients, so keep this code.
+                self._lro_patch_legacy = patch.object(msrest.polling.LROPoller,
+                                                      '__init__',
+                                                      BaseTest.lro_init_legacy)
+                self._lro_patch_legacy.start()
+                self.addCleanup(self._lro_patch_legacy.stop)
 
             if constants.ENV_ACCESS_TOKEN in os.environ:
                 self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
@@ -463,6 +469,26 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
 
     @staticmethod
     def lro_init(self, client, initial_response, deserialization_callback, polling_method):
+        self._client = client
+        self._response = initial_response.response if \
+            isinstance(initial_response, ClientRawResponse) else \
+            initial_response
+        self._callbacks = []  # type List[Callable]
+        self._polling_method = azure.core.polling.NoPolling()
+
+        if isinstance(deserialization_callback, type) and \
+                issubclass(deserialization_callback, Model):
+            deserialization_callback = deserialization_callback.deserialize
+
+        # Might raise a CloudError
+        self._polling_method.initialize(self._client, self._response, deserialization_callback)
+
+        self._thread = None
+        self._done = None
+        self._exception = None
+
+    @staticmethod
+    def lro_init_legacy(self, client, initial_response, deserialization_callback, polling_method):
         self._client = client if isinstance(client, ServiceClient) else client._client
         self._response = initial_response.response if \
             isinstance(initial_response, ClientRawResponse) else \
@@ -489,7 +515,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     def session_client_wrapper(self, client, vault_url=None):
         client = Session._old_client(self, client)
         # TODO: Is there a way to override it properly instead of hijacking?
-        client._config.polling_interval = 0
+        if hasattr(client, '_config'):
+            client._config.polling_interval = 0
+        # TODO: Legacy clients.. Just in case
+        if hasattr(client, 'config'):
+            client.config.long_running_operation_timeout = 0
         return client
 
 

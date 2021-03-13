@@ -11,22 +11,22 @@ import re
 import time
 import uuid
 from concurrent.futures import as_completed
+from functools import lru_cache
+from json import JSONEncoder
 
+from azure.core.pipeline.policies import (CustomHookPolicy, RetryMode,
+                                          RetryPolicy)
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
+from azure.identity import ManagedIdentityCredential
 from azure.keyvault.secrets import SecretClient, SecretProperties
 from azure.mgmt.managementgroups import ManagementGroupsAPI
-from azure.identity import ManagedIdentityCredential
 from azure.mgmt.web.models import NameValuePair
-from c7n_azure import constants
+from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
-from json import JSONEncoder
 
-from c7n.utils import chunks, local_session
-
-from functools import lru_cache
-
+from c7n_azure import constants
 
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
                                   re.IGNORECASE)
@@ -627,3 +627,31 @@ def serialize(item):
         else:
             d[k.strip('_')] = v
     return d
+
+class C7nRetryPolicy(RetryPolicy):
+
+    def __init__(self, **kwargs):
+        if 'retry_total' not in kwargs:
+            kwargs['retry_total'] = 3
+        if 'retry_mode' not in kwargs:
+            kwargs['retry_mode'] = RetryMode.Fixed
+        if 'retry_backoff_factor' not in kwargs:
+            kwargs['retry_backoff_factor'] = constants.DEFAULT_MAX_RETRY_AFTER
+
+        super(RetryPolicy, self).__init__(**kwargs)
+
+    def _sleep_for_retry(self, response, transport):
+        # Ignore `retry_after` header if it exceeds maximum time
+        retry_after = self.get_retry_after(response)
+        if retry_after and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+            transport.sleep(retry_after)
+            return True
+        return False
+
+
+def log_response_data(response):
+    http_response = response.http_response
+    send_logger.debug(http_response.status_code)
+    for k, v in http_response.headers.items():
+        if k.startswith('x-ms-ratelimit'):
+            send_logger.info(k + ':' + v)
