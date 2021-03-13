@@ -357,3 +357,16 @@ class SessionTest(BaseTest):
         s = Session()
         result = s.get_auth_endpoint(constants.STORAGE_AUTH_ENDPOINT)
         self.assertEqual('https://storage.azure.com/', result)
+
+    @patch('c7n_azure.utils.C7nRetryPolicy.__init__', return_value=None)
+    def test_retry_policy_override(self, c7n_retry):
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        c7n_retry.assert_called_once()
+
+    @patch('c7n_azure.session.log_response_data', return_value=None)
+    def test_log_custom_hook(self, log):
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        [v for v in client.virtual_machines.list_all()]
+        log.assert_called_once()
