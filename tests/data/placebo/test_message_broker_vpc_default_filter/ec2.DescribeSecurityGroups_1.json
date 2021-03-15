@@ -3,9 +3,9 @@
     "data": {
         "SecurityGroups": [
             {
-                "Description": "AWS created security group for d-90677cc91c directory controllers",
-                "GroupName": "d-90677cc91c_controllers",
-                "IpPermissions": [ 
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
                     {
                         "IpProtocol": "-1",
                         "IpRanges": [],
@@ -13,15 +13,35 @@
                         "PrefixListIds": [],
                         "UserIdGroupPairs": [
                             {
-                                "GroupId": "sg-08f62b8c3dd4669bc",
+                                "GroupId": "sg-6c7fa917",
                                 "UserId": "012345678910"
                             }
                         ]
                     }
                 ],
                 "OwnerId": "012345678910",
-                "GroupId": "sg-08f62b8c3dd4669bc",
+                "GroupId": "sg-6c7fa917",
                 "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Private"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5"
+            },
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
                     {
                         "IpProtocol": "-1",
                         "IpRanges": [],
@@ -29,13 +49,28 @@
                         "PrefixListIds": [],
                         "UserIdGroupPairs": [
                             {
-                                "GroupId": "sg-08f62b8c3dd4669bc",
+                                "GroupId": "sg-0d30141b566cfa039",
                                 "UserId": "012345678910"
                             }
                         ]
                     }
                 ],
-                "VpcId": "vpc-0598080981e0332f9"
+                "OwnerId": "012345678910",
+                "GroupId": "sg-0d30141b566cfa039",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-072f438c953672ace"
             }
         ],
         "ResponseMetadata": {}

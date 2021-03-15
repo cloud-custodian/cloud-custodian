@@ -4,26 +4,26 @@
         "ResponseMetadata": {},
         "AuthenticationStrategy": "simple",
         "AutoMinorVersionUpgrade": true,
-        "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker1:b-cec75166-abad-49f9-bad0-015c7e405219",
-        "BrokerId": "b-cec75166-abad-49f9-bad0-015c7e405219",
+        "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker5:b-8160e23b-f87a-448e-ac5e-d8015179f260",
+        "BrokerId": "b-8160e23b-f87a-448e-ac5e-d8015179f260",
         "BrokerInstances": [
             {
-                "ConsoleURL": "https://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:8162",
+                "ConsoleURL": "https://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:8162",
                 "Endpoints": [
-                    "ssl://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:61617",
-                    "amqp+ssl://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:5671",
-                    "stomp+ssl://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:61614",
-                    "mqtt+ssl://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:8883",
-                    "wss://b-cec75166-abad-49f9-bad0-015c7e405219-1.mq.us-east-1.amazonaws.com:61619"
+                    "ssl://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:61617",
+                    "amqp+ssl://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:5671",
+                    "stomp+ssl://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:61614",
+                    "mqtt+ssl://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:8883",
+                    "wss://b-8160e23b-f87a-448e-ac5e-d8015179f260-1.mq.us-east-1.amazonaws.com:61619"
                 ],
-                "IpAddress": "52.204.80.11"
+                "IpAddress": "34.197.73.106"
             }
         ],
-        "BrokerName": "TestBroker1",
+        "BrokerName": "TestBroker5",
         "BrokerState": "RUNNING",
         "Configurations": {
             "Current": {
-                "Id": "c-4165d773-b914-4761-8bb1-a3d18acd6bd9",
+                "Id": "c-17d946e2-6c0c-43f4-994e-970890f24e3e",
                 "Revision": 1
             },
             "History": []
@@ -32,11 +32,11 @@
             "__class__": "datetime",
             "year": 2021,
             "month": 3,
-            "day": 8,
+            "day": 12,
             "hour": 17,
-            "minute": 8,
-            "second": 50,
-            "microsecond": 622000
+            "minute": 46,
+            "second": 6,
+            "microsecond": 312000
         },
         "DeploymentMode": "SINGLE_INSTANCE",
         "EncryptionOptions": {
@@ -44,16 +44,16 @@
         },
         "EngineType": "ActiveMQ",
         "EngineVersion": "5.15.14",
-        "HostInstanceType": "mq.t3.micro",
+        "HostInstanceType": "mq.m5.large",
         "Logs": {
             "Audit": false,
-            "AuditLogGroup": "/aws/amazonmq/broker/b-cec75166-abad-49f9-bad0-015c7e405219/audit",
+            "AuditLogGroup": "/aws/amazonmq/broker/b-8160e23b-f87a-448e-ac5e-d8015179f260/audit",
             "General": false,
-            "GeneralLogGroup": "/aws/amazonmq/broker/b-cec75166-abad-49f9-bad0-015c7e405219/general"
+            "GeneralLogGroup": "/aws/amazonmq/broker/b-8160e23b-f87a-448e-ac5e-d8015179f260/general"
         },
         "MaintenanceWindowStartTime": {
-            "DayOfWeek": "MONDAY",
-            "TimeOfDay": "13:00",
+            "DayOfWeek": "SATURDAY",
+            "TimeOfDay": "12:00",
             "TimeZone": "UTC"
         },
         "PubliclyAccessible": true,
@@ -62,11 +62,9 @@
         ],
         "StorageType": "efs",
         "SubnetIds": [
-            "subnet-efbcccb7"
+            "subnet-3a334610"
         ],
-        "Tags": {
-            "test": "test1"
-        },
+        "Tags": {},
         "Users": [
             {
                 "Username": "testing"

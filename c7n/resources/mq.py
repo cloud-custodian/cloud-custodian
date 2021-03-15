@@ -111,24 +111,24 @@ class VpcFilter(VpcFilter):
     def get_related_ids(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
         related_ids = set()
+        sg_ids = set()
         for r in resources:
-            try:
-                sg_ids = r.get('SecurityGroups', [])
-            except IndexError:
-                continue
-            vpc_id = self.sg_vpc_dict.get(sg_ids[0])
+            sg_id = r.get('SecurityGroups', [])[0]
+            vpc_id = self.sg_vpc_dict.get(sg_id)
             if vpc_id:
                 related_ids.add(vpc_id)
                 continue
+            sg_ids.add(sg_id)
+        if len(sg_ids) > 0:
             try:
                 response = client.describe_security_groups(
-                    GroupIds=[sg_ids[0]],
+                    GroupIds=list(sg_ids),
                 )
-                vpc_id = response.get('SecurityGroups')[0].get('VpcId')
-                related_ids.add(vpc_id)
-                self.sg_vpc_dict[sg_ids[0]] = vpc_id
-            except ClientError:
-                continue
+                for sg in response.get('SecurityGroups'):
+                    self.sg_vpc_dict[sg.get('GroupId')] = sg.get('VpcId')
+                    related_ids.add(sg.get('VpcId'))
+            except ClientError as e:
+                self.log.warning(e)
         return related_ids
 
     RelatedIdsExpression = ""

@@ -4,42 +4,42 @@
         "ResponseMetadata": {},
         "BrokerSummaries": [
             {
-                "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker2:b-c7aa6808-ba11-4d0c-b570-795e4724c841",
-                "BrokerId": "b-c7aa6808-ba11-4d0c-b570-795e4724c841",
-                "BrokerName": "TestBroker2",
+                "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker6:b-494999bd-7800-4e0c-90e1-cab9873f515d",
+                "BrokerId": "b-494999bd-7800-4e0c-90e1-cab9873f515d",
+                "BrokerName": "TestBroker6",
                 "BrokerState": "RUNNING",
                 "Created": {
                     "__class__": "datetime",
                     "year": 2021,
                     "month": 3,
-                    "day": 8,
-                    "hour": 17,
-                    "minute": 10,
-                    "second": 34,
-                    "microsecond": 888000
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 44,
+                    "second": 17,
+                    "microsecond": 247000
                 },
                 "DeploymentMode": "SINGLE_INSTANCE",
                 "EngineType": "ActiveMQ",
-                "HostInstanceType": "mq.t3.micro"
+                "HostInstanceType": "mq.m5.large"
             },
             {
-                "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker1:b-cec75166-abad-49f9-bad0-015c7e405219",
-                "BrokerId": "b-cec75166-abad-49f9-bad0-015c7e405219",
-                "BrokerName": "TestBroker1",
+                "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker5:b-8160e23b-f87a-448e-ac5e-d8015179f260",
+                "BrokerId": "b-8160e23b-f87a-448e-ac5e-d8015179f260",
+                "BrokerName": "TestBroker5",
                 "BrokerState": "RUNNING",
                 "Created": {
                     "__class__": "datetime",
                     "year": 2021,
                     "month": 3,
-                    "day": 8,
+                    "day": 12,
                     "hour": 17,
-                    "minute": 8,
-                    "second": 50,
-                    "microsecond": 622000
+                    "minute": 46,
+                    "second": 6,
+                    "microsecond": 312000
                 },
                 "DeploymentMode": "SINGLE_INSTANCE",
                 "EngineType": "ActiveMQ",
-                "HostInstanceType": "mq.t3.micro"
+                "HostInstanceType": "mq.m5.large"
             }
         ]
     }
