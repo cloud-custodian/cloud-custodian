@@ -1,16 +1,290 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas::644160558196:servicequotas/L-0C8306D7",
+                "QuotaCode": "L-0C8306D7",
+                "QuotaName": "Active requests per account",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": true
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-36BDD542",
+                "QuotaCode": "L-36BDD542",
+                "QuotaName": "Active requests per quota",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-C235F4E9",
+                "QuotaCode": "L-C235F4E9",
+                "QuotaName": "Max requests per template",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-EE8661AA",
+                "QuotaCode": "L-EE8661AA",
+                "QuotaName": "Throttle Rate for AssociateServiceQuotaTemplate",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-346CB6CB",
+                "QuotaCode": "L-346CB6CB",
+                "QuotaName": "Throttle rate for DeleteServiceQuotaIncreaseRequestFromTemplate",
+                "Value": 2.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-AA9737D2",
+                "QuotaCode": "L-AA9737D2",
+                "QuotaName": "Throttle rate for DisassociateServiceQuotaTemplate",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-A53F603E",
+                "QuotaCode": "L-A53F603E",
+                "QuotaName": "Throttle rate for GetAWSDefaultServiceQuota",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-1CF4B0F4",
+                "QuotaCode": "L-1CF4B0F4",
+                "QuotaName": "Throttle rate for GetAssociationForServiceQuotaTemplate",
+                "Value": 2.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-027D2B0A",
+                "QuotaCode": "L-027D2B0A",
+                "QuotaName": "Throttle rate for GetRequestedServiceQuotaChange",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-09C84CC6",
+                "QuotaCode": "L-09C84CC6",
+                "QuotaName": "Throttle rate for GetServiceQuota",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-2C1C746A",
+                "QuotaCode": "L-2C1C746A",
+                "QuotaName": "Throttle rate for GetServiceQuotaIncreaseRequestFromTemplate",
+                "Value": 2.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-71DCD22A",
+                "QuotaCode": "L-71DCD22A",
+                "QuotaName": "Throttle rate for ListAWSDefaultServiceQuotas",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-C7624166",
+                "QuotaCode": "L-C7624166",
+                "QuotaName": "Throttle rate for ListRequestedServiceQuotaChangeHistory",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-0E18483E",
+                "QuotaCode": "L-0E18483E",
+                "QuotaName": "Throttle rate for ListRequestedServiceQuotaChangeHistoryByQuota",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-909E6D4A",
+                "QuotaCode": "L-909E6D4A",
+                "QuotaName": "Throttle rate for ListServiceQuotaIncreaseRequestsInTemplate",
+                "Value": 2.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-65470577",
+                "QuotaCode": "L-65470577",
+                "QuotaName": "Throttle rate for ListServiceQuotas",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-E3924FE5",
+                "QuotaCode": "L-E3924FE5",
+                "QuotaName": "Throttle rate for ListServices",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-1BAB2CA7",
+                "QuotaCode": "L-1BAB2CA7",
+                "QuotaName": "Throttle rate for PutServiceQuotaIncreaseRequestIntoTemplate",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            },
+            {
+                "ServiceCode": "servicequotas",
+                "ServiceName": "Service Quotas",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:servicequotas/L-61010047",
+                "QuotaCode": "L-61010047",
+                "QuotaName": "Throttle rate for RequestServiceQuotaIncrease",
+                "Value": 3.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false,
+                "Period": {
+                    "PeriodValue": 1,
+                    "PeriodUnit": "SECOND"
+                }
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "6b4b44be-b071-4bcb-83c9-4e6749bf17de",
+            "RequestId": "2694381d-919a-4020-baeb-da990a42c6a0",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:37 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "6430",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "6b4b44be-b071-4bcb-83c9-4e6749bf17de"
+                "x-amzn-requestid": "2694381d-919a-4020-baeb-da990a42c6a0"
             },
             "RetryAttempts": 0
         }

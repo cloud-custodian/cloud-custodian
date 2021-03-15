@@ -1,16 +1,28 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "kinesis",
+                "ServiceName": "Amazon Kinesis Data Streams",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:kinesis/L-0918CF54",
+                "QuotaCode": "L-0918CF54",
+                "QuotaName": "Shards per Region",
+                "Value": 500.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "2a2246ac-d95a-4e48-8a49-6dc3bc44475f",
+            "RequestId": "a0c5e5b4-aa67-4263-9e8c-ad844308653d",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:34 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "282",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "2a2246ac-d95a-4e48-8a49-6dc3bc44475f"
+                "x-amzn-requestid": "a0c5e5b4-aa67-4263-9e8c-ad844308653d"
             },
             "RetryAttempts": 0
         }

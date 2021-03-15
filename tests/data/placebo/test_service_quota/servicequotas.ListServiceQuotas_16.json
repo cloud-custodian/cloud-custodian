@@ -1,16 +1,226 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-E15CE20A",
+                "QuotaCode": "L-E15CE20A",
+                "QuotaName": "Concurrent task runs per transform",
+                "Value": 3.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-B78896B9",
+                "QuotaCode": "L-B78896B9",
+                "QuotaName": "Label file size",
+                "Value": 10.0,
+                "Unit": "Megabytes",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-5E4153CA",
+                "QuotaCode": "L-5E4153CA",
+                "QuotaName": "Max Concurrent JobRuns",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-F574AED9",
+                "QuotaCode": "L-F574AED9",
+                "QuotaName": "Max Concurrent JobRuns per Job",
+                "Value": 1000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-76EC689B",
+                "QuotaCode": "L-76EC689B",
+                "QuotaName": "Max DPU per Devendpoint",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-DBA56E2F",
+                "QuotaCode": "L-DBA56E2F",
+                "QuotaName": "Max Devendpoint Count",
+                "Value": 25.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-611FDDE4",
+                "QuotaCode": "L-611FDDE4",
+                "QuotaName": "Max Jobs",
+                "Value": 250.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-EEC98450",
+                "QuotaCode": "L-EEC98450",
+                "QuotaName": "Max Jobs per Trigger",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-83192DBF",
+                "QuotaCode": "L-83192DBF",
+                "QuotaName": "Max Security Configurations",
+                "Value": 250.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-08F3B322",
+                "QuotaCode": "L-08F3B322",
+                "QuotaName": "Max Task DPU",
+                "Value": 300.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-F1653A6D",
+                "QuotaCode": "L-F1653A6D",
+                "QuotaName": "Max Triggers",
+                "Value": 250.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-11FA2C1A",
+                "QuotaCode": "L-11FA2C1A",
+                "QuotaName": "Max crawlers",
+                "Value": 1000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-A57B5BCE",
+                "QuotaCode": "L-A57B5BCE",
+                "QuotaName": "Max databases per catalog",
+                "Value": 10000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-1DD415D5",
+                "QuotaCode": "L-1DD415D5",
+                "QuotaName": "Max functions per database",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-2C3F5401",
+                "QuotaCode": "L-2C3F5401",
+                "QuotaName": "Max partitions per table",
+                "Value": 10000000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-071ABE08",
+                "QuotaCode": "L-071ABE08",
+                "QuotaName": "Max table versions per table",
+                "Value": 100000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-B8497671",
+                "QuotaCode": "L-B8497671",
+                "QuotaName": "Max tables per database",
+                "Value": 200000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-04CEE988",
+                "QuotaCode": "L-04CEE988",
+                "QuotaName": "Number of machine learning transforms",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "glue",
+                "ServiceName": "AWS Glue",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:glue/L-83A59AA6",
+                "QuotaCode": "L-83A59AA6",
+                "QuotaName": "Total concurrent task runs per account",
+                "Value": 30.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "3d1c1cb5-335b-4cf5-ada3-00fe0167a828",
+            "RequestId": "c274c798-d712-4be7-836c-a5eec6a27703",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:34 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "4788",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "3d1c1cb5-335b-4cf5-ada3-00fe0167a828"
+                "x-amzn-requestid": "c274c798-d712-4be7-836c-a5eec6a27703"
             },
             "RetryAttempts": 0
         }

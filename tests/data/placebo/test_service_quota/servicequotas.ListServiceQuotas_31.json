@@ -1,16 +1,39 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "sms",
+                "ServiceName": "AWS Server Migration Service",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:sms/L-AFABDADD",
+                "QuotaCode": "L-AFABDADD",
+                "QuotaName": "Concurrent VM migrations",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "sms",
+                "ServiceName": "AWS Server Migration Service",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:sms/L-3290AB9E",
+                "QuotaCode": "L-3290AB9E",
+                "QuotaName": "Duration of service usage per VM in days",
+                "Value": 90.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "52cec3ce-fa9e-4027-a518-bcbcf5da6958",
+            "RequestId": "4300e7d1-75c3-4f25-90fa-85535ba06f47",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:39 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "566",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "52cec3ce-fa9e-4027-a518-bcbcf5da6958"
+                "x-amzn-requestid": "4300e7d1-75c3-4f25-90fa-85535ba06f47"
             },
             "RetryAttempts": 0
         }

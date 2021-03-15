@@ -1,16 +1,83 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "dynamodb",
+                "ServiceName": "Amazon DynamoDB",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:dynamodb/L-34F6A552",
+                "QuotaCode": "L-34F6A552",
+                "QuotaName": "Account-level read throughput limit (Provisioned mode)",
+                "Value": 80000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "AccountProvisionedReadCapacityUnits",
+                        "Service": "DynamoDB",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                }
+            },
+            {
+                "ServiceCode": "dynamodb",
+                "ServiceName": "Amazon DynamoDB",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:dynamodb/L-34F8CCC8",
+                "QuotaCode": "L-34F8CCC8",
+                "QuotaName": "Account-level write throughput limit (Provisioned mode)",
+                "Value": 80000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "AccountProvisionedWriteCapacityUnits",
+                        "Service": "DynamoDB",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                }
+            },
+            {
+                "ServiceCode": "dynamodb",
+                "ServiceName": "Amazon DynamoDB",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:dynamodb/L-CF0CBE56",
+                "QuotaCode": "L-CF0CBE56",
+                "QuotaName": "Table-level read throughput limit",
+                "Value": 40000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "dynamodb",
+                "ServiceName": "Amazon DynamoDB",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:dynamodb/L-AB614373",
+                "QuotaCode": "L-AB614373",
+                "QuotaName": "Table-level write throughput limit",
+                "Value": 40000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "5838abd8-bb33-4641-befd-9d54504d0508",
+            "RequestId": "06644766-4622-42f9-90ed-822848ec2232",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "date": "Thu, 31 Oct 2019 17:52:31 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "1651",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "5838abd8-bb33-4641-befd-9d54504d0508"
+                "x-amzn-requestid": "06644766-4622-42f9-90ed-822848ec2232"
             },
             "RetryAttempts": 0
         }

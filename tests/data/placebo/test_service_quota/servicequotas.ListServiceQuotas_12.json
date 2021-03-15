@@ -3,37 +3,37 @@
     "data": {
         "Quotas": [
             {
-                "ServiceCode": "autoscaling",
-                "ServiceName": "Amazon EC2 Auto Scaling",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:autoscaling/L-CDE20ADC",
-                "QuotaCode": "L-CDE20ADC",
-                "QuotaName": "Auto Scaling groups per region",
-                "Value": 200.0,
-                "Unit": "None",
+                "ServiceCode": "elasticloadbalancing",
+                "ServiceName": "Elastic Load Balancing (ELB)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:elasticloadbalancing/L-53DA6B97",
+                "QuotaCode": "L-53DA6B97",
+                "QuotaName": "Application Load Balancers per Region",
+                "Value": 50.0,
+                "Unit": "Count",
                 "Adjustable": true,
                 "GlobalQuota": false
             },
             {
-                "ServiceCode": "autoscaling",
-                "ServiceName": "Amazon EC2 Auto Scaling",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:autoscaling/L-6B80B8FA",
-                "QuotaCode": "L-6B80B8FA",
-                "QuotaName": "Launch configurations per region",
-                "Value": 200.0,
-                "Unit": "None",
+                "ServiceCode": "elasticloadbalancing",
+                "ServiceName": "Elastic Load Balancing (ELB)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:elasticloadbalancing/L-E9E9831D",
+                "QuotaCode": "L-E9E9831D",
+                "QuotaName": "Classic Load Balancers per Region",
+                "Value": 20.0,
+                "Unit": "Count",
                 "Adjustable": true,
                 "GlobalQuota": false
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "bab4aa1a-4de6-4889-b95f-12f028452864",
+            "RequestId": "23c4258e-ad76-4037-819b-72b06e1a3d8c",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:32 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "588",
+                "content-length": "642",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "bab4aa1a-4de6-4889-b95f-12f028452864"
+                "x-amzn-requestid": "23c4258e-ad76-4037-819b-72b06e1a3d8c"
             },
             "RetryAttempts": 0
         }

@@ -1,16 +1,39 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "autoscaling",
+                "ServiceName": "Amazon EC2 Auto Scaling",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:autoscaling/L-CDE20ADC",
+                "QuotaCode": "L-CDE20ADC",
+                "QuotaName": "Auto Scaling groups per region",
+                "Value": 200.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "autoscaling",
+                "ServiceName": "Amazon EC2 Auto Scaling",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:autoscaling/L-6B80B8FA",
+                "QuotaCode": "L-6B80B8FA",
+                "QuotaName": "Launch configurations per region",
+                "Value": 200.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "a9ffea58-029c-48af-b700-d62a148bfc0e",
+            "RequestId": "bab4aa1a-4de6-4889-b95f-12f028452864",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:30 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "588",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "a9ffea58-029c-48af-b700-d62a148bfc0e"
+                "x-amzn-requestid": "bab4aa1a-4de6-4889-b95f-12f028452864"
             },
             "RetryAttempts": 0
         }

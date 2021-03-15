@@ -1,16 +1,39 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "vpc",
+                "ServiceName": "Amazon Virtual Private Cloud (Amazon VPC)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:vpc/L-A4707A72",
+                "QuotaCode": "L-A4707A72",
+                "QuotaName": "Internet gateways per Region",
+                "Value": 8.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "vpc",
+                "ServiceName": "Amazon Virtual Private Cloud (Amazon VPC)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:vpc/L-F678F1CE",
+                "QuotaCode": "L-F678F1CE",
+                "QuotaName": "VPCs per Region",
+                "Value": 8.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "4ebb60ec-c056-4b89-b1a0-47e9e70957f6",
+            "RequestId": "7c5d780a-3a44-4d60-a7cc-a043cdca07cc",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:38 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "569",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "4ebb60ec-c056-4b89-b1a0-47e9e70957f6"
+                "x-amzn-requestid": "7c5d780a-3a44-4d60-a7cc-a043cdca07cc"
             },
             "RetryAttempts": 0
         }

@@ -1,16 +1,160 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-15E423AD",
+                "QuotaCode": "L-15E423AD",
+                "QuotaName": "Concurrent deployment jobs",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-FE0C173F",
+                "QuotaCode": "L-FE0C173F",
+                "QuotaName": "Concurrent simulation jobs",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-19B1F5F2",
+                "QuotaCode": "L-19B1F5F2",
+                "QuotaName": "Fleets",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-CEB47779",
+                "QuotaCode": "L-CEB47779",
+                "QuotaName": "Minimum simulation duration",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-E5D0EA7D",
+                "QuotaCode": "L-E5D0EA7D",
+                "QuotaName": "Robot applications",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-40FACCBF",
+                "QuotaCode": "L-40FACCBF",
+                "QuotaName": "Robots",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-275E9052",
+                "QuotaCode": "L-275E9052",
+                "QuotaName": "Robots per fleet",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-04ECBB71",
+                "QuotaCode": "L-04ECBB71",
+                "QuotaName": "Simulation Job Creation Rate Per Minute",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-D6554FB1",
+                "QuotaCode": "L-D6554FB1",
+                "QuotaName": "Simulation applications",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-7E2BA58F",
+                "QuotaCode": "L-7E2BA58F",
+                "QuotaName": "Simulation duration",
+                "Value": 14.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-3CD5069F",
+                "QuotaCode": "L-3CD5069F",
+                "QuotaName": "Source size",
+                "Value": 5.0,
+                "Unit": "Gigabytes",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-AE5043DD",
+                "QuotaCode": "L-AE5043DD",
+                "QuotaName": "Versions per robot application",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "robomaker",
+                "ServiceName": "AWS RoboMaker",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:robomaker/L-4D288B5C",
+                "QuotaCode": "L-4D288B5C",
+                "QuotaName": "Versions per simulation application",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "3d4b2e3c-907e-4c05-9b16-8499f6e482fe",
+            "RequestId": "73cd61ae-3188-4e89-9d91-d00d145b145b",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:36 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "3448",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "3d4b2e3c-907e-4c05-9b16-8499f6e482fe"
+                "x-amzn-requestid": "73cd61ae-3188-4e89-9d91-d00d145b145b"
             },
             "RetryAttempts": 0
         }

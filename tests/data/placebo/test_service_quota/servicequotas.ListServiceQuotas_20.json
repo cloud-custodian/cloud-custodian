@@ -1,16 +1,39 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "license-manager",
+                "ServiceName": "AWS License Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:license-manager/L-0B08C8C5",
+                "QuotaCode": "L-0B08C8C5",
+                "QuotaName": "License configuration associations per resource",
+                "Value": 10.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "license-manager",
+                "ServiceName": "AWS License Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:license-manager/L-CDB75D7A",
+                "QuotaCode": "L-CDB75D7A",
+                "QuotaName": "License configurations",
+                "Value": 25.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "7b1dd69b-a83f-49b9-ba45-b35f930ad303",
+            "RequestId": "59712839-9a39-4725-ae76-dd21159eb974",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:35 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "601",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "7b1dd69b-a83f-49b9-ba45-b35f930ad303"
+                "x-amzn-requestid": "59712839-9a39-4725-ae76-dd21159eb974"
             },
             "RetryAttempts": 0
         }

@@ -1,16 +1,105 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-D1AFAF75",
+                "QuotaCode": "L-D1AFAF75",
+                "QuotaName": "Channels",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-05A796F2",
+                "QuotaCode": "L-05A796F2",
+                "QuotaName": "HEVC Channels",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-6A0116BB",
+                "QuotaCode": "L-6A0116BB",
+                "QuotaName": "Input Security Groups",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-4D7207DE",
+                "QuotaCode": "L-4D7207DE",
+                "QuotaName": "Pull Inputs",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-9E233AF7",
+                "QuotaCode": "L-9E233AF7",
+                "QuotaName": "Push Inputs",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-1F6E2FAF",
+                "QuotaCode": "L-1F6E2FAF",
+                "QuotaName": "Reservations",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-DDE858F0",
+                "QuotaCode": "L-DDE858F0",
+                "QuotaName": "UHD Channels",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "medialive",
+                "ServiceName": "AWS Elemental MediaLive",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:medialive/L-68E02936",
+                "QuotaCode": "L-68E02936",
+                "QuotaName": "VPC Inputs",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "b39745bc-0144-483d-91f8-e1332a59282b",
+            "RequestId": "cc1347e9-c06b-4452-b60d-8f6080aaa745",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:35 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "2122",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "b39745bc-0144-483d-91f8-e1332a59282b"
+                "x-amzn-requestid": "cc1347e9-c06b-4452-b60d-8f6080aaa745"
             },
             "RetryAttempts": 0
         }

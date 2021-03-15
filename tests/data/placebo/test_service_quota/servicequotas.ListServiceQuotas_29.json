@@ -1,16 +1,105 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-F03CADDF",
+                "QuotaCode": "L-F03CADDF",
+                "QuotaName": "Instances per target",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-26BF3FE6",
+                "QuotaCode": "L-26BF3FE6",
+                "QuotaName": "Maintenance Window concurrent executions",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-00E10A78",
+                "QuotaCode": "L-00E10A78",
+                "QuotaName": "Maintenance Window execution history retention",
+                "Value": 30.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-7727CE5B",
+                "QuotaCode": "L-7727CE5B",
+                "QuotaName": "Maintenance Windows",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-22ADA421",
+                "QuotaCode": "L-22ADA421",
+                "QuotaName": "Single Maintenance Window concurrent executions",
+                "Value": 1.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-038D7E0A",
+                "QuotaCode": "L-038D7E0A",
+                "QuotaName": "Target groups per Maintenance Window target or task",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-B1A84B8B",
+                "QuotaCode": "L-B1A84B8B",
+                "QuotaName": "Targets per Maintenance Window",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ssm",
+                "ServiceName": "AWS Systems Manager",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ssm/L-3D9CCA6E",
+                "QuotaCode": "L-3D9CCA6E",
+                "QuotaName": "Tasks per Maintenance Window",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "85fa13f2-43bd-4966-ae07-ab836897c503",
+            "RequestId": "5f77153c-7e73-4b5a-bef2-23ab4073a3dc",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:37 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "2183",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "85fa13f2-43bd-4966-ae07-ab836897c503"
+                "x-amzn-requestid": "5f77153c-7e73-4b5a-bef2-23ab4073a3dc"
             },
             "RetryAttempts": 0
         }

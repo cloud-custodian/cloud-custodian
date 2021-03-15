@@ -1,16 +1,61 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "cloudhsm",
+                "ServiceName": "AWS CloudHSM",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:cloudhsm/L-4B16B391",
+                "QuotaCode": "L-4B16B391",
+                "QuotaName": "Clusters per AWS Region and AWS account",
+                "Value": 4.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "Cluster",
+                        "Service": "CloudHSM",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                }
+            },
+            {
+                "ServiceCode": "cloudhsm",
+                "ServiceName": "AWS CloudHSM",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:cloudhsm/L-95BA35D1",
+                "QuotaCode": "L-95BA35D1",
+                "QuotaName": "HSMs per AWS Region and AWS account",
+                "Value": 6.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "HSM",
+                        "Service": "CloudHSM",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                }
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "97132765-af33-4d33-90b4-8fb942985cbf",
+            "RequestId": "e8946447-df3c-474a-b62b-2af77e1e9d5b",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:30 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "984",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "97132765-af33-4d33-90b4-8fb942985cbf"
+                "x-amzn-requestid": "e8946447-df3c-474a-b62b-2af77e1e9d5b"
             },
             "RetryAttempts": 0
         }

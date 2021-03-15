@@ -1,16 +1,193 @@
 {
     "status_code": 200,
     "data": {
-        "Quotas": [],
+        "Quotas": [
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-AA8B1026",
+                "QuotaCode": "L-AA8B1026",
+                "QuotaName": "Authorizations per DB security group",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-E4C808A8",
+                "QuotaCode": "L-E4C808A8",
+                "QuotaName": "DB cluster parameter groups",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-952B80B8",
+                "QuotaCode": "L-952B80B8",
+                "QuotaName": "DB clusters",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-7B6409FD",
+                "QuotaCode": "L-7B6409FD",
+                "QuotaName": "DB instances",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-48C6BF61",
+                "QuotaCode": "L-48C6BF61",
+                "QuotaName": "DB subnet groups",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-A59F4C87",
+                "QuotaCode": "L-A59F4C87",
+                "QuotaName": "Event subscriptions",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-E094F43D",
+                "QuotaCode": "L-E094F43D",
+                "QuotaName": "IAM roles per DB cluster",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-DD2301CA",
+                "QuotaCode": "L-DD2301CA",
+                "QuotaName": "IAM roles per DB instance",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-272F1212",
+                "QuotaCode": "L-272F1212",
+                "QuotaName": "Manual snapshots",
+                "Value": 100.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-9FA33840",
+                "QuotaCode": "L-9FA33840",
+                "QuotaName": "Option groups",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-DE55804A",
+                "QuotaCode": "L-DE55804A",
+                "QuotaName": "Parameter groups",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-5BC124EF",
+                "QuotaCode": "L-5BC124EF",
+                "QuotaName": "Read replicas per master",
+                "Value": 5.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-78E853F4",
+                "QuotaCode": "L-78E853F4",
+                "QuotaName": "Reserved DB instances",
+                "Value": 40.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-732153D0",
+                "QuotaCode": "L-732153D0",
+                "QuotaName": "Security groups",
+                "Value": 25.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-6F3ACC36",
+                "QuotaCode": "L-6F3ACC36",
+                "QuotaName": "Subnets per DB subnet group",
+                "Value": 20.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "rds",
+                "ServiceName": "Amazon Relational Database Service (Amazon RDS)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:rds/L-7ADDB58A",
+                "QuotaCode": "L-7ADDB58A",
+                "QuotaName": "Total storage for all DB instances",
+                "Value": 100000.0,
+                "Unit": "Gigabytes",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "0bf7a851-16dd-4b8f-9065-f2d99b9d0d68",
+            "RequestId": "8853f661-3033-4b4b-a886-6101b1bf922c",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:35 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "13",
+                "content-length": "4582",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "0bf7a851-16dd-4b8f-9065-f2d99b9d0d68"
+                "x-amzn-requestid": "8853f661-3033-4b4b-a886-6101b1bf922c"
             },
             "RetryAttempts": 0
         }
