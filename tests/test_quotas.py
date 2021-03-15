@@ -56,8 +56,8 @@ class TestQuotas(BaseTest):
         resource: aws.service-quota
         filters:
             - UsageMetric: present
-            - type: usage
-              limit: 10
+            - type: usage-metric
+              limit: 20
         """)
         p = self.load_policy(policy, session_factory=session_factory)
         resources = p.run()

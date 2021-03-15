@@ -27,10 +27,12 @@ class ServiceQuotaRequest(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'service-quotas'
+        permission_prefix = 'servicequotas'
         enum_spec = ('list_requested_service_quota_change_history', 'RequestedQuotas', None)
-        id = 'Id'
-        arn = None
-        name = None
+        name = id = 'Id'
+        # Service Quota Requests dont actually have arns, but we need to set an arn_type here
+        # to ensure that the tests pass resource type validation
+        arn_type = 'request'
 
 
 @resources.register('service-quota')
@@ -40,6 +42,7 @@ class ServiceQuota(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'service-quotas'
+        permission_prefix = 'servicequotas'
         enum_spec = ('list_services', 'Services', None)
         id = 'QuotaCode'
         arn = 'QuotaArn'
@@ -90,7 +93,7 @@ class ServiceQuota(QueryResourceManager):
         return results
 
 
-@ServiceQuota.filter_registry.register('usage')
+@ServiceQuota.filter_registry.register('usage-metric')
 class UsageFilter(MetricsFilter):
     """
     Filter service quotas by usage, only compatible with service quotas
@@ -108,11 +111,11 @@ class UsageFilter(MetricsFilter):
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
-                - type: usage
+                - type: usage-metric
                   limit: 19
     """
 
-    schema = type_schema('usage', limit={'type': 'integer'})
+    schema = type_schema('usage-metric', limit={'type': 'integer'})
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
@@ -227,7 +230,7 @@ class RequestHistoryFilter(RelatedResourceFilter):
         'request-history', rinherit=ValueFilter.schema
     )
 
-    permissions = ('servicequota:ListRequestedServiceQuotaChangeHistory',)
+    permissions = ('servicequotas:ListRequestedServiceQuotaChangeHistory',)
 
     def get_related(self, resources):
         resource_manager = self.get_resource_manager()
@@ -267,7 +270,7 @@ class Increase(Action):
     """
 
     schema = type_schema('request-increase', multiplier={'type': 'number', 'minimum': 1.0})
-    permissions = ('servicequota:RequestServiceQuotaIncrease',)
+    permissions = ('servicequotas:RequestServiceQuotaIncrease',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('service-quotas')
@@ -320,14 +323,14 @@ class AddToTemplate(Action):
                   value: ec2
                 - type: value
                   key: QuotaName
-                  value: *.On-Demand instances.*
+                  value: ".*On-Demand instances.*"
                   op: regex
               actions:
                 - type: add-to-template
                   regions:
                     - us-east-1
                     - us-west-2
-                  multiplier: 1.2
+                  multiplier: 2
     """
 
     all_regions = [
@@ -349,7 +352,7 @@ class AddToTemplate(Action):
         },
         **{'required': ['multiplier']}
     )
-    permissions = ('servicequota:PutServiceQuotaIncreaseRequestIntoTemplate',)
+    permissions = ('servicequotas:PutServiceQuotaIncreaseRequestIntoTemplate',)
 
     def process_resources(self, resources, op):
         # Use us-east-1 to make the request to get around the error:
@@ -425,7 +428,7 @@ class RemoveFromTemplate(AddToTemplate):
         }
     )
 
-    permissions = ('servicequota:DeleteServiceQuotaIncreaseRequestFromTemplate',)
+    permissions = ('servicequotas:DeleteServiceQuotaIncreaseRequestFromTemplate',)
 
     def process(self, resources):
         op = 'delete_service_quota_increase_request_from_template'
@@ -451,7 +454,7 @@ class InTemplateFilter(Filter):
         quota={'type': 'string'},
         **{'properties': {'required': ['quota']}}
     )
-    permissions = ('servicequota:ListServiceQuotaIncreaseRequestsInTemplate',)
+    permissions = ('servicequotas:ListServiceQuotaIncreaseRequestsInTemplate',)
 
     def process(self, resources, event):
         client = local_session(
