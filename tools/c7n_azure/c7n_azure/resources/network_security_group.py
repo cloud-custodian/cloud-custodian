@@ -289,7 +289,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
                                   nsg_name, self.access_action, ports)
 
             try:
-                self.manager.get_client().security_rules.create_or_update(
+                self.manager.get_client().security_rules.begin_create_or_update(
                     resource_group,
                     nsg_name,
                     rule_name,
