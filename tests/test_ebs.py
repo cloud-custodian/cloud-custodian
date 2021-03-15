@@ -16,6 +16,7 @@ from c7n.resources.ebs import (
     ErrorHandler,
     SnapshotQueryParser as QueryParser
 )
+from c7n.utils import yaml_load
 
 from .common import BaseTest
 
@@ -430,6 +431,22 @@ class SnapshotSetPermissions(BaseTest):
             SnapshotId=resources[0]['SnapshotId'],
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == [{"UserId": "112233445566"}]
+
+
+class SnapshotVolumeFilter(BaseTest):
+
+    def test_ebs_volume_filter(self):
+        factory = self.replay_flight_data("test_ebs_volume_related_filter")
+        p = self.load_policy(yaml_load("""
+           name: ebs-snapshot-volume
+           resource: aws.ebs-snapshot
+           filters:
+             - type: volume
+               key: VolumeId
+               value: absent
+        """), session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class AttachedInstanceTest(BaseTest):

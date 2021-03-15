@@ -16,6 +16,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
     ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -358,6 +359,32 @@ class SnapshotSkipAmiSnapshots(Filter):
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
         return resources
+
+
+@Snapshot.filter_registry.register('volume')
+class SnapshotVolumeFilter(RelatedResourceFilter):
+    """
+    Filter EBS snapshots by their volume attributes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: snapshot-with-no-volume
+            resource: aws.ebs-snapshot
+            filters:
+                - not:
+                    - name: volume
+                      key: [].Arn
+                      op: absent
+
+    """
+
+    RelatedResource = 'c7n.resources.ebs.EBS'
+    RelatedIdsExpression = 'VolumeId'
+    AnnotationKey = 'Volume'
+
+    schema = type_schema(
+        'volume', rinherit=ValueFilter.schema)
 
 
 @Snapshot.action_registry.register('delete')
