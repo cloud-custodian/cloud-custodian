@@ -131,7 +131,7 @@ class VpcFilter(VpcFilter):
                 continue
         return related_ids
 
-    RelatedIdsExpression = "VpcId"
+    RelatedIdsExpression = ""
 
 
 @MessageBroker.action_registry.register('delete')

@@ -176,7 +176,7 @@ class MessageQueue(BaseTest):
                     {
                         'type': 'vpc',
                         'key': 'IsDefault',
-                        'value': 'True'
+                        'value': True
                     }
                 ],
             },
