@@ -210,7 +210,7 @@ class Session:
         if 'credentials' in klass_parameters and 'tenant_id' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            tenant_id=self.credentials.tenant_id,
-                           base_url=self.cloud_endpoints.endpoints.resource_manager)
+                           base_url=self.resource_endpoint)
             legacy = True
         elif 'credentials' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
