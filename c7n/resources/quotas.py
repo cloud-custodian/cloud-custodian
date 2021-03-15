@@ -309,6 +309,7 @@ class AddToTemplate(Action):
     Multiplier defaults to 1.2
 
     .. code-block:: yaml
+
         policies:
             - name: put-request-increase-in-template
               resource: aws.service-quota
