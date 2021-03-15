@@ -262,7 +262,7 @@ class Increase(Action):
                 key: QuotaCode
                 value: L-foo
             actions:
-              - type: increase
+              - type: request-increase
                 multiplier: 1.2
     """
 
