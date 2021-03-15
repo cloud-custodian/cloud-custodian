@@ -372,10 +372,9 @@ class SnapshotVolumeFilter(RelatedResourceFilter):
           - name: snapshot-with-no-volume
             resource: aws.ebs-snapshot
             filters:
-                - not:
-                    - name: volume
-                      key: [].Arn
-                      op: absent
+              - type: volume
+                key: VolumeId
+                value: absent
 
     """
 
