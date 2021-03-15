@@ -90,7 +90,7 @@ class ServiceQuota(QueryResourceManager):
         return results
 
 
-@ServiceQuota.filter_registry.register('usage-metric')
+@ServiceQuota.filter_registry.register('usage')
 class UsageFilter(MetricsFilter):
     """
     Filter service quotas by usage, only compatible with service quotas
