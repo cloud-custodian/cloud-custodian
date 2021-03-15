@@ -14,7 +14,7 @@
                     "second": 0,
                     "microsecond": 0
                 },
-                "Maximum": 1.0,
+                "Maximum": 20.0,
                 "Unit": "None"
             }
         ],

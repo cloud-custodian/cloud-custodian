@@ -3,120 +3,12 @@
     "data": {
         "Services": [
             {
-                "ServiceCode": "apigateway",
-                "ServiceName": "Amazon API Gateway"
-            },
-            {
-                "ServiceCode": "athena",
-                "ServiceName": "Amazon Athena"
-            },
-            {
-                "ServiceCode": "batch",
-                "ServiceName": "AWS Batch"
-            },
-            {
-                "ServiceCode": "autoscaling",
-                "ServiceName": "Amazon AutoScaling"
-            },
-            {
-                "ServiceCode": "cloudhsm",
-                "ServiceName": "AWS CloudHSM"
-            },
-            {
-                "ServiceCode": "cloudformation",
-                "ServiceName": "AWS CloudFormation"
-            },
-            {
-                "ServiceCode": "comprehend",
-                "ServiceName": "Amazon Comprehend"
-            },
-            {
-                "ServiceCode": "dynamodb",
-                "ServiceName": "Amazon DynamoDB"
-            },
-            {
-                "ServiceCode": "ebs",
-                "ServiceName": "Amazon Elastic Block Store (Amazon EBS)"
-            },
-            {
                 "ServiceCode": "ec2",
                 "ServiceName": "Amazon Elastic Compute Cloud (Amazon EC2)"
             },
             {
-                "ServiceCode": "elasticfilesystem",
-                "ServiceName": "Amazon Elastic File System (EFS)"
-            },
-            {
-                "ServiceCode": "elasticloadbalancing",
-                "ServiceName": "Elastic Load Balancing (ELB)"
-            },
-            {
                 "ServiceCode": "firehose",
                 "ServiceName": "Amazon Kinesis Data Firehose"
-            },
-            {
-                "ServiceCode": "glue",
-                "ServiceName": "AWS Glue"
-            },
-            {
-                "ServiceCode": "iam",
-                "ServiceName": "AWS Identity and Access Management (IAM)"
-            },
-            {
-                "ServiceCode": "kinesis",
-                "ServiceName": "Amazon Kinesis Data Streams"
-            },
-            {
-                "ServiceCode": "kms",
-                "ServiceName": "AWS Key Management Service (AWS KMS)"
-            },
-            {
-                "ServiceCode": "license-manager",
-                "ServiceName": "AWS License Manager"
-            },
-            {
-                "ServiceCode": "mediaconnect",
-                "ServiceName": "AWS Elemental MediaConnect"
-            },
-            {
-                "ServiceCode": "medialive",
-                "ServiceName": "AWS Elemental MediaLive"
-            },
-            {
-                "ServiceCode": "qldb",
-                "ServiceName": "Amazon QLDB"
-            },
-            {
-                "ServiceCode": "rds",
-                "ServiceName": "Amazon Relational Database Service (Amazon RDS)"
-            },
-            {
-                "ServiceCode": "robomaker",
-                "ServiceName": "AWS RoboMaker"
-            },
-            {
-                "ServiceCode": "route53",
-                "ServiceName": "Amazon Route 53"
-            },
-            {
-                "ServiceCode": "route53resolver",
-                "ServiceName": "Route 53 Resolver"
-            },
-            {
-                "ServiceCode": "servicequotas",
-                "ServiceName": "Service Quotas"
-            },
-            {
-                "ServiceCode": "ssm",
-                "ServiceName": "AWS Systems Manager"
-            },
-            {
-                "ServiceCode": "vpc",
-                "ServiceName": "Amazon Virtual Private Cloud (Amazon VPC)"
-            },
-            {
-                "ServiceCode": "sms",
-                "ServiceName": "AWS Server Migration Service"
             }
         ],
         "ResponseMetadata": {

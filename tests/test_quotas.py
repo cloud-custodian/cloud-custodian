@@ -57,7 +57,7 @@ class TestQuotas(BaseTest):
         filters:
             - UsageMetric: present
             - type: usage-metric
-              limit: 20
+              limit: 10
         """)
         p = self.load_policy(policy, session_factory=session_factory)
         resources = p.run()

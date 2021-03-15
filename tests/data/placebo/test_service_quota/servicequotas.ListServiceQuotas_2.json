@@ -3,59 +3,41 @@
     "data": {
         "Quotas": [
             {
-                "ServiceCode": "athena",
-                "ServiceName": "Amazon Athena",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:athena/L-3CE0BBA0",
-                "QuotaCode": "L-3CE0BBA0",
-                "QuotaName": "DDL query limit",
-                "Value": 20.0,
+                "ServiceCode": "firehose",
+                "ServiceName": "Amazon Kinesis Data Firehose",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:firehose/L-14BB0BE7",
+                "QuotaCode": "L-14BB0BE7",
+                "QuotaName": "Delivery streams",
+                "Value": 50.0,
                 "Unit": "None",
                 "Adjustable": true,
-                "GlobalQuota": false
-            },
-            {
-                "ServiceCode": "athena",
-                "ServiceName": "Amazon Athena",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:athena/L-56A94400",
-                "QuotaCode": "L-56A94400",
-                "QuotaName": "DDL query timeout",
-                "Value": 600.0,
-                "Unit": "None",
-                "Adjustable": true,
-                "GlobalQuota": false
-            },
-            {
-                "ServiceCode": "athena",
-                "ServiceName": "Amazon Athena",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:athena/L-FC5F6546",
-                "QuotaCode": "L-FC5F6546",
-                "QuotaName": "DML query limit",
-                "Value": 20.0,
-                "Unit": "None",
-                "Adjustable": true,
-                "GlobalQuota": false
-            },
-            {
-                "ServiceCode": "athena",
-                "ServiceName": "Amazon Athena",
-                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:athena/L-E80DC288",
-                "QuotaCode": "L-E80DC288",
-                "QuotaName": "DML query timeout",
-                "Value": 30.0,
-                "Unit": "None",
-                "Adjustable": true,
-                "GlobalQuota": false
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "DeliveryStreams",
+                        "Service": "Firehose",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                },
+                "Period": {
+                    "PeriodValue": 300,
+                    "PeriodUnit": "SECOND"
+                }
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "5c5095d4-beaf-4f97-b373-c322ecddb00d",
+            "RequestId": "2374979e-0783-4e70-b1d6-2266c159907f",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "date": "Thu, 31 Oct 2019 17:52:33 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1021",
+                "content-length": "555",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "5c5095d4-beaf-4f97-b373-c322ecddb00d"
+                "x-amzn-requestid": "2374979e-0783-4e70-b1d6-2266c159907f"
             },
             "RetryAttempts": 0
         }
