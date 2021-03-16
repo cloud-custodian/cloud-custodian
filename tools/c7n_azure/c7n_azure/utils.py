@@ -486,32 +486,13 @@ class AppInsightsHelper:
 
 
 class ManagedGroupHelper:
-    class serialize(JSONEncoder):
-        def default(self, o):
-            return o.__dict__
 
     @staticmethod
-    def filter_subscriptions(key, dictionary):
-        for k, v in dictionary.items():
-            if k == key:
-                if v == '/subscriptions':
-                    yield dictionary
-            elif isinstance(v, dict):
-                for result in ManagedGroupHelper.filter_subscriptions(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in ManagedGroupHelper.filter_subscriptions(key, d):
-                        yield result
+    def get_subscriptions_list(managed_resource_group, session):
+        client = session.client('azure.mgmt.managementgroups.ManagementGroupsAPI')
+        result = client.management_groups.get_descendants(group_id=managed_resource_group)
 
-    @staticmethod
-    def get_subscriptions_list(managed_resource_group, credentials):
-        client = ManagementGroupsAPI(credentials)
-        groups = client.management_groups.get(
-            group_id=managed_resource_group, recurse=True,
-            expand="children").serialize()["properties"]
-        subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
-        subscriptions = [subscription['name'] for subscription in subscriptions]
+        subscriptions = [r.name for r in result if '/subscriptions' in r.type]
         return subscriptions
 
 

@@ -12,7 +12,6 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryDataset, QueryDefinition,
                                               QueryFilter, QueryGrouping,
                                               QueryTimePeriod, TimeframeType)
-from azure.mgmt.policyinsights import PolicyInsightsClient
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
@@ -484,7 +483,7 @@ class PolicyCompliantFilter(Filter):
                               d.name in self.definitions]
 
         # Find non-compliant resources
-        client = PolicyInsightsClient(s.get_credentials())
+        client = s.client('azure.mgmt.policyinsights.PolicyInsightsClient')
         query = client.policy_states.list_query_results_for_subscription(
             policy_states_resource='latest', subscription_id=s.subscription_id).value
         non_compliant = [f.resource_id.lower() for f in query
