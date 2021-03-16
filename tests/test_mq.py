@@ -162,6 +162,7 @@ class MessageQueue(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            cache=True,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -181,6 +182,7 @@ class MessageQueue(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            cache=True,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)

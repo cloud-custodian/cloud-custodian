@@ -88,13 +88,7 @@ class MQMetrics(MetricsFilter):
 @MessageBroker.filter_registry.register('vpc')
 class VpcFilter(VpcFilter):
     """Filter a resource by its VPC id. Choose to select resources that are in that VPC or select
-    resources that are not in that VPC using the 'op' field. Security group ID is used to get
-    the VPC ID of a message broker, since DescribeMessageBrokers does not return a VPC ID.
-    Since message brokers are exclusively launched in a single VPC, and their security groups
-    all belong to this VPC, only the first security group id is needed to check the VPC
-    ID of the message broker. Continue is used in the function if a client error occurs
-    when trying to get a broker's vpc -- this will skip this broker, but still attempt to grab
-    the vpc ids of the other brokers in the list.
+    resources that are not in that VPC using the 'op' field.
 
     :example:
 
@@ -103,10 +97,15 @@ class VpcFilter(VpcFilter):
             policies:
               - name: mq-vpc-filters
                 resource: message-broker
-                filters: [{'type': 'vpc', 'key': 'VpcId', 'value': 'vpc-xxxxxxxxxxx', 'op': 'eq'}]
+                filters: [
+                    {
+                        'type': 'vpc',
+                        'key': 'VpcId',
+                        'value': 'vpc-xxxxxxxxxxx',
+                        'op': 'eq'
+                    }
+                ]
     """
-
-    sg_vpc_dict = {}
 
     def get_related_ids(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -114,7 +113,7 @@ class VpcFilter(VpcFilter):
         sg_ids = set()
         for r in resources:
             sg_id = r.get('SecurityGroups', [])[0]
-            vpc_id = self.sg_vpc_dict.get(sg_id)
+            vpc_id = self.manager._cache.get(sg_id)
             if vpc_id:
                 related_ids.add(vpc_id)
                 continue
@@ -125,10 +124,10 @@ class VpcFilter(VpcFilter):
                     GroupIds=list(sg_ids),
                 )
                 for sg in response.get('SecurityGroups'):
-                    self.sg_vpc_dict[sg.get('GroupId')] = sg.get('VpcId')
+                    self.manager._cache.save(sg.get('GroupId'), sg.get('VpcId'))
                     related_ids.add(sg.get('VpcId'))
             except ClientError as e:
-                self.log.warning(e)
+                raise(e)
         return related_ids
 
     RelatedIdsExpression = ""
