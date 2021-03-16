@@ -435,7 +435,7 @@ class SnapshotSetPermissions(BaseTest):
 class SnapshotVolumeFilter(BaseTest):
 
     def test_ebs_volume_filter(self):
-        factory = self.record_flight_data("test_ebs_volume_related_filter")
+        factory = self.replay_flight_data("test_ebs_volume_related_filter")
         p = self.load_policy(
             {
                 "name": "ebs-snapshot-volume",
