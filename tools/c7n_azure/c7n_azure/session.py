@@ -25,13 +25,6 @@ from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              log_response_data)
 
-try:
-    from azure.cli.core._profile import Profile
-    from knack.util import CLIError
-except Exception:
-    Profile = None
-    CLIError = ImportError  # Assign an exception that never happens because of Auth problems
-
 from functools import lru_cache
 
 log = logging.getLogger('custodian.azure.session')
