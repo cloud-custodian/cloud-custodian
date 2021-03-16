@@ -373,7 +373,6 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     def setUpClass(cls, *args, **kwargs):
         super(BaseTest, cls).setUpClass(*args, **kwargs)
 
-
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
         super(BaseTest, cls).tearDownClass(*args, **kwargs)

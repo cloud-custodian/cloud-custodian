@@ -4,8 +4,7 @@
 from azure.mgmt.web.models import (
     Site,
     SiteConfig,
-    ManagedServiceIdentity,
-    Components1Jq1T4ISchemasManagedserviceidentityPropertiesUserassignedidentitiesAdditionalproperties as UserAssignedIdentity)
+    ManagedServiceIdentity)
 
 from c7n_azure.constants import (AUTH_TYPE_EMBED, FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
@@ -31,7 +30,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         identity = ManagedServiceIdentity(type=params['identity']['type'])
         if 'id' in params['identity']:
             identity.user_assigned_identities = {
-                params['identity']['id']: UserAssignedIdentity()}
+                params['identity']['id']: {}}
         return identity
 
     def _provision(self, params):
