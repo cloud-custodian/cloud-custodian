@@ -370,12 +370,18 @@ class SnapshotVolumeFilter(RelatedResourceFilter):
 
         policies:
           - name: snapshot-with-no-volume
+            description: Find any snapshots that do not have a corresponding volume.
             resource: aws.ebs-snapshot
             filters:
               - type: volume
                 key: VolumeId
                 value: absent
-
+          - name: find-snapshots-from-volume
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: vol-foobarbaz
     """
 
     RelatedResource = 'c7n.resources.ebs.EBS'
