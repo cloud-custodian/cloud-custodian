@@ -224,6 +224,7 @@ class Session:
                 'retry_policy': C7nRetryPolicy()
             }
 
+            # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351
             # This workaround will replace used api-version for costmanagement requests
             # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
             if client == 'azure.mgmt.costmanagement.CostManagementClient':
