@@ -655,3 +655,10 @@ def log_response_data(response):
     for k, v in http_response.headers.items():
         if k.startswith('x-ms-ratelimit'):
             send_logger.info(k + ':' + v)
+
+# This workaround will replace used api-version for costmanagement requests
+# 2020-06-01 is not supported, but 2019-11-01 is working as expected.
+def cost_query_override_api_version(request):
+    request.http_request.url = request.http_request.url.replace(
+        'query?api-version=2020-06-01',
+        'query?api-version=2019-11-01')

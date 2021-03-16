@@ -22,6 +22,7 @@ from requests import HTTPError
 from c7n_azure import constants
 from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
                              ResourceIdParser, StringUtils,
+                             cost_query_override_api_version,
                              custodian_azure_send_override,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              log_response_data)
@@ -124,7 +125,7 @@ class AzureCredential:
     #  - Azure Graph
     def legacy_credentials(self, scope):
         # Track 2 SDKs use tuple
-        token = self.get_token((scope))
+        token = self.get_token((scope + '.default'))
         return BasicTokenAuthentication(token={'access_token': token.token})
 
     @property
@@ -214,7 +215,7 @@ class Session:
         elif 'credentials' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            subscription_id=self.credentials.subscription_id,
-                           base_url=self.resource_endpoint)
+                           base_url=self.cloud_endpoints.endpoints.resource_manager)
             legacy = True
         else:
             client_args = {
@@ -222,6 +223,13 @@ class Session:
                 'raw_response_hook': log_response_data,
                 'retry_policy': C7nRetryPolicy()
             }
+
+            # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351
+            # This workaround will replace used api-version for costmanagement requests
+            # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
+            if client == 'azure.mgmt.costmanagement.CostManagementClient':
+                client_args['raw_request_hook'] = cost_query_override_api_version
+
             if 'subscription_id' in klass_parameters:
                 client_args['subscription_id'] = self.subscription_id
                 client_args['base_url'] = self.cloud_endpoints.endpoints.resource_manager
