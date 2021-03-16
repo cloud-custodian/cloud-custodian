@@ -3,10 +3,9 @@
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination
 from c7n_azure.azure_events import AzureEventSubscription
-from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 
-from ..azure_common import BaseTest, arm_template, requires_arm_polling
+from ..azure_common import BaseTest, arm_template
 
 
 class AzureEventSubscriptionsTest(BaseTest):

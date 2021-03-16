@@ -190,8 +190,8 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def _azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
-        if [(k[0].lower(), k[1].lower()) for k in set(r1.query) if k[0] != 'api-version'] != [
-            (k[0].lower(), k[1].lower()) for k in set(r2.query) if k[0] != 'api-version']:
+        if [(k[0].lower(), k[1].lower()) for k in set(r1.query) if k[0] != 'api-version'] != \
+           [(k[0].lower(), k[1].lower()) for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
@@ -372,17 +372,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super(BaseTest, cls).setUpClass(*args, **kwargs)
-        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
-            cls._token_patch = patch(
-                'c7n_azure.session.jwt.decode',
-                return_value={'tid': DEFAULT_TENANT_ID})
-            cls._token_patch.start()
+
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
         super(BaseTest, cls).tearDownClass(*args, **kwargs)
-        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
-            cls._token_patch.stop()
 
     def setUp(self):
         super(BaseTest, self).setUp()

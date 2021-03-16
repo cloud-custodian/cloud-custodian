@@ -362,9 +362,11 @@ class StorageTest(BaseTest):
 
         # assert all logging settings are enabled
         self.assertTrue(blob_settings['analytics_logging'].delete and
-                        blob_settings['analytics_logging'].read and blob_settings['analytics_logging'].write)
+                        blob_settings['analytics_logging'].read and
+                        blob_settings['analytics_logging'].write)
         self.assertTrue(queue_settings['analytics_logging'].delete and
-                        queue_settings['analytics_logging'].read and queue_settings['analytics_logging'].write)
+                        queue_settings['analytics_logging'].read and
+                        queue_settings['analytics_logging'].write)
         self.assertTrue(table_settings.logging.delete and
                         table_settings.logging.read and table_settings.logging.write)
 
@@ -412,9 +414,12 @@ class StorageTest(BaseTest):
             TABLE_TYPE, resources[0], session=session)
 
         # assert read and write logging settings are disabled
-        self.assertFalse(blob_settings['analytics_logging'].read and blob_settings['analytics_logging'].write)
-        self.assertFalse(queue_settings['analytics_logging'].read and queue_settings['analytics_logging'].write)
-        self.assertFalse(table_settings.logging.read and table_settings.logging.write)
+        self.assertFalse(blob_settings['analytics_logging'].read and
+                         blob_settings['analytics_logging'].write)
+        self.assertFalse(queue_settings['analytics_logging'].read and
+                         queue_settings['analytics_logging'].write)
+        self.assertFalse(table_settings.logging.read and
+                         table_settings.logging.write)
 
         # assert delete logging settings are enabled
         self.assertTrue(blob_settings['analytics_logging'].delete)

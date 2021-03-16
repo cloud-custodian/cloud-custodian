@@ -1,12 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
-from azure.common import AzureHttpError
 from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
-from azure.storage.common import TokenCredential
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ResourceIdParser
 from mock import patch
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from c7n.utils import local_session
@@ -128,5 +125,7 @@ class StorageUtilsTest(BaseTest):
                                                      Session(cloud_endpoints=AZURE_CHINA_CLOUD))
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "queuename")
-        self.assertTrue(CHINA_STORAGE_ENDPOINT in queue_service._get_service(queue_name).primary_endpoint)
+        self.assertIn(
+            CHINA_STORAGE_ENDPOINT,
+            queue_service._get_service(queue_name).primary_endpoint)
         self.assertTrue(mock_create.called_once())

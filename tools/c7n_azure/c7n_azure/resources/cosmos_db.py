@@ -101,7 +101,6 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
         return resource_rules
 
 
-
 @CosmosDB.filter_registry.register('firewall-bypass')
 class CosmosFirewallBypassFilter(FirewallBypassFilter):
     """

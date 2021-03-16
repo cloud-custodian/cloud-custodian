@@ -8,17 +8,12 @@ from importlib import reload
 
 import pytest
 from adal import AdalError
-from azure.common.credentials import (BasicTokenAuthentication,
-                                      ServicePrincipalCredentials)
 from azure.core.credentials import AccessToken
-from azure.identity import (AzureCliCredential, ChainedTokenCredential,
-                            ClientSecretCredential, ManagedIdentityCredential)
+from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
 from c7n_azure import constants
-from c7n_azure.session import AzureCredential, Session
-from knack.util import CLIError
+from c7n_azure.session import Session
 from mock import patch
 from msrest.exceptions import AuthenticationError
-from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
 from requests import HTTPError
 
@@ -134,9 +129,10 @@ class SessionTest(BaseTest):
             s = Session()
 
             self.assertIsInstance(s.get_credentials()._credential, ManagedIdentityCredential)
-            self.assertEqual(s.get_credentials()._credential._credential._identity_config["client_id"], 'client')
+            self.assertEqual(
+                s.get_credentials()._credential._credential._identity_config["client_id"],
+                'client')
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
-
 
     @patch('msrestazure.azure_active_directory.MSIAuthentication.__init__')
     @patch('c7n_azure.session.log.error')
@@ -296,7 +292,8 @@ class SessionTest(BaseTest):
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
 
-        file_params = Session(authorization_file=self.authorization_file_full).get_credentials().auth_params
+        session = Session(authorization_file=self.authorization_file_full)
+        file_params = session.get_credentials().auth_params
 
         self.assertTrue(env_params.pop('enable_cli_auth'))
         self.assertFalse(file_params.pop('enable_cli_auth', None))
@@ -361,7 +358,7 @@ class SessionTest(BaseTest):
     @patch('c7n_azure.utils.C7nRetryPolicy.__init__', return_value=None)
     def test_retry_policy_override(self, c7n_retry):
         s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        s.client('azure.mgmt.compute.ComputeManagementClient')
         c7n_retry.assert_called_once()
 
     @patch('c7n_azure.session.log_response_data', return_value=None)

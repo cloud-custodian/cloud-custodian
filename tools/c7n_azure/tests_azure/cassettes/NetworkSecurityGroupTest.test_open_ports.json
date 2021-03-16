@@ -45,6 +45,7 @@
                                     "provisioningState": "Succeeded",
                                     "resourceGuid": "73755b2a-d58b-47db-8deb-76ba8ddbde0f",
                                     "securityRules": [
+                                        {
                                             "name": "test4",
                                             "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg/securityRules/test4",
                                             "etag": "W/\"95ab7ee9-b501-403a-9d79-b69e24b26900\"",
@@ -252,7 +253,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg/securityRules/c7n-policy-baea42b8-85e7-11eb-b168-00155d1e47af?api-version=2020-08-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networksecuritygroup/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg/securityRules/c7n-policy-00000000-0000-0000-0000-000000000000?api-version=2020-08-01",
                 "body": "mock_body",
                 "headers": {}
             },

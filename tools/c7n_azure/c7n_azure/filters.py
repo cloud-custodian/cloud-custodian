@@ -947,7 +947,10 @@ class CostFilter(ValueFilter):
             timeframe = 'Custom'
             time_period = QueryTimePeriod(from_property=start_time, to=end_time)
 
-        definition = QueryDefinition(type='ActualCost', timeframe=timeframe, time_period=time_period, dataset=dataset)
+        definition = QueryDefinition(type='ActualCost',
+                                     timeframe=timeframe,
+                                     time_period=time_period,
+                                     dataset=dataset)
 
         subscription_id = manager.get_session().get_subscription_id()
 

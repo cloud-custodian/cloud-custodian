@@ -1,21 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
-from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
-from c7n_azure.provider import resources
-from c7n_azure.session import Session
+import logging
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
-from c7n_azure.utils import GraphHelper
-
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
+from c7n_azure.filters import FirewallBypassFilter, FirewallRulesFilter
+from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-
-import logging
-
+from c7n_azure.session import Session
+from c7n_azure.utils import GraphHelper
 from netaddr import IPSet
 
 log = logging.getLogger('custodian.azure.keyvault')

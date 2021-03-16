@@ -35,6 +35,7 @@ RESOURCE_ID_CHILD = (
 
 GUID = '00000000-0000-0000-0000-000000000000'
 
+
 def _get_descendant_info(**kwargs):
     info = DescendantInfo()
     for k, v in kwargs.items():
