@@ -477,7 +477,7 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-dns"
-version = "3.0.0"
+version = "8.0.0b1"
 description = "Microsoft Azure DNS Management Client Library for Python"
 category = "main"
 optional = false
@@ -485,8 +485,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-eventgrid"
@@ -568,7 +568,7 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-managementgroups"
-version = "0.2.0"
+version = "1.0.0b1"
 description = "Microsoft Azure Management Groups Client Library for Python"
 category = "main"
 optional = false
@@ -576,8 +576,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-monitor"
@@ -607,7 +607,7 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-policyinsights"
-version = "0.4.0"
+version = "1.0.0"
 description = "Microsoft Azure Policy Insights Client Library for Python"
 category = "main"
 optional = false
@@ -615,8 +615,8 @@ python-versions = "*"
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-rdbms"
@@ -1483,7 +1483,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "fd32297cc2fa293266d39496251c63c7fd4a2011b9bf25f393a57b2fc2fafdf3"
+content-hash = "d2766fed3bf661fca2771fa2cebcc933d4015ac6478f62c853dacb02ba473202"
 
 [metadata.files]
 adal = [
@@ -1627,8 +1627,8 @@ azure-mgmt-datalake-store = [
     {file = "azure_mgmt_datalake_store-1.0.0-py2.py3-none-any.whl", hash = "sha256:02c0ceed26f9188e588dc1d4b1191184767f48a631e43f4d38de7d114ff61034"},
 ]
 azure-mgmt-dns = [
-    {file = "azure-mgmt-dns-3.0.0.zip", hash = "sha256:6ecdf4e67d8eb5db593ec331e6d9f350616e77c31225c91d266605e03e63b37f"},
-    {file = "azure_mgmt_dns-3.0.0-py2.py3-none-any.whl", hash = "sha256:cac173375bee9c23a045340eaf456807edb7fa8f265f3e96c8acf62a7fa5ef41"},
+    {file = "azure-mgmt-dns-8.0.0b1.zip", hash = "sha256:9719649beb813feb46cb4d926444d382f23b134df7b36086d276c68ccabf6749"},
+    {file = "azure_mgmt_dns-8.0.0b1-py2.py3-none-any.whl", hash = "sha256:fc1e16f0c4844bbc16ae74940954278e3854edc8a8a1896335a9be13d934d0a8"},
 ]
 azure-mgmt-eventgrid = [
     {file = "azure-mgmt-eventgrid-8.0.0.zip", hash = "sha256:a8a6e1bb105a14f1d3545ecb07c190370f21a145f8ba51599ed169f1dc8d5dcc"},
@@ -1655,8 +1655,8 @@ azure-mgmt-logic = [
     {file = "azure_mgmt_logic-9.0.0-py2.py3-none-any.whl", hash = "sha256:abacd7b493119bb74050cbfa82f80298ead8aa4a13a3d4c92e918e88b9e23b77"},
 ]
 azure-mgmt-managementgroups = [
-    {file = "azure-mgmt-managementgroups-0.2.0.zip", hash = "sha256:3d5237947458dc94b4a392141174b1c1258d26611241ee104e9006d1d798f682"},
-    {file = "azure_mgmt_managementgroups-0.2.0-py2.py3-none-any.whl", hash = "sha256:8194ee6274df865eccd1ed9d385ea625aeba9b8058b9e4fdf547f5207271a775"},
+    {file = "azure-mgmt-managementgroups-1.0.0b1.zip", hash = "sha256:c2ce8f1b9edfb51ef9b06aae6ed97ce9a50e0a5113b712f527f0c7eb35317d21"},
+    {file = "azure_mgmt_managementgroups-1.0.0b1-py2.py3-none-any.whl", hash = "sha256:4279009126a018b75c5a23862be744ff09621ce33cf2891d8ea1ad809f55aee5"},
 ]
 azure-mgmt-monitor = [
     {file = "azure-mgmt-monitor-2.0.0.zip", hash = "sha256:e7f7943fe8f0efe98b3b1996cdec47c709765257a6e09e7940f7838a0f829e82"},
@@ -1667,8 +1667,8 @@ azure-mgmt-network = [
     {file = "azure_mgmt_network-17.1.0-py2.py3-none-any.whl", hash = "sha256:43a1896c4d674ab28c46e2261f128d3ab7a30bcb19cf806f20ff5bccf95187d9"},
 ]
 azure-mgmt-policyinsights = [
-    {file = "azure-mgmt-policyinsights-0.4.0.zip", hash = "sha256:cff0fe9e04242b5fcd9db9f31e8a7eeaa13e8681678dbe49615b82cad3cfc9ac"},
-    {file = "azure_mgmt_policyinsights-0.4.0-py2.py3-none-any.whl", hash = "sha256:cd96c59e18ba835410c0490b7ab07c71f897862c5bd2bc1dbc83e98ef7842110"},
+    {file = "azure-mgmt-policyinsights-1.0.0.zip", hash = "sha256:75103fb4541aeae30bb687dee1fedd9ca65530e6b97b2d9ea87f74816905202a"},
+    {file = "azure_mgmt_policyinsights-1.0.0-py2.py3-none-any.whl", hash = "sha256:c543e2fa23878b4c18ef0e8388de001abd6ed361b2b69669eb8bae362444037d"},
 ]
 azure-mgmt-rdbms = [
     {file = "azure-mgmt-rdbms-8.0.0.zip", hash = "sha256:8b018543048fc4fddb4155d9f22246ad0c4be2fb582a29dbb21ec4022724a119"},
