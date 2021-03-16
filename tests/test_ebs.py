@@ -443,8 +443,8 @@ class SnapshotVolumeFilter(BaseTest):
                 "filters": [
                     {
                         "type": "volume",
-                        "key": "VolumeId",
-                        "value": "vol-02dbf91b6667bcdad"
+                        "key": "AvailabilityZone",
+                        "value": "us-east-1a"
                     }
                 ]
             }, session_factory=factory
