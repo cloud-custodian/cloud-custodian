@@ -11,7 +11,7 @@ from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
 import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
-from c7n.actions import AutoTagUser, ResizeAutoscalingTarget
+from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
 
 
@@ -807,8 +807,8 @@ Service.filter_registry.register('offhour', OffHour)
 Service.filter_registry.register('onhour', OnHour)
 
 
-@Service.action_registry.register('resize')
-class ResizeECSService(ResizeAutoscalingTarget):
+@Service.action_registry.register('autoscaling')
+class AutoscalingECSService(AutoscalingBase):
     permissions = (
         'ecs:UpdateService',
         'ecs:TagResource',
