@@ -473,7 +473,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 issubclass(deserialization_callback, Model):
             deserialization_callback = deserialization_callback.deserialize
 
-        # Might raise a CloudError
+        # Might raise a AzureError
         self._polling_method.initialize(self._client, self._response, deserialization_callback)
 
         self._thread = None
