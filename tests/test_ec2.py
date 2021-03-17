@@ -1978,6 +1978,7 @@ class TestDedicatedHost(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
+
 class TestSpotFleetRequest(BaseTest):
 
     def test_spot_fleet_request_query(self):
