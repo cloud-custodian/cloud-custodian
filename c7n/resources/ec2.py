@@ -2217,7 +2217,8 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_name = 'SpotFleetRequestIds'
         filter_type = 'list'
         date = 'CreateTime'
-        cfn_type = config_type = 'AWS::EC2::SpotFleet'
+        arn_type = 'spot-fleet-request'
+        cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 
