@@ -127,6 +127,37 @@ class Firewall(QueryResourceManager):
                         'firewall': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
+@Firewall.action_registry.register('delete')
+class DeleteFirewall(MethodAction):
+    """Delete filtered Firewall Rules
+
+    :example: Delete firewall rule
+
+    .. yaml:
+
+     policies:
+       - name: delete-public-access-firewall-rules
+         resource: gcp.firewall
+         filters:
+         - type: value
+           key: sourceRanges
+           value: "0.0.0.0/0"
+           op: in
+           value_type: swap
+         actions:
+         - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile('.*?/projects/(.*?)/global/firewalls/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, resource_name = self.path_param_re.match(
+            r['selfLink']).groups()
+        return {'project': project, 'firewall': resource_name}
+
+
 @resources.register('router')
 class Router(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/routers
