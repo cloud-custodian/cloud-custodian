@@ -97,14 +97,11 @@ class VpcFilter(VpcFilter):
             policies:
               - name: mq-vpc-filters
                 resource: message-broker
-                filters: [
-                    {
-                        'type': 'vpc',
-                        'key': 'VpcId',
-                        'value': 'vpc-xxxxxxxxxxx',
-                        'op': 'eq'
-                    }
-                ]
+                filters:
+                      - type: vpc
+                        key: VpcId
+                        value: vpc-xxxxxxxxxxx
+                        op: eq
     """
 
     def get_related_ids(self, resources):
