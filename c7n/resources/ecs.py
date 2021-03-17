@@ -5,12 +5,13 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
+from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
 import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
-from c7n.actions import AutoTagUser
+from c7n.actions import AutoTagUser, ResizeAutoscalingTarget
 import c7n.filters.vpc as net_filters
 
 
@@ -801,3 +802,48 @@ TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
 Service.action_registry.register('auto-tag-user', AutoTagUser)
 Task.action_registry.register('auto-tag-user', AutoTagUser)
 ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
+
+Service.filter_registry.register('offhour', OffHour)
+Service.filter_registry.register('onhour', OnHour)
+
+
+@Service.action_registry.register('resize')
+class ResizeECSService(ResizeAutoscalingTarget):
+    permissions = (
+        'ecs:UpdateService',
+        'ecs:TagResource',
+        'ecs:UntagResource',
+    )
+
+    service_namespace = 'ecs'
+    scalable_dimension = 'ecs:service:DesiredCount'
+
+    def get_resource_id(self, resource):
+        return resource['serviceArn'].split(':')[-1]
+
+    def get_resource_tag(self, resource, key):
+        for tag in resource['Tags']:
+            if tag['Key'] == key:
+                return tag['Value']
+        return None
+
+    def get_resource_desired(self, resource):
+        return int(resource['desiredCount'])
+
+    def set_resource_tag(self, resource, key, value):
+        client = local_session(self.manager.session_factory).client('ecs')
+        client.tag_resource(
+            resourceArn=resource['serviceArn'],
+            tags=[{
+                'key': key,
+                'value': value,
+            }],
+        )
+
+    def set_resource_desired(self, resource, desired):
+        client = local_session(self.manager.session_factory).client('ecs')
+        client.update_service(
+            cluster=resource['clusterArn'],
+            service=resource['serviceName'],
+            desiredCount=desired,
+        )
