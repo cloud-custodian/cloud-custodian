@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from msrestazure.azure_exceptions import CloudError
 
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit

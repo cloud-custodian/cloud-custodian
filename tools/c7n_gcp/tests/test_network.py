@@ -1,9 +1,9 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
 
 from gcp_common import BaseTest, event_data
+from googleapiclient.errors import HttpError
 
 
 class FirewallTest(BaseTest):
@@ -18,6 +18,28 @@ class FirewallTest(BaseTest):
             'firewall_rule_id': '4746899906201084445',
             'project_id': 'cloud-custodian'})
         self.assertEqual(fw['name'], 'allow-inbound-xyz')
+
+    def test_firewall_delete(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('firewall-delete', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'fdelete',
+             'resource': 'gcp.firewall',
+             'filters': [{'name': 'test'}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        client = p.resource_manager.get_client()
+        try:
+            result = client.execute_query(
+                'get', {'project': project_id,
+                        'firewall': 'test'})
+            self.fail('found deleted firewall: %s' % result)
+        except HttpError as e:
+            self.assertTrue("was not found" in str(e))
 
 
 class SubnetTest(BaseTest):
@@ -84,7 +106,7 @@ class SubnetTest(BaseTest):
 
 class RouterTest(BaseTest):
     def test_router_query(self):
-        project_id = 'atomic-shine-231410'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('router-query', project_id=project_id)
 
         policy = {
@@ -100,7 +122,7 @@ class RouterTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'test-router')
 
     def test_router_get(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('router-get', project_id=project_id)
 
         p = self.load_policy({
@@ -119,7 +141,7 @@ class RouterTest(BaseTest):
         self.assertEqual(routers[0]['bgp']['asn'], 65001)
 
     def test_router_delete(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('router-delete', project_id=project_id)
 
         p = self.load_policy(
@@ -146,7 +168,7 @@ class RouterTest(BaseTest):
 
 class RouteTest(BaseTest):
     def test_route_query(self):
-        project_id = 'atomic-shine-231410'
+        project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('route-query', project_id=project_id)
 
         policy = {
@@ -162,7 +184,7 @@ class RouteTest(BaseTest):
         self.assertEqual(resources[0]['destRange'], '10.160.0.0/20')
 
     def test_route_get(self):
-        project_id = 'mitrop-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('route-get', project_id=project_id)
 
         p = self.load_policy({

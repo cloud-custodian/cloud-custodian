@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -38,9 +37,9 @@ from c7n.filters.core import (
 from c7n.structure import StructureParser # noqa
 
 
-def validate(data, schema=None):
+def validate(data, schema=None, resource_types=()):
     if schema is None:
-        schema = generate()
+        schema = generate(resource_types)
         JsonSchemaValidator.check_schema(schema)
 
     validator = JsonSchemaValidator(schema)
@@ -259,7 +258,7 @@ def generate(resource_types=()):
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
-                'metadata': {'$ref': '#/definitions/basic_dict'},
+                'metadata': {'type': 'object'},
                 'mode': {'$ref': '#/definitions/policy-mode'},
                 'source': {'enum': ['describe', 'config', 'inventory',
                                     'resource-graph', 'disk', 'static']},

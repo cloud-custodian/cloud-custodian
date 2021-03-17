@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "51e07389-e68f-4713-aa2e-c913565057b9",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/51e07389-e68f-4713-aa2e-c913565057b9",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 2,
+                "day": 10,
+                "hour": 3,
+                "minute": 54,
+                "second": 50,
+                "microsecond": 599000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my S3 objects when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

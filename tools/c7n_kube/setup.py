@@ -14,28 +14,29 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete (>=1.12.0,<2.0.0)',
- 'attrs (>=20.1.0,<21.0.0)',
- 'boto3 (>=1.14.54,<2.0.0)',
- 'botocore (>=1.17.54,<2.0.0)',
- 'c7n (>=0.9.5,<0.10.0)',
- 'docutils (>=0.15.2,<0.16.0)',
- 'importlib-metadata (>=1.7.0,<2.0.0)',
+['argcomplete (>=1.12.2,<2.0.0)',
+ 'attrs (>=20.3.0,<21.0.0)',
+ 'boto3 (>=1.17.10,<2.0.0)',
+ 'botocore (>=1.20.10,<2.0.0)',
+ 'c7n (>=0.9.11,<0.10.0)',
+ 'importlib-metadata (>=3.4.0,<4.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
+ 'jsonpickle (>=1.3,<2.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
  'kubernetes>=10.0.1,<11.0.0',
- 'pyrsistent (>=0.16.0,<0.17.0)',
+ 'pyrsistent (>=0.17.3,<0.18.0)',
  'python-dateutil (>=2.8.1,<3.0.0)',
- 'pyyaml (>=5.3.1,<6.0.0)',
- 's3transfer (>=0.3.3,<0.4.0)',
+ 'pyyaml (>=5.4.1,<6.0.0)',
+ 's3transfer (>=0.3.4,<0.4.0)',
  'six (>=1.15.0,<2.0.0)',
- 'tabulate (>=0.8.7,<0.9.0)',
- 'urllib3 (>=1.25.10,<2.0.0)',
- 'zipp (>=3.1.0,<4.0.0)']
+ 'tabulate (>=0.8.8,<0.9.0)',
+ 'typing-extensions (>=3.7.4.3,<4.0.0.0)',
+ 'urllib3 (>=1.26.3,<2.0.0)',
+ 'zipp (>=3.4.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.5',
+    'version': '0.2.10',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'long_description': '# Custodian Kubernetes Support\n\n\nWork in Progress - Not Ready For Use.\n\n',
     'long_description_content_type': 'text/markdown',

@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import collections
@@ -7,6 +6,7 @@ import enum
 import hashlib
 import itertools
 import logging
+import random
 import re
 import time
 import uuid
@@ -18,19 +18,16 @@ from azure.keyvault import KeyVaultClient, KeyVaultId
 from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
-from c7n_azure.constants import RESOURCE_VAULT
 from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from netaddr import IPNetwork, IPRange, IPSet
 from json import JSONEncoder
 
 from c7n.utils import chunks, local_session
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
@@ -141,13 +138,17 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
                 send_logger.debug(k + ':' + v)
 
         # Retry codes from urllib3/util/retry.py
-        if response.status_code in [413, 429, 503]:
+        if response.status_code in [429, 503]:
             retry_after = None
             for k in response.headers.keys():
                 if StringUtils.equal('retry-after', k):
                     retry_after = int(response.headers[k])
-
-            if retry_after is not None and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+            if retry_after is None:
+                # we want to attempt retries even when azure fails to send a header
+                # this has been a constant source of instability in larger environments
+                retry_after = (constants.DEFAULT_RETRY_AFTER * retries) + \
+                    random.randint(1, constants.DEFAULT_RETRY_AFTER)
+            if retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
                 send_logger.warning('Received retriable error code %i. Retry-After: %i'
                                     % (response.status_code, retry_after))
                 time.sleep(retry_after)
@@ -379,7 +380,14 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
-    def build_ports_dict(nsg, direction_key, ip_protocol):
+    def check_address(target_address, address_set, address):
+        if not target_address:
+            return True
+        return target_address in address_set or target_address == address
+
+    @staticmethod
+    def build_ports_dict(nsg, direction_key, ip_protocol,
+                         source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
             based on the provided Network Security Group object, direction and protocol.
         """
@@ -398,6 +406,18 @@ class PortsRangeHelper:
             if not StringUtils.equal(protocol, "*") and \
                not StringUtils.equal(ip_protocol, "*") and \
                not StringUtils.equal(protocol, ip_protocol):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    source_address,
+                    rule['properties'].get('sourceAddressPrefixes'),
+                    rule['properties'].get('sourceAddressPrefix')):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    destination_address,
+                    rule['properties'].get('destinationAddressPrefixes'),
+                    rule['properties'].get('destinationAddressPrefix')):
                 continue
 
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')
@@ -546,18 +566,19 @@ class RetentionPeriod:
 
 
 @lru_cache()
-def get_keyvault_secret(user_identity_id, keyvault_secret_id):
+def get_keyvault_secret(user_identity_id, keyvault_secret_id, cloud_endpoints=AZURE_PUBLIC_CLOUD):
     secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
     access_token = None
 
+    resource = get_keyvault_auth_endpoint(cloud_endpoints)
     # Use UAI if client_id is provided
     if user_identity_id:
         msi = MSIAuthentication(
             client_id=user_identity_id,
-            resource=RESOURCE_VAULT)
+            resource=resource)
     else:
         msi = MSIAuthentication(
-            resource=RESOURCE_VAULT)
+            resource=resource)
 
     access_token = AccessToken(token=msi.token['access_token'])
     credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
@@ -601,3 +622,7 @@ def resolve_service_tag_alias(rule):
         resource_name = p[1] if 1 < len(p) else None
         resource_region = p[2] if 2 < len(p) else None
         return IPSet(get_service_tag_ip_space(resource_name, resource_region))
+
+
+def get_keyvault_auth_endpoint(cloud_endpoints):
+    return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])

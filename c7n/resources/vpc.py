@@ -1,10 +1,10 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
 import operator
 import zlib
 import jmespath
+import re
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -12,7 +12,7 @@ from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
-from c7n.filters.related import RelatedResourceFilter
+from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
@@ -448,6 +448,34 @@ class VpcPostFinding(PostFinding):
         return envelope
 
 
+class DescribeSubnets(query.DescribeSource):
+
+    def get_resources(self, resource_ids):
+        while resource_ids:
+            try:
+                return super().get_resources(resource_ids)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidSubnetID.NotFound':
+                    raise
+                sid = extract_subnet_id(e)
+                if sid:
+                    resource_ids.remove(sid)
+                else:
+                    return []
+
+
+RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
+
+
+def extract_subnet_id(state_error):
+    "Extract an subnet id from an error"
+    subnet_id = None
+    match = RE_ERROR_SUBNET_ID.search(str(state_error))
+    if match:
+        subnet_id = match.groupdict().get('subnet_id')
+    return subnet_id
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
@@ -460,6 +488,10 @@ class Subnet(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
+
+    source_mapping = {
+        'describe': DescribeSubnets,
+        'config': query.ConfigSource}
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
@@ -1956,6 +1988,12 @@ class AclAwsS3Cidrs(Filter):
         return results
 
 
+class DescribeElasticIp(query.DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if self.manager.resource_type.id in r]
+
+
 @resources.register('elastic-ip', aliases=('network-addr',))
 class NetworkAddress(query.QueryResourceManager):
 
@@ -1968,6 +2006,11 @@ class NetworkAddress(query.QueryResourceManager):
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
+
+    source_mapping = {
+        'describe': DescribeElasticIp,
+        'config': query.ConfigSource
+    }
 
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
@@ -2192,6 +2235,57 @@ class EndpointVpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
+@Vpc.filter_registry.register("vpc-endpoint")
+class VPCEndpointFilter(RelatedResourceByIdFilter):
+    """Filters vpcs based on their vpc-endpoints
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-vpc-endpoint-enabled
+                resource: vpc
+                filters:
+                  - type: vpc-endpoint
+                    key: ServiceName
+                    value: com.amazonaws.us-east-1.s3
+    """
+    RelatedResource = "c7n.resources.vpc.VpcEndpoint"
+    RelatedIdsExpression = "VpcId"
+    AnnotationKey = "matched-vpc-endpoint"
+
+    schema = type_schema(
+        'vpc-endpoint',
+        rinherit=ValueFilter.schema)
+
+
+@Subnet.filter_registry.register("vpc-endpoint")
+class SubnetEndpointFilter(RelatedResourceByIdFilter):
+    """Filters subnets based on their vpc-endpoints
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: athena-endpoint-enabled
+                resource: subnet
+                filters:
+                  - type: vpc-endpoint
+                    key: ServiceName
+                    value: com.amazonaws.us-east-1.athena
+    """
+    RelatedResource = "c7n.resources.vpc.VpcEndpoint"
+    RelatedIdsExpression = "SubnetId"
+    RelatedResourceByIdExpression = "SubnetIds"
+    AnnotationKey = "matched-vpc-endpoint"
+
+    schema = type_schema(
+        'vpc-endpoint',
+        rinherit=ValueFilter.schema)
+
+
 @resources.register('key-pair')
 class KeyPair(query.QueryResourceManager):
 
@@ -2199,7 +2293,8 @@ class KeyPair(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
-        name = id = 'KeyName'
+        name = 'KeyName'
+        id = 'KeyPairId'
         filter_name = 'KeyNames'
 
 

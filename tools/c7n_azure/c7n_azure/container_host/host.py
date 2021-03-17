@@ -1,4 +1,3 @@
-# Copyright 2019 Microsoft Corporation
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -88,6 +87,7 @@ class Host:
         # Configure scheduler
         self.scheduler = BlockingScheduler(Host.get_scheduler_config())
         logging.getLogger('apscheduler.executors.default').setLevel(logging.ERROR)
+        logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
         # Schedule recurring policy updates
         self.scheduler.add_job(self.update_policies,
@@ -251,7 +251,10 @@ class Host:
                 return path
 
         try:
-            removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
+            # Some policies might have bad format, so they have never been loaded
+            removed = [policies.pop(p['name'])
+                       for p in policy_config.get('policies', [])
+                       if p['name'] in policies]
             log.info('Removing policies %s' % removed)
 
             # update periodic
@@ -365,7 +368,7 @@ class Host:
             if not events:
                 continue
             events = AzureEvents.get_event_operations(events)
-            if operation_name in events:
+            if operation_name.upper() in (event.upper() for event in events):
                 self.scheduler.add_job(Host.run_policy,
                                        id=k + event['id'],
                                        name=k,
@@ -420,12 +423,17 @@ class Host:
 
     @staticmethod
     def get_scheduler_config():
+        if os.name == 'nt':
+            executor = "apscheduler.executors.pool:ThreadPoolExecutor"
+        else:
+            executor = "apscheduler.executors.pool:ProcessPoolExecutor"
+
         return {
             'apscheduler.jobstores.default': {
                 'type': 'memory'
             },
             'apscheduler.executors.default': {
-                'class': 'apscheduler.executors.pool:ProcessPoolExecutor',
+                'class': executor,
                 'max_workers': '4'
             },
             'apscheduler.executors.threadpool': {

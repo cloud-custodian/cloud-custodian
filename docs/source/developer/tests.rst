@@ -55,6 +55,7 @@ the pytest-terraform library.
 
   - `Pytest Terraform <https://github.com/cloud-custodian/pytest-terraform>`_ a Pytest Plugin leveraging terraform to setup test environments
 
+.. _Creating Tests:
 
 Creating Cloud Resources with Terraform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,8 +74,8 @@ shell's PATH.
 In addition to a working terraform installation, credentials and configuration for the target cloud will need to be completed.
 `Getting started with Terraform <https://learn.hashicorp.com/terraform>`_
 
-Pytest Terraform looks for matching modules in the ```tests/terraform`` directory.
-So for a test named ```test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
+Pytest Terraform looks for matching modules in the ``tests/terraform`` directory.
+So for a test named ``test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
 
 Here's an example terraform file for the upcoming example.
 It is placed in ``tests/terraform/file_example/main.tf``.
@@ -153,7 +154,7 @@ Recording Custodian Interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Cloud Custodian tests provide a pytest fixture, ``test``, that provides access to
-common unitest methods (such as ``assertEqual``) as well as the placebo based test methods.
+common unittest methods (such as ``assertEqual``) as well as the placebo based test methods.
 In order to write a placebo enabled test two helper methods are provided:
 
   - ``record_flight_data`` - use this when creating the test
@@ -303,6 +304,7 @@ The following test uses the above `sqs_delete` terraform module:
         # Attempt to delete the queue and expect AWS API to produce an error
         pytest.raises(ClientError, client.purge_queue, QueueUrl=queue_url)
 
+.. _Converting Tests:
 
 Converting older functional tests
 ---------------------------------

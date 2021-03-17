@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
@@ -190,7 +189,7 @@ class ComputePermissions(CheckPermissions):
                 [p[0] for p in profile_arns],
                 self.manager.get_resource_manager(
                     'iam-profile').get_resources(
-                        [p[1] for p in profile_arns]))}
+                        [p[0].split('/', 1)[-1] for p in profile_arns]))}
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
@@ -1060,7 +1059,7 @@ class SetMetadataServerAccess(BaseAction):
          - name: ec2-require-imdsv2
            resource: ec2
            filters:
-             - MetadataOptions.HttpsToken: optional
+             - MetadataOptions.HttpToken: optional
            actions:
              - type: set-metadata-access
                tokens: required
@@ -1149,7 +1148,8 @@ class InstanceFinding(PostFinding):
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
             details["SubnetId"] = r["SubnetId"]
-        if "IamInstanceProfile" in r:
+        # config will use an empty key
+        if "IamInstanceProfile" in r and r['IamInstanceProfile']:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {
@@ -2182,3 +2182,20 @@ class ReservedInstance(query.QueryResourceManager):
         filter_name = 'ReservedInstancesIds'
         filter_type = 'list'
         arn_type = "reserved-instances"
+
+
+@resources.register('ec2-host')
+class DedicatedHost(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Dedicated Hosts.
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        name = id = 'HostId'
+        enum_spec = ('describe_hosts', 'Hosts', None)
+        arn_type = "dedicated-host"
+        filter_name = 'HostIds'
+        filter_type = 'list'
+        date = 'AllocationTime'
+        cfn_type = config_type = 'AWS::EC2::Host'
+        permissions_enum = ('ec2:DescribeHosts',)

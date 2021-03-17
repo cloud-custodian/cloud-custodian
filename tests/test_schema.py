@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import mock
@@ -298,7 +297,17 @@ class SchemaTest(BaseTest):
 
     def test_metadata(self):
         data = {
-            "policies": [{"name": "test", "resource": "ec2", "metadata": {"createdBy": "Totoro"}}],
+            "policies": [
+                {
+                    "name": "object_test",
+                    "resource": "ec2",
+                    "metadata": {
+                        "createdBy": "Totoro",
+                        "version": 1988,
+                        "relatedTo": ['Ghibli', 'Classic', 'Miyazaki']
+                    }
+                }
+            ],
         }
         load_resources(('aws.ec2',))
         validator = self.get_validator(data)

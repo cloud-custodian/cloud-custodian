@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter
@@ -17,6 +16,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
     ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -361,6 +361,37 @@ class SnapshotSkipAmiSnapshots(Filter):
         return resources
 
 
+@Snapshot.filter_registry.register('volume')
+class SnapshotVolumeFilter(RelatedResourceFilter):
+    """
+    Filter EBS snapshots by their volume attributes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: snapshot-with-no-volume
+            description: Find any snapshots that do not have a corresponding volume.
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: absent
+          - name: find-snapshots-from-volume
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: vol-foobarbaz
+    """
+
+    RelatedResource = 'c7n.resources.ebs.EBS'
+    RelatedIdsExpression = 'VolumeId'
+    AnnotationKey = 'Volume'
+
+    schema = type_schema(
+        'volume', rinherit=ValueFilter.schema)
+
+
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
     """Deletes EBS snapshots
@@ -512,6 +543,95 @@ class CopySnapshot(BaseAction):
             waiter.wait(SnapshotIds=copy_ids)
             self.log.debug(
                 "Cross region copy complete %s", ",".join(copy_ids))
+
+
+@Snapshot.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Action to set permissions for creating volumes from a snapshot
+
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove respectively.  The default is to remove any create
+    volume permissions granted to other AWS accounts.
+
+    Combining this action with the 'cross-account' filter allows you
+    greater control over which accounts will be removed, e.g. using a
+    whitelist:
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ebs-dont-share-cross-account
+                resource: ebs-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist:
+                    - '112233445566'
+                actions:
+                  - type: set-permissions
+                    remove: matched
+    """
+    schema = type_schema(
+        'set-permissions',
+        remove={
+            'oneOf': [
+                {'enum': ['matched']},
+                {'type': 'array', 'items': {
+                    'type': 'string', 'minLength': 12, 'maxLength': 12}},
+            ]},
+        add={
+            'type': 'array', 'items': {
+                'type': 'string', 'minLength': 12, 'maxLength': 12}},
+    )
+
+    permissions = ('ec2:ModifySnapshotAttribute',)
+
+    def validate(self):
+        if self.data.get('remove') == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, SnapshotCrossAccountAccess):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
+
+    def process(self, snapshots):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in snapshots:
+            self.process_image(client, i)
+
+    def process_image(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+        if not add_accounts and not remove_accounts:
+            return client.reset_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'], Attribute="createVolumePermission")
+        if remove_accounts == 'matched':
+            remove_accounts = snapshot.get(
+                'c7n:' + SnapshotCrossAccountAccess.annotation_key)
+
+        remove = []
+        remove.extend([{'UserId': a} for a in remove_accounts if a != 'all'])
+        if 'all' in remove_accounts:
+            remove.append({'Group': 'all'})
+            remove_accounts.remove('all')
+
+        add = [{'UserId': a} for a in add_accounts]
+
+        if remove:
+            client.modify_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'],
+                CreateVolumePermission={'Remove': remove},
+                OperationType='remove')
+        if add:
+            client.modify_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'],
+                CreateVolumePermission={'Add': add},
+                OperationType='add')
 
 
 @resources.register('ebs')

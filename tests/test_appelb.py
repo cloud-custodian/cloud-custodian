@@ -1,11 +1,17 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.resources.appelb import AppELB, AppELBTargetGroup
+from c7n.resources.appelb import AppELB, AppELBTargetGroup, serialize_attribute_value
+
+
+def test_serialize():
+    assert serialize_attribute_value(True) == 'true'
+    assert serialize_attribute_value(False) == 'false'
+    assert serialize_attribute_value(60) == '60'
+    assert serialize_attribute_value('abc') == 'abc'
 
 
 class AppELBTest(BaseTest):
@@ -42,16 +48,14 @@ class AppELBTest(BaseTest):
         source = p.resource_manager.get_source("config")
         resource = source.load_resource(event)
         self.maxDiff = None
-        self.assertEqual(
-            resource["Tags"],
-            [
-                {"Key": "App", "Value": "ARTIFACTPLATFORM"},
-                {"Key": "OwnerContact", "Value": "me@example.com"},
-                {"Key": "TeamName", "Value": "Frogger"},
-                {"Key": "Env", "Value": "QA"},
-                {"Key": "Name", "Value": "Artifact ELB"},
-            ],
-        )
+
+        assert resource["Tags"] == [
+            {"Key": "App", "Value": "ARTIFACTPLATFORM"},
+            {"Key": "Env", "Value": "QA"},
+            {"Key": "Name", "Value": "Artifactory ELB"},
+            {"Key": "OwnerContact", "Value": "me@example.com"},
+            {"Key": "TeamName", "Value": "Frogger"},
+        ]
 
     def test_appelb_simple(self):
         self.patch(AppELB, "executor_factory", MainThreadExecutor)
@@ -365,6 +369,40 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_appelb_modify_attributes(self):
+        session_factory = self.replay_flight_data(
+            "test_appelb_modify_attributes")
+        client = session_factory().client("elbv2")
+        p = self.load_policy(
+            {
+                "name": "appelb-enable-deletion-protection",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "deletion_protection.enabled",
+                        "value": False,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "modify-attributes",
+                        "attributes": {
+                            "deletion_protection.enabled": "true",
+                        },
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]["LoadBalancerArn"]
+        attrs = client.describe_load_balancer_attributes(
+            LoadBalancerArn=arn)["Attributes"]
+        attrs = {obj['Key']: obj['Value'] for obj in attrs}
+        assert attrs['deletion_protection.enabled'] == 'true'
 
     def test_appelb_waf_any(self):
         factory = self.replay_flight_data("test_appelb_waf")

@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
@@ -11,9 +10,13 @@ import yaml
 
 import jinja2
 import jmespath
-from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
+
+try:
+    from botocore.exceptions import ClientError
+except ImportError:  # pragma: no cover
+    pass  # Azure provider
 
 
 class Providers:

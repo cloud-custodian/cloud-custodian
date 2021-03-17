@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
@@ -113,8 +112,8 @@ class MetricFilter(Filter):
         'average': Math.mean,
         'total': Math.sum,
         'count': Math.sum,
-        'minimum': Math.max,
-        'maximum': Math.min
+        'minimum': Math.min,
+        'maximum': Math.max
     }
 
     schema = {
@@ -130,7 +129,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
-            'no_data_action': {'enum': ['include', 'exclude']},
+            'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'}
         }
     }
@@ -197,6 +196,12 @@ class MetricFilter(Filter):
                 for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
+        if self.no_data_action == "to_zero":
+            if m is None:
+                m = [0]
+            else:
+                m = [0 if v is None else v for v in m]
 
         self._write_metric_to_resource(resource, metrics_data, m)
 
@@ -421,7 +426,9 @@ class DiagnosticSettingsFilter(ValueFilter):
         for resource in resources:
             settings = client.diagnostic_settings.list(resource['id'])
             settings = [s.as_dict() for s in settings.value]
-
+            # put an empty item in when no diag settings, so the absent operator can function
+            if not settings:
+                settings = [{}]
             filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
             if filtered_settings:

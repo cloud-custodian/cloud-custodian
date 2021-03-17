@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
@@ -9,8 +8,10 @@ from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
+import c7n.filters.vpc as net_filters
 
 
 def ecs_tag_normalize(resources):
@@ -47,6 +48,7 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
+        arn_type = 'cluster'
         cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
@@ -235,6 +237,25 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """
 
 
+@Service.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'networkConfiguration.awsvpcConfiguration.subnets[]')
+
+    def get_related_ids(self, resources):
+        subnet_ids = set()
+        for exp in self.expressions:
+            cexp = jmespath.compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
+                if ids:
+                    subnet_ids.update(ids)
+        return list(subnet_ids)
+
+
 @Service.action_registry.register('modify')
 class UpdateService(BaseAction):
     """Action to update service
@@ -397,6 +418,12 @@ class Task(query.ChildResourceManager):
         return super(Task, self).get_resources(ids, cache, augment=False)
 
 
+@Task.filter_registry.register('subnet')
+class TaskSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "attachments[].details[?name == 'subnetId'].value[]"
+
+
 @Task.filter_registry.register('task-definition')
 class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """Filter tasks by their task definition.
@@ -457,6 +484,7 @@ class TaskDefinition(query.QueryResourceManager):
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
         cfn_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
 
     def get_resources(self, ids, cache=True):
         if cache:

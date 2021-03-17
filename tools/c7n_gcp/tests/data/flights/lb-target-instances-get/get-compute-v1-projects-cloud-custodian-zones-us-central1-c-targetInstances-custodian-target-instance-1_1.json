@@ -1,0 +1,31 @@
+{
+  "body": {
+    "kind": "compute#targetInstance", 
+    "description": "", 
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
+    "natPolicy": "NO_NAT", 
+    "instance": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-group-5-0nrj", 
+    "creationTimestamp": "2019-04-30T07:06:51.669-07:00", 
+    "id": "4583563657092655252", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/targetInstances/custodian-target-instance-1", 
+    "name": "custodian-target-instance-1"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "603", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 16:16:50 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 16:16:50 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/targetInstances/custodian-target-instance-1?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"eTCqFyHokdDv6vVJKzX-GuwbgOA=/OPHfol5yKtqbqKMO49mqjM1AL9I=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

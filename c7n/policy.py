@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
@@ -37,14 +36,15 @@ def load(options, path, format=None, validate=True, vars=None):
 
     structure = StructureParser()
     structure.validate(data)
-    load_resources(structure.get_resource_types(data))
+    rtypes = structure.get_resource_types(data)
+    load_resources(rtypes)
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
         return None
 
     if validate:
-        errors = validate(data)
+        errors = validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
@@ -764,11 +764,19 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
         return utils.local_session(
             self.policy.session_factory).client('config')
 
+    def put_evaluations(self, client, token, evaluations):
+        for eval_set in utils.chunks(evaluations, 100):
+            self.policy.resource_manager.retry(
+                client.put_evaluations,
+                Evaluations=eval_set,
+                ResultToken=token)
+
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
         resource_id = self.policy.resource_manager.resource_type.id
         client = self._get_client()
+        token = event.get('resultToken')
 
         matched_resources = set()
         for r in PullMode.run(self):
@@ -787,11 +795,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             Annotation='The resource is not compliant with policy:%s.' % (
                 self.policy.name))
             for r in matched_resources]
-        if evaluations:
-            self.policy.resource_manager.retry(
-                client.put_evaluations,
-                Evaluations=evaluations,
-                ResultToken=event.get('resultToken', 'No token found.'))
+        if evaluations and token:
+            self.put_evaluations(client, token, evaluations)
 
         evaluations = [dict(
             ComplianceResourceType=resource_type,
@@ -801,11 +806,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             Annotation='The resource is compliant with policy:%s.' % (
                 self.policy.name))
             for r in unmatched_resources]
-        if evaluations:
-            self.policy.resource_manager.retry(
-                client.put_evaluations,
-                Evaluations=evaluations,
-                ResultToken=event.get('resultToken', 'No token found.'))
+        if evaluations and token:
+            self.put_evaluations(client, token, evaluations)
         return list(matched_resources)
 
 
@@ -842,7 +844,7 @@ class ConfigRuleMode(LambdaMode):
         resources = []
 
         # TODO config resource type matches policy check
-        if event['eventLeftScope'] or cfg_item['configurationItemStatus'] in (
+        if event.get('eventLeftScope') or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
                 "ResourceNotRecorded",
                 "ResourceDeletedNotRecorded"):
@@ -927,10 +929,13 @@ class PolicyConditions:
         self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
+        self.initialized = False
 
     def validate(self):
-        self.filters.extend(self.convert_deprecated())
-        self.filters = self.filter_registry.parse(self.filters, self)
+        if not self.initialized:
+            self.filters.extend(self.convert_deprecated())
+            self.filters = self.filter_registry.parse(self.filters, self)
+            self.initialized = True
 
     def evaluate(self, event=None):
         policy_vars = dict(self.env_vars)

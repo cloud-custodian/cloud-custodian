@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
@@ -70,7 +69,7 @@ class DescribeKey(DescribeSource):
                 r.update(info)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
+                    self.manager.log.warning(
                         "Access denied when describing key:%s",
                         key_id)
                 else:
@@ -86,6 +85,7 @@ class Key(QueryResourceManager):
         service = 'kms'
         arn_type = "key"
         enum_spec = ('list_keys', 'Keys', None)
+        detail_spec = ('describe_key', 'KeyId', 'Arn', 'KeyMetadata')  # overriden
         name = id = "KeyId"
         arn = 'Arn'
         universal_taggable = True

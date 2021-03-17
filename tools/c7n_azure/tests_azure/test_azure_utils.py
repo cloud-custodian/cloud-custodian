@@ -1,7 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import sys
+import time
 import types
 
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
@@ -9,11 +9,12 @@ from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math, PortsRangeHelper,
                              ResourceIdParser, StringUtils, custodian_azure_send_override,
                              get_keyvault_secret, get_service_tag_ip_space, is_resource_group_id,
-                             is_resource_group)
+                             is_resource_group, get_keyvault_auth_endpoint)
 from mock import patch, Mock
 
 from c7n.config import Bag
 import pytest
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 try:
     from importlib import reload
@@ -239,6 +240,25 @@ class UtilsTest(BaseTest):
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
 
+    @patch('c7n_azure.utils.send_logger.debug')
+    @patch('c7n_azure.utils.send_logger.warning')
+    def test_custodian_azure_send_override_429_missingheader(self, logger_debug, logger_warning):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
+
+        response_dict = {
+            'headers': {},
+            'status_code': 429
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+
+        with patch('time.sleep', new_callable=time.sleep(0)):
+            mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 3)
+        self.assertEqual(logger_debug.call_count, 3)
+        self.assertEqual(logger_warning.call_count, 3)
+
     managed_group_return_value = Bag({
         'properties': {
             'name': 'dev',
@@ -275,7 +295,25 @@ class UtilsTest(BaseTest):
             reload(sys.modules['c7n_azure.utils'])
 
             result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412')
-            self.assertEqual(result, mock.value)
+            self.assertEqual(mock.value, result)
+            resource_auth = _1.call_args.kwargs.get('resource')
+            self.assertEqual('https://vault.azure.net', resource_auth)
+
+    @patch('msrestazure.azure_active_directory.MSIAuthentication')
+    def test_get_keyvault_secret_with_parameter(self, _1):
+        mock = Mock()
+        mock.value = '{"client_id": "client", "client_secret": "secret"}'
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   return_value=None), \
+                patch('azure.keyvault.v7_0.KeyVaultClient.get_secret', return_value=mock):
+
+            reload(sys.modules['c7n_azure.utils'])
+
+            result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412',
+                                         cloud_endpoints=AZURE_CHINA_CLOUD)
+            self.assertEqual(mock.value, result)
+            resource_auth = _1.call_args.kwargs.get('resource')
+            self.assertEqual('https://vault.azure.cn', resource_auth)
 
     # Test relies on substitute data in Azure Common, not designed for live data
     @pytest.mark.skiplive
@@ -315,3 +353,11 @@ class UtilsTest(BaseTest):
     def test_is_resource_group(self):
         self.assertTrue(is_resource_group({'type': 'resourceGroups'}))
         self.assertFalse(is_resource_group({'type': 'virtualMachines'}))
+
+    def test_get_keyvault_auth_public(self):
+        auth = get_keyvault_auth_endpoint(AZURE_PUBLIC_CLOUD)
+        self.assertEqual('https://vault.azure.net', auth)
+
+    def test_get_keyvault_auth_china(self):
+        auth = get_keyvault_auth_endpoint(AZURE_CHINA_CLOUD)
+        self.assertEqual('https://vault.azure.cn', auth)

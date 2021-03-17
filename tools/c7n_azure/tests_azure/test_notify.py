@@ -1,6 +1,6 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import pytest
 from azure.common import AzureHttpError
 from .azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
@@ -35,6 +35,7 @@ class NotifyTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('keyvault.json')
+    @pytest.mark.skiplive
     def test_notify_though_storage_queue(self):
         account = self.setup_account()
 

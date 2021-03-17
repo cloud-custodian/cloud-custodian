@@ -1,8 +1,7 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 from c7n.resources.aws import shape_validate
 
@@ -91,6 +90,17 @@ class CodeCommit(BaseTest):
 
 class CodeBuild(BaseTest):
 
+    def test_config_source(self):
+        factory = self.replay_flight_data('test_codebuild_config')
+        config_resources = self.load_policy({
+            'name': 'builders', 'resource': 'aws.codebuild', 'source': 'config'},
+            session_factory=factory).run()
+        resources = self.load_policy({
+            'name': 'dbuilders', 'resource': 'aws.codebuild'},
+            session_factory=factory).run()
+        assert set(config_resources[0].keys()) == (
+            set(resources[0].keys()).difference(('created', 'lastModified', 'badge')))
+
     def test_query_builds(self):
         factory = self.replay_flight_data("test_codebuild")
         p = self.load_policy(
@@ -165,6 +175,20 @@ class CodeBuild(BaseTest):
 
 
 class CodePipeline(BaseTest):
+
+    def test_config_pipeline(self):
+        p = self.load_policy({
+            'name': 'config-pipe',
+            'resource': 'aws.codepipeline',
+            'source': 'config',
+        })
+        source = p.resource_manager.get_source('config')
+        item = event_data('pipeline.json', 'config')
+        resource = source.load_resource(item)
+        assert resource['name'] == 'burnifyPipeline'
+        assert resource['artifactStore'] == {
+            'type': 'S3', 'location': 'mypipe-artifactbucketstore-4ebot00zlvbv'}
+        assert len(resource['stages']) == 4
 
     def test_query_pipeline(self):
         factory = self.replay_flight_data("test_codepipeline")

@@ -1,10 +1,6 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
-import os
-import sys
-
 import pytest
 
 from c7n.config import Config
@@ -80,19 +76,6 @@ def get_doc_policies(resources):
     return policies
 
 
-skip_condition = not (
-    # Okay slightly gross, basically if we're explicitly told via
-    # env var to run doc tests do it.
-    (os.environ.get("C7N_TEST_DOC") in ('yes', 'true') or
-     # Or for ci to avoid some tox pain, we'll auto configure here
-     # to run on the py3.6 test runner, as its the only one
-     # without additional responsibilities.
-     (os.environ.get('C7N_TEST_RUN') and
-      sys.version_info.major == 3 and
-      sys.version_info.minor == 6)))
-
-
-@pytest.mark.skipif(skip_condition, reason="Doc tests must be explicitly enabled with C7N_DOC_TEST")
 @pytest.mark.parametrize("provider_name", ('aws', 'azure', 'gcp', 'k8s'))
 def test_doc_examples(provider_name):
     load_resources()

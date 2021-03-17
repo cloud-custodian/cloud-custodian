@@ -1,4 +1,3 @@
-# Copyright 2019 Karol Lassak
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -112,7 +111,7 @@ class SetLabelsAction(BaseLabelAction):
             raise FilterValidationError("Must specify one of labels or remove")
 
     def get_labels_to_add(self, resource):
-        return {k: Lookup.extract(v, resource) for k, v in self.data.get('labels').items()}
+        return {k: Lookup.extract(v, resource) for k, v in self.data.get('labels', {}).items()}
 
     def get_labels_to_delete(self, resource):
         return self.data.get('remove')

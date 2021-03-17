@@ -1,4 +1,3 @@
-# Copyright 2015-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
@@ -8,7 +7,7 @@ from concurrent.futures import as_completed
 import jmespath
 
 from c7n.actions import BaseAction
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.filters import (
     AgeFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
@@ -152,8 +151,25 @@ class RemoveLaunchPermissions(BaseAction):
 
     """
 
-    schema = type_schema('remove-launch-permissions')
-    permissions = ('ec2:ResetImageAttribute',)
+    schema = type_schema(
+        'remove-launch-permissions',
+        accounts={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'string', 'minLength': 12, 'maxLength': 12}]})
+
+    permissions = ('ec2:ResetImageAttribute', 'ec2:ModifyImageAttribute',)
+
+    def validate(self):
+        if 'accounts' in self.data and self.data['accounts'] == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, AmiCrossAccountFilter):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -161,8 +177,25 @@ class RemoveLaunchPermissions(BaseAction):
             self.process_image(client, i)
 
     def process_image(self, client, image):
-        client.reset_image_attribute(
-            ImageId=image['ImageId'], Attribute="launchPermission")
+        accounts = self.data.get('accounts')
+        if not accounts:
+            return client.reset_image_attribute(
+                ImageId=image['ImageId'], Attribute="launchPermission")
+        if accounts == 'matched':
+            accounts = image.get(AmiCrossAccountFilter.annotation_key)
+        if not accounts:
+            return
+        remove = []
+        if 'all' in accounts:
+            remove.append({'Group': 'all'})
+            accounts.remove('all')
+        remove.extend([{'UserId': a} for a in accounts])
+        if not remove:
+            return
+        client.modify_image_attribute(
+            ImageId=image['ImageId'],
+            LaunchPermission={'Remove': remove},
+            OperationType='remove')
 
 
 @AMI.action_registry.register('copy')
@@ -308,6 +341,7 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     permissions = ('ec2:DescribeImageAttribute',)
+    annotation_key = 'c7n:CrossAccountViolations'
 
     def process_resource_set(self, client, accounts, resource_set):
         results = []
@@ -316,10 +350,11 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
                 client.describe_image_attribute,
                 ImageId=r['ImageId'],
                 Attribute='launchPermission')['LaunchPermissions']
+            r['c7n:LaunchPermissions'] = attrs
             image_accounts = {a.get('Group') or a.get('UserId') for a in attrs}
             delta_accounts = image_accounts.difference(accounts)
             if delta_accounts:
-                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                r[self.annotation_key] = list(delta_accounts)
                 results.append(r)
         return results
 

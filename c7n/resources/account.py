@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """AWS Account as a custodian resource.
@@ -94,6 +93,49 @@ class AccountCredentialReport(CredentialReport):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
+
+
+@filters.register('check-macie')
+class MacieEnabled(ValueFilter):
+    """Check status of macie v2 in the account.
+
+    Gets the macie session info for the account, and
+    the macie master account for the current account if
+    configured.
+    """
+
+    schema = type_schema('check-macie', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:macie'
+    annotate = False
+    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+
+    def process(self, resources, event=None):
+
+        if self.annotation_key not in resources[0]:
+            self.get_macie_info(resources[0])
+
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+
+    def get_macie_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('macie2')
+
+        try:
+            info = client.get_macie_session()
+            info.pop('ResponseMetadata')
+        except client.exceptions.AccessDeniedException:
+            info = {}
+
+        try:
+            minfo = client.get_master_account().get('master')
+        except (client.exceptions.AccessDeniedException,
+                client.exceptions.ResourceNotFoundException):
+            info['master'] = {}
+        else:
+            info['master'] = minfo
+        account[self.annotation_key] = info
 
 
 @filters.register('check-cloudtrail')

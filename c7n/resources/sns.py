@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -31,21 +30,13 @@ class DescribeTopic(DescribeSource):
             return list(w.map(_augment, resources))
 
 
-class ConfigSNS(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super().load_resource(item)
-        resource['Tags'] = [{'Key': t['key'], 'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        return resource
-
-
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sns'
-        arn_type = 'topic'
+        arn_type = ''
+        arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
@@ -64,7 +55,7 @@ class SNS(QueryResourceManager):
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
         'describe': DescribeTopic,
-        'config': ConfigSNS
+        'config': ConfigSource
     }
 
 
