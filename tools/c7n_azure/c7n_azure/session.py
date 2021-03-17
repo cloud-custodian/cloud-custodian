@@ -75,31 +75,39 @@ class AzureCredential:
         self._credential = None
         self._subscription_id = self._auth_params['subscription_id']
         if self._auth_params.get('access_token') is not None:
+            auth_name = 'Access Token'
             pass
-        elif (self._auth_params['client_id'] and
-              self._auth_params['client_secret'] and
-              self._auth_params['tenant_id']
+        elif (self._auth_params.get('client_id') and
+              self._auth_params.get('client_secret') and
+              self._auth_params.get('tenant_id')
               ):
+            auth_name = 'Principal'
             self._credential = ClientSecretCredential(
                 client_id=self._auth_params['client_id'],
                 client_secret=self._auth_params['client_secret'],
                 tenant_id=self._auth_params['tenant_id'],
                 authority=self._auth_params['authority'])
         elif self._auth_params.get('use_msi'):
+            auth_name = 'MSI'
             self._credential = ManagedIdentityCredential(
                 client_id=self._auth_params.get('client_id'))
         elif self._auth_params.get('enable_cli_auth'):
+            auth_name = 'Azure CLI'
             self._credential = AzureCliCredential()
             self._subscription_id, error = _run_command('az account show --output tsv --query id')
             self._subscription_id = self._subscription_id.strip('\n')
             if error is not None:
                 raise Exception('Unable to query SubscriptionId')
 
+        log.info('Authenticated [%s | %s%s]',
+                 auth_name, self.subscription_id,
+                 ' | Authorization File' if authorization_file else '')
+
     def get_token(self, *scopes, **kwargs):
         # Access Token is used only in tests realistically because
         # KeyVault, Storage and mgmt plane requires separate tokens.
         # TODO: Should we scope this to tests only?
-        if (self._auth_params['access_token']):
+        if (self._auth_params.get('access_token')):
             return AccessToken(self._auth_params['access_token'], expires_on=0)
         try:
             return self._credential.get_token(*scopes, **kwargs)
