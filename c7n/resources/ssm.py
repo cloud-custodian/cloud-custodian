@@ -597,3 +597,17 @@ class PostItem(Action):
 
 
 resources.subscribe(PostItem.register_resource)
+
+
+@resources.register('ssm-document')
+class SSMDocument(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('list_documents', 'DocumentIdentifiers', None)
+        id = 'InstanceId'
+        name = 'Name'
+        date = 'RegistrationDate'
+        arn_type = 'Document'
+
+    permissions = ('ssm:DescribeDocumentPermission','ssm:ListDocuments',)
