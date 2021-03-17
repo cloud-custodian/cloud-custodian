@@ -941,7 +941,7 @@ six = "*"
 name = "jmespath"
 version = "0.10.0"
 description = "JSON Matching Expressions"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 

@@ -636,6 +636,7 @@ def log_response_data(response):
             send_logger.debug(k + ':' + v)
 
 
+
 # This workaround will replace used api-version for costmanagement requests
 # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
 def cost_query_override_api_version(request):
