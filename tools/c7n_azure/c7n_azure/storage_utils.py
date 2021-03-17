@@ -1,17 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import namedtuple
-from functools import lru_cache, wraps
+from functools import lru_cache
 from urllib.parse import urlparse
 
-from azure.common import AzureHttpError
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobServiceClient
-from azure.storage.common import TokenCredential
 from azure.storage.queue import QueueClient
-from types import MethodType
-
-from c7n_azure.constants import STORAGE_AUTH_ENDPOINT
 
 
 class OldBlobServiceClient(BlobServiceClient):
@@ -47,7 +42,7 @@ class OldQueueService:
         except ResourceExistsError:
             # Queue already exists
             pass
-        except:
+        except Exception:
             return False
         return True
 
@@ -55,7 +50,7 @@ class OldQueueService:
         queue_service = self._get_service(queue_name)
         try:
             queue_service.delete_queue()
-        except:
+        except Exception:
             return False
         return True
 
@@ -132,12 +127,14 @@ class StorageUtilities:
 
     @staticmethod
     def create_queue_from_storage_account(storage_account, name, session):
-        queue_service = StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
+        queue_service = \
+            StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
         return queue_service.create_queue(name)
 
     @staticmethod
     def delete_queue_from_storage_account(storage_account, name, session):
-        queue_service = StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
+        queue_service = \
+            StorageUtilities.get_queue_client_by_storage_account(storage_account, session)
         return queue_service.delete_queue(name)
 
     @staticmethod

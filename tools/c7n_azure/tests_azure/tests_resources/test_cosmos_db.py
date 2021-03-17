@@ -28,6 +28,7 @@ def get_azuredc_ip():
     # this means "azure datacenters only"
     return '0.0.0.0'
 
+
 def get_ip_rules(ip_str):
     if ip_str == '':
         return []
@@ -279,12 +280,14 @@ class CosmosDBTest(BaseTest):
 class CosmosDBFirewallFilterTest(BaseTest):
 
     def test_query_firewall_disabled(self):
-        resource = {'properties': {'ipRules': get_ip_rules(''), 'isVirtualNetworkFilterEnabled': False}}
+        resource = {'properties': {'ipRules': get_ip_rules(''),
+                                   'isVirtualNetworkFilterEnabled': False}}
         expected = IPSet(['0.0.0.0/0'])
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
     def test_query_block_everything(self):
-        resource = {'properties': {'ipRules': get_ip_rules(''), 'isVirtualNetworkFilterEnabled': True}}
+        resource = {'properties': {'ipRules': get_ip_rules(''),
+                                   'isVirtualNetworkFilterEnabled': True}}
         expected = IPSet()
         self.assertEqual(expected, self._get_filter()._query_rules(resource))
 
@@ -338,7 +341,8 @@ class CosmosDBFirewallBypassFilterTest(BaseTest):
         [get_ip_rules(','.join(AZURE_CLOUD_IPS + PORTAL_IPS)), False, ['AzureCloud', 'Portal']],
         [get_ip_rules(','.join(AZURE_CLOUD_IPS + ['10.0.0.8'])), False, ['AzureCloud']],
         [get_ip_rules(','.join(PORTAL_IPS + ['10.0.0.8'])), False, ['Portal']],
-        [get_ip_rules(','.join(AZURE_CLOUD_IPS + PORTAL_IPS + ['10.0.0.8'])), False, ['AzureCloud', 'Portal']],
+        [get_ip_rules(','.join(AZURE_CLOUD_IPS + PORTAL_IPS + ['10.0.0.8'])), False,
+         ['AzureCloud', 'Portal']],
     ]
 
     @parameterized.expand(scenarios)
@@ -380,7 +384,8 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())
-        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
+        actual = set([ip['ipAddressOrRange']
+                      for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -416,7 +421,8 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', ext_ip])
         expected.update(get_portal_ips())
-        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
+        actual = set([ip['ipAddressOrRange']
+                      for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -453,7 +459,8 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', ext_ip, get_azuredc_ip()])
         expected.update(get_portal_ips())
-        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
+        actual = set([ip['ipAddressOrRange']
+                      for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -492,7 +499,8 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(resources[0]['name'], args[1])
 
         expected = set(['21.22.23.24', ext_ip])
-        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
+        actual = set([ip['ipAddressOrRange']
+                      for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(expected, actual)
 
@@ -525,7 +533,8 @@ class CosmosDBFirewallActionTest(BaseTest):
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())
-        actual = set([ip['ipAddressOrRange'] for ip in kwargs['create_update_parameters']['properties']['ipRules']])
+        actual = set([ip['ipAddressOrRange']
+                      for ip in kwargs['create_update_parameters']['properties']['ipRules']])
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])

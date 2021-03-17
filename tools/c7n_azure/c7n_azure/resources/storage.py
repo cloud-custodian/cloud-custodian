@@ -434,8 +434,8 @@ class SetLogSettingsAction(AzureBaseAction):
                     'read': self.READ in self.logs_to_enable,
                     'write': self.WRITE in self.logs_to_enable,
                     'retention_policy': {
-                        'enabled':self.retention != 0,
-                        'days': self.retention if self.retention != 0 else None # Throws if 0
+                        'enabled': self.retention != 0,
+                        'days': self.retention if self.retention != 0 else None  # Throws if 0
                     },
                     'version': '1.0'}
             else:
@@ -492,7 +492,7 @@ class StorageSettingsUtilities:
     @staticmethod
     def _get_client(storage_type, storage_account, session=None):
         client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
-                            .format(storage_type))(storage_account, session)
+                         .format(storage_type))(storage_account, session)
         return client
 
     @staticmethod

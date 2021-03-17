@@ -9,11 +9,9 @@ import os
 import sys
 import types
 
-import jwt
 from azure.common.credentials import BasicTokenAuthentication
 from azure.core.credentials import AccessToken
-from azure.identity import (AzureCliCredential, ChainedTokenCredential,
-                            ClientSecretCredential, CredentialUnavailableError,
+from azure.identity import (AzureCliCredential, ClientSecretCredential,
                             ManagedIdentityCredential)
 from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -26,13 +24,6 @@ from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
                              custodian_azure_send_override,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              log_response_data)
-
-try:
-    from azure.cli.core._profile import Profile
-    from knack.util import CLIError
-except Exception:
-    Profile = None
-    CLIError = ImportError  # Assign an exception that never happens because of Auth problems
 
 from functools import lru_cache
 
@@ -81,14 +72,14 @@ class AzureCredential:
                         'from Key Vault with client id: {0}'.format(keyvault_client_id)
             raise
 
-        self._credential = None  # type: TokenCredential
+        self._credential = None
         self._subscription_id = self._auth_params['subscription_id']
         if self._auth_params.get('access_token') is not None:
             pass
         elif (self._auth_params['client_id'] and
               self._auth_params['client_secret'] and
               self._auth_params['tenant_id']
-        ):
+              ):
             self._credential = ClientSecretCredential(
                 client_id=self._auth_params['client_id'],
                 client_secret=self._auth_params['client_secret'],
@@ -105,8 +96,6 @@ class AzureCredential:
                 raise Exception('Unable to query SubscriptionId')
 
     def get_token(self, *scopes, **kwargs):
-        # type: (*str, **Any) -> AccessToken
-
         # Access Token is used only in tests realistically because
         # KeyVault, Storage and mgmt plane requires separate tokens.
         # TODO: Should we scope this to tests only?

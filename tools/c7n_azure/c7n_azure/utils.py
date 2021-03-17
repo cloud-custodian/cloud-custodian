@@ -12,14 +12,11 @@ import time
 import uuid
 from concurrent.futures import as_completed
 from functools import lru_cache
-from json import JSONEncoder
 
-from azure.core.pipeline.policies import (CustomHookPolicy, RetryMode,
-                                          RetryPolicy)
+from azure.core.pipeline.policies import RetryMode, RetryPolicy
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.identity import ManagedIdentityCredential
 from azure.keyvault.secrets import SecretClient, SecretProperties
-from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
@@ -609,6 +606,7 @@ def serialize(item):
             d[k.strip('_')] = v
     return d
 
+
 class C7nRetryPolicy(RetryPolicy):
 
     def __init__(self, **kwargs):
@@ -636,6 +634,7 @@ def log_response_data(response):
     for k, v in http_response.headers.items():
         if k.startswith('x-ms-ratelimit'):
             send_logger.info(k + ':' + v)
+
 
 # This workaround will replace used api-version for costmanagement requests
 # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
