@@ -19,6 +19,12 @@ class OldBlobServiceClient(BlobServiceClient):
         client = self.get_blob_client(container_name, blob_name)
         return client.download_blob().content_as_bytes()
 
+    def get_blob_to_path(self, container_name, blob_name, path):
+        client = self.get_blob_client(container_name, blob_name)
+        with open(path, "wb") as f:
+            download_stream = client.download_blob()
+            f.write(download_stream.readall())
+
     def create_blob_from_bytes(self, container_name, blob_name, content, validate_content):
         client = self.get_blob_client(container_name, blob_name)
         client.upload_blob(content, overwrite=True)
@@ -26,6 +32,11 @@ class OldBlobServiceClient(BlobServiceClient):
     def get_blob_properties(self, container_name, blob_name):
         client = self.get_blob_client(container_name, blob_name)
         return client.get_blob_properties()
+
+    def list_blobs(self, container_name):
+        client = self.get_container_client(container_name)
+        return client.list_blobs()
+
 
 
 class OldQueueService:
