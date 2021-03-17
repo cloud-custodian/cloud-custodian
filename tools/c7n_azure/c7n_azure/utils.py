@@ -633,7 +633,8 @@ def log_response_data(response):
     send_logger.debug(http_response.status_code)
     for k, v in http_response.headers.items():
         if k.startswith('x-ms-ratelimit'):
-            send_logger.info(k + ':' + v)
+            send_logger.debug(k + ':' + v)
+
 
 
 # This workaround will replace used api-version for costmanagement requests

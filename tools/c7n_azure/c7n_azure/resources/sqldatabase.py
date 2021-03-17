@@ -17,6 +17,7 @@ import abc
 import enum
 import logging
 
+from azure.core.exceptions import AzureError, ResourceNotFoundError
 from azure.mgmt.sql.models import (BackupLongTermRetentionPolicy,
                                    BackupShortTermRetentionPolicy,
                                    DatabaseUpdate, Sku)
@@ -29,7 +30,6 @@ from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
-from msrestazure.azure_exceptions import CloudError
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -119,17 +119,16 @@ class BackupRetentionPolicyHelper:
 
         try:
             response = get_operation(resource_group_name, server_name, database_name, policy)
-        except CloudError as e:
-            if e.status_code == 404:
-                return None
-            else:
-                log.error(
-                    "Unable to get backup retention policy. "
-                    "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
-                        resource_group_name, server_name, database_name
-                    )
+        except ResourceNotFoundError:
+            return None
+        except AzureError as e:
+            log.error(
+                "Unable to get backup retention policy. "
+                "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
+                    resource_group_name, server_name, database_name
                 )
-                raise e
+            )
+            raise e
 
         retention_policy = response.as_dict()
         database[policy_key] = retention_policy
