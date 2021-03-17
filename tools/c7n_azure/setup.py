@@ -90,7 +90,7 @@ install_requires = \
  'tabulate (>=0.8.9,<0.9.0)',
  'typing-extensions (>=3.7.4.3,<4.0.0.0)',
  'urllib3 (>=1.26.3,<2.0.0)',
- 'zipp (>=3.4.1,<4.0.0)']
+ 'zipp (>=3.4.0,<4.0.0)']
 
 extras_require = \
 {':python_version >= "3" and python_version < "4"': ['azure-functions>=1.0.8,<2.0.0']}
