@@ -73,7 +73,6 @@ class AzureCredential:
             raise
 
         self._credential = None
-        self._subscription_id = self._auth_params['subscription_id']
         if self._auth_params.get('access_token') is not None:
             auth_name = 'Access Token'
             pass
@@ -94,11 +93,15 @@ class AzureCredential:
         elif self._auth_params.get('enable_cli_auth'):
             auth_name = 'Azure CLI'
             self._credential = AzureCliCredential()
-            self._subscription_id, error = _run_command('az account show --output tsv --query id')
-            self._subscription_id = self._subscription_id.strip('\n')
+            account_info, error = _run_command('az account show --output json')
+            account_json = json.loads(account_info)
+            self._auth_params['subscription_id'] = account_json['id']
+            self._auth_params['tenant_id'] = account_json['tenantId']
             if error is not None:
-                raise Exception('Unable to query SubscriptionId')
+                raise Exception('Unable to query TenantId and SubscriptionId')
 
+        self._subscription_id = self._auth_params['subscription_id']
+        self._tenant_id = self._auth_params['tenant_id']
         log.info('Authenticated [%s | %s%s]',
                  auth_name, self.subscription_id,
                  ' | Authorization File' if authorization_file else '')
@@ -128,7 +131,7 @@ class AzureCredential:
     @property
     def tenant_id(self):
         # type: (None) -> str
-        return self._auth_params['tenant_id']
+        return self._tenant_id
 
     @property
     def auth_params(self):
