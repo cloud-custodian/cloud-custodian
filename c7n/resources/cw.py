@@ -3,14 +3,20 @@
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
+import botocore.exceptions
+
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
-from c7n.filters.core import parse_date
+from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.related import ChildResourceFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
+from c7n.resources import load_resources
+from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
 
@@ -68,6 +74,27 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
+@resources.register('event-bus')
+class EventBus(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'events'
+        arn_type = 'event-bus'
+        arn = 'Arn'
+        enum_spec = ('list_event_buses', 'EventBuses', None)
+        id = name = 'Name'
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@EventBus.filter_registry.register('cross-account')
+class EventBusCrossAccountFilter(CrossAccountAccessFilter):
+
+    # dummy permission
+    permissions = ('events:ListEventBuses',)
+
+
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
 
@@ -90,6 +117,173 @@ class EventRuleMetrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': 'RuleName', 'Value': resource['Name']}]
+
+
+@EventRule.filter_registry.register('event-rule-target')
+class EventRuleTargetFilter(ChildResourceFilter):
+    """
+    Filter event rules by their targets
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-event-rules-with-no-targets
+              resource: aws.event-rule
+              filters:
+                - type: event-rule-target
+                  key: Arn
+                  value: absent
+    """
+
+    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedIdsExpression = 'Name'
+    AnnotationKey = "EventRuleTargets"
+
+    schema = type_schema('event-rule-target', rinherit=ValueFilter.schema)
+    permissions = ('events:ListTargetsByRule',)
+
+
+@EventRule.filter_registry.register('invalid-targets')
+class ValidEventRuleTargetFilter(ChildResourceFilter):
+    """
+    Filter event rules for invalid targets, Use the `all` option to
+    find any event rules that have all invalid targets, otherwise
+    defaults to filtering any event rule with at least one invalid
+    target.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-event-rules-with-invalid-targets
+              resource: aws.event-rule
+              filters:
+                - type: invalid-targets
+                  all: true # defaults to false
+    """
+
+    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedIdsExpression = 'Name'
+    AnnotationKey = "EventRuleTargets"
+
+    schema = type_schema(
+        'invalid-targets',
+        **{
+            'all': {
+                'type': 'boolean',
+                'default': False
+            }
+        }
+    )
+
+    permissions = ('events:ListTargetsByRule',)
+
+    def validate(self):
+        """
+        Empty validate here to bypass the validation found in the base value filter
+        as we're inheriting from the ChildResourceFilter/RelatedResourceFilter
+        """
+        return self
+
+    def get_rules_with_children(self, resources):
+        """
+        Augments resources by adding the c7n:ChildArns to the resource dict
+        """
+
+        results = []
+
+        # returns a map of {parent_reosurce_id: [{child_resource}, {child_resource2}, etc.]}
+        child_resources = self.get_related(resources)
+
+        # maps resources by their name to their data
+        for r in resources:
+            if child_resources.get(r['Name']):
+                for c in child_resources[r['Name']]:
+                    r.setdefault('c7n:ChildArns', []).append(c['Arn'])
+                results.append(r)
+        return results
+
+    def process(self, resources, event=None):
+        # Due to lazy loading of resources, we need to explicilty load the following
+        # potential targets for a event rule target:
+        load_resources(
+            [
+                "aws.sqs",
+                "aws.lambda",
+                "aws.ecs-cluster",
+                "aws.ecs-task",
+                "aws.kinesis",
+                "aws.sns",
+                "aws.ssm-parameter",
+                "aws.batch-compute",
+                "aws.codepipeline",
+            ]
+        )
+        arn_resolver = ArnResolver(self.manager)
+        resources = self.get_rules_with_children(resources)
+        results = []
+
+        if self.data.get('all'):
+            op = any
+        else:
+            op = all
+
+        for r in resources:
+            resolved = arn_resolver.resolve(r['c7n:ChildArns'])
+            if not op(resolved.values()):
+                for i, j in resolved.items():
+                    if not j:
+                        r.setdefault('c7n:InvalidTargets', []).append(i)
+                results.append(r)
+        return results
+
+
+@EventRule.action_registry.register('delete')
+class EventRuleDelete(BaseAction):
+    """
+    Delete an event rule, force target removal with the `force` option
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: force-delete-rules
+              resource: aws.event-rule
+              filters:
+                - Name: my-event-rule
+              actions:
+                - type: delete
+                  force: true
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('events:DeleteRule', 'events:RemoveTargets', 'events:ListTargetsByRule',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('events')
+        children = {}
+        target_error_msg = "Rule can't be deleted since it has targets."
+        for r in resources:
+            try:
+                client.delete_rule(Name=r['Name'])
+            except botocore.exceptions.ClientError as e:
+                if e.response['Error']['Message'] != target_error_msg:
+                    raise
+                if not self.data.get('force'):
+                    self.log.warning(
+                        'Unable to delete %s event rule due to attached rule targets,'
+                        'set force to true to remove targets' % r['Name'])
+                    raise
+                child_manager = self.manager.get_resource_manager('aws.event-rule-target')
+                if not children:
+                    children = EventRuleTargetFilter({}, child_manager).get_related(resources)
+                targets = list(set([t['Id'] for t in children.get(r['Name'])]))
+                client.remove_targets(Rule=r['Name'], Ids=targets)
+                client.delete_rule(Name=r['Name'])
 
 
 @resources.register('event-rule-target')
@@ -414,6 +608,29 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
             if found:
                 results.append(r)
         return results
+
+
+@LogGroup.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cw-log-group-kms-key-filter
+            resource: log-group
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/cw)"
+                op: regex
+    """
+
+    RelatedIdsExpression = 'kmsKeyId'
 
 
 @LogGroup.action_registry.register('set-encryption')

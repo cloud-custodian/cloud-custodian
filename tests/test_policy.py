@@ -226,6 +226,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q1 2021,
+            'AwsSsmPatchCompliance',
             # newer wave q4 2020
             'AwsApiGatewayRestApi',
             'AwsApiGatewayStage',
@@ -264,6 +266,9 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
@@ -298,8 +303,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::SSM::FileData',
-            'AWS::SecretsManager::Secret'}
+            'AWS::SSM::FileData'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -393,7 +397,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',

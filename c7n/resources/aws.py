@@ -141,6 +141,8 @@ class Arn(namedtuple('_Arn', (
 
     @classmethod
     def parse(cls, arn):
+        if isinstance(arn, Arn):
+            return arn
         parts = arn.split(':', 5)
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api'):
@@ -155,6 +157,8 @@ class Arn(namedtuple('_Arn', (
         elif len(parts) == 6:
             parts.append('')
             parts.append('')
+        # replace the literal 'arn' string with raw arn
+        parts[0] = arn
         return cls(*parts)
 
 
@@ -163,8 +167,36 @@ class ArnResolver:
     def __init__(self, manager):
         self.manager = manager
 
+    def resolve(self, arns):
+        arns = map(Arn.parse, arns)
+        a_service = operator.attrgetter('service')
+        a_resource = operator.attrgetter('resource_type')
+        kfunc = lambda a: (a_service(a), a_resource(a))  # noqa
+        arns = sorted(arns, key=kfunc)
+        results = {}
+        for (service, arn_type), arn_set in itertools.groupby(arns, key=kfunc):
+            arn_set = list(arn_set)
+            rtype = ArnResolver.resolve_type(arn_set[0])
+            rmanager = self.manager.get_resource_manager(rtype)
+            if rtype == 'sns':
+                resources = rmanager.get_resources(
+                    [rarn.arn for rarn in arn_set])
+            else:
+                resources = rmanager.get_resources(
+                    [rarn.resource for rarn in arn_set])
+            for rarn, r in zip(rmanager.get_arns(resources), resources):
+                results[rarn] = r
+
+            for rarn in arn_set:
+                if rarn.arn not in results:
+                    results[rarn.arn] = None
+        return results
+
     @staticmethod
     def resolve_type(arn):
+        arn = Arn.parse(arn)
+
+        # this would benefit from a class cache {service} -> rtypes
         for type_name, klass in AWS.resources.items():
             if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
                 continue
@@ -176,6 +208,9 @@ class ArnResolver:
                 return type_name
             elif (klass.resource_type.arn_type is not None and
                     klass.resource_type.arn_type == arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_service == arn.service and
+                    klass.resource_type.arn_type == ""):
                 return type_name
 
 

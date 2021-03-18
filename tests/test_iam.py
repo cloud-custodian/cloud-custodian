@@ -108,6 +108,34 @@ class UserCredentialReportTest(BaseTest):
             p.resource_manager.get_arns(resources),
             ["arn:aws:iam::644160558196:user/kapil"])
 
+    def test_credential_access_key_multifilter_delete_noop(self):
+        factory = self.replay_flight_data('test_iam_user_credential_multi_delete_noop')
+        p = self.load_policy({
+            'name': 'user-cred-multi-noop',
+            'resource': 'iam-user',
+            'source': 'config',
+            'filters': [
+                {'UserName': 'test1'},
+                {"type": "credential",
+                 "key": "access_keys.last_rotated",
+                 "value": 30,
+                 'op': 'gt',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "key": "access_keys.active",
+                 "value": True,
+                 "op": "eq"}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 0)
+        client = factory().client('iam')
+        keys = client.list_access_keys(UserName='test1').get('AccessKeyMetadata')
+        self.assertEqual(len(keys), 2)
+
     def test_credential_access_key_reverse_filter_delete(self):
         factory = self.replay_flight_data(
             'test_iam_user_credential_reverse_filter_delete'
@@ -395,6 +423,18 @@ def test_iam_role_delete(test, iam_role_delete):
 
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_role(RoleName=iam_role_delete['aws_iam_role.test_role.name'])
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.list_instance_profiles_for_role(
+            RoleName=iam_role_delete['aws_iam_role.test_role.name'])
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.remove_role_from_instance_profile(
+            RoleName=iam_role_delete['aws_iam_role.test_role.name'],
+            InstanceProfileName='test_profile')
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.delete_instance_profile(InstanceProfileName='test_profile')
 
 
 class IamRoleTest(BaseTest):
@@ -734,7 +774,7 @@ class IamUserTest(BaseTest):
                  'value_type': 'age',
                  'key': 'CreateDate',
                  'op': 'greater-than',
-                 'value': 400},
+                 'value': 10000},
             ],
             'actions': [
                 {'type': 'remove-keys',
@@ -765,6 +805,49 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
         self.assertEqual(
             resources[0]['c7n:matched-keys'][0]['c7n:match-type'], 'access')
+
+    def test_iam_user_ssh_key_filter(self):
+        factory = self.replay_flight_data('test_iam_user_ssh_key_filter')
+        p = self.load_policy({
+            'name': 'iam-user-old-ssh-keys',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceName = 'test3'"},
+            ],
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+                {'type': 'ssh-key', 'key': 'UploadDate',
+                 'value_type': 'age', 'value': 90, 'op': 'greater-than'},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+
+    def test_iam_user_delete_ssh_keys(self):
+        factory = self.replay_flight_data('test_iam_user_delete_ssh_keys')
+        user_name = 'test2'
+        p = self.load_policy({
+            'name': 'iam-user-delete-ssh-keys',
+            'resource': 'iam-user',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceName = 'test2'"},
+            ],
+            'filters': [
+                {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+            ],
+            'actions': [
+                {'type': 'delete-ssh-keys'},
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+        client = p.session_factory().client('iam')
+        keys = client.list_ssh_public_keys(UserName=user_name)['SSHPublicKeys']
+        self.assertEqual(len(keys), 0)
 
     def test_iam_user_delete_some_access(self):
         # TODO: this test could use a rewrite
@@ -835,6 +918,41 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
+
+
+@terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_user_disable_ssh_keys(test, iam_user):
+    factory = test.replay_flight_data('test_iam_user_disable_ssh_keys')
+    username = iam_user['aws_iam_user.user.name']
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy({
+        'name': 'iam-user-ssh-keys',
+        'resource': 'iam-user',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'UserName',
+                'value': username
+            },
+            {'type': 'ssh-key', 'key': 'Status', 'value': 'Active'},
+        ],
+        'actions': [
+            {'type': 'delete-ssh-keys', 'disable': True, 'matched': True},
+        ]},
+        session_factory=factory)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(len(resources[0]['c7n:matched-ssh-keys']), 1)
+
+    client = p.session_factory().client('iam')
+    keys = client.list_ssh_public_keys(UserName=username)['SSHPublicKeys']
+    test.assertTrue(all(
+        key['Status'] == 'Inactive' for key in keys
+    ))
 
 
 class IamUserGroupMembership(BaseTest):
@@ -1337,6 +1455,27 @@ class IamInlinePolicyUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertFalse(resources[0]["c7n:InlinePolicies"])
+
+    def test_iam_group_delete_inline_policies(self):
+        session_factory = self.replay_flight_data("test_iam_group_delete_inline_policies")
+        p = self.load_policy(
+            {
+                "name": "iam-delete-group-policies",
+                "resource": "aws.iam-group",
+                "actions": [{
+                    "type": "delete-inline-policies"
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = {r["GroupName"]: r for r in p.run()}
+        noncompliant_group = "test1"
+        self.assertIn(noncompliant_group, resources)
+        self.assertEqual(len(resources[noncompliant_group]["c7n:InlinePolicies"]), 1)
+
+        client = session_factory().client("iam")
+        inline_policies_after = client.list_group_policies(GroupName=noncompliant_group)
+        self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
 
 
 class KMSCrossAccount(BaseTest):

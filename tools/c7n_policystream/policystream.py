@@ -399,11 +399,7 @@ class PolicyRepo:
                     current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 if f in self.policy_files:
-                    # if the policies were moved, only add in policies
-                    # that are not already accounted for.
-                    current_policies += self.policy_files[f].select(
-                        set(current_policies.keys()).difference(
-                            self.policy_files[f].keys()))
+                    current_policies += self.policy_files[f]
                     removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)

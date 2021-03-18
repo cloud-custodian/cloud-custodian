@@ -3,7 +3,7 @@
 
 import logging
 
-from azure.keyvault.key_vault_id import KeyVaultId
+from azure.keyvault.keys import KeyProperties
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
@@ -11,7 +11,7 @@ from c7n.utils import type_schema
 from c7n_azure import constants
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
-from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_url
+from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 
 log = logging.getLogger('custodian.azure.keyvault.keys')
@@ -79,10 +79,10 @@ class KeyVaultKeys(ChildResourceManager):
     class resource_type(ChildTypeInfo):
         doc_groups = ['Security']
 
-        resource = constants.RESOURCE_VAULT
-        service = 'azure.keyvault'
-        client = 'KeyVaultClient'
-        enum_spec = (None, 'get_keys', None)
+        resource = constants.VAULT_AUTH_ENDPOINT
+        service = 'azure.keyvault.keys'
+        client = 'KeyClient'
+        enum_spec = (None, 'list_properties_of_keys', None)
 
         parent_manager_name = 'keyvault'
         raise_on_exception = False
@@ -96,9 +96,7 @@ class KeyVaultKeys(ChildResourceManager):
             'attributes.recoveryLevel'
         )
 
-        @classmethod
-        def extra_args(cls, parent_resource):
-            return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}
+        keyvault_child = True
 
     def augment(self, resources):
         resources = super(KeyVaultKeys, self).augment(resources)
@@ -144,14 +142,13 @@ class KeyTypeFilter(Filter):
         return resources
 
     def _process_resource_set(self, resources, event):
-        client = self.manager.get_client()
-
         matched = []
         for resource in resources:
             try:
                 if 'c7n:kty' not in resource:
-                    id = KeyVaultId.parse_key_id(resource['kid'])
-                    key = client.get_key(id.vault, id.name, id.version)
+                    id = KeyProperties(key_id=resource['id'])
+                    client = self.manager.get_client(vault_url=id.vault_url)
+                    key = client.get_key(id.name, id.version)
 
                     resource['c7n:kty'] = key.key.kty.lower()
 

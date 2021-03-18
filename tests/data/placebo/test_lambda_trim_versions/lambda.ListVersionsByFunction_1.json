@@ -1,0 +1,119 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Versions": [
+            {
+                "FunctionName": "custodian-ec2-check",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-check:$LATEST",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CustodianMu",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 460635,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2021-02-18T15:47:06.622+0000",
+                "CodeSha256": "smjkmN7392jtVOwJ+Z+1jsmdA8/PJd2Gk2H4sfpABEo=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "Environment": {
+                    "Variables": {
+                        "App": "Prod"
+                    }
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "31bbb323-ca56-438a-b390-83295102099d",
+                "PackageType": "Zip"
+            },
+            {
+                "FunctionName": "custodian-ec2-check",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-check:6",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CustodianMu",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 462153,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2020-12-29T22:16:21.791+0000",
+                "CodeSha256": "j5r1XGjUD7ancGCPEhCxDOiv8PHUYODBVUBVZ10XZYU=",
+                "Version": "6",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "815c5c78-82a2-47cd-aa59-15e9e968c331",
+                "PackageType": "Zip"
+            },
+            {
+                "FunctionName": "custodian-ec2-check",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-check:11",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CustodianMu",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 460627,
+                "Description": "cloud-custodian lambda policy - test",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2021-02-18T15:45:47.097+0000",
+                "CodeSha256": "ZWjv/hQfoy8s6/ztoDR8DwvnBNEpB6/bTs/RuuaYSeA=",
+                "Version": "11",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "Environment": {
+                    "Variables": {
+                        "App": "Prod"
+                    }
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "f3f9b7aa-7a48-4b9a-8507-ab834079d188",
+                "PackageType": "Zip"
+            },
+            {
+                "FunctionName": "custodian-ec2-check",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-check:12",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CustodianMu",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 460635,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2021-02-18T15:47:05.435+0000",
+                "CodeSha256": "smjkmN7392jtVOwJ+Z+1jsmdA8/PJd2Gk2H4sfpABEo=",
+                "Version": "12",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "Environment": {
+                    "Variables": {
+                        "App": "Prod"
+                    }
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "e0bd74bf-262a-45af-b5d0-aef134bf5439",
+                "PackageType": "Zip"
+            }
+        ]
+    }
+}

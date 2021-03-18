@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceProfiles": [
+            {
+                "InstanceProfileName": "test_profile",
+                "Roles": [
+                    {
+                        "RoleName": "test_role"
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

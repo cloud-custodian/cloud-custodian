@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "item": [
+            {
+                "deploymentId": "rp2mlf",
+                "stageName": "api",
+                "description": "2d49180b2988ed5273315098420ef6f7",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {},
+                "variables": {},
+                "tracingEnabled": false,
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 2,
+                    "second": 9,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 2,
+                    "second": 9,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

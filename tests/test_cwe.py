@@ -1,11 +1,30 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+from pytest_terraform import terraform
 from unittest import TestCase
 
 from .common import event_data, BaseTest
 
 from c7n.cwe import CloudWatchEvents
+
+
+@terraform('event_bridge_bus')
+def test_event_bus_describe(test, event_bridge_bus):
+    factory = test.replay_flight_data('test_cwe_bus_xaccount')
+    p = test.load_policy({
+        'name': 'bus-xaccount',
+        'resource': 'aws.event-bus',
+        'filters': [
+            {'tag:Env': 'Sandbox'},
+            'cross-account'
+        ],
+    }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['Name'] == event_bridge_bus[
+        'aws_cloudwatch_event_bus.messenger.name']
+    assert 'CrossAccountViolations' in resources[0]
 
 
 class CloudWatchEventTest(BaseTest):
@@ -49,6 +68,73 @@ class CloudWatchEventTest(BaseTest):
             "Targets"
         )
         self.assertEqual(targets, [])
+
+    def test_event_rule_force_delete(self):
+        session_factory = self.replay_flight_data("test_cwe_rule_force_delete")
+        client = session_factory().client('events')
+        policy = self.load_policy({
+            "name": "cwe-filter-on-target",
+            "resource": "aws.event-rule",
+            "filters": [
+                {
+                    "type": "event-rule-target",
+                    "key": "[].Arn",
+                    "value": "arn:aws:lambda:us-east-1:644160558196:function:test",
+                    "op": "in",
+                    "value_type": "swap"
+                }
+            ],
+            "actions": [
+                {
+                    "type": "delete",
+                    "force": True
+                }
+            ]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.describe_rule(Name=resources[0]["Name"])
+        self.assertEqual(len(resources), 1)
+
+    def test_event_rule_invalid_targets_any(self):
+        session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
+        lambda_client = session_factory().client('lambda')
+        sns_client = session_factory().client('sns')
+        policy = self.load_policy({
+            "name": "cwe-filter-on-invalid-target",
+            "resource": "aws.event-rule",
+            "filters": [
+                {
+                    "type": "invalid-targets"
+                }
+            ],
+        }, session_factory=session_factory)
+        resources = policy.run()
+        invalid_targets = set([
+            "arn:aws:lambda:us-east-1:644160558196:function:test",
+            "arn:aws:sns:us-east-1:644160558196:foo"])
+        self.assertEqual(set(resources[0]["c7n:InvalidTargets"]), invalid_targets)
+        with self.assertRaises(lambda_client.exceptions.ClientError):
+            lambda_client.get_function(FunctionName="test")
+        with self.assertRaises(sns_client.exceptions.NotFoundException):
+            sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:foo")
+        res = sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:test2")
+        self.assertTrue(res)
+
+    def test_event_rule_invalid_targets_all(self):
+        session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
+        policy = self.load_policy({
+            "name": "cwe-filter-on-invalid-target",
+            "resource": "aws.event-rule",
+            "filters": [
+                {
+                    "type": "invalid-targets",
+                    "all": True
+                }
+            ],
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
 
 
 class CloudWatchEventsFacadeTest(TestCase):

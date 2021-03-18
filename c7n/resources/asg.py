@@ -1761,3 +1761,69 @@ class LaunchConfigDelete(Action):
             if e.response['Error']['Code'] == 'ValidationError':
                 return
             raise
+
+
+@resources.register('scaling-policy')
+class ScalingPolicy(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'autoscaling'
+        arn_type = "scalingPolicy"
+        id = name = 'PolicyName'
+        date = 'CreatedTime'
+        enum_spec = (
+            'describe_policies', 'ScalingPolicies', None
+        )
+        filter_name = 'PolicyNames'
+        filter_type = 'list'
+        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
+
+
+@ASG.filter_registry.register('scaling-policy')
+class ScalingPolicyFilter(ValueFilter):
+
+    """Filter asg by scaling-policies attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: scaling-policies-with-target-tracking
+            resource: asg
+            filters:
+              - type: scaling-policy
+                key: PolicyType
+                value: "TargetTrackingScaling"
+
+    """
+
+    schema = type_schema(
+        'scaling-policy', rinherit=ValueFilter.schema
+    )
+    schema_alias = False
+    permissions = ("autoscaling:DescribePolicies",)
+    annotate = False  # no default value annotation on policy
+    annotation_key = 'c7n:matched-policies'
+
+    def get_scaling_policies(self, asgs):
+        policies = self.manager.get_resource_manager('scaling-policy').resources()
+        policy_map = {}
+        for policy in policies:
+            policy_map.setdefault(
+                policy['AutoScalingGroupName'], []).append(policy)
+        return policy_map
+
+    def process(self, asgs, event=None):
+        self.policy_map = self.get_scaling_policies(asgs)
+        return super(ScalingPolicyFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        asg_policies = self.policy_map.get(asg['AutoScalingGroupName'], ())
+        matched = []
+        for policy in asg_policies:
+            if self.match(policy):
+                matched.append(policy)
+        if matched:
+            asg[self.annotation_key] = matched
+        return bool(matched)

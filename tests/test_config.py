@@ -20,6 +20,21 @@ class ConfigRecorderTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'default')
 
+    def test_config_recorder_cross_account(self):
+        factory = self.replay_flight_data('test_config_recorder_cross_account')
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': ['cross-account']},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert 'CrossAccountViolations' in resources[0]
+        assert [(cav['AuthorizedAwsRegion'], cav['AuthorizedAccountId'])
+                for cav in resources[0]['CrossAccountViolations']] == [
+                    ('us-east-1', '123456890123'),
+                    ('us-east-2', '123456890123')]
+
 
 class ConfigComplianceTest(BaseTest):
 

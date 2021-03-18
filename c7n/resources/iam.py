@@ -216,6 +216,19 @@ class RoleSetBoundary(SetBoundary):
 
 class DescribeUser(DescribeSource):
 
+    def augment(self, resources):
+        # iam has a race condition, where listing will potentially return a
+        # new user prior it to its availability to get user
+        client = local_session(self.manager.session_factory).client('iam')
+        results = []
+        for r in resources:
+            ru = self.manager.retry(
+                client.get_user, UserName=r['UserName'],
+                ignore_err_codes=client.exceptions.NoSuchEntityException)
+            if ru:
+                results.append(ru['User'])
+        return list(filter(None, results))
+
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.manager.session_factory).client('iam')
         results = []
@@ -1093,6 +1106,17 @@ class SetPolicy(BaseAction):
 class RoleDelete(BaseAction):
     """Delete an IAM Role.
 
+    To delete IAM Role you must first delete the policies
+    that are associated with the role. Also, you need to remove
+    the role from all instance profiles that the role is in.
+
+    https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html
+
+    For this case option 'force' is used. If you set it as 'true',
+    policies that are associated with the role would be detached
+    (inline policies would be removed) and all instance profiles
+    the role is in would be removed as well as the role.
+
     For example, if you want to automatically delete an unused IAM role.
 
     :example:
@@ -1111,7 +1135,7 @@ class RoleDelete(BaseAction):
 
     """
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('iam:DeleteRole',)
+    permissions = ('iam:DeleteRole', 'iam:DeleteInstanceProfile',)
 
     def detach_inline_policies(self, client, r):
         policies = (self.manager.retry(
@@ -1121,6 +1145,26 @@ class RoleDelete(BaseAction):
             self.manager.retry(
                 client.delete_role_policy,
                 RoleName=r['RoleName'], PolicyName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+
+    def delete_instance_profiles(self, client, r):
+        # An instance profile can contain only one IAM role,
+        # although a role can be included in multiple instance profiles
+        profile_names = []
+        profiles = self.manager.retry(
+            client.list_instance_profiles_for_role,
+            RoleName=r['RoleName'],
+            ignore_err_codes=('NoSuchEntityException',))
+        if profiles:
+            profile_names = [p.get('InstanceProfileName') for p in profiles['InstanceProfiles']]
+        for p in profile_names:
+            self.manager.retry(
+                client.remove_role_from_instance_profile,
+                RoleName=r['RoleName'], InstanceProfileName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+            self.manager.retry(
+                client.delete_instance_profile,
+                InstanceProfileName=p,
                 ignore_err_codes=('NoSuchEntityException',))
 
     def process(self, resources):
@@ -1134,12 +1178,13 @@ class RoleDelete(BaseAction):
         for r in resources:
             if self.data.get('force', False):
                 self.detach_inline_policies(client, r)
+                self.delete_instance_profiles(client, r)
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
                     ("Role:%s cannot be deleted, set force "
-                     "to detach policy and delete, error: %s") % (
+                     "to detach policy, instance profile and delete, error: %s") % (
                          r['Arn'], str(e)))
                 error = e
             except (client.exceptions.NoSuchEntityException,
@@ -1784,6 +1829,61 @@ class UserAccessKey(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('ssh-key')
+class UserSSHKeyFilter(ValueFilter):
+    """Filter IAM users based on uploaded SSH public keys
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-old-ssh-keys
+            resource: iam-user
+            filters:
+              - type: ssh-key
+                key: Status
+                value: Active
+              - type: ssh-key
+                key: UploadDate
+                value_type: age
+                value: 90
+    """
+
+    schema = type_schema(
+        'ssh-key',
+        rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('iam:ListSSHPublicKeys',)
+    annotation_key = 'c7n:SSHKeys'
+    matched_annotation_key = 'c7n:matched-ssh-keys'
+    annotate = False
+
+    def get_user_ssh_keys(self, client, user_set):
+        for u in user_set:
+            u[self.annotation_key] = self.manager.retry(
+                client.list_ssh_public_keys,
+                UserName=u['UserName'])['SSHPublicKeys']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
+            self.log.debug(
+                "Querying %d users' SSH keys" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_user_ssh_keys, client),
+                chunks(augment_set, 50)))
+
+        matched = []
+        for r in resources:
+            matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                matched.append(r)
+        return matched
+
+
 # Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
@@ -2153,7 +2253,10 @@ class UserRemoveAccessKey(BaseAction):
                 m_keys = resolve_credential_keys(
                     r.get(CredentialReport.matched_annotation_key),
                     keys)
-                assert m_keys, "shouldn't have gotten this far without keys"
+                # It is possible for a _user_ to match multiple credential filters
+                # without having any single key match them all.
+                if not m_keys:
+                    continue
                 keys = m_keys
 
             for k in keys:
@@ -2169,6 +2272,53 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
+
+
+@User.action_registry.register('delete-ssh-keys')
+class UserDeleteSSHKey(BaseAction):
+    """Delete or disable a user's SSH keys.
+
+    For example to delete keys after 90 days:
+
+    :example:
+
+        .. code-block:: yaml
+
+         - name: iam-user-delete-ssh-keys
+           resource: iam-user
+           actions:
+             - type: delete-ssh-keys
+    """
+
+    schema = type_schema(
+        'delete-ssh-keys',
+        matched={'type': 'boolean'},
+        disable={'type': 'boolean'})
+    annotation_key = 'c7n:SSHKeys'
+    permissions = ('iam:ListSSHPublicKeys', 'iam:UpdateSSHPublicKey',
+                   'iam:DeleteSSHPublicKey')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = client.list_ssh_public_keys(
+                    UserName=r['UserName'])['SSHPublicKeys']
+
+            keys = (r.get(UserSSHKeyFilter.matched_annotation_key, [])
+                    if self.data.get('matched') else r[self.annotation_key])
+
+            for k in keys:
+                if self.data.get('disable'):
+                    client.update_ssh_public_key(
+                        UserName=r['UserName'],
+                        SSHPublicKeyId=k['SSHPublicKeyId'],
+                        Status='Inactive')
+                else:
+                    client.delete_ssh_public_key(
+                        UserName=r['UserName'],
+                        SSHPublicKeyId=k['SSHPublicKeyId'])
 
 
 def resolve_credential_keys(m_keys, keys):
@@ -2256,6 +2406,43 @@ class IamGroupInlinePolicy(Filter):
             if len(r['c7n:InlinePolicies']) == 0 and not value:
                 res.append(r)
         return res
+
+
+@Group.action_registry.register('delete-inline-policies')
+class GroupInlinePolicyDelete(BaseAction):
+    """Delete inline policies embedded in an IAM group.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-group-policies
+          resource: aws.iam-group
+          filters:
+            - type: value
+              key: GroupName
+              value: test
+          actions:
+            - type: delete-inline-policies
+    """
+    schema = type_schema('delete-inline-policies')
+    permissions = ('iam:ListGroupPolicies', 'iam:DeleteGroupPolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        if 'c7n:InlinePolicies' not in r:
+            r['c7n:InlinePolicies'] = client.list_group_policies(
+                GroupName=r['GroupName'])['PolicyNames']
+        for policy in r.get('c7n:InlinePolicies', []):
+            try:
+                self.manager.retry(client.delete_group_policy,
+                    GroupName=r['GroupName'], PolicyName=policy)
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 @Group.action_registry.register('delete')
