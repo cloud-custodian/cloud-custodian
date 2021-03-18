@@ -31,6 +31,6 @@ class Batch(ArmResourceManager):
         doc_groups = ['Compute']
 
         service = 'azure.mgmt.batch'
-        client = 'BatchManagementClient'
+        client = 'BatchManagement'
         enum_spec = ('batch_account', 'list', None)
         resource_type = 'Microsoft.Batch/batchAccounts'

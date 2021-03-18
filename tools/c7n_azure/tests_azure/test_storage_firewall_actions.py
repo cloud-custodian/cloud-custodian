@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
-from azure.mgmt.storage.models import StorageAccountUpdateParameters, Action, DefaultAction
-from .azure_common import BaseTest, arm_template
+from azure.mgmt.storage.models import (DefaultAction,
+                                       StorageAccountUpdateParameters)
+from c7n.utils import local_session
 from c7n_azure.session import Session
 
-from c7n.utils import local_session
+from .azure_common import BaseTest, arm_template
 
 rg_name = 'test_storage'
 
@@ -55,8 +56,8 @@ class StorageTestFirewallActions(BaseTest):
         self.assertEqual(len(ip_rules), 2)
         self.assertEqual(ip_rules[0].ip_address_or_range, '11.12.13.14')
         self.assertEqual(ip_rules[1].ip_address_or_range, '21.22.23.24')
-        self.assertEqual(ip_rules[0].action, Action.allow)
-        self.assertEqual(ip_rules[1].action, Action.allow)
+        self.assertEqual(ip_rules[0].action, 'Allow')
+        self.assertEqual(ip_rules[1].action, 'Allow')
 
     @arm_template('storage.json')
     def test_virtual_network_rules_action(self):
@@ -95,8 +96,8 @@ class StorageTestFirewallActions(BaseTest):
         self.assertEqual(len(rules), 2)
         self._assert_equal_resource_ids(rules[0].virtual_network_resource_id, id1)
         self._assert_equal_resource_ids(rules[1].virtual_network_resource_id, id2)
-        self.assertEqual(rules[0].action, Action.allow)
-        self.assertEqual(rules[1].action, Action.allow)
+        self.assertEqual(rules[0].action, 'Allow')
+        self.assertEqual(rules[1].action, 'Allow')
 
     @arm_template('storage.json')
     def test_empty_bypass_network_rules_action(self):

@@ -31,5 +31,5 @@ class Delete(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.event_subscriptions.delete(
+        self.client.event_subscriptions.begin_delete(
             resource['properties']['topic'], resource['name'])

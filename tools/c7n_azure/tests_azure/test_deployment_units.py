@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import pytest
-from .azure_common import BaseTest, requires_arm_polling
+from azure.core.exceptions import AzureError
+from c7n.utils import local_session
 from c7n_azure import constants
 from c7n_azure.constants import FUNCTION_DOCKER_VERSION
 from c7n_azure.functionapp_utils import FunctionAppUtilities
@@ -10,9 +11,8 @@ from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
-from msrestazure.azure_exceptions import CloudError
 
-from c7n.utils import local_session
+from .azure_common import BaseTest, requires_arm_polling
 
 
 @requires_arm_polling
@@ -33,7 +33,7 @@ class DeploymentUnitsTest(BaseTest):
             cls.session = local_session(Session)
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
             client.resource_groups.create_or_update(cls.rg_name, {'location': cls.rg_location})
-        except CloudError:
+        except AzureError:
             pass
 
     @classmethod
@@ -41,8 +41,8 @@ class DeploymentUnitsTest(BaseTest):
         super(DeploymentUnitsTest, cls).tearDownClass()
         try:
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
-            client.resource_groups.delete(cls.rg_name)
-        except CloudError:
+            client.resource_groups.begin_delete(cls.rg_name)
+        except AzureError:
             pass
 
     def _validate(self, unit, params):
