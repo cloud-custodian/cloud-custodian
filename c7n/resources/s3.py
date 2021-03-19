@@ -3376,7 +3376,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
 
-            # Checking if the bucket id or arn passed in is the defualt s3 key
+            # Checking if the bucket id or arn passed in is the default s3 key
             if (key['Description'] == default_key_desc and
                     key['KeyManager'] == 'AWS'):
                 bucket_key = True
