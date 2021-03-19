@@ -5,7 +5,7 @@ import itertools
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import DescribeSource, QueryResourceManager, TypeInfo
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
@@ -50,14 +50,14 @@ class OrganizationSetIamPolicy(SetIamPolicy):
 
 @resources.register('folder')
 class Folder(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/folders
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v2/folders
     """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v2'
         component = 'folders'
         scope = 'global'
-        enum_spec = ('list', 'folders', None)
+        enum_spec = ('search', 'folders', None)
         name = id = 'name'
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
@@ -77,7 +77,38 @@ class Folder(QueryResourceManager):
         if 'query' in self.data:
             for child in self.data.get('query'):
                 if 'parent' in child:
-                    return {'parent': child['parent']}
+                    return {'body': {"query": "parent=%s" % child['parent']}}
+
+
+class ProjectHierarchy(DescribeSource):
+    """Describe Source for Projects that supports working on all projects within a given folder."""
+
+    def get_resources(self, query):
+        if 'subtree' in query:
+            return self.get_sub_tree(query)
+        return super().get_resources(query)
+
+    def get_sub_tree(self, query):
+        # recursively look for folders against the given folder
+        frm = self.manager.get_resource_manager('gcp.folder')
+        folder_ids = self.get_child_folders(frm, query['subtree'], set())
+        folder_ids.add(query['subtree'])
+
+        # now for each folder fetch the projects
+        prm = self.manager.get_resource_manager('gcp.project')
+        projects = []
+        for fid in folder_ids:
+            prm.data = {'query': [{
+                'filter': 'parent.type:folder parent.id:%s' % fid.split('/', 1)[-1]}]}
+            projects.extend(prm.resources())
+        return projects
+
+    def get_child_folders(self, frm, folder_id, result_ids):
+        frm.data = {'query': [{'parent': folder_id}]}
+        for folder in frm.resources():
+            result_ids.add(folder['name'])
+            self.get_child_folders(frm, folder['name'], result_ids)
+        return result_ids
 
 
 @resources.register('project')
@@ -112,12 +143,19 @@ class Project(QueryResourceManager):
             return client.execute_query(
                 'get', {'projectId': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
+    def get_source(self, source_type):
+        if source_type == 'describe-gcp':
+            return ProjectHierarchy(self)
+        return super().get_source(source_type)
+
     def get_resource_query(self):
         # https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
         if 'query' in self.data:
             for child in self.data.get('query'):
                 if 'filter' in child:
                     return {'filter': child['filter']}
+                if 'subtree' in child:
+                    return {'subtree': child['subtree']}
 
 
 @Project.action_registry.register('delete')
