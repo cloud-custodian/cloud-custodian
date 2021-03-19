@@ -63,6 +63,7 @@ class Folder(QueryResourceManager):
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
         perm_service = 'resourcemanager'
+        permissions = ('resourcemanager.folders.get',)
 
     def get_resources(self, resource_ids):
         client = self.get_client()
@@ -193,7 +194,7 @@ class HierarchyAction(MethodAction):
     def load_hierarchy(self, resources):
         parents = {}
         session = local_session(self.manager.session_factory)
-
+        root_parent = self.data.get('root-parent')
         for r in resources:
             client = self.get_client(session, self.manager.resource_type)
             ancestors = client.execute_command(
@@ -201,6 +202,8 @@ class HierarchyAction(MethodAction):
             parents[r['projectId']] = [
                 a['resourceId']['id'] for a in ancestors
                 if a['resourceId']['type'] == 'folder']
+            if root_parent and root_parent in parents[r['projectId']]:
+                parents[r['projectId']] = parents[:r['projectId'].index(root_parent)+1]
         self.parents = parents
         self.folder_ids = set(itertools.chain(*self.parents.values()))
 
@@ -280,6 +283,7 @@ class ProjectPropagateLabels(HierarchyAction):
         'propagate-labels',
         required=('folder-labels',),
         **{
+            'root-parent': {'type': 'string'},
             'folder-labels': {
                 '$ref': '#/definitions/filters_common/value_from'}},
     )
