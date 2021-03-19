@@ -3261,15 +3261,16 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     """Action enables default encryption on S3 buckets
 
     `enabled`: boolean Optional: Defaults to True
+
     `crypto`: aws:kms | AES256` Optional: Defaults to AES256
+
     `key`: arn, alias, or kms id key
+
     `bucket-key`: boolean Optional:
-        Defaults to True for SSE, default
-        AWS KMS key, otherwise False. Reduces the
-        amount of API traffic from Amazon S3 to KMS
-        and can reduce KMS request costs by up to 99
-        percent. Requires kms:Decrypt permissions for
-        copy and upload on the AWS KMS Key Policy.
+    Defaults to True for SSE, default AWS KM key, otherwise False. Reduces the
+    amount of API traffic from Amazon S3 to KMS and can reduce KMS request costs
+    by up to 99 percent. Requires kms:Decrypt permissions for copy and upload on
+    the AWS KMS Key Policy.
 
     Bucket Key Docs: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html
 
