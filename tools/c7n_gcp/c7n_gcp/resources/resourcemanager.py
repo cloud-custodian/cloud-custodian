@@ -203,7 +203,7 @@ class HierarchyAction(MethodAction):
                 a['resourceId']['id'] for a in ancestors
                 if a['resourceId']['type'] == 'folder']
             if root_parent and root_parent in parents[r['projectId']]:
-                parents[r['projectId']] = parents[:r['projectId'].index(root_parent)+1]
+                parents[r['projectId']] = parents[:parents.index(root_parent)+1]
         self.parents = parents
         self.folder_ids = set(itertools.chain(*self.parents.values()))
 
