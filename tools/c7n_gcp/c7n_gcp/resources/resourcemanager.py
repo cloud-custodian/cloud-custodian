@@ -84,7 +84,7 @@ class ProjectHierarchy(DescribeSource):
     """Describe Source for Projects that supports working on all projects within a given folder."""
 
     def get_resources(self, query):
-        if 'subtree' in query:
+        if query and 'subtree' in query:
             return self.get_sub_tree(query)
         return super().get_resources(query)
 
