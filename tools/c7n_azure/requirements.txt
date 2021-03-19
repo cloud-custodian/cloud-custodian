@@ -1,101 +1,87 @@
 adal==1.2.6
 applicationinsights==0.11.9
 apscheduler==3.7.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0" and python_version < "4")
-argcomplete==1.12.2; python_full_version >= "3.6.0"
-azure-cli-core==2.19.1; python_full_version >= "3.6.0"
-azure-cli-telemetry==1.0.6; python_full_version >= "3.6.0"
-azure-common==1.1.26; python_full_version >= "3.6.0"
-azure-core==1.11.0; python_full_version >= "3.6.0"
+azure-common==1.1.26
+azure-core==1.12.0
 azure-cosmos==3.2.0
 azure-cosmosdb-nspkg==2.0.2
 azure-cosmosdb-table==1.0.6
 azure-functions==1.6.0; python_version >= "3" and python_version < "4"
 azure-graphrbac==0.61.1
-azure-keyvault==1.1.0
-azure-mgmt-apimanagement==0.1.0
-azure-mgmt-applicationinsights==0.2.0
-azure-mgmt-authorization==0.60.0
-azure-mgmt-batch==7.0.0
-azure-mgmt-cdn==4.0.0
-azure-mgmt-cognitiveservices==5.0.0
-azure-mgmt-compute==10.0.0
-azure-mgmt-containerinstance==1.5.0
-azure-mgmt-containerregistry==2.8.0
-azure-mgmt-containerservice==8.3.0
-azure-mgmt-core==1.2.2; python_full_version >= "3.6.0"
-azure-mgmt-cosmosdb==0.11.0
-azure-mgmt-costmanagement==0.1.0
-azure-mgmt-databricks==0.1.0
-azure-mgmt-datafactory==0.8.0
-azure-mgmt-datalake-nspkg==3.0.1
-azure-mgmt-datalake-store==0.5.0
-azure-mgmt-dns==3.0.0
-azure-mgmt-eventgrid==2.2.0
-azure-mgmt-eventhub==3.1.0
-azure-mgmt-hdinsight==1.7.0
-azure-mgmt-iothub==0.10.0
-azure-mgmt-keyvault==1.1.0
-azure-mgmt-logic==3.0.0
-azure-mgmt-managementgroups==0.2.0
-azure-mgmt-monitor==0.7.0
-azure-mgmt-network==9.0.0
-azure-mgmt-nspkg==3.0.2
-azure-mgmt-policyinsights==0.4.0
-azure-mgmt-rdbms==1.9.0
-azure-mgmt-redis==6.0.0
-azure-mgmt-resource==6.0.0
-azure-mgmt-resourcegraph==2.0.0
-azure-mgmt-search==2.1.0
-azure-mgmt-sql==0.16.0
-azure-mgmt-storage==7.2.0
-azure-mgmt-subscription==0.5.0
-azure-mgmt-web==0.44.0
+azure-identity==1.5.0
+azure-keyvault-certificates==4.2.1
+azure-keyvault-keys==4.3.1
+azure-keyvault-secrets==4.2.0
+azure-keyvault==4.1.0
+azure-mgmt-apimanagement==1.0.0
+azure-mgmt-applicationinsights==1.0.0
+azure-mgmt-authorization==1.0.0
+azure-mgmt-batch==15.0.0
+azure-mgmt-cdn==10.0.0
+azure-mgmt-cognitiveservices==11.0.0
+azure-mgmt-compute==19.0.0
+azure-mgmt-containerinstance==7.0.0
+azure-mgmt-containerregistry==8.0.0b1
+azure-mgmt-containerservice==15.0.0
+azure-mgmt-core==1.2.2
+azure-mgmt-cosmosdb==6.1.0
+azure-mgmt-costmanagement==1.0.0
+azure-mgmt-databricks==1.0.0b1
+azure-mgmt-datafactory==1.0.0
+azure-mgmt-datalake-store==1.0.0
+azure-mgmt-dns==8.0.0b1
+azure-mgmt-eventgrid==8.0.0
+azure-mgmt-eventhub==8.0.0
+azure-mgmt-hdinsight==7.0.0
+azure-mgmt-iothub==1.0.0
+azure-mgmt-keyvault==8.0.0
+azure-mgmt-logic==9.0.0
+azure-mgmt-managementgroups==1.0.0b1
+azure-mgmt-monitor==2.0.0
+azure-mgmt-msi==1.0.0
+azure-mgmt-network==17.1.0
+azure-mgmt-policyinsights==1.0.0
+azure-mgmt-rdbms==8.0.0
+azure-mgmt-redis==12.0.0
+azure-mgmt-resource==16.0.0
+azure-mgmt-resourcegraph==7.0.0
+azure-mgmt-search==8.0.0
+azure-mgmt-sql==1.0.0
+azure-mgmt-storage==17.0.0
+azure-mgmt-subscription==1.0.0
+azure-mgmt-web==2.0.0
 azure-nspkg==3.0.2
-azure-storage-blob==2.1.0
+azure-storage-blob==12.8.0
 azure-storage-common==2.1.0
+azure-storage-file-share==12.4.1
 azure-storage-file==2.1.0
-azure-storage-queue==2.1.0
-bcrypt==3.2.0; python_version >= "3.6" and python_full_version >= "3.6.0"
+azure-storage-queue==12.1.5
 certifi==2020.12.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-cffi==1.14.5; python_version >= "3.6" and python_full_version >= "3.6.0"
+cffi==1.14.5; python_version >= "3.6"
 chardet==4.0.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 click==7.1.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
-colorama==0.4.4; python_full_version >= "3.6.0"
-cryptography==3.4.6; python_version >= "3.6" and python_full_version >= "3.6.0"
+cryptography==3.4.6; python_version >= "3.6"
 distlib==0.3.1
-humanfriendly==9.1; python_full_version >= "3.6.0"
 idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-importlib-metadata==3.4.0; python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0"
-importlib-resources==5.1.0; python_version >= "3.6" and python_version < "3.7"
+importlib-resources==5.1.2; python_version >= "3.6" and python_version < "3.7"
 isodate==0.6.0
-jmespath==0.10.0; python_full_version >= "3.6.0"
+jmespath==0.10.0; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
 jsonpickle==1.3
-knack==0.8.0rc2; python_full_version >= "3.6.0"
-msal-extensions==0.1.3; python_full_version >= "3.6.0"
-msal==1.0.0; python_full_version >= "3.6.0"
-msrest==0.6.21; python_full_version >= "3.6.0"
-msrestazure==0.6.4; python_full_version >= "3.6.0"
+msal-extensions==0.3.0
+msal==1.10.0
+msrest==0.6.21
+msrestazure==0.6.4
 netaddr==0.7.20
 oauthlib==3.1.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
-paramiko==2.7.2; python_full_version >= "3.6.0"
-pkginfo==1.7.0; python_full_version >= "3.6.0"
-portalocker==1.7.1; python_full_version >= "3.6.0"
-psutil==5.8.0; python_full_version >= "3.6.0"
+portalocker==1.7.1
 pycparser==2.20; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
-pygments==2.8.0; python_version >= "3.5" and python_full_version >= "3.6.0"
 pyjwt==1.7.1
-pynacl==1.4.0; python_full_version >= "3.6.0"
-pyopenssl==20.0.1; python_full_version >= "3.6.0"
-pyreadline==2.1; sys_platform == "win32" and python_full_version >= "3.6.0"
-python-dateutil==2.8.1; python_full_version >= "3.6.0"
+python-dateutil==2.8.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
 pytz==2021.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 pywin32==300; platform_system == "Windows" and python_full_version >= "3.6.0"
-pyyaml==5.4.1; python_full_version >= "3.6.0"
 requests-oauthlib==1.3.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
 requests==2.25.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
-six==1.15.0; python_full_version >= "3.6.0" and python_version < "4" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.3.0") and python_version >= "3.6"
-tabulate==0.8.8; python_full_version >= "3.6.0"
-typing-extensions==3.7.4.3; python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0"
+six==1.15.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 tzlocal==2.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 urllib3==1.26.3; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
-zipp==3.4.0; python_version >= "3.6" and python_version < "3.7" and (python_version == "3.6" and python_full_version >= "3.6.0" or python_version == "3.7" and python_full_version >= "3.6.0")
+zipp==3.4.0; python_version >= "3.6" and python_version < "3.7"
