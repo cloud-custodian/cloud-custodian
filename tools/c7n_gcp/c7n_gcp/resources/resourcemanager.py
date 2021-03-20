@@ -195,6 +195,9 @@ class HierarchyAction(MethodAction):
         parents = {}
         session = local_session(self.manager.session_factory)
         root_parent = self.data.get('root-parent')
+        if root_parent.startswith('folders'):
+            root_parent = root_parent.split('/')[-1]
+
         for r in resources:
             client = self.get_client(session, self.manager.resource_type)
             ancestors = client.execute_command(
@@ -301,10 +304,22 @@ class ProjectPropagateLabels(HierarchyAction):
         self.load_folders()
         self.resolve_paths()
 
+    def get_root_parent(self):
+        root_parent = self.data.get('root-parent')
+        if not root_parent:
+            return root_parent
+        if root_parent.startswith('folders/'):
+            root_parent = root_parent.split('/')[-1]
+        return root_parent
+
     def resolve_paths(self):
         self.folder_paths = {}
 
+        root_parent = self.get_root_parent()
+
         def get_path_segments(fid):
+            if root_parent and fid == root_parent:
+                return
             p = self.folders[fid]['parent']
             if p.startswith('folder'):
                 for s in get_path_segments(p.split('/')[-1]):
