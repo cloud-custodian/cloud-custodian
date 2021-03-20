@@ -57,6 +57,7 @@ class Provider(metaclass=abc.ABCMeta):
         resource_classes, not_found = import_resource_classes(
             cls.resource_map, resource_types)
         for r in resource_classes:
+            cls.initialize_resource(r)
             cls.resources.notify(r)
         return resource_classes, not_found
 
