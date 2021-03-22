@@ -6,7 +6,7 @@ import uuid
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import StringUtils, PortsRangeHelper
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import AzureError
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
@@ -289,13 +289,13 @@ class NetworkSecurityGroupPortsAction(BaseAction):
                                   nsg_name, self.access_action, ports)
 
             try:
-                self.manager.get_client().security_rules.create_or_update(
+                self.manager.get_client().security_rules.begin_create_or_update(
                     resource_group,
                     nsg_name,
                     rule_name,
                     new_rule
                 )
-            except CloudError as e:
+            except AzureError as e:
                 self.manager.log.error('Failed to create or update security rule for %s NSG.',
                                        nsg_name)
                 self.manager.log.error(e)

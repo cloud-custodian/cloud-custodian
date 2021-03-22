@@ -11,8 +11,11 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources import aws, load_resources
 from c7n import output
 
-from .common import BaseTest
+# resolver test needs to patch out thread usage
+from c7n.resources.sqs import SQS
+from c7n.executor import MainThreadExecutor
 
+from .common import BaseTest
 
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
@@ -36,7 +39,7 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
-class ArnResolverTest(BaseTest):
+class TestArnResolver:
 
     table = [
         ('arn:aws:waf::123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf'),
@@ -61,19 +64,20 @@ class ArnResolverTest(BaseTest):
         ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
     ]
 
-    def test_arn_resolve_resources(self):
+    def test_arn_resolve_resources(self, test):
         arns = [
             'arn:aws:sqs:us-east-1:644160558196:origin-dev',
             'arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified',
             'arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-tag-creator:$LATEST',
         ]
 
-        factory = self.replay_flight_data('test_arn_resolve_resources')
-        p = self.load_policy(
+        factory = test.replay_flight_data('test_arn_resolve_resources')
+        p = test.load_policy(
             {'name': 'resolve', 'resource': 'aws.ec2'},
             session_factory=factory)
         resolver = aws.ArnResolver(p.resource_manager)
         load_resources(('aws.sqs', 'aws.lambda'))
+        test.patch(SQS, 'executor_factory', MainThreadExecutor)
         arn_map = resolver.resolve(arns)
         assert len(arn_map) == 3
         assert None not in arn_map.values()
@@ -84,7 +88,7 @@ class ArnResolverTest(BaseTest):
         for k, v in aws.AWS.resources.items():
             if getattr(v.resource_type, 'type', None) is not None:
                 legacy.add(k)
-        self.assertFalse(legacy)
+        assert not legacy
 
     def test_arn_resolve_type(self):
         for value, expected in self.table:
@@ -92,7 +96,7 @@ class ArnResolverTest(BaseTest):
             aws.AWS.get_resource_types(("aws.%s" % expected,))
             arn = aws.Arn.parse(value)
             result = aws.ArnResolver.resolve_type(arn)
-            self.assertEqual(result, expected)
+            assert result == expected
 
     def test_arn_cwe_resolver(self):
 

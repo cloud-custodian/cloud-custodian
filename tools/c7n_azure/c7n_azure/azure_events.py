@@ -139,5 +139,6 @@ class AzureEventSubscription:
         scope = '/subscriptions/%s' % subscription_id
 
         client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
-        event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+        event_subscription = \
+            client.event_subscriptions.begin_create_or_update(scope, name, event_info)
         return event_subscription.result()

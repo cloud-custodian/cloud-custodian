@@ -120,7 +120,7 @@ class ChildResourceQuery(ResourceQuery):
         self.session_factory = session_factory
         self.manager = manager
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, parent_ids=None, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(m.service)
@@ -131,12 +131,13 @@ class ChildResourceQuery(ResourceQuery):
 
         parent_type, parent_key, annotate_parent = m.parent_spec
         parents = self.manager.get_resource_manager(parent_type)
-        parent_ids = []
-        for p in parents.resources(augment=False):
-            if isinstance(p, str):
-                parent_ids.append(p)
-            else:
-                parent_ids.append(p[parents.resource_type.id])
+        if not parent_ids:
+            parent_ids = []
+            for p in parents.resources(augment=False):
+                if isinstance(p, str):
+                    parent_ids.append(p)
+                else:
+                    parent_ids.append(p[parents.resource_type.id])
 
         # Bail out with no parent ids...
         existing_param = parent_key in params

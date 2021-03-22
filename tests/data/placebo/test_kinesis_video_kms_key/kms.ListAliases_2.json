@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/alias/aws/lambda",
+                "AliasArn": "arn:aws:kms:us-east-1:123456789012:alias/alias/aws/lambda",
+                "TargetKeyId": "0d543df5-915c-42a1-afa1-c9c5f1f97955"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

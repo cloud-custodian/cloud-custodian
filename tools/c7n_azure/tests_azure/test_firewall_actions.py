@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest
 from c7n_azure.resources.storage import StorageSetFirewallAction
+import pytest
 
 
-class TestFirewallActions(BaseTest):
+class FirewallActionsTest(BaseTest):
 
     def test_build_bypass_rules(self):
         data = {
@@ -49,6 +50,8 @@ class TestFirewallActions(BaseTest):
         rules = action._build_ip_rules(['1.1.1.1', '8.0.0.0/12'], data['ip-rules'])
         self.assertEqual(sorted(['1.1.1.1', '6.0.0.0/16', '8.0.0.0/12']), sorted(rules))
 
+    # Service Tag IP lists are dynamic and will always be changing in live tests
+    @pytest.mark.skiplive
     def test_build_ip_rules_alias(self):
         data = {
             'ip-rules': ['ServiceTags.ApiManagement.WestUS', '6.0.0.0/16']

@@ -1,26 +1,23 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from adal import AdalError
-from knack.util import CLIError
-from msrest.exceptions import AuthenticationError
-from requests import HTTPError
-
-try:
-    from importlib import reload
-except Exception:
-    pass  # Python 2.7 has reload built-in
-
 import json
 import os
 import re
 import sys
+from importlib import reload
 
-from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-from msrestazure.azure_active_directory import MSIAuthentication
-from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID
+import pytest
+from adal import AdalError
+from azure.core.credentials import AccessToken
+from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
 from c7n_azure import constants
 from c7n_azure.session import Session
 from mock import patch
+from msrest.exceptions import AuthenticationError
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD
+from requests import HTTPError
+
+from .azure_common import DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
 
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 
@@ -47,57 +44,49 @@ class SessionTest(BaseTest):
         pass
 
     def test_initialize_session_auth_file(self):
-        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                   autospec=True, return_value=None):
-            s = Session(authorization_file=self.authorization_file)
+        s = Session(authorization_file=self.authorization_file)
 
-            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
-            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
-            self.assertEqual(s.get_tenant_id(), 'tenant')
+        self.assertIs(type(s.get_credentials()._credential), ClientSecretCredential)
+        self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+        self.assertEqual(s.get_tenant_id(), 'tenant')
 
     def test_initialize_session_auth_file_custom_subscription(self):
-        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                   autospec=True, return_value=None):
-            s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
-                        authorization_file=self.authorization_file)
+        s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
+                    authorization_file=self.authorization_file)
 
-            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
-            self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
+        self.assertIs(type(s.get_credentials()._credential), ClientSecretCredential)
+        self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
 
-            # will vary between recorded/live auth options but useful to ensure
-            # we ended up with one of the valid values
-            self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
+        # will vary between recorded/live auth options but useful to ensure
+        # we ended up with one of the valid values
+        self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
 
     def test_initialize_session_auth_file_no_sub(self):
-        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                   autospec=True, return_value=None):
-            s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
-                        authorization_file=self.authorization_file_no_sub)
+        s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
+                    authorization_file=self.authorization_file_no_sub)
 
-            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
-            self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
+        self.assertIs(type(s.get_credentials()._credential), ClientSecretCredential)
+        self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
 
-            # will vary between recorded/live auth options but useful to ensure
-            # we ended up with one of the valid values
-            self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
+        # will vary between recorded/live auth options but useful to ensure
+        # we ended up with one of the valid values
+        self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
 
     def test_initialize_session_principal(self):
-        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                   autospec=True, return_value=None):
-            with patch.dict(os.environ,
-                            {
-                                constants.ENV_TENANT_ID: DEFAULT_TENANT_ID,
-                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
-                                constants.ENV_CLIENT_ID: 'client',
-                                constants.ENV_CLIENT_SECRET: 'secret'
-                            }, clear=True):
-                s = Session()
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: DEFAULT_TENANT_ID,
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_SECRET: 'secret'
+                        }, clear=True):
+            s = Session()
 
-                self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
-                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
-                self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+            self.assertIs(type(s.get_credentials()._credential), ClientSecretCredential)
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
 
-    @patch('azure.common.credentials.ServicePrincipalCredentials.__init__')
+    @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
     def test_initialize_session_authentication_error(self, mock_log, mock_cred):
         with self.assertRaises(SystemExit):
@@ -115,37 +104,35 @@ class SessionTest(BaseTest):
                                 constants.ENV_CLIENT_SECRET: 'secret'
                             }, clear=True):
                 s = Session()
-                s.get_subscription_id()
+                s.get_credentials().get_token()
 
-        mock_log.assert_called_once_with(
-            'Failed to authenticate with service principal.\nMessage: {\n  "error": "test"\n}')
+        mock_log.assert_called_once()
 
     def test_initialize_msi_auth_system(self):
-        with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
-                   autospec=True, return_value=None):
-            with patch.dict(os.environ,
-                            {
-                                constants.ENV_USE_MSI: 'true',
-                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
-                            }, clear=True):
-                s = Session()
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_USE_MSI: 'true',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
+                        }, clear=True):
+            s = Session()
 
-                self.assertTrue(isinstance(s.get_credentials(), MSIAuthentication))
-                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertIsInstance(s.get_credentials()._credential, ManagedIdentityCredential)
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     def test_initialize_msi_auth_user(self):
-        with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
-                   autospec=True, return_value=None):
-            with patch.dict(os.environ,
-                            {
-                                constants.ENV_USE_MSI: 'true',
-                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
-                                constants.ENV_CLIENT_ID: 'client'
-                            }, clear=True):
-                s = Session()
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_USE_MSI: 'true',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client'
+                        }, clear=True):
+            s = Session()
 
-                self.assertIs(type(s.get_credentials()), MSIAuthentication)
-                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertIsInstance(s.get_credentials()._credential, ManagedIdentityCredential)
+            self.assertEqual(
+                s.get_credentials()._credential._credential._identity_config["client_id"],
+                'client')
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     @patch('msrestazure.azure_active_directory.MSIAuthentication.__init__')
     @patch('c7n_azure.session.log.error')
@@ -159,12 +146,11 @@ class SessionTest(BaseTest):
                                 constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
                             }, clear=True):
                 s = Session()
-                s.get_subscription_id()
+                s.get_credentials().get_token()
 
-        mock_log.assert_called_once_with('Failed to authenticate with MSI')
+        mock_log.assert_called_once()
 
-    @patch('c7n_azure.session.jwt.decode', return_value={'tid': DEFAULT_TENANT_ID})
-    def test_initialize_session_token(self, _1):
+    def test_initialize_session_token(self):
         with patch.dict(os.environ,
                         {
                             constants.ENV_ACCESS_TOKEN: 'token',
@@ -172,8 +158,9 @@ class SessionTest(BaseTest):
                         }, clear=True):
             s = Session()
 
-            self.assertIs(type(s.get_credentials()), BasicTokenAuthentication)
+            self.assertIsNone(s.get_credentials()._credential)
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_credentials().get_token(), AccessToken('token', 0))
 
     def test_get_functions_auth_string(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
@@ -277,23 +264,20 @@ class SessionTest(BaseTest):
 
     def test_get_session_for_resource(self):
         s = Session()
-        resource_session = s.get_session_for_resource(constants.RESOURCE_STORAGE)
-        self.assertEqual(resource_session.resource_namespace, constants.RESOURCE_STORAGE)
+        resource_session = s.get_session_for_resource(constants.STORAGE_AUTH_ENDPOINT)
+        self.assertEqual(resource_session.resource_endpoint, constants.STORAGE_AUTH_ENDPOINT)
 
-    @patch('c7n_azure.utils.custodian_azure_send_override')
-    def test_get_client_overrides(self, mock):
-        # Reload the module to re-import patched function
-        reload(sys.modules['c7n_azure.session'])
-        s = Session()
+    # This test won't run with real credentials unless the
+    # tenant is actually in Azure China cloud.
+    @pytest.mark.skiplive
+    def test_get_client_non_default_base_url(self):
+        s = Session(cloud_endpoints=AZURE_CHINA_CLOUD)
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        self.assertFalse(client._client.config.retry_policy.policy.respect_retry_after_header)
-        self.assertIsNotNone(client._client.orig_send)
-        client._client.send()
-        self.assertTrue(mock.called)
+        self.assertEqual(AZURE_CHINA_CLOUD.endpoints.resource_manager,
+                         client._client._base_url)
 
     @patch('c7n_azure.utils.get_keyvault_secret', return_value='{}')
-    @patch('c7n_azure.session.jwt.decode', return_value={'tid': DEFAULT_TENANT_ID})
-    def test_compare_auth_params(self, _1, _2):
+    def test_compare_auth_params(self, _1):
         reload(sys.modules['c7n_azure.session'])
         with patch.dict(os.environ,
                         {
@@ -306,9 +290,10 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret'
                         }, clear=True):
-            env_params = Session().auth_params
+            env_params = Session().get_credentials().auth_params
 
-        file_params = Session(authorization_file=self.authorization_file_full).auth_params
+        session = Session(authorization_file=self.authorization_file_full)
+        file_params = session.get_credentials().auth_params
 
         self.assertTrue(env_params.pop('enable_cli_auth'))
         self.assertFalse(file_params.pop('enable_cli_auth', None))
@@ -325,9 +310,7 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret'
                         }, clear=True):
-            with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
-                       autospec=True, return_value=None):
-                auth_params = Session().auth_params
+            auth_params = Session().get_credentials().auth_params
             self.assertEqual(auth_params.get('tenant_id'), 'tenant')
             self.assertEqual(auth_params.get('subscription_id'), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(auth_params.get('keyvault_client_id'), 'kv_client')
@@ -357,19 +340,30 @@ class SessionTest(BaseTest):
             'Failed to retrieve SP credential from '
             'Key Vault with client id: kv_client')
 
-    @patch('azure.cli.core._profile.Profile.get_login_credentials')
-    @patch('c7n_azure.session.log.error')
-    def test_initialize_session_cli_error(self, mock_log, mock_cli_creds):
-        with self.assertRaises(SystemExit):
-            mock_cli_creds.side_effect = CLIError("Bad CLI credentials")
+    def test_get_auth_endpoint(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.DEFAULT_AUTH_ENDPOINT)
+        self.assertEqual('https://management.core.windows.net/', result)
 
-            with patch.dict(os.environ,
-                            {
-                                constants.ENV_TENANT_ID: 'tenant',
-                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
-                            }, clear=True):
-                s = Session()
-                s.get_subscription_id()
+    def test_get_auth_endpoint_vault(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.VAULT_AUTH_ENDPOINT)
+        self.assertEqual('https://vault.azure.net', result)
 
-        mock_log.assert_called_once_with('Failed to authenticate with CLI credentials. '
-                                         'Bad CLI credentials')
+    def test_get_auth_endpoint_storage(self):
+        s = Session()
+        result = s.get_auth_endpoint(constants.STORAGE_AUTH_ENDPOINT)
+        self.assertEqual('https://storage.azure.com/', result)
+
+    @patch('c7n_azure.utils.C7nRetryPolicy.__init__', return_value=None)
+    def test_retry_policy_override(self, c7n_retry):
+        s = Session()
+        s.client('azure.mgmt.compute.ComputeManagementClient')
+        c7n_retry.assert_called_once()
+
+    @patch('c7n_azure.session.log_response_data', return_value=None)
+    def test_log_custom_hook(self, log):
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        [v for v in client.virtual_machines.list_all()]
+        log.assert_called_once()

@@ -1059,7 +1059,7 @@ class SetMetadataServerAccess(BaseAction):
          - name: ec2-require-imdsv2
            resource: ec2
            filters:
-             - MetadataOptions.HttpsToken: optional
+             - MetadataOptions.HttpToken: optional
            actions:
              - type: set-metadata-access
                tokens: required
