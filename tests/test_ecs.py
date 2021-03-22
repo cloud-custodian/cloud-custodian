@@ -307,6 +307,28 @@ class TestEcsTaskDefinition(BaseTest):
                     resourceArn=resources[0]["taskDefinitionArn"]).get("tags")}
         self.assertEqual(tags, {"TestKey": "TestValue", "c7n-tag": "present"})
 
+    def test_ecs_task_def_config(self):
+        session_factory = self.replay_flight_data("test_ecs_task_def_config")
+        p = self.load_policy(
+            {
+                "name": "ecs-task-def-config-tag",
+                "resource": "ecs-task-definition",
+                "source": "config",
+                "filters": [
+                    {"tag:test": "name"}
+                ],
+                "actions": [
+                    {"type": "remove-tag", "tags": ["test"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ecs")
+        self.assertEqual(len(client.list_tags_for_resource(
+                    resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)
+
 
 class TestEcsTask(BaseTest):
 

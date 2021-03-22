@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 9,
+                    "hour": 6,
+                    "minute": 33,
+                    "second": 56,
+                    "microsecond": 616000
+                },
+                "configurationItemStatus": "OK",
+                "configurationStateId": "1615289636616",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:ecs:us-east-1:644160558196:task-definition/app-fargate-task:2",
+                "resourceType": "AWS::ECS::TaskDefinition",
+                "resourceId": "app-fargate-task:2",
+                "resourceName": "app-fargate-task:2",
+                "awsRegion": "us-east-1",
+                "availabilityZone": "Regional",
+                "tags": {
+                    "test": "name"
+                },
+                "relatedEvents": [],
+                "relationships": [],
+                "configuration": "{\"ContainerDefinitions\":[{\"Name\":\"fargate-app-2\",\"Image\":\"httpd:2.4\",\"Cpu\":0,\"Links\":[],\"PortMappings\":[{\"ContainerPort\":80,\"HostPort\":80,\"Protocol\":\"tcp\"}],\"Essential\":true,\"EntryPoint\":[\"sh\",\"-c\"],\"Command\":[\"/bin/sh -c \\\"echo \\u0027\\u003chtml\\u003e \\u003chead\\u003e \\u003ctitle\\u003eAmazon ECS Sample App\\u003c/title\\u003e \\u003cstyle\\u003ebody {margin-top: 40px; background-color: #333;} \\u003c/style\\u003e \\u003c/head\\u003e\\u003cbody\\u003e \\u003cdiv style\\u003dcolor:white;text-align:center\\u003e \\u003ch1\\u003eAmazon ECS Sample App\\u003c/h1\\u003e \\u003ch2\\u003eCongratulations!\\u003c/h2\\u003e \\u003cp\\u003eYour application is now running on a container in Amazon ECS.\\u003c/p\\u003e \\u003c/div\\u003e\\u003c/body\\u003e\\u003c/html\\u003e\\u0027 \\u003e  /usr/local/apache2/htdocs/index.html \\u0026\\u0026 httpd-foreground\\\"\"],\"Environment\":[],\"EnvironmentFiles\":[],\"MountPoints\":[],\"VolumesFrom\":[],\"Secrets\":[],\"DependsOn\":[],\"DnsServers\":[],\"DnsSearchDomains\":[],\"ExtraHosts\":[],\"DockerSecurityOptions\":[],\"DockerLabels\":{},\"Ulimits\":[],\"SystemControls\":[],\"ResourceRequirements\":[]}],\"Cpu\":\"256\",\"Family\":\"app-fargate-task\",\"InferenceAccelerators\":[],\"Memory\":\"512\",\"NetworkMode\":\"awsvpc\",\"PlacementConstraints\":[],\"RequiresCompatibilities\":[\"FARGATE\"],\"Status\":\"ACTIVE\",\"Tags\":[{\"Key\":\"test\",\"Value\":\"name\"}],\"TaskDefinitionArn\":\"arn:aws:ecs:us-east-1:644160558196:task-definition/app-fargate-task:2\",\"Volumes\":[]}",
+                "supplementaryConfiguration": {}
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMTAzLC03MiwxMjEsOTMsOTEsNjMsLTc5LC0zOSwtNDUsLTE4LDExMCwtMTA0LC02NSw5MiwtNDcsNzMsMjksMTksLTEsMCw1OCw5MywyMCwxOCwtOTYsLTc3LDI5LC05NCwxMTMsNzksLTEyMywxMjUsLTkxLC01MSwtODYsOTEsOTUsMzcsLTE0LC05LDU5LC0xMTAsLTk1LDM1LDEyLC02Miw2OCwyNywtMTE3LC0zNiwtMTAyLC0yNywzNSw1MSw4MCw4MCw5MCw0NCwxMTUsLTYzLC0xMjAsLTEyNCwtOTYsLTkxLDg5LDEyNiwtNzgsMTI1LC01OSw5OSwtMzcsLTcwLC0zMyw0MCwtOTAsLTg1LC0yNCwxMjIsLTEyMiw1MywtMTksLTgxLDM2LC01LC05MiwxMjIsLTkwLC00MCwxMjIsNzYsMTcsLTUsNDgsNTMsOTcsNDAsLTQsNzgsMTEzLC0xMDUsMTIwLC0xOCwxMDgsODgsMTEyLC0xMDYsLTU4LDI3LC0zNiwzLDEwMSwxMTgsMjksLTExNCwzOCwxMTYsMzUsLTIwLDk4LC0xMTcsNTEsODQsLTkzLDcxLDEzLC0xLDg3LDQ0LC0xMDAsOTIsLTQ3LDY1LC03OCwtMTUsLTc5LC05NSw0MiwtNTYsLTgsNiw3OCwtMTA4LC0zNCwtOSw3NCwtMTE4LC0yLDEyNSwtMTcsMjIsLTQsMjUsLTYwLC0xMDEsOTgsLTUxLDI2LC0xMTgsNTYsOTgsLTE4LC0xMjAsNzUsNDgsLTQsLTJdLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbLTYzLDEyNywyNywtOTIsLTQxLC0xMTMsMTE5LDI2LC00NCwxNywyOCwtNzIsLTQzLC0xMTQsLTEwMiw1OF19fQ==",
+        "ResponseMetadata": {}
+    }
+}

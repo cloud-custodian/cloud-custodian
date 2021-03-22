@@ -8,6 +8,7 @@ from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.query import DescribeSource, ConfigSource
 import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
@@ -470,33 +471,25 @@ class StopTask(BaseAction):
                     raise
 
 
-@resources.register('ecs-task-definition')
-class TaskDefinition(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ecs'
-        arn = id = name = 'taskDefinitionArn'
-        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        cfn_type = 'AWS::ECS::TaskDefinition'
-        arn_type = 'task-definition'
+class DescribeTaskDefinition(DescribeSource):
 
     def get_resources(self, ids, cache=True):
         if cache:
-            resources = self._get_cached_resources(ids)
+            resources = self.manager._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
             resources = self.augment(ids)
             return resources
         except ClientError as e:
-            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            self.manager.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
 
     def augment(self, resources):
         results = []
-        client = local_session(self.session_factory).client('ecs')
+        client = local_session(self.manager.session_factory).client('ecs')
         for task_def_set in resources:
-            response = self.retry(
+            response = self.manager.retry(
                 client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
@@ -505,6 +498,31 @@ class TaskDefinition(query.QueryResourceManager):
             results.append(r)
         ecs_tag_normalize(results)
         return results
+
+
+class ConfigECSTaskDefinition(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        if 'TaskDefinitionArn' in resource.keys():
+            resource["taskDefinitionArn"] = resource['TaskDefinitionArn']
+        return resource
+
+
+@resources.register('ecs-task-definition')
+class TaskDefinition(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ecs'
+        arn = id = name = 'taskDefinitionArn'
+        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
+        cfn_type = config_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
+
+    source_mapping = {
+        'config': ConfigECSTaskDefinition,
+        'describe': DescribeTaskDefinition
+    }
 
 
 @TaskDefinition.action_registry.register('delete')
