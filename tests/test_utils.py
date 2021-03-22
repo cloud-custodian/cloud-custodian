@@ -319,6 +319,17 @@ class UtilTest(BaseTest):
             ],
         )
 
+    def test_camel_case_implicit(self):
+        d = {'ownerId': 'abc',
+             'modifyDateIso': '2021-01-05T13:43:26.749906',
+             'createTimeMillis': '1609854135165',
+             'createTime': '1609854135'}
+        r = utils.camelResource(d, implicitTitle=False, implicitDate=True)
+        assert set(r) == {'ownerId', 'modifyDateIso', 'createTimeMillis', 'createTime'}
+        r.pop('ownerId')
+        for k in r:
+            assert r[k].strftime('%Y/%m/%d') == '2021/01/05'
+
     def test_camel_case(self):
         d = {
             "zebraMoon": [{"instanceId": 123}, "moon"],

@@ -25,7 +25,7 @@ class StructureParser:
         if not isinstance(data, dict):
             raise PolicyValidationError((
                 "Policy file top level data structure "
-                "should be a mapping/dict, instead found:%s""") % (
+                "should be a mapping/dict, instead found:%s") % (
                     type(data).__name__))
         dkeys = set(data.keys())
 

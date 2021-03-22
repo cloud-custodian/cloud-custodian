@@ -8,6 +8,7 @@ import uuid
 
 from azure.common import AzureHttpError
 from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import AzureError
 
 from c7n.utils import reset_session_cache
 from c7n.config import Config
@@ -53,7 +54,7 @@ def run(event, context, subscription_id=None):
         for p in policies:
             try:
                 p.push(event, context)
-            except (CloudError, AzureHttpError) as error:
+            except (CloudError, AzureHttpError, AzureError) as error:
                 log.error("Unable to process policy: %s :: %s" % (p.name, error))
 
     reset_session_cache()

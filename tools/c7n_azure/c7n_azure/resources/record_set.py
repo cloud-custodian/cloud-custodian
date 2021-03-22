@@ -38,8 +38,6 @@ class RecordSet(ChildArmResourceManager):
         # NOTE: Record Sets each have their own resource_type value
         resource_type = 'Microsoft.Network/dnszones/{A|AAAA|CAA|CNAME|LIST|MX|NS|PTR|SOA|SRV|TXT}'
 
-        enable_tag_operations = False
-
         @classmethod
         def extra_args(cls, dns_zone):
             return {

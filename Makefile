@@ -1,6 +1,6 @@
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
-PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext
+PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform
 
 install:
 	python3 -m venv .
@@ -84,7 +84,10 @@ test:
 	./bin/tox -e py38
 
 ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
+
+ttest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
 
 sphinx:
 # if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install

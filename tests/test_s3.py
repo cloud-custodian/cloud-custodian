@@ -13,6 +13,7 @@ from unittest import TestCase
 
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
+from pytest_terraform import terraform
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -28,6 +29,44 @@ from .common import (
     skip_if_not_validating,
     functional,
 )
+
+
+@terraform('s3_tag')
+def test_s3_tag(test, s3_tag):
+    test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+    test.patch(s3.EncryptExtantKeys, "executor_factory", MainThreadExecutor)
+    test.patch(
+        s3, "S3_AUGMENT_TABLE", [("get_bucket_tagging", "Tags", [], "TagSet")]
+    )
+    session_factory = test.replay_flight_data("test_s3_tag")
+    session = session_factory()
+    client = session.client("s3")
+    bucket_name = s3_tag['aws_s3_bucket.example.bucket']
+
+    p = test.load_policy(
+        {
+            "name": "s3-tagger",
+            "resource": "s3",
+            "filters": [{"Name": bucket_name}],
+            "actions": [
+                {
+                    "type": "tag",
+                    "tags": {"new-tag": "new-value"},
+                }
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    tags = {
+        t["Key"]: t["Value"]
+        for t in client.get_bucket_tagging(Bucket=bucket_name)["TagSet"]
+    }
+    test.assertEqual(
+        {"original-tag": "original-value", "new-tag": "new-value"}, tags
+    )
 
 
 class RestoreCompletionTest(TestCase):
@@ -672,61 +711,6 @@ class BucketDelete(BaseTest):
         self.assertEqual(len(resources), 1)
         buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertFalse(bname in buckets)
-
-
-class BucketTag(BaseTest):
-
-    @functional
-    def test_tag_bucket(self):
-        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(s3.EncryptExtantKeys, "executor_factory", MainThreadExecutor)
-        self.patch(
-            s3, "S3_AUGMENT_TABLE", [("get_bucket_tagging", "Tags", [], "TagSet")]
-        )
-        session_factory = self.replay_flight_data("test_s3_tag")
-        session = session_factory()
-        client = session.client("s3")
-        bname = "custodian-tagger"
-        if self.recording:
-            destroyBucketIfPresent(client, bname)
-        client.create_bucket(
-            Bucket=bname, CreateBucketConfiguration={"LocationConstraint": "us-east-2"}
-        )
-        self.addCleanup(destroyBucket, client, bname)
-        client.put_bucket_tagging(
-            Bucket=bname,
-            Tagging={
-                "TagSet": [
-                    {"Key": "rudolph", "Value": "reindeer"},
-                    {"Key": "platform", "Value": "lxwee"},
-                ]
-            },
-        )
-
-        p = self.load_policy(
-            {
-                "name": "s3-tagger",
-                "resource": "s3",
-                "filters": [{"Name": bname}],
-                "actions": [
-                    {
-                        "type": "tag",
-                        "tags": {"borrowed": "new", "platform": "serverless"},
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        tags = {
-            t["Key"]: t["Value"]
-            for t in client.get_bucket_tagging(Bucket=bname)["TagSet"]
-        }
-        self.assertEqual(
-            {"rudolph": "reindeer", "platform": "serverless", "borrowed": "new"}, tags
-        )
 
 
 class S3ConfigSource(ConfigTest):
@@ -3626,3 +3610,52 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(len(lifecycle["Rules"]), 1)
         self.assertEqual(lifecycle["Rules"][0]["ID"], lifecycle_id2)
+
+
+@terraform('aws_s3_encryption_audit')
+def test_s3_encryption_audit(test, aws_s3_encryption_audit):
+    test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+    test.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+    test.patch(s3, "S3_AUGMENT_TABLE", [])
+    session_factory = test.replay_flight_data("test_s3_encryption_audit")
+
+    p = test.load_policy(
+        {
+            "name": "s3-audit",
+            "resource": "s3",
+            "filters": [
+                {
+                    "or": [
+                        {
+                            "type": "bucket-encryption",
+                            "state": False,
+                        },
+                        {
+                            "type": "bucket-encryption",
+                            "crypto": "aws:kms",
+                            "state": True,
+                        },
+                        {
+                            "type": "bucket-encryption",
+                            "crypto": "AES256",
+                            "state": True,
+                        },
+                    ]
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+
+    assert len(resources) == 3
+
+    expected_names = [
+        'c7n-aws-s3-encryption-audit-test-a',
+        'c7n-aws-s3-encryption-audit-test-b',
+        'c7n-aws-s3-encryption-audit-test-c',
+    ]
+    actual_names = sorted([r.get('Name') for r in resources])
+
+    assert actual_names == expected_names

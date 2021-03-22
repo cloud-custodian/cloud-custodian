@@ -2293,7 +2293,8 @@ class KeyPair(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
-        name = id = 'KeyName'
+        name = 'KeyName'
+        id = 'KeyPairId'
         filter_name = 'KeyNames'
 
 

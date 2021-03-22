@@ -17,9 +17,10 @@ import abc
 import enum
 import logging
 
-from azure.mgmt.sql.models import BackupLongTermRetentionPolicy, DatabaseUpdate, Sku
-from msrestazure.azure_exceptions import CloudError
-
+from azure.core.exceptions import AzureError, ResourceNotFoundError
+from azure.mgmt.sql.models import (BackupLongTermRetentionPolicy,
+                                   BackupShortTermRetentionPolicy,
+                                   DatabaseUpdate, Sku)
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import get_annotation_prefix, type_schema
@@ -59,7 +60,6 @@ class SqlDatabase(ChildArmResourceManager):
         enum_spec = ('databases', 'list_by_server', None)
         parent_manager_name = 'sqlserver'
         resource_type = 'Microsoft.Sql/servers/databases'
-        enable_tag_operations = False  # GH Issue #4543
         default_report_fields = (
             'name',
             'location',
@@ -102,8 +102,9 @@ class BackupRetentionPolicyHelper:
         resource_group_name = database['resourceGroup']
         database_name = database['name']
         server_name = ResourceIdParser.get_resource_name(server_id)
+        policy = 'default'
 
-        return resource_group_name, server_name, database_name
+        return resource_group_name, server_name, database_name, policy
 
     @staticmethod
     def get_backup_retention_policy(database, get_operation, cache_key):
@@ -113,22 +114,21 @@ class BackupRetentionPolicyHelper:
         if cached_policy:
             return cached_policy
 
-        resource_group_name, server_name, database_name = \
+        resource_group_name, server_name, database_name, policy = \
             BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
 
         try:
-            response = get_operation(resource_group_name, server_name, database_name)
-        except CloudError as e:
-            if e.status_code == 404:
-                return None
-            else:
-                log.error(
-                    "Unable to get backup retention policy. "
-                    "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
-                        resource_group_name, server_name, database_name
-                    )
+            response = get_operation(resource_group_name, server_name, database_name, policy)
+        except ResourceNotFoundError:
+            return None
+        except AzureError as e:
+            log.error(
+                "Unable to get backup retention policy. "
+                "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
+                    resource_group_name, server_name, database_name
                 )
-                raise e
+            )
+            raise e
 
         retention_policy = response.as_dict()
         database[policy_key] = retention_policy
@@ -314,14 +314,14 @@ class BackupRetentionPolicyBaseAction(AzureBaseAction, metaclass=abc.ABCMeta):
         self.client = self.manager.get_client()
 
     def _process_resource(self, database):
-        update_operation = getattr(self.client, self.operations_property).create_or_update
+        update_operation = getattr(self.client, self.operations_property).begin_create_or_update
 
-        resource_group_name, server_name, database_name = \
+        resource_group_name, server_name, database_name, policy = \
             BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
         parameters = self._get_parameters_for_new_retention_policy(database)
 
         new_retention_policy = update_operation(
-            resource_group_name, server_name, database_name, parameters).result()
+            resource_group_name, server_name, database_name, policy, parameters).result()
 
         # Update the cached version
         database[get_annotation_prefix(self.operations_property)] = new_retention_policy.as_dict()
@@ -383,7 +383,7 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
         return self
 
     def _get_parameters_for_new_retention_policy(self, database):
-        return self.retention_period_days
+        return BackupShortTermRetentionPolicy(retention_days=self.retention_period_days)
 
 
 @SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
@@ -532,7 +532,7 @@ class Resize(AzureBaseAction):
     def _process_resource(self, database):
         sku = Sku(capacity=self.capacity, tier=self.tier, name=self.tier)
         max_size_bytes = self.max_size_bytes if not 0 else database['properties']['maxSizeBytes']
-        self.client.databases.update(
+        self.client.databases.begin_update(
             database['resourceGroup'],
             ResourceIdParser.get_resource_name(database['c7n:parent-id']),
             database['name'],

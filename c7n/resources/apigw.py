@@ -455,15 +455,8 @@ class StageClientCertificateFilter(RelatedResourceFilter):
     """
     schema = type_schema('client-certificate', rinherit=ValueFilter.schema)
     RelatedResource = "c7n.resources.apigw.RestClientCertificate"
+    RelatedIdsExpression = 'clientCertificateId'
     annotation_key = "c7n:matched-client-certificate"
-    source_related_id_map = {
-        "config": "ClientCertificateId",
-        "describe": "clientCertificateId"
-    }
-
-    def __init__(self, data, manager):
-        self.RelatedIdsExpression = self.source_related_id_map[manager.source_type]
-        super(StageClientCertificateFilter, self).__init__(data, manager)
 
     def process(self, resources, event=None):
         related = self.get_related(resources)

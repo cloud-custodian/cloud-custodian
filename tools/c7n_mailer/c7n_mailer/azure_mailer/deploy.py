@@ -27,8 +27,9 @@ def cache_path():
 
 
 def get_mailer_requirements():
-    deps = ['azure-keyvault', 'azure-storage-queue',
-            'azure-storage-blob', 'sendgrid'] + list(CORE_DEPS)
+    deps = ['azure-mgmt-managementgroups', 'azure-mgmt-web',
+            'azure-graphrbac', 'azure-keyvault', 'azure-storage-queue',
+            'azure-storage-blob', 'netaddr', 'sendgrid', 'pyyaml'] + list(CORE_DEPS)
     requirements = generate_requirements(
         deps, ignore=['boto3', 'botocore', 'pywin32'],
         exclude=['pkg_resources'],
@@ -121,13 +122,15 @@ def provision(config):
     function_app_name = FunctionAppUtilities.get_function_name(
         '-'.join([service_plan['name'], function_name]), suffix)
     FunctionAppUtilities.validate_function_name(function_app_name)
+    identity = jmespath.search('function_properties.identity', config) or {
+        'type': AUTH_TYPE_EMBED}
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
         function_app={'resource_group_name': service_plan['resource_group_name'],
-                      'identity': {'type': AUTH_TYPE_EMBED},
+                      'identity': identity,
                       'name': function_app_name})
 
     FunctionAppUtilities.deploy_function_app(params)

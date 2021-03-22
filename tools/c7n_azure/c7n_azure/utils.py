@@ -11,27 +11,19 @@ import re
 import time
 import uuid
 from concurrent.futures import as_completed
+from functools import lru_cache
 
+from azure.core.pipeline.policies import RetryMode, RetryPolicy
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
-from azure.keyvault import KeyVaultAuthentication, AccessToken
-from azure.keyvault import KeyVaultClient, KeyVaultId
-from azure.mgmt.managementgroups import ManagementGroupsAPI
+from azure.identity import ManagedIdentityCredential
+from azure.keyvault.secrets import SecretClient, SecretProperties
 from azure.mgmt.web.models import NameValuePair
-from c7n_azure import constants
-from c7n_azure.constants import RESOURCE_VAULT
-from msrestazure.azure_active_directory import MSIAuthentication
+from c7n.utils import chunks, local_session
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
-from json import JSONEncoder
 
-from c7n.utils import chunks, local_session
-
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
-
+from c7n_azure import constants
 
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
                                   re.IGNORECASE)
@@ -383,7 +375,14 @@ class PortsRangeHelper:
         return result
 
     @staticmethod
-    def build_ports_dict(nsg, direction_key, ip_protocol):
+    def check_address(target_address, address_set, address):
+        if not target_address:
+            return True
+        return target_address in address_set or target_address == address
+
+    @staticmethod
+    def build_ports_dict(nsg, direction_key, ip_protocol,
+                         source_address=None, destination_address=None):
         """ Build entire ports array filled with True (Allow), False (Deny) and None(default - Deny)
             based on the provided Network Security Group object, direction and protocol.
         """
@@ -402,6 +401,18 @@ class PortsRangeHelper:
             if not StringUtils.equal(protocol, "*") and \
                not StringUtils.equal(ip_protocol, "*") and \
                not StringUtils.equal(protocol, ip_protocol):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    source_address,
+                    rule['properties'].get('sourceAddressPrefixes'),
+                    rule['properties'].get('sourceAddressPrefix')):
+                continue
+
+            if not PortsRangeHelper.check_address(
+                    destination_address,
+                    rule['properties'].get('destinationAddressPrefixes'),
+                    rule['properties'].get('destinationAddressPrefix')):
                 continue
 
             IsAllowed = StringUtils.equal(rule['properties']['access'], 'allow')
@@ -472,32 +483,13 @@ class AppInsightsHelper:
 
 
 class ManagedGroupHelper:
-    class serialize(JSONEncoder):
-        def default(self, o):
-            return o.__dict__
 
     @staticmethod
-    def filter_subscriptions(key, dictionary):
-        for k, v in dictionary.items():
-            if k == key:
-                if v == '/subscriptions':
-                    yield dictionary
-            elif isinstance(v, dict):
-                for result in ManagedGroupHelper.filter_subscriptions(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in ManagedGroupHelper.filter_subscriptions(key, d):
-                        yield result
+    def get_subscriptions_list(managed_resource_group, session):
+        client = session.client('azure.mgmt.managementgroups.ManagementGroupsAPI')
+        result = client.management_groups.get_descendants(group_id=managed_resource_group)
 
-    @staticmethod
-    def get_subscriptions_list(managed_resource_group, credentials):
-        client = ManagementGroupsAPI(credentials)
-        groups = client.management_groups.get(
-            group_id=managed_resource_group, recurse=True,
-            expand="children").serialize()["properties"]
-        subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
-        subscriptions = [subscription['name'] for subscription in subscriptions]
+        subscriptions = [r.name for r in result if '/subscriptions' in r.type]
         return subscriptions
 
 
@@ -551,23 +543,10 @@ class RetentionPeriod:
 
 @lru_cache()
 def get_keyvault_secret(user_identity_id, keyvault_secret_id):
-    secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
-    access_token = None
-
-    # Use UAI if client_id is provided
-    if user_identity_id:
-        msi = MSIAuthentication(
-            client_id=user_identity_id,
-            resource=RESOURCE_VAULT)
-    else:
-        msi = MSIAuthentication(
-            resource=RESOURCE_VAULT)
-
-    access_token = AccessToken(token=msi.token['access_token'])
-    credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
-
-    kv_client = KeyVaultClient(credentials)
-    return kv_client.get_secret(secret_id.vault, secret_id.name, secret_id.version).value
+    secret_id = SecretProperties(attributes=None, vault_id=keyvault_secret_id)
+    kv_client = SecretClient(vault_url=secret_id.vault_url,
+                             credential=ManagedIdentityCredential(client_id=user_identity_id))
+    return kv_client.get_secret(secret_id.name, secret_id.version).value
 
 
 @lru_cache()
@@ -605,3 +584,61 @@ def resolve_service_tag_alias(rule):
         resource_name = p[1] if 1 < len(p) else None
         resource_region = p[2] if 2 < len(p) else None
         return IPSet(get_service_tag_ip_space(resource_name, resource_region))
+
+
+def get_keyvault_auth_endpoint(cloud_endpoints):
+    return 'https://{0}'.format(cloud_endpoints.suffixes.keyvault_dns[1:])
+
+
+# This function is a workaround for Azure KeyVault objects that lack
+# standard serialization method.
+# These objects store variables with an underscore prefix, so we strip it.
+def serialize(item):
+    d = {}
+    for k, v in vars(item).items():
+        if not callable(v) and hasattr(v, '__dict__'):
+            d[k.strip('_')] = serialize(v)
+        elif callable(v):
+            pass
+        elif isinstance(v, bytes):
+            d[k.strip('_')] = str(v)
+        else:
+            d[k.strip('_')] = v
+    return d
+
+
+class C7nRetryPolicy(RetryPolicy):
+
+    def __init__(self, **kwargs):
+        if 'retry_total' not in kwargs:
+            kwargs['retry_total'] = 3
+        if 'retry_mode' not in kwargs:
+            kwargs['retry_mode'] = RetryMode.Fixed
+        if 'retry_backoff_factor' not in kwargs:
+            kwargs['retry_backoff_factor'] = constants.DEFAULT_MAX_RETRY_AFTER
+
+        super(RetryPolicy, self).__init__(**kwargs)
+
+    def _sleep_for_retry(self, response, transport):
+        # Ignore `retry_after` header if it exceeds maximum time
+        retry_after = self.get_retry_after(response)
+        if retry_after and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+            transport.sleep(retry_after)
+            return True
+        return False
+
+
+def log_response_data(response):
+    http_response = response.http_response
+    send_logger.debug(http_response.status_code)
+    for k, v in http_response.headers.items():
+        if k.startswith('x-ms-ratelimit'):
+            send_logger.debug(k + ':' + v)
+
+
+# This workaround will replace used api-version for costmanagement requests
+# 2020-06-01 is not supported, but 2019-11-01 is working as expected.
+def cost_query_override_api_version(request):
+    request.http_request.url = request.http_request.url.replace(
+        'query?api-version=2020-06-01',
+        'query?api-version=2019-11-01')

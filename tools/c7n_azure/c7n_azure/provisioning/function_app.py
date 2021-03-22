@@ -4,8 +4,7 @@
 from azure.mgmt.web.models import (
     Site,
     SiteConfig,
-    ManagedServiceIdentity,
-    ManagedServiceIdentityUserAssignedIdentitiesValue as UserAssignedIdentity)
+    ManagedServiceIdentity)
 
 from c7n_azure.constants import (AUTH_TYPE_EMBED, FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
@@ -31,7 +30,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         identity = ManagedServiceIdentity(type=params['identity']['type'])
         if 'id' in params['identity']:
             identity.user_assigned_identities = {
-                params['identity']['id']: UserAssignedIdentity()}
+                params['identity']['id']: {}}
         return identity
 
     def _provision(self, params):
@@ -81,6 +80,6 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
                                                               FUNCTION_EXT_VERSION))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
 
-        return self.client.web_apps.create_or_update(params['resource_group_name'],
-                                                     params['name'],
-                                                     functionapp_def).result()
+        return self.client.web_apps.begin_create_or_update(params['resource_group_name'],
+                                                           params['name'],
+                                                           functionapp_def).result()
