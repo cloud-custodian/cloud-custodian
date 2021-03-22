@@ -505,7 +505,7 @@ class ConfigECSTaskDefinition(ConfigSource):
     def load_resource(self, item):
         resource = super().load_resource(item)
         if 'TaskDefinitionArn' in resource.keys():
-            resource["taskDefinitionArn"] = resource['TaskDefinitionArn']
+            resource['taskDefinitionArn'] = resource['TaskDefinitionArn']
         return resource
 
 
