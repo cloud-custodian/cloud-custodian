@@ -424,6 +424,18 @@ def test_iam_role_delete(test, iam_role_delete):
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_role(RoleName=iam_role_delete['aws_iam_role.test_role.name'])
 
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.list_instance_profiles_for_role(
+            RoleName=iam_role_delete['aws_iam_role.test_role.name'])
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.remove_role_from_instance_profile(
+            RoleName=iam_role_delete['aws_iam_role.test_role.name'],
+            InstanceProfileName='test_profile')
+
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.delete_instance_profile(InstanceProfileName='test_profile')
+
 
 class IamRoleTest(BaseTest):
 
@@ -762,7 +774,7 @@ class IamUserTest(BaseTest):
                  'value_type': 'age',
                  'key': 'CreateDate',
                  'op': 'greater-than',
-                 'value': 400},
+                 'value': 10000},
             ],
             'actions': [
                 {'type': 'remove-keys',

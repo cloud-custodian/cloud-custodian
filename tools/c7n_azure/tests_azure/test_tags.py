@@ -64,8 +64,8 @@ class TagsTest(BaseTest):
 
         action.manager.type = 'vm'
         TagHelper.update_resource_tags(action, resource, self.existing_tags)
-        client_mock.resources.update_by_id.assert_called_once()
-        args = client_mock.resources.update_by_id.call_args[0]
+        client_mock.resources.begin_update_by_id.assert_called_once()
+        args = client_mock.resources.begin_update_by_id.call_args[0]
         self.assertEqual(args[0], resource['id'])
         self.assertEqual(args[2].tags, self.existing_tags)
         # Only PATCH tags

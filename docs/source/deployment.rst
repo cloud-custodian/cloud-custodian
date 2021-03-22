@@ -166,7 +166,7 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
-                    "logs:CreateLogGroup",
+                    "logs:CreateLogGroup"
                 ],
                 "Resource": "*"
             }

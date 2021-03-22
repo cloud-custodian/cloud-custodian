@@ -106,7 +106,8 @@ class AzureTest(unittest.TestCase):
     def test_azure_mailer_requirements(self):
         reqs = deploy.get_mailer_requirements()
         self.assertIn('adal', reqs)
-        self.assertIn('azure-storage-common', reqs)
+        self.assertIn('azure-storage-blob', reqs)
+        self.assertIn('azure-storage-queue', reqs)
         self.assertIn('azure-common', reqs)
         self.assertIn('azure-mgmt-managementgroups', reqs)
         self.assertIn('azure-mgmt-web', reqs)
