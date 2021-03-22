@@ -327,7 +327,7 @@ class TestEcsTaskDefinition(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client("ecs")
         self.assertEqual(len(client.list_tags_for_resource(
-                    resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)
+            resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)
 
 
 class TestEcsTask(BaseTest):
