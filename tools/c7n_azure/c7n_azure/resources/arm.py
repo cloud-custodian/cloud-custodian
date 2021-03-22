@@ -15,7 +15,7 @@ from c7n_azure.utils import ResourceIdParser
 
 # ARM resources which do not currently support tagging
 # for database it is a C7N known issue (#4543)
-arm_tags_unsupported = ['microsoft.network/dnszones',
+arm_tags_unsupported = ['microsoft.network/dnszones/',
                         'microsoft.sql/servers/databases',
                         'microsoft.storage/storageaccounts/blobservices/containers']
 
