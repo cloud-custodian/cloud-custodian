@@ -273,6 +273,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
+            'AWS::ECS::TaskDefinition',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
             'AWS::S3::AccountPublicAccessBlock',
