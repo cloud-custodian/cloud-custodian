@@ -2083,6 +2083,7 @@ class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         id = 'LaunchTemplateId'
+        id_prefix = 'lt-'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
@@ -2177,6 +2178,7 @@ class ReservedInstance(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'ReservedInstancesId'
+        id_prefix = ""
         date = 'Start'
         enum_spec = (
             'describe_reserved_instances', 'ReservedInstances', None)
@@ -2193,6 +2195,7 @@ class DedicatedHost(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'HostId'
+        id_prefix = 'h-'
         enum_spec = ('describe_hosts', 'Hosts', None)
         arn_type = "dedicated-host"
         filter_name = 'HostIds'
