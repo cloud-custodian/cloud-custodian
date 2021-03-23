@@ -47,6 +47,7 @@ class Snapshot(QueryResourceManager):
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
         id = 'SnapshotId'
+        id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
@@ -642,6 +643,7 @@ class EBS(QueryResourceManager):
         arn_type = 'volume'
         enum_spec = ('describe_volumes', 'Volumes', None)
         name = id = 'VolumeId'
+        id_prefix = 'vol-'
         filter_name = 'VolumeIds'
         filter_type = 'list'
         date = 'createTime'

@@ -2003,6 +2003,7 @@ class NetworkAddress(query.QueryResourceManager):
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
+        ip_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
@@ -2295,6 +2296,7 @@ class KeyPair(query.QueryResourceManager):
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         name = 'KeyName'
         id = 'KeyPairId'
+        id_prefix = 'key-'
         filter_name = 'KeyNames'
 
 

@@ -106,6 +106,7 @@ class EC2(query.QueryResourceManager):
         date = 'LaunchTime'
         dimension = 'InstanceId'
         cfn_type = config_type = "AWS::EC2::Instance"
+        id_prefix = 'i-'
 
         default_report_fields = (
             'CustodianDate',
