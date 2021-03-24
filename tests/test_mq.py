@@ -166,6 +166,7 @@ class MessageQueue(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('BrokerId'), 'b-c7aa6808-ba11-4d0c-b570-795e4724c841')
 
     def test_mq_message_broker_vpc_default_filter(self):
         session_factory = self.replay_flight_data('test_message_broker_vpc_default_filter')
@@ -186,3 +187,4 @@ class MessageQueue(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('BrokerId'), 'b-494999bd-7800-4e0c-90e1-cab9873f515d')
