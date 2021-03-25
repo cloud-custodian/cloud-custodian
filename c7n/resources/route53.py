@@ -75,7 +75,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         service = 'route53'
         arn_type = 'hostedzone'
         enum_spec = ('list_hosted_zones', 'HostedZones', None)
-        # detail_spec = ('get_hosted_zone', 'Id', 'Id', None)
+        # detail_spec = ('get_hosted_zone', 'Id', 'Id', None, None)
         id = 'Id'
         name = 'Name'
         universal_taggable = True

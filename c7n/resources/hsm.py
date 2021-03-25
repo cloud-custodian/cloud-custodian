@@ -61,7 +61,7 @@ class CloudHSM(QueryResourceManager):
         arn = id = 'HsmArn'
         arn_type = 'cluster'
         name = 'Name'
-        detail_spec = ("describe_hsm", "HsmArn", None, None)
+        detail_spec = ("describe_hsm", "HsmArn", None, None, None)
 
 
 @resources.register('hsm-hapg')
@@ -70,7 +70,7 @@ class PartitionGroup(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_hapgs', 'HapgList', None)
-        detail_spec = ('describe_hapg', 'HapgArn', None, None)
+        detail_spec = ('describe_hapg', 'HapgArn', None, None, None)
         arn = id = 'HapgArn'
         name = 'HapgSerial'
         date = 'LastModifiedTimestamp'
@@ -82,6 +82,6 @@ class HSMClient(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_luna_clients', 'ClientList', None)
-        detail_spec = ('describe_luna_client', 'ClientArn', None, None)
+        detail_spec = ('describe_luna_client', 'ClientArn', None, None, None)
         arn = id = 'ClientArn'
         name = 'Label'

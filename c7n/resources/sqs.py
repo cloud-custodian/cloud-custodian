@@ -59,7 +59,7 @@ class SQS(QueryResourceManager):
         service = 'sqs'
         arn_type = ""
         enum_spec = ('list_queues', 'QueueUrls', {'MaxResults': 1000})
-        detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
+        detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes", None)
         cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
         arn = "QueueArn"

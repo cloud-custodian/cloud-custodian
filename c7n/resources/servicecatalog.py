@@ -23,7 +23,7 @@ class CatalogPortfolio(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'servicecatalog'
         enum_spec = ('list_portfolios', 'PortfolioDetails', None)
-        detail_spec = ('describe_portfolio', 'Id', 'Id', None)
+        detail_spec = ('describe_portfolio', 'Id', 'Id', None, None)
         arn = 'ARN'
         id = 'Id'
         name = 'DisplayName'

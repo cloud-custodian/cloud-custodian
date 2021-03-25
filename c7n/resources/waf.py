@@ -16,7 +16,7 @@ class WAF(QueryResourceManager):
     class resource_type(TypeInfo):
         service = "waf"
         enum_spec = ("list_web_acls", "WebACLs", None)
-        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
+        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL", None)
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"
@@ -33,7 +33,7 @@ class RegionalWAF(QueryResourceManager):
     class resource_type(TypeInfo):
         service = "waf-regional"
         enum_spec = ("list_web_acls", "WebACLs", None)
-        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
+        detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL", None)
         name = "Name"
         id = "WebACLId"
         dimension = "WebACL"

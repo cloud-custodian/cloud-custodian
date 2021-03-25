@@ -238,7 +238,7 @@ class CodeDeployPipeline(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codepipeline'
         enum_spec = ('list_pipelines', 'pipelines', None)
-        detail_spec = ('get_pipeline', 'name', 'name', 'pipeline')
+        detail_spec = ('get_pipeline', 'name', 'name', 'pipeline', None)
         name = id = 'name'
         date = 'created'
         # Note this is purposeful, codepipeline don't have a separate type specifier.

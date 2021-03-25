@@ -15,7 +15,7 @@ class SecretsManager(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'secretsmanager'
         enum_spec = ('list_secrets', 'SecretList', None)
-        detail_spec = ('describe_secret', 'SecretId', 'Name', None)
+        detail_spec = ('describe_secret', 'SecretId', 'Name', None, None)
         config_type = cfn_type = 'AWS::SecretsManager::Secret'
         name = id = 'Name'
         arn = 'ARN'

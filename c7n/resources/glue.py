@@ -494,7 +494,7 @@ class GlueWorkflow(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('list_workflows', 'Workflows', None)
-        detail_spec = ('get_workflow', 'Name', None, 'Workflow')
+        detail_spec = ('get_workflow', 'Name', None, 'Workflow', None)
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()

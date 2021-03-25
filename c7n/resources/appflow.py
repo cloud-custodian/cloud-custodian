@@ -16,7 +16,7 @@ class AppFlow(QueryResourceManager):
         enum_spec = ('list_flows', 'flows', {'maxResults': 100})
         id = name = 'flowName'
         arn = 'flowArn'
-        detail_spec = ('describe_flow', 'flowName', 'flowName', None)
+        detail_spec = ('describe_flow', 'flowName', 'flowName', None, None)
 
     def augment(self, resources):
         resources = super(AppFlow, self).augment(resources)

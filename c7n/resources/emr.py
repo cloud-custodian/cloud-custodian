@@ -318,7 +318,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
-        detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
+        detail_spec = ('describe_security_configuration', 'Name', 'Name', None, None)
         id = name = 'Name'
         cfn_type = 'AWS::EMR::SecurityConfiguration'
 

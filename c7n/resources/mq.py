@@ -17,7 +17,7 @@ class MessageBroker(QueryResourceManager):
         service = 'mq'
         enum_spec = ('list_brokers', 'BrokerSummaries', None)
         detail_spec = (
-            'describe_broker', 'BrokerId', 'BrokerId', None)
+            'describe_broker', 'BrokerId', 'BrokerId', None, None)
         cfn_type = 'AWS::AmazonMQ::Broker'
         id = 'BrokerId'
         arn = 'BrokerArn'

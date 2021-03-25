@@ -96,7 +96,7 @@ class Role(QueryResourceManager):
         service = 'iam'
         arn_type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
-        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
+        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role', None)
         id = name = 'RoleName'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Role"
@@ -247,7 +247,7 @@ class User(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'user'
-        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
+        detail_spec = ('get_user', 'UserName', 'UserName', 'User', None)
         enum_spec = ('list_users', 'Users', None)
         id = name = 'UserName'
         date = 'CreateDate'
@@ -2549,7 +2549,7 @@ class SamlProvider(QueryResourceManager):
         service = 'iam'
         name = id = 'Arn'
         enum_spec = ('list_saml_providers', 'SAMLProviderList', None)
-        detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
+        detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None, None)
         arn = 'Arn'
         arn_type = 'saml-provider'
         global_resource = True
@@ -2571,7 +2571,8 @@ class OpenIdProvider(QueryResourceManager):
         service = 'iam'
         name = id = 'Arn'
         enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
-        detail_spec = ('get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None)
+        detail_spec = (
+            'get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None, None)
         arn = 'Arn'
         arn_type = 'oidc-provider'
         global_resource = True

@@ -19,7 +19,7 @@ class NotebookInstance(QueryResourceManager):
         enum_spec = ('list_notebook_instances', 'NotebookInstances', None)
         detail_spec = (
             'describe_notebook_instance', 'NotebookInstanceName',
-            'NotebookInstanceName', None)
+            'NotebookInstanceName', None, None)
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
@@ -52,7 +52,7 @@ class SagemakerJob(QueryResourceManager):
         service = 'sagemaker'
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
-            'describe_training_job', 'TrainingJobName', 'TrainingJobName', None)
+            'describe_training_job', 'TrainingJobName', 'TrainingJobName', None, None)
         arn = id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
@@ -95,7 +95,7 @@ class SagemakerTransformJob(QueryResourceManager):
         service = 'sagemaker'
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
-            'describe_transform_job', 'TransformJobName', 'TransformJobName', None)
+            'describe_transform_job', 'TransformJobName', 'TransformJobName', None, None)
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
@@ -198,7 +198,7 @@ class SagemakerEndpoint(QueryResourceManager):
         enum_spec = ('list_endpoints', 'Endpoints', None)
         detail_spec = (
             'describe_endpoint', 'EndpointName',
-            'EndpointName', None)
+            'EndpointName', None, None)
         arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
@@ -231,7 +231,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         enum_spec = ('list_endpoint_configs', 'EndpointConfigs', None)
         detail_spec = (
             'describe_endpoint_config', 'EndpointConfigName',
-            'EndpointConfigName', None)
+            'EndpointConfigName', None, None)
         arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
@@ -263,7 +263,7 @@ class Model(QueryResourceManager):
         enum_spec = ('list_models', 'Models', None)
         detail_spec = (
             'describe_model', 'ModelName',
-            'ModelName', None)
+            'ModelName', None, None)
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'

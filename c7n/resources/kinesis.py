@@ -27,7 +27,7 @@ class KinesisStream(QueryResourceManager):
         arn_type = 'stream'
         enum_spec = ('list_streams', 'StreamNames', None)
         detail_spec = (
-            'describe_stream', 'StreamName', None, 'StreamDescription')
+            'describe_stream', 'StreamName', None, 'StreamDescription', 10)
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
@@ -107,7 +107,7 @@ class DeliveryStream(QueryResourceManager):
         enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', None)
         detail_spec = (
             'describe_delivery_stream', 'DeliveryStreamName', None,
-            'DeliveryStreamDescription')
+            'DeliveryStreamDescription', None)
         name = id = 'DeliveryStreamName'
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
@@ -244,7 +244,7 @@ class AnalyticsApp(QueryResourceManager):
         service = "kinesisanalytics"
         enum_spec = ('list_applications', 'ApplicationSummaries', None)
         detail_spec = ('describe_application', 'ApplicationName',
-                       'ApplicationName', 'ApplicationDetail')
+                       'ApplicationName', 'ApplicationDetail', None)
         name = "ApplicationName"
         arn = id = "ApplicationARN"
         arn_type = 'application'

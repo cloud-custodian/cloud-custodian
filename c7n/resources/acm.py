@@ -33,7 +33,7 @@ class Certificate(QueryResourceManager):
         date = 'CreatedAt'
         detail_spec = (
             "describe_certificate", "CertificateArn",
-            'CertificateArn', 'Certificate')
+            'CertificateArn', 'Certificate', None)
         cfn_type = "AWS::CertificateManager::Certificate"
         config_type = "AWS::ACM::Certificate"
         arn_type = 'certificate'

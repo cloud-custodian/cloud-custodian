@@ -29,7 +29,7 @@ class ShieldAttack(QueryResourceManager):
         service = 'shield'
         enum_spec = ('list_attacks', 'Attacks', None)
         detail_spec = (
-            'describe_attack', 'AttackId', 'AttackId', 'Attack')
+            'describe_attack', 'AttackId', 'AttackId', 'Attack', None)
         name = id = 'AttackId'
         date = 'StartTime'
         filter_name = 'ResourceArns'
