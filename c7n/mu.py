@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
-Cloud Custodian Lambda Provisioning Support
+Cloud Custodian Lambda Provisioning Support 
 
 docs/lambda.rst
 """
@@ -17,6 +17,8 @@ import shutil
 import time
 import tempfile
 import zipfile
+import botocore
+import boto3
 
 
 # We use this for freezing dependencies for serverless environments
@@ -409,6 +411,27 @@ class LambdaManager:
             self.client.delete_function(FunctionName=func.name)
         except self.client.exceptions.ResourceNotFoundException:
             pass
+
+    def create_layer(self):
+        layer_name = f'botocore{botocore.__version__}-boto3{boto3.__version__}'
+        try:
+            layer = self.client.get_layer_version(
+                LayerName=layer_name,
+                VersionName=1
+            )
+        except self.client.exceptions.ResourceNotFoundException:
+            layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3']))
+            layer = self.client.publish_layer_version(
+                LayerName=layer_name,
+                Description='Lambda Layer for c7n',
+                Content={
+                    'ZipFile': layer_archive
+                },
+                CompatibleRuntimes=[
+                    'python2.7', 'python3.6','python3.7','python3.8',
+                ],
+            )
+            self.layer = layer['LayerArn'] 
 
     @staticmethod
     def delta_function(old_config, new_config):
