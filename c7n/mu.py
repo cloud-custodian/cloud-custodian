@@ -413,16 +413,17 @@ class LambdaManager:
             pass
 
     def create_layer(self):
-        layer_name = f'botocore{botocore.__version__}-boto3{boto3.__version__}'
-        if not self.get('_layer'):
+        layer_name = f'botocore{botocore.__version__}-boto3{boto3.__version__}'.replace('.', '-')
+        if not hasattr(self, '_layer'):
             try:
-                self._layer = self.client.get_layer_version(
+                layer = self.client.get_layer_version(
                     LayerName=layer_name,
                     VersionNumber=1
-                )['LayerArn']
+                )
+                print(layer)
             except self.client.exceptions.ResourceNotFoundException:
-                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3']))
-                self._layer = self.client.publish_layer_version(
+                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3'])).close()
+                layer = self.client.publish_layer_version(
                     LayerName=layer_name,
                     Description='Lambda Layer for c7n',
                     Content={
@@ -431,7 +432,8 @@ class LambdaManager:
                     CompatibleRuntimes=[
                         'python2.7', 'python3.6','python3.7','python3.8',
                     ],
-                )['LayerArn']
+                )
+        self._layer = [layer['LayerVersionArn']]
         return self._layer
 
     @staticmethod
@@ -503,7 +505,7 @@ class LambdaManager:
 
             new_config = func.get_config()
             new_config['Role'] = role
-            new_config['Layer'] = func.layers if func.layers else self.create_layer()
+            new_config['Layers'] = func.layers if func.layers else self.create_layer()
 
             if self._update_tags(existing, new_config.pop('Tags', {})):
                 changed = True
@@ -520,7 +522,7 @@ class LambdaManager:
             log.info('Publishing custodian policy lambda function %s', func.name)
             params = func.get_config()
             layers = func.layers if func.layers else self.create_layer()
-            params.update({'Publish': True, 'Code': code_ref, 'Role': role, 'Layer': layers})
+            params.update({'Publish': True, 'Code': code_ref, 'Role': role, 'Layers': layers})
             result = self.client.create_function(**params)
             self._update_concurrency(None, func)
             changed = True
