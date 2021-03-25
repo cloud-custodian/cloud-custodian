@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 import botocore.exceptions
 
+from c7n import tags
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
@@ -12,13 +13,18 @@ from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
-from c7n.tags import universal_augment
+from c7n.tags import Tag, universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
+
+class DescribeAlarm(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('alarm')
@@ -37,6 +43,67 @@ class Alarm(QueryResourceManager):
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
+
+    # def augment(self, resources):
+    #     return tags.universal_augment(self.manager, resources)
+
+@Alarm.filter_registry.register('tag')
+class AlarmTagFilter(Filter):
+    """Filter cloud watch alarms based on tags.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-alarms-tag-filter
+                resource: alarm
+                filters:
+                  - type: tag
+                    value: some-tag
+                    op: eq
+    """
+    schema = type_schema('tag')
+    permissions = ('cloudwatch:ListTagsForResource',)
+
+    def process(self, resources, event=None):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+        print('\nResources: ', resources)
+        for resource_set in chunks(resources, size=100):
+            for r in resource_set:
+                tags = client.list_tags_for_resource(
+                    ResourceARN=r['AlarmArn']
+                )
+                # print('\nTags: ', tags)
+        return resources
+
+
+@Alarm.action_registry.register('tag')
+class AlarmTag(Tag):
+    """Action to add tag(s) to CloudWatch alarms
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cw-alarm-add-owner-tag
+                resource: alarm
+                filters:
+                  - "tag:OwnerName": missing
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
+    permissions = ('cloudwatch:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+                client.tag_resource(
+                    AlarmArn=r['AlarmArn'],
+                    Tags=tags)
 
 
 @Alarm.action_registry.register('delete')
