@@ -12,7 +12,7 @@ class ArtifactDomain(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
-        detail_spec = ('describe_domain', 'domain', 'name', 'domain')
+        detail_spec = ('describe_domain', 'domain', 'name', 'domain', None)
         id = name = 'name'
         arn = 'arn'
 

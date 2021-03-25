@@ -11,7 +11,7 @@ class SnowballCluster(QueryResourceManager):
         service = 'snowball'
         enum_spec = ('list_clusters', 'ClusterListEntries', None)
         detail_spec = (
-            'describe_cluster', 'ClusterId', 'ClusterId', 'ClusterMetadata')
+            'describe_cluster', 'ClusterId', 'ClusterId', 'ClusterMetadata', None)
         id = 'ClusterId'
         name = 'Description'
         date = 'CreationDate'
@@ -25,7 +25,7 @@ class Snowball(QueryResourceManager):
         service = 'snowball'
         enum_spec = ('list_jobs', 'JobListEntries', None)
         detail_spec = (
-            'describe_job', 'JobId', 'JobId', 'JobMetadata')
+            'describe_job', 'JobId', 'JobId', 'JobMetadata', None)
         id = 'JobId'
         name = 'Description'
         date = 'CreationDate'

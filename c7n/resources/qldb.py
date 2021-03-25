@@ -22,7 +22,7 @@ class QLDB(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'qldb'
         enum_spec = ('list_ledgers', 'Ledgers', None)
-        detail_spec = ('describe_ledger', 'Name', 'Name', None)
+        detail_spec = ('describe_ledger', 'Name', 'Name', None, None)
         arn_type = 'ledger'
         id = name = 'Name'
         date = 'CreationDateTime'

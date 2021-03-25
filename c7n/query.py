@@ -9,6 +9,7 @@ from concurrent.futures import as_completed
 import functools
 import itertools
 import json
+import time
 
 import jmespath
 import os
@@ -710,7 +711,7 @@ def _batch_augment(manager, model, detail_spec, resource_set):
 
 
 def _scalar_augment(manager, model, detail_spec, resource_set):
-    detail_op, param_name, param_key, detail_path = detail_spec
+    detail_op, param_name, param_key, detail_path, tps_quota = detail_spec
     client = local_session(manager.session_factory).client(
         model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
@@ -720,8 +721,20 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
     else:
         args = ()
     results = []
+    tps_start = time.time()
+    tps_current = time.time()
+    tps_count = 0
     for r in resource_set:
+        if tps_quota is not None and tps_count is tps_quota:
+            current_tps = tps_count / (tps_current - tps_start)
+            if current_tps > tps_quota:
+                time.sleep(1 - ((tps_current - tps_start) / 1000))
+                tps_start = time.time()
+                tps_count = 0
         kw = {param_name: param_key and r[param_key] or r}
+        if tps_quota is not None:
+            tps_current = time.time()
+            tps_count += 1
         response = op(*args, **kw)
         if detail_path:
             response = response[detail_path]

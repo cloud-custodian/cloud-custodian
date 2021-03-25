@@ -24,7 +24,7 @@ class StepFunction(QueryResourceManager):
         date = 'creationDate'
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
-            'stateMachineArn', None)
+            'stateMachineArn', None, None)
 
     def augment(self, resources):
         resources = super().augment(resources)

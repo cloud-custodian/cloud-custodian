@@ -18,7 +18,7 @@ class EKS(QueryResourceManager):
         enum_spec = ('list_clusters', 'clusters', None)
         arn = 'arn'
         arn_type = 'cluster'
-        detail_spec = ('describe_cluster', 'name', None, 'cluster')
+        detail_spec = ('describe_cluster', 'name', None, 'cluster', None)
         id = name = 'name'
         date = 'createdAt'
         cfn_type = 'AWS::EKS::Cluster'

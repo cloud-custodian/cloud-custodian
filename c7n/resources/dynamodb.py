@@ -45,7 +45,7 @@ class Table(query.QueryResourceManager):
         service = 'dynamodb'
         arn_type = 'table'
         enum_spec = ('list_tables', 'TableNames', None)
-        detail_spec = ("describe_table", "TableName", None, "Table")
+        detail_spec = ("describe_table", "TableName", None, "Table", None)
         id = 'TableName'
         name = 'TableName'
         date = 'CreationDateTime'
@@ -404,7 +404,7 @@ class Stream(query.QueryResourceManager):
         enum_spec = ('list_streams', 'Streams', None)
         # Note max rate of 10 calls per second.
         detail_spec = (
-            "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
+            "describe_stream", "StreamArn", "StreamArn", "StreamDescription", 10)
         arn = id = 'StreamArn'
         arn_type = 'stream'
 

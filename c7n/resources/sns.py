@@ -39,7 +39,7 @@ class SNS(QueryResourceManager):
         arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
-            'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
+            'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes', None)
         id = 'TopicArn'
         name = 'DisplayName'
         dimension = 'TopicName'

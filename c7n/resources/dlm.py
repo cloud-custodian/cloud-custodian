@@ -12,7 +12,7 @@ class DLMPolicy(QueryResourceManager):
         id = name = 'PolicyId'
         enum_spec = (
             'get_lifecycle_policies', 'Policies', None)
-        detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy')
+        detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy', None)
         filter_name = 'PolicyIds'
         filter_type = 'list'
         arn = False
