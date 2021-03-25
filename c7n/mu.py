@@ -65,7 +65,7 @@ class PythonPackageArchive:
 
     zip_compression = zipfile.ZIP_DEFLATED
 
-    def __init__(self, modules=(), cache_file=None):
+    def __init__(self, modules=(), cache_file=None, layer_archive=False):
         self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
         if cache_file:
             with open(cache_file, 'rb') as fin:
@@ -75,7 +75,7 @@ class PythonPackageArchive:
             self._temp_archive_file, mode='a',
             compression=self.zip_compression)
         self._closed = False
-        self.add_modules(None, modules)
+        self.add_modules(None, modules, layer_archive)
 
     def __del__(self):
         try:
@@ -112,12 +112,15 @@ class PythonPackageArchive:
 
         return file
 
-    def add_modules(self, ignore, modules):
+    def add_modules(self, ignore, modules, layer_archive):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
         files, including compiled modules. You'll have to add such files
         manually using :py:meth:`add_file`.
         """
+        if layer_archive:
+            os.mkdir('python')
+            # how to make python the root of the archive?
         for module_name in modules:
             module = importlib.import_module(module_name)
 
@@ -434,7 +437,7 @@ class LambdaManager:
                         'python2.7', 'python3.6','python3.7','python3.8',
                     ],
                 )
-                log.debug("Layer created with SHA: %s", layer['CodeSha256'])
+                log.debug("Layer created with SHA: %s", layer['Content']['CodeSha256'])
         self._layer = [layer['LayerVersionArn']]
         return self._layer
 
