@@ -272,7 +272,6 @@ class TestSSM(BaseTest):
 
     def test_get_ssm_documents(self):
         session_factory = self.replay_flight_data("test_get_ssm_documents")
-        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "retrieve-ssm-documents",
@@ -291,7 +290,6 @@ class TestSSM(BaseTest):
 
     def test_ssm_document_remove_sharing(self):
         session_factory = self.replay_flight_data("test_ssm_document_remove_sharing")
-        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "remove-sharing-ssm-documents",
@@ -311,7 +309,6 @@ class TestSSM(BaseTest):
 
     def test_ssm_document_delete(self):
         session_factory = self.replay_flight_data("test_ssm_document_delete")
-        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "delete-ssm-documents",
