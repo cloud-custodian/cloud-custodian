@@ -623,13 +623,12 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
 
             policies:
               - name: ssm-cross-account
-                resource: ssm
+                resource: ssm-document
                 filters:
                   - type: cross-account
                     whitelist: [xxxxxxxxxxxx]
     """
 
-    schema = type_schema('cross-account')
     permissions = ('ssm:DescribeDocumentPermission',)
 
     def process(self, resources, event=None):
