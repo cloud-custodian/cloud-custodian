@@ -10,7 +10,6 @@ snapshots).
 """
 from collections import Counter
 from concurrent.futures import as_completed
-from distutils.version import LooseVersion
 
 from datetime import datetime, timedelta
 from dateutil import tz as tzutil
