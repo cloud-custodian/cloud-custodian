@@ -626,6 +626,7 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
                 resource: ssm
                 filters:
                   - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
     """
 
     schema = type_schema('cross-account')
@@ -669,6 +670,9 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
 
 @SSMDocument.action_registry.register('remove-sharing')
 class RemoveSharingSSMDocument(Action):
+    """Remove external accounts from SSM document permissions
+    """
+
     schema = type_schema('remove-sharing')
     permissions = ('ssm:ModifyDocumentPermission',)
 
@@ -696,6 +700,9 @@ class RemoveSharingSSMDocument(Action):
 
 @SSMDocument.action_registry.register('delete')
 class DeleteSSMDocument(Action):
+    """Delete SSM documents
+    """
+
     schema = type_schema('delete')
     permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission')
 
