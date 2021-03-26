@@ -13,13 +13,14 @@ from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import Tag, universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
+
 
 class DescribeAlarm(DescribeSource):
 
@@ -43,9 +44,11 @@ class Alarm(QueryResourceManager):
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
+    source_mapping = {
+        'describe': DescribeAlarm,
+        'config': ConfigSource
+    }
 
-    # def augment(self, resources):
-    #     return tags.universal_augment(self.manager, resources)
 
 @Alarm.filter_registry.register('tag')
 class AlarmTagFilter(Filter):
@@ -70,12 +73,6 @@ class AlarmTagFilter(Filter):
         client = local_session(
             self.manager.session_factory).client('cloudwatch')
         print('\nResources: ', resources)
-        for resource_set in chunks(resources, size=100):
-            for r in resource_set:
-                tags = client.list_tags_for_resource(
-                    ResourceARN=r['AlarmArn']
-                )
-                # print('\nTags: ', tags)
         return resources
 
 

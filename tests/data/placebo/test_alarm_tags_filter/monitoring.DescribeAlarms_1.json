@@ -5,7 +5,7 @@
         "MetricAlarms": [
             {
                 "AlarmName": "c7n-test-alarm-tags-filter",
-                "AlarmArn": "arn:aws:cloudwatch:us-east-1:012345678910:alarm:c7n-test-alarm-tags-filter",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-tags-filter",
                 "AlarmConfigurationUpdatedTimestamp": {
                     "__class__": "datetime",
                     "year": 2021,
