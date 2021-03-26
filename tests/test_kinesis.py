@@ -18,7 +18,7 @@ class Kinesis(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 15)
         self.assertEqual(resources[0]["Tags"], [{"Key": "Origin", "Value": "home"}])
         self.assertEqual(resources[0]["StreamStatus"], "ACTIVE")
 

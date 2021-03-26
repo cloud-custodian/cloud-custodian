@@ -4,7 +4,133 @@
         "PaginationToken": "", 
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt", 
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt0", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt1", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt2", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt3", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt4", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt5", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt6", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt7", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt8", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt9", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt10", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt11", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt12", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt13", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt14", 
                 "Tags": [
                     {
                         "Value": "home", 

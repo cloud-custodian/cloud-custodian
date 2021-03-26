@@ -730,7 +730,9 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
             if current_tps > tps_quota:
                 time.sleep(1 - ((tps_current - tps_start) / 1000))
                 tps_start = time.time()
-                tps_count = 0
+            else:
+                tps_start = tps_current
+            tps_count = 0
         kw = {param_name: param_key and r[param_key] or r}
         if tps_quota is not None:
             tps_current = time.time()

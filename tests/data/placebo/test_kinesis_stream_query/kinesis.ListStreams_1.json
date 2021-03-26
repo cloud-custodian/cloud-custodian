@@ -2,7 +2,21 @@
     "status_code": 200, 
     "data": {
         "StreamNames": [
-            "test-yes-encrypt"
+            "test-yes-encrypt0",
+            "test-yes-encrypt1",
+            "test-yes-encrypt2",
+            "test-yes-encrypt3",
+            "test-yes-encrypt4",
+            "test-yes-encrypt5",
+            "test-yes-encrypt6",
+            "test-yes-encrypt7",
+            "test-yes-encrypt8",
+            "test-yes-encrypt9",
+            "test-yes-encrypt10",
+            "test-yes-encrypt11",
+            "test-yes-encrypt12",
+            "test-yes-encrypt13",
+            "test-yes-encrypt14"
         ], 
         "HasMoreStreams": false, 
         "ResponseMetadata": {

@@ -17,7 +17,7 @@
         "StreamDescription": {
             "HasMoreShards": false, 
             "RetentionPeriodHours": 24, 
-            "StreamName": "test-yes-encrypt", 
+            "StreamName": "test-yes-encrypt0", 
             "Shards": [
                 {
                     "ShardId": "shardId-000000000000", 
