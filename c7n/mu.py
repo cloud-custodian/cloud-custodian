@@ -420,8 +420,9 @@ class LambdaManager:
                     LayerName=layer_name,
                     VersionNumber=1
                 )
-                print(layer)
+                log.debug("Previously deployed layer found, using: %s", layer['LayerArn']) 
             except self.client.exceptions.ResourceNotFoundException:
+                log.debug("Creating lambda layer for function as: %s", layer_name)                
                 layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3'])).close()
                 layer = self.client.publish_layer_version(
                     LayerName=layer_name,
@@ -433,6 +434,7 @@ class LambdaManager:
                         'python2.7', 'python3.6','python3.7','python3.8',
                     ],
                 )
+                log.debug("Layer created with SHA: %s", layer['CodeSha256'])
         self._layer = [layer['LayerVersionArn']]
         return self._layer
 
