@@ -305,7 +305,7 @@ class TestSSM(BaseTest):
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        p.run()
         permissions = client.describe_document_permission(
             Name='Test-Document-1',
             PermissionType='Share'
@@ -330,9 +330,9 @@ class TestSSM(BaseTest):
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        p.run()
         try:
-            document = client.get_document(
+            client.get_document(
                 Name='Test-Document-1',
             )
         except Exception as e:
