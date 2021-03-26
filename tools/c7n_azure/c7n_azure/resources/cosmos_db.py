@@ -368,7 +368,6 @@ class CosmosDBOfferFilter(ValueFilter):
     """
 
     schema = type_schema('offer', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def process(self, resources, event=None):
         return OfferHelper.execute_in_parallel_grouped_by_account(
