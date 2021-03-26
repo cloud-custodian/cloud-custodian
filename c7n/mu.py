@@ -417,9 +417,10 @@ class LambdaManager:
             pass
 
     def create_layer(self):
-        layer_name = f'botocore{botocore.__version__}-boto3{boto3.__version__}'.replace('.', '-')
+        layer_name = f'c7n-botocore{botocore.__version__}-boto3{boto3.__version__}'.replace('.', '-')
         if not hasattr(self, '_layer'):
             try:
+                # Maybe use list layers instead and just pull version from there?
                 layer = self.client.get_layer_version(
                     LayerName=layer_name,
                     VersionNumber=1
