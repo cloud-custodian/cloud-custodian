@@ -4,9 +4,10 @@ import json
 import hashlib
 import operator
 
+from concurrent.futures import as_completed
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter
+from c7n.filters import Filter, CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
@@ -605,9 +606,115 @@ class SSMDocument(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ssm'
         enum_spec = ('list_documents', 'DocumentIdentifiers', None)
-        id = 'InstanceId'
         name = 'Name'
         date = 'RegistrationDate'
         arn_type = 'Document'
 
-    permissions = ('ssm:DescribeDocumentPermission','ssm:ListDocuments',)
+    permissions = ('ssm:DescribeDocumentPermission', 'ssm:ListDocuments', )
+
+
+@SSMDocument.filter_registry.register('cross-account')
+class SSMDocumentCrossAccount(CrossAccountAccessFilter):
+    """Filter SSM documents which have cross account permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-cross-account
+                resource: ssm
+                filters:
+                  - type: cross-account
+    """
+
+    schema = type_schema('cross-account')
+    permissions = ('ssm:DescribeDocumentPermission',)
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        client = local_session(self.manager.session_factory).client('ssm')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for resource_set in chunks(resources, 10):
+                futures.append(w.submit(
+                    self.process_resource_set, client, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access \n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, client, resource_set):
+        results = []
+        for r in resource_set:
+            if r['Owner'] == 'Amazon':
+                continue
+            attrs = self.manager.retry(
+                client.describe_document_permission,
+                Name=r['Name'],
+                PermissionType='Share')['AccountSharingInfoList']
+            shared_accounts = {
+                g.get('AccountId') for g in attrs}
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+
+@SSMDocument.action_registry.register('remove-sharing')
+class RemoveSharingSSMDocument(Action):
+    schema = type_schema('remove-sharing')
+    permissions = ('ssm:ModifyDocumentPermission',)
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, CrossAccountAccessFilter):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                "policy:%s action:%s requires cross-account filter" % (
+                    self.manager.ctx.policy.name, self.type))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            client.modify_document_permission(
+                Name=r['Name'],
+                PermissionType='Share',
+                AccountIdsToRemove=r['c7n:CrossAccountViolations']
+            )
+        return resources
+
+
+@SSMDocument.action_registry.register('delete')
+class DeleteSSMDocument(Action):
+    schema = type_schema('delete')
+    permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            try:
+                client.delete_document(Name=r['Name'], Force=True)
+            except client.exceptions.InvalidDocumentOperation:
+                response = client.describe_document_permission(
+                    Name=r['Name'],
+                    PermissionType='Share'
+                )
+                client.modify_document_permission(
+                    Name=r['Name'],
+                    PermissionType='Share',
+                    AccountIdsToRemove=response.get('AccountIds', [])
+                )
+                client.delete_document(
+                    Name=r['Name'],
+                    Force=True
+                )
