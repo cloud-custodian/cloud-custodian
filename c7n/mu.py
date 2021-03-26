@@ -417,7 +417,8 @@ class LambdaManager:
             pass
 
     def create_layer(self):
-        layer_name = f'c7n-botocore{botocore.__version__}-boto3{boto3.__version__}'.replace('.', '-')
+        layer_name = f'c7n-botocore{botocore.__version__} \
+            -boto3{boto3.__version__}'.replace('.', '-')
         if not hasattr(self, '_layer'):
             try:
                 # Maybe use list layers instead and just pull version from there?
@@ -425,10 +426,11 @@ class LambdaManager:
                     LayerName=layer_name,
                     VersionNumber=1
                 )
-                log.debug("Previously deployed layer found, using: %s", layer['LayerArn']) 
+                log.debug("Previously deployed layer found, using: %s", layer['LayerArn'])
             except self.client.exceptions.ResourceNotFoundException:
-                log.debug("Creating lambda layer for function as: %s", layer_name)                
-                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3']), layer_archive=True).close()
+                log.debug("Creating lambda layer for function as: %s", layer_name)
+                layer_archive = PythonPackageArchive(
+                    sorted(['botocore', 'boto3']), layer_archive=True).close()
                 layer = self.client.publish_layer_version(
                     LayerName=layer_name,
                     Description='Lambda Layer for c7n',
@@ -436,7 +438,7 @@ class LambdaManager:
                         'ZipFile': layer_archive.get_bytes()
                     },
                     CompatibleRuntimes=[
-                        'python2.7', 'python3.6','python3.7','python3.8',
+                        'python3.6', 'python3.7', 'python3.8',
                     ],
                 )
                 log.debug("Layer created with SHA: %s", layer['Content']['CodeSha256'])
