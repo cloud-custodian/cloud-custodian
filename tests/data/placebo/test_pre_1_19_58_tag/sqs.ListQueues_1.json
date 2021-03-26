@@ -1,9 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "QueueUrls": [
-            "https://queue.amazonaws.com/644160558196/mine"
-        ],
-        "ResponseMetadata": {}
-    }
-}
