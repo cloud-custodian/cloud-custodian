@@ -113,15 +113,12 @@ class PythonPackageArchive:
 
         return file
 
-    def add_modules(self, ignore, modules, layer_archive):
+    def add_modules(self, ignore, modules):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
         files, including compiled modules. You'll have to add such files
         manually using :py:meth:`add_file`.
         """
-        if layer_archive:
-            os.mkdir('python')
-            # how to make python the root of the archive?
         for module_name in modules:
             module = importlib.import_module(module_name)
 
@@ -430,11 +427,7 @@ class LambdaManager:
                 log.debug("Previously deployed layer found, using: %s", layer['LayerArn']) 
             except self.client.exceptions.ResourceNotFoundException:
                 log.debug("Creating lambda layer for function as: %s", layer_name)                
-<<<<<<< HEAD
                 layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3']), layer_archive=True).close()
-=======
-                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3'])).close()
->>>>>>> d13547d8d4e02697ff73b6778427fef324147069
                 layer = self.client.publish_layer_version(
                     LayerName=layer_name,
                     Description='Lambda Layer for c7n',
