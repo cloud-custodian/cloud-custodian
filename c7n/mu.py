@@ -65,7 +65,7 @@ class PythonPackageArchive:
 
     zip_compression = zipfile.ZIP_DEFLATED
 
-    def __init__(self, modules=(), cache_file=None):
+    def __init__(self, modules=(), cache_file=None, layer_archive=False):
         self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
         if cache_file:
             with open(cache_file, 'rb') as fin:
@@ -75,6 +75,7 @@ class PythonPackageArchive:
             self._temp_archive_file, mode='a',
             compression=self.zip_compression)
         self._closed = False
+        self.layer_archive = layer_archive
         self.add_modules(None, modules)
 
     def __del__(self):
@@ -214,7 +215,10 @@ class PythonPackageArchive:
 
         """
         assert not self._closed, "Archive closed"
-        dest = self.create_zinfo(dest)
+        if self.layer_archive:
+            dest = self.create_zinfo(f'python/{dest}')
+        else:
+            dest = self.create_zinfo(dest)
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -423,7 +427,7 @@ class LambdaManager:
                 log.debug("Previously deployed layer found, using: %s", layer['LayerArn']) 
             except self.client.exceptions.ResourceNotFoundException:
                 log.debug("Creating lambda layer for function as: %s", layer_name)                
-                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3'])).close()
+                layer_archive = PythonPackageArchive(sorted(['botocore', 'boto3']), layer_archive=True).close()
                 layer = self.client.publish_layer_version(
                     LayerName=layer_name,
                     Description='Lambda Layer for c7n',
@@ -434,7 +438,7 @@ class LambdaManager:
                         'python2.7', 'python3.6','python3.7','python3.8',
                     ],
                 )
-                log.debug("Layer created with SHA: %s", layer['CodeSha256'])
+                log.debug("Layer created with SHA: %s", layer['Content']['CodeSha256'])
         self._layer = [layer['LayerVersionArn']]
         return self._layer
 
