@@ -2,14 +2,9 @@
     "status_code": 200,
     "data": {
         "AccountIds": [
-            "xxxxxxxxxxxx",
             "xxxxxxxxxxxx"
         ],
         "AccountSharingInfoList": [
-            {
-                "AccountId": "xxxxxxxxxxxx",
-                "SharedDocumentVersion": "$DEFAULT"
-            },
             {
                 "AccountId": "xxxxxxxxxxxx",
                 "SharedDocumentVersion": "$DEFAULT"

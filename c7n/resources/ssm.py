@@ -675,17 +675,6 @@ class RemoveSharingSSMDocument(Action):
     schema = type_schema('remove-sharing')
     permissions = ('ssm:ModifyDocumentPermission',)
 
-    def validate(self):
-        found = False
-        for f in self.manager.iter_filters():
-            if isinstance(f, CrossAccountAccessFilter):
-                found = True
-                break
-        if not found:
-            raise PolicyValidationError(
-                "policy:%s action:%s requires cross-account filter" % (
-                    self.manager.ctx.policy.name, self.type))
-
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ssm')
         for r in resources:

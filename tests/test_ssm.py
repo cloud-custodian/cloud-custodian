@@ -290,6 +290,7 @@ class TestSSM(BaseTest):
 
     def test_ssm_document_remove_sharing(self):
         session_factory = self.replay_flight_data("test_ssm_document_remove_sharing")
+        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "remove-sharing-ssm-documents",
@@ -305,10 +306,16 @@ class TestSSM(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        permissions = client.describe_document_permission(
+            Name='Test-Document-1',
+            PermissionType='Share'
+        )
+        self.assertEqual(len(permissions.get('AccountIds')), 1)
+        self.assertEqual(permissions.get('AccountIds'), ['xxxxxxxxxxxx'])
 
     def test_ssm_document_delete(self):
         session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "delete-ssm-documents",
@@ -324,4 +331,9 @@ class TestSSM(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        try:
+            document = client.get_document(
+                Name='Test-Document-1',
+            )
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocument)

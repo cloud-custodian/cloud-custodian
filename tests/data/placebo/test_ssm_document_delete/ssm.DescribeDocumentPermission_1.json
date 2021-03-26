@@ -3,7 +3,7 @@
     "data": {
         "AccountIds": [
             "xxxxxxxxxxxx",
-            "xxxxxxxxxxxx"
+            "yyyyyyyyyyyy"
         ],
         "AccountSharingInfoList": [
             {
@@ -11,7 +11,7 @@
                 "SharedDocumentVersion": "$DEFAULT"
             },
             {
-                "AccountId": "xxxxxxxxxxxx",
+                "AccountId": "yyyyyyyyyyyy",
                 "SharedDocumentVersion": "$DEFAULT"
             }
         ],
