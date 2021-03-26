@@ -29,6 +29,20 @@
                 "SchemaVersion": "2.2",
                 "DocumentFormat": "JSON",
                 "Tags": []
+            },
+            {
+                "Name": "Test-AWS-Document",
+                "Owner": "Amazon",
+                "PlatformTypes": [
+                    "Windows",
+                    "Linux",
+                    "MacOS"
+                ],
+                "DocumentVersion": "1",
+                "DocumentType": "Command",
+                "SchemaVersion": "2.2",
+                "DocumentFormat": "JSON",
+                "Tags": []
             }
         ],
         "ResponseMetadata": {}

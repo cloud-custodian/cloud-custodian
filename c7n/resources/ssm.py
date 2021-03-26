@@ -694,7 +694,6 @@ class RemoveSharingSSMDocument(Action):
                 PermissionType='Share',
                 AccountIdsToRemove=r['c7n:CrossAccountViolations']
             )
-        return resources
 
 
 @SSMDocument.action_registry.register('delete')
