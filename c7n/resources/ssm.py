@@ -678,7 +678,7 @@ class RemoveSharingSSMDocument(Action):
     .. code-block:: yaml
 
             policies:
-              - name: ssm-cross-account
+              - name: ssm-remove-sharing
                 resource: ssm-document
                 filters:
                   - type: cross-account
@@ -712,7 +712,7 @@ class DeleteSSMDocument(Action):
     .. code-block:: yaml
 
             policies:
-              - name: ssm-cross-account
+              - name: ssm-delete-documents
                 resource: ssm-document
                 filters:
                   - type: cross-account
