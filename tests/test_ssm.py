@@ -348,7 +348,7 @@ class TestSSM(BaseTest):
         client = session_factory().client("ssm")
         p = self.load_policy(
             {
-                "name": "delete-ssm-documents",
+                "name": "delete-ssm-documents-error",
                 "resource": "ssm-document",
                 "filters": [
                     {
