@@ -2213,6 +2213,7 @@ class SpotFleetRequest(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'SpotFleetRequestId'
+        id_prefix = 'sfr-'
         enum_spec = ('describe_spot_fleet_requests', 'SpotFleetRequestConfigs', None)
         filter_name = 'SpotFleetRequestIds'
         filter_type = 'list'
