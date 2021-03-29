@@ -4,6 +4,9 @@
 from .core import BaseAction
 from c7n.utils import local_session, type_schema
 
+# parameters to save to/restore from a tag
+tag_params = ['Min', 'Max', 'Desired']
+
 
 class AutoscalingBase(BaseAction):
     """Action to resize the min/max/desired count in an application autoscaling target
@@ -100,12 +103,118 @@ class AutoscalingBase(BaseAction):
         """ set the desired for the provided resource """
         raise NotImplementedError
 
+    def process_suspend_scaling(self, target):
+        self.update_scaling_suspended_state(target, True)
+
+    def process_restore_scaling(self, target):
+        self.update_scaling_suspended_state(target, False)
+
+    def update_scaling_suspended_state(self, target, suspended_value):
+        resource_id = target['ResourceId']
+        update_suspended_state = {}
+        for state, suspended in target['SuspendedState'].items():
+            if suspended != suspended_value:
+                update_suspended_state[state] = suspended_value
+
+        if update_suspended_state:
+            self.log.debug('Target %s updating suspended_state=%s' %
+                (resource_id, update_suspended_state))
+
+            client = local_session(self.manager.session_factory).client(
+                'application-autoscaling')
+            client.register_scalable_target(
+                ServiceNamespace=self.service_namespace,
+                ResourceId=resource_id,
+                ScalableDimension=self.scalable_dimension,
+                SuspendedState=update_suspended_state,
+            )
+
+    def update_scaling_options(self, resource, target, new_min, new_max, new_desired):
+        updated = False
+
+        cur_min = target['MinCapacity']
+        cur_max = target['MaxCapacity']
+        cur_desired = self.get_resource_desired(resource)
+
+        if new_desired is not None and new_desired != cur_desired:
+            self.log.debug('Target %s updating desired=%d' %
+                (target['ResourceId'], new_desired))
+            self.set_resource_desired(resource, new_desired)
+            updated = True
+
+            # Lower MinCapacity if desired is below
+            if new_min is not None:
+                new_min = min(new_desired, new_min)
+            else:
+                new_min = min(new_desired, cur_min)
+
+        capacity_changes = {}
+        if new_min is not None and new_min != cur_min:
+            capacity_changes['MinCapacity'] = new_min
+        if new_max is not None and new_max != cur_max:
+            capacity_changes['MaxCapacity'] = new_max
+
+        if capacity_changes:
+            resource_id = target['ResourceId']
+            self.log.debug('Target %s updating min=%s, max=%s'
+                % (resource_id, new_min, new_max))
+            client = local_session(self.manager.session_factory).client(
+                'application-autoscaling')
+            client.register_scalable_target(
+                ServiceNamespace=self.service_namespace,
+                ResourceId=resource_id,
+                ScalableDimension=self.scalable_dimension,
+                **capacity_changes,
+            )
+            updated = True
+
+        return updated
+
+    def process_restore_scaling_options_from_tag(self, resource, target):
+        # we want to restore all ASG size params from saved data
+        self.log.debug(
+            'Want to restore resource %s from tag %s' %
+            (target['ResourceId'], self.data['restore-options-tag']))
+        restore_options = self.get_resource_tag(
+            resource,
+            self.data['restore-options-tag'])
+
+        new_min, new_max, new_desired = None, None, None
+        if restore_options is not None:
+            for field in restore_options.split(':'):
+                (param, value) = field.split('=')
+                if param == 'Min':
+                    new_min = int(value)
+                elif param == 'Max':
+                    new_max = int(value)
+                elif param == 'Desired':
+                    new_desired = int(value)
+
+            return self.update_scaling_options(resource, target, new_min, new_max, new_desired)
+
+        return False
+
+    def process_update_scaling_options(self, resource, target):
+        new_min = self.data.get('min-capacity', None)
+        new_max = self.data.get('max-capacity', None)
+        new_desired = self.data.get('desired', None)
+        return self.update_scaling_options(resource, target, new_min, new_max, new_desired)
+
+    def process_save_scaling_options_to_tag(self, resource, target):
+        current_desired = self.get_resource_desired(resource)
+        # save existing params to a tag before changing them
+        self.log.debug('Saving resource %s size to tag %s' %
+            (target['ResourceId'], self.data['save-options-tag']))
+        self.set_resource_tag(
+            resource,
+            self.data['save-options-tag'],
+            'Min=%d:Max=%d:Desired=%d' % (
+                target['MinCapacity'],
+                target['MaxCapacity'],
+                current_desired))
+
     def process(self, resources):
-        # parameters to save to/restore from a tag
-        tag_params = ['Min', 'Max', 'Desired']
-
         resources_by_id = {self.get_resource_id(r): r for r in resources}
-
         client = local_session(self.manager.session_factory).client(
             'application-autoscaling')
         paginator = client.get_paginator('describe_scalable_targets')
@@ -119,95 +228,21 @@ class AutoscalingBase(BaseAction):
             for target in response['ScalableTargets']:
                 resource_id = target['ResourceId']
                 resource = resources_by_id[resource_id]
-                current_desired = self.get_resource_desired(resource)
-                update = {
-                    'Min': target['MinCapacity'],
-                    'Max': target['MaxCapacity'],
-                    'Desired': current_desired,
-                }
+
+                if 'suspend-scaling' in self.data and self.data['suspend-scaling']:
+                    # suspend scaling activities
+                    self.process_suspend_scaling(target)
+                elif 'restore-scaling' in self.data and self.data['restore-scaling']:
+                    # restore scaling activities
+                    self.process_restore_scaling(target)
 
                 if 'restore-options-tag' in self.data:
-                    # we want to restore all ASG size params from saved data
-                    self.log.debug(
-                        'Want to restore target %s size from tag %s' %
-                        (resource_id, self.data['restore-options-tag']))
-                    restore_options = self.get_resource_tag(
-                        resource,
-                        self.data['restore-options-tag'])
-                    if restore_options is not None:
-                        for field in restore_options.split(':'):
-                            (param, value) = field.split('=')
-                            if param in tag_params:
-                                update[param] = int(value)
-
+                    # resize based on prior TAG values
+                    updated = self.process_restore_scaling_options_from_tag(resource, target)
                 else:
-                    # we want to resize, parse provided params
-                    if 'min-capacity' in self.data:
-                        update['Min'] = self.data['min-capacity']
+                    # resize based on params in policy
+                    updated = self.process_update_scaling_options(resource, target)
 
-                    if 'max-capacity' in self.data:
-                        update['Max'] = self.data['max-capacity']
-
-                    if 'desired' in self.data and type(self.data['desired']) == int:
-                        update['Desired'] = self.data['desired']
-                        # Lower MinCapacity if desired is below
-                        update['Min'] = min(self.data['desired'], update['Min'])
-
-                if update['Min'] == target['MinCapacity']:
-                    del update['Min']
-                if update['Max'] == target['MaxCapacity']:
-                    del update['Max']
-                if update['Desired'] == current_desired:
-                    del update['Desired']
-
-                suspended_state = {}
-                if 'suspend-scaling' in self.data and self.data['suspend-scaling']:
-                    for state, suspended in target['SuspendedState'].items():
-                        if not suspended:
-                            suspended_state[state] = True
-                elif 'restore-scaling' in self.data and self.data['restore-scaling']:
-                    for state, suspended in target['SuspendedState'].items():
-                        if suspended:
-                            suspended_state[state] = False
-
-                if suspended_state:
-                    self.log.debug('Target %s updating suspended_state=%s' %
-                        (resource_id, suspended_state))
-                    client.register_scalable_target(
-                        ServiceNamespace=self.service_namespace,
-                        ResourceId=resource_id,
-                        ScalableDimension=self.scalable_dimension,
-                        SuspendedState=suspended_state,
-                    )
-
-                if update:
-                    if 'Desired' in update:
-                        self.log.debug('Target %s updating desired=%d' %
-                            (resource_id, update['Desired']))
-                        self.set_resource_desired(resource, update['Desired'])
-                    if 'Min' in update or 'Max' in update:
-                        self.log.debug('Target %s updating min=%s, max=%s'
-                            % (resource_id, update.get('Min', target['MinCapacity']),
-                            update.get('Max', target['MaxCapacity'])))
-                        client.register_scalable_target(
-                            ServiceNamespace=self.service_namespace,
-                            ResourceId=resource_id,
-                            ScalableDimension=self.scalable_dimension,
-                            MinCapacity=update.get('Min', target['MinCapacity']),
-                            MaxCapacity=update.get('Max', target['MaxCapacity']),
-                        )
-
-                    if 'save-options-tag' in self.data:
-                        # save existing params to a tag before changing them
-                        self.log.debug('Saving target %s size to tag %s' %
-                            (resource_id, self.data['save-options-tag']))
-                        self.set_resource_tag(
-                            resource,
-                            self.data['save-options-tag'],
-                            'Min=%d:Max=%d:Desired=%d' % (
-                                target['MinCapacity'],
-                                target['MaxCapacity'],
-                                current_desired))
-
-                else:
-                    self.log.debug('nothing to resize')
+                if 'save-options-tag' in self.data and updated:
+                    # save prior values as tags
+                    self.process_save_scaling_options_to_tag(resource, target)
