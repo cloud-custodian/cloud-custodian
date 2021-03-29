@@ -51,7 +51,7 @@ class Alarm(QueryResourceManager):
 
 
 @Alarm.filter_registry.register('tag')
-class AlarmTagFilter(Filter):
+class AlarmTagFilter(ValueFilter):
     """Filter cloud watch alarms based on tags.
 
     :example:
@@ -66,13 +66,12 @@ class AlarmTagFilter(Filter):
                     value: some-tag
                     op: eq
     """
-    schema = type_schema('tag')
+    # schema = type_schema('tag', name={'type': 'string'}, value={'type': 'string'})
     permissions = ('cloudwatch:ListTagsForResource',)
 
     def process(self, resources, event=None):
-        client = local_session(
-            self.manager.session_factory).client('cloudwatch')
-        print('\nResources: ', resources)
+        result = []
+        
         return resources
 
 

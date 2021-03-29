@@ -61,13 +61,21 @@ class AlarmTest(BaseTest):
             {
                 "name": "filter-alarm-tags",
                 "resource": "alarm",
-                "filters": ['tag'],
+                "filters": [
+                    {
+                        'type': 'tag',
+                        'key': 'some-other',
+                        'value': 'some-value',
+                        'op': 'eq'
+                    }
+                ],
             },
             session_factory=factory,
         )
 
         resources = p.run()
-        # print('\nResouces returned from tag filter: ', resources)
+
+        print('\nResouces returned from tag filter: ', resources)
         # self.assertEqual(len(resources), 1)
         # self.assertEqual(
         #     client.describe_alarms(AlarmNames=[alarm_name])["MetricAlarms"], []
