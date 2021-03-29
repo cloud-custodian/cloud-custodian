@@ -822,9 +822,10 @@ class AutoscalingECSService(AutoscalingBase):
         return resource['serviceArn'].split(':')[-1]
 
     def get_resource_tag(self, resource, key):
-        for tag in resource['Tags']:
-            if tag['Key'] == key:
-                return tag['Value']
+        if 'Tags' in resource:
+            for tag in resource['Tags']:
+                if tag['Key'] == key:
+                    return tag['Value']
         return None
 
     def get_resource_desired(self, resource):
