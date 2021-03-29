@@ -605,12 +605,15 @@ class SSMDocument(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'ssm'
-        enum_spec = ('list_documents', 'DocumentIdentifiers', None)
+        enum_spec = ('list_documents', 'DocumentIdentifiers', {'Filters': [
+            {
+                'Key': 'Owner',
+                'Values': ['Self']}]})
         name = 'Name'
         date = 'RegistrationDate'
         arn_type = 'Document'
 
-    permissions = ('ssm:DescribeDocumentPermission', 'ssm:ListDocuments', )
+    permissions = ('ssm:ListDocuments',)
 
 
 @SSMDocument.filter_registry.register('cross-account')
@@ -652,8 +655,6 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
     def process_resource_set(self, client, resource_set):
         results = []
         for r in resource_set:
-            if r['Owner'] == 'Amazon':
-                continue
             attrs = self.manager.retry(
                 client.describe_document_permission,
                 Name=r['Name'],
@@ -669,7 +670,21 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
 
 @SSMDocument.action_registry.register('remove-sharing')
 class RemoveSharingSSMDocument(Action):
-    """Remove external accounts from SSM document permissions
+    """Remove external accounts from SSM document permissions. For use with Cross Account filter,
+    which will identify external accounts on documents to be removed.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-cross-account
+                resource: ssm-document
+                filters:
+                  - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
+                actions:
+                  - type: remove-sharing
     """
 
     schema = type_schema('remove-sharing')
@@ -687,28 +702,51 @@ class RemoveSharingSSMDocument(Action):
 
 @SSMDocument.action_registry.register('delete')
 class DeleteSSMDocument(Action):
-    """Delete SSM documents
+    """Delete SSM documents. Set force flag to True to force delete on documents that are
+    shared across accounts. This will remove those shared accounts, and then delete the document.
+    Otherwise, delete will fail and raise InvalidDocumentOperation exception
+    if a document is shared with other accounts. Default value for force is False.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-cross-account
+                resource: ssm-document
+                filters:
+                  - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
+                actions:
+                  - type: delete
+                    force: True
     """
 
-    schema = type_schema('delete')
-    permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission')
+    schema = type_schema(
+        'delete',
+        force={'type': 'boolean'}
+    )
+    permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ssm')
         for r in resources:
             try:
                 client.delete_document(Name=r['Name'], Force=True)
-            except client.exceptions.InvalidDocumentOperation:
-                response = client.describe_document_permission(
-                    Name=r['Name'],
-                    PermissionType='Share'
-                )
-                client.modify_document_permission(
-                    Name=r['Name'],
-                    PermissionType='Share',
-                    AccountIdsToRemove=response.get('AccountIds', [])
-                )
-                client.delete_document(
-                    Name=r['Name'],
-                    Force=True
-                )
+            except client.exceptions.InvalidDocumentOperation as e:
+                if self.data.get('force', False):
+                    response = client.describe_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share'
+                    )
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToRemove=response.get('AccountIds', [])
+                    )
+                    client.delete_document(
+                        Name=r['Name'],
+                        Force=True
+                    )
+                else:
+                    raise(e)

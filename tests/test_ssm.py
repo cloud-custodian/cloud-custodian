@@ -326,7 +326,12 @@ class TestSSM(BaseTest):
                         "whitelist": ["xxxxxxxxxxxx"]
                     }
                 ],
-                "actions": [{"type": "delete"}]
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ]
             },
             session_factory=session_factory,
         )
@@ -337,3 +342,30 @@ class TestSSM(BaseTest):
             )
         except Exception as e:
             self.assertTrue(e, client.exceptions.InvalidDocument)
+
+    def test_ssm_document_delete_error(self):
+        session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "delete-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        try:
+            p.run()
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
