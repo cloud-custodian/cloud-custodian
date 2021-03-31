@@ -64,7 +64,6 @@ class CloudHSM(QueryResourceManager):
         name = 'Name'
         detail_spec = ("describe_hsm", "HsmArn", None, None)
 
-
     def resources(self, query=None, augment=True):
         try:
             return super().resources(query, augment)
