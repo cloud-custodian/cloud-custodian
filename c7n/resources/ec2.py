@@ -2227,7 +2227,7 @@ SpotFleetRequest.filter_registry.register('offhour', OffHour)
 SpotFleetRequest.filter_registry.register('onhour', OnHour)
 
 
-@SpotFleetRequest.action_registry.register('autoscaling')
+@SpotFleetRequest.action_registry.register('resize')
 class AutoscalingSpotFleetRequest(AutoscalingBase):
     permissions = (
         'ec2:CreateTags',

@@ -807,7 +807,7 @@ Service.filter_registry.register('offhour', OffHour)
 Service.filter_registry.register('onhour', OnHour)
 
 
-@Service.action_registry.register('autoscaling')
+@Service.action_registry.register('resize')
 class AutoscalingECSService(AutoscalingBase):
     permissions = (
         'ecs:UpdateService',

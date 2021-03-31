@@ -2000,7 +2000,7 @@ class TestSpotFleetRequest(BaseTest):
                 ],
                 "actions": [
                     {
-                        'type': 'autoscaling',
+                        'type': 'resize',
                         'min-capacity': 0,
                         'desired': 0,
                         'save-options-tag': 'OffHoursPrevious',
@@ -2029,7 +2029,7 @@ class TestSpotFleetRequest(BaseTest):
                 ],
                 "actions": [
                     {
-                        'type': 'autoscaling',
+                        'type': 'resize',
                         'restore-options-tag': 'OffHoursPrevious',
                         'restore-scaling': True,
                     }
