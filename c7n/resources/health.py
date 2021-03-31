@@ -18,6 +18,7 @@ class HealthEvents(QueryResourceManager):
         arn_type = 'event'
         enum_spec = ('describe_events', 'events', None)
         name = 'eventTypeCode'
+        global_resource = True
         id = 'arn'
         date = 'startTime'
 
