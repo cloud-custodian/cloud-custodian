@@ -26,7 +26,7 @@ class AutoscalingBase(BaseAction):
                     offhour: 19
                     default_tz: bst
                 actions:
-                  - type: autoscaling
+                  - type: resize
                     min-capacity: 0
                     desired: 0
                     save-options-tag: OffHoursPrevious
@@ -44,14 +44,14 @@ class AutoscalingBase(BaseAction):
                     onhour: 8
                     default_tz: bst
                 actions:
-                  - type: autoscaling
+                  - type: resize
                     restore-options-tag: OffHoursPrevious
                     restore-scaling: true
 
     """
 
     schema = type_schema(
-        'autoscaling',
+        'resize',
         **{
             'min-capacity': {'type': 'integer', 'minimum': 0},
             'max-capacity': {'type': 'integer', 'minimum': 0},
