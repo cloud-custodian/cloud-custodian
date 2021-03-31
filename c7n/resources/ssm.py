@@ -658,7 +658,8 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
             attrs = self.manager.retry(
                 client.describe_document_permission,
                 Name=r['Name'],
-                PermissionType='Share')['AccountSharingInfoList']
+                PermissionType='Share',
+                ignore_err_codes=('InvalidDocument',))['AccountSharingInfoList']
             shared_accounts = {
                 g.get('AccountId') for g in attrs}
             delta_accounts = shared_accounts.difference(self.accounts)
@@ -668,36 +669,67 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
         return results
 
 
-@SSMDocument.action_registry.register('remove-sharing')
+@SSMDocument.action_registry.register('set-sharing')
 class RemoveSharingSSMDocument(Action):
-    """Remove external accounts from SSM document permissions. For use with Cross Account filter,
-    which will identify external accounts on documents to be removed.
+    """Edit list of accounts that share permissions on an SSM document. Pass in a list of account
+    IDs to the 'add' or 'remove' fields to edit document sharing permissions.
+    Set 'remove' to 'matched' to automatically remove any external accounts on a
+    document (use in conjunction with the cross-account filter).
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: ssm-remove-sharing
+              - name: ssm-set-sharing
                 resource: ssm-document
                 filters:
                   - type: cross-account
                     whitelist: [xxxxxxxxxxxx]
                 actions:
-                  - type: remove-sharing
+                  - type: set-sharing
+                    add: [yyyyyyyyyy]
+                    remove: matched
     """
 
-    schema = type_schema('remove-sharing')
+    schema = type_schema('set-sharing',
+                        remove={
+                            'oneOf': [
+                                {'enum': ['matched']},
+                                {'type': 'array', 'items': {
+                                    'type': 'string'}},
+                            ]},
+                        add={
+                            'type': 'array', 'items': {
+                                'type': 'string'}})
     permissions = ('ssm:ModifyDocumentPermission',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ssm')
-        for r in resources:
-            client.modify_document_permission(
-                Name=r['Name'],
-                PermissionType='Share',
-                AccountIdsToRemove=r['c7n:CrossAccountViolations']
-            )
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+        if self.data.get('remove') == 'matched':
+            for r in resources:
+                try:
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToAdd=add_accounts,
+                        AccountIdsToRemove=r['c7n:CrossAccountViolations']
+                    )
+                except client.exceptions.InvalidDocumentOperation as e:
+                    raise(e)
+        else:
+            for r in resources:
+                try:
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToAdd=add_accounts,
+                        AccountIdsToRemove=remove_accounts
+                    )
+                except client.exceptions.InvalidDocumentOperation as e:
+                    raise(e)
 
 
 @SSMDocument.action_registry.register('delete')
