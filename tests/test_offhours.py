@@ -328,7 +328,8 @@ class OffHoursFilterTest(BaseTest):
         self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "off"))
         self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "on"))
         self.assertTrue(off.parser.keys_are_valid(off.get_tag_value(i)))
-        self.assertEqual(off.parser.raw_data(off.get_tag_value(i)), {'off': '[(s,1)]', 'on': '[(m,6)]', 'tz': 'pst'})
+        self.assertEqual(off.parser.raw_data(off.get_tag_value(i)),
+                        {'off': '[(s,1)]', 'on': '[(m,6)]', 'tz': 'pst'})
 
     def test_offhours(self):
         t = datetime.datetime(
