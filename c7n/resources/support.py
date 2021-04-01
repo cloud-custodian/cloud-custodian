@@ -10,6 +10,7 @@ class SupportCase(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'support'
         enum_spec = ('describe_cases', 'cases', None)
+        global_resource = True
         filter_name = 'caseIdList'
         filter_type = 'list'
         id = 'caseId'
