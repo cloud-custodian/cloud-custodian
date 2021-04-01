@@ -221,7 +221,6 @@ class AutoscalingBase(BaseAction):
         paginator = client.get_paginator('describe_scalable_targets')
         response_iterator = paginator.paginate(
             ServiceNamespace=self.service_namespace,
-            ScalableDimension=self.scalable_dimension,
         )
 
         for response in response_iterator:
@@ -229,6 +228,9 @@ class AutoscalingBase(BaseAction):
                 resource_id = target['ResourceId']
 
                 if resource_id not in resource_ids:
+                    continue
+
+                if target['ScalableDimension'] != self.scalable_dimension:
                     continue
 
                 resource = resources_by_id[resource_id]
