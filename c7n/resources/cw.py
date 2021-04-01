@@ -13,7 +13,8 @@ from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource)
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
@@ -50,31 +51,6 @@ class Alarm(QueryResourceManager):
     }
 
 
-@Alarm.filter_registry.register('tag')
-class AlarmTagFilter(ValueFilter):
-    """Filter cloud watch alarms based on tags.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: cloudwatch-alarms-tag-filter
-                resource: alarm
-                filters:
-                  - type: tag
-                    value: some-tag
-                    op: eq
-    """
-    # schema = type_schema('tag', name={'type': 'string'}, value={'type': 'string'})
-    permissions = ('cloudwatch:ListTagsForResource',)
-
-    def process(self, resources, event=None):
-        result = []
-        
-        return resources
-
-
 @Alarm.action_registry.register('tag')
 class AlarmTag(Tag):
     """Action to add tag(s) to CloudWatch alarms
@@ -84,10 +60,8 @@ class AlarmTag(Tag):
     .. code-block:: yaml
 
             policies:
-              - name: cw-alarm-add-owner-tag
+              - name: cw-alarm-add-tag
                 resource: alarm
-                filters:
-                  - "tag:OwnerName": missing
                 actions:
                   - type: tag
                     key: OwnerName
@@ -97,9 +71,9 @@ class AlarmTag(Tag):
 
     def process_resource_set(self, client, resource_set, tags):
         for r in resource_set:
-                client.tag_resource(
-                    AlarmArn=r['AlarmArn'],
-                    Tags=tags)
+            client.tag_resource(
+                ResourceARN=r['AlarmArn'],
+                Tags=tags)
 
 
 @Alarm.action_registry.register('delete')
