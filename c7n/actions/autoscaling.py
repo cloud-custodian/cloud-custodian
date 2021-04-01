@@ -215,18 +215,22 @@ class AutoscalingBase(BaseAction):
 
     def process(self, resources):
         resources_by_id = {self.get_resource_id(r): r for r in resources}
+        resource_ids = list(resources_by_id.keys())
         client = local_session(self.manager.session_factory).client(
             'application-autoscaling')
         paginator = client.get_paginator('describe_scalable_targets')
         response_iterator = paginator.paginate(
             ServiceNamespace=self.service_namespace,
-            ResourceIds=list(resources_by_id.keys()),
             ScalableDimension=self.scalable_dimension,
         )
 
         for response in response_iterator:
             for target in response['ScalableTargets']:
                 resource_id = target['ResourceId']
+
+                if resource_id not in resource_ids:
+                    continue
+
                 resource = resources_by_id[resource_id]
 
                 if 'suspend-scaling' in self.data and self.data['suspend-scaling']:
