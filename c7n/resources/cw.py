@@ -34,7 +34,6 @@ class Alarm(QueryResourceManager):
         filter_type = 'list'
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
-        cfn_type = config_type = 'AWS::CloudWatch::Alarm'
         universal_taggable = object()
 
     augment = universal_augment
