@@ -159,7 +159,7 @@ class Host:
 
             client.get_blob_to_path(container, blob.name, policy_path)
             self.load_policy(policy_path, policies_copy)
-            self.blob_cache.update({blob.name: blob.properties.content_settings.content_md5})
+            self.blob_cache.update({blob.name: blob.content_settings.content_md5})
 
         # Assign our copy back over the original
         self.policies = policies_copy
@@ -167,7 +167,7 @@ class Host:
     def _get_new_blobs(self, blobs):
         new_blobs = []
         for blob in blobs:
-            md5_hash = blob.properties.content_settings.content_md5
+            md5_hash = blob.content_settings.content_md5
             if not md5_hash:
                 blob, md5_hash = self._try_create_md5_content_hash(blob)
             if blob and md5_hash and md5_hash != self.blob_cache.get(blob.name):
@@ -191,7 +191,7 @@ class Host:
             # Re-fetch the blob with the new hash
             hashed_blob = client.get_blob_properties(container, blob.name)
 
-            return hashed_blob, hashed_blob.properties.content_settings.content_md5
+            return hashed_blob, hashed_blob.content_settings.content_md5
         except AzureHttpError as e:
             log.warning("Failed to apply a md5 content hash to policy {}. "
                         "This policy will be skipped.".format(blob.name))

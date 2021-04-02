@@ -166,7 +166,6 @@ class VirtualMachine(ArmResourceManager):
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def __call__(self, i):
         if 'instanceView' not in i:
@@ -199,7 +198,7 @@ class VmPowerOffAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.power_off(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_power_off(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('stop')
@@ -211,7 +210,7 @@ class VmStopAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.deallocate(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_deallocate(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('start')
@@ -223,7 +222,7 @@ class VmStartAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.start(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_start(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
@@ -235,7 +234,7 @@ class VmRestartAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.restart(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_restart(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('resize')
@@ -280,7 +279,7 @@ class VmResizeAction(AzureBaseAction):
     def _process_resource(self, resource):
         hardware_profile = HardwareProfile(vm_size=self.vm_size)
 
-        self.client.virtual_machines.update(
+        self.client.virtual_machines.begin_update(
             resource['resourceGroup'],
             resource['name'],
             VirtualMachineUpdate(hardware_profile=hardware_profile)

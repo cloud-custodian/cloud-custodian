@@ -5,8 +5,10 @@
 -r tools/c7n_azure/requirements.txt
 -r tools/c7n_gcp/requirements.txt
 -r tools/c7n_kube/requirements.txt
+-r tools/c7n_openstack/requirements.txt
 -r tools/c7n_mailer/requirements.txt
 -r tools/c7n_org/requirements.txt
+-r tools/c7n_terraform/requirements.txt
 
 # Setup source directories as editable/development distributions
 -e .
@@ -18,6 +20,8 @@
 -e tools/c7n_gcp
 # Local package required for c7n_kube tests
 -e tools/c7n_kube
+# Local package required for c7n_openstack tests
+-e tools/c7n_openstack
 # Local package required for c7n_org tests
 -e tools/c7n_org
 

@@ -4,14 +4,14 @@
 Lambda entry point
 """
 from c7n_azure.session import Session
-from c7n_azure.constants import RESOURCE_STORAGE
+from c7n_azure.constants import STORAGE_AUTH_ENDPOINT
 from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 
 
 def start_c7n_mailer(logger, config, auth_file):
     try:
         logger.info('c7n_mailer starting...')
-        session = Session(authorization_file=auth_file, resource=RESOURCE_STORAGE)
+        session = Session(authorization_file=auth_file, resource=STORAGE_AUTH_ENDPOINT)
         mailer_azure_queue_processor = MailerAzureQueueProcessor(config, logger, session=session)
         mailer_azure_queue_processor.run()
     except Exception as e:

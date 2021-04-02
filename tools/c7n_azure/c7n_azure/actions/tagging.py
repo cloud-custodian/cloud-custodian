@@ -308,8 +308,12 @@ class AutoTagUser(AutoTagBase):
             return False
 
     def _get_tag_value_from_resource(self, resource):
-        first_op = self._get_first_event(resource).serialize(True)
-        return self._get_tag_value_from_event({'data': first_op})
+        first_op = self._get_first_event(resource)
+
+        if not first_op:
+            return None
+
+        return self._get_tag_value_from_event({'data': first_op.serialize(True)})
 
 
 class AutoTagDate(AutoTagBase):

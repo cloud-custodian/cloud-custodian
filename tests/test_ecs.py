@@ -333,6 +333,27 @@ class TestEcsTask(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 4)
 
+    def test_ecs_task_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_task_subnet")
+        p = self.load_policy(
+            {
+                "name": "ecs-task-fargate-subnets",
+                "resource": "ecs-task",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:Name",
+                        "value": "implied"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('attachments')[0].get(
+            'details')[0].get('value'), "subnet-05b58b4afe5124322")
+
     def test_task_delete(self):
         session_factory = self.replay_flight_data("test_ecs_task_delete")
         p = self.load_policy(

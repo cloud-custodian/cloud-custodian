@@ -96,7 +96,7 @@ class Resize(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, cluster):
-        self.client.clusters.resize(
+        self.client.clusters.begin_resize(
             cluster['resourceGroup'],
             cluster['name'],
             target_instance_count=self.data['count']

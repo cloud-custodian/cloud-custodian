@@ -48,6 +48,7 @@ class AMI(QueryResourceManager):
         filter_type = 'list'
         name = 'Name'
         date = 'CreationDate'
+        id_prefix = "ami-"
 
     source_mapping = {
         'describe': DescribeImageSource

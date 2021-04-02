@@ -219,3 +219,43 @@ class Kinesis(BaseTest):
             ],
             "DELETING",
         )
+
+    def test_video_stream_delete(self):
+        factory = self.replay_flight_data("test_kinesis_video_stream_delete")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-delete",
+                "resource": "kinesis-video",
+                "filters": [{"StreamName": "test-video"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        stream = factory().client("kinesisvideo").describe_stream(StreamName="test-video")[
+            "StreamInfo"
+        ]
+        self.assertEqual(stream["Status"], "DELETING")
+
+    def test_kinesis_video_kms_key(self):
+        session_factory = self.replay_flight_data("test_kinesis_video_kms_key")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-kms-alias",
+                "resource": "kinesis-video",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/alias/aws/lambda)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['KmsKeyId'],
+            'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')

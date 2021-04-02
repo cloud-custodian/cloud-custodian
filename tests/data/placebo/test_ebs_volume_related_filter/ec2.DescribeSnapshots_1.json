@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-02185b624983574f8",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 24,
+                    "second": 10,
+                    "microsecond": 691000
+                },
+                "State": "completed",
+                "VolumeId": "vol-02dbf91b6667bcdad",
+                "VolumeSize": 1
+            },
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-03ab300c6ce8d9e7e",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 15,
+                    "hour": 23,
+                    "minute": 16,
+                    "second": 16,
+                    "microsecond": 135000
+                },
+                "State": "completed",
+                "VolumeId": "vol-0ec2ee2808bf1bb7d",
+                "VolumeSize": 8
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

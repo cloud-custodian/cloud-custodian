@@ -61,7 +61,9 @@ class FunctionPackageTest(BaseTest):
             content = json.loads(zf.read('test-azure-public-ip/auth.json'))
             self.assertEqual(content, {
                 'client_id': 'dog',
-                'subscription_id': None, 'use_msi': True})
+                'subscription_id': None,
+                'use_msi': True,
+                'tenant_id': self.session.get_tenant_id()})
 
     def test_auth_file_user_assigned_identity(self):
         p = self.load_policy({
@@ -80,7 +82,10 @@ class FunctionPackageTest(BaseTest):
         packer.pkg.close()
         with zipfile.ZipFile(packer.pkg.path) as zf:
             content = json.loads(zf.read('test-azure-public-ip/auth.json'))
-            self.assertEqual(content, {'subscription_id': None, 'use_msi': True})
+            self.assertEqual(content, {
+                'subscription_id': None,
+                'use_msi': True,
+                'tenant_id': self.session.get_tenant_id()})
 
     def test_add_function_config_events(self):
         p = self.load_policy({

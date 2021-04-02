@@ -10,9 +10,13 @@ import yaml
 
 import jinja2
 import jmespath
-from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
+
+try:
+    from botocore.exceptions import ClientError
+except ImportError:  # pragma: no cover
+    pass  # Azure provider
 
 
 class Providers:

@@ -178,8 +178,12 @@ class ArnResolver:
             arn_set = list(arn_set)
             rtype = ArnResolver.resolve_type(arn_set[0])
             rmanager = self.manager.get_resource_manager(rtype)
-            resources = rmanager.get_resources(
-                [rarn.resource for rarn in arn_set])
+            if rtype == 'sns':
+                resources = rmanager.get_resources(
+                    [rarn.arn for rarn in arn_set])
+            else:
+                resources = rmanager.get_resources(
+                    [rarn.resource for rarn in arn_set])
             for rarn, r in zip(rmanager.get_arns(resources), resources):
                 results[rarn] = r
 
@@ -204,6 +208,9 @@ class ArnResolver:
                 return type_name
             elif (klass.resource_type.arn_type is not None and
                     klass.resource_type.arn_type == arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_service == arn.service and
+                    klass.resource_type.arn_type == ""):
                 return type_name
 
 

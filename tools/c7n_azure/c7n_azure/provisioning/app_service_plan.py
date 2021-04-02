@@ -35,9 +35,9 @@ class AppServicePlanUnit(DeploymentUnit):
             target_worker_size_id=0,
             reserved=True)
 
-        plan = self.client.app_service_plans.create_or_update(params['resource_group_name'],
-                                                              params['name'],
-                                                              plan_params).result()
+        plan = self.client.app_service_plans.begin_create_or_update(params['resource_group_name'],
+                                                                    params['name'],
+                                                                    plan_params).result()
 
         # Deploy default autoscale rule for dedicated plans if required by the policy
         autoscale_params = copy.deepcopy(params.get('auto_scale', {}))
