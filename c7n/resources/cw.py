@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import botocore.exceptions
 
-from c7n import tags
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
@@ -13,20 +12,13 @@ from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource)
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
-from c7n.tags import Tag, universal_augment
+from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
-
-
-class DescribeAlarm(DescribeSource):
-
-    def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('alarm')
@@ -43,37 +35,11 @@ class Alarm(QueryResourceManager):
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
+        universal_taggable = object()
+
+    augment = universal_augment
 
     retry = staticmethod(get_retry(('Throttled',)))
-    source_mapping = {
-        'describe': DescribeAlarm,
-        'config': ConfigSource
-    }
-
-
-@Alarm.action_registry.register('tag')
-class AlarmTag(Tag):
-    """Action to add tag(s) to CloudWatch alarms
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: cw-alarm-add-tag
-                resource: alarm
-                actions:
-                  - type: tag
-                    key: OwnerName
-                    value: OwnerName
-    """
-    permissions = ('cloudwatch:TagResource',)
-
-    def process_resource_set(self, client, resource_set, tags):
-        for r in resource_set:
-            client.tag_resource(
-                ResourceARN=r['AlarmArn'],
-                Tags=tags)
 
 
 @Alarm.action_registry.register('delete')
