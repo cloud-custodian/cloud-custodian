@@ -349,6 +349,7 @@ class TestEcsTaskDefinition(BaseTest):
                                'hostPort': 80,
                                'protocol': 'tcp'}],
              'volumesFrom': []}]
+        assert resources[0]['Tags'] == [{'Key': 'test', 'Value': 'name'}]
         client = session_factory().client("ecs")
         self.assertEqual(len(client.list_tags_for_resource(
             resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)

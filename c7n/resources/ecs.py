@@ -508,12 +508,15 @@ class DescribeTaskDefinition(DescribeSource):
 
 class ConfigECSTaskDefinition(ConfigSource):
 
-    preserve_empty = ('mountPoints', 'portMappings', 'volumesFrom')
+    preserve_empty = {'mountPoints', 'portMappings', 'volumesFrom'}
+    preserve_case = {'Tags'}
 
     @classmethod
     def lowerKeys(cls, data):
         if isinstance(data, dict):
             for k, v in list(data.items()):
+                if k in cls.preserve_case:
+                    continue
                 lk = k[0].lower() + k[1:]
                 data[lk] = data.pop(k)
                 # describe doesn't return empty list/dict by default
@@ -526,9 +529,7 @@ class ConfigECSTaskDefinition(ConfigSource):
         return data
 
     def load_resource(self, item):
-        resource = self.lowerKeys(super().load_resource(item))
-        ecs_tag_normalize((resource,))
-        return resource
+        return self.lowerKeys(super().load_resource(item))
 
 
 @resources.register('ecs-task-definition')
