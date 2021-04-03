@@ -325,6 +325,30 @@ class TestEcsTaskDefinition(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        assert resources[0]['containerDefinitions'] == [
+            {'command': ['/bin/sh -c "echo \'<html> <head> '
+                         '<title>Amazon ECS Sample App</title> '
+                         '<style>body {margin-top: 40px; '
+                         'background-color: #333;} </style> '
+                         '</head><body> <div '
+                         'style=color:white;text-align:center> '
+                         '<h1>Amazon ECS Sample App</h1> '
+                         '<h2>Congratulations!</h2> <p>Your '
+                         'application is now running on a '
+                         'container in Amazon ECS.</p> '
+                         "</div></body></html>' >  "
+                         '/usr/local/apache2/htdocs/index.html '
+                         '&& httpd-foreground"'],
+             'cpu': 0,
+             'entryPoint': ['sh', '-c'],
+             'essential': True,
+             'image': 'httpd:2.4',
+             'mountPoints': [],
+             'name': 'fargate-app-2',
+             'portMappings': [{'containerPort': 80,
+                               'hostPort': 80,
+                               'protocol': 'tcp'}],
+             'volumesFrom': []}]
         client = session_factory().client("ecs")
         self.assertEqual(len(client.list_tags_for_resource(
             resourceArn=resources[0]["taskDefinitionArn"]).get("tags")), 0)

@@ -324,7 +324,10 @@ class PolicyMetaLint(BaseTest):
             raise AssertionError(
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
+        # config service can't be bothered to update their sdk correctly
+        invalid_ignore = {'AWS::ECS::TaskDefinition'}
         bad_types = resource_config_types.difference(config_types)
+        bad_types = bad_types.difference(invalid_ignore)
         if bad_types:
             raise AssertionError(
                 "Invalid config types \n %s" % ('\n'.join(bad_types)))
