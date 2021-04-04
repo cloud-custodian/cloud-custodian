@@ -206,7 +206,7 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
-        cfn_type = 'AWS::ECS::Service'
+        config_type = cfn_type = 'AWS::ECS::Service'
 
     source_mapping = {
         'config': ECSServiceConfigSource,

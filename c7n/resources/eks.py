@@ -37,7 +37,7 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
-        cfn_type = 'AWS::EKS::Cluster'
+        config_type = cfn_type = 'AWS::EKS::Cluster'
 
     source_mapping = {
         'config': EKSConfigSource,
