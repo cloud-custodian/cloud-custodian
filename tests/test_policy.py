@@ -277,6 +277,7 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
+            'AWS::Config::ConformancePackCompliance',
             'AWS::NetworkFirewall::FirewallPolicy',
             'AWS::NetworkFirewall::Firewall',
             'AWS::NetworkFirewall::RuleGroup',
