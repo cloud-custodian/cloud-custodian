@@ -336,7 +336,10 @@ class PolicyMetaLint(BaseTest):
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
         # config service can't be bothered to update their sdk correctly
-        invalid_ignore = {'AWS::ECS::TaskDefinition'}
+        invalid_ignore = {
+            'AWS::ECS::TaskDefinition',
+            'AWS::NetworkFirewall::Firewall'
+        }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
         if bad_types:
