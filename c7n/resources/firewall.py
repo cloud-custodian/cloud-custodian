@@ -29,7 +29,10 @@ class FirewallConfig(ConfigSource):
 
 @AWS.resources.register('firewall')
 class NetworkFirewall(QueryResourceManager):
+    """AWS Network Firewall
 
+    https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html
+    """
     source_mapping = {
         'describe': FirewallDescribe,
         'config': FirewallConfig
