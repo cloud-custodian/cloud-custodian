@@ -249,6 +249,6 @@ class AutoscalingBase(BaseAction):
                     # resize based on params in policy
                     updated = self.process_update_scaling_options(resource, target)
 
-                if 'save-options-tag' in self.data and updated:
-                    # save prior values as tags
-                    self.process_save_scaling_options_to_tag(resource, target)
+                    if 'save-options-tag' in self.data and updated:
+                        # save prior values as tags
+                        self.process_save_scaling_options_to_tag(resource, target)
