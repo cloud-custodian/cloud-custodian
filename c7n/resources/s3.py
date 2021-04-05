@@ -1642,7 +1642,7 @@ class ToggleLogging(BucketActionBase):
         return self
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory),
+        session = local_session(self.manager.session_factory)
         kwargs = {
             "enabled": self.data.get('enabled', True),
             "session": session,
