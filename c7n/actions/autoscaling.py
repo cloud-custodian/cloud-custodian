@@ -97,6 +97,7 @@ class AutoscalingBase(BaseAction):
 
     def set_resource_tag(self, resource, key, value):
         """ set the tag for the provided resource """
+        """ default implementation is to use `UniversalTag` """
         tag_action = self.manager.action_registry.get('tag')
         tag_action({'key': key, 'value': value}, self.manager).process([resource])
 
