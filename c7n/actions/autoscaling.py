@@ -235,10 +235,10 @@ class AutoscalingBase(BaseAction):
 
                 resource = resources_by_id[resource_id]
 
-                if 'suspend-scaling' in self.data and self.data['suspend-scaling']:
+                if self.data.get('suspend-scaling'):
                     # suspend scaling activities
                     self.process_suspend_scaling(target)
-                elif 'restore-scaling' in self.data and self.data['restore-scaling']:
+                if self.data.get('restore-scaling'):
                     # restore scaling activities
                     self.process_restore_scaling(target)
 
