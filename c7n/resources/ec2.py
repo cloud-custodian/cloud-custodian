@@ -2250,16 +2250,6 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
     def get_resource_desired(self, resource):
         return int(resource['SpotFleetRequestConfig']['TargetCapacity'])
 
-    def set_resource_tag(self, resource, key, value):
-        client = utils.local_session(self.manager.session_factory).client('ec2')
-        client.create_tags(
-            Resources=[resource['SpotFleetRequestId']],
-            Tags=[{
-                'Key': key,
-                'Value': value,
-            }],
-        )
-
     def set_resource_desired(self, resource, desired):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         client.modify_spot_fleet_request(

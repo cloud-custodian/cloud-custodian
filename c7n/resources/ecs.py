@@ -831,16 +831,6 @@ class AutoscalingECSService(AutoscalingBase):
     def get_resource_desired(self, resource):
         return int(resource['desiredCount'])
 
-    def set_resource_tag(self, resource, key, value):
-        client = local_session(self.manager.session_factory).client('ecs')
-        client.tag_resource(
-            resourceArn=resource['serviceArn'],
-            tags=[{
-                'key': key,
-                'value': value,
-            }],
-        )
-
     def set_resource_desired(self, resource, desired):
         client = local_session(self.manager.session_factory).client('ecs')
         client.update_service(
