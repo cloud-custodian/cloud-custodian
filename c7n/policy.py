@@ -1106,6 +1106,7 @@ class Policy:
             'bucket_region': '{bucket_region}',
             'bucket_name': '{bucket_name}',
             'source_bucket_name': '{source_bucket_name}',
+            'source_bucket_region': '{source_bucket_region}',
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
