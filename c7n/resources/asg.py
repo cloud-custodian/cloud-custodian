@@ -1670,9 +1670,9 @@ class Update(Action):
             policies:
               - name: set-asg-instance-lifetime
                 resource: asg
-                filter:
+                filters:
                   - MaxInstanceLifetime: empty
-                action:
+                actions:
                   - type: update
                     max-instance-lifetime: 604800  # (7 days)
 
