@@ -3267,10 +3267,10 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     `key`: arn, alias, or kms id key
 
     `bucket-key`: boolean Optional:
-    Defaults to True for SSE, default AWS KM key, otherwise False. Reduces the
-    amount of API traffic from Amazon S3 to KMS and can reduce KMS request costs
-    by up to 99 percent. Requires kms:Decrypt permissions for copy and upload on
-    the AWS KMS Key Policy.
+    Defaults to True.
+    Reduces amount of API traffic from Amazon S3 to KMS and can reduce KMS request
+    costsby up to 99 percent. Requires kms:Decrypt permissions for copy and upload
+    on the AWS KMS Key Policy.
 
     Bucket Key Docs: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html
 
@@ -3356,12 +3356,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
 
         # bucket key defaults to True for alias/aws/s3 and AES256 (Amazon SSE)
         # and ignores False values for that crypto
-        bucket_key = self.data.get('bucket-key', False)
-        if self.data.get('crypto') in ('AES256', None,):
-            bucket_key = True
-        elif self.data.get('key') == 'alias/aws/s3':
-            bucket_key = True
-
+        bucket_key = self.data.get('bucket-key', True)
         config = {
             'Rules': [
                 {
@@ -3377,11 +3372,6 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             key = self.get_key(bucket)
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
-
-            # Checking if the bucket id or arn passed in is the default s3 key
-            if (key['Description'] == default_key_desc and
-                    key['KeyManager'] == 'AWS'):
-                bucket_key = True
 
             config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
                 'KMSMasterKeyID': key['Arn'],
