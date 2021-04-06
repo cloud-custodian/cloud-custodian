@@ -23,5 +23,5 @@ setup(
     author_email="ryanash@gmail.com",
     license="Apache-2.0",
     py_modules=["c7n_autodoc"],
-    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2==2.10.1", "jsonschema"]
+    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2>=2.11.3", "jsonschema"]
 )
