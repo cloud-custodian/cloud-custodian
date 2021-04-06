@@ -175,7 +175,8 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            credentials, _ = google.auth.default()
+            credentials, _ = google.auth.default(quota_project_id=project_id or
+            get_default_project())
         self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
         if use_rate_limiter:
             self._rate_limiter = RateLimiter(max_calls=quota_max_calls,
