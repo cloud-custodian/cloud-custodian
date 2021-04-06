@@ -94,7 +94,7 @@ def cli(**kwargs):
             continue
         try:
             params = AzureFunctionMode(p).get_function_app_params()
-            creds = web_client.web_apps.list_publishing_credentials(
+            creds = web_client.web_apps.begin_list_publishing_credentials(
                 params.function_app_resource_group_name,
                 params.function_app_name).result()
             deployments[p.name] = {'scm_uri': creds.scm_uri, 'status': None}

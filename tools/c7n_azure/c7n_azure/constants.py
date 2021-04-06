@@ -4,8 +4,7 @@
 """
 Azure Functions
 """
-# Docker version from https://hub.docker.com/r/microsoft/azure-functions/
-FUNCTION_DOCKER_VERSION = 'DOCKER|mcr.microsoft.com/azure-functions/python:3.0-python3.8'
+FUNCTION_DOCKER_VERSION = 'python|3.8'
 FUNCTION_EXT_VERSION = '~3'
 FUNCTION_EVENT_TRIGGER_MODE = 'azure-event-grid'
 FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'

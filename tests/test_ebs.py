@@ -432,6 +432,27 @@ class SnapshotSetPermissions(BaseTest):
         assert perms == [{"UserId": "112233445566"}]
 
 
+class SnapshotVolumeFilter(BaseTest):
+
+    def test_ebs_volume_filter(self):
+        factory = self.replay_flight_data("test_ebs_volume_related_filter")
+        p = self.load_policy(
+            {
+                "name": "ebs-snapshot-volume",
+                "resource": "aws.ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "volume",
+                        "key": "AvailabilityZone",
+                        "value": "us-east-1a"
+                    }
+                ]
+            }, session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
 class AttachedInstanceTest(BaseTest):
 
     def test_ebs_instance_filter(self):

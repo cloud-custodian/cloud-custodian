@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "UpdateToken": "062f41d7-1389-450f-9a9a-041736d3f677",
+        "Firewall": {
+            "FirewallName": "unicron",
+            "FirewallArn": "arn:aws:network-firewall:us-east-2:644160558196:firewall/unicron",
+            "FirewallPolicyArn": "arn:aws:network-firewall:us-east-2:644160558196:firewall-policy/policya",
+            "VpcId": "vpc-0517fa6f2b78569ac",
+            "SubnetMappings": [
+                {
+                    "SubnetId": "subnet-0419cca2069994f38"
+                },
+                {
+                    "SubnetId": "subnet-060031dd8ac95c297"
+                }
+            ],
+            "DeleteProtection": false,
+            "SubnetChangeProtection": false,
+            "FirewallPolicyChangeProtection": false,
+            "FirewallId": "f80c47ff-8cd0-46f9-aeb7-e4093414f0ed",
+            "Tags": [
+                {
+                    "Key": "App",
+                    "Value": "CustodianDev"
+                },
+                {
+                    "Key": "Owner",
+                    "Value": "Kapil"
+                }
+            ]
+        },
+        "FirewallStatus": {
+            "Status": "READY",
+            "ConfigurationSyncStateSummary": "IN_SYNC",
+            "SyncStates": {
+                "us-east-2a": {
+                    "Attachment": {
+                        "SubnetId": "subnet-0419cca2069994f38",
+                        "EndpointId": "vpce-0720b9b5e9a7d611e",
+                        "Status": "READY"
+                    },
+                    "Config": {
+                        "arn:aws:network-firewall:us-east-2:644160558196:firewall-policy/policya": {
+                            "SyncStatus": "IN_SYNC",
+                            "UpdateToken": "9e6f07c6-c057-4d62-8136-ab2bba025cfa"
+                        }
+                    }
+                },
+                "us-east-2c": {
+                    "Attachment": {
+                        "SubnetId": "subnet-060031dd8ac95c297",
+                        "EndpointId": "vpce-053a673424ec2b82f",
+                        "Status": "READY"
+                    },
+                    "Config": {
+                        "arn:aws:network-firewall:us-east-2:644160558196:firewall-policy/policya": {
+                            "SyncStatus": "IN_SYNC",
+                            "UpdateToken": "9e6f07c6-c057-4d62-8136-ab2bba025cfa"
+                        }
+                    }
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

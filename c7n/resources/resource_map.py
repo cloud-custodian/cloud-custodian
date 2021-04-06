@@ -69,6 +69,7 @@ ResourceMap = {
     "aws.event-bus": "c7n.resources.cw.EventBus",
     "aws.event-rule": "c7n.resources.cw.EventRule",
     "aws.event-rule-target": "c7n.resources.cw.EventRuleTarget",
+    "aws.firewall": "c7n.resources.firewall.NetworkFirewall",
     "aws.firehose": "c7n.resources.kinesis.DeliveryStream",
     "aws.fsx": "c7n.resources.fsx.FSx",
     "aws.fsx-backup": "c7n.resources.fsx.FSxBackup",

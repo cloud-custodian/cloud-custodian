@@ -6,25 +6,26 @@ import logging
 
 import jsonpickle
 from azure.cosmosdb.table import TableService
-from azure.mgmt.storage.models import IPRule, \
-    NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
-from azure.storage.blob import BlockBlobService
-from azure.storage.common.models import RetentionPolicy, Logging
+from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
+                                       StorageAccountUpdateParameters,
+                                       VirtualNetworkRule)
+from azure.storage.blob import BlobServiceClient
+from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
-from azure.storage.queue import QueueService
+from azure.storage.queue import QueueServiceClient
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import type_schema
+from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import FirewallRulesFilter, ValueFilter, FirewallBypassFilter
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
+                               ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ThreadHelper
 from netaddr import IPSet
-
-from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema
-from c7n.utils import local_session, get_annotation_prefix
 
 
 @resources.register('storage')
@@ -322,22 +323,23 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
-        token = StorageUtilities.get_storage_token(session)
         result, errors = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self.process_resource_set,
             executor_factory=self.executor_factory,
             log=self.log,
-            session=session,
-            token=token
+            session=session
         )
         return result
 
-    def process_resource_set(self, resources, event=None, session=None, token=None):
+    def process_resource_set(self, resources, event=None, session=None):
         matched = []
         for resource in resources:
-            settings = self._get_settings(resource, session, token)
+            settings = self._get_settings(resource, session)
+            # New SDK renamed the property, this code is to ensure back compat
+            if 'analytics_logging' in settings.keys():
+                settings['logging'] = settings.pop('analytics_logging')
             filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
                                                                                      event)
 
@@ -346,12 +348,12 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
         return matched
 
-    def _get_settings(self, storage_account, session=None, token=None):
+    def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
         if not (storage_prefix_property in storage_account):
             settings = StorageSettingsUtilities.get_settings(
-                self.storage_type, storage_account, session, token)
+                self.storage_type, storage_account, session)
             storage_account[storage_prefix_property] = json.loads(jsonpickle.encode(settings))
 
         return storage_account[storage_prefix_property]
@@ -421,26 +423,41 @@ class SetLogSettingsAction(AzureBaseAction):
                 'attribute: retention can not be less than 0 or greater than 365')
 
     def process_in_parallel(self, resources, event):
-        self.token = StorageUtilities.get_storage_token(self.session)
         return super(SetLogSettingsAction, self).process_in_parallel(resources, event)
 
     def _process_resource(self, resource, event=None):
-        retention = RetentionPolicy(enabled=self.retention != 0, days=self.retention)
-        log_settings = Logging(self.DELETE in self.logs_to_enable, self.READ in self.logs_to_enable,
-                               self.WRITE in self.logs_to_enable, retention_policy=retention)
 
         for storage_type in self.storage_types:
+            if storage_type in [BLOB_TYPE, QUEUE_TYPE, FILE_TYPE]:
+                log_settings = {
+                    'delete': self.DELETE in self.logs_to_enable,
+                    'read': self.READ in self.logs_to_enable,
+                    'write': self.WRITE in self.logs_to_enable,
+                    'retention_policy': {
+                        'enabled': self.retention != 0,
+                        'days': self.retention if self.retention != 0 else None  # Throws if 0
+                    },
+                    'version': '1.0'}
+            else:
+                log_settings = Logging(
+                    self.DELETE in self.logs_to_enable,
+                    self.READ in self.logs_to_enable,
+                    self.WRITE in self.logs_to_enable,
+                    retention_policy=RetentionPolicy(
+                        enabled=self.retention != 0,
+                        days=self.retention))
+
             StorageSettingsUtilities.update_logging(storage_type, resource,
-                                                    log_settings, self.session, self.token)
+                                                    log_settings, self.session)
 
 
 class StorageSettingsUtilities:
 
     @staticmethod
-    def _get_blob_client_from_storage_account(storage_account, token):
-        return BlockBlobService(
-            account_name=storage_account['name'],
-            token_credential=token
+    def _get_blob_client_from_storage_account(storage_account, session):
+        return BlobServiceClient(
+            account_url=storage_account['properties']['primaryEndpoints']['blob'],
+            credential=session.get_credentials()
         )
 
     @staticmethod
@@ -466,30 +483,32 @@ class StorageSettingsUtilities:
         )
 
     @staticmethod
-    def _get_queue_client_from_storage_account(storage_account, token):
-        return QueueService(account_name=storage_account['name'], token_credential=token)
+    def _get_queue_client_from_storage_account(storage_account, session):
+        return QueueServiceClient(
+            account_url=storage_account['properties']['primaryEndpoints']['queue'],
+            credential=session.get_credentials()
+        )
 
     @staticmethod
-    def _get_client(storage_type, storage_account, session=None, token=None):
-        if storage_type == TABLE_TYPE or storage_type == FILE_TYPE:
-            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
-                             .format(storage_type))(storage_account, session)
-        else:
-            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
-                             .format(storage_type))(storage_account, token)
-
+    def _get_client(storage_type, storage_account, session=None):
+        client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
+                         .format(storage_type))(storage_account, session)
         return client
 
     @staticmethod
-    def get_settings(storage_type, storage_account, session=None, token=None):
-        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
+    def get_settings(storage_type, storage_account, session=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session)
 
+        if storage_type in [QUEUE_TYPE, BLOB_TYPE]:
+            return getattr(client, 'get_service_properties')()
         return getattr(client, 'get_{}_service_properties'.format(storage_type))()
 
     @staticmethod
-    def update_logging(storage_type, storage_account, logging_settings, session=None, token=None):
-        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
+    def update_logging(storage_type, storage_account, logging_settings, session=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session)
 
+        if storage_type in [QUEUE_TYPE, BLOB_TYPE]:
+            return getattr(client, 'set_service_properties')(analytics_logging=logging_settings)
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
 

@@ -4,22 +4,16 @@
 import logging
 import re
 
-from azure.graphrbac import GraphRbacManagementClient
+from c7n.filters import Filter, FilterValidationError, ValueFilter
+from c7n.filters.related import RelatedResourceFilter
+from c7n.query import sources
+from c7n.resources import load_resources
+from c7n.utils import local_session, type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
-from c7n_azure.provider import Azure
-from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager, DescribeSource
+from c7n_azure.provider import Azure, resources
+from c7n_azure.query import DescribeSource, QueryResourceManager
 from c7n_azure.utils import GraphHelper
-
-from c7n.filters import Filter
-from c7n.filters import FilterValidationError
-from c7n.filters import ValueFilter
-from c7n.filters.related import RelatedResourceFilter
-from c7n.resources import load_resources
-from c7n.query import sources
-from c7n.utils import local_session
-from c7n.utils import type_schema
 
 log = logging.getLogger('custodian.azure.access_control')
 
@@ -110,7 +104,7 @@ class RoleAssignment(QueryResourceManager):
 
     def augment(self, resources):
         s = self.get_session().get_session_for_resource(GRAPH_AUTH_ENDPOINT)
-        graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
+        graph_client = s.client('azure.graphrbac.GraphRbacManagementClient')
 
         object_ids = list(set(
             resource['properties']['principalId'] for resource in resources
