@@ -305,8 +305,9 @@ class Increase(Action):
 @ServiceQuota.action_registry.register('add-to-template')
 class AddToTemplate(Action):
     """
-    Adds service quota requests to template. This action should only be used in the master
-    payer account.
+    Adds service quota requests to template.
+
+    This action should only be used in the organization management account.
 
     If no regions are specified, defaults to the current region
 
@@ -402,7 +403,7 @@ class RemoveFromTemplate(AddToTemplate):
     """
     Removes service quota requests from template
 
-    This action should only be used in the master payer account.
+    This action should only be used in the organization management account.
 
     If no regions are specified, defaults to the current region
 
@@ -443,7 +444,7 @@ class InTemplateFilter(Filter):
     """
     Filter if a service quota is in template
 
-    This filter should only be used in the master payer account.
+    This filter should only be used in the organization management account.
 
     .. code-block:: yaml
 
