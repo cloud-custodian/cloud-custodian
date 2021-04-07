@@ -17,12 +17,14 @@ package_data = \
 install_requires = \
 ['argcomplete>=1.11.1,<2.0.0',
  'boto3>=1.12.31,<2.0.0',
- 'importlib-metadata>1.7.0',
  'jsonpickle==1.3',
  'jsonschema>=3.2.0,<4.0.0',
  'python-dateutil>=2.8.1,<3.0.0',
  'pyyaml>=5.3,<6.0',
  'tabulate>=0.8.6,<0.9.0']
+
+extras_require = \
+{':python_version < "3.8"': ['importlib-metadata>=1.7.0,<2.0.0']}
 
 entry_points = \
 {'console_scripts': ['custodian = c7n.cli:main']}
@@ -41,6 +43,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
+    'extras_require': extras_require,
     'entry_points': entry_points,
     'python_requires': '>=3.6,<4.0',
 }
