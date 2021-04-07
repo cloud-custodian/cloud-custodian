@@ -32,6 +32,7 @@ from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty
 
 from c7n_org.utils import environ, account_tags
+from c7n_azure.provider import Azure
 
 log = logging.getLogger('c7n_org')
 
@@ -83,6 +84,7 @@ CONFIG_SCHEMA = {
             'required': ['subscription_id'],
             'properties': {
                 'subscription_id': {'type': 'string'},
+                'region': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
                 'vars': {'type': 'object'},
@@ -518,7 +520,7 @@ def accounts_iterator(config):
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
-             'regions': ['global'],
+             'regions': [a.get('region', 'global')],
              'provider': 'azure',
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
@@ -583,6 +585,10 @@ def run_account(account, region, policies_config, output_path,
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
             try:
+                # azure needs to be initialized so we can use the correct cloud endpoints
+                if p.provider_name == 'azure' and region != 'global':
+                    p.options.regions = [region]
+                    p.options = Azure().initialize(p.options)
                 resources = p.run()
                 policy_counts[p.name] = resources and len(resources) or 0
                 if not resources:

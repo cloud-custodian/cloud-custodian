@@ -37,8 +37,9 @@ class Azure(Provider):
         self.cloud_endpoints = self._get_cloud_endpoints(options)
         options['region'] = self.cloud_endpoints.name
 
+        # c7n-org needs to initialize a session to set the correct cloud endpoints
+        session = local_session(self.get_session_factory(options))
         if options['account_id'] is None:
-            session = local_session(self.get_session_factory(options))
             options['account_id'] = session.get_subscription_id()
         options['cache'] = 'memory'
         return options
