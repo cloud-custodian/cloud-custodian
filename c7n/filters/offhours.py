@@ -29,6 +29,9 @@ different policy, they support the same configuration options:
  - **weekends-only**: default false, whether to turn the resource off only on
    the weekend
  - **default_tz**: which timezone to utilize when evaluating time **(REQUIRED)**
+ - **fallback-schedule**: If a resource doesn't support tagging or doesn't provide
+   a tag you can supply a default schedule that will be used. When the tag is provided
+   this will be ignored. See :ref:`ScheduleParser Time Specifications <scheduleparser-time-spec>`.
  - **tag**: which resource tag name to use for per-resource configuration
    (schedule and timezone overrides and opt-in/opt-out); default is
    ``maid_offhours``.
@@ -60,6 +63,7 @@ This example policy overrides most of the defaults for an offhour policy:
            opt-out: true
            onhour: 8
            offhour: 20
+
 
 Tag Based Configuration
 =======================
@@ -93,6 +97,9 @@ The value of the tag must be one of the following:
   * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
     supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
     in the next section.
+
+
+.. _scheduleparser-time-spec:
 
 ScheduleParser Time Specifications
 ----------------------------------
@@ -255,6 +262,7 @@ class Time(Filter):
         'properties': {
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
+            'fallback_schedule': {'type': 'string'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
@@ -315,6 +323,7 @@ class Time(Filter):
         self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
         self.tag_key = self.data.get('tag', self.DEFAULT_TAG).lower()
+        self.fallback_schedule = self.data.get('fallback-schedule', None)
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 
@@ -438,12 +447,12 @@ class Time(Filter):
     def get_tag_value(self, i):
         """Get the resource's tag value specifying its schedule."""
         # Look for the tag, Normalize tag key and tag value
-        found = False
+        found = self.fallback_schedule
         for t in i.get('Tags', ()):
             if t['Key'].lower() == self.tag_key:
                 found = t['Value']
                 break
-        if found is False:
+        if found in (False, None):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8').decode('utf8')
