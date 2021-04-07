@@ -24,7 +24,7 @@ install_requires = \
  'tabulate>=0.8.6,<0.9.0']
 
 extras_require = \
-{':python_version < "3.8"': ['importlib-metadata>=1.7.0,<2.0.0']}
+{':python_version < "3.8"': ['importlib-metadata>=1.7.0']}
 
 entry_points = \
 {'console_scripts': ['custodian = c7n.cli:main']}
