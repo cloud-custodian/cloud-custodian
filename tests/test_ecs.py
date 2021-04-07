@@ -25,6 +25,17 @@ class TestEcsService(BaseTest):
             [{'Key': 'Env', 'Value': 'Dev'},
              {'Key': 'Data', 'Value': 'Magic'}])
 
+    def test_ecs_service_config(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_service_config')
+        p = self.load_policy({
+            'name': 'ctags', 'resource': 'ecs-service', 'source': 'config'},
+            session_factory=session_factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['name'] == 'queue-processor'
+        assert resources[0]['clusterArn'].endswith('cluster/dev')
+
     def test_ecs_service_tag_augment(self):
         session_factory = self.replay_flight_data(
             'test_ecs_service_tag_augment')
