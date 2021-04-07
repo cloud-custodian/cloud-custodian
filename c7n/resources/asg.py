@@ -1718,6 +1718,7 @@ class Update(Action):
 
         with self.executor_factory(max_workers=2) as w:
             futures = {}
+            error = None
             for a in asgs:
                 futures[w.submit(self.process_asg, client, a, settings)] = a
             for f in as_completed(futures):
@@ -1725,6 +1726,10 @@ class Update(Action):
                     self.log.error("Error while updating asg:%s error:%s" % (
                         futures[f]['AutoScalingGroupName'],
                         f.exception()))
+                    error = f.exception()
+            if error:
+                # make sure we stop policy execution if there were errors
+                raise error
 
     def process_asg(self, client, asg, settings):
         self.manager.retry(
