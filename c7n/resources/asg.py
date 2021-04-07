@@ -1708,6 +1708,14 @@ class Update(Action):
         "capacity-rebalance": "CapacityRebalance"
     }
 
+    def validate(self):
+        if not set(self.settings_map).intersection(set(self.data)):
+            raise PolicyValidationError(
+                "At least one setting must be specified from: " +
+                ", ".join(sorted(self.settings_map))
+            )
+        return self
+
     def process(self, asgs):
         client = local_session(self.manager.session_factory).client('autoscaling')
 

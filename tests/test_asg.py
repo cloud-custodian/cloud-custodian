@@ -8,6 +8,7 @@ from pytest_terraform import terraform
 
 from .common import BaseTest
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
 
@@ -164,6 +165,21 @@ def test_aws_asg_update(test, aws_asg_update):
     test.assertEqual(result["MaxInstanceLifetime"], 604800)
     test.assertTrue(result["NewInstancesProtectedFromScaleIn"])
     test.assertTrue(result["CapacityRebalance"])
+
+
+def test_aws_asg_update_no_settings(test):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    with test.assertRaises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "asg-update",
+                "resource": "aws.asg",
+                "actions": [{
+                    "type": "update",
+                }],
+            },
+            session_factory=factory,
+        )
 
 
 class AutoScalingTest(BaseTest):
