@@ -210,18 +210,21 @@ class Session:
         if 'credentials' in klass_parameters and 'tenant_id' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            tenant_id=self.credentials.tenant_id,
-                           base_url=self.resource_endpoint)
+                           base_url=self.resource_endpoint,
+                           credential_scopes=[self.resource_endpoint + ".default"])
             legacy = True
         elif 'credentials' in klass_parameters:
             client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
                            subscription_id=self.credentials.subscription_id,
-                           base_url=self.cloud_endpoints.endpoints.resource_manager)
+                           base_url=self.cloud_endpoints.endpoints.resource_manager,
+                           credential_scopes=[self.resource_endpoint + ".default"])
             legacy = True
         else:
             client_args = {
                 'credential': self.credentials,
                 'raw_response_hook': log_response_data,
-                'retry_policy': C7nRetryPolicy()
+                'retry_policy': C7nRetryPolicy(),
+                'credential_scopes': [self.resource_endpoint + ".default"]
             }
 
             # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351
