@@ -3,16 +3,16 @@
     "data": {
         "Vpcs": [
             {
-                "CidrBlock": "172.16.0.0/16",
+                "CidrBlock": "10.205.0.0/18",
                 "DhcpOptionsId": "dopt-24ff1940",
                 "State": "available",
-                "VpcId": "vpc-0598080981e0332f9",
+                "VpcId": "vpc-03005fb9b8740263d",
                 "OwnerId": "012345678910",
                 "InstanceTenancy": "default",
                 "CidrBlockAssociationSet": [
                     {
-                        "AssociationId": "vpc-cidr-assoc-07a76233f273c7199",
-                        "CidrBlock": "172.16.0.0/16",
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044",
+                        "CidrBlock": "10.205.0.0/18",
                         "CidrBlockState": {
                             "State": "associated"
                         }
@@ -21,8 +21,8 @@
                 "IsDefault": false,
                 "Tags": [
                     {
-                        "Key": "AWSServiceAccount",
-                        "Value": "012345678910"
+                        "Key": "Name",
+                        "Value": "PeerA"
                     }
                 ]
             },

@@ -156,7 +156,7 @@ class MessageQueue(BaseTest):
                     {
                         'type': 'vpc',
                         'key': 'VpcId',
-                        'value': 'vpc-0598080981e0332f9',
+                        'value': 'vpc-03005fb9b8740263d',
                         'op': 'eq'
                     }
                 ],
@@ -166,7 +166,7 @@ class MessageQueue(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('BrokerId'), 'b-c7aa6808-ba11-4d0c-b570-795e4724c841')
+        self.assertEqual(resources[0].get('BrokerId'), 'b-68a927df-9830-4f87-a3e4-737be3f89160')
 
     def test_mq_message_broker_vpc_default_filter(self):
         session_factory = self.replay_flight_data('test_message_broker_vpc_default_filter')
@@ -178,7 +178,7 @@ class MessageQueue(BaseTest):
                     {
                         'type': 'vpc',
                         'key': 'IsDefault',
-                        'value': False
+                        'value': True
                     }
                 ],
             },
@@ -187,4 +187,4 @@ class MessageQueue(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('BrokerId'), 'b-494999bd-7800-4e0c-90e1-cab9873f515d')
+        self.assertEqual(resources[0].get('BrokerId'), 'b-6f66b513-8060-435f-820b-de08fef5f328')

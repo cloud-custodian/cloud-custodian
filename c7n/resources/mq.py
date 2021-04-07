@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
-from c7n.exceptions import ClientError
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
@@ -103,28 +102,22 @@ class VpcFilter(VpcFilter):
                         value: vpc-xxxxxxxxxxx
                         op: eq
     """
+    vpc_id_map = {}
 
     def get_related_ids(self, resources):
-        client = local_session(self.manager.session_factory).client('ec2')
         related_ids = set()
         sg_ids = set()
         for r in resources:
             sg_id = r.get('SecurityGroups', [])[0]
-            vpc_id = self.manager._cache.get(sg_id)
-            if vpc_id:
-                related_ids.add(vpc_id)
+            if self.vpc_id_map.get(sg_id):
+                related_ids.add(self.vpc_id_map.get(sg_id))
                 continue
             sg_ids.add(sg_id)
-        if len(sg_ids) > 0:
-            try:
-                response = client.describe_security_groups(
-                    GroupIds=list(sg_ids),
-                )
-                for sg in response.get('SecurityGroups'):
-                    self.manager._cache.save(sg.get('GroupId'), sg.get('VpcId'))
-                    related_ids.add(sg.get('VpcId'))
-            except ClientError as e:
-                raise(e)
+        sgs = self.manager.get_resource_manager('security-group').get_resources(list(sg_ids))
+        for sg in sgs:
+            vpc_id = sg.get('VpcId')
+            self.vpc_id_map[sg.get('GroupId')] = vpc_id
+            related_ids.add(vpc_id)
         return related_ids
 
     RelatedIdsExpression = ""

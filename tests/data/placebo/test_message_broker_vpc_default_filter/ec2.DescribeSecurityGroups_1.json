@@ -41,22 +41,9 @@
             {
                 "Description": "default VPC security group",
                 "GroupName": "default",
-                "IpPermissions": [
-                    {
-                        "IpProtocol": "-1",
-                        "IpRanges": [],
-                        "Ipv6Ranges": [],
-                        "PrefixListIds": [],
-                        "UserIdGroupPairs": [
-                            {
-                                "GroupId": "sg-0d30141b566cfa039",
-                                "UserId": "012345678910"
-                            }
-                        ]
-                    }
-                ],
+                "IpPermissions": [],
                 "OwnerId": "012345678910",
-                "GroupId": "sg-0d30141b566cfa039",
+                "GroupId": "sg-0fd0c04f0c434d68d",
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1",
@@ -70,7 +57,7 @@
                         "UserIdGroupPairs": []
                     }
                 ],
-                "VpcId": "vpc-072f438c953672ace"
+                "VpcId": "vpc-03005fb9b8740263d"
             }
         ],
         "ResponseMetadata": {}
