@@ -12,6 +12,7 @@ import logging
 import operator
 import re
 
+from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 from distutils import version
@@ -22,7 +23,7 @@ from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
+from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date, dumps
 from c7n.manager import iter_filters
 
 
@@ -977,6 +978,7 @@ try:
     import celpy
     import celpy.c7nlib
     import celpy.celtypes
+    from celpy.evaluation import CELEvalError
 
     class CELFilter(Filter):
         """Generic CEL filter using CEL-Python
@@ -1030,6 +1032,7 @@ try:
                 "now": celpy.celtypes.TimestampType
             }
             self.decls.update(celpy.c7nlib.DECLARATIONS)
+            self.resource_cache = {}
 
         schema = {
             'type': 'object',
@@ -1061,18 +1064,69 @@ try:
 
         def process(self, resources, event=None, filter=Filter):
             filtered_resources = []
-            for r in resources:
-                cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+
+            for resource in resources:
+                self.resource_cache.clear()
                 cel_activation = {
-                    "resource": celpy.json_to_cel(r),
+                    "resource": celpy.json_to_cel(resource),
                     "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
                 }
 
                 with celpy.c7nlib.C7NContext(filter=self):
-                    cel_result = cel_prgm.evaluate(cel_activation, self)
-                    if cel_result:
-                        filtered_resources.append(r)
+                    try:
+                        cel_result = cel_prgm.evaluate(cel_activation, self)
+                        # TODO: address cel_prgm returning a CELEvalError rather than raising it
+                        if cel_result:
+                            filtered_resources.append(resource)
+                            related_ids = self.resource_cache.get('related_ids')
+                            ids = [str(r) for r in related_ids if r]
+                            if ids:
+                                self._add_annotations(ids, resource)
+
+                    # if CEL expression errors out from attempting to access non-existent resource
+                    # fields, let the policy author know by appending None object and logging
+                    except TypeError as e:
+                        if e.args[0] == "'CELEvalError' object is not iterable":
+                            try:
+                                filtered_resources.append(dumps(CELEvalError(*e.args)))
+                            except TypeError:
+                                logging.warning(f"Error trying to serialize {CELEvalError(*e.args)}")
+                                filtered_resources.append(None)
 
             return filtered_resources
+
+        def get_related(self, related_ids):
+            resource_manager = self.get_resource_manager()
+            model = resource_manager.get_model()
+
+            if len(related_ids) < self.FetchThreshold:
+                related = resource_manager.get_resources(list(related_ids))
+                return related
+            else:
+                related = resource_manager.resources()
+
+            return [r for r in related
+                    if r[model.id] in related_ids]
+
+        def get_related_kms(self, client, related_ids):
+            if related_ids:
+                related = self.get_related(related_ids)
+
+                for r in related:
+                    try:
+                        alias_info = self.manager.retry(client.list_aliases, KeyId=r.get('KeyId'))
+                    except ClientError as e:
+                        self.log.warning(e)
+                        continue
+                    r['c7n:AliasName'] = alias_info.get('Aliases')[0].get('AliasName', '')
+                return related
+            else:
+                return []
+
+        def _add_annotations(self, related_ids, resource):
+            if self.AnnotationKey is not None:
+                akey = f'c7n:{self.AnnotationKey}'
+                resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
 except ImportError:
     raise
