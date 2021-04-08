@@ -10,7 +10,6 @@ from datetime import timedelta
 import itertools
 import time
 from xml.etree import ElementTree
-import celpy
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
