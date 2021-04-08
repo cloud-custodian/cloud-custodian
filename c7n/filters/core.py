@@ -1066,10 +1066,10 @@ try:
             filtered_resources = []
             cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
 
-            for resource in resources:
+            for r in resources:
                 self.resource_cache.clear()
                 cel_activation = {
-                    "resource": celpy.json_to_cel(resource),
+                    "resource": celpy.json_to_cel(r),
                     "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
                 }
 
@@ -1078,11 +1078,11 @@ try:
                         cel_result = cel_prgm.evaluate(cel_activation, self)
                         # TODO: address cel_prgm returning a CELEvalError rather than raising it
                         if cel_result:
-                            filtered_resources.append(resource)
+                            filtered_resources.append(r)
                             related_ids = self.resource_cache.get('related_ids')
                             ids = [str(r) for r in related_ids if r]
                             if ids:
-                                self._add_annotations(ids, resource)
+                                self._add_annotations(ids, r)
 
                     # if CEL expression errors out from attempting to access non-existent resource
                     # fields, let the policy author know by appending None object and logging
@@ -1091,7 +1091,9 @@ try:
                             try:
                                 filtered_resources.append(dumps(CELEvalError(*e.args)))
                             except TypeError:
-                                logging.warning(f"Error trying to serialize {CELEvalError(*e.args)}")
+                                logging.warning(
+                                    f"Error trying to serialize {CELEvalError(*e.args)}"
+                                )
                                 filtered_resources.append(None)
 
             return filtered_resources

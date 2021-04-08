@@ -2427,27 +2427,9 @@ class CELFilter(BaseCELFilter, CredentialReport):
     permissions = ('iam:GenerateCredentialReport',
                    'iam:GetCredentialReport')
 
-    def get_credential_report(self):
+    def get_credential_report(self, resource):
         report = super(CELFilter, self).get_credential_report()
         if report is None:
             return []
-        r = self.current_resource
-        info = report.get(r['UserName'])
+        info = report.get(resource['UserName'])
         return info
-
-    def process(self, resources, event=None, filter=Filter):
-        filtered_resources = []
-
-        for resource in resources:
-            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
-            cel_activation = {
-                "Resource": celpy.json_to_cel(resource),
-                "Now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
-            }
-            self.current_resource = resource
-            with celpy.c7nlib.C7NContext(filter=self):
-                cel_result = cel_prgm.evaluate(cel_activation, self)
-                if cel_result:
-                    filtered_resources.append(resource)
-
-        return filtered_resources

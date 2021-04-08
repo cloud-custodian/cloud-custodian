@@ -2009,7 +2009,7 @@ class TestCEL(BaseTest):
                 "filters": [
                     {
                         "type": "cel",
-                        "expr": "Resource.credentials().password_enabled",
+                        "expr": "resource.credentials().password_enabled",
                     },
                 ],
             },

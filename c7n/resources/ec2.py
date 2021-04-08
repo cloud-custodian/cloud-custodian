@@ -6,13 +6,11 @@ import operator
 import random
 import re
 import zlib
-import datetime
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
 import jmespath
-import celpy
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
@@ -2213,20 +2211,6 @@ class CELFilter(BaseCELFilter, InstanceImageBase):
     def get_permissions(self):
         return ('ec2:DescribeInstanceAttribute',)
 
-    def process(self, resources, event=None, filter=Filter):
+    def process(self, resources, event):
         super().prefetch_instance_images(resources)
-
-        filtered_resources = []
-        for r in resources:
-            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
-            cel_activation = {
-                "resource": celpy.json_to_cel(r),
-                "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
-            }
-
-            with celpy.c7nlib.C7NContext(filter=self):
-                cel_result = cel_prgm.evaluate(cel_activation, self)
-                if cel_result:
-                    filtered_resources.append(r)
-
-        return filtered_resources
+        return BaseCELFilter.process(self, resources)

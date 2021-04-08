@@ -626,7 +626,10 @@ class TestCEL(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['c7n:matched-kms-key'], ['36812ccf-daaf-49b1-a24b-0eef254ffe41'])
+        self.assertEqual(
+            resources[0]['c7n:matched-kms-key'],
+            ['36812ccf-daaf-49b1-a24b-0eef254ffe41']
+        )
 
     def test_cel_lambda_related_sg(self):
         session_factory = self.replay_flight_data("test_cel_lambda_related_sg")
