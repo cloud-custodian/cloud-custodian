@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "test-python",
+                "FunctionArn": "arn:aws:lambda:us-east-1:012345678910:function:test-python",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::012345678910:role/TestRole",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 281,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2021-03-26T17:11:57.186+0000",
+                "CodeSha256": "shacode",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-07c118e47bb84cee7"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-sg1",
+                        "sg-sg2"
+                    ],
+                    "VpcId": "vpc-0a00a00a0aaa0aaa0"
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "c61aa238-54f4-4d50-a915-f33e93c42ae4",
+                "PackageType": "Zip"
+            }
+        ]
+    }
+}

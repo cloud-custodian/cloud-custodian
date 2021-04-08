@@ -605,3 +605,71 @@ class TestCEL(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_cel_lambda_related_kms_key(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_kms_key")
+
+        p = self.load_policy(
+            {
+                "name": "cel_lambda_related_kms_key",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_kms_keys(resource)
+                                    .exists(key, key['c7n:AliasName'].glob('*alias/skunk/trails'))
+                                """
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-kms-key'], ['36812ccf-daaf-49b1-a24b-0eef254ffe41'])
+
+    def test_cel_lambda_related_sg(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_sg")
+
+        p = self.load_policy(
+            {
+                "name": "cel_lambda_related_sg",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_sgs(resource).exists(
+                                    sg, sg.Tags.exists(
+                                        t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"""
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            cache=True
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-security-groups'], ['sg-01a111b11c1defg1h'])
+
+    def test_cel_lambda_related_subnets(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_subnets")
+
+        p = self.load_policy(
+            {
+                "name": "cel_lambda_related_subnet",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_subnets(resource).exists(
+                                    sg, sg.Tags.exists(
+                                        t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"""
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            cache=True
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-07c118e47bb84cee7'])

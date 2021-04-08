@@ -80,13 +80,6 @@ class AWSLambda(query.QueryResourceManager):
         return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
-@AWSLambda.filter_registry.register('cel')
-class CELFilter(BaseCELFilter):
-    """
-    Provide CELFilter support for Lambda functions
-    """
-
-
 @AWSLambda.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -649,3 +642,50 @@ class LayerPostFinding(PostFinding):
         payload.update(self.filter_empty(
             select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
         return envelope
+
+
+@AWSLambda.filter_registry.register('cel')
+class CELFilter(
+    BaseCELFilter,
+    KmsRelatedFilter,
+    SecurityGroupFilter,
+    SubnetFilter
+):
+    """
+    Filter Lambda functions based on various attributes using CEL filters.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: cel-lambda-related-kms-keys-alias
+                resource: lambda
+                filters:
+                  - type: cel
+                    expr: get_related_kms_keys(Resource)
+                            .exists(key, key['c7n:AliasName'].glob('*alias/skunk/trails'))
+    """
+    def get_related_sgs(self, resource):
+        self.RelatedResource = 'c7n.resources.vpc.SecurityGroup'
+        self.RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
+        self.AnnotationKey = 'matched-security-groups'
+        related_ids = SecurityGroupFilter.get_related_ids(self, [resource])
+        self.resource_cache['related_ids'] = related_ids
+        return BaseCELFilter.get_related(self, related_ids)
+
+    def get_related_subnets(self, resource):
+        self.RelatedResource = 'c7n.resources.vpc.Subnet'
+        self.RelatedIdsExpression = 'VpcConfig.SubnetIds[]'
+        self.AnnotationKey = 'matched-subnets'
+        related_ids = SubnetFilter.get_related_ids(self, [resource])
+        self.resource_cache['related_ids'] = related_ids
+        return BaseCELFilter.get_related(self, related_ids)
+
+    def get_related_kms_keys(self, resource):
+        self.RelatedIdsExpression = 'KMSKeyArn'
+        self.AnnotationKey = 'matched-kms-key'
+        related_ids = KmsRelatedFilter.get_related_ids(self, [resource])
+        related = []
+        if related_ids:
+            client = local_session(self.manager.session_factory).client('kms')
+            related = BaseCELFilter.get_related_kms(self, client, related_ids)
+            self.resource_cache['related_ids'] = related_ids
+        return related
