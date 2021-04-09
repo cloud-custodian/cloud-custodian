@@ -29,7 +29,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty
+from c7n.utils import CONN_CACHE, dumps, filter_empty, local_session
 
 from c7n_org.utils import environ, account_tags
 from c7n_azure.provider import Azure
@@ -558,6 +558,13 @@ def run_account(account, region, policies_config, output_path,
 
     env_vars = account_tags(account)
 
+    # azure needs to be initialized so we can use the correct cloud endpoints
+    if account.get('provider') == 'azure' and region != 'global':
+        config['regions'] = [region]
+        azure = Azure()
+        sessionFactory = azure.get_session_factory(azure.initialize(config))
+        local_session(sessionFactory)
+
     if account.get('role'):
         if isinstance(account['role'], str):
             config['assume_role'] = account['role']
@@ -585,10 +592,6 @@ def run_account(account, region, policies_config, output_path,
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
             try:
-                # azure needs to be initialized so we can use the correct cloud endpoints
-                if p.provider_name == 'azure' and region != 'global':
-                    p.options.regions = [region]
-                    p.options = Azure().initialize(p.options)
                 resources = p.run()
                 policy_counts[p.name] = resources and len(resources) or 0
                 if not resources:
