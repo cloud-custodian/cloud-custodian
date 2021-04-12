@@ -8,6 +8,7 @@ from concurrent.futures import as_completed
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
@@ -758,6 +759,7 @@ class DeleteSSMDocument(Action):
         'delete',
         force={'type': 'boolean'}
     )
+
     permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission',)
 
     def process(self, resources):
@@ -782,3 +784,63 @@ class DeleteSSMDocument(Action):
                     )
                 else:
                     raise(e)
+
+
+@resources.register('ssm-data-sync')
+class SSMDataSync(QueryResourceManager):
+    """Resource for AWS DataSync
+    https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-inventory-datasync.html
+    """
+    class resource_type(TypeInfo):
+
+        enum_spec = ('list_resource_data_sync', 'ResourceDataSyncItems', None)
+        service = 'ssm'
+        arn_type = 'datasync'
+        id = 'DataSync'
+        name = 'Title'
+
+    permissions = ('ssm:ListResourceDataSync',)
+
+
+@SSMDataSync.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: resource-data-sync-kms-key-filters
+                  resource: ssm-data-sync
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(skunk-s3)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'S3Destination.AWSKMSKeyARN'
+
+
+@SSMDataSync.action_registry.register('delete')
+class DeleteDataSync(Action):
+    """Delete an ssm data sync
+
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: delete-resource-data-sync
+                resource: ssm-data-sync
+    """
+    permissions = ('ssm:DeleteResourceDataSync',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            try:
+                client.delete_resource_data_sync(SyncName=r['SyncName'])
+            except client.exceptions.ResourceNotFound:
+                continue
