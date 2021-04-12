@@ -829,6 +829,7 @@ class DeleteDataSync(Action):
     """Delete SSM data sync resources.
 
     :example:
+
     .. code-block:: yaml
 
         policies:
