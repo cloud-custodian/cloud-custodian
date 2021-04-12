@@ -813,26 +813,29 @@ class KmsFilter(KmsRelatedFilter):
         .. code-block:: yaml
 
             policies:
-                - name: resource-data-sync-kms-key-filters
-                  resource: ssm-data-sync
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(skunk-s3)"
-                      op: regex
+              - name: resource-data-sync-kms-key-filters
+                resource: ssm-data-sync
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(skunk-s3)"
+                    op: regex
     """
     RelatedIdsExpression = 'S3Destination.AWSKMSKeyARN'
 
 
 @SSMDataSync.action_registry.register('delete')
 class DeleteDataSync(Action):
-    """Delete an ssm data sync
+    """Delete SSM data sync resources.
 
     :example:
     .. code-block:: yaml
-            policies:
-              - name: delete-resource-data-sync
-                resource: ssm-data-sync
+
+        policies:
+          - name: delete-resource-data-sync
+            resource: ssm-data-sync
+            actions:
+              - type: delete
     """
     permissions = ('ssm:DeleteResourceDataSync',)
     schema = type_schema('delete')
