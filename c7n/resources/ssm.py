@@ -810,16 +810,16 @@ class KmsFilter(KmsRelatedFilter):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: resource-data-sync-kms-key-filters
-                resource: ssm-data-sync
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(skunk-s3)"
-                    op: regex
+        policies:
+            - name: resource-data-sync-kms-key-filters
+            resource: ssm-data-sync
+            filters:
+                - type: kms-key
+                key: c7n:AliasName
+                value: "^(skunk-s3)"
+                op: regex
     """
     RelatedIdsExpression = 'S3Destination.AWSKMSKeyARN'
 
