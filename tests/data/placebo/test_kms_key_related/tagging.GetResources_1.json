@@ -2,45 +2,7 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
-                "Tags": [
-                    {
-                        "Key": "Test",
-                        "Value": "Test"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "c7n/sagemaker"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b",
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "CMK-Rotation-Test"
-                    }
-                ]
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "1c08fc57-b124-11e8-b504-f92a1abec32a",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1c08fc57-b124-11e8-b504-f92a1abec32a",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "470",
-                "date": "Wed, 05 Sep 2018 15:55:27 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResourceTagMappingList": [],
+        "ResponseMetadata": {}
     }
 }
