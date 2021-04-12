@@ -813,10 +813,10 @@ class KmsFilter(KmsRelatedFilter):
     .. code-block:: yaml
 
         policies:
-            - name: resource-data-sync-kms-key-filters
+          - name: resource-data-sync-kms-key-filters
             resource: ssm-data-sync
             filters:
-                - type: kms-key
+              - type: kms-key
                 key: c7n:AliasName
                 value: "^(skunk-s3)"
                 op: regex
