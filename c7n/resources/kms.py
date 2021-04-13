@@ -62,11 +62,15 @@ class DescribeKey(DescribeSource):
         for r in resources:
             try:
                 key_id = r.get('KeyId')
-                key_arn = r.get('KeyArn', key_id)
-                info = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                # We get `KeyArn` from list_keys and `Arn` from describe_key.
+                # If we already have describe_key info we don't need to fetch
+                # it again.
+                if 'Arn' not in r:
+                    key_arn = r.get('KeyArn', key_id)
+                    info = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                    r.update(info)
                 if key_id in alias_map:
-                    info['AliasNames'] = alias_map[key_id]
-                r.update(info)
+                    r['AliasNames'] = alias_map[key_id]
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.manager.log.warning(
