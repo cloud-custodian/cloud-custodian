@@ -1,9 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from botocore.exceptions import ClientError
 from .core import ValueFilter
 from .related import RelatedResourceFilter
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema
 
 
 class KmsRelatedFilter(RelatedResourceFilter):
@@ -60,7 +59,6 @@ class KmsRelatedFilter(RelatedResourceFilter):
         return normalized_ids
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('kms')
         related = self.get_related(resources)
         for r in related.values():
             try:
