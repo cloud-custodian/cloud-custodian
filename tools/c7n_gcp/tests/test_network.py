@@ -451,7 +451,7 @@ class RouteTest(BaseTest):
             'resource': 'gcp.route',
             'mode': {
                 'type': 'gcp-audit',
-                'methods': ['v1.compute.routes.insert']}},
+                'methods': ['v1.compute.networks.insert', 'v1.compute.networks.addPeering']}},
             session_factory=factory)
 
         exec_mode = p.get_execution_mode()
@@ -464,3 +464,48 @@ class RouteTest(BaseTest):
             p.resource_manager.get_urns(routes),
             ["gcp:compute::cloud-custodian:route/test-route-2"],
         )
+
+
+class NetworkTest(BaseTest):
+
+    def test_route_get_insert(self):
+        project_id = 'cloud-custodian'
+        network_name = 'https://www.googleapis.com/compute/v1/projects/' \
+                       'cloud-custodian/regions/us-east1/subnetworks/subnet'
+        factory = self.replay_flight_data('vpc-get-insert', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'gcp-vpc-insert',
+            'resource': 'gcp.vpc',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.subnetworks.insert']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('gcp-vpc-insert.json')
+        subnetworks = exec_mode.run(event, None)
+
+        self.assertEqual(len(subnetworks), 1)
+        self.assertEqual(subnetworks[0]['subnetworks'][0], network_name)
+
+    def test_route_get_add_peering(self):
+        project_id = 'cloud-custodian'
+        network_name = 'https://www.googleapis.com/compute/v1/projects/' \
+                       'cloud-custodian/regions/us-east1/subnetworks/subnet'
+        factory = self.replay_flight_data('vpc-get-add-peering', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'gcp-vpc-add-peering',
+            'resource': 'gcp.vpc',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.subnetworks.addPeering']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('gcp-get-add-peering.json')
+        subnetworks = exec_mode.run(event, None)
+
+        self.assertEqual(len(subnetworks), 1)
+        self.assertEqual(subnetworks[0]['subnetworks'][0], network_name)
