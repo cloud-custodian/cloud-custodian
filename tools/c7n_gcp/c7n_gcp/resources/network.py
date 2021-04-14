@@ -33,7 +33,7 @@ class Network(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            path_param_re = re.compile('.*?/projects/(.*?)/global/networks/(.*)')
+            path_param_re = re.compile('.*?projects/(.*?)/global/networks/(.*)')
             project, network = path_param_re.match(
                 resource_info["resourceName"]).groups()
             return client.execute_query(
