@@ -50,6 +50,8 @@ ResourceMap = {
     "gcp.interconnect-attachment": "c7n_gcp.resources.network.InterconnectAttachment",
     "gcp.kms-cryptokey": "c7n_gcp.resources.kms.KmsCryptoKey",
     "gcp.kms-cryptokey-version": "c7n_gcp.resources.kms.KmsCryptoKeyVersion",
+    "gcp.logging-sink": "c7n_gcp.resources.logging.LoggingSink",
+    "gcp.logging-sink-bucket": "c7n_gcp.resources.logging.LoggingSinkBucket",
     "gcp.kms-keyring": "c7n_gcp.resources.kms.KmsKeyRing",
     "gcp.loadbalancer-address": "c7n_gcp.resources.loadbalancer.LoadBalancingAddress",
     "gcp.loadbalancer-backend-bucket": "c7n_gcp.resources.loadbalancer.LoadBalancingBackendBucket",

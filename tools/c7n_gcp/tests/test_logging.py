@@ -178,3 +178,45 @@ class LogExclusionTest(BaseTest):
                 'gcp:logging::cloud-custodian:exclusion/qwerty',
             ],
         )
+
+
+class LoggingSinkBucketTest(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        bucket_name = 'for_test_12345678'
+        factory = self.replay_flight_data('test-logging-sink-bucket-query', project_id)
+        policy = self.load_policy({
+            'name': 'logging-sink-bucket',
+            'resource': 'gcp.logging-sink-bucket',
+            'filters': [{
+                'type': 'value',
+                'key': 'locationType',
+                'value': 'region'
+            }]
+        }, session_factory=factory)
+        resources = policy.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['name'], bucket_name)
+
+
+class LoggingSinkTest(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        sink_name = 'datasets_are_not_anon_or_pub_accessible'
+        factory = self.replay_flight_data('test-logging-sink-query', project_id)
+        policy = self.load_policy({
+            'name': 'logging-sink',
+            'resource': 'gcp.logging-sink',
+            'filters': [{
+                'type': 'value',
+                'key': 'writerIdentity',
+                'value': 'serviceAccount:cloud-logs@system.gserviceaccount.com'
+            }]
+        }, session_factory=factory)
+        resources = policy.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['name'], sink_name)

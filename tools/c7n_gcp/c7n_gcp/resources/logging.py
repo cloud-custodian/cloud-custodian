@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import re
+
 from c7n.utils import local_session, type_schema
 from c7n.filters.core import ValueFilter
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
 # TODO .. folder, billing account, org sink
 # how to map them given a project level root entity sans use of c7n-org
@@ -145,4 +147,56 @@ class LogExclusion(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_query('get', {
                 'name': 'projects/{project_id}/exclusions/{name}'.format(
+                    **resource_info)})
+
+
+@resources.register('logging-sink-bucket')
+class LoggingSinkBucket(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'storage'
+        version = 'v1'
+        component = 'buckets'
+        scope = 'project'
+        enum_spec = ('list', 'items[]', None)
+        name = id = 'name'
+        default_report_fields = ['name', 'destination', 'createTime',
+                                 'updateTime', 'filter', 'writerIdentity']
+        parent_spec = {
+            'resource': 'logging-sink',
+            'child_enum_params': [ ],
+            'parent_get_params': [
+                ('bucket', 'bucket_name'),
+            ]
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'bucket': resource_info['bucket_name']})
+
+    def _get_parent_resource_info(self, child_instance):
+        mappings = {}
+        project_param_re = re.compile('.*?/storage/v1/b/.*')
+        mappings['bucket_name'] = project_param_re.match(child_instance['selfLink']).group(1)
+        return mappings
+
+
+@resources.register('logging-sink')
+class LoggingSink(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'logging'
+        version = 'v2'
+        component = 'projects.sinks'
+        enum_spec = ('list', 'sinks[]', None)
+        scope_key = 'parent'
+        scope_template = "projects/{}"
+        name = id = 'name'
+        default_report_fields = ['name', 'kind', 'items']
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.get('get', {
+                'sinkName': 'projects/{project_id}/sinks/{name}'.format(
                     **resource_info)})
