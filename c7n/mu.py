@@ -1078,6 +1078,8 @@ class CloudWatchEventSource(AWSEventBase):
                 })
             if self.data.get('categories', []):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
+            if not payload['detail']:
+                payload.pop('detail')
         elif event_type == 'hub-finding':
             payload['source'] = ['aws.securityhub']
             payload['detail-type'] = ['Security Hub Findings - Imported']
