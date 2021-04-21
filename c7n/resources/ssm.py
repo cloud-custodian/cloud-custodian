@@ -804,23 +804,6 @@ class SSMDataSync(QueryResourceManager):
 
 @SSMDataSync.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: resource-data-sync-kms-key-filters
-            resource: ssm-data-sync
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(skunk-s3)"
-                op: regex
-    """
     RelatedIdsExpression = 'S3Destination.AWSKMSKeyARN'
 
 
@@ -846,5 +829,5 @@ class DeleteDataSync(Action):
         for r in resources:
             try:
                 client.delete_resource_data_sync(SyncName=r['SyncName'])
-            except client.exceptions.ResourceNotFound:
+            except client.exceptions.ResourceDataSyncNotFoundException:
                 continue
