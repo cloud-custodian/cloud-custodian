@@ -93,7 +93,7 @@ class AzureADAdministratorsFilter(ValueFilter):
 
     .. code-block:: json
 
-      "principalType": "User",
+      "administratorType": "ActiveDirectory",
       "login": "bob@contoso.com",
       "sid": "00000011-1111-2222-2222-123456789111",
       "tenantId": "00000011-1111-2222-2222-123456789111",
@@ -113,19 +113,6 @@ class AzureADAdministratorsFilter(ValueFilter):
                 key: login
                 value: absent
 
-    Find SQL Servers with a User principal type
-
-    .. code-block:: yaml
-
-        policies:
-          - name: sqlserver-no-ad-admin
-            resource: azure.sqlserver
-            filters:
-              - type: azure-ad-administrators
-                key: principalType
-                op: eq
-                value: User
-
     """
 
     schema = type_schema('azure-ad-administrators', rinherit=ValueFilter.schema)
@@ -133,15 +120,18 @@ class AzureADAdministratorsFilter(ValueFilter):
     def __call__(self, i):
         if 'administrators' not in i['properties']:
             client = self.manager.get_client()
-            administrators = (
+            administrators = list(
                 client.server_azure_ad_administrators
                 .list_by_server(i['resourceGroup'], i['name'])
             )
 
             # This matches the expanded schema, and despite the name
             # there can only be a single administrator, not an array.
-            i['properties']['administrators'] = \
-                administrators.next().serialize().get('properties', {})
+            if administrators:
+                i['properties']['administrators'] = \
+                    administrators[0].serialize().get('properties', {})
+            else:
+                i['properties']['administrators'] = {}
 
         return super(AzureADAdministratorsFilter, self).__call__(i['properties']['administrators'])
 

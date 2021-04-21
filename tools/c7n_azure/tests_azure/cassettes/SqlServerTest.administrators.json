@@ -14,14 +14,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "date": [
-                        "Wed, 21 Apr 2021 16:04:37 GMT"
+                        "Wed, 21 Apr 2021 18:58:56 GMT"
                     ],
                     "content-length": [
                         "492"
@@ -63,34 +63,22 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "date": [
-                        "Wed, 21 Apr 2021 16:04:37 GMT"
+                        "Wed, 21 Apr 2021 18:58:56 GMT"
                     ],
                     "content-length": [
-                        "423"
+                        "12"
                     ]
                 },
                 "body": {
                     "data": {
-                        "value": [
-                            {
-                                "properties": {
-                                    "administratorType": "ActiveDirectory",
-                                    "login": "aj@stacklet.io",
-                                    "sid": "17285ecf-6528-44e9-a94d-e77024b77418",
-                                    "tenantId": "00000000-0000-0000-0000-000000000003"
-                                },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/administrators/ActiveDirectory",
-                                "name": "ActiveDirectory",
-                                "type": "Microsoft.Sql/servers"
-                            }
-                        ]
+                        "value": []
                     }
                 }
             }

@@ -87,10 +87,10 @@ class TransparentDataEncryptionFilter(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: sqlserver-no-ad-admin
+          - name: sql-database-no-tde
             resource: azure.sql-database
             filters:
-              - type: azure-ad-administrators
+              - type: transparent-data-encryption
                 key: status
                 op: ne
                 value: Enabled
