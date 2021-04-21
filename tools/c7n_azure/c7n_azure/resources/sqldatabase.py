@@ -22,7 +22,7 @@ from azure.mgmt.sql.models import (BackupLongTermRetentionPolicy,
                                    BackupShortTermRetentionPolicy,
                                    DatabaseUpdate, Sku)
 from c7n.filters import Filter
-from c7n.filters.core import PolicyValidationError
+from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import get_annotation_prefix, type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
@@ -38,7 +38,7 @@ log = logging.getLogger('custodian.azure.sqldatabase')
 class SqlDatabase(ChildArmResourceManager):
     """SQL Server Database Resource
 
-    The ``azure.sqldatabase`` resource is a child resource of the SQL Server resource,
+    The ``azure.sql-database`` resource is a child resource of the SQL Server resource,
     and the SQL Server parent id is available as the ``c7n:parent-id`` property.
 
     :example:
@@ -49,7 +49,7 @@ class SqlDatabase(ChildArmResourceManager):
 
         policies:
             - name: find-all-sql-databases
-              resource: azure.sqldatabase
+              resource: azure.sql-database
 
     """
     class resource_type(ChildArmResourceManager.resource_type):
@@ -72,6 +72,49 @@ class SqlDatabase(ChildArmResourceManager):
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
                     'server_name': parent_resource['name']}
+
+
+@SqlDatabase.filter_registry.register('transparent-data-encryption')
+class TransparentDataEncryptionFilter(ValueFilter):
+    """
+    Provides a value filter targetting the current Transparent Data Encryption
+    configuration for this database.
+
+    :examples:
+
+    Find SQL databases with TDE disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sqlserver-no-ad-admin
+            resource: azure.sql-database
+            filters:
+              - type: azure-ad-administrators
+                key: status
+                op: ne
+                value: Enabled
+
+    """
+
+    schema = type_schema('transparent-data-encryption', rinherit=ValueFilter.schema)
+
+    def __call__(self, i):
+        if 'transparentDataEncryption' not in i['properties']:
+            client = self.manager.get_client()
+            server_id = i[ChildTypeInfo.parent_key]
+            server_name = ResourceIdParser.get_resource_name(server_id)
+
+            tde = (
+                client.transparent_data_encryptions
+                .get(i['resourceGroup'], server_name, i['name'], "current")
+            )
+
+            i['properties']['transparentDataEncryption'] = \
+                tde.serialize().get('properties', {})
+
+        return super(TransparentDataEncryptionFilter, self).__call__(
+            i['properties']['transparentDataEncryption'])
 
 
 class BackupRetentionPolicyHelper:
