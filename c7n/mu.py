@@ -1071,7 +1071,11 @@ class CloudWatchEventSource(AWSEventBase):
             payload['detail-type'] = events
         elif event_type == 'phd':
             payload['source'] = ['aws.health']
-            payload.setdefault('detail', {})
+
+            phd_event_keys = ['events', 'statuses', 'categories']
+            if len([k for k in self.data.keys() if k in phd_event_keys]) > 0:
+                payload.setdefault('detail', {})
+
             if self.data.get('events'):
                 payload['detail'].update({
                     'eventTypeCode': list(self.data['events'])
