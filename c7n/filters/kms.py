@@ -61,11 +61,8 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def process(self, resources, event=None):
         related = self.get_related(resources)
         for r in related.values():
-            try:
-                # `AliasNames` is set when we fetch keys, but only for keys
-                # which have aliases defined. Fall back to an empty string
-                # to avoid lookup errors in filters.
-                r['c7n:AliasName'] = r['AliasNames'][0]
-            except (IndexError, KeyError):
-                r['c7n:AliasName'] = ''
+            # `AliasNames` is set when we fetch keys, but only for keys
+            # which have aliases defined. Fall back to an empty string
+            # to avoid lookup errors in filters.
+            r['c7n:AliasName'] = r.get('AliasNames', ('',))[0]
         return [r for r in resources if self.process_resource(r, related)]
