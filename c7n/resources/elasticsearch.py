@@ -43,6 +43,15 @@ class DescribeDomain(DescribeSource):
         return results
 
 
+class ConfigElastic(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        # config converts the type field on this field violating the sdk schema
+        resource.get('ServiceSoftwareOptions', {}).pop('AutomatedUpdateDate', None)
+        return resource
+
+
 @resources.register('elasticsearch')
 class ElasticSearchDomain(QueryResourceManager):
 
@@ -59,7 +68,7 @@ class ElasticSearchDomain(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeDomain,
-        'config': ConfigSource
+        'config': ConfigElastic
     }
 
 
