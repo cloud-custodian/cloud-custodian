@@ -126,7 +126,6 @@ class TransparentDataEncryptionFilter(Filter):
         result = []
         for resource in resources:
             if 'transparentDataEncryption' not in resource['properties']:
-                client = self.manager.get_client()
                 server_id = resource[ChildTypeInfo.parent_key]
                 server_name = ResourceIdParser.get_resource_name(server_id)
 
@@ -137,7 +136,7 @@ class TransparentDataEncryptionFilter(Filter):
                     "current")
 
                 resource['properties']['transparentDataEncryption'] = \
-                    tde.serialize().get('properties', {})
+                    tde.serialize(True).get('properties', {})
 
             required_status = 'Enabled' if self.enabled else 'Disabled'
 

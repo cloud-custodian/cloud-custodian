@@ -129,7 +129,7 @@ class AzureADAdministratorsFilter(ValueFilter):
             # there can only be a single administrator, not an array.
             if administrators:
                 i['properties']['administrators'] = \
-                    administrators[0].serialize().get('properties', {})
+                    administrators[0].serialize(True).get('properties', {})
             else:
                 i['properties']['administrators'] = {}
 
