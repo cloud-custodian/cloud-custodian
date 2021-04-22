@@ -114,8 +114,7 @@ class SqlDatabaseTest(BaseTest):
                 },
                 {
                     'type': 'transparent-data-encryption',
-                    'key': 'status',
-                    'value': 'Enabled'
+                    'enabled': True
                 }],
         })
         resources = p.run()

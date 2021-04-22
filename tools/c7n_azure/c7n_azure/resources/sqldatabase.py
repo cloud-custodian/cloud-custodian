@@ -22,14 +22,14 @@ from azure.mgmt.sql.models import (BackupLongTermRetentionPolicy,
                                    BackupShortTermRetentionPolicy,
                                    DatabaseUpdate, Sku)
 from c7n.filters import Filter
-from c7n.filters.core import PolicyValidationError, ValueFilter
+from c7n.filters.core import PolicyValidationError
 from c7n.utils import get_annotation_prefix, type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
-from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
+from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper, StringUtils
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -75,12 +75,12 @@ class SqlDatabase(ChildArmResourceManager):
 
 
 @SqlDatabase.filter_registry.register('transparent-data-encryption')
-class TransparentDataEncryptionFilter(ValueFilter):
+class TransparentDataEncryptionFilter(Filter):
     """
-    Provides a value filter targetting the current Transparent Data Encryption
+    Filter by the current Transparent Data Encryption
     configuration for this database.
 
-    :examples:
+    :example:
 
     Find SQL databases with TDE disabled
 
@@ -91,30 +91,62 @@ class TransparentDataEncryptionFilter(ValueFilter):
             resource: azure.sql-database
             filters:
               - type: transparent-data-encryption
-                key: status
-                op: ne
-                value: Enabled
+                enabled: false
 
     """
 
-    schema = type_schema('transparent-data-encryption', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'transparent-data-encryption',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
 
-    def __call__(self, i):
-        if 'transparentDataEncryption' not in i['properties']:
-            client = self.manager.get_client()
-            server_id = i[ChildTypeInfo.parent_key]
-            server_name = ResourceIdParser.get_resource_name(server_id)
+    log = logging.getLogger('custodian.azure.sqldatabase.TransparentDataEncryptionFilter')
 
-            tde = (
-                client.transparent_data_encryptions
-                .get(i['resourceGroup'], server_name, i['name'], "current")
-            )
+    def __init__(self, data, manager=None):
+        super(TransparentDataEncryptionFilter, self).__init__(data, manager)
+        self.enabled = self.data.get('enabled')
 
-            i['properties']['transparentDataEncryption'] = \
-                tde.serialize().get('properties', {})
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
 
-        return super(TransparentDataEncryptionFilter, self).__call__(
-            i['properties']['transparentDataEncryption'])
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'transparentDataEncryption' not in resource['properties']:
+                client = self.manager.get_client()
+                server_id = resource[ChildTypeInfo.parent_key]
+                server_name = ResourceIdParser.get_resource_name(server_id)
+
+                tde = client.transparent_data_encryptions.get(
+                    resource['resourceGroup'],
+                    server_name,
+                    resource['name'],
+                    "current")
+
+                resource['properties']['transparentDataEncryption'] = \
+                    tde.serialize().get('properties', {})
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['properties']['transparentDataEncryption'].get('status'),
+                    required_status):
+                result.append(resource)
+
+        return result
 
 
 class BackupRetentionPolicyHelper:
