@@ -19,6 +19,7 @@ class Bucket(QueryResourceManager):
         default_report_fields = [
             "name", "timeCreated", "location", "storageClass"]
         asset_type = "storage.googleapis.com/Bucket"
+        metric_key = 'resource.labels.bucket_name'
 
         @staticmethod
         def get(client, resource_info):
