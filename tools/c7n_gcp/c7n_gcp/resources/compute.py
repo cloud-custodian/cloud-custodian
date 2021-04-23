@@ -547,3 +547,52 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('node-template')
+class NodeTemplate(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/nodeTemplates
+   """
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'nodeTemplates'
+        enum_spec = ('aggregatedList', 'items.*.nodeTemplates[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'region': resource_info['region'],
+                        'nodeTemplate': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+
+@NodeTemplate.action_registry.register('delete')
+class NodeTemplateDelete(MethodAction):
+    """
+    `Deletes <https://cloud.google.com/compute/docs/reference/rest/v1/nodeTemplates/delete>`_
+    a Node Template. The action does not specify any parameters.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-node-template-delete
+            resource: gcp.node-template
+            filters:
+              - type: value
+                key: name
+                value: node-template-to-delete
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        project, region, node_template = re.match(
+            '.*/projects/(.*?)/regions/(.*?)/nodeTemplates/(.*)', r['selfLink']).groups()
+        return {'project': project, 'region': region, 'nodeTemplate': node_template}

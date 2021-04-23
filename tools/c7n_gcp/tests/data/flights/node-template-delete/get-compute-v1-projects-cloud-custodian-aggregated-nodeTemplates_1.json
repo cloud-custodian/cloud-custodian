@@ -1,0 +1,48 @@
+{
+  "body": {
+    "items": {
+      "regions/asia-east1": {
+        "nodeTemplates": [
+          {
+            "status": "READY", 
+            "serverBinding": {
+              "type": "RESTART_NODE_ON_ANY_SERVER"
+            }, 
+            "kind": "compute#nodeTemplate", 
+            "name": "node-template-to-delete", 
+            "nodeTypeFlexibility": {
+              "memory": "any", 
+              "localSsd": "0", 
+              "cpus": "any"
+            }, 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1", 
+            "creationTimestamp": "2019-06-17T04:31:32.753-07:00", 
+            "id": "5246958095131395323", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1/nodeTemplates/node-template-to-delete"
+          }
+        ]
+      }
+    }, 
+    "kind": "compute#nodeTemplateAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/nodeTemplates", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/nodeTemplates"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "6715", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/nodeTemplates?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Thu, 18 Jul 2019 11:50:25 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "etag": "\"J2oRG-vo7JQxR8GDT_okaQzs89s=/ix8egsJjvrWbcyw-XV5weUWmqI0=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Thu, 18 Jul 2019 11:50:25 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

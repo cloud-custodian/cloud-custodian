@@ -1,0 +1,37 @@
+{
+  "body": {
+    "status": "READY", 
+    "serverBinding": {
+      "type": "RESTART_NODE_ON_ANY_SERVER"
+    }, 
+    "kind": "compute#nodeTemplate", 
+    "name": "custodian-node-template", 
+    "nodeTypeFlexibility": {
+      "localSsd": "0", 
+      "cpus": "any", 
+      "memory": "any"
+    }, 
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1", 
+    "creationTimestamp": "2019-06-17T02:07:43.782-07:00", 
+    "id": "8224147532577171120", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/nodeTemplates/custodian-node-template"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "572", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 17 Jun 2019 09:48:50 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 17 Jun 2019 09:48:50 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/nodeTemplates/custodian-node-template?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"4X_mRe_1IT8JhPstl3xBt40JADw=/6FnLzp9tSI5GiSZJbZR7Ve5BjfU=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

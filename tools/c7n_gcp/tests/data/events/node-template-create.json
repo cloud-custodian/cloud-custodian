@@ -1,0 +1,36 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0,gzip(gfe),gzip(gfe)"
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "beta.compute.nodeTemplates.insert",
+    "resourceName": "projects/cloud-custodian/regions/us-central1/nodeTemplates/custodian-node-template",
+    "request": {
+      "@type": "type.googleapis.com/compute.nodeTemplates.insert"
+    }
+  },
+  "insertId": "-lwq7gud27ui",
+  "resource": {
+    "type": "gce_node_template",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "node_template_id": "8224147532577171120",
+      "region": "us-central1"
+    }
+  },
+  "timestamp": "2019-06-17T09:07:44.700Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1560762463168-58b815432260e-bb5b0636-1370d94d",
+    "producer": "compute.googleapis.com",
+    "last": true
+  },
+  "receiveTimestamp": "2019-06-17T09:07:44.977682288Z"
+}

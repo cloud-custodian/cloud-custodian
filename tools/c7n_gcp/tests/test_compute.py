@@ -446,3 +446,75 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
         self.assertEqual(result_policy['minNumReplicas'], 1)
         self.assertEqual(result_policy['maxNumReplicas'], 4)
+
+
+class NodeTemplateTest(BaseTest):
+
+    def test_node_template_query(self):
+        resource_id = 'custodian-node-template'
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'node-template-query', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-node-template-dryrun',
+             'resource': 'gcp.node-template'},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(resources[0]['name'], resource_id)
+
+    def test_node_template_get(self):
+        resource_id = 'custodian-node-template'
+        session_factory = self.replay_flight_data('node-template-get')
+
+        policy = self.load_policy(
+            {'name': 'gcp-node-template-audit',
+             'resource': 'gcp.node-template',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['beta.compute.nodeTemplates.insert']
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('node-template-create.json')
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['name'], resource_id)
+
+    def test_node_template_delete(self):
+        project_id = 'cloud-custodian'
+        region_id = 'asia-east1'
+        resource_id = 'node-template-to-delete'
+        resource_full_name = 'projects/%s/regions/%s/nodeTemplates/%s' % \
+                             (project_id, region_id, resource_id)
+        session_factory = self.replay_flight_data(
+            'node-template-delete', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-node-template-delete',
+             'resource': 'gcp.node-template',
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'value': resource_id
+             }],
+             'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_id)
+
+        if self.recording:
+            time.sleep(1)
+
+        client = policy.resource_manager.get_client()
+        try:
+            result = client.execute_query(
+                'get', {'project': project_id,
+                        'region': region_id,
+                        'nodeTemplate': resource_id})
+            self.fail('found deleted resource: %s' % result)
+        except HttpError as e:
+            self.assertTrue(re.match(".*The resource '%s' was not found.*" %
+                                     resource_full_name, str(e)))
