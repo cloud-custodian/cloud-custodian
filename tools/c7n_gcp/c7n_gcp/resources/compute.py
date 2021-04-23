@@ -27,6 +27,7 @@ class Instance(QueryResourceManager):
         labels = True
         default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
         asset_type = "compute.googleapis.com/Instance"
+        metric_key = 'metric.labels.instance_name'
 
         @staticmethod
         def get(client, resource_info):
@@ -422,6 +423,7 @@ class Autoscaler(QueryResourceManager):
         default_report_fields = [
             "name", "description", "status", "target", "recommendedSize"]
         asset_type = "compute.googleapis.com/Autoscaler"
+        metric_key = "resource.labels.autoscaler_name"
 
         @staticmethod
         def get(client, resource_info):
