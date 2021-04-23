@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.filters.metrics import MetricsFilter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -53,6 +53,7 @@ class KmsFilter(KmsRelatedFilter):
                 value: "^(alias/aws/mq)"
                 op: regex
     """
+
     RelatedIdsExpression = 'EncryptionOptions.KmsKeyId'
 
 
@@ -83,10 +84,48 @@ class MQMetrics(MetricsFilter):
                  'Value': "{}-1".format(resource['BrokerName'])}]
 
 
+@MessageBroker.filter_registry.register('vpc')
+class VpcFilter(VpcFilter):
+    """Filter a resource by its VPC id. Choose to select resources that are in that VPC or select
+    resources that are not in that VPC using the 'op' field.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: mq-vpc-filters
+                resource: message-broker
+                filters:
+                      - type: vpc
+                        key: VpcId
+                        value: vpc-xxxxxxxxxxx
+                        op: eq
+    """
+    vpc_id_map = {}
+
+    def get_related_ids(self, resources):
+        related_ids = set()
+        sg_ids = set()
+        for r in resources:
+            sg_id = r.get('SecurityGroups', [])[0]
+            if self.vpc_id_map.get(sg_id):
+                related_ids.add(self.vpc_id_map.get(sg_id))
+                continue
+            sg_ids.add(sg_id)
+        sgs = self.manager.get_resource_manager('security-group').get_resources(list(sg_ids))
+        for sg in sgs:
+            vpc_id = sg.get('VpcId')
+            self.vpc_id_map[sg.get('GroupId')] = vpc_id
+            related_ids.add(vpc_id)
+        return related_ids
+
+    RelatedIdsExpression = ""
+
+
 @MessageBroker.action_registry.register('delete')
 class Delete(Action):
-    """Delete a set of message brokers
-    """
+    """Delete a set of message brokers"""
 
     schema = type_schema('delete')
     permissions = ("mq:DeleteBroker",)

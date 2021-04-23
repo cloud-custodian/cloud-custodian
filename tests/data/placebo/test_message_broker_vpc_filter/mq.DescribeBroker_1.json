@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AuthenticationStrategy": "simple",
+        "AutoMinorVersionUpgrade": true,
+        "BrokerArn": "arn:aws:mq:us-east-1:012345678910:broker:TestBroker2:b-68a927df-9830-4f87-a3e4-737be3f89160",
+        "BrokerId": "b-68a927df-9830-4f87-a3e4-737be3f89160",
+        "BrokerInstances": [
+            {
+                "ConsoleURL": "https://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:8162",
+                "Endpoints": [
+                    "ssl://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:61617",
+                    "amqp+ssl://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:5671",
+                    "stomp+ssl://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:61614",
+                    "mqtt+ssl://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:8883",
+                    "wss://b-68a927df-9830-4f87-a3e4-737be3f89160-1.mq.us-east-1.amazonaws.com:61619"
+                ],
+                "IpAddress": "18.210.195.50"
+            }
+        ],
+        "BrokerName": "TestBroker2",
+        "BrokerState": "RUNNING",
+        "Configurations": {
+            "Current": {
+                "Id": "c-bb470935-239a-4d95-99da-52699501848f",
+                "Revision": 1
+            },
+            "History": []
+        },
+        "Created": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 4,
+            "day": 7,
+            "hour": 15,
+            "minute": 30,
+            "second": 36,
+            "microsecond": 763000
+        },
+        "DeploymentMode": "SINGLE_INSTANCE",
+        "EncryptionOptions": {
+            "UseAwsOwnedKey": true
+        },
+        "EngineType": "ActiveMQ",
+        "EngineVersion": "5.15.14",
+        "HostInstanceType": "mq.m5.large",
+        "Logs": {
+            "Audit": false,
+            "AuditLogGroup": "/aws/amazonmq/broker/b-68a927df-9830-4f87-a3e4-737be3f89160/audit",
+            "General": false,
+            "GeneralLogGroup": "/aws/amazonmq/broker/b-68a927df-9830-4f87-a3e4-737be3f89160/general"
+        },
+        "MaintenanceWindowStartTime": {
+            "DayOfWeek": "FRIDAY",
+            "TimeOfDay": "19:00",
+            "TimeZone": "UTC"
+        },
+        "PubliclyAccessible": true,
+        "SecurityGroups": [
+            "sg-0fd0c04f0c434d68d"
+        ],
+        "StorageType": "efs",
+        "SubnetIds": [
+            "subnet-07c118e47bb84cee7"
+        ],
+        "Tags": {},
+        "Users": [
+            {
+                "Username": "testing"
+            }
+        ]
+    }
+}
