@@ -51,7 +51,7 @@ class Azure(Provider):
 
         # c7n-org will have a region set to either global or the specified region
         region = options.get('region')
-        if region != '':
+        if region:
             # commercial is always set to global
             if region == 'global':
                 region = 'AzureCloud'
