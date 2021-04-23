@@ -4,10 +4,26 @@ from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n import tags
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.utils import local_session, type_schema
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
+from .ecs import ContainerConfigSource
+
+
+class EKSDescribeSource(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            if 'tags' not in r:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+        return resources
+
+
+class EKSConfigSource(ContainerConfigSource):
+    mapped_keys = {'certificateAuthorityData': 'certificateAuthority'}
 
 
 @resources.register('eks')
@@ -21,15 +37,12 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
-        cfn_type = 'AWS::EKS::Cluster'
+        config_type = cfn_type = 'AWS::EKS::Cluster'
 
-    def augment(self, resources):
-        resources = super(EKS, self).augment(resources)
-        for r in resources:
-            if 'tags' not in r:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
-        return resources
+    source_mapping = {
+        'config': EKSConfigSource,
+        'describe': EKSDescribeSource
+    }
 
 
 @EKS.filter_registry.register('subnet')

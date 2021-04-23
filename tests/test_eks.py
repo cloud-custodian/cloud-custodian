@@ -6,6 +6,15 @@ from .common import BaseTest
 
 class EKS(BaseTest):
 
+    def test_config(self):
+        factory = self.replay_flight_data('test_eks_config')
+        p = self.load_policy(
+            {"name": "eks", "source": "config", "resource": "eks"},
+            session_factory=factory,
+            config={'region': 'us-east-2'})
+        resources = p.run()
+        assert resources[0]['name'] == 'kapil-dev'
+
     def test_query_with_subnet_sg_filter(self):
         factory = self.replay_flight_data("test_eks_query")
         p = self.load_policy(
