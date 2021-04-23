@@ -1,0 +1,78 @@
+{
+  "body": {
+    "items": {
+      "zones/us-central1-a": {
+        "instanceGroupManagers": [
+          {
+            "status": {
+              "isStable": true
+            }, 
+            "targetSize": 1, 
+            "name": "instance-group-1", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a", 
+            "versions": [
+              {
+                "targetSize": {
+                  "calculated": 1
+                }, 
+                "instanceTemplate": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/instanceTemplates/instance-template-1"
+              }
+            ], 
+            "currentActions": {
+              "none": 1, 
+              "recreating": 0, 
+              "creating": 0, 
+              "verifying": 0, 
+              "restarting": 0, 
+              "abandoning": 0, 
+              "deleting": 0, 
+              "creatingWithoutRetries": 0, 
+              "refreshing": 0
+            }, 
+            "instanceGroup": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a/instanceGroups/instance-group-1", 
+            "kind": "compute#instanceGroupManager", 
+            "instanceTemplate": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/instanceTemplates/instance-template-1", 
+            "updatePolicy": {
+              "type": "OPPORTUNISTIC", 
+              "maxSurge": {
+                "calculated": 1, 
+                "fixed": 1
+              }, 
+              "minimalAction": "REPLACE", 
+              "maxUnavailable": {
+                "calculated": 1, 
+                "fixed": 1
+              }
+            }, 
+            "fingerprint": "GqTiND9i6cw=", 
+            "baseInstanceName": "instance-group-1", 
+            "creationTimestamp": "2019-07-31T04:02:58.489-07:00", 
+            "id": "3602261525171850125", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a/instanceGroupManagers/instance-group-1"
+          }
+        ]
+      }
+    }, 
+    "kind": "compute#instanceGroupManagerAggregatedList", 
+    "id": "projects/mitrop-custodian/aggregated/instanceGroupManagers", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/aggregated/instanceGroupManagers"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "23493", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/aggregated/instanceGroupManagers?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Wed, 31 Jul 2019 11:04:56 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "etag": "\"GlRlmAaN-BvQr22IfAiLbzbCGMU=/sxbqjBvLeTVLrcJzHvVBZ2IfpGU=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Wed, 31 Jul 2019 11:04:56 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "whatever@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "1.1.1.1",
+      "callerSuppliedUserAgent": "Mozilla/5.0"
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.instanceGroupManagers.insert",
+    "resourceName": "projects/mitrop-custodian/zones/us-central1-a/instanceGroupManagers/instance-group-1",
+    "request": {
+      "@type": "type.googleapis.com/compute.instanceGroupManagers.insert"
+    }
+  },
+  "insertId": "-d19khrd3bs2",
+  "resource": {
+    "type": "gce_instance_group_manager",
+    "labels": {
+      "instance_group_manager_name": "instance-group-1",
+      "project_id": "mitrop-custodian",
+      "instance_group_manager_id": "3608392234477804705",
+      "location": "us-central1-a"
+    }
+  },
+  "timestamp": "2019-06-10T13:59:49.523Z",
+  "severity": "NOTICE",
+  "logName": "projects/mitrop-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1560175181541-58af8977bb13c-a07ebf92-6e8beaff",
+    "producer": "compute.googleapis.com",
+    "last": true
+  },
+  "receiveTimestamp": "2019-06-10T13:59:50.342256352Z"
+}

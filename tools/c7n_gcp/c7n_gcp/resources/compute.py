@@ -547,3 +547,179 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('instance-group-manager')
+class InstanceGroupManager(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/instanceGroupManagers
+    """
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'instanceGroupManagers'
+        enum_spec = ('aggregatedList', 'items.*.instanceGroupManagers[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'zone': resource_info['location'],
+                        'instanceGroupManager': resource_info['instance_group_manager_name']})
+
+
+@InstanceGroupManager.action_registry.register('delete')
+class InstanceGroupManagerDelete(MethodAction):
+    """`Deletes <https://cloud.google.com/compute/docs/reference/rest/v1/instanceGroupManagers
+    /delete>`_ an instance group manager
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: instance-group-manager-delete
+            resource: gcp.instance-group-manager
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value: test-instance-group
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instanceGroupManagers/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, zone, name = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instanceGroupManager': name}
+
+
+@InstanceGroupManager.action_registry.register('set')
+class InstanceGroupManagerSet(MethodAction):
+    """
+    `Patches <https://cloud.google.com/compute/docs/reference/rest/v1/instanceGroupManagers
+    /patch>`_ configuration parameters for an instance group.
+
+    Available fields:
+    - `instanceTemplate`
+    - `autoHealingPolicies[].healthCheck`
+    - `autoHealingPolicies[].initialDelaySec`
+    - `updatePolicy.type`
+    - `updatePolicy.minimalAction`
+    - `updatePolicy.maxSurge.fixed`
+    - `updatePolicy.maxSurge.percent`
+    - `updatePolicy.maxUnavailable.fixed`
+    - `updatePolicy.maxUnavailable.percent`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: instance-group-manager-set
+            resource: gcp.instance-group-manager
+            actions:
+              - type: set
+                instanceTemplate:
+                  "https://www.googleapis.com/compute/v1/projects/mitrop-custodian\
+                  /global/instanceTemplates/instance-template-2"
+                autoHealingPolicies:
+                  - healthCheck:
+                      "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global\
+                      /healthChecks/test-health-check"
+                    initialDelaySec: 10
+                updatePolicy:
+                  type: OPPORTUNISTIC
+                  minimalAction: REPLACE
+                  maxSurge:
+                    fixed: 4
+                  maxUnavailable:
+                    fixed: 1
+    """
+    schema = type_schema('set',
+                         **{
+                             'instanceTemplate': {'type': 'string'},
+                             'autoHealingPolicies': {
+                                 'type': 'array',
+                                 'items': {
+                                     'type': 'object',
+                                     'required': ['healthCheck'],
+                                     'properties': {
+                                         'healthCheck': {'type': 'string'},
+                                         'initialDelaySec': {
+                                             'type': 'integer',
+                                             'maximum': 3600,
+                                             'minimum': 0
+                                         }
+                                     }
+                                 },
+                             },
+                             'updatePolicy': {
+                                 'type': 'object',
+                                 'properties': {
+                                     'type': {
+                                         'type': 'string',
+                                         'enum': ['PROACTIVE', 'OPPORTUNISTIC']
+                                     },
+                                     'minimalAction': {
+                                         'type': 'string',
+                                         'enum': ['RESTART', 'REPLACE']
+                                     },
+                                     'maxSurge': {
+                                         'type': 'object',
+                                         'properties': {
+                                             'fixed': {
+                                                 'type': 'integer',
+                                                 'minimum': 0
+                                             },
+                                             'percent': {
+                                                 'type': 'integer',
+                                                 'maximum': 100,
+                                                 'minimum': 0
+                                             }
+                                         }
+                                     },
+                                     'maxUnavailable': {
+                                         'type': 'object',
+                                         'properties': {
+                                             'fixed': {
+                                                 'type': 'integer',
+                                                 'minimum': 0
+                                             },
+                                             'percent': {
+                                                 'type': 'integer',
+                                                 'maximum': 100,
+                                                 'minimum': 0
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         })
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instanceGroupManagers/(.*)')
+
+    def get_resource_params(self, model, resource):
+        project, zone, manager = self.path_param_re.match(resource['selfLink']).groups()
+        body = {}
+
+        if 'instanceTemplate' in self.data:
+            body['instanceTemplate'] = self.data['instanceTemplate']
+
+        if 'autoHealingPolicies' in self.data:
+            body['autoHealingPolicies'] = self.data['autoHealingPolicies']
+
+        if 'updatePolicy' in self.data:
+            body['updatePolicy'] = self.data['updatePolicy']
+
+        result = {'project': project,
+                  'zone': zone,
+                  'instanceGroupManager': manager,
+                  'body': body}
+
+        return result

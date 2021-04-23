@@ -1,0 +1,67 @@
+{
+  "body": {
+    "status": {
+      "isStable": true
+    }, 
+    "kind": "compute#instanceGroupManager", 
+    "name": "instance-group-1", 
+    "zone": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a", 
+    "versions": [
+      {
+        "targetSize": {
+          "calculated": 1
+        }, 
+        "instanceTemplate": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/instanceTemplates/instance-template-1"
+      }
+    ], 
+    "targetSize": 1, 
+    "instanceGroup": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a/instanceGroups/instance-group-1", 
+    "currentActions": {
+      "none": 1, 
+      "recreating": 0, 
+      "creating": 0, 
+      "verifying": 0, 
+      "restarting": 0, 
+      "abandoning": 0, 
+      "deleting": 0, 
+      "creatingWithoutRetries": 0, 
+      "refreshing": 0
+    }, 
+    "instanceTemplate": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/global/instanceTemplates/instance-template-1", 
+    "updatePolicy": {
+      "maxSurge": {
+        "calculated": 1, 
+        "fixed": 1
+      }, 
+      "type": "OPPORTUNISTIC", 
+      "maxUnavailable": {
+        "calculated": 1, 
+        "fixed": 1
+      }, 
+      "minimalAction": "REPLACE"
+    }, 
+    "fingerprint": "LDIsrudffn8=", 
+    "baseInstanceName": "instance-group-1", 
+    "creationTimestamp": "2019-06-10T06:59:42.310-07:00", 
+    "id": "3608392234477804705", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a/instanceGroupManagers/instance-group-1"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1387", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 10 Jun 2019 14:42:39 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 10 Jun 2019 14:42:39 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/mitrop-custodian/zones/us-central1-a/instanceGroupManagers/instance-group-1?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"LuFxroaC-kDuOSpfVoRkt9k4yC8=/dYgf_k5Rq-wF1eSbMp8cVMiZ4k0=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

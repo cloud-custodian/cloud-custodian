@@ -4,8 +4,9 @@
 import re
 import time
 
-from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+
+from gcp_common import BaseTest, event_data
 
 
 class InstanceTest(BaseTest):
@@ -446,3 +447,120 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
         self.assertEqual(result_policy['minNumReplicas'], 1)
         self.assertEqual(result_policy['maxNumReplicas'], 4)
+
+
+class InstanceGroupManagerTest(BaseTest):
+
+    def test_instance_group_manager_query(self):
+        project_id = 'mitrop-custodian'
+        resource_name = 'instance-group-1'
+
+        session_factory = self.replay_flight_data(
+            'instance-group-manager-query',
+            project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'all-instance-group-managers',
+             'resource': 'gcp.instance-group-manager'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_instance_group_manager_get(self):
+        resource_name = 'instance-group-1'
+        session_factory = self.replay_flight_data('instance-group-manager-get')
+
+        policy = self.load_policy(
+            {'name': 'new-instance-group-manager',
+             'resource': 'gcp.instance-group-manager',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['type.googleapis.com/compute.instanceGroupManagers.insert']
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('instance-group-manager-create.json')
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_instance_group_manager_delete(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('instance-group-manager-delete', project_id=project_id)
+
+        p = self.load_policy(
+            {'name': 'delete-instance-group-manager',
+             'resource': 'gcp.instance-group-manager',
+             'filters': [{'name': 'instance-group-4'}],
+             'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = instance-group-4',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+
+        self.assertEqual(result['items'][0]['currentActions']['deleting'], 1)
+
+    def test_instance_group_manager_set(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('instance-group-manager-set', project_id=project_id)
+
+        instance_template_url = ('https://www.googleapis.com/compute/v1/projects/mitrop-custodian'
+                                 '/global/instanceTemplates/instance-template-2')
+        health_check_url = ('https://www.googleapis.com/compute/v1/projects/mitrop-custodian'
+                            '/global/healthChecks/test-health-check')
+
+        p = self.load_policy(
+            {'name': 'set-instance-group-manager',
+             'resource': 'gcp.instance-group-manager',
+             'filters': [{'name': 'instance-group-1'}],
+             'actions': [{'type': 'set',
+                          'instanceTemplate': instance_template_url,
+                          'autoHealingPolicies': [{
+                              'healthCheck': health_check_url,
+                              'initialDelaySec': 10
+                          }],
+                          'updatePolicy': {
+                              'type': 'OPPORTUNISTIC',
+                              'minimalAction': 'REPLACE',
+                              'maxSurge': {
+                                  'fixed': 4
+                              },
+                              'maxUnavailable': {
+                                  'fixed': 1
+                              }
+                          }}]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(60)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'zone': 'us-central1-a',
+                     'filter': 'name = instance-group-1'})
+
+        manager = result['items'][0]
+
+        self.assertEqual(manager['instanceTemplate'], instance_template_url)
+        self.assertEqual(manager['autoHealingPolicies'][0]['healthCheck'], health_check_url)
+        self.assertEqual(manager['autoHealingPolicies'][0]['initialDelaySec'], 10)
+        self.assertEqual(manager['updatePolicy']['type'], 'OPPORTUNISTIC')
+        self.assertEqual(manager['updatePolicy']['minimalAction'], 'REPLACE')
+        self.assertEqual(manager['updatePolicy']['maxSurge']['fixed'], 4)
+        self.assertEqual(manager['updatePolicy']['maxUnavailable']['fixed'], 1)
