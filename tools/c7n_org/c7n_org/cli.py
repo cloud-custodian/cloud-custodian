@@ -558,13 +558,6 @@ def run_account(account, region, policies_config, output_path,
 
     env_vars = account_tags(account)
 
-    # azure needs to be initialized so we can use the correct cloud endpoints
-    if account.get('provider') == 'azure' and region != 'global':
-        config['regions'] = [region]
-        azure = Azure()
-        sessionFactory = azure.get_session_factory(azure.initialize(config))
-        local_session(sessionFactory)
-
     if account.get('role'):
         if isinstance(account['role'], str):
             config['assume_role'] = account['role']
