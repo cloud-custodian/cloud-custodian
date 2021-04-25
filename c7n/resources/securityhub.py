@@ -446,7 +446,7 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
-            finding_id = '{}/{}/{}/{}'.format(
+            finding_id = '{}/{}/{}/{}'.format(  # nosec nosemgrep
                 self.manager.config.region,
                 self.manager.config.account_id,
                 hashlib.md5(json.dumps(

@@ -548,7 +548,7 @@ class PostItem(Action):
             self.manager.config.region,
             self.manager.config.account_id)).encode('utf8')
         # size restrictions on this value is 4-20, digest is 32
-        dedup = hashlib.md5(dedup).hexdigest()[:20]
+        dedup = hashlib.md5(dedup).hexdigest()[:20]  # nosec nosemgrep
 
         i = dict(
             Title=title,

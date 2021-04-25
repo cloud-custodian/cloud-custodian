@@ -8,7 +8,7 @@ from collections import Counter
 import logging
 import os
 import time
-import subprocess
+import subprocess  # nosec
 import sys
 
 import multiprocessing
@@ -404,7 +404,7 @@ def report(config, output, use, output_dir, accounts,
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, formatter.headers())
+    writer = csv.writer(output, formatter.headers(), quoting=csv.QUOTE_ALL)
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
@@ -440,7 +440,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
              account['name'], region, " ".join(script_args))
 
     if debug:
-        subprocess.check_call(args=script_args, env=env)
+        subprocess.check_call(args=script_args, env=env)  # nosec
         return 0
 
     output_dir = os.path.join(output_dir, account['name'], region)
@@ -449,7 +449,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
-            return subprocess.call(
+            return subprocess.call(  # nosec
                 args=script_args, env=env, stdout=stdout, stderr=stderr)
 
 
