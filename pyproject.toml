@@ -11,6 +11,7 @@ license = "Apache-2.0"
 packages = [
     { include = "c7n" }]
 classifiers=[
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"]
 
