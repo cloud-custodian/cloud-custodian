@@ -122,7 +122,7 @@ analyzer-bandit:
 
 
 analyzer-semgrep:
-	semgrep --verbose --config p/security-audit \
+	semgrep --error --verbose --config p/security-audit \
 	 tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_terraform/c7n_terraform \
