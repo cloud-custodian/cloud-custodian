@@ -88,6 +88,11 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -Z \
           -v -f coverage.xml
 
+      - name: License Check
+        if: contains(matrix.tox-target, 'py39')
+        run: |
+          ./.tox/${{ matrix.tox-target }}/bin/python tools/dev/license-check.py
+
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
     # where we cache the entire tox virtualenv directory, without error.

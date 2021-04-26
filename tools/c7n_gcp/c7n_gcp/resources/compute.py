@@ -5,12 +5,13 @@ import re
 
 from datetime import datetime
 
-from c7n.utils import type_schema
+from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+from c7n.filters.core import ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -63,6 +64,57 @@ class InstanceOnHour(OnHour):
 
     def get_tag_value(self, instance):
         return instance.get('labels', {}).get(self.tag_key, False)
+
+
+@Instance.filter_registry.register('effective-firewall')
+class EffectiveFirewall(ValueFilter):
+    """Filters instances by their effective firewall rules.
+    See `getEffectiveFirewalls
+    <https://cloud.google.com/compute/docs/reference/rest/v1/instances/getEffectiveFirewalls>`_
+    for valid fields.
+
+    :example:
+
+    Filter all instances that have a firewall rule that allows public
+    acess
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-publicly-accessable-instances
+             resource: gcp.instance
+             filters:
+             - type: effective-firewall
+               key: firewalls[*].sourceRanges[]
+               op: contains
+               value: "0.0.0.0/0"
+    """
+
+    schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
+    permissions = ('compute.instances.getEffectiveFirewalls',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+
+    def process_resource(self, client, resource):
+        params = self.get_resource_params(resource)
+        effective_firewalls = []
+        for interface in resource["networkInterfaces"]:
+            effective_firewalls.append(client.execute_command(
+                'getEffectiveFirewalls', {"networkInterface": interface["name"], **params}))
+        return super(EffectiveFirewall, self).process(effective_firewalls, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        model = self.manager.get_model()
+        session = local_session(self.manager.session_factory)
+        client = self.get_client(session, model)
+        return [r for r in resources if self.process_resource(client, r)]
 
 
 class InstanceAction(MethodAction):

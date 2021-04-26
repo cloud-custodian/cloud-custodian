@@ -9,6 +9,7 @@ documentation = "https://cloudcustodian.io/docs/"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
@@ -19,7 +20,7 @@ kubernetes = "^10.0.1"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}
-pytest = "~6.0.0"
+pytest = "^6.0.0"
 vcrpy = "^4.0.2"
 
 [build-system]
