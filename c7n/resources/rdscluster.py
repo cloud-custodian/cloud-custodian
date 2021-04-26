@@ -113,23 +113,7 @@ RDSCluster.filter_registry.register('network-location', net_filters.NetworkLocat
 
 @RDSCluster.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: rdscluster-kms-key-filter
-                  resource: aws.rds-cluster
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/rds)"
-                      op: regex
-    """
     RelatedIdsExpression = 'KmsKeyId'
 
 

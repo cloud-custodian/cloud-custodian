@@ -9,6 +9,7 @@ documentation = "https://cloudcustodian.io/docs/"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
@@ -26,7 +27,7 @@ pygit2 = "~1.5"
 boto3 = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "~6.0.0"
+pytest = "^6.0.0"
 c7n = {path = "../..", develop = true}
 mock = "^4.0.2"
 

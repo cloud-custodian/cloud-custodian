@@ -251,23 +251,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
 @AWSLambda.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: lambda-kms-key-filters
-                  resource: aws.lambda
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/lambda)"
-                      op: regex
-    """
     RelatedIdsExpression = 'KMSKeyArn'
 
 

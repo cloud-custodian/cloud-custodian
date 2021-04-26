@@ -89,21 +89,5 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
 @Workspace.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: workspace-kms-key-filter
-            resource: workspaces
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/workspaces)"
-                op: regex
-    """
     RelatedIdsExpression = 'VolumeEncryptionKey'

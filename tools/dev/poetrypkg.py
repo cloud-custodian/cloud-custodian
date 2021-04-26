@@ -43,6 +43,12 @@ setup_kwargs = {{
     'name': {name!r},
     'version': {version!r},
     'description': {description!r},
+    'license': 'Apache-2.0',
+    'classifiers': [
+        'License :: OSI Approved :: Apache Software License',
+        'Topic :: System :: Systems Administration',
+        'Topic :: System :: Distributed Computing'
+    ],
     'long_description': {long_description!r},
     'long_description_content_type': 'text/markdown',
     'author': {author!r},
