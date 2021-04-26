@@ -485,7 +485,6 @@ class TestSSM(BaseTest):
 
     def test_data_sync_delete_error(self):
         session_factory = self.replay_flight_data("test_data_sync_delete_error")
-        client = session_factory().client('ssm', region_name='us-east-1')
         p = self.load_policy(
             {
                 "name": "ssm-delete-data-sync-resources",
@@ -498,7 +497,6 @@ class TestSSM(BaseTest):
             },
             session_factory=session_factory,
         )
-        try:
-            p.run()
-        except Exception as e:
-            self.assertTrue(e, client.exceptions.ResourceDataSyncNotFoundException)
+
+        data_syncs = p.run()
+        self.assertEqual(len(data_syncs), 3)
