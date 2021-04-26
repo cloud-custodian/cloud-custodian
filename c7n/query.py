@@ -763,11 +763,11 @@ class TypeMeta(type):
 
 
 class TypeInfo(metaclass=TypeMeta):
-    
+
     """
     Resource Type Metadata
-    
-    
+
+
     **Required**
 
     :param id: Identifier used for apis
@@ -778,9 +778,10 @@ class TypeInfo(metaclass=TypeMeta):
     **Permissions - Optional**
 
     :param permission_prefix: Permission string prefix if not service
-    :param  permissions_enum: Permissions for resource enumeration/get. Normally we autogen but in some cases we need to specify statically
-    :param  permissions_augment: Permissions for resource augment
-    
+    :param permissions_enum: Permissions for resource enumeration/get.
+        Normally we autogen but in some cases we need to specify statically
+    :param permissions_augment: Permissions for resource augment
+
     **Arn handling / generation metadata - Optional**
 
     :param arn: Arn resource attribute, when describe format has arn
@@ -790,7 +791,9 @@ class TypeInfo(metaclass=TypeMeta):
 
     **Resource retrieval - Optional**
 
-    :param filter_name: When fetching a single resource via enum_spec this is technically optional, but effectively required for serverless event policies else we have to enumerate the population
+    :param filter_name: When fetching a single resource via enum_spec this is technically optional,
+        but effectively required for serverless event policies else we have to enumerate the
+        population
     :param filter_type: filter_type, scalar or list
     :param detail_spec: Used to enrich the resource descriptions returned by enum_spec
     :param batch_detail_spec: Used when the api supports getting resource details enmasse
@@ -798,17 +801,24 @@ class TypeInfo(metaclass=TypeMeta):
     **Misc - Optional**
 
     :param default_report_fields: Used for reporting, array of fields
-    :param date: Latest date associated to resource, generally references either create date or modified date
-    :param dimension: Defines that resource has cloud watch metrics and the resource id can be passed as this value. Further customizations of dimensions require subclass metrics filter
+    :param date: Latest date associated to resource, generally references either create date or
+        modified date
+    :param dimension: Defines that resource has cloud watch metrics and the resource id can be
+        passed as this value. Further customizations of dimensions require subclass metrics filter
     :param cfn_type: AWS Cloudformation type
     :param config_type: AWS Config Service resource type name
-    :param universal_taggable: Whether or not resource group tagging api can be used, in which case we'll automatically register tag actions/filters. Note: values of True will register legacy tag filters/actions, values of object() will just register current standard tag/filters/actions.
-    :param global_resource: Denotes if this resource exists across all regions (iam, cloudfront, r53)
-    :param metrics_namespace: Generally we utilize a service to namespace mapping in the metrics filter. However some resources have a type specific namespace (ig. ebs)
+    :param universal_taggable: Whether or not resource group tagging api can be used, in which case
+        we'll automatically register tag actions/filters. Note: values of True will register legacy
+        tag filters/actions, values of object() will just register current standard
+        tag/filters/actions.
+    :param global_resource: Denotes if this resource exists across all regions (iam, cloudfront,
+        r53)
+    :param metrics_namespace: Generally we utilize a service to namespace mapping in the metrics
+        filter. However some resources have a type specific namespace (ig. ebs)
     :param id_prefix: Specific to ec2 service resources used to disambiguate a resource by its id
 
     """
-    
+
     # Required
     id = None
     name = None
