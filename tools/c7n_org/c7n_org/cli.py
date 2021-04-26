@@ -29,10 +29,9 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty, local_session
+from c7n.utils import CONN_CACHE, dumps, filter_empty
 
 from c7n_org.utils import environ, account_tags
-from c7n_azure.provider import Azure
 
 log = logging.getLogger('c7n_org')
 
