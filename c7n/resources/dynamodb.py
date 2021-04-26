@@ -61,23 +61,7 @@ class Table(query.QueryResourceManager):
 
 @Table.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-kms-key-filters
-                resource: dynamodb-table
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/dynamodb)"
-                    op: regex
-    """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 

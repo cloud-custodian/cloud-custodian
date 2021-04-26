@@ -10,6 +10,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.utils import type_schema
+from c7n.filters.core import ValueFilter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
 log = logging.getLogger('custodian.azure.sql-server')
@@ -80,6 +81,59 @@ class SqlServer(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+
+
+@SqlServer.filter_registry.register('azure-ad-administrators')
+class AzureADAdministratorsFilter(ValueFilter):
+    """
+    Provides a value filter targetting the Azure AD Administrator of this
+    SQL Server.
+
+    Here is an example of the available fields:
+
+    .. code-block:: json
+
+      "administratorType": "ActiveDirectory",
+      "login": "bob@contoso.com",
+      "sid": "00000011-1111-2222-2222-123456789111",
+      "tenantId": "00000011-1111-2222-2222-123456789111",
+      "azureADOnlyAuthentication": true
+
+    :examples:
+
+    Find SQL Servers without AD Administrator
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sqlserver-no-ad-admin
+            resource: azure.sqlserver
+            filters:
+              - type: azure-ad-administrators
+                key: login
+                value: absent
+
+    """
+
+    schema = type_schema('azure-ad-administrators', rinherit=ValueFilter.schema)
+
+    def __call__(self, i):
+        if 'administrators' not in i['properties']:
+            client = self.manager.get_client()
+            administrators = list(
+                client.server_azure_ad_administrators
+                .list_by_server(i['resourceGroup'], i['name'])
+            )
+
+            # This matches the expanded schema, and despite the name
+            # there can only be a single administrator, not an array.
+            if administrators:
+                i['properties']['administrators'] = \
+                    administrators[0].serialize(True).get('properties', {})
+            else:
+                i['properties']['administrators'] = {}
+
+        return super(AzureADAdministratorsFilter, self).__call__(i['properties']['administrators'])
 
 
 @SqlServer.filter_registry.register('firewall-rules')

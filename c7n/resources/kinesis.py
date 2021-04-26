@@ -329,22 +329,5 @@ class DeleteVideoStream(Action):
 
 @KinesisVideoStream.filter_registry.register('kms-key')
 class KmsFilterVideoStream(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the alias name
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: kinesis-video-stream-kms-key
-                resource: aws.kinesis-video
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/)"
-                    op: regex
-    """
 
     RelatedIdsExpression = 'KmsKeyId'

@@ -50,6 +50,7 @@ class ServiceAccount(QueryResourceManager):
         name = 'email'
         default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
         asset_type = "iam.googleapis.com/ServiceAccount"
+        metric_key = 'resource.labels.unique_id'
 
         @staticmethod
         def get(client, resource_info):

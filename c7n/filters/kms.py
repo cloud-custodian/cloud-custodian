@@ -13,6 +13,8 @@ class KmsRelatedFilter(RelatedResourceFilter):
 
     :example:
 
+    Match a specific key alias:
+
         .. code-block:: yaml
 
             policies:
@@ -20,8 +22,22 @@ class KmsRelatedFilter(RelatedResourceFilter):
                   resource: dms-instance
                   filters:
                     - type: kms-key
-                      key: c7n:AliasName
+                      key: "c7n:AliasName"
                       value: alias/aws/dms
+
+    Or match against native key attributes such as ``KeyManager``, which
+    more explicitly distinguishes between ``AWS`` and ``CUSTOMER``-managed
+    keys. The above policy can also be written as:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: dms-aws-managed-key
+                  resource: dms-instance
+                  filters:
+                    - type: kms-key
+                      key: KeyManager
+                      value: AWS
     """
 
     schema = type_schema(

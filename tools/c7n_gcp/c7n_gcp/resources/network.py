@@ -39,6 +39,7 @@ class Subnet(QueryResourceManager):
             "name", "description", "creationTimestamp", "ipCidrRange",
             "gatewayAddress", "region", "state"]
         asset_type = "compute.googleapis.com/Subnetwork"
+        metric_key = "resource.labels.subnetwork_name"
 
         @staticmethod
         def get(client, resource_info):
@@ -119,6 +120,7 @@ class Firewall(QueryResourceManager):
             name, "description", "network", "priority", "creationTimestamp",
             "logConfig.enabled", "disabled"]
         asset_type = "compute.googleapis.com/Firewall"
+        metric_key = 'metric.labels.firewall_name'
 
         @staticmethod
         def get(client, resource_info):
