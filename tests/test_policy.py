@@ -363,7 +363,6 @@ class PolicyMetaLint(BaseTest):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
-                    breakpoint()
                     empty.add(k)
         if empty:
             raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
