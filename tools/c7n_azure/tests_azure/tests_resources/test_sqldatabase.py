@@ -102,6 +102,24 @@ class SqlDatabaseTest(BaseTest):
         self.assertEqual('cctestdb', args[2])
         self.assertEqual(expected_db_update, args[3])
 
+    def test_data_encryption_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-database',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestdb'
+                },
+                {
+                    'type': 'transparent-data-encryption',
+                    'enabled': True
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
 

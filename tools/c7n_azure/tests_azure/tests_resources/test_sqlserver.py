@@ -257,6 +257,24 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('administrators')
+    def test_administrators_filter(self):
+        """
+        It is not practical to programmatically assign AD
+        users/administrators for testing, but a test for missing
+        administrator still verifies most of the code.
+        """
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'azure-ad-administrators',
+                 'key': 'login',
+                 'value': 'absent'}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 

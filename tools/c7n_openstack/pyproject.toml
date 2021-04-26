@@ -9,6 +9,7 @@ repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
@@ -19,7 +20,7 @@ openstacksdk = "^0.52.0"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}
-pytest = "~6.0.0"
+pytest = "^6.0.0"
 vcrpy = "^4.0.2"
 
 
