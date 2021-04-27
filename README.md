@@ -264,6 +264,7 @@ identified the issue positively or negatively.
 Code of Conduct
 ---------------
 
-This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
-participating, you are expected to honor this code.
+This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+
+By participating, you are expected to honor this code.
 
