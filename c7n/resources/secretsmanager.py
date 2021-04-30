@@ -63,7 +63,9 @@ class TagSecretsManagerResource(Tag):
 
     def process_resource_set(self, client, resources, new_tags):
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r['Tags']}
+            tags = {}
+            if 'Tags' in r:
+                tags = {t['Key']: t['Value'] for t in r['Tags']}
             for t in new_tags:
                 tags[t['Key']] = t['Value']
             formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
