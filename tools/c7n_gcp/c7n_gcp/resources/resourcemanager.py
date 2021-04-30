@@ -5,7 +5,8 @@ import itertools
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import DescribeSource, QueryResourceManager, TypeInfo
+from c7n_gcp.query import (
+    AssetInventory, DescribeSource, QueryResourceManager, TypeInfo)
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
@@ -48,6 +49,19 @@ class OrganizationSetIamPolicy(SetIamPolicy):
         return verb_arguments
 
 
+class FolderInventory(AssetInventory):
+
+    def _describe_format(self, resources):
+        for r in resources:
+            # check for cached resources
+            if not self._common_describe_format(r):
+                continue
+            # remap only valid for v2 folders, v3 switches to 'state'
+            r['lifecycleState'] = r.pop('state')
+
+        return resources
+
+
 @resources.register('folder')
 class Folder(QueryResourceManager):
     """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v2/folders
@@ -62,27 +76,63 @@ class Folder(QueryResourceManager):
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
+        asset_history = False  # supported but its loses info
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.folders.get',)
 
-    def get_resources(self, resource_ids):
-        client = self.get_client()
-        results = []
-        for rid in resource_ids:
-            if not rid.startswith('folders/'):
-                rid = 'folders/%s' % rid
-            results.append(client.execute_query('get', {'name': rid}))
-        return results
+    source_mapping = {'inventory': FolderInventory, 'describe-gcp': DescribeSource}
 
     def get_resource_query(self):
         if 'query' in self.data:
             for child in self.data.get('query'):
                 if 'parent' in child:
                     return {'body': {"query": "parent=%s" % child['parent']}}
+                if 'scope' in child:
+                    return {'scope': child['scope']}
 
 
-class ProjectHierarchy(DescribeSource):
-    """Describe Source for Projects that supports working on all projects within a given folder."""
+class ProjectSource:
+
+    def get_resources(self, query):
+        if query and 'subtree' in query:
+            return self.get_sub_tree(query)
+        return super().get_resources(query)
+
+
+class ProjectInventoryHierarchy(ProjectSource, AssetInventory):
+    # for inventory we filter hierarchy client side as this is much faster
+    # for deeply nested trees as there is enough metadata from inventory
+    # to just to do a set intersection for hierarchy.
+
+    def _describe_format(self, resources):
+        for r in resources:
+            # check if operating on cached resources
+            if not self._common_describe_format(r):
+                continue
+            # only while project resource is using v1 of resourcemanager api
+            r['lifecycleState'] = r.pop('state')
+            r['name'] = r.pop('displayName', None)
+            attrs = r.pop('additionalAttributes', None)
+            if attrs:
+                r.update(attrs)
+            # can obsolete as we move to v3 of resourcemanager api
+            if isinstance(r['parent'], str):
+                ptype, pname = r['parent'].split('/', 2)
+                r['parent'] = {'type': ptype[:-1], 'id': pname}
+        return resources
+
+    def _filter_resource_parent(self, resources, parent):
+        return [r for r in resources if parent in r['folders']]
+
+    def get_sub_tree(self, query):
+        # get a second resource manager so we can cache the results sans the subtree query cache key
+        prm = self.manager.get_resource_manager('gcp.project')
+        projects = prm.resources()
+        return self._filter_resource_parent(projects, query['subtree'])
+
+
+class ProjectDescribeHierarchy(ProjectSource, DescribeSource):
+    """Describe Source for Projects for working against a folder subtree"""
 
     def get_resources(self, query):
         if query and 'subtree' in query:
@@ -90,7 +140,6 @@ class ProjectHierarchy(DescribeSource):
         return super().get_resources(query)
 
     def get_sub_tree(self, query):
-        # recursively look for folders against the given folder
         frm = self.manager.get_resource_manager('gcp.folder')
         folder_ids = self.get_child_folders(frm, query['subtree'], set())
         folder_ids.add(query['subtree'])
@@ -99,13 +148,19 @@ class ProjectHierarchy(DescribeSource):
         prm = self.manager.get_resource_manager('gcp.project')
         projects = []
         for fid in folder_ids:
-            prm.data = {'query': [{
-                'filter': 'parent.type:folder parent.id:%s' % fid.split('/', 1)[-1]}]}
+            prm.data = self.get_project_query(fid)
             projects.extend(prm.resources())
         return projects
 
+    def get_project_query(self, folder_id):
+        return {'query': [{
+            'filter': 'parent.type:folder parent.id:%s' % folder_id.split('/', 1)[-1]}]}
+
+    def get_subfolder_query(self, folder_id):
+        return {'query': [{'parent': folder_id}]}
+
     def get_child_folders(self, frm, folder_id, result_ids):
-        frm.data = {'query': [{'parent': folder_id}]}
+        frm.data = self.get_subfolder_query(folder_id)
         for folder in frm.resources():
             result_ids.add(folder['name'])
             self.get_child_folders(frm, folder['name'], result_ids)
@@ -126,6 +181,7 @@ class Project(QueryResourceManager):
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Project"
+        asset_history = False
         scc_type = "google.cloud.resourcemanager.Project"
         perm_service = 'resourcemanager'
         labels = True
@@ -144,19 +200,22 @@ class Project(QueryResourceManager):
             return client.execute_query(
                 'get', {'projectId': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
-    def get_source(self, source_type):
-        if source_type == 'describe-gcp':
-            return ProjectHierarchy(self)
-        return super().get_source(source_type)
+    source_mapping = {
+        'describe-gcp': ProjectDescribeHierarchy,
+        'inventory': ProjectInventoryHierarchy
+    }
 
     def get_resource_query(self):
         # https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
-        if 'query' in self.data:
-            for child in self.data.get('query'):
-                if 'filter' in child:
-                    return {'filter': child['filter']}
-                if 'subtree' in child:
-                    return {'subtree': child['subtree']}
+        q = {}
+        for child in self.data.get('query', ()):
+            if 'filter' in child:
+                q['filter'] = child['filter']
+            if 'subtree' in child:
+                q['subtree'] = child['subtree']
+            if self.source_type == 'inventory' and 'scope' in child:
+                q['scope'] = child['scope']
+        return q or None
 
 
 @Project.action_registry.register('delete')
@@ -200,11 +259,16 @@ class HierarchyAction(MethodAction):
 
         for r in resources:
             client = self.get_client(session, self.manager.resource_type)
-            ancestors = client.execute_command(
-                'getAncestry', {'projectId': r['projectId']}).get('ancestor')
-            parents[r['projectId']] = [
-                a['resourceId']['id'] for a in ancestors
-                if a['resourceId']['type'] == 'folder']
+            if 'folders' in r:
+                parents[r['projectId']] = [
+                    f.split('/', 1)[-1] for f in r['folders']]
+            else:
+                ancestors = client.execute_command(
+                    'getAncestry', {'projectId': r['projectId']}).get('ancestor')
+                parents[r['projectId']] = [
+                    a['resourceId']['id'] for a in ancestors
+                    if a['resourceId']['type'] == 'folder']
+
             if root_parent and root_parent in parents[r['projectId']]:
                 rparents = parents[r['projectId']]
                 parents[r['projectId']] = rparents[:rparents.index(root_parent) + 1]
@@ -213,9 +277,22 @@ class HierarchyAction(MethodAction):
 
     def load_folders(self):
         folder_manager = self.manager.get_resource_manager('gcp.folder')
+        if folder_manager.source_type == 'inventory':
+            folders = [r for r in folder_manager.resources()
+                       if r['name'].split('/', 1)[-1] in self.folder_ids]
+        else:
+            folders = self._get_folders(folder_manager, self.folder_ids)
         self.folders = {
-            f['name'].split('/', 1)[-1]: f for f in
-            folder_manager.get_resources(list(self.folder_ids))}
+            f['name'].split('/', 1)[-1]: f for f in folders}
+
+    def _get_folders(self, folder_manager, folder_ids):
+        client = folder_manager.get_client()
+        results = []
+        for rid in folder_ids:
+            if not rid.startswith('folders/'):
+                rid = 'folders/%s' % rid
+            results.append(client.execute_query('get', {'name': rid}))
+        return results
 
     def load_metadata(self):
         raise NotImplementedError()
@@ -226,13 +303,19 @@ class HierarchyAction(MethodAction):
     def process(self, resources):
         if self.attr_filter:
             resources = self.filter_resources(resources)
+        if not resources:
+            return
 
         self.load_hierarchy(resources)
         self.load_metadata()
         op_set = self.diff(resources)
         client = self.manager.get_client()
+        count = 0
         for op in op_set:
             self.invoke_api(client, *op)
+            count += 1
+        if count:
+            self.log.info('propagate labels updated %d projects', count)
 
 
 @Project.action_registry.register('propagate-labels')
@@ -281,6 +364,56 @@ class ProjectPropagateLabels(HierarchyAction):
 
     Will result in project-a being tagged with owner: network and env: dev
     and project-b being tagged with owner: ml and env: dev
+
+    Note you can also use folder ids in the form "folders/33311281122" in
+    your label json file, ie.
+
+    .. code-block:: json
+
+      {"folders/123333333": {"env": "dev", "owner": "dev"},
+       "folders/333344444": {"owner": "network"}}
+
+
+    when applying to a subtree the folder json can also be specified relative
+    to a root parent. ie. given a tree, where we only want to apply folder
+    labels to the projects under network.
+
+    ::
+
+       /dev
+           /network
+              /shared
+                /project-a
+              /team-a
+                /project-b
+              /team-b
+                /project-c
+           /ml
+           ...
+
+    you can specify a policy like
+
+    .. code-block:: yaml
+
+      policies:
+       - name: tag-projects
+         resource: gcp.project
+         # use cloud asset inventory to fetch projects
+         source: inventory
+         query:
+           # org scope is required for using cloud asset inventory on projects & folders
+           - scope: organization/1122333444
+           # network folder id / only look at projects under this tree
+           - subtree: folder/1223123321
+         filters:
+           - "tag:owner": absent
+         actions:
+           - type: propagate-labels
+             # root-parent allows our sub folder keys in the json to be specified relative
+             # to the root. in this case we'll do it relative to the network folder by id.
+             root-parent: folder/1223123321
+             folder-labels:
+                url: file://folder-labels.json
 
     """
     schema = type_schema(

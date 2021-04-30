@@ -7,6 +7,8 @@ from c7n.provider import Provider, clouds
 from .client import Session
 from functools import partial
 
+import logging
+
 from c7n_gcp.resources.resource_map import ResourceMap
 
 
@@ -19,6 +21,8 @@ class GoogleCloud(Provider):
     resource_map = ResourceMap
 
     def initialize(self, options):
+        logging.getLogger('google.auth._default').setLevel(logging.INFO)
+        logging.getLogger('google_auth_httplib2').setLevel(logging.INFO)
         return options
 
     def initialize_policies(self, policy_collection, options):
