@@ -232,8 +232,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             q.update(i)
         return q
 
-    def get_resource_manager(self, resource_type):
-        rm = super().get_resource_manager(resource_type)
+    def get_resource_manager(self, resource_type, data=None):
+        rm = super().get_resource_manager(resource_type, data)
         q = self.get_resource_query()
         # scope is special in gcp and should propagate
         if q and 'scope' in q:
