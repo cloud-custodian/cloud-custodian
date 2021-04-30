@@ -95,9 +95,10 @@ class ResourceManager:
         if data is None:
             data = {'source': self.source_type}
         # if we're using config and its not supported by the resource type fallback
-        if (data.get('source') == 'config' and
-               self.source_type == 'config' and
-               not getattr(self.resource_type, 'config_type', None)):
+        if (
+                data.get('source') == 'config' and
+                self.source_type == 'config' and
+                not getattr(self.resource_type, 'config_type', None)):
             data.pop('config')
         return klass(self.ctx, data or {})
 
