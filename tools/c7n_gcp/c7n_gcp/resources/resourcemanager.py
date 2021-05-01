@@ -254,7 +254,7 @@ class HierarchyAction(MethodAction):
         parents = {}
         session = local_session(self.manager.session_factory)
         root_parent = self.data.get('root-parent')
-        if root_parent.startswith('folders'):
+        if root_parent and root_parent.startswith('folders'):
             root_parent = root_parent.split('/')[-1]
 
         for r in resources:
