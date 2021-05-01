@@ -6,7 +6,6 @@ import re
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.related import RelatedResourceFilter
-from c7n.query import sources
 from c7n.resources import load_resources
 from c7n.utils import local_session, type_schema
 from c7n_azure.actions.base import AzureBaseAction
@@ -123,6 +122,16 @@ class RoleAssignment(QueryResourceManager):
         return resources
 
 
+class RoleDescribeSource(DescribeSource):
+
+    def get_resources(self, query):
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.authorization.AuthorizationManagementClient')
+        scope = '/subscriptions/%s' % (s.subscription_id)
+        resources = client.role_definitions.list(scope)
+        return [r.serialize(True) for r in resources]
+
+
 @resources.register('roledefinition')
 class RoleDefinition(QueryResourceManager):
     """Role definitions define sets of permissions that can be assigned
@@ -164,20 +173,7 @@ class RoleDefinition(QueryResourceManager):
             'properties.permissions'
         )
 
-    @property
-    def source_type(self):
-        return self.data.get('source', 'describe-azure-roledefinition')
-
-
-@sources.register('describe-azure-roledefinition')
-class DescribeSource(DescribeSource):
-
-    def get_resources(self, query):
-        s = local_session(self.manager.session_factory)
-        client = s.client('azure.mgmt.authorization.AuthorizationManagementClient')
-        scope = '/subscriptions/%s' % (s.subscription_id)
-        resources = client.role_definitions.list(scope)
-        return [r.serialize(True) for r in resources]
+    source_mapping = {'describe': RoleDescribeSource}
 
 
 @RoleAssignment.filter_registry.register('role')

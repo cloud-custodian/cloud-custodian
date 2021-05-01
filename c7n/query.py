@@ -450,13 +450,6 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
 
-    @property
-    def source_type(self):
-        return self.data.get('source', 'describe')
-
-    def get_source(self, source_type):
-        return self.source_mapping.get(source_type)(self)
-
     @classmethod
     def has_arn(cls):
         if cls.resource_type.arn is not None:

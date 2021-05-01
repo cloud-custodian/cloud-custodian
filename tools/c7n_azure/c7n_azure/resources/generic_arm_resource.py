@@ -7,7 +7,6 @@ from c7n_azure.query import DescribeSource, ResourceQuery
 from c7n_azure.resources.arm import ArmResourceManager
 
 from c7n.filters.core import Filter, type_schema
-from c7n.query import sources
 from c7n_azure.utils import ResourceIdParser, is_resource_group_id
 
 
@@ -25,7 +24,6 @@ class GenericArmResourceQuery(ResourceQuery):
         return results
 
 
-@sources.register('describe-azure-generic')
 class GenericArmDescribeSource(DescribeSource):
 
     resource_query_factory = GenericArmResourceQuery
@@ -48,6 +46,7 @@ class GenericArmResource(ArmResourceManager):
               - tag:Tag1: present
 
     """
+    source_mapping = {'describe': GenericArmDescribeSource}
 
     class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['Generic']
@@ -79,10 +78,6 @@ class GenericArmResource(ArmResourceManager):
             result.append(resource)
 
         return self.augment([r.serialize(True) for r in result])
-
-    @property
-    def source_type(self):
-        return self.data.get('source', 'describe-azure-generic')
 
 
 @GenericArmResource.filter_registry.register('resource-type')

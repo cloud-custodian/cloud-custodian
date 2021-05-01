@@ -63,6 +63,15 @@ class ResourceManager:
         """return ids that match this resource type's id format."""
         return ids
 
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe')
+
+    def get_source(self, source_type):
+        source_class = self.source_mapping.get(source_type)
+        if source_class:
+            return source_class(self)
+
     @classmethod
     def get_permissions(cls):
         return ()
