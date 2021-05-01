@@ -23,14 +23,13 @@ class LimitsTest(BaseTest):
             {'name': 'limits',
              "max-resources-percent": 2.5,
              'resource': 'gcp.folder',
-             'query':
-                 [{'parent': parent}]},
+             'query': [{'parent': parent}]},
             session_factory=session_factory)
 
         p.ctx.metrics.flush = mock.MagicMock()
         output = self.capture_logging('custodian.policy', level=logging.ERROR)
         self.assertRaises(ResourceLimitExceeded, p.run)
-        self.assertTrue("policy:limits exceeded resource-limit:2.5% found:1 total:"
+        self.assertTrue("policy:limits exceeded resource-limit:2.5% found:4 total:"
                         in output.getvalue())
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
@@ -117,7 +116,7 @@ class OrganizationTest(BaseTest):
 class FolderTest(BaseTest):
 
     def test_folder_query(self):
-        resource_name = 'folders/112838955399'
+        resource_name = 'folders/264112844077'
         parent = 'organizations/926683928810'
         session_factory = self.replay_flight_data('folder-query')
 

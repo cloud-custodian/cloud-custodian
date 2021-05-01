@@ -679,14 +679,7 @@ class MaxResourceLimit:
 
 class ChildResourceManager(QueryResourceManager):
 
-    child_source = 'describe-child'
-
-    @property
-    def source_type(self):
-        source = self.data.get('source', self.child_source)
-        if source == 'describe':
-            source = self.child_source
-        return source
+    source_mapping = {'describe': ChildDescribeSource}
 
     def get_parent_manager(self):
         return self.get_resource_manager(self.resource_type.parent_spec[0])

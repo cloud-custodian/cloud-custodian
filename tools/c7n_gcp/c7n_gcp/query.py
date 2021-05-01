@@ -262,7 +262,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
 
-        # Check if we're out of a policies execution limits.
+        # Check resource limits if we're the current policy execution.
         if self.data == self.ctx.policy.data:
             self.check_resource_limit(len(resources), resource_count)
         return resources

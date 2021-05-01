@@ -396,7 +396,7 @@ class ProjectPropagateLabels(HierarchyAction):
     .. code-block:: yaml
 
       policies:
-       - name: tag-projects
+       - name: tag-projects-inventory
          resource: gcp.project
          # use cloud asset inventory to fetch projects
          source: inventory

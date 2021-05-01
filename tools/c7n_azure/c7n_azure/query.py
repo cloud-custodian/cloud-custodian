@@ -220,6 +220,9 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
+
+    source_mapping = sources
+
     class resource_type(TypeInfo):
         pass
 
