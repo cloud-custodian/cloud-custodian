@@ -410,11 +410,13 @@ class ProjectPropagateLabels(HierarchyAction):
          actions:
            - type: propagate-labels
              # root-parent allows our sub folder keys in the json to be specified relative
-             # to the root. in this case we'll do it relative to the network folder by id.
+             # to the specifiedroot-parent. in this case we'll do it relative to the network folder by id.
              root-parent: folder/1223123321
              folder-labels:
                 url: file://folder-labels.json
 
+
+    note the above policy also uses cloud asset inventory.
     """
     schema = type_schema(
         'propagate-labels',

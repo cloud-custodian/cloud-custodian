@@ -145,6 +145,32 @@ class ProjectTest(BaseTest):
         self.assertEqual(project['lifecycleState'], 'ACTIVE')
         self.assertEqual(project['name'], 'cloud-custodian')
 
+
+    def test_inventory_subtree(self):
+        factory = self.replay_flight_data('project-inventory-subtree')
+        label_path = os.path.join(
+            os.path.dirname(__file__), 'data', 'folder-labels-subtree.json')
+
+        p = self.load_policy({
+            'name': 'p-label',
+            'resource': 'gcp.project',
+            'source': 'inventory',
+            'query': [
+                {'subtree': 'folders/264112811077'},
+                {'scope': 'organizations/926683928810'},
+            ],
+        }, session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 6
+        assert {r['projectId'] for r in resources} == {
+            'c7n-test-target',
+            'jamisonscalendar-1606980909947',
+            'jamisonsdocs-1612473311065',
+            'norse-ward-302218',
+            'practical-truck-276716',
+            'updatechart-1609401712091',
+        }
+
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')
     def test_propagate_tags(self):
