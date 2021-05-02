@@ -371,6 +371,7 @@ class ProjectPropagateLabels(HierarchyAction):
     .. code-block:: json
 
       {"folders/123333333": {"env": "dev", "owner": "dev"},
+       "network/shared": {"env": "qa"},
        "folders/333344444": {"owner": "network"}}
 
 
@@ -380,8 +381,8 @@ class ProjectPropagateLabels(HierarchyAction):
 
     ::
 
-       /dev
-           /network
+       /dev - folders/123333333
+           /network - folders/333344444
               /shared
                 /project-a
               /team-a
@@ -402,21 +403,24 @@ class ProjectPropagateLabels(HierarchyAction):
          source: inventory
          query:
            # org scope is required for using cloud asset inventory on projects & folders
-           - scope: organization/1122333444
+           - scope: organizations/1122333444
            # network folder id / only look at projects under this tree
-           - subtree: folder/1223123321
+           - subtree: folders/123333333
          filters:
            - "tag:owner": absent
          actions:
            - type: propagate-labels
-             # root-parent allows our sub folder keys in the json to be specified relative
-             # to the specifiedroot-parent. in this case we'll do it relative to the network folder by id.
-             root-parent: folder/1223123321
+             # root-parent allows our sub folder keys in the json to
+             # be specified relative to the specifiedroot-parent. in
+             # this case we'll do it relative to the network folder by
+             # id.
+             root-parent: folders/123333333
              folder-labels:
                 url: file://folder-labels.json
 
 
-    note the above policy also uses cloud asset inventory.
+    note the above policy also uses cloud asset inventory. updates to cloud asset inventory can
+
     """
     schema = type_schema(
         'propagate-labels',

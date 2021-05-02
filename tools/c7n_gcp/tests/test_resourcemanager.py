@@ -145,12 +145,8 @@ class ProjectTest(BaseTest):
         self.assertEqual(project['lifecycleState'], 'ACTIVE')
         self.assertEqual(project['name'], 'cloud-custodian')
 
-
     def test_inventory_subtree(self):
         factory = self.replay_flight_data('project-inventory-subtree')
-        label_path = os.path.join(
-            os.path.dirname(__file__), 'data', 'folder-labels-subtree.json')
-
         p = self.load_policy({
             'name': 'p-label',
             'resource': 'gcp.project',
