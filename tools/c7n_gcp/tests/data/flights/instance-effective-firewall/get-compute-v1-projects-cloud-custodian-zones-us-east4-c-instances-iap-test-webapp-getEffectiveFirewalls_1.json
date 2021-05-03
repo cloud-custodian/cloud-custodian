@@ -1,0 +1,115 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 30 Mar 2021 14:09:49 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5971",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east4-c/instances/iap-test-webapp/getEffectiveFirewalls?networkInterface=nic0&alt=json"
+  },
+  "body": {
+    "firewalls": [
+      {
+        "id": "4713402177317714233",
+        "creationTimestamp": "2021-03-02T10:45:42.112-08:00",
+        "name": "default-allow-ssh",
+        "description": "Allow SSH from anywhere",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "36.235.250.0/20"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "22"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": true,
+          "metadata": "EXCLUDE_ALL_METADATA"
+        },
+        "disabled": true,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-ssh",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "358824338733749616",
+        "creationTimestamp": "2021-03-16T10:32:15.618-07:00",
+        "name": "ssh-access-via-iap",
+        "description": "allows ssh access via iap",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 499,
+        "sourceRanges": [
+          "35.235.240.0/20"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "22",
+              "3389"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": true,
+          "metadata": "EXCLUDE_ALL_METADATA"
+        },
+        "disabled": true,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/ssh-access-via-iap",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "6315777690029996345",
+        "creationTimestamp": "2021-03-02T10:45:42.110-08:00",
+        "name": "default-allow-internal",
+        "description": "Allow internal traffic on the default network",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "10.128.0.0/9"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "0-65535"
+            ]
+          },
+          {
+            "IPProtocol": "udp",
+            "ports": [
+              "0-65535"
+            ]
+          },
+          {
+            "IPProtocol": "icmp"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": true,
+          "metadata": "EXCLUDE_ALL_METADATA"
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-internal",
+        "kind": "compute#firewall"
+      }
+    ],
+    "firewallPolicys": [
+    ]
+  }
+}

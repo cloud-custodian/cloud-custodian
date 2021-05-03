@@ -1162,13 +1162,13 @@ class CloudWatchEventSource(AWSEventBase):
     def pause(self, func):
         try:
             self.client.disable_rule(Name=func.name)
-        except Exception:
+        except ClientError:
             pass
 
     def resume(self, func):
         try:
             self.client.enable_rule(Name=func.name)
-        except Exception:
+        except ClientError:
             pass
 
     def remove(self, func):
@@ -1665,7 +1665,7 @@ class ConfigRule(AWSEventBase):
         if ('MaximumExecutionFrequency' in params and
                 rule['MaximumExecutionFrequency'] != params['MaximumExecutionFrequency']):
             return True
-        if rule.get('Description', '') != rule.get('Description', ''):
+        if rule.get('Description', '') != params.get('Description', ''):
             return True
         return False
 

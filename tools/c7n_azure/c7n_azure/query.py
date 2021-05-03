@@ -100,9 +100,6 @@ class ResourceGraphSource:
                 % self.manager.data['resource'])
 
     def get_resources(self, _):
-        log.warning('The Azure Resource Graph source '
-                    'should not be used in production scenarios at this time.')
-
         session = self.manager.get_session()
         client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
 

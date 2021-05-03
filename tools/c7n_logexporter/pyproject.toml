@@ -9,6 +9,7 @@ documentation = "https://cloudcustodian.io/docs/"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]

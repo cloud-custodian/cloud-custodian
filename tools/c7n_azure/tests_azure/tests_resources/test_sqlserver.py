@@ -268,9 +268,35 @@ class SqlServerTest(BaseTest):
             'name': 'test-azure-sql-server',
             'resource': 'azure.sqlserver',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
                 {'type': 'azure-ad-administrators',
                  'key': 'login',
                  'value': 'absent'}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('vulnerability-scan')
+    def test_vulnerability_filter(self):
+        """
+        Vulnerability scans require expensive account level defender
+        subscriptions so we'll only test the negative here.
+        """
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'vulnerability-assessment',
+                 'enabled': False}],
         })
         resources = p.run()
         self.assertEqual(1, len(resources))

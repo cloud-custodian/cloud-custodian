@@ -103,11 +103,11 @@ class TransparentDataEncryptionFilter(Filter):
         }
     )
 
-    log = logging.getLogger('custodian.azure.sqldatabase.TransparentDataEncryptionFilter')
+    log = logging.getLogger('custodian.azure.sqldatabase.transparent-data-encryption-filter')
 
     def __init__(self, data, manager=None):
         super(TransparentDataEncryptionFilter, self).__init__(data, manager)
-        self.enabled = self.data.get('enabled')
+        self.enabled = self.data['enabled']
 
     def process(self, resources, event=None):
         resources, exceptions = ThreadHelper.execute_in_parallel(
