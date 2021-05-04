@@ -609,6 +609,10 @@ class AbstractLambdaFunction:
         """Name for the lambda function"""
 
     @abc.abstractproperty
+    def event_name(self):
+        """Name for event sources"""
+
+    @abc.abstractproperty
     def runtime(self):
         """ """
 
@@ -730,6 +734,8 @@ class LambdaFunction(AbstractLambdaFunction):
     def name(self):
         return self.func_data['name']
 
+    event_name = name
+
     @property
     def description(self):
         return self.func_data['description']
@@ -823,6 +829,8 @@ class PolicyLambda(AbstractLambdaFunction):
     def name(self):
         prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
         return "%s%s" % (prefix, self.policy.name)
+
+    event_name = name
 
     @property
     def description(self):
@@ -1101,7 +1109,7 @@ class CloudWatchEventSource(AWSEventBase):
 
     def add(self, func):
         params = dict(
-            Name=func.name, Description=func.description, State='ENABLED')
+            Name=func.event_name, Description=func.description, State='ENABLED')
 
         pattern = self.render_event_pattern()
         if pattern:
@@ -1110,10 +1118,10 @@ class CloudWatchEventSource(AWSEventBase):
         if schedule:
             params['ScheduleExpression'] = schedule
 
-        rule = self.get(func.name)
+        rule = self.get(func.event_name)
 
         if rule and self.delta(rule, params):
-            log.debug("Updating cwe rule for %s" % func.name)
+            log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
@@ -1125,7 +1133,7 @@ class CloudWatchEventSource(AWSEventBase):
         try:
             client.add_permission(
                 FunctionName=func.name,
-                StatementId=func.name,
+                StatementId=func.event_name,
                 SourceArn=response['RuleArn'],
                 Action='lambda:InvokeFunction',
                 Principal='events.amazonaws.com')
@@ -1135,7 +1143,7 @@ class CloudWatchEventSource(AWSEventBase):
 
         # Add Targets
         found = False
-        response = RuleRetry(self.client.list_targets_by_rule, Rule=func.name)
+        response = RuleRetry(self.client.list_targets_by_rule, Rule=func.event_name)
         # CloudWatchE seems to be quite picky about function arns (no aliases/versions)
         func_arn = func.arn
 
@@ -1152,7 +1160,7 @@ class CloudWatchEventSource(AWSEventBase):
             self, func_arn))
 
         self.client.put_targets(
-            Rule=func.name, Targets=[{"Id": func.name, "Arn": func_arn}])
+            Rule=func.event_name, Targets=[{"Id": func.event_name, "Arn": func_arn}])
 
         return True
 
@@ -1161,31 +1169,31 @@ class CloudWatchEventSource(AWSEventBase):
 
     def pause(self, func):
         try:
-            self.client.disable_rule(Name=func.name)
-        except ClientError:
+            self.client.disable_rule(Name=func.event_name)
+        except Exception:
             pass
 
     def resume(self, func):
         try:
-            self.client.enable_rule(Name=func.name)
-        except ClientError:
+            self.client.enable_rule(Name=func.event_name)
+        except Exception:
             pass
 
     def remove(self, func):
-        if self.get(func.name):
-            log.info("Removing cwe targets and rule %s", func.name)
+        if self.get(func.event_name):
+            log.info("Removing cwe targets and rule %s", func.event_name)
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
                 if targets:
                     self.client.remove_targets(
-                        Rule=func.name,
+                        Rule=func.event_name,
                         Ids=[t['Id'] for t in targets])
             except ClientError as e:
                 log.warning(
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
-            self.client.delete_rule(Name=func.name)
+            self.client.delete_rule(Name=func.event_name)
 
 
 class SecurityHubAction:
@@ -1228,7 +1236,7 @@ class SecurityHubAction:
     def add(self, func):
         self.cwe.add(func)
         client = local_session(self.session_factory).client('securityhub')
-        action = self.get(func.name).get('action')
+        action = self.get(func.event_name).get('action')
         arn = self._get_arn()
         params = {'Name': (
             self.policy.data.get('title') or (
@@ -1384,7 +1392,7 @@ class CloudWatchLogSubscription:
             # Consistent put semantics / ie no op if extant
             self.client.put_subscription_filter(
                 logGroupName=group['logGroupName'],
-                filterName=func.name,
+                filterName=func.event_name,
                 filterPattern=self.filter_pattern,
                 destinationArn=func.alias or func.arn)
 
@@ -1401,7 +1409,8 @@ class CloudWatchLogSubscription:
 
             try:
                 response = self.client.delete_subscription_filter(
-                    logGroupName=group['logGroupName'], filterName=func.name)
+                    logGroupName=group['logGroupName'],
+                    filterName=func.event_name)
                 log.debug("Removed subscription filter from: %s",
                           group['logGroupName'])
             except lambda_client.exceptions.ResourceNotFoundException:
@@ -1665,7 +1674,7 @@ class ConfigRule(AWSEventBase):
         if ('MaximumExecutionFrequency' in params and
                 rule['MaximumExecutionFrequency'] != params['MaximumExecutionFrequency']):
             return True
-        if rule.get('Description', '') != params.get('Description', ''):
+        if rule.get('Description', '') != rule.get('Description', ''):
             return True
         return False
 
