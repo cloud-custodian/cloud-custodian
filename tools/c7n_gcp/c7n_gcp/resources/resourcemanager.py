@@ -122,7 +122,7 @@ class ProjectInventoryHierarchy(ProjectSource, AssetInventory):
         return resources
 
     def _filter_resource_parent(self, resources, parent):
-        return [r for r in resources if parent in r['folders']]
+        return [r for r in resources if parent in r.get('folders', ())]
 
     def get_sub_tree(self, query):
         # get a second resource manager so we can cache the results sans the subtree query cache key
