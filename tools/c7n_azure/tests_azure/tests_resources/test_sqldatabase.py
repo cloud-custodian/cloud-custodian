@@ -120,6 +120,24 @@ class SqlDatabaseTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    def test_data_masking_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-database',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestdb'
+                },
+                {
+                    'type': 'data-masking-policy',
+                    'enabled': False
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
 
