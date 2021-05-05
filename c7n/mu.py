@@ -681,6 +681,7 @@ class AbstractLambdaFunction:
         """Return the lambda distribution archive object."""
 
     def get_config(self):
+
         conf = {
             'FunctionName': self.name,
             'MemorySize': self.memory_size,
@@ -1194,6 +1195,7 @@ class CloudWatchEventSource(AWSEventBase):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
+            return True
 
 
 class SecurityHubAction:
@@ -1356,6 +1358,7 @@ class BucketLambdaNotification:
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'],
             NotificationConfiguration=notifies)
+        return True
 
 
 class CloudWatchLogSubscription:
@@ -1398,6 +1401,7 @@ class CloudWatchLogSubscription:
 
     def remove(self, func):
         lambda_client = self.session.client('lambda')
+        found = None
         for group in self.log_groups:
             try:
                 response = lambda_client.remove_permission(
@@ -1406,15 +1410,16 @@ class CloudWatchLogSubscription:
                 log.debug("Removed lambda permission result: %s" % response)
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
-
             try:
                 response = self.client.delete_subscription_filter(
                     logGroupName=group['logGroupName'],
                     filterName=func.event_name)
                 log.debug("Removed subscription filter from: %s",
                           group['logGroupName'])
+                found = True
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
+        return True
 
 
 class SQSSubscription:
@@ -1468,11 +1473,14 @@ class SQSSubscription:
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
                 FunctionName=func.name).get('EventSourceMappings', ())}
 
+        found = None
         for queue_arn in self.queue_arns:
             if queue_arn not in event_mappings:
                 continue
             client.delete_event_source_mapping(
                 UUID=event_mappings[queue_arn]['UUID'])
+            found = True
+        return found
 
 
 class SNSSubscription:
@@ -1711,5 +1719,6 @@ class ConfigRule(AWSEventBase):
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)
+            return True
         except self.client.exceptions.NoSuchConfigRuleException:
             pass
