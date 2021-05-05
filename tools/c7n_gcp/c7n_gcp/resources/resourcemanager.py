@@ -420,7 +420,7 @@ class ProjectPropagateLabels(HierarchyAction):
 
 
     note the above policy also uses cloud asset inventory. updates to cloud asset inventory can
-
+    take some time to reflect in this source.
     """
     schema = type_schema(
         'propagate-labels',
