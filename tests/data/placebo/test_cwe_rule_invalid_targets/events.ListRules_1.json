@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "test",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/test",
+                "EventPattern": "{\"source\":[\"aws.apigateway\"]}",
+                "State": "ENABLED",
+                "EventBusName": "default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

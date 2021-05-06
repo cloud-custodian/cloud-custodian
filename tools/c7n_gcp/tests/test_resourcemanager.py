@@ -53,6 +53,16 @@ class LimitsTest(BaseTest):
 
 
 class OrganizationTest(BaseTest):
+    def test_project_get(self):
+        factory = self.replay_flight_data(
+            'organization-get-resource', project_id='cloud-custodian')
+        p = self.load_policy({'name': 'organization', 'resource': 'gcp.organization'},
+                             session_factory=factory)
+        org = p.resource_manager.get_resource({
+            "resourceName": "//cloudresourcemanager.googleapis.com/"
+            "organizations/111111111111"})
+        self.assertEqual(org['lifecycleState'], 'ACTIVE')
+        self.assertEqual(org['displayName'], 'custodian.com')
 
     def test_organization_query(self):
         organization_name = 'organizations/851339424791'
@@ -124,6 +134,17 @@ class FolderTest(BaseTest):
 
 
 class ProjectTest(BaseTest):
+
+    def test_project_get(self):
+        factory = self.replay_flight_data(
+            'project-get-resource', project_id='cloud-custodian')
+        p = self.load_policy({'name': 'project', 'resource': 'gcp.project'},
+                             session_factory=factory)
+        project = p.resource_manager.get_resource({
+            "resourceName": "//cloudresourcemanager.googleapis.com/"
+            "projects/cloud-custodian"})
+        self.assertEqual(project['lifecycleState'], 'ACTIVE')
+        self.assertEqual(project['name'], 'cloud-custodian')
 
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')

@@ -22,15 +22,13 @@ EOF
   }
 }
 
-
-//resource "aws_iam_instance_profile" "test_profile" {
-//  name = "test_profile"
-//  role = aws_iam_role.test_role.name
-//}
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "test_profile"
+  role = aws_iam_role.test_role.name
+}
 
 
 // inline policy
-
 resource "aws_iam_role_policy" "test_policy" {
   name = "test_policy"
   role = aws_iam_role.test_role.id

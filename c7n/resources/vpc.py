@@ -1781,6 +1781,7 @@ class TransitGateway(query.QueryResourceManager):
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
         name = id = 'TransitGatewayId'
         arn = "TransitGatewayArn"
+        id_prefix = "tgw-"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
         cfn_type = 'AWS::EC2::TransitGateway'
@@ -1810,6 +1811,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         service = 'ec2'
         enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
+        id_prefix = 'tgw-attach-'
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
@@ -2003,6 +2005,7 @@ class NetworkAddress(query.QueryResourceManager):
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
+        id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
@@ -2293,7 +2296,9 @@ class KeyPair(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
-        name = id = 'KeyName'
+        name = 'KeyName'
+        id = 'KeyPairId'
+        id_prefix = 'key-'
         filter_name = 'KeyNames'
 
 

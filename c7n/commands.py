@@ -205,7 +205,8 @@ def validate(options):
 
         with open(config_file) as fh:
             if fmt in ('yml', 'yaml', 'json'):
-                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)
+                # our loader is safe loader derived.
+                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
             else:
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
@@ -542,4 +543,6 @@ def version_cmd(options):
         packages.append('c7n_azure')
     if 'k8s' in found:
         packages.append('c7n_kube')
+    if 'openstack' in found:
+        packages.append('c7n_openstack')
     print(generate_requirements(packages))

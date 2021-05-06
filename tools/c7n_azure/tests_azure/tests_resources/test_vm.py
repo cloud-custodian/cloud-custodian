@@ -83,7 +83,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_stop(self, filter_mock):
-        with patch(self._get_vm_client_string() + '.deallocate') as stop_action_mock:
+        with patch(self._get_vm_client_string() + '.begin_deallocate') as stop_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -110,7 +110,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_poweroff(self, filter_mock):
-        with patch(self._get_vm_client_string() + '.power_off') as poweroff_action_mock:
+        with patch(self._get_vm_client_string() + '.begin_power_off') as poweroff_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -139,7 +139,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_start(self, filter_mock):
-        with patch(self._get_vm_client_string() + '.start') as start_action_mock:
+        with patch(self._get_vm_client_string() + '.begin_start') as start_action_mock:
 
             p = self.load_policy({
                 'name': 'test-azure-vm',
@@ -167,7 +167,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_restart(self, filter_mock):
-        with patch(self._get_vm_client_string() + '.restart') as restart_action_mock:
+        with patch(self._get_vm_client_string() + '.begin_restart') as restart_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -194,7 +194,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_resize(self, resize_action_mock):
-        with patch(self._get_vm_client_string() + '.update') as resize_action_mock:
+        with patch(self._get_vm_client_string() + '.begin_update') as resize_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',

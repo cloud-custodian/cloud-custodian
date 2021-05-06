@@ -36,6 +36,7 @@ class SNS(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'sns'
         arn_type = ''
+        arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
@@ -347,22 +348,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filters SNS topic by kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sns-encrypt-key-check
-                  resource: sns
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: alias/aws/sns
-    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 

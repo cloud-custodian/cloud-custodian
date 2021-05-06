@@ -6,7 +6,7 @@ import boto3
 import click
 import json
 from c7n.credentials import assumed_session
-from c7n.utils import get_retry, dumps, chunks
+from c7n.utils import get_retry, dumps, chunks, get_human_size
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc, tzlocal
@@ -480,18 +480,6 @@ def access(config, region, accounts=()):
     print(tabulate(accounts_report, headers='keys'))
 
 
-def GetHumanSize(size, precision=2):
-    # interesting discussion on 1024 vs 1000 as base
-    # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-    suffixIndex = 0
-    while size > 1024:
-        suffixIndex += 1
-        size = size / 1024.0
-
-    return "%.*f %s" % (precision, size, suffixes[suffixIndex])
-
-
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
@@ -540,7 +528,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
             account.pop('groups')
             total_size += size
             if human:
-                account['size'] = GetHumanSize(size)
+                account['size'] = get_human_size(size)
             else:
                 account['size'] = size
             account['count'] = count
@@ -548,7 +536,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
 
     accounts_report.sort(key=operator.itemgetter('count'), reverse=True)
     print(tabulate(accounts_report, headers='keys'))
-    log.info("total size:%s", GetHumanSize(total_size))
+    log.info("total size:%s", get_human_size(total_size))
 
 
 @cli.command()

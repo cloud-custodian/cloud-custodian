@@ -200,6 +200,16 @@ class PolicyMetaLint(BaseTest):
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
 
+    def test_ec2_id_prefix(self):
+        missing_prefix = []
+        for k, v in manager.resources.items():
+            if v.resource_type.service != 'ec2':
+                continue
+            if v.resource_type.id_prefix is None:
+                missing_prefix.append(k)
+        if missing_prefix:
+            self.fail('ec2 resources missing id prefix %s' % (', '.join(missing_prefix)))
+
     def test_cfn_resource_validity(self):
         # for resources which are annotated with cfn_type ensure that it is
         # a valid type.
@@ -226,6 +236,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # newer wave q1 2021,
+            'AwsS3AccountPublicAccessBlock',
+            'AwsSsmPatchCompliance',
             # newer wave q4 2020
             'AwsApiGatewayRestApi',
             'AwsApiGatewayStage',
@@ -264,10 +277,15 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
+            'AWS::Config::ConformancePackCompliance',
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
+            'AWS::ECS::TaskDefinition',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
             'AWS::S3::AccountPublicAccessBlock',
@@ -298,8 +316,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ApiGatewayV2::Api',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::SSM::FileData',
-            'AWS::SecretsManager::Secret'}
+            'AWS::SSM::FileData'}
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -318,7 +335,15 @@ class PolicyMetaLint(BaseTest):
             raise AssertionError(
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
+        # config service can't be bothered to update their sdk correctly
+        invalid_ignore = {
+            'AWS::EKS::Cluster',
+            'AWS::ECS::Service',
+            'AWS::ECS::TaskDefinition',
+            'AWS::NetworkFirewall::Firewall'
+        }
         bad_types = resource_config_types.difference(config_types)
+        bad_types = bad_types.difference(invalid_ignore)
         if bad_types:
             raise AssertionError(
                 "Invalid config types \n %s" % ('\n'.join(bad_types)))
@@ -393,7 +418,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',

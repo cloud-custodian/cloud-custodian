@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test"
+        ],
+        "ResponseMetadata": {}
+    }
+}

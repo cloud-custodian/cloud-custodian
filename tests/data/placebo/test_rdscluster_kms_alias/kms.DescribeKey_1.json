@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "72c87446-729b-4624-9faa-137b26402e0f",
+            "Arn": "arn:aws:kms:us-east-2:644160558196:key/72c87446-729b-4624-9faa-137b26402e0f",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 1,
+                "day": 19,
+                "hour": 9,
+                "minute": 22,
+                "second": 14,
+                "microsecond": 575000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my RDS database volumes when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

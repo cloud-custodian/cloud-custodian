@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 30 Mar 2021 16:46:39 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=117",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "317",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects/cloud-custodian?alt=json"
+  },
+  "body": {
+    "projectNumber": "111111111111",
+    "projectId": "cloud-custodian",
+    "lifecycleState": "ACTIVE",
+    "name": "cloud-custodian",
+    "createTime": "2021-03-02T18:34:12.155Z"
+  }
+}

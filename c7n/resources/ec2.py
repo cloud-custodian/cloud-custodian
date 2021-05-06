@@ -107,6 +107,7 @@ class EC2(query.QueryResourceManager):
         date = 'LaunchTime'
         dimension = 'InstanceId'
         cfn_type = config_type = "AWS::EC2::Instance"
+        id_prefix = 'i-'
 
         default_report_fields = (
             'CustodianDate',
@@ -1060,7 +1061,7 @@ class SetMetadataServerAccess(BaseAction):
          - name: ec2-require-imdsv2
            resource: ec2
            filters:
-             - MetadataOptions.HttpsToken: optional
+             - MetadataOptions.HttpToken: optional
            actions:
              - type: set-metadata-access
                tokens: required
@@ -2083,6 +2084,7 @@ class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         id = 'LaunchTemplateId'
+        id_prefix = 'lt-'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
@@ -2177,6 +2179,7 @@ class ReservedInstance(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'ReservedInstancesId'
+        id_prefix = ""
         date = 'Start'
         enum_spec = (
             'describe_reserved_instances', 'ReservedInstances', None)
@@ -2193,6 +2196,7 @@ class DedicatedHost(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'HostId'
+        id_prefix = 'h-'
         enum_spec = ('describe_hosts', 'Hosts', None)
         arn_type = "dedicated-host"
         filter_name = 'HostIds'

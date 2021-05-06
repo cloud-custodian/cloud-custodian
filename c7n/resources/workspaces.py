@@ -4,6 +4,7 @@ import functools
 import itertools
 
 from c7n.filters import ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
@@ -84,3 +85,9 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
     def get_resource_value(self, k, i):
         return super(WorkspaceConnectionStatusFilter, self).get_resource_value(
             k, i[self.annotation_key])
+
+
+@Workspace.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'VolumeEncryptionKey'
