@@ -85,7 +85,7 @@ class Key(QueryResourceManager):
         service = 'kms'
         arn_type = "key"
         enum_spec = ('list_keys', 'Keys', None)
-        detail_spec = ('describe_key', 'KeyId', 'Arn', 'KeyMetadata')  # overriden
+        detail_spec = ('describe_key', 'KeyId', 'KeyArn', 'KeyMetadata')  # overriden
         name = id = "KeyId"
         arn = 'KeyArn'
         universal_taggable = True

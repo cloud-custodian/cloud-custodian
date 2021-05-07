@@ -3131,7 +3131,7 @@ class KMSKeyResolverMixin:
             try:
                 self.arns[r] = client.describe_key(
                     KeyId=self.data.get('key')
-                ).get('KeyMetadata').get('Arn')
+                ).get('KeyMetadata').get('KeyArn')
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))

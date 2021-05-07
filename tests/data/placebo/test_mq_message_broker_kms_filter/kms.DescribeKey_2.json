@@ -4,7 +4,7 @@
         "KeyMetadata": {
             "AWSAccountId": "alias/aws/mq",
             "KeyId": "0d543df5-915c-42a1-afa1-c9c5f1f97955",
-            "Arn": "arn:aws:kms:us-east-1:alias/aws/mq:key/0d543df5-915c-42a1-afa1-c9c5f1f97955"
+            "KeyArn": "arn:aws:kms:us-east-1:alias/aws/mq:key/0d543df5-915c-42a1-afa1-c9c5f1f97955"
         },
         "ResponseMetadata": {}
     }
