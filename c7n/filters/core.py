@@ -1131,3 +1131,9 @@ if (sys.version_info.major, sys.version_info.minor) > (3, 6):
             if self.AnnotationKey is not None:
                 akey = f'c7n:{self.AnnotationKey}'
                 resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
+else:
+    # define a dummy class to be imported by resource files
+    # to prevent failure when trying to run tests in py36 envs
+    class CELFilter(Filter):
+        def __init__(self, data, manager):
+            super().__init__(data, manager)
