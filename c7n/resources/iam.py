@@ -2584,7 +2584,7 @@ class OpenIdProvider(QueryResourceManager):
 
 
 @User.filter_registry.register('cel', condition=(
-    (sys.version_info.major, sys.version_info.minor) > (3, 7)))
+    (sys.version_info.major, sys.version_info.minor) > (3, 6)))
 class CELFilter(BaseCELFilter, CredentialReport):
     schema = type_schema(
         'cel',

@@ -2207,7 +2207,7 @@ class DedicatedHost(query.QueryResourceManager):
         permissions_enum = ('ec2:DescribeHosts',)
 
 
-@filters.register('cel', condition=((sys.version_info.major, sys.version_info.minor) > (3, 7)))
+@filters.register('cel', condition=((sys.version_info.major, sys.version_info.minor) > (3, 6)))
 class CELFilter(BaseCELFilter, InstanceImageBase):
     """
     EC2-specific implementation of CELFilter

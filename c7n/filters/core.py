@@ -11,6 +11,7 @@ import ipaddress
 import logging
 import operator
 import re
+import sys
 
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
@@ -974,7 +975,7 @@ class ReduceFilter(BaseValueFilter):
             return sorted(items, key=key, reverse=(self.order == 'desc'))
 
 
-try:
+if (sys.version_info.major, sys.version_info.minor) > (3, 6):
     import celpy
     import celpy.c7nlib
     import celpy.celtypes
@@ -1130,5 +1131,3 @@ try:
             if self.AnnotationKey is not None:
                 akey = f'c7n:{self.AnnotationKey}'
                 resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
-except ImportError:
-    raise
