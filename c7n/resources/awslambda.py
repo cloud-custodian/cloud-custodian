@@ -734,7 +734,7 @@ class LayerPostFinding(PostFinding):
 
 
 @AWSLambda.filter_registry.register('cel', condition=(
-        (sys.version_info.major, sys.version_info.minor) > (3, 7)))
+    (sys.version_info.major, sys.version_info.minor) > (3, 7)))
 class CELFilter(
     BaseCELFilter,
     KmsRelatedFilter,
