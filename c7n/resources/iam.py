@@ -8,6 +8,7 @@ import json
 import io
 from datetime import timedelta
 import itertools
+import sys
 import time
 
 # Used to parse saml provider metadata configuration.
@@ -2582,7 +2583,8 @@ class OpenIdProvider(QueryResourceManager):
     source_mapping = {'describe': OpenIdDescribe}
 
 
-@User.filter_registry.register('cel')
+@User.filter_registry.register('cel', condition=(
+        (sys.version_info.major, sys.version_info.minor) > (3, 7)))
 class CELFilter(BaseCELFilter, CredentialReport):
     schema = type_schema(
         'cel',

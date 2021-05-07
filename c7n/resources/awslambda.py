@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
+import sys
 from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
@@ -732,7 +733,8 @@ class LayerPostFinding(PostFinding):
         return envelope
 
 
-@AWSLambda.filter_registry.register('cel')
+@AWSLambda.filter_registry.register('cel', condition=(
+        (sys.version_info.major, sys.version_info.minor) > (3, 7)))
 class CELFilter(
     BaseCELFilter,
     KmsRelatedFilter,
