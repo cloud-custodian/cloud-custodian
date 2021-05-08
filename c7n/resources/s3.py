@@ -762,6 +762,7 @@ class BucketActionBase(BaseAction):
                         'error modifying bucket: policy:%s action:%s bucket:%s error:%s',
                         self.manager.data.get('name'), self.name, b['Name'], f.exception()
                     )
+                    continue
                 results += filter(None, [f.result()])
 
             return results
