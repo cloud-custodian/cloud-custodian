@@ -457,6 +457,7 @@ class DirectoryOutput:
 class BlobOutput(DirectoryOutput):
 
     log = logging.getLogger('custodian.output.blob')
+    delete_on_exit = True
 
     def __init__(self, ctx, config):
         self.ctx = ctx
@@ -484,7 +485,8 @@ class BlobOutput(DirectoryOutput):
         self.log.debug("%s: uploading policy logs", self.type)
         self.compress()
         self.upload()
-        shutil.rmtree(self.root_dir)
+        if self.delete_on_exit:
+            shutil.rmtree(self.root_dir)
         self.log.debug("%s: policy logs uploaded", self.type)
 
     def upload(self):
