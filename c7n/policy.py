@@ -1079,9 +1079,9 @@ class Policy:
         if not variables:
             variables = {}
 
+        partition = utils.get_partition(self.options.region)
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                partition = utils.get_partition(self.options.region)
                 self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
                     (partition, self.options.account_id, self.data['mode']['role'])
 
@@ -1089,6 +1089,7 @@ class Policy:
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
+            'partition': partition,
             'region': self.options.region,
             # non-standard runtime variables from local filter/action vocabularies
             #
