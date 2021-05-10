@@ -35,7 +35,7 @@ PORTAL_IPS = ['104.42.195.92',
               '52.176.6.30',
               '52.169.50.45',
               '52.187.184.26']
-AZURE_CLOUD_IPS = ['0.0.0.0']
+AZURE_CLOUD_IPS = ['0.0.0.0']  # nosec
 
 
 @resources.register('cosmosdb')

@@ -103,11 +103,11 @@ class TransparentDataEncryptionFilter(Filter):
         }
     )
 
-    log = logging.getLogger('custodian.azure.sqldatabase.TransparentDataEncryptionFilter')
+    log = logging.getLogger('custodian.azure.sqldatabase.transparent-data-encryption-filter')
 
     def __init__(self, data, manager=None):
         super(TransparentDataEncryptionFilter, self).__init__(data, manager)
-        self.enabled = self.data.get('enabled')
+        self.enabled = self.data['enabled']
 
     def process(self, resources, event=None):
         resources, exceptions = ThreadHelper.execute_in_parallel(
@@ -142,6 +142,88 @@ class TransparentDataEncryptionFilter(Filter):
 
             if StringUtils.equal(
                     resource['properties']['transparentDataEncryption'].get('status'),
+                    required_status):
+                result.append(resource)
+
+        return result
+
+
+@SqlDatabase.filter_registry.register('data-masking-policy')
+class DataMaskingPolicyFilter(Filter):
+    """
+    Filter by the current data masking policy
+    configuration for this database.
+
+    This filter will exclude the `master` database
+    because data masking can not be configured on it.
+
+    :example:
+
+    Find SQL databases with data masking disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-database-masking
+            resource: azure.sql-database
+            filters:
+              - type: data-masking-policy
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'data-masking-policy',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqldatabase.data-masking-policy-filter')
+
+    def __init__(self, data, manager=None):
+        super(DataMaskingPolicyFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            database_name = resource['name']
+            if StringUtils.equal(database_name, "master"):
+                continue
+
+            if 'c7n:data-masking-policy' not in resource:
+                server_id = resource[ChildTypeInfo.parent_key]
+                server_name = ResourceIdParser.get_resource_name(server_id)
+
+                dmr = client.data_masking_policies.get(
+                    resource['resourceGroup'],
+                    server_name,
+                    database_name)
+
+                if dmr:
+                    resource['c7n:data-masking-policy'] = dmr.serialize(True).get('properties', {})
+                else:
+                    resource['c7n:data-masking-policy'] = {}
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['c7n:data-masking-policy'].get('dataMaskingState'),
                     required_status):
                 result.append(resource)
 

@@ -1,0 +1,19 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "ABg5-UyEP_BF1ev_ivYVFwqcPyLTnBJ8h7-PtU4OmwEbrWIljBID0U6STbKcR_xdUHy3sGrDyCWrzMPHi0_SAetWx8k",
+    "etag": "\"49b0fbd0cc9416b132a59028866ac6d7\"",
+    "x-goog-generation": "1617026389575135",
+    "x-goog-metageneration": "1",
+    "x-goog-hash": "crc32c=lb0B9A==, md5=SbD70MyUFrEypZAohmrG1w==",
+    "x-goog-stored-content-length": "537277",
+    "x-goog-stored-content-encoding": "identity",
+    "vary": "Origin",
+    "content-length": "0",
+    "date": "Mon, 29 Mar 2021 13:59:49 GMT",
+    "server": "UploadServer",
+    "content-type": "text/html; charset=UTF-8",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200"
+  },
+  "body": {}
+}

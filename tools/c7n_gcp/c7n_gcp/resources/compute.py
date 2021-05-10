@@ -28,6 +28,7 @@ class Instance(QueryResourceManager):
         labels = True
         default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
         asset_type = "compute.googleapis.com/Instance"
+        scc_type = "google.compute.Instance"
         metric_key = 'metric.labels.instance_name'
 
         @staticmethod
