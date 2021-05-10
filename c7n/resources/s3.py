@@ -50,7 +50,7 @@ except ImportError:
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -748,13 +748,12 @@ class BucketActionBase(BaseAction):
         return self._process_with_futures(buckets)
 
     def _process_with_futures(self, buckets, *args, max_workers=3, **kwargs):
+        errors = 0
+        results = []
         with self.executor_factory(max_workers=max_workers) as w:
             futures = {}
-            results = []
-
             for b in buckets:
                 futures[w.submit(self.process_bucket, b, *args, **kwargs)] = b
-
             for f in as_completed(futures):
                 if f.exception():
                     b = futures[f]
@@ -762,10 +761,13 @@ class BucketActionBase(BaseAction):
                         'error modifying bucket: policy:%s action:%s bucket:%s error:%s',
                         self.manager.data.get('name'), self.name, b['Name'], f.exception()
                     )
+                    errors += 1
                     continue
                 results += filter(None, [f.result()])
-
-            return results
+        if errors:
+            self.log.error('encountered %d errors while processing %s', errors, self.name)
+            raise PolicyExecutionError('%d resources failed', errors)
+        return results
 
 
 class BucketFilterBase(Filter):
