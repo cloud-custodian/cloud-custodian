@@ -13,6 +13,7 @@ import re
 import sys
 import threading
 import time
+import jmespath
 from urllib import parse as urlparse
 from urllib.request import getproxies
 
@@ -213,7 +214,12 @@ class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except TypeError:
+            if hasattr(obj, '__dict__'):
+                return obj.__dict__
+            raise
 
 
 def group_by(resources, key):
@@ -767,3 +773,62 @@ def get_human_size(size, precision=2):
         size = size / 1024.0
 
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def split_by_expression(objects, key_expr, allowed_values=(), exclude=()):
+    """
+    Take a list of objects and split them by a jmespath expression.
+
+    If `allowed_values` is specified, then only include objects who's
+    value matches any of those values.
+
+    If `exclude` is specified, then exclude objects who's value matches
+    any of those values.
+
+    The result is two lists: matched and not matched.
+    """
+    search_expr = jmespath.compile(key_expr)
+    matched = []
+    nomatch = []
+
+    if not isinstance(allowed_values, (list, tuple)):
+        allowed_values = (allowed_values,)
+    if not isinstance(exclude, (list, tuple)):
+        exclude = (exclude,)
+
+    # do each object individually so object that do not match
+    # the expression can be compared.  jmespath will drop any nulls.
+    for o in objects:
+        try:
+            value = search_expr.search(o)
+        except jmespath.exceptions.JMESPathTypeError:
+            # in cases like:
+            #   jmespath.exceptions.JMESPathTypeError: In function length(),
+            #   invalid type for value: None, expected one of:
+            #   ['string', 'array', 'object'], received: "null"
+            # just assign a value of None as the query is invalid for this object
+            value = None
+
+        # support a list of results, any of which can match
+        if not isinstance(value, (list, tuple)):
+            value = [value]
+
+        match = True
+        if allowed_values:
+            match = False
+            for i in allowed_values:
+                if i in value:
+                    match = True
+                    break
+        if exclude:
+            for i in exclude:
+                if i in value:
+                    match = False
+                    break
+
+        if match:
+            matched.append(o)
+        else:
+            nomatch.append(o)
+
+    return matched, nomatch
