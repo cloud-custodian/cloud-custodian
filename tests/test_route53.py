@@ -3,10 +3,8 @@
 import time
 import logging
 
-import pytest
 from pytest_terraform import terraform
 
-from botocore.exceptions import ClientError
 from .common import BaseTest
 
 
