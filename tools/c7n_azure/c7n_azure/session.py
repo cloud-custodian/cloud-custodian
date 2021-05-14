@@ -37,8 +37,6 @@ class AzureCredential:
         if authorization_file:
             with open(authorization_file) as json_file:
                 self._auth_params = json.load(json_file)
-            if subscription_id_override is not None:
-                self._auth_params['subscription_id'] = subscription_id_override
         else:
             self._auth_params = {
                 'client_id': os.environ.get(constants.ENV_CLIENT_ID),
@@ -46,8 +44,7 @@ class AzureCredential:
                 'access_token': os.environ.get(constants.ENV_ACCESS_TOKEN),
                 'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
                 'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
-                'subscription_id':
-                    subscription_id_override or os.environ.get(constants.ENV_SUB_ID),
+                'subscription_id': os.environ.get(constants.ENV_SUB_ID),
                 'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
                 'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
                 'enable_cli_auth': True
@@ -99,6 +96,9 @@ class AzureCredential:
             self._auth_params['tenant_id'] = account_json['tenantId']
             if error is not None:
                 raise Exception('Unable to query TenantId and SubscriptionId')
+
+        if subscription_id_override is not None:
+            self._auth_params['subscription_id'] = subscription_id_override
 
         self._subscription_id = self._auth_params['subscription_id']
         self._tenant_id = self._auth_params['tenant_id']
@@ -221,7 +221,8 @@ class Session:
             client_args = {
                 'credential': self.credentials,
                 'raw_response_hook': log_response_data,
-                'retry_policy': C7nRetryPolicy()
+                'retry_policy': C7nRetryPolicy(),
+                'credential_scopes': [self.resource_endpoint + ".default"]
             }
 
             # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351

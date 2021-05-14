@@ -24,6 +24,8 @@ class DataSet(QueryResourceManager):
             id, name, "description",
             "creationTime", "lastModifiedTime"]
         asset_type = "bigquery.googleapis.com/Dataset"
+        scc_type = "google.cloud.bigquery.Dataset"
+        metric_key = "resouece.labels.dataset_id"
         permissions = ('bigquery.datasets.get',)
 
         @staticmethod

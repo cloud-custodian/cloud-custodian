@@ -10,6 +10,7 @@ ResourceMap = {
     "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
     "azure.containerregistry": "c7n_azure.resources.container_registry.ContainerRegistry",
+    "azure.container-registry": "c7n_azure.resources.container_registry.ContainerRegistry",
     "azure.containerservice": "c7n_azure.resources.container_service.ContainerService",
     "azure.cosmosdb": "c7n_azure.resources.cosmos_db.CosmosDB",
     "azure.cosmosdb-collection": "c7n_azure.resources.cosmos_db.CosmosDBCollection",

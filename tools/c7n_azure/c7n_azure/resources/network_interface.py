@@ -68,7 +68,6 @@ class EffectiveRouteTableFilter(ValueFilter):
                   - VirtualAppliance
     """
     schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
-    schema_alias = False
 
     def process(self, resources, event=None):
 

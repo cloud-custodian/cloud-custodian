@@ -23,6 +23,15 @@ class Network(QueryResourceManager):
             "name", "description", "creationTimestamp",
             "autoCreateSubnetworks", "IPv4Range", "gatewayIPv4"]
         asset_type = "compute.googleapis.com/Network"
+        scc_type = "google.compute.Network"
+
+        @staticmethod
+        def get(client, resource_info):
+            path_param_re = re.compile('.*?/projects/(.*?)/global/networks/(.*)')
+            project, network = path_param_re.match(
+                resource_info["resourceName"]).groups()
+            return client.execute_query(
+                'get', {'project': project, 'network': network})
 
 
 @resources.register('subnet')
@@ -39,13 +48,18 @@ class Subnet(QueryResourceManager):
             "name", "description", "creationTimestamp", "ipCidrRange",
             "gatewayAddress", "region", "state"]
         asset_type = "compute.googleapis.com/Subnetwork"
+        scc_type = "google.compute.Subnetwork"
+        metric_key = "resource.labels.subnetwork_name"
 
         @staticmethod
         def get(client, resource_info):
+
+            path_param_re = re.compile(
+                '.*?/projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
+            project, region, subnet = path_param_re.match(
+                resource_info["resourceName"]).groups()
             return client.execute_query(
-                'get', {'project': resource_info['project_id'],
-                        'region': resource_info['location'],
-                        'subnetwork': resource_info['subnetwork_name']})
+                'get', {'project': project, 'region': region, 'subnetwork': subnet})
 
 
 class SubnetAction(MethodAction):
@@ -119,6 +133,8 @@ class Firewall(QueryResourceManager):
             name, "description", "network", "priority", "creationTimestamp",
             "logConfig.enabled", "disabled"]
         asset_type = "compute.googleapis.com/Firewall"
+        scc_type = "google.compute.Firewall"
+        metric_key = 'metric.labels.firewall_name'
 
         @staticmethod
         def get(client, resource_info):
@@ -156,6 +172,53 @@ class DeleteFirewall(MethodAction):
         project, resource_name = self.path_param_re.match(
             r['selfLink']).groups()
         return {'project': project, 'firewall': resource_name}
+
+
+@Firewall.action_registry.register('modify')
+class ModifyFirewall(MethodAction):
+    """Modify filtered Firewall Rules
+
+    :example: Enable logging on filtered firewalls
+
+    .. yaml:
+
+     policies:
+       - name: enable-firewall-logging
+         resource: gcp.firewall
+         filters:
+         - type: value
+           key: name
+           value: no-logging
+         actions:
+         - type: modify
+           logConfig:
+             enabled: true
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'description': {'type': 'string'},
+           'network': {'type': 'string'},
+           'priority': {'type': 'number'},
+           'sourceRanges': {'type': 'array', 'items': {'type': 'string'}},
+           'destinationRanges': {'type': 'array', 'items': {'type': 'string'}},
+           'sourceTags': {'type': 'array', 'items': {'type': 'string'}},
+           'targetTags': {'type': 'array', 'items': {'type': 'string'}},
+           'sourceServiceAccounts': {'type': 'array', 'items': {'type': 'string'}},
+           'targetServiceAccounts': {'type': 'array', 'items': {'type': 'string'}},
+           'allowed': {'type': 'array', 'items': {'type': 'object'}},
+           'denied': {'type': 'array', 'items': {'type': 'object'}},
+           'direction': {'enum': ['INGRESS', 'EGRESS']},
+           'logConfig': {'type': 'object'},
+           'disabled': {'type': 'boolean'}})
+    method_spec = {'op': 'patch'}
+    permissions = ('compute.networks.updatePolicy', 'compute.firewalls.update')
+    path_param_re = re.compile('.*?/projects/(.*?)/global/firewalls/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, resource_name = self.path_param_re.match(
+            r['selfLink']).groups()
+        return {'project': project, 'firewall': resource_name, 'body': self.data}
 
 
 @resources.register('router')

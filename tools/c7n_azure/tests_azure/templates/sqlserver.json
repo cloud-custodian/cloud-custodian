@@ -41,6 +41,18 @@
          },
          "resources": [
             {
+              "comments": "Transparent Data Encryption",
+              "name": "current",
+              "type": "transparentDataEncryption",
+              "apiVersion": "2017-03-01-preview",
+              "properties": {
+                "status": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]"
+              ]
+            },
+            {
                "name": "default",
                "type": "backupShortTermRetentionPolicies",
                "apiVersion": "2017-10-01-preview",

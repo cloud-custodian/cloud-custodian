@@ -1,10 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 import logging
 
-import jsonpickle
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
                                        StorageAccountUpdateParameters,
@@ -24,7 +22,7 @@ from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, serialize
 from netaddr import IPSet
 
 
@@ -354,7 +352,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
         if not (storage_prefix_property in storage_account):
             settings = StorageSettingsUtilities.get_settings(
                 self.storage_type, storage_account, session)
-            storage_account[storage_prefix_property] = json.loads(jsonpickle.encode(settings))
+            storage_account[storage_prefix_property] = serialize(settings)
 
         return storage_account[storage_prefix_property]
 

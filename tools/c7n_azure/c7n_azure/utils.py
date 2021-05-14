@@ -593,9 +593,13 @@ def get_keyvault_auth_endpoint(cloud_endpoints):
 # This function is a workaround for Azure KeyVault objects that lack
 # standard serialization method.
 # These objects store variables with an underscore prefix, so we strip it.
-def serialize(item):
+def serialize(data):
     d = {}
-    for k, v in vars(item).items():
+    if type(data) is dict:
+        items = data.items()
+    else:
+        items = vars(data).items()
+    for k, v in items:
         if not callable(v) and hasattr(v, '__dict__'):
             d[k.strip('_')] = serialize(v)
         elif callable(v):
