@@ -122,6 +122,7 @@ ResourceMap = {
     "aws.lightsail-elb": "c7n.resources.lightsail.LoadBalancer",
     "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
     "aws.log-group": "c7n.resources.cw.LogGroup",
+    "aws.log-metric-filter": "c7n.resources.cw.LogMetricFilterResource",
     "aws.message-broker": "c7n.resources.mq.MessageBroker",
     "aws.message-config": "c7n.resources.mq.MessageConfig",
     "aws.ml-model": "c7n.resources.ml.MLModel",
