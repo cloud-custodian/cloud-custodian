@@ -315,7 +315,8 @@ class KinesisAnalyticsAppV2Delete(Action):
 @KinesisAnalyticsAppV2.filter_registry.register('subnet')
 class KinesisAnalyticsSubnetFilter(SubnetFilter):
 
-    RelatedIdsExpression = 'ApplicationConfigurationDescription.VpcConfigurationDescriptions[].SubnetIds[]'
+    RelatedIdsExpression = 'ApplicationConfigurationDescription.' \
+        'VpcConfigurationDescriptions[].SubnetIds[]'
 
 
 @resources.register('kinesis-video')
