@@ -292,9 +292,9 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
         arn_type = 'application'
         universal_taggable = object()
         cfn_type = 'AWS::KinesisAnalyticsV2::Application'
+        permission_prefix = "kinesisanalytics"
 
     permissions = ("kinesisanalytics:DescribeApplication",)
-    permission_prefix = "kinesisanalytics"
 
     def augment(self, resources):
         return universal_augment(self, super().augment(resources))
