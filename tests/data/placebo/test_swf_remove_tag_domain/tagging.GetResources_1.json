@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:swf:us-east-1:012345678910:/domain/test-custodian-swf",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

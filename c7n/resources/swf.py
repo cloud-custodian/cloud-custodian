@@ -1,41 +1,42 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session
-from c7n import tags
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.tags import Tag, RemoveTag, universal_augment
+
+
+class DescribeSimpleWorkflow(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('swf')
-class SimpleWorkflowDomain(QueryResourceManager):
+class SimpleWorkflow(QueryResourceManager):
     class resource_type(TypeInfo):
-        service = arn_type = 'swf'
+        service = 'swf'
+        arn_type = ''
         enum_spec = ('list_domains', 'domainInfos', {'registrationStatus': 'REGISTERED'})
         id = name = 'name'
+        arn = 'arn'
         universal_taggable = object()
         permission_augment = ('swf:ListTagsForResource',)
 
-    def augment(self, rules):
-        client = local_session(self.session_factory).client('swf')
-
-        def _add_tags(r):
-            r['Tags'] = client.list_tags_for_resource(
-                resourceArn=r['arn']).get('tags', [])
-            return r
-
-        return list(map(_add_tags, rules))
+    source_mapping = {
+        'describe': DescribeSimpleWorkflow,
+        'config': ConfigSource
+    }
 
 
-@SimpleWorkflowDomain.action_registry.register('tag')
-class Tag(tags.Tag):
-    """Tag a Simple Workflow Domain with a key/value
+@SimpleWorkflow.action_registry.register('tag')
+class TagSWF(Tag):
+    """Tag a Simple Workflow resource with a key/value
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: swf-domain-tag-owner-tag
+              - name: swf-domain-tag-ownername
                 resource: swf
                 filters:
                   - "tag:OwnerName": absent
@@ -47,19 +48,40 @@ class Tag(tags.Tag):
     permissions = ('swf:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
+        tags_lower = []
+
         for t in tags:
-            if t.get('Key'):
-                t['key'] = t['Key']
-                del t['Key']
-            if t.get('Value'):
-                t['value'] = t['Value']
-                del t['Value']
+            tags_lower.append({k.lower(): v for k, v in t.items()})
 
         for r in resources:
             try:
-                client.tag_resource(
-                    resourceArn=r['arn'],
-                    tags=tags
-                )
+                client.tag_resource(resourceArn=r['arn'], tags=tags_lower)
+            except client.exceptions.ResourceNotFound:
+                continue
+
+
+@SimpleWorkflow.action_registry.register('remove-tag')
+class RemoveTagSWF(RemoveTag):
+    """Remove tag from a Simple Workflow resource with a provided key
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: swf-domain-remove-tag
+                resource: swf
+                filters:
+                  - "tag:OwnerName": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OwnerName"]
+    """
+    permissions = ('swf:UntagResource',)
+
+    def process_resource_set(self, client, resources, tag_keys):
+        for r in resources:
+            try:
+                client.untag_resource(resourceArn=r['arn'], tagKeys=tag_keys)
             except client.exceptions.ResourceNotFound:
                 continue
