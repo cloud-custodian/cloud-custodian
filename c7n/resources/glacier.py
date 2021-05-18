@@ -8,7 +8,7 @@ from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
-from c7n.utils import get_retry, local_session, type_schema
+from c7n.utils import get_retry, local_session, type_schema, convert_tags
 
 
 @resources.register('glacier')
@@ -31,10 +31,7 @@ class Glacier(QueryResourceManager):
             tag_dict = self.retry(
                 client.list_tags_for_vault,
                 vaultName=resource[self.get_model().name])['Tags']
-            tag_list = []
-            for k, v in tag_dict.items():
-                tag_list.append({'Key': k, 'Value': v})
-            resource['Tags'] = tag_list
+            resource['Tags'] = convert_tags(tag_dict, list)
             return resource
 
         with self.executor_factory(max_workers=2) as w:

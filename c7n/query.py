@@ -20,7 +20,7 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource)
+    local_session, generate_arn, get_retry, chunks, camelResource, convert_tags)
 
 
 try:
@@ -357,20 +357,13 @@ class ConfigSource:
         if 'Tags' in resource:
             return
         elif item.get('tags'):
-            resource['Tags'] = [
-                {u'Key': k, u'Value': v} for k, v in item['tags'].items()]
+            resource['Tags'] = convert_tags(item['tags'], list)
         elif item['supplementaryConfiguration'].get('Tags'):
             stags = item['supplementaryConfiguration']['Tags']
             if isinstance(stags, str):
                 stags = json.loads(stags)
-            if isinstance(stags, list):
-                resource['Tags'] = [
-                    {u'Key': t.get('key', t.get('tagKey')),
-                     u'Value': t.get('value', t.get('tagValue'))}
-                    for t in stags
-                ]
-            elif isinstance(stags, dict):
-                resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
+            if isinstance(stags, (list, dict)):
+                resource['Tags'] = convert_tags(stags, list)
 
     def get_listed_resources(self, client):
         # fallback for when config decides to arbitrarily break select

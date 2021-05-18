@@ -4,7 +4,7 @@ from c7n.manager import resources
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session
+from c7n.utils import local_session, convert_tags
 
 
 @resources.register('secrets-manager')
@@ -63,10 +63,9 @@ class TagSecretsManagerResource(Tag):
 
     def process_resource_set(self, client, resources, new_tags):
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', ())}
-            for t in new_tags:
-                tags[t['Key']] = t['Value']
-            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            tags = convert_tags(r.get('Tags'), dict)
+            tags.update(convert_tags(new_tags, dict))
+            formatted_tags = convert_tags(tags, list)
             client.tag_resource(SecretId=r['ARN'], Tags=formatted_tags)
 
 

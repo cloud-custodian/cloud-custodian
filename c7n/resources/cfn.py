@@ -8,7 +8,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, convert_tags
 from c7n.tags import RemoveTag, Tag
 
 log = logging.getLogger('custodian.cfn')
@@ -167,7 +167,7 @@ class CloudFormationAddTag(Tag):
 
 def _tag_stack(client, s, add=(), remove=()):
 
-    tags = {t['Key']: t['Value'] for t in s.get('Tags')}
+    tags = convert_tags(s.get('Tags'), dict)
     for t in remove:
         tags.pop(t, None)
 
@@ -192,7 +192,7 @@ def _tag_stack(client, s, add=(), remove=()):
         Capabilities=capabilities,
         Parameters=params,
         NotificationARNs=notifications,
-        Tags=[{'Key': k, 'Value': v} for k, v in tags.items()],
+        Tags=convert_tags(tags, list),
     )
 
 

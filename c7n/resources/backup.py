@@ -4,7 +4,7 @@ from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session
+from c7n.utils import local_session, convert_tags
 
 
 @resources.register('backup-plan')
@@ -29,7 +29,7 @@ class BackupPlan(QueryResourceManager):
                 tags = client.list_tags(ResourceArn=r['BackupPlanArn']).get('Tags', {})
             except client.exceptions.ResourceNotFoundException:
                 continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            r['Tags'] = convert_tags(tags, list)
             results.append(r)
 
         return results

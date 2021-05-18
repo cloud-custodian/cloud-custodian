@@ -61,7 +61,7 @@ from c7n.resources.securityhub import PostFinding
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
-    dumps, format_string_values, get_account_alias_from_sts)
+    dumps, format_string_values, get_account_alias_from_sts, convert_tags)
 
 
 log = logging.getLogger('custodian.s3')
@@ -295,8 +295,7 @@ class ConfigS3(query.ConfigSource):
         resource['Policy'] = item_value['policyText']
 
     def handle_BucketTaggingConfiguration(self, resource, item_value):
-        resource['Tags'] = [
-            {"Key": k, "Value": v} for k, v in item_value['tagSets'][0]['tags'].items()]
+        resource['Tags'] = convert_tags(item_value['tagSets'][0]['tags'], list)
 
     def handle_BucketVersioningConfiguration(self, resource, item_value):
         # Config defaults versioning to 'Off' for a null value
@@ -516,11 +515,11 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                 raise
             bucket['Tags'] = []
 
-        new_tags = {t['Key']: t['Value'] for t in add_tags}
+        new_tags = convert_tags(add_tags, dict)
         for t in bucket.get('Tags', ()):
             if (t['Key'] not in new_tags and t['Key'] not in remove_tags):
                 new_tags[t['Key']] = t['Value']
-        tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+        tag_set = convert_tags(new_tags, list)
 
         try:
             client.put_bucket_tagging(
@@ -791,7 +790,7 @@ class BucketFinding(PostFinding):
             "Type": self.resource_type,
             "Id": "arn:aws:s3:::{}".format(r["Name"]),
             "Region": get_region(r),
-            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Tags": convert_tags(r.get("Tags"), dict),
             "Details": {self.resource_type: {
                 "OwnerId": owner.get('ID', 'Unknown')}}
         }

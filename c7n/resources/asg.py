@@ -21,7 +21,7 @@ from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import (
-    local_session, type_schema, chunks, get_retry, select_keys)
+    local_session, type_schema, chunks, get_retry, select_keys, convert_tags)
 
 from .ec2 import deserialize_user_data
 
@@ -964,7 +964,7 @@ class Resize(Action):
         client = local_session(self.manager.session_factory).client(
             'autoscaling')
         for a in asgs:
-            tag_map = {t['Key']: t['Value'] for t in a.get('Tags', [])}
+            tag_map = convert_tags(a.get('Tags'), dict)
             update = {}
             current_size = len(a['Instances'])
 
@@ -1129,18 +1129,16 @@ class Tag(Action):
     batch_size = 1
 
     def get_tag_set(self):
-        tags = []
+        tags = {}
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
         if key and value:
-            tags.append({'Key': key, 'Value': value})
+            tags[key] = value
+        tags.update(self.data.get('tags', {}))
 
-        for k, v in self.data.get('tags', {}).items():
-            tags.append({'Key': k, 'Value': v})
-
-        return tags
+        return convert_tags(tags, list)
 
     def process(self, asgs):
         tags = self.get_tag_set()
@@ -1256,7 +1254,7 @@ class PropagateTags(Action):
         if not self.manager.config.dryrun and instance_ids and tag_map:
             client.create_tags(
                 Resources=instance_ids,
-                Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+                Tags=convert_tags(tag_map, list))
         return len(instance_ids)
 
     def prune_instance_tags(self, client, asg, tag_set, instances):
