@@ -581,7 +581,7 @@ class ValueFilter(BaseValueFilter):
                 return op(r, v)
             except TypeError:
                 return False
-        elif r == self.v:
+        elif r == v:
             return True
 
         return False
