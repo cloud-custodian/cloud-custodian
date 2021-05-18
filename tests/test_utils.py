@@ -559,7 +559,6 @@ class UtilTest(BaseTest):
             tags = utils.convert_tags(i, dict, strip_aws=False)
             assert set(list(tags)) == {"tag1", "tag2", "aws:tag"}
 
-        for i in (tags_list, tags_dict):
             tags = utils.convert_tags(i, list, strip_aws=False)
             assert set([t['Key'] for t in tags]) == {"tag1", "tag2", "aws:tag"}
 
@@ -567,6 +566,9 @@ class UtilTest(BaseTest):
         for i in (tags_list, tags_dict):
             tags = utils.convert_tags(i, dict, strip_aws=True)
             assert set(list(tags)) == {"tag1", "tag2"}
+
+            tags = utils.convert_tags(i, list, strip_aws=True)
+            assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
 
     def test_convert_tags_lower(self):
         tags_dict = {
@@ -580,6 +582,14 @@ class UtilTest(BaseTest):
         tags = utils.convert_tags(tags_dict, list, lower=True)
         assert set([t['key'] for t in tags]) == {"tag1", "tag2"}
         assert set([t['value'] for t in tags]) == {"value1", "value2"}
+
+    def test_convert_tags_invalid(self):
+        # check that we raise an error on invalid inputs
+        # input cannot be a str
+        self.assertRaises(ValueError, utils.convert_tags, "bad input", dict)
+        # form can only be dict or list
+        self.assertRaises(ValueError, utils.convert_tags, None, str)
+        self.assertRaises(ValueError, utils.convert_tags, None, tuple)
 
 
 def test_parse_date_floor():
