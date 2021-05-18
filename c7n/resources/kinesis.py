@@ -283,7 +283,7 @@ class DescribeVideoStream(DescribeSource):
 class KinesisAnalyticsAppV2(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        permission_prefix = service = "kinesisanalyticsv2"
+        service = "kinesisanalyticsv2"
         enum_spec = ('list_applications', 'ApplicationSummaries', None)
         detail_spec = ('describe_application', 'ApplicationName',
                        'ApplicationName', 'ApplicationDetail')
@@ -294,6 +294,7 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
         cfn_type = 'AWS::KinesisAnalyticsV2::Application'
 
     permissions = ("kinesisanalytics:DescribeApplication",)
+    permission_prefix = "kinesisanalytics"
 
     def augment(self, resources):
         return universal_augment(self, super().augment(resources))
