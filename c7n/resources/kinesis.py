@@ -283,7 +283,7 @@ class DescribeVideoStream(DescribeSource):
 class KinesisAnalyticsAppV2(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = "kinesisanalyticsv2"
+        permission_prefix = service = "kinesisanalyticsv2"
         enum_spec = ('list_applications', 'ApplicationSummaries', None)
         detail_spec = ('describe_application', 'ApplicationName',
                        'ApplicationName', 'ApplicationDetail')
