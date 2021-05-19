@@ -425,7 +425,7 @@ class PolicyMetaLint(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'healthcheck', 'event-rule-target',
+            'healthcheck', 'event-rule-target', 'log-metric-filter',
             'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []

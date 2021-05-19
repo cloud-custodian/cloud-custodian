@@ -473,6 +473,7 @@ class LogMetricFilterResource(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'logs'
         enum_spec = ('describe_metric_filters', 'metricFilters', None)
+        arn = False
         id = name = 'filterName'
         date = 'creationTime'
         cfn_type = 'AWS::Logs::MetricFilter'
