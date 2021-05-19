@@ -17,6 +17,7 @@ import os
 import time
 import subprocess
 import sys
+import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -277,8 +278,11 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
     """
     try:
         import docker
-    except ImportError:
+    except ImportError as e:
+        print("import error %s" % e)
+        traceback.print_exc()
         print("python docker client library required")
+        print("python %s" % ("\n".join(sys.path)))
         sys.exit(1)
     if quiet:
         logging.getLogger().setLevel(logging.WARNING)
