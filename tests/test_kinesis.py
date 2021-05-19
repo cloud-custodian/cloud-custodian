@@ -259,3 +259,30 @@ class Kinesis(BaseTest):
         self.assertTrue(len(resources), 1)
         self.assertEqual(resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')
+
+
+class KinesisAnalyticsAppV2(BaseTest):
+
+    def test_kinesis_analyticsv2_app_delete(self):
+        factory = self.replay_flight_data("test_kinesis_analyticsv2_app_delete")
+        p = self.load_policy(
+            {
+                "name": "kapp",
+                "resource": "kinesis-analyticsv2",
+                "filters": [{"type": "subnet", "key": "tag:Name", "value": "implied", "op": "eq"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            factory().client("kinesisanalyticsv2").describe_application(
+                ApplicationName=resources[0]['ApplicationName']
+            )[
+                "ApplicationDetail"
+            ][
+                "ApplicationStatus"
+            ],
+            "DELETING",
+        )
