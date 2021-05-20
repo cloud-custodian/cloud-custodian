@@ -188,6 +188,12 @@ def resource_format(resource, resource_type):
                 resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
             resource['AllocatedStorage'])
+    elif resource_type == 'rds-cluster':
+        return "%s %s %s" % (
+            resource['DBClusterIdentifier'],
+            "%s-%s" % (
+                resource['Engine'], resource['EngineVersion']),
+            resource['AllocatedStorage'])
     elif resource_type == 'asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s" % (
