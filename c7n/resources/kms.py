@@ -3,7 +3,7 @@
 from botocore.exceptions import ClientError
 
 import json
-from functools import cached_property
+from functools import lru_cache
 
 from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
@@ -111,7 +111,8 @@ class Key(QueryResourceManager):
         'describe': DescribeKey
     }
 
-    @cached_property
+    @property
+    @lru_cache()
     def alias_map(self):
         aliases = KeyAlias(self.ctx, {}).resources()
         alias_map = {}
