@@ -75,9 +75,50 @@ class TestGCPMetricsFilter(BaseTest):
         metric_filter.process([])
         batch = metric_filter.get_batched_query_filter(resources)
 
-        self.assertEquals(len(batch), 2)
+        self.assertEqual(len(batch), 2)
         self.assertLess(len(batch[0]), 11000)
         self.assertIn('resource.labels.zone = "us-east4-d"', batch[0])
         self.assertIn('metric.type = "compute.googleapis.com/instance/cpu/utilization"', batch[0])
         self.assertIn('resource.labels.zone = "us-east4-d"', batch[1])
         self.assertIn('metric.type = "compute.googleapis.com/instance/cpu/utilization"', batch[1])
+
+
+class TestSecurityComandCenterFindingsFilter(BaseTest):
+
+    def test_findings(self):
+
+        session_factory = self.replay_flight_data("filter-scc-findings")
+
+        p = self.load_policy(
+            {
+                "name": "test-scc-findings",
+                "resource": "gcp.bucket",
+                "filters": [
+                    {'type': 'scc-findings',
+                     'org': 111111111111,
+                     'key': 'category',
+                     'value': 'BUCKET_LOGGING_DISABLED'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-findings'][0]['category'],
+          'BUCKET_LOGGING_DISABLED')
+
+    def test_findings_no_key(self):
+
+        session_factory = self.replay_flight_data("filter-scc-findings")
+
+        p = self.load_policy(
+            {
+                "name": "test-scc-findings",
+                "resource": "gcp.bucket",
+                "filters": [
+                    {'type': 'scc-findings',
+                     'org': 111111111111}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

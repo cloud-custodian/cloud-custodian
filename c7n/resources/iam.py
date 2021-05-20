@@ -9,7 +9,9 @@ import io
 from datetime import timedelta
 import itertools
 import time
-from xml.etree import ElementTree
+
+# Used to parse saml provider metadata configuration.
+from xml.etree import ElementTree  # nosec nosemgrep
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc

@@ -221,7 +221,8 @@ class Session:
             client_args = {
                 'credential': self.credentials,
                 'raw_response_hook': log_response_data,
-                'retry_policy': C7nRetryPolicy()
+                'retry_policy': C7nRetryPolicy(),
+                'credential_scopes': [self.resource_endpoint + ".default"]
             }
 
             # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351

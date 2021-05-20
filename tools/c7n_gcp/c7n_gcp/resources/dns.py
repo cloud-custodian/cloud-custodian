@@ -20,6 +20,7 @@ class DnsManagedZone(QueryResourceManager):
         name = 'name'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
+        scc_type = "google.cloud.dns.ManagedZone"
 
         @staticmethod
         def get(client, resource_info):
