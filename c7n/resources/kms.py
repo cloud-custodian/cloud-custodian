@@ -51,41 +51,6 @@ class DescribeKey(DescribeSource):
             return results
         return super().get_resources(ids, cache)
 
-    def augment(self, resources):
-        aliases = KeyAlias(self.manager.ctx, {}).resources()
-        alias_map = {}
-        for a in aliases:
-            key_id = a['TargetKeyId']
-            alias_map[key_id] = alias_map.get(key_id, []) + [a['AliasName']]
-
-        client = local_session(self.manager.session_factory).client('kms')
-        for r in resources:
-            key_id = r.get('KeyId')
-
-            # We get `KeyArn` from list_keys and `Arn` from describe_key.
-            # If we already have describe_key details we don't need to fetch
-            # it again.
-            if 'Arn' not in r:
-                try:
-                    key_arn = r.get('KeyArn', key_id)
-                    key_detail = client.describe_key(KeyId=key_arn)['KeyMetadata']
-                    r.update(key_detail)
-                except ClientError as e:
-                    if e.response['Error']['Code'] == 'AccessDeniedException':
-                        self.manager.log.warning(
-                            "Access denied when describing key:%s",
-                            key_id)
-                        # If a describe fails, we still want the `Arn` key
-                        # available since it is a core attribute
-                        r['Arn'] = r['KeyArn']
-                    else:
-                        raise
-
-            if key_id in alias_map:
-                r['AliasNames'] = alias_map[key_id]
-
-        return universal_augment(self.manager, resources)
-
 
 @resources.register('kms-key')
 class Key(QueryResourceManager):
@@ -104,6 +69,41 @@ class Key(QueryResourceManager):
         'config': ConfigSource,
         'describe': DescribeKey
     }
+
+    def augment(self, resources):
+        aliases = KeyAlias(self.ctx, {}).resources()
+        alias_map = {}
+        for a in aliases:
+            key_id = a['TargetKeyId']
+            alias_map[key_id] = alias_map.get(key_id, []) + [a['AliasName']]
+
+        client = local_session(self.session_factory).client('kms')
+        for r in resources:
+            key_id = r.get('KeyId')
+
+            # We get `KeyArn` from list_keys and `Arn` from describe_key.
+            # If we already have describe_key details we don't need to fetch
+            # it again.
+            if 'Arn' not in r:
+                try:
+                    key_arn = r.get('KeyArn', key_id)
+                    key_detail = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                    r.update(key_detail)
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'AccessDeniedException':
+                        self.log.warning(
+                            "Access denied when describing key:%s",
+                            key_id)
+                        # If a describe fails, we still want the `Arn` key
+                        # available since it is a core attribute
+                        r['Arn'] = r['KeyArn']
+                    else:
+                        raise
+
+            if key_id in alias_map:
+                r['AliasNames'] = alias_map[key_id]
+
+        return universal_augment(self, resources)
 
 
 @Key.filter_registry.register('key-rotation-status')

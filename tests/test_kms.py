@@ -90,6 +90,27 @@ class KMSTest(BaseTest):
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
 
+    def test_kms_config_source(self):
+        session_factory = self.replay_flight_data("test_kms_config_source")
+        p = self.load_policy(
+            {
+                "name": "kms-config-source",
+                "resource": "kms-key",
+                "source": "config",
+                "query": [
+                    {"clause": "configuration.description = 'For testing the KMS config source'"}
+                ],
+                "filters": [
+                    {"AliasNames[0]": "alias/config-source-testing"},
+                    {"tag:ConfigTesting": "present"}
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_kms_access_denied(self):
         session_factory = self.replay_flight_data("test_kms_access_denied")
         p = self.load_policy(
