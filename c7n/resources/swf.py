@@ -10,8 +10,8 @@ class DescribeSimpleWorkflow(DescribeSource):
         return universal_augment(self.manager, super().augment(resources))
 
 
-@resources.register('swf')
-class SimpleWorkflow(QueryResourceManager):
+@resources.register('swf-domain')
+class SimpleWorkflowDomain(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'swf'
         arn_type = ''
