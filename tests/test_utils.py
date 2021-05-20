@@ -533,8 +533,8 @@ class UtilTest(BaseTest):
             # no inputs have a key
             ([{"nokey": "tag1", "value": "value1"}], dict, {}),
             # handle tagKey/tagValue format
-            ([{"tagKey": "tag1", "tagValue": "value1"}], dict, {"tag1": "value1"}),
-            ([{"tagKey": "tag1", "tagValue": "value1"}], list, [{"Key": "tag1", "Value": "value1"}]),
+            ([{"tagKey": "tag", "tagValue": "value"}], dict, {"tag": "value"}),
+            ([{"tagKey": "tag", "tagValue": "value"}], list, [{"Key": "tag", "Value": "value"}]),
 
             # DICT inputs
             ({"tag1": "value1"}, list, [{"Key": "tag1", "Value": "value1"}]),
