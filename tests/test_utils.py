@@ -513,8 +513,8 @@ class UtilTest(BaseTest):
     def test_convert_tags(self):
         tbl = []
 
-        # EMPTY inputs
-        for i in ([], {}, None):
+        # expect EMPTY results
+        for i in ([], {}, None, "just a string"):
             tbl.append((i, list, []))
             tbl.append((i, dict, {}))
 
@@ -532,11 +532,15 @@ class UtilTest(BaseTest):
             ([{"key": "tag1", "value": "value1"}, {"nokey": "noval"}], dict, {"tag1": "value1"}),
             # no inputs have a key
             ([{"nokey": "tag1", "value": "value1"}], dict, {}),
+            # handle tagKey/tagValue format
+            ([{"tagKey": "tag1", "tagValue": "value1"}], dict, {"tag1": "value1"}),
+            ([{"tagKey": "tag1", "tagValue": "value1"}], list, [{"Key": "tag1", "Value": "value1"}]),
 
             # DICT inputs
             ({"tag1": "value1"}, list, [{"Key": "tag1", "Value": "value1"}]),
             ({"tag1": "value1"}, dict, {"tag1": "value1"}),
         ])
+
         for row in tbl:
             tags, form, expected = row
             assert utils.convert_tags(tags, form) == expected
@@ -575,7 +579,15 @@ class UtilTest(BaseTest):
             "tag1": "value1",
             "tag2": "value2",
         }
+        tags_list = [
+            {"tagKey": "tag1", "tagValue": "value1"},
+            {"tagKey": "tag2", "tagValue": "value2"},
+        ]
         tags = utils.convert_tags(tags_dict, list)
+        assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['Value'] for t in tags]) == {"value1", "value2"}
+
+        tags = utils.convert_tags(tags_list, list)
         assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
         assert set([t['Value'] for t in tags]) == {"value1", "value2"}
 
@@ -583,10 +595,11 @@ class UtilTest(BaseTest):
         assert set([t['key'] for t in tags]) == {"tag1", "tag2"}
         assert set([t['value'] for t in tags]) == {"value1", "value2"}
 
+        tags = utils.convert_tags(tags_list, list, lower=True)
+        assert set([t['key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['value'] for t in tags]) == {"value1", "value2"}
+
     def test_convert_tags_invalid(self):
-        # check that we raise an error on invalid inputs
-        # input cannot be a str
-        self.assertRaises(ValueError, utils.convert_tags, "bad input", dict)
         # form can only be dict or list
         self.assertRaises(ValueError, utils.convert_tags, None, str)
         self.assertRaises(ValueError, utils.convert_tags, None, tuple)
