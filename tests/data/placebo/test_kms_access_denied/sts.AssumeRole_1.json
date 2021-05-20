@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Credentials": {
+            "AccessKeyId": "ASIAY5Y4D45RCKXDVNSH",
+            "SecretAccessKey": "Su6DBXFWMeR6ObojUe49uk++8OjLMu64cBBKrZay",
+            "SessionToken": "FwoGZXIvYXdzEAwaDAekW/sLwoTjSPadRSK/AdlzTHoR1R8mlxCpYv0SSkqT0/KyWPbvOhZIKeQZ0e6g8c07jyLKevz/n3/m5wrK9/sAo+DUAHKf5JWlDJOYQeOKNsxddvoXhSl0wJj5Q7fA/rgEFDe6OEcElMkeX8pu1HyMSR2XzGnvfEfxysYdTkOmt1i6qfX044R6l0ZaJaqiX1IgKy/mgKU9CoQ0n3mEzGNpjzYach6bK18x5zkLQ8KUkxAFuKCO8H2evJ67E/qOsJ7LDkA953T51Z7cfjg3KOjNmoUGMi08uEyTV4HRZnSgpR01e4G4KMOdBMDULRUZx950Iczd52dsG0s/i5IfWZTTtrY=",
+            "Expiration": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 5,
+                "day": 20,
+                "hour": 19,
+                "minute": 14,
+                "second": 0,
+                "microsecond": 0
+            }
+        },
+        "AssumedRoleUser": {
+            "AssumedRoleId": "AROAY5Y4D45RB4HB76LFB:botocore-session-1621534440",
+            "Arn": "arn:aws:sts::644160558196:assumed-role/custodian-readonly/botocore-session-1621534440"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -60,24 +60,29 @@ class DescribeKey(DescribeSource):
 
         client = local_session(self.manager.session_factory).client('kms')
         for r in resources:
-            try:
-                key_id = r.get('KeyId')
-                # We get `KeyArn` from list_keys and `Arn` from describe_key.
-                # If we already have describe_key info we don't need to fetch
-                # it again.
-                if 'Arn' not in r:
+            key_id = r.get('KeyId')
+
+            # We get `KeyArn` from list_keys and `Arn` from describe_key.
+            # If we already have describe_key details we don't need to fetch
+            # it again.
+            if 'Arn' not in r:
+                try:
                     key_arn = r.get('KeyArn', key_id)
-                    info = client.describe_key(KeyId=key_arn)['KeyMetadata']
-                    r.update(info)
-                if key_id in alias_map:
-                    r['AliasNames'] = alias_map[key_id]
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.manager.log.warning(
-                        "Access denied when describing key:%s",
-                        key_id)
-                else:
-                    raise
+                    key_detail = client.describe_key(KeyId=key_arn)['KeyMetadata']
+                    r.update(key_detail)
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'AccessDeniedException':
+                        self.manager.log.warning(
+                            "Access denied when describing key:%s",
+                            key_id)
+                        # If a describe fails, we still want the `Arn` key
+                        # available since it is a core attribute
+                        r['Arn'] = r['KeyArn']
+                    else:
+                        raise
+
+            if key_id in alias_map:
+                r['AliasNames'] = alias_map[key_id]
 
         return universal_augment(self.manager, resources)
 

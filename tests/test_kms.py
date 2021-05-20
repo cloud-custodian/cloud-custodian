@@ -90,6 +90,30 @@ class KMSTest(BaseTest):
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
 
+    def test_kms_access_denied(self):
+        session_factory = self.replay_flight_data("test_kms_access_denied")
+        p = self.load_policy(
+            {
+                "name": "survive-access-denied",
+                "resource": "kms-key",
+                "filters": [
+                    {"type": "value",
+                     "key": "AliasNames[0]",
+                     "op": "glob",
+                     "value": "alias/test-kms*"}
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-west-1"}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        # Restrictive key policies may prevent us from loading detailed
+        # key information, but we should always have an Arn
+        self.assertFalse(all('KeyState' in r for r in resources))
+        self.assertTrue(all('Arn' in r for r in resources))
+
     @functional
     def test_kms_remove_matched(self):
         session_factory = self.replay_flight_data("test_kms_remove_matched")
