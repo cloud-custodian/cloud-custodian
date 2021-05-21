@@ -1,26 +1,14 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
 
 import requests
-import six
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import get_rendered_jinja
 from c7n_mailer.utils_email import is_email
 
 
-class SlackDelivery(object):
+class SlackDelivery:
 
     def __init__(self, config, logger, email_handler):
         self.caching = self.cache_factory(config, config.get('cache_engine', None))
@@ -47,7 +35,7 @@ class SlackDelivery(object):
             if target == 'slack://owners':
                 to_addrs_to_resources_map = \
                     self.email_handler.get_email_to_addrs_to_resources_map(sqs_message)
-                for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
+                for to_addrs, resources in to_addrs_to_resources_map.items():
 
                     resolved_addrs = self.retrieve_user_im(list(to_addrs))
 

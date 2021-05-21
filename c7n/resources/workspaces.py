@@ -1,23 +1,10 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import functools
 import itertools
 
 from c7n.filters import ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
@@ -33,6 +20,7 @@ class Workspace(QueryResourceManager):
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
+        cfn_type = 'AWS::WorkSpaces::Workspace'
 
     def augment(self, resources):
         return universal_augment(self, resources)
@@ -70,7 +58,7 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
     schema = type_schema('connection-status', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('workspaces:DescribeConnectionStatus',)
+    permissions = ('workspaces:DescribeWorkspacesConnectionStatus',)
     annotation_key = 'c7n:ConnectionStatus'
 
     def get_connection_status(self, client, workspace_ids):
@@ -97,3 +85,9 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
     def get_resource_value(self, k, i):
         return super(WorkspaceConnectionStatusFilter, self).get_resource_value(
             k, i[self.annotation_key])
+
+
+@Workspace.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'VolumeEncryptionKey'

@@ -1,0 +1,20 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 29 Mar 2021 13:59:43 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "631",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "uploadUrl": "https://storage.googleapis.com/gcf-upload-us-central1-db550cf8-9d78-456c-96b1-6069320edaa3/f89d2596-4ecf-4488-a79e-ac6ca774c786.zip?GoogleAccessId=service-99999999999@gcf-admin-robot.iam.gserviceaccount.com&Expires=1617028182&Signature=vMAJdLOJSWspft8eLsqjs0sDI4JgkZQrrxR88Vq1iRkoHqoIM%2BC61ALIrHPTOi60ILcOh4B3y2ORQ469M5mk9ti7xy6KU3JXUwk67v2sV%2B4zVEQ9stdgNujPUxPCamtP65%2BeGwc5eBwLNNppTO0j%2BR2hmB%2BVRnaVI1MvGm3hQUyWmFAwwHfDtTUh%2F%2FPEd%2FKBsbURFYgbToOMuEzePDcFxYDvuVIzri%2F1oiid1PIVgaosJP1%2BZ4srQbHBlVde62TDSqZwkG9RfA3rRIj1Q22UxzoZAQSGUD9RCBiY1M6Q4Z%2FVqnBFa4r76rmv49ENEuI9KyzI%2BtLw5jO2qv3XbRWSIA%3D%3D"
+  }
+}

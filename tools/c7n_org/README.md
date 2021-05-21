@@ -143,20 +143,27 @@ output
 
 Use `c7n-org report` to generate a csv report from the output directory.
 
-## Selecting accounts and policy for execution
+## Selecting accounts, regions, policies for execution
 
 You can filter the accounts to be run against by either passing the
 account name or id via the `-a` flag, which can be specified multiple
-times.
+times, or alternatively with comma separated values.
 
 Groups of accounts can also be selected for execution by specifying
 the `-t` tag filter.  Account tags are specified in the config
 file. ie given the above accounts config file you can specify all prod
-accounts with `-t type:prod`.
+accounts with `-t type:prod`. you can specify the -t flag multiple
+times or use a comma separated list.
 
 You can specify which policies to use for execution by either
 specifying `-p` or selecting groups of policies via their tags with
-`-l`.
+`-l`, both options support being specified multiple times or using
+comma separated values.
+
+By default in aws, c7n-org will execute in parallel across regions,
+the '-r' flag can be specified multiple times, and defaults to
+(us-east-1, us-west-2).  a special value of `all` will execute across
+all regions.
 
 
 See `c7n-org run --help` for more information.
@@ -198,9 +205,10 @@ don't require quoting, i.e., "my_{charge_code}".
 
 ## Other commands
 
-c7n-org also supports running arbitrary scripts on AWS against
-accounts via the run-script command, which exports standard AWS SDK
-credential information into the process environment before executing.
+c7n-org also supports running arbitrary scripts against accounts via the run-script command.
+For AWS the standard AWS SDK credential information is exported into the process environment before executing.
+For Azure and GCP, only the environment variables `AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition
+of the system env variables).
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.

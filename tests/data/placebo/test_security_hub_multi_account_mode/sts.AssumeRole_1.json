@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Credentials": {
+            "AccessKeyId": "ASIAZL6XWCR2GOMA123",
+            "SecretAccessKey": "8MRAN32++RGwfMhuzLLB0kjV71hYROeJIz9abdEE",
+            "SessionToken": "FwoGZXIvYXdzEAYaDMqD1qEObDBTVaqTyiKxAXJSbRVG5CUSPyWhkLK/KrrkrlXyHN/ociAzIjVK5kQIV5+Nh1LDUb/vduDm15yjlj56iVHc80EvtaP3mCUioqf3U3z23bw5/gO/UsjXLEk6IhJkDyG8LL3TOtvzlVWKi6JaUoihcwOr/CblWgOQf9aXRb48lOFYUa7PjWtITMbtH3wUPQ9M/SjF7V+rMrZrm8Ckz2X1613exwC4/SEqHqPFBVxDqd9OaVjXIC7KU48oiSjU5P3wBTIt8K2FcwXiEASnxQj9unK2ztAjM1XAlzOocyY1i8L4XAQ4Fb2aJlmlg4WKobrb",
+            "Expiration": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 1,
+                "day": 15,
+                "hour": 21,
+                "minute": 13,
+                "second": 8,
+                "microsecond": 0
+            }
+        },
+        "AssumedRoleUser": {
+            "AssumedRoleId": "AROAIS6DAH72KKDTPRAXA:CustodianTest",
+            "Arn": "arn:aws:sts::644160558196:assumed-role/CustodianGuardDuty/CustodianTest"
+        },
+        "ResponseMetadata": {
+            "RequestId": "725dd3a7-37d3-11ea-bd96-29aca0018fe3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "725dd3a7-37d3-11ea-bd96-29aca0018fe3",
+                "content-type": "text/xml",
+                "content-length": "1055",
+                "date": "Wed, 15 Jan 2020 20:13:08 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

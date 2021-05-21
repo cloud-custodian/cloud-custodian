@@ -1,21 +1,9 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
+from unittest.mock import MagicMock
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -102,6 +90,102 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
 
+    def test_continuous_backup_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-filters",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], # noqa
+            "DISABLED")
+
+    def test_continuous_backup_action(self):
+        session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")
+        client = session_factory().client("dynamodb")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-action",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-continuous-backup"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"],  # noqa
+            "DISABLED")
+        res = client.describe_continuous_backups(TableName=resources[0]["TableName"])['ContinuousBackupsDescription']  # noqa
+        self.assertEqual(
+            res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"],
+            'ENABLED')
+
+    def test_continuous_backup_action_error(self):
+        factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")
+
+        client = factory().client("dynamodb")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'dynamodb').exceptions.TableNotFoundException = (
+                client.exceptions.TableNotFoundException)
+
+        mock_factory().client('dynamodb').update_continuous_backups.side_effect = (
+            client.exceptions.TableNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='update_continuous_backups'))
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-action",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-continuous-backup"
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+        try:
+            p.resource_manager.actions[0].process([{'TableName': 'abc', 'TableStatus': 'ACTIVE'}])
+        except client.exceptions.TableNotFoundException:
+            self.fail('should not raise')
+        mock_factory().client('dynamodb').update_continuous_backups.assert_called_once()
+
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
         client = session_factory().client("dynamodb")
@@ -116,7 +200,7 @@ class DynamodbTest(BaseTest):
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "days": 0,
+                        "days": 1,
                         "op": "delete",
                         "tag": "test_tag",
                     }

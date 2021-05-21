@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 SQS Message Processing
 ===============
@@ -22,8 +11,6 @@ import logging
 import traceback
 import zlib
 
-import six
-
 from .email_delivery import EmailDelivery
 from .sns_delivery import SnsDelivery
 
@@ -32,7 +19,7 @@ from c7n_mailer.utils import kms_decrypt
 DATA_MESSAGE = "maidmsg/1.0"
 
 
-class MailerSqsQueueIterator(object):
+class MailerSqsQueueIterator:
     # Copied from custodian to avoid runtime library dependency
     msg_attributes = ['sequence_id', 'op', 'ser']
 
@@ -75,7 +62,7 @@ class MailerSqsQueueIterator(object):
             ReceiptHandle=m['ReceiptHandle'])
 
 
-class MailerSqsQueueProcessor(object):
+class MailerSqsQueueProcessor:
 
     def __init__(self, config, session, logger, max_num_processes=16):
         self.config = config
@@ -83,6 +70,7 @@ class MailerSqsQueueProcessor(object):
         self.session = session
         self.max_num_processes = max_num_processes
         self.receive_queue = self.config['queue_url']
+        self.endpoint_url = self.config.get('endpoint_url', None)
         if self.config.get('debug', False):
             self.logger.debug('debug logging is turned on from mailer config file.')
             logger.setLevel(logging.DEBUG)
@@ -105,7 +93,7 @@ class MailerSqsQueueProcessor(object):
     """
     def run(self, parallel=False):
         self.logger.info("Downloading messages from the SQS queue.")
-        aws_sqs = self.session.client('sqs')
+        aws_sqs = self.session.client('sqs', endpoint_url=self.endpoint_url)
         sqs_messages = MailerSqsQueueIterator(aws_sqs, self.receive_queue, self.logger)
 
         sqs_messages.msg_attributes = ['mtype', 'recipient']
@@ -160,7 +148,7 @@ class MailerSqsQueueProcessor(object):
         # and send any emails (to SES or SMTP) if there are email addresses found
         email_delivery = EmailDelivery(self.config, self.session, self.logger)
         to_addrs_to_email_messages_map = email_delivery.get_to_addrs_email_messages_map(sqs_message)
-        for email_to_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
+        for email_to_addrs, mimetext_msg in to_addrs_to_email_messages_map.items():
             email_delivery.send_c7n_email(sqs_message, list(email_to_addrs), mimetext_msg)
 
         # this sections gets the map of sns_to_addresses to rendered_jinja messages

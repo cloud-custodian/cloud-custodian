@@ -1,32 +1,19 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer/SQSDefaultPolicy\",\"Statement\":[{\"Sid\":\"Sid1483703606926\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:*\",\"Resource\":\"arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer\"}]}", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1483525735", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1483703607", 
-            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:whit537-testing-mailer"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "354bd4e2-c4a2-5545-abc9-857561eb25b9", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "354bd4e2-c4a2-5545-abc9-857561eb25b9", 
-                "content-length": "1651", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 13:35:05 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:add59a4d-ea1e-2f39-34ca-6cb94b9c25bb",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1599099137",
+            "LastModifiedTimestamp": "1599099137",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
+        "ResponseMetadata": {}
     }
 }

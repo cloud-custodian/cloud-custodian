@@ -1,5 +1,6 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
-import six
 
 from abc import ABCMeta, abstractmethod
 
@@ -7,8 +8,7 @@ from c7n.utils import local_session
 from c7n_azure.session import Session
 
 
-@six.add_metaclass(ABCMeta)
-class DeploymentUnit:
+class DeploymentUnit(metaclass=ABCMeta):
     log = logging.getLogger('custodian.azure.deployment_unit.DeploymentUnit')
 
     def __init__(self, client):

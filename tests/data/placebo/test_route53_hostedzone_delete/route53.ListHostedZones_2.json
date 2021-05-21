@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z016061795MC0AU0Z2UW",
+                "Name": "custodian.net.",
+                "CallerReference": "terraform-20201008130027248200000001",
+                "Config": {
+                    "Comment": "Managed by Terraform",
+                    "PrivateZone": false
+                },
+                "ResourceRecordSetCount": 3
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

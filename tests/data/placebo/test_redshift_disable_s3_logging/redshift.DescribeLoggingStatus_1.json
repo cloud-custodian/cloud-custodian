@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoggingEnabled": false,
+        "BucketName": "redshiftlogtest2",
+        "S3KeyPrefix": "redshiftlogs/",
+        "ResponseMetadata": {
+            "RequestId": "5e5de3f4-2362-11ea-b6af-7126da6f11af",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5e5de3f4-2362-11ea-b6af-7126da6f11af",
+                "content-type": "text/xml",
+                "content-length": "425",
+                "date": "Fri, 20 Dec 2019 19:53:17 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

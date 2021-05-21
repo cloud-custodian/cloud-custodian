@@ -1,21 +1,8 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 from mock import MagicMock, call
 
@@ -26,7 +13,18 @@ from c7n.utils import yaml_load
 from .common import BaseTest
 
 
-class UniversalAugmentTest(BaseTest):
+class UniversalTagTest(BaseTest):
+
+    def test_auto_tag_registration(self):
+        try:
+            self.load_policy({
+                'name': 'sfn-auto',
+                'resource': 'step-machine',
+                'mode': {'type': 'cloudtrail',
+                         'events': [{'ids': 'some', 'source': 'thing', 'event': 'wicked'}]},
+                'actions': [{'type': 'auto-tag-user', 'tag': 'creator'}]})
+        except Exception as e:
+            self.fail('auto-tag policy failed to load %s' % e)
 
     def test_universal_augment_resource_missing_tags(self):
         session_factory = self.replay_flight_data('test_tags_universal_augment_missing_tags')
@@ -46,9 +44,6 @@ class UniversalAugmentTest(BaseTest):
         )
         results = policy.run()
         self.assertTrue('Tags' in results[0])
-
-
-class UniversalTagRetry(BaseTest):
 
     def test_retry_no_error(self):
         mock = MagicMock()

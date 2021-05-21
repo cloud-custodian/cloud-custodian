@@ -1,18 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from .core import ValueFilter
 from .related import RelatedResourceFilter
@@ -21,20 +8,36 @@ from c7n.utils import local_session, type_schema
 
 class KmsRelatedFilter(RelatedResourceFilter):
     """
-    Filter a resource by its associcated kms key and optionally the aliasname
+    Filter a resource by its associated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
 
     :example:
 
+    Match a specific key alias:
+
         .. code-block:: yaml
 
             policies:
-                - name:
+                - name: dms-encrypt-key-check
                   resource: dms-instance
                   filters:
                     - type: kms-key
-                      key: c7n:AliasName
+                      key: "c7n:AliasName"
                       value: alias/aws/dms
+
+    Or match against native key attributes such as ``KeyManager``, which
+    more explicitly distinguishes between ``AWS`` and ``CUSTOMER``-managed
+    keys. The above policy can also be written as:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: dms-aws-managed-key
+                  resource: dms-instance
+                  filters:
+                    - type: kms-key
+                      key: KeyManager
+                      value: AWS
     """
 
     schema = type_schema(
@@ -43,6 +46,16 @@ class KmsRelatedFilter(RelatedResourceFilter):
            'operator': {'enum': ['and', 'or']}})
     RelatedResource = "c7n.resources.kms.Key"
     AnnotationKey = "matched-kms-key"
+
+    def get_related_ids(self, resources):
+        related_ids = super().get_related_ids(resources)
+        normalized_ids = []
+        for rid in related_ids:
+            if rid.startswith('arn:'):
+                normalized_ids.append(rid.rsplit('/', 1)[-1])
+            else:
+                normalized_ids.append(rid)
+        return normalized_ids
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('kms')

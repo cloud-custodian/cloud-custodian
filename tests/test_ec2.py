@@ -1,28 +1,15 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
 import time
 
-from datetime import datetime
+import datetime
 from dateutil import tz
 import jmespath
 from mock import mock
-from jsonschema.exceptions import ValidationError
 
+from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
@@ -108,6 +95,43 @@ class TestInstanceAttrFilter(BaseTest):
         self.assertEqual(
             resources[0]["c7n:attribute-rootDeviceName"], {"Value": "/dev/sda1"}
         )
+
+
+class TestSetMetadata(BaseTest):
+
+    def test_set_metadata_server(self):
+        output = self.capture_logging('custodian.actions')
+        session_factory = self.replay_flight_data('test_ec2_set_md_access')
+        policy = self.load_policy({
+            'name': 'ec2-imds-access',
+            'resource': 'aws.ec2',
+            'actions': [
+                {'type': 'set-metadata-access',
+                 'tokens': 'required'},
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        if self.recording:
+            time.sleep(2)
+        results = session_factory().client('ec2').describe_instances(
+            InstanceIds=[r['InstanceId'] for r in resources])
+        self.assertJmes('[0].MetadataOptions.HttpTokens', resources, 'optional')
+        self.assertJmes(
+            'Reservations[].Instances[].MetadataOptions',
+            results,
+            [{'HttpEndpoint': 'enabled',
+              'HttpPutResponseHopLimit': 1,
+              'HttpTokens': 'required',
+              'State': 'pending'},
+             {'HttpEndpoint': 'enabled',
+              'HttpPutResponseHopLimit': 1,
+              'HttpTokens': 'required',
+              'State': 'applied'}])
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            output.getvalue(),
+            ('set-metadata-access implicitly filtered 1 of 2 resources '
+             'key:MetadataOptions.HttpTokens on optional\n'))
 
 
 class TestMetricFilter(BaseTest):
@@ -213,13 +237,11 @@ class TestDisableApiTermination(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "ec2:DescribeInstanceAttribute",
-                )
-            ),
+            {
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "ec2:DescribeInstanceAttribute",
+            },
         )
 
 
@@ -259,6 +281,34 @@ class TestSsm(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue('c7n:SsmState' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
+
+    def test_ssm_compliance(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_compliance_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm-compliance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm-compliance',
+                 'compliance_types': [
+                     'Association',
+                     'Patch'
+                 ],
+                 'severity': [
+                     'CRITICAL',
+                     'HIGH',
+                     'MEDIUM',
+                     'LOW',
+                     'UNSPECIFIED'
+                 ],
+                 'states': ['NON_COMPLIANT']}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:ssm-compliance' in resources[0])
         self.assertEqual(
             [r['InstanceId'] for r in resources],
             ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
@@ -487,7 +537,7 @@ class TestStateTransitionAgeFilter(BaseTest):
             instance.get_resource_date(
                 {"StateTransitionReason": "User initiated (2017-02-06 17:57:00 GMT)"}
             ),
-            datetime(2017, 2, 6, 17, 57, tzinfo=tz.tzutc()),
+            datetime.datetime(2017, 2, 6, 17, 57, tzinfo=tz.tzutc()),
         )
 
 
@@ -717,7 +767,7 @@ class TestTag(BaseTest):
 
     def test_ec2_mark_zero(self):
         localtz = tz.gettz("America/New_York")
-        dt = datetime.now(localtz)
+        dt = datetime.datetime.now(localtz)
         dt = dt.replace(year=2017, month=11, day=24, hour=7, minute=00)
         session_factory = self.replay_flight_data("test_ec2_mark_zero")
         session = session_factory(region="us-east-1")
@@ -757,7 +807,7 @@ class TestTag(BaseTest):
             0
         ]
         tags = [t["Value"] for t in resource["Tags"] if t["Key"] == "maid_status"]
-        result = datetime.strptime(
+        result = datetime.datetime.strptime(
             tags[0].strip().split("@", 1)[-1], "%Y/%m/%d"
         ).replace(
             tzinfo=localtz
@@ -766,7 +816,7 @@ class TestTag(BaseTest):
 
     def test_ec2_mark_hours(self):
         localtz = tz.gettz("America/New_York")
-        dt = datetime.now(localtz)
+        dt = datetime.datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=2, day=20, hour=18, minute=00, second=0, microsecond=0
         )
@@ -805,7 +855,7 @@ class TestTag(BaseTest):
             0
         ]
         tags = [t["Value"] for t in resource["Tags"] if t["Key"] == "hourly-mark"]
-        result = datetime.strptime(
+        result = datetime.datetime.strptime(
             tags[0].strip().split("@", 1)[-1], "%Y/%m/%d %H%M %Z"
         ).replace(
             tzinfo=localtz
@@ -849,6 +899,42 @@ class TestStop(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ec2_stop_hibernate(self):
+        session_factory = self.replay_flight_data("test_ec2_stop_hibernate")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-hibernate",
+                "resource": "ec2",
+                "query": [{"tag-key": "Testing"}],
+                "actions": [{"type": "stop", "hibernate": True}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        if self.recording:
+            time.sleep(25)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=[r["InstanceId"] for r in resources]
+        )
+
+        stopped = [
+            i
+            for i in instances
+            if i["StateReason"]["Code"] == "Client.UserInitiatedShutdown"
+        ]
+        hibernated = [
+            i
+            for i in instances
+            if i["StateReason"]["Code"] == "Client.UserInitiatedHibernate"
+        ]
+
+        self.assertEqual(len(stopped), 1)
+        self.assertEqual(len(hibernated), 1)
 
 
 class TestReboot(BaseTest):
@@ -1086,6 +1172,30 @@ class TestSnapshot(BaseTest):
         for s in snaps:
             self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 
+    def test_ec2_snapshot_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_snapshot_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-snapshot",
+                "resource": "ec2",
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage'],
+                             "tags": {"test-tag": 'custodian'}}]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('App')
+        rtags['test-tag'] = 'custodian'
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+
 
 class TestSetInstanceProfile(BaseTest):
 
@@ -1271,6 +1381,134 @@ class TestSingletonFilter(BaseTest):
         self.assertEqual(resources[0]["InstanceId"], "i-00fe7967fb7167c62")
 
 
+class TestOffHoursFilter(BaseTest):
+
+    def test_ec2_offhours_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_offhours_filter")
+
+        t = datetime.datetime.now(tz.gettz("America/New_York"))
+        t = t.replace(year=2020, month=2, day=11, hour=19, minute=00)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy(
+                {
+                    "name": "ec2-offhours",
+                    "resource": "ec2",
+                    "query": [{"tag-key": "c7n_test"}],
+                    "filters": [
+                        {
+                            "type": "offhour",
+                            "offhour": 19,
+                            "tag": "custodian_downtime",
+                            "default_tz": "utc",
+                            "opt-out": True,
+                            "weekends": False,
+                        },
+                    ],
+                },
+                config={"region": "us-west-2"},
+                session_factory=session_factory,
+            )
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+    def test_ec2_offhours_no_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_offhours_no_filter")
+
+        t = datetime.datetime.now(tz.gettz("America/New_York"))
+        t = t.replace(year=2020, month=2, day=11, hour=19, minute=00)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy(
+                {
+                    "name": "ec2-offhours",
+                    "resource": "ec2",
+                    "query": [{"tag-key": "c7n_test"}],
+                    "filters": [
+                        {
+                            "type": "offhour",
+                            "offhour": 19,
+                            "tag": "custodian_downtime",
+                            "default_tz": "utc",
+                            "opt-out": True,
+                            "weekends": False,
+                            "state-filter": False,
+                        },
+                    ],
+                },
+                config={"region": "us-west-2"},
+                session_factory=session_factory,
+            )
+
+            resources = p.run()
+            self.assertEqual(len(resources), 2)
+
+
+class TestOnHoursFilter(BaseTest):
+
+    def test_ec2_onhours_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_onhours_filter")
+
+        t = datetime.datetime.now(tz.gettz("America/New_York"))
+        t = t.replace(year=2020, month=2, day=11, hour=7, minute=00)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy(
+                {
+                    "name": "ec2-onhours",
+                    "resource": "ec2",
+                    "query": [{"tag-key": "c7n_test"}],
+                    "filters": [
+                        {
+                            "type": "onhour",
+                            "onhour": 7,
+                            "tag": "custodian_downtime",
+                            "default_tz": "utc",
+                            "opt-out": True,
+                            "weekends": False,
+                        },
+                    ],
+                },
+                config={"region": "us-west-2"},
+                session_factory=session_factory,
+            )
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+    def test_ec2_onhours_no_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_onhours_no_filter")
+
+        t = datetime.datetime.now(tz.gettz("America/New_York"))
+        t = t.replace(year=2020, month=2, day=11, hour=7, minute=00)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy(
+                {
+                    "name": "ec2-onhours",
+                    "resource": "ec2",
+                    "query": [{"tag-key": "c7n_test"}],
+                    "filters": [
+                        {
+                            "type": "onhour",
+                            "onhour": 7,
+                            "tag": "custodian_downtime",
+                            "default_tz": "utc",
+                            "opt-out": True,
+                            "weekends": False,
+                            "state-filter": False,
+                        },
+                    ],
+                },
+                config={"region": "us-west-2"},
+                session_factory=session_factory,
+            )
+
+            resources = p.run()
+            self.assertEqual(len(resources), 2)
+
+
 class TestActions(unittest.TestCase):
 
     def test_action_construction(self):
@@ -1290,7 +1528,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             "resource": "ec2",
             "actions": [{"type": "modify-security-groups", "remove": "matched"}],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, data=policy, validate=True)
 
     def test_invalid_remove_params(self):
         # string invalid
@@ -1299,7 +1537,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             "resource": "ec2",
             "actions": [{"type": "modify-security-groups", "remove": "none"}],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, data=policy, validate=True)
 
         # list - one valid, one invalid
         policy = {
@@ -1312,7 +1550,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 }
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_valid_add_params(self):
         # string invalid
@@ -1335,7 +1573,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
             "resource": "ec2",
             "actions": [{"type": "modify-security-groups", "isolation-group": "none"}],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, data=policy, validate=True)
 
         # list - one valid, one invalid
         policy = {
@@ -1348,7 +1586,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 }
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, data=policy, validate=True)
 
 
 class TestModifySecurityGroupAction(BaseTest):
@@ -1479,7 +1717,7 @@ class TestModifySecurityGroupAction(BaseTest):
             "filters": [],
             "actions": [{"type": "modify-security-groups", "change": "matched"}],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_ec2_add_security_groups(self):
         # Test conditions:
@@ -1671,3 +1909,71 @@ class TestReservedInstance(BaseTest):
             'resource': 'aws.ec2-reserved'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestMonitoringInstance(BaseTest):
+
+    def test_monitor_instance(self):
+        factory = self.replay_flight_data('test_ec2_monitor_instance')
+        p = self.load_policy({
+            'name': 'ec2-monitor-instance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {
+                    'Monitoring.State': 'disabled'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'set-monitoring',
+                    'state': 'enable'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        instance = utils.query_instances(
+            factory(), InstanceIds=[resources[0]['InstanceId']]
+        )
+        self.assertIn(
+            instance[0]['Monitoring']['State'].lower(), ["enabled", "pending"]
+        )
+
+    def test_unmonitor_instance(self):
+        factory = self.replay_flight_data('test_ec2_unmonitor_instance')
+        p = self.load_policy({
+            'name': 'ec2-unmonitor-instance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {
+                    'Monitoring.State': 'enabled'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'set-monitoring',
+                    'state': 'disable'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        instance = utils.query_instances(
+            factory(), InstanceIds=[resources[0]['InstanceId']]
+        )
+        self.assertIn(
+            instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
+        )
+
+
+class TestDedicatedHost(BaseTest):
+
+    def test_dedicated_host_query(self):
+        factory = self.replay_flight_data('test_ec2_host_query')
+        p = self.load_policy({
+            'name': 'ec2-dedicated-hosts',
+            'resource': 'aws.ec2-host'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

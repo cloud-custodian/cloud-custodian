@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "StreamDescription": {
+            "StreamName": "dev1",
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/dev1",
+            "StreamStatus": "ACTIVE",
+            "Shards": [
+                {
+                    "ShardId": "shardId-644160558196",
+                    "HashKeyRange": {
+                        "StartingHashKey": "0",
+                        "EndingHashKey": "644160558196644160558196644160558196455"
+                    },
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "64416055819664416055819664416055819664416055819625978114"
+                    }
+                }
+            ],
+            "HasMoreShards": false,
+            "RetentionPeriodHours": 24,
+            "StreamCreationTimestamp": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 5,
+                "day": 3,
+                "hour": 10,
+                "minute": 46,
+                "second": 33,
+                "microsecond": 0
+            },
+            "EnhancedMonitoring": [
+                {
+                    "ShardLevelMetrics": []
+                }
+            ],
+            "EncryptionType": "NONE"
+        },
+        "ResponseMetadata": {}
+    }
+}

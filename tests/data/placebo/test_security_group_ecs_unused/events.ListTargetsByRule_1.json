@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Targets": [
+            {
+                "Id": "apichanges-build-target",
+                "Arn": "arn:aws:ecs:us-east-1:644160558196:cluster/apichanges",
+                "RoleArn": "arn:aws:iam::644160558196:role/apichanges-events",
+                "Input": "{}",
+                "EcsParameters": {
+                    "TaskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/apichanges:6",
+                    "TaskCount": 1,
+                    "LaunchType": "FARGATE",
+                    "NetworkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "Subnets": [
+                                "subnet-8e261cb2"
+                            ],
+                            "SecurityGroups": [
+                                "sg-0f026884bba48e350"
+                            ],
+                            "AssignPublicIp": "ENABLED"
+                        }
+                    },
+                    "PlatformVersion": "LATEST"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

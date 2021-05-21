@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Id": "j-2OMWOHFEP8XA9",
+                "Name": "pratyush-emr-test",
+                "Status": {
+                    "State": "WAITING",
+                    "StateChangeReason": {
+                        "Message": "Cluster ready after last step completed"
+                    },
+                    "Timeline": {
+                        "CreationDateTime": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 9,
+                            "day": 27,
+                            "hour": 10,
+                            "minute": 36,
+                            "second": 12,
+                            "microsecond": 558000
+                        },
+                        "ReadyDateTime": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 9,
+                            "day": 27,
+                            "hour": 10,
+                            "minute": 42,
+                            "second": 52,
+                            "microsecond": 754000
+                        }
+                    }
+                },
+                "NormalizedInstanceHours": 106352,
+                "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:644160558196:cluster/j-2OMWOHFEP8XA9"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

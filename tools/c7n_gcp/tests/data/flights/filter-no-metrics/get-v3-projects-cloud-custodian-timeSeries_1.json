@@ -1,0 +1,21 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Apr 2021 18:36:51 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "23",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fcpu%2Futilization%22+AND+metric.labels.instance_name+%3D+%22iap-test-webapp%22+AND++resource.labels.zone+%3D+%22us-east4-d%22&interval.startTime=2021-03-18T18%3A36%3A49.285503%2B00%3A00&interval.endTime=2021-04-01T18%3A36%3A49.285503%2B00%3A00&aggregation.alignmentPeriod=1209600.0s&aggregation.perSeriesAligner=ALIGN_MEAN&aggregation.crossSeriesReducer=REDUCE_NONE&view=FULL&alt=json"
+  },
+  "body": {
+    "unit": "10^2.%"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/test/glue",
+                "AliasArn": "arn:aws:kms:us-east-1:0123456789012:alias/test/glue",
+                "TargetKeyId": "358f7699-4ea5-455a-9c78-1c868301e5a8"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

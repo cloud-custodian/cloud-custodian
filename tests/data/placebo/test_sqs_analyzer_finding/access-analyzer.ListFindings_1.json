@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "findings": [
+            {
+                "action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteMessage",
+                    "sqs:DeleteMessageBatch",
+                    "sqs:GetQueueAttributes",
+                    "sqs:GetQueueUrl",
+                    "sqs:ListDeadLetterSourceQueues",
+                    "sqs:PurgeQueue",
+                    "sqs:ReceiveMessage",
+                    "sqs:SendMessage",
+                    "sqs:SendMessageBatch"
+                ],
+                "analyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 17,
+                    "second": 55,
+                    "microsecond": 0
+                },
+                "condition": {},
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 19,
+                    "hour": 19,
+                    "minute": 52,
+                    "second": 19,
+                    "microsecond": 0
+                },
+                "id": "b90c8d49-2dcd-42e4-a900-f51831e7b9e6",
+                "isPublic": true,
+                "principal": {
+                    "AWS": "*"
+                },
+                "resource": "arn:aws:sqs:us-east-1:644160558196:public-test",
+                "resourceOwnerAccount": "644160558196",
+                "resourceType": "AWS::SQS::Queue",
+                "status": "ACTIVE",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 19,
+                    "hour": 19,
+                    "minute": 52,
+                    "second": 19,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

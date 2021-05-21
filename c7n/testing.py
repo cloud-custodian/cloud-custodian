@@ -1,18 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import functools
 import io
@@ -27,11 +14,12 @@ import unittest
 
 import pytest
 import mock
-import six
 import yaml
 
+from distutils.util import strtobool
+
 from c7n import policy
-from c7n.schema import generate, validate as schema_validate
+from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
 from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
@@ -42,10 +30,15 @@ skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason="We are not validating schemas.")
 functional = pytest.mark.functional
 
+C7N_FUNCTIONAL = strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 
-class CustodianTestCore(object):
+
+class CustodianTestCore:
 
     custodian_schema = None
+    # thread local? tests are single threaded, multiprocess execution
+    policy_loader = PolicyLoader(Config.empty())
+    policy_loader.default_policy_validate = C7N_VALIDATE
 
     def addCleanup(self, func, *args, **kw):
         raise NotImplementedError("subclass required")
@@ -83,32 +76,38 @@ class CustodianTestCore(object):
         return ctx
 
     def load_policy(
-        self,
-        data,
-        config=None,
-        session_factory=None,
-        validate=C7N_VALIDATE,
-        output_dir=None,
-        cache=False,
+            self,
+            data,
+            config=None,
+            session_factory=None,
+            validate=C7N_VALIDATE,
+            output_dir='null://',
+            log_group='null://',
+            cache=False,
     ):
-        if validate:
-            if not self.custodian_schema:
-                self.custodian_schema = generate()
-            errors = schema_validate({"policies": [data]}, self.custodian_schema)
-            if errors:
-                raise errors[0]
+        pdata = {'policies': [data]}
+        if not (config and isinstance(config, Config)):
+            config = self._get_policy_config(
+                log_group=log_group,
+                output_dir=output_dir,
+                cache=cache, **(config or {}))
+        collection = self.policy_loader.load_data(
+            pdata, validate=validate,
+            file_uri="memory://test",
+            session_factory=session_factory,
+            config=config)
+        # policy non schema validation is also lazy initialization
+        [p.validate() for p in collection]
+        return list(collection)[0]
 
-        config = config or {}
-        if not output_dir:
-            temp_dir = self.get_temp_dir()
-            config["output_dir"] = temp_dir
-        if cache:
+    def _get_policy_config(self, **kw):
+        config = kw
+        if kw.get('output_dir') is None or config.get('cache'):
+            config["output_dir"] = temp_dir = self.get_temp_dir()
+        if config.get('cache'):
             config["cache"] = os.path.join(temp_dir, "c7n.cache")
             config["cache_period"] = 300
-        conf = Config.empty(**config)
-        p = policy.Policy(data, conf, session_factory)
-        p.validate()
-        return p
+        return Config.empty(**config)
 
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data, format="json")
@@ -185,7 +184,7 @@ class CustodianTestCore(object):
     # Backport from stdlib for 2.7 compat, drop when 2.7 support is dropped.
     def assertRegex(self, text, expected_regex, msg=None):
         """Fail the test unless the text matches the regular expression."""
-        if isinstance(expected_regex, six.string_types):
+        if isinstance(expected_regex, str):
             assert expected_regex, "expected_regex must not be empty."
             expected_regex = re.compile(expected_regex)
         if not expected_regex.search(text):
@@ -240,7 +239,7 @@ class TextTestIO(io.StringIO):
         # we want to print from (think: traceback.print_exc) so we can't
         # standardize the arg type up at the call sites. Hack it here.
 
-        if not isinstance(b, six.text_type):
+        if not isinstance(b, str):
             b = b.decode("utf8")
         return super(TextTestIO, self).write(b)
 
@@ -270,10 +269,8 @@ def mock_datetime_now(tgt, dt):
         def utcnow(cls):
             return cls.target
 
-        # Python2 & Python3 compatible metaclass
-
     MockedDatetime = DatetimeSubclassMeta(
-        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
+        "datetime",
         (BaseMockedDatetime,),
         {},
     )
