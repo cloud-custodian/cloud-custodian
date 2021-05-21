@@ -3,6 +3,7 @@
 from botocore.exceptions import ClientError
 
 import json
+from collections import defaultdict
 from functools import lru_cache
 
 from c7n.actions import RemovePolicyBase, BaseAction
@@ -114,11 +115,16 @@ class Key(QueryResourceManager):
     @property
     @lru_cache()
     def alias_map(self):
+        """A dict mapping key IDs to aliases
+
+        Fetch key aliases as a flat list, and convert it to a map of
+        key ID -> aliases. We can build this once and use it to
+        augment key resources.
+        """
         aliases = KeyAlias(self.ctx, {}).resources()
-        alias_map = {}
+        alias_map = defaultdict(list)
         for a in aliases:
-            key_id = a['TargetKeyId']
-            alias_map[key_id] = alias_map.get(key_id, []) + [a['AliasName']]
+            alias_map[a['TargetKeyId']].append(a['AliasName'])
         return alias_map
 
 
