@@ -145,7 +145,32 @@
           }
         }
       }
+    },
+    {
+    "name": "[concat(variables('vmName'), '/script1')]",
+    "type": "Microsoft.Compute/virtualMachines/extensions",
+    "location": "[resourceGroup().location]",
+    "apiVersion": "2019-03-01",
+    "dependsOn": [
+      "[concat('Microsoft.Compute/virtualMachines/', concat(variables('vmName')))]"
+    ],
+    "tags": {
+      "displayName": "config-app"
+    },
+    "properties": {
+      "publisher": "Microsoft.Azure.Extensions",
+      "type": "CustomScript",
+      "typeHandlerVersion": "2.1",
+      "autoUpgradeMinorVersion": true,
+      "settings": {
+        "skipDos2Unix":false,
+        "timestamp":123456789
+      },
+      "protectedSettings": {
+         "commandToExecute": "echo foo"
+      }
     }
+  }
   ],
   "outputs": {
     "hostname": {
