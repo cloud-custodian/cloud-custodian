@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
-from c7n.resources.cw import MetricFilterAlarmFilter
+from c7n.resources.cw import LogMetricAlarmFilter
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
@@ -317,8 +317,8 @@ class LogGroupTest(BaseTest):
     def test_log_metric_filter(self):
         session_factory = self.replay_flight_data('test_log_group_log_metric_filter')
         p = self.load_policy(
-            {"name": "log-metric-filter",
-             "resource": "aws.log-metric-filter",
+            {"name": "log-metric",
+             "resource": "aws.log-metric",
              "filters": [
                  {"type": "value",
                   "key": "logGroupName",
@@ -331,8 +331,8 @@ class LogGroupTest(BaseTest):
     def test_log_metric_filter_alarm(self):
         session_factory = self.replay_flight_data('test_log_group_log_metric_filter_alarm')
         p = self.load_policy(
-            {"name": "log-metric-filter",
-             "resource": "aws.log-metric-filter",
+            {"name": "log-metric",
+             "resource": "aws.log-metric",
              "filters": [
                  {"type": "value",
                   "key": "logGroupName",
@@ -349,7 +349,7 @@ class LogGroupTest(BaseTest):
 
         # Ensure matching test results whether we fetch alarms
         # individually or in bulk
-        MetricFilterAlarmFilter.FetchThreshold = 0
+        LogMetricAlarmFilter.FetchThreshold = 0
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertIn('c7n:MetricAlarms', resources[0])

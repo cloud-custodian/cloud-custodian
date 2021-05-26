@@ -468,8 +468,8 @@ class LogGroupMetrics(MetricsFilter):
         return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
 
-@resources.register('log-metric-filter')
-class LogMetricFilterResource(QueryResourceManager):
+@resources.register('log-metric')
+class LogMetric(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'logs'
         enum_spec = ('describe_metric_filters', 'metricFilters', None)
@@ -479,8 +479,8 @@ class LogMetricFilterResource(QueryResourceManager):
         cfn_type = 'AWS::Logs::MetricFilter'
 
 
-@LogMetricFilterResource.filter_registry.register('alarm')
-class MetricFilterAlarmFilter(ValueFilter):
+@LogMetric.filter_registry.register('alarm')
+class LogMetricAlarmFilter(ValueFilter):
     """
     Filter log metric filters based on associated alarms.
 
@@ -489,8 +489,8 @@ class MetricFilterAlarmFilter(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: log-metric-filters-with-alarms
-            resource: aws.log-metric-filter
+          - name: log-metrics-with-alarms
+            resource: aws.log-metric
             filters:
               - type: alarm
                 key: AlarmName
@@ -519,7 +519,7 @@ class MetricFilterAlarmFilter(ValueFilter):
                     for t in r.get('metricTransformations', ())
                 )))
         else:
-            alarms = Alarm(self.manager.ctx, {}).resources()
+            alarms = self.manager.get_resource_manager('aws.alarm').resources()
 
             # We'll be matching resources to alarms based on namespace and
             # metric name - this lookup table makes that smoother
@@ -535,7 +535,7 @@ class MetricFilterAlarmFilter(ValueFilter):
 
     def get_permissions(self):
         return [
-            *Alarm(self.manager.ctx, {}).get_permissions(),
+            *self.manager.get_resource_manager('aws.alarm').get_permissions(),
             'cloudwatch:DescribeAlarmsForMetric'
         ]
 
