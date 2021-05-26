@@ -1185,7 +1185,7 @@ class CloudWatchEventSource(AWSEventBase):
             log.info("Removing cwe targets and rule %s", func.event_name)
             try:
                 targets = self.client.list_targets_by_rule(
-                    Rule=func.name)['Targets']
+                    Rule=func.event_name)['Targets']
                 if targets:
                     self.client.remove_targets(
                         Rule=func.event_name,
@@ -1195,6 +1195,14 @@ class CloudWatchEventSource(AWSEventBase):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
+            client = self.session.client("lambda")
+            try:
+                LambdaConflictRetry(
+                    client.remove_permission,
+                    FunctionName=func.name,
+                    StatementId=func.event_name)
+            except client.ResourceNotFoundException:
+                pass
             return True
 
 
@@ -1719,6 +1727,16 @@ class ConfigRule(AWSEventBase):
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)
-            return True
         except self.client.exceptions.NoSuchConfigRuleException:
+            pass
+
+        client = self.session.client("lambda")
+        try:
+            LambdaConflictRetry(
+                client.remove_permission,
+                FunctionName=func.name,
+                StatementId=func.name,
+            )
+            return True
+        except client.ResourceNotFoundException:
             pass
