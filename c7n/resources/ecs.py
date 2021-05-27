@@ -574,6 +574,9 @@ class TaskDefinition(query.QueryResourceManager):
         'describe': DescribeTaskDefinition
     }
 
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(TaskDefinition, self).get_resources(ids, cache, augment=False)
+
 
 @TaskDefinition.action_registry.register('delete')
 class DeleteTaskDefinition(BaseAction):
