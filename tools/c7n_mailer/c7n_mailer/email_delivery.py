@@ -18,8 +18,23 @@ class EmailDelivery:
         self.config = config
         self.logger = logger
         self.session = session
-        self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
+        self.aws_ses = self.get_ses_session()
         self.ldap_lookup = self.get_ldap_connection()
+
+    def get_ses_session(self):
+        if self.config.get('ses_role', False):
+            creds = self.session.client('sts').assume_role(
+                RoleArn=self.config.get('ses_role'),
+                RoleSessionName='CustodianNotification')['Credentials']
+
+            return self.session.client(
+                'ses',
+                region_name=self.config.get('ses_region'),
+                aws_access_key_id=creds['AccessKeyId'],
+                aws_secret_access_key=creds['SecretAccessKey'],
+                aws_session_token=creds['SessionToken'])
+
+        return self.session.client('ses', region_name=self.config.get('ses_region'))
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
