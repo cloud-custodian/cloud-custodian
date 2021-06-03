@@ -134,7 +134,8 @@ class RestApi(query.QueryResourceManager):
         id = 'id'
         name = 'name'
         date = 'createdDate'
-        dimension = 'GatewayName'
+        dimension = 'ApiName'
+        dimension_field = 'name'
         cfn_type = config_type = "AWS::ApiGateway::RestApi"
         universal_taggable = object()
         permissions_enum = ('apigateway:GET',)

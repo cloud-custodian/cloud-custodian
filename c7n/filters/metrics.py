@@ -97,6 +97,7 @@ class MetricsFilter(Filter):
 
     # ditto for spot fleet
     DEFAULT_NAMESPACE = {
+        'apigateway': 'AWS/ApiGateway',
         'cloudfront': 'AWS/CloudFront',
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
@@ -163,7 +164,7 @@ class MetricsFilter(Filter):
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
-                 'Value': resource[self.model.dimension]}]
+                 'Value': resource[self.model.dimension_field or self.model.dimension]}]
 
     def get_user_dimensions(self):
         dims = []
