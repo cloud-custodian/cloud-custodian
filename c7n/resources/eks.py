@@ -4,11 +4,59 @@ from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n import tags
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
+from c7n import query
 from c7n.utils import local_session, type_schema
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
+
+
+@query.sources.register('describe-eks-nodegroup')
+class NodeGroupDescribeSource(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super(NodeGroupDescribeSource, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        results = []
+        with self.manager.executor_factory(
+                max_workers=self.manager.max_workers) as w:
+            client = local_session(self.manager.session_factory).client('eks')
+            for clusterName, nodegroupName in resources:
+                nodegroup = client.describe_nodegroup(
+                        clusterName=clusterName,
+                        nodegroupName=nodegroupName
+                    )['nodegroup']
+                if 'tags' in nodegroup:
+                    nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+                results.append(nodegroup)
+        return results
+
+
+@resources.register('nodegroup')
+class NodeGroup(ChildResourceManager):
+
+    chunk_size = 10
+
+    class resource_type(TypeInfo):
+
+        service = 'eks'
+        arn = 'arn'
+        arn_type = 'nodegroup'
+        name = id = 'nodegroup-name'
+        enum_spec = ('list_nodegroups', 'nodegroups', None)
+        detail_spec = ('describe_nodegroup', 'nodegroupName', 'clusterName', None)
+        parent_spec = ('eks', 'clusterName', None)
+        permissions_enum = ('eks:DescribeNodegroup',)
+        date = 'createdAt'
+
+    source_mapping = {
+        'describe-child': NodeGroupDescribeSource,
+        'describe': NodeGroupDescribeSource,
+    }
 
 
 class EKSDescribeSource(DescribeSource):
