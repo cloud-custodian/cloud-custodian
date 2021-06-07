@@ -1,12 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from botocore.exceptions import ClientError
+
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n import tags
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
 from c7n import query
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
@@ -22,17 +24,14 @@ class NodeGroupDescribeSource(query.ChildDescribeSource):
 
     def augment(self, resources):
         results = []
-        with self.manager.executor_factory(
-                max_workers=self.manager.max_workers) as w:
-            client = local_session(self.manager.session_factory).client('eks')
-            for clusterName, nodegroupName in resources:
-                nodegroup = client.describe_nodegroup(
-                        clusterName=clusterName,
-                        nodegroupName=nodegroupName
-                    )['nodegroup']
-                if 'tags' in nodegroup:
-                    nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
-                results.append(nodegroup)
+        client = local_session(self.manager.session_factory).client('eks')
+        for clusterName, nodegroupName in resources:
+            nodegroup = client.describe_nodegroup(
+                clusterName=clusterName,
+                nodegroupName=nodegroupName)['nodegroup']
+            if 'tags' in nodegroup:
+                nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+            results.append(nodegroup)
         return results
 
 
@@ -57,6 +56,26 @@ class NodeGroup(ChildResourceManager):
         'describe-child': NodeGroupDescribeSource,
         'describe': NodeGroupDescribeSource,
     }
+
+
+@NodeGroup.action_registry.register('delete')
+class DeleteService(Action):
+    """Delete node group(s)."""
+
+    schema = type_schema('delete')
+    permissions = ('eks:DeleteNodegroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        retry = get_retry(('Throttling',))
+        for r in resources:
+            try:
+                retry(client.delete_nodegroup,
+                      clusterName=r['clusterName'],
+                      nodegroupName=r['nodegroupName'])
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ServiceNotFoundException':
+                    raise
 
 
 class EKSDescribeSource(DescribeSource):
