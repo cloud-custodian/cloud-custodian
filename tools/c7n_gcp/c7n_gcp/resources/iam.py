@@ -61,6 +61,36 @@ class ServiceAccount(QueryResourceManager):
                         resource_info['email_id'])})
 
 
+@ServiceAccount.action_registry.register('delete')
+class DeleteServiceAccount(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ("iam.serviceAccounts.delete",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('enable')
+class EnableServiceAccount(MethodAction):
+    schema = type_schema('enable')
+    method_spec = {'op': 'enable'}
+    permissions = ("iam.serviceAccounts.enable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('disable')
+class DisableServiceAccount(MethodAction):
+    schema = type_schema('disable')
+    method_spec = {'op': 'disable'}
+    permissions = ("iam.serviceAccounts.disable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
 @resources.register('service-account-key')
 class ServiceAccountKey(ChildResourceManager):
     """GCP Resource
