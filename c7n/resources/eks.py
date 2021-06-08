@@ -35,7 +35,7 @@ class NodeGroupDescribeSource(query.ChildDescribeSource):
         return results
 
 
-@resources.register('nodegroup')
+@resources.register('eks-nodegroup')
 class NodeGroup(ChildResourceManager):
 
     chunk_size = 10
