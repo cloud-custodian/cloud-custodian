@@ -5,9 +5,8 @@ from botocore.exceptions import ClientError
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n import tags
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
-from c7n import query
+from c7n import tags, query
+from c7n.query import QueryResourceManager, ChildResourceManager, ChildDescribeSource, TypeInfo, DescribeSource
 from c7n.utils import local_session, type_schema, get_retry
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
@@ -15,7 +14,7 @@ from .ecs import ContainerConfigSource
 
 
 @query.sources.register('describe-eks-nodegroup')
-class NodeGroupDescribeSource(query.ChildDescribeSource):
+class NodeGroupDescribeSource(ChildDescribeSource):
 
     def get_query(self):
         query = super(NodeGroupDescribeSource, self).get_query()
