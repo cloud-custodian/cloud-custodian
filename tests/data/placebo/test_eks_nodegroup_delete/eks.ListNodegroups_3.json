@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "nodegroups": [
+            "node_group_example"
+        ]
+    }
+}

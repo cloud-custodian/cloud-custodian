@@ -1,0 +1,301 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_availability_zones": {
+            "available": {
+                "all_availability_zones": null,
+                "exclude_names": null,
+                "exclude_zone_ids": null,
+                "filter": null,
+                "group_names": [
+                    "eu-central-1"
+                ],
+                "id": "eu-central-1",
+                "names": [
+                    "eu-central-1a",
+                    "eu-central-1b",
+                    "eu-central-1c"
+                ],
+                "state": "available",
+                "zone_ids": [
+                    "euc1-az2",
+                    "euc1-az3",
+                    "euc1-az1"
+                ]
+            }
+        },
+        "aws_default_route_table": {
+            "example": {
+                "arn": "arn:aws:ec2:eu-central-1:644160558196:route-table/rtb-0791f4f256ddf87f3",
+                "default_route_table_id": "rtb-0791f4f256ddf87f3",
+                "id": "rtb-0791f4f256ddf87f3",
+                "owner_id": "644160558196",
+                "propagating_vgws": null,
+                "route": [
+                    {
+                        "cidr_block": "0.0.0.0/0",
+                        "destination_prefix_list_id": "",
+                        "egress_only_gateway_id": "",
+                        "gateway_id": "igw-0024af182d3fa4153",
+                        "instance_id": "",
+                        "ipv6_cidr_block": "",
+                        "nat_gateway_id": "",
+                        "network_interface_id": "",
+                        "transit_gateway_id": "",
+                        "vpc_endpoint_id": "",
+                        "vpc_peering_connection_id": ""
+                    }
+                ],
+                "tags": null,
+                "vpc_id": "vpc-07ebba7604ed0ce08"
+            }
+        },
+        "aws_eks_cluster": {
+            "example": {
+                "arn": "arn:aws:eks:eu-central-1:644160558196:cluster/example",
+                "certificate_authority": [
+                    {
+                        "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EWXdPREEzTXpneU1sb1hEVE14TURZd05qQTNNemd5TWxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTHNMCnV1ZElmdHNYMThHdVUyTVNwZDlKUVZremtKcFl2RWRtbk5oNGJ0U2paRUdVLzdvUzByL0ZlM2tQOU1RRHo3cFQKZVpPSVYwVWtmR01abnQxaExUa0FwRlVVZTgrZUdlSHNnVlcxNVdVUHh5SGtCNFcwaFpDZkF6ZVNNK1JkTGU2dApZV2NtM0RCcEZzdm1XbC91VURMcG1RMFNoZCtDNmNCbGx6MFAvWi9TTGR1SnhqeWUwOEhFQm9yOHVlc2xlMnc3CkE4UHpoV0xNRDFJZ0V4LzZXdmdsTHg0bUF5SHJJOXIyZjVBNncwdDY1eEtEbFVyNm9MSlYwdzFiSlpXZDhuOTAKL2Zac24xZDVNWThXS3ZKSlNuanBVRTVuVmp2dDJHNEVMeG9xUGxuQ0VtbC9KcVVsMHgwWEJxbzVGc1dlNXVDbwp0U2phckVXZnN2N0d1b0JHSExjQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQS2xWemJWZks5VEVGdWtsRndqaEZodkw1ZkFNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFBdXNCMkF0R2xBSFdaVWl4ZDN3cnM3S3YzZWxISGt1Y3dTYkNVWHlZT0h4S2ZiUFNDOAoydnN3ZGZISDF1N1k1dGk4Z0I0K0Q3WkNwRmkrRGlwcjNjZ2FvWGhvTnNsdG54cUFESGJpa2YrekJWZnlXRHZuClFYSDJjcFFvcElyc3l4ZTJwZVhwaloxRzB4TFhadk40aXJ5R3hNenYvcmpLOUVDcVpXbzNGK0ZweTRwWmtIL1EKZmhxOFQyMzkwbFBFU3BpZll6d2s2elRGY2QrTUw5SnF5c21KYzQ5cVVic3ZkRzZQS0NHMzVUN3ZOUk9hWVh5Twpjdm81T0l6MU1mSUpDZjhYY1NyQys3eTFlZ0VNc2FRK051RWNSbW1BNGd6MHdhYUtUa2RlRkJNMy9sR1BmNUthCkNFc1NERlY5c3BkUC9hNmJFTTJLck1UT0tNWVlma1p3V0VTNAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+                    }
+                ],
+                "created_at": "2021-06-08 07:31:50.69 +0000 UTC",
+                "enabled_cluster_log_types": null,
+                "encryption_config": [],
+                "endpoint": "https://66B40CB0A70686E82533DD13B97E5500.gr7.eu-central-1.eks.amazonaws.com",
+                "id": "example",
+                "identity": [
+                    {
+                        "oidc": [
+                            {
+                                "issuer": "https://oidc.eks.eu-central-1.amazonaws.com/id/66B40CB0A70686E82533DD13B97E5500"
+                            }
+                        ]
+                    }
+                ],
+                "kubernetes_network_config": [
+                    {
+                        "service_ipv4_cidr": "172.20.0.0/16"
+                    }
+                ],
+                "name": "example",
+                "platform_version": "eks.5",
+                "role_arn": "arn:aws:iam::644160558196:role/eks-cluster-example",
+                "status": "ACTIVE",
+                "tags": null,
+                "timeouts": null,
+                "version": "1.19",
+                "vpc_config": [
+                    {
+                        "cluster_security_group_id": "sg-04716cb4019002972",
+                        "endpoint_private_access": false,
+                        "endpoint_public_access": true,
+                        "public_access_cidrs": [
+                            "0.0.0.0/0"
+                        ],
+                        "security_group_ids": null,
+                        "subnet_ids": [
+                            "subnet-04003ba7bc4d63523",
+                            "subnet-094dee44b3576dce3"
+                        ],
+                        "vpc_id": "vpc-07ebba7604ed0ce08"
+                    }
+                ]
+            }
+        },
+        "aws_eks_node_group": {
+            "example": {
+                "ami_type": "AL2_x86_64",
+                "arn": "arn:aws:eks:eu-central-1:644160558196:nodegroup/example/node_group_example/68bcf549-87e9-d8db-5223-83347dd49c8a",
+                "capacity_type": "ON_DEMAND",
+                "cluster_name": "example",
+                "disk_size": 20,
+                "force_update_version": null,
+                "id": "example:node_group_example",
+                "instance_types": [
+                    "m5.large"
+                ],
+                "labels": null,
+                "launch_template": [],
+                "node_group_name": "node_group_example",
+                "node_role_arn": "arn:aws:iam::644160558196:role/eks-node-group-example",
+                "release_version": "1.19.6-20210526",
+                "remote_access": [],
+                "resources": [
+                    {
+                        "autoscaling_groups": [
+                            {
+                                "name": "eks-68bcf549-87e9-d8db-5223-83347dd49c8a"
+                            }
+                        ],
+                        "remote_access_security_group_id": ""
+                    }
+                ],
+                "scaling_config": [
+                    {
+                        "desired_size": 1,
+                        "max_size": 1,
+                        "min_size": 1
+                    }
+                ],
+                "status": "ACTIVE",
+                "subnet_ids": [
+                    "subnet-0e7b90b136e09b1a3",
+                    "subnet-0fdbcc64e3fa8acc4"
+                ],
+                "tags": null,
+                "timeouts": null,
+                "version": "1.19"
+            }
+        },
+        "aws_iam_role": {
+            "cluster_example": {
+                "arn": "arn:aws:iam::644160558196:role/eks-cluster-example",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"eks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-06-08T07:31:31Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "eks-cluster-example",
+                "inline_policy": [
+                    {
+                        "name": "",
+                        "policy": ""
+                    }
+                ],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "eks-cluster-example",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "unique_id": "AROA43SAJ7OOA2D5NRWIL"
+            },
+            "node_group_example": {
+                "arn": "arn:aws:iam::644160558196:role/eks-node-group-example",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-06-08T07:31:31Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "eks-node-group-example",
+                "inline_policy": [
+                    {
+                        "name": "",
+                        "policy": ""
+                    }
+                ],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "eks-node-group-example",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "unique_id": "AROA43SAJ7OONAD3NAOYY"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "example-AmazonEC2ContainerRegistryReadOnly": {
+                "id": "eks-node-group-example-20210608073134844200000001",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+                "role": "eks-node-group-example"
+            },
+            "example-AmazonEKSClusterPolicy": {
+                "id": "eks-cluster-example-20210608073135371600000005",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+                "role": "eks-cluster-example"
+            },
+            "example-AmazonEKSVPCResourceController": {
+                "id": "eks-cluster-example-20210608073135315400000004",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController",
+                "role": "eks-cluster-example"
+            },
+            "example-AmazonEKSWorkerNodePolicy": {
+                "id": "eks-node-group-example-20210608073134870800000003",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+                "role": "eks-node-group-example"
+            },
+            "example-AmazonEKS_CNI_Policy": {
+                "id": "eks-node-group-example-20210608073134845900000002",
+                "policy_arn": "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+                "role": "eks-node-group-example"
+            }
+        },
+        "aws_internet_gateway": {
+            "example": {
+                "arn": "arn:aws:ec2:eu-central-1:644160558196:internet-gateway/igw-0024af182d3fa4153",
+                "id": "igw-0024af182d3fa4153",
+                "owner_id": "644160558196",
+                "tags": null,
+                "vpc_id": "vpc-07ebba7604ed0ce08"
+            }
+        },
+        "aws_subnet": {
+            "cluster_example": {
+                "arn": "arn:aws:ec2:eu-central-1:644160558196:subnet/subnet-04003ba7bc4d63523",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "eu-central-1a",
+                "availability_zone_id": "euc1-az2",
+                "cidr_block": "10.0.0.0/24",
+                "customer_owned_ipv4_pool": "",
+                "id": "subnet-04003ba7bc4d63523",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": true,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-07ebba7604ed0ce08"
+            },
+            "node_group_example": {
+                "arn": "arn:aws:ec2:eu-central-1:644160558196:subnet/subnet-0e7b90b136e09b1a3",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "eu-central-1a",
+                "availability_zone_id": "euc1-az2",
+                "cidr_block": "10.0.2.0/24",
+                "customer_owned_ipv4_pool": "",
+                "id": "subnet-0e7b90b136e09b1a3",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": true,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "tags": {
+                    "kubernetes.io/cluster/example": "shared"
+                },
+                "tags_all": {
+                    "kubernetes.io/cluster/example": "shared"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-07ebba7604ed0ce08"
+            }
+        },
+        "aws_vpc": {
+            "example": {
+                "arn": "arn:aws:ec2:eu-central-1:644160558196:vpc/vpc-07ebba7604ed0ce08",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-03f2d1b7d1033ec07",
+                "default_route_table_id": "rtb-0791f4f256ddf87f3",
+                "default_security_group_id": "sg-0fdf3a15e025748ef",
+                "dhcp_options_id": "dopt-d74e4fbc",
+                "enable_classiclink": null,
+                "enable_classiclink_dns_support": null,
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "id": "vpc-07ebba7604ed0ce08",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "main_route_table_id": "rtb-0791f4f256ddf87f3",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {}
+            }
+        }
+    }
+}
