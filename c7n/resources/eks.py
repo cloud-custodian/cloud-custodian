@@ -6,7 +6,7 @@ from c7n.manager import resources
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
@@ -52,6 +52,25 @@ class NodeGroup(ChildResourceManager):
         'describe-child': NodeGroupDescribeSource,
         'describe': NodeGroupDescribeSource,
     }
+
+
+@NodeGroup.action_registry.register('delete')
+class DeleteNodeGroup(Action):
+    """Delete node group(s)."""
+
+    schema = type_schema('delete')
+    permissions = ('eks:DeleteNodegroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        retry = get_retry(('Throttling',))
+        for r in resources:
+            try:
+                retry(client.delete_nodegroup,
+                      clusterName=r['clusterName'],
+                      nodegroupName=r['nodegroupName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 class EKSDescribeSource(DescribeSource):
