@@ -770,16 +770,21 @@ class TypeInfo(metaclass=TypeMeta):
     ###########
     # Required
 
-    # id field, should be the identifier used for apis
+    # the field name in the JSON response from enum_spec/<operation> that have to be used as resource identifier
     id = None
 
-    # name field, used for display
+    # the field name (JMESPath format) in the JSON response from enum_spec/<operation> that used for display
     name = None
 
-    # which aws service (per sdk) has the api for this resource.
+    # The name of a service, e.g. 's3' or 'ec2' that used for creating SDK sessions
+    # e.g., if you use boto3, you can get a list of available services via get_available_services()
     service = None
 
     # used to query the resource by describe-sources
+    # it has a tuple of 3 parameters:
+    # - <operation>: the name of the SDK resource method used to retrieve the list of resources
+    # - <path>: the JMESPath to get the resource list in the JSON response body from <operation>
+    # - <extra arguments>: dictionary structure ({'param1': 'value1', ...}) with additional parameters for <operation>
     enum_spec = None
 
     ###########
