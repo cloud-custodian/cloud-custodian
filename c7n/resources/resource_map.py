@@ -56,6 +56,7 @@ ResourceMap = {
     "aws.efs": "c7n.resources.efs.ElasticFileSystem",
     "aws.efs-mount-target": "c7n.resources.efs.ElasticFileSystemMountTarget",
     "aws.eks": "c7n.resources.eks.EKS",
+    "aws.eks-nodegroup": "c7n.resources.eks.NodeGroup",
     "aws.elasticbeanstalk": "c7n.resources.elasticbeanstalk.ElasticBeanstalk",
     "aws.elasticbeanstalk-environment": (
         "c7n.resources.elasticbeanstalk.ElasticBeanstalkEnvironment"),
