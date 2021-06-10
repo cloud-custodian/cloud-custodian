@@ -1,18 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.client import ClientError
 
 from collections import Counter
@@ -23,7 +10,7 @@ from dateutil.parser import parse
 import itertools
 import time
 
-from c7n.actions import Action
+from c7n.actions import Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
@@ -31,8 +18,10 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
+from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
-from c7n.utils import local_session, type_schema, chunks, get_retry
+from c7n.utils import (
+    local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -52,6 +41,7 @@ class ASG(query.QueryResourceManager):
         filter_name = 'AutoScalingGroupNames'
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::AutoScalingGroup'
+        cfn_type = 'AWS::AutoScaling::AutoScalingGroup'
 
         default_report_fields = (
             'AutoScalingGroupName',
@@ -73,7 +63,7 @@ ASG.filter_registry.register('marked-for-op', TagActionFilter)
 ASG.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-class LaunchInfo(object):
+class LaunchInfo:
 
     permissions = ("ec2:DescribeLaunchTemplateVersions",
                    "autoscaling:DescribeLaunchConfigurations",)
@@ -123,12 +113,12 @@ class LaunchInfo(object):
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['Version'])
+            return (lid['LaunchTemplateId'], lid.get('Version', '$Default'))
 
         if 'MixedInstancesPolicy' in asg:
             mip_spec = asg['MixedInstancesPolicy'][
                 'LaunchTemplate']['LaunchTemplateSpecification']
-            return (mip_spec['LaunchTemplateId'], mip_spec['Version'])
+            return (mip_spec['LaunchTemplateId'], mip_spec.get('Version', '$Default'))
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.
@@ -272,23 +262,23 @@ class ConfigValidFilter(Filter):
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
-        return set([s['SubnetId'] for s in manager.resources()])
+        return {s['SubnetId'] for s in manager.resources()}
 
     def get_security_groups(self):
         manager = self.manager.get_resource_manager('security-group')
-        return set([s['GroupId'] for s in manager.resources()])
+        return {s['GroupId'] for s in manager.resources()}
 
     def get_key_pairs(self):
         manager = self.manager.get_resource_manager('key-pair')
-        return set([k['KeyName'] for k in manager.resources()])
+        return {k['KeyName'] for k in manager.resources()}
 
     def get_elbs(self):
         manager = self.manager.get_resource_manager('elb')
-        return set([e['LoadBalancerName'] for e in manager.resources()])
+        return {e['LoadBalancerName'] for e in manager.resources()}
 
     def get_appelb_target_groups(self):
         manager = self.manager.get_resource_manager('app-elb-target-group')
-        return set([a['TargetGroupArn'] for a in manager.resources()])
+        return {a['TargetGroupArn'] for a in manager.resources()}
 
     def get_images(self):
         images = self.launch_info.get_image_map()
@@ -312,9 +302,8 @@ class ConfigValidFilter(Filter):
                     continue
                 snaps.add(bd['Ebs']['SnapshotId'].strip())
         manager = self.manager.get_resource_manager('ebs-snapshot')
-        return set([
-            s['SnapshotId'] for s in manager.get_resources(
-                list(snaps), cache=False)])
+        return {s['SnapshotId'] for s in manager.get_resources(
+                list(snaps), cache=False)}
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
@@ -576,6 +565,8 @@ class ImageAgeFilter(AgeFilter):
 
     def get_resource_date(self, asg):
         cfg = self.launch_info.get(asg)
+        if cfg is None:
+            cfg = {}
         ami = self.images.get(cfg.get('ImageId'), {})
         return parse(ami.get(
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
@@ -611,7 +602,7 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        image = self.launch_info.get(i).get('ImageId', None)
+        image = self.images.get(self.launch_info.get(i).get('ImageId', None))
         # Finally, if we have no image...
         if not image:
             self.log.warning(
@@ -729,6 +720,42 @@ class PropagatedTagFilter(Filter):
                 if not match and not all(k in tags for k in keys):
                     results.append(asg)
         return results
+
+
+@ASG.action_registry.register('post-finding')
+class AsgPostFinding(PostFinding):
+
+    resource_type = 'AwsAutoScalingAutoScalingGroup'
+    launch_info = LaunchInfo(None)
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        details = select_keys(r, [
+            'CreatedTime', 'HealthCheckType', 'HealthCheckGracePeriod', 'LoadBalancerNames'])
+        lid = self.launch_info.get_launch_id(r)
+        if isinstance(lid, tuple):
+            lid = "%s:%s" % lid
+        details['CreatedTime'] = details['CreatedTime'].isoformat()
+        # let's arbitrarily cut off key information per security hub's restrictions...
+        details['LaunchConfigurationName'] = lid[:32]
+        payload.update(details)
+        return envelope
+
+
+@ASG.action_registry.register('auto-tag-user')
+class AutoScaleAutoTagUser(AutoTagUser):
+
+    schema = type_schema(
+        'auto-tag-user',
+        propagate={'type': 'boolean'},
+        rinherit=AutoTagUser.schema)
+    schema_alias = False
+
+    def set_resource_tags(self, tags, resources):
+        tag_action = self.manager.action_registry.get('tag')
+        tag_action(
+            {'tags': tags, 'propagate': self.data.get('propagate', False)},
+            self.manager).process(resources)
 
 
 @ASG.action_registry.register('tag-trim')
@@ -1120,7 +1147,7 @@ class Tag(Action):
         error = None
 
         client = self.get_client()
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
@@ -1149,6 +1176,7 @@ class Tag(Action):
                 atags['ResourceType'] = 'auto-scaling-group'
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
+                a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
     def get_client(self):
@@ -1159,11 +1187,13 @@ class Tag(Action):
 class PropagateTags(Action):
     """Propagate tags to an asg instances.
 
-    In AWS changing an asg tag does not propagate to instances.
+    In AWS changing an asg tag does not automatically propagate to
+    extant instances even if the tag is set to propagate. It only
+    is applied to new instances.
 
-    This action exists to do that, and can also trim older tags
-    not present on the asg anymore that are present on instances.
-
+    This action exists to ensure that extant instances also have these
+    propagated tags set, and can also trim older tags not present on
+    the asg anymore that are present on instances.
 
     :example:
 
@@ -1178,6 +1208,7 @@ class PropagateTags(Action):
                   - type: propagate-tags
                     tags:
                       - OwnerName
+
     """
 
     schema = type_schema(
@@ -1201,7 +1232,6 @@ class PropagateTags(Action):
             self.log.info("Applied tags to %d instances" % instance_count)
 
     def process_asg(self, asg):
-        client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
                    if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
@@ -1211,11 +1241,19 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
+        if not tag_map and not self.get('trim', False):
+            self.log.error(
+                'No tags found to propagate on asg:{} tags configured:{}'.format(
+                    asg['AutoScalingGroupName'], self.data.get('tags')))
+
         tag_set = set(tag_map)
+        client = local_session(self.manager.session_factory).client('ec2')
+
         if self.data.get('trim', False):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
-        if not self.manager.config.dryrun:
+
+        if not self.manager.config.dryrun and instance_ids and tag_map:
             client.create_tags(
                 Resources=instance_ids,
                 Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
@@ -1395,6 +1433,7 @@ class MarkForOp(TagDelayedAction):
         key={'type': 'string'},
         tag={'type': 'string'},
         tz={'type': 'string'},
+        msg={'type': 'string'},
         message={'type': 'string'},
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0})
@@ -1406,7 +1445,7 @@ class MarkForOp(TagDelayedAction):
         d = {
             'op': self.data.get('op', 'stop'),
             'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)),
-            'msg': self.data.get('message', self.default_template),
+            'msg': self.data.get('message', self.data.get('msg', self.default_template)),
             'tz': self.data.get('tz', 'utc'),
             'days': self.data.get('days', 0),
             'hours': self.data.get('hours', 0)}
@@ -1620,6 +1659,93 @@ class Delete(Action):
             raise
 
 
+@ASG.action_registry.register('update')
+class Update(Action):
+    """Action to update ASG configuration settings
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-asg-instance-lifetime
+                resource: asg
+                filters:
+                  - MaxInstanceLifetime: empty
+                actions:
+                  - type: update
+                    max-instance-lifetime: 604800  # (7 days)
+
+              - name: set-asg-by-policy
+                resource: asg
+                actions:
+                  - type: update
+                    default-cooldown: 600
+                    max-instance-lifetime: 0      # (clear it)
+                    new-instances-protected-from-scale-in: true
+                    capacity-rebalance: true
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'default-cooldown': {'type': 'integer', 'minimum': 0},
+            'max-instance-lifetime': {
+                "anyOf": [
+                    {'enum': [0]},
+                    {'type': 'integer', 'minimum': 86400}
+                ]
+            },
+            'new-instances-protected-from-scale-in': {'type': 'boolean'},
+            'capacity-rebalance': {'type': 'boolean'},
+        }
+    )
+    permissions = ("autoscaling:UpdateAutoScalingGroup",)
+    settings_map = {
+        "default-cooldown": "DefaultCooldown",
+        "max-instance-lifetime": "MaxInstanceLifetime",
+        "new-instances-protected-from-scale-in": "NewInstancesProtectedFromScaleIn",
+        "capacity-rebalance": "CapacityRebalance"
+    }
+
+    def validate(self):
+        if not set(self.settings_map).intersection(set(self.data)):
+            raise PolicyValidationError(
+                "At least one setting must be specified from: " +
+                ", ".join(sorted(self.settings_map))
+            )
+        return self
+
+    def process(self, asgs):
+        client = local_session(self.manager.session_factory).client('autoscaling')
+
+        settings = {}
+        for k, v in self.settings_map.items():
+            if k in self.data:
+                settings[v] = self.data.get(k)
+
+        with self.executor_factory(max_workers=2) as w:
+            futures = {}
+            error = None
+            for a in asgs:
+                futures[w.submit(self.process_asg, client, a, settings)] = a
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error("Error while updating asg:%s error:%s" % (
+                        futures[f]['AutoScalingGroupName'],
+                        f.exception()))
+                    error = f.exception()
+            if error:
+                # make sure we stop policy execution if there were errors
+                raise error
+
+    def process_asg(self, client, asg, settings):
+        self.manager.retry(
+            client.update_auto_scaling_group,
+            AutoScalingGroupName=asg['AutoScalingGroupName'],
+            **settings)
+
+
 @resources.register('launch-config')
 class LaunchConfig(query.QueryResourceManager):
 
@@ -1632,7 +1758,7 @@ class LaunchConfig(query.QueryResourceManager):
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
-        config_type = 'AWS::AutoScaling::LaunchConfiguration'
+        cfn_type = config_type = 'AWS::AutoScaling::LaunchConfiguration'
 
 
 @LaunchConfig.filter_registry.register('age')
@@ -1681,9 +1807,8 @@ class UnusedLaunchConfig(Filter):
 
     def process(self, configs, event=None):
         asgs = self.manager.get_resource_manager('asg').resources()
-        used = set([
-            a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
-            for a in asgs if not a.get('LaunchTemplate')])
+        used = {a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
+                for a in asgs if not a.get('LaunchTemplate')}
         return [c for c in configs if c['LaunchConfigurationName'] not in used]
 
 
@@ -1723,3 +1848,69 @@ class LaunchConfigDelete(Action):
             if e.response['Error']['Code'] == 'ValidationError':
                 return
             raise
+
+
+@resources.register('scaling-policy')
+class ScalingPolicy(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'autoscaling'
+        arn_type = "scalingPolicy"
+        id = name = 'PolicyName'
+        date = 'CreatedTime'
+        enum_spec = (
+            'describe_policies', 'ScalingPolicies', None
+        )
+        filter_name = 'PolicyNames'
+        filter_type = 'list'
+        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
+
+
+@ASG.filter_registry.register('scaling-policy')
+class ScalingPolicyFilter(ValueFilter):
+
+    """Filter asg by scaling-policies attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: scaling-policies-with-target-tracking
+            resource: asg
+            filters:
+              - type: scaling-policy
+                key: PolicyType
+                value: "TargetTrackingScaling"
+
+    """
+
+    schema = type_schema(
+        'scaling-policy', rinherit=ValueFilter.schema
+    )
+    schema_alias = False
+    permissions = ("autoscaling:DescribePolicies",)
+    annotate = False  # no default value annotation on policy
+    annotation_key = 'c7n:matched-policies'
+
+    def get_scaling_policies(self, asgs):
+        policies = self.manager.get_resource_manager('scaling-policy').resources()
+        policy_map = {}
+        for policy in policies:
+            policy_map.setdefault(
+                policy['AutoScalingGroupName'], []).append(policy)
+        return policy_map
+
+    def process(self, asgs, event=None):
+        self.policy_map = self.get_scaling_policies(asgs)
+        return super(ScalingPolicyFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        asg_policies = self.policy_map.get(asg['AutoScalingGroupName'], ())
+        matched = []
+        for policy in asg_policies:
+            if self.match(policy):
+                matched.append(policy)
+        if matched:
+            asg[self.annotation_key] = matched
+        return bool(matched)

@@ -1,20 +1,9 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest, load_data
 from c7n.config import Config, Bag
-from c7n import manager
+from c7n import manager, resources
 import fnmatch
 
 
@@ -46,6 +35,7 @@ class TestIamGen(BaseTest):
         all_invalid = []
 
         perms = load_data('iam-actions.json')
+        resources.load_available()
 
         for k, v in manager.resources.items():
             p = Bag({'name': 'permcheck', 'resource': k, 'provider_name': 'aws'})
@@ -92,6 +82,6 @@ class TestIamGen(BaseTest):
             raise ValueError(
                 "resources missing service %s" % ('\n'.join(sorted(missing))))
 
-        if invalid:
+        if all_invalid:
             raise ValueError(
-                "invalid permissions \n %s" % ('\n'.join(sorted(map(str, invalid)))))
+                "invalid permissions \n %s" % ('\n'.join(sorted(map(str, all_invalid)))))

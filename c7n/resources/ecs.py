@@ -1,18 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -21,8 +8,11 @@ from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.query import DescribeSource, ConfigSource
+import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
+import c7n.filters.vpc as net_filters
 
 
 def ecs_tag_normalize(resources):
@@ -49,6 +39,46 @@ def ecs_taggable(model, r):
     return len(path_parts) > 2
 
 
+class ContainerConfigSource(ConfigSource):
+
+    preserve_empty = ()
+    preserve_case = {'Tags'}
+    mapped_keys = {}
+
+    @classmethod
+    def remap_keys(cls, resource):
+        for k, v in cls.mapped_keys.items():
+            if v in resource:
+                continue
+            if k not in resource:
+                continue
+            resource[v] = resource.pop(k)
+        return resource
+
+    @classmethod
+    def lower_keys(cls, data):
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                if k in cls.preserve_case:
+                    continue
+                lk = k[0].lower() + k[1:]
+                data[lk] = data.pop(k)
+                # describe doesn't return empty list/dict by default
+                if isinstance(v, (list, dict)) and not v and lk not in cls.preserve_empty:
+                    data.pop(lk)
+                elif isinstance(v, (dict, list)):
+                    data[lk] = cls.lower_keys(v)
+        elif isinstance(data, list):
+            return list(map(cls.lower_keys, data))
+        return data
+
+    def load_resource(self, item):
+        resource = self.lower_keys(super().load_resource(item))
+        if self.mapped_keys:
+            return self.remap_keys(resource)
+        return resource
+
+
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
@@ -59,6 +89,8 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
+        arn_type = 'cluster'
+        cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)
@@ -153,6 +185,15 @@ class ECSServiceDescribeSource(ECSClusterResourceDescribeSource):
         return results
 
 
+class ECSServiceConfigSource(ContainerConfigSource):
+    perserve_empty = {
+        'placementConstraints', 'placementStrategy',
+        'serviceRegistries', 'Tags', 'loadBalancers'}
+
+    mapped_keys = {
+        'role': 'roleArn', 'cluster': 'clusterArn'}
+
+
 @resources.register('ecs-service')
 class Service(query.ChildResourceManager):
 
@@ -165,13 +206,13 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
+        config_type = cfn_type = 'AWS::ECS::Service'
 
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-ecs-service'
-        return source
+    source_mapping = {
+        'config': ECSServiceConfigSource,
+        'describe-child': ECSServiceDescribeSource,
+        'describe': ECSServiceDescribeSource,
+    }
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(Service, self).get_resources(ids, cache, augment=False)
@@ -243,6 +284,25 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
            actions:
              - type: stop
     """
+
+
+@Service.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.subnets[]',
+                'networkConfiguration.awsvpcConfiguration.subnets[]')
+
+    def get_related_ids(self, resources):
+        subnet_ids = set()
+        for exp in self.expressions:
+            cexp = jmespath.compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
+                if ids:
+                    subnet_ids.update(ids)
+        return list(subnet_ids)
 
 
 @Service.action_registry.register('modify')
@@ -394,6 +454,7 @@ class Task(query.ChildResourceManager):
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
+        cfn_type = 'AWS::ECS::TaskSet'
 
     @property
     def source_type(self):
@@ -404,6 +465,12 @@ class Task(query.ChildResourceManager):
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(Task, self).get_resources(ids, cache, augment=False)
+
+
+@Task.filter_registry.register('subnet')
+class TaskSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "attachments[].details[?name == 'subnetId'].value[]"
 
 
 @Task.filter_registry.register('task-definition')
@@ -458,31 +525,26 @@ class StopTask(BaseAction):
                     raise
 
 
-@resources.register('ecs-task-definition')
-class TaskDefinition(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ecs'
-        arn = id = name = 'taskDefinitionArn'
-        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
+class DescribeTaskDefinition(DescribeSource):
 
     def get_resources(self, ids, cache=True):
         if cache:
-            resources = self._get_cached_resources(ids)
+            resources = self.manager._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
             resources = self.augment(ids)
             return resources
         except ClientError as e:
-            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            self.manager.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
 
     def augment(self, resources):
         results = []
-        client = local_session(self.session_factory).client('ecs')
+        client = local_session(self.manager.session_factory).client('ecs')
         for task_def_set in resources:
-            response = client.describe_task_definition(
+            response = self.manager.retry(
+                client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
             r = response['taskDefinition']
@@ -490,6 +552,30 @@ class TaskDefinition(query.QueryResourceManager):
             results.append(r)
         ecs_tag_normalize(results)
         return results
+
+
+class ConfigECSTaskDefinition(ContainerConfigSource):
+
+    preserve_empty = {'mountPoints', 'portMappings', 'volumesFrom'}
+
+
+@resources.register('ecs-task-definition')
+class TaskDefinition(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ecs'
+        arn = id = name = 'taskDefinitionArn'
+        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
+        cfn_type = config_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
+
+    source_mapping = {
+        'config': ConfigECSTaskDefinition,
+        'describe': DescribeTaskDefinition
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(TaskDefinition, self).get_resources(ids, cache, augment=False)
 
 
 @TaskDefinition.action_registry.register('delete')
@@ -526,7 +612,7 @@ class ContainerInstance(query.ChildResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'containerInstance'
+        id = name = 'containerInstanceArn'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         arn = "containerInstanceArn"

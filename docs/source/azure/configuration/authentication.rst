@@ -155,3 +155,20 @@ Note: you cannot leverage Azure Storage functionality if you use Access Token fo
 
 More details about Azure Storage access rights:
 `Azure Documents <https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-rbac>`_
+
+Azure Cloud Offerings
+---------------------
+
+Cloud Custodian supports four different Cloud offerings:
+1. Default Azure Public Cloud (`AzureCloud`)
+2. Azure China Cloud (`AzureChinaCloud`)
+3. Azure German Cloud (`AzureGermanCloud`)
+4. Azure US Government (`AzureUSGovernment`)
+
+To target these Clouds, pass the cloud name in the ``--region`` flag
+
+.. code-block:: bash
+
+    custodian run -s . --region=AzureChinaCloud my-policy.yml
+
+**Note**: All Custodian features may not be available in every Cloud.

@@ -7,7 +7,7 @@ The following example policy will find any VPC Flow Log in your region that is
 not properly configured and notify a group via email.  Ensuring VPC Flow Logs
 are enabled and setup properly is very important for compliance and security.
 Flow Logs themselves capture IP traffic information to and from network
-interfaces and can be used for troubleshooting traffic issues and montitoring
+interfaces and can be used for troubleshooting traffic issues and monitoring
 network traffic as a security tool.  See more info on example dashboarding
 of VPC Flow Logs using Elasticsearch and Kibana
 https://aws.amazon.com/blogs/aws/cloudwatch-logs-subscription-consumer-elasticsearch-kibana-dashboards/

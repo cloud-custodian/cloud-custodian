@@ -1,0 +1,36 @@
+{
+  "status_code": 200,
+  "data": {
+    "checks": [
+      {
+        "id": "nO7SS0l7J9",
+        "name": "IAM Instance Profiles",
+        "description": "Checks for usage that is more than 80% of the IAM Instance Profiles Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-limits.html\" target=\"_blank\">IAM Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "oQ7TT0l7J9",
+        "name": "IAM Roles",
+        "description": "Checks for usage that is more than 80% of the IAM Roles Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-limits.html\" target=\"_blank\">IAM Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

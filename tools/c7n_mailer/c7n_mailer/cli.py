@@ -1,5 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import argparse
 import functools
 import logging
@@ -7,12 +7,12 @@ from os import path
 
 import boto3
 import jsonschema
+import yaml
 from c7n_mailer import deploy, utils
 from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.azure_mailer import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from c7n_mailer.utils import get_provider, Providers
-from ruamel import yaml
 
 AZURE_KV_SECRET_SCHEMA = {
     'type': 'object',
@@ -39,7 +39,14 @@ CONFIG_SCHEMA = {
     'required': ['queue_url'],
     'properties': {
         'queue_url': {'type': 'string'},
+        'endpoint_url': {'type': 'string'},
         'from_address': {'type': 'string'},
+        'additional_email_headers': {
+            'type': 'object',
+            'patternProperties': {
+                '': {'type': 'string'},
+            }
+        },
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
 
@@ -60,6 +67,16 @@ CONFIG_SCHEMA = {
         # Azure Function Config
         'function_properties': {
             'type': 'object',
+            'identity': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'type': {'enum': [
+                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'client_id': {'type': 'string'},
+                    'id': {'type': 'string'},
+                },
+            },
             'appInsights': {
                 'type': 'object',
                 'oneOf': [
@@ -140,6 +157,7 @@ CONFIG_SCHEMA = {
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},
+        'splunk_hec_sourcetype': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},

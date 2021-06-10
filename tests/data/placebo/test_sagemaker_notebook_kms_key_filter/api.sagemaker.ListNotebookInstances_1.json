@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "NotebookInstances": [
+            {
+                "NotebookInstanceName": "test-kms",
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/test-kms",
+                "NotebookInstanceStatus": "Stopped",
+                "Url": "test-kms.notebook.us-east-1.sagemaker.aws",
+                "InstanceType": "ml.t2.medium",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 20,
+                    "hour": 22,
+                    "minute": 25,
+                    "second": 28,
+                    "microsecond": 627000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 20,
+                    "hour": 23,
+                    "minute": 41,
+                    "second": 8,
+                    "microsecond": 198000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

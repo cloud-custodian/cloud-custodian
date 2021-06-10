@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "c7n-delete",
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "c7n-delete-0001-001",
+                    "c7n-delete-0001-002"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "Slots": "0-16383",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "c7n-delete-0001-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0001-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            }
+                        ]
+                    }
+                ],
+                "AutomaticFailover": "enabled",
+                "MultiAZ": "disabled",
+                "ConfigurationEndpoint": {
+                    "Address": "c7n-delete.qgcgte.clustercfg.use1.cache.amazonaws.com",
+                    "Port": 6379
+                },
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "09:00-10:00",
+                "ClusterEnabled": true,
+                "CacheNodeType": "cache.r5.large",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

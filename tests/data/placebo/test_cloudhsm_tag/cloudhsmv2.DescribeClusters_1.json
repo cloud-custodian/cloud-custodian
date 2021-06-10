@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "BackupPolicy": "DEFAULT",
+                "ClusterId": "cluster-remd5qbjj6l",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 9,
+                    "day": 7,
+                    "hour": 16,
+                    "minute": 36,
+                    "second": 28,
+                    "microsecond": 179000
+                },
+                "Hsms": [],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-08e64d28891c7b9c9",
+                "State": "UNINITIALIZED",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-914763e7"
+                },
+                "VpcId": "vpc-d2d616b5",
+                "Certificates": {},
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

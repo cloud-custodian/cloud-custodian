@@ -1,18 +1,7 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-from c7n.provider import clouds
+from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
 import contextlib
@@ -22,20 +11,22 @@ import itertools
 import logging
 import os
 import operator
-import shutil
 import sys
-import tempfile
 import time
+import threading
 import traceback
 
 import boto3
 
 from botocore.validate import ParamValidator
+from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError
 from c7n.log import CloudWatchLogHandler
+
+from .resource_map import ResourceMap
 
 # Import output registries aws provider extends.
 from c7n.output import (
@@ -50,7 +41,7 @@ from c7n.output import (
 from c7n.output import (
     Metrics,
     DeltaStats,
-    DirectoryOutput,
+    BlobOutput,
     LogOutput,
 )
 
@@ -65,7 +56,7 @@ try:
     HAVE_XRAY = True
 except ImportError:
     HAVE_XRAY = False
-    class Context(object): pass  # NOQA
+    class Context: pass  # NOQA
 
 _profile_session = None
 
@@ -150,6 +141,8 @@ class Arn(namedtuple('_Arn', (
 
     @classmethod
     def parse(cls, arn):
+        if isinstance(arn, Arn):
+            return arn
         parts = arn.split(':', 5)
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api'):
@@ -161,16 +154,49 @@ class Arn(namedtuple('_Arn', (
         elif ':' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split(':', 1)))
             parts.append(':')
+        elif len(parts) == 6:
+            parts.append('')
+            parts.append('')
+        # replace the literal 'arn' string with raw arn
+        parts[0] = arn
         return cls(*parts)
 
 
-class ArnResolver(object):
+class ArnResolver:
 
     def __init__(self, manager):
         self.manager = manager
 
+    def resolve(self, arns):
+        arns = map(Arn.parse, arns)
+        a_service = operator.attrgetter('service')
+        a_resource = operator.attrgetter('resource_type')
+        kfunc = lambda a: (a_service(a), a_resource(a))  # noqa
+        arns = sorted(arns, key=kfunc)
+        results = {}
+        for (service, arn_type), arn_set in itertools.groupby(arns, key=kfunc):
+            arn_set = list(arn_set)
+            rtype = ArnResolver.resolve_type(arn_set[0])
+            rmanager = self.manager.get_resource_manager(rtype)
+            if rtype == 'sns':
+                resources = rmanager.get_resources(
+                    [rarn.arn for rarn in arn_set])
+            else:
+                resources = rmanager.get_resources(
+                    [rarn.resource for rarn in arn_set])
+            for rarn, r in zip(rmanager.get_arns(resources), resources):
+                results[rarn] = r
+
+            for rarn in arn_set:
+                if rarn.arn not in results:
+                    results[rarn.arn] = None
+        return results
+
     @staticmethod
     def resolve_type(arn):
+        arn = Arn.parse(arn)
+
+        # this would benefit from a class cache {service} -> rtypes
         for type_name, klass in AWS.resources.items():
             if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
                 continue
@@ -182,6 +208,9 @@ class ArnResolver(object):
                 return type_name
             elif (klass.resource_type.arn_type is not None and
                     klass.resource_type.arn_type == arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_service == arn.service and
+                    klass.resource_type.arn_type == ""):
                 return type_name
 
 
@@ -283,7 +312,8 @@ class CloudWatchLogOutput(LogOutput):
             self.ctx.policy.name)
 
 
-class XrayEmitter(object):
+class XrayEmitter:
+    # implement https://github.com/aws/aws-xray-sdk-python/issues/51
 
     def __init__(self):
         self.buf = []
@@ -299,18 +329,33 @@ class XrayEmitter(object):
         self.buf = []
         for segment_set in utils.chunks(buf, 50):
             self.client.put_trace_segments(
-                TraceSegmentDocuments=[
-                    s.serialize() for s in segment_set])
+                TraceSegmentDocuments=[s.serialize() for s in segment_set])
 
 
 class XrayContext(Context):
+    """Specialized XRay Context for Custodian.
+
+    A context is used as a segment storage stack for currently in
+    progress segments.
+
+    We use a customized context for custodian as policy execution
+    commonly uses a concurrent.futures threadpool pattern during
+    execution for api concurrency. Default xray semantics would use
+    thread local storage and treat each of those as separate trace
+    executions. We want to aggregate/associate all thread pool api
+    executions to the custoidan policy execution. XRay sdk supports
+    this via manual code for every thread pool usage, but we don't
+    want to explicitly couple xray integration everywhere across the
+    codebase. Instead we use a context that is aware of custodian
+    usage of threads and associates subsegments therein to the policy
+    execution active subsegment.
+    """
 
     def __init__(self, *args, **kw):
         super(XrayContext, self).__init__(*args, **kw)
-        # We want process global semantics as policy execution
-        # can span threads.
         self._local = Bag()
         self._current_subsegment = None
+        self._main_tid = threading.get_ident()
 
     def handle_context_missing(self):
         """Custodian has a few api calls out of band of policy execution.
@@ -322,9 +367,46 @@ class XrayContext(Context):
         so default to disabling context missing output.
         """
 
+    # Annotate any segments/subsegments with their thread ids.
+    def put_segment(self, segment):
+        if getattr(segment, 'thread_id', None) is None:
+            segment.thread_id = threading.get_ident()
+        super().put_segment(segment)
+
+    def put_subsegment(self, subsegment):
+        if getattr(subsegment, 'thread_id', None) is None:
+            subsegment.thread_id = threading.get_ident()
+        super().put_subsegment(subsegment)
+
+    # Override since we're not just popping the end of the stack, we're removing
+    # the thread subsegment from the array by identity.
+    def end_subsegment(self, end_time):
+        subsegment = self.get_trace_entity()
+        if self._is_subsegment(subsegment):
+            subsegment.close(end_time)
+            self._local.entities.remove(subsegment)
+            return True
+        else:
+            log.warning("No subsegment to end.")
+            return False
+
+    # Override get trace identity, any worker thread will find its own subsegment
+    # on the stack, else will use the main thread's sub/segment
+    def get_trace_entity(self):
+        tid = threading.get_ident()
+        entities = self._local.get('entities', ())
+        for s in reversed(entities):
+            if s.thread_id == tid:
+                return s
+            # custodian main thread won't advance (create new segment)
+            # with worker threads still doing pool work.
+            elif s.thread_id == self._main_tid:
+                return s
+        return self.handle_context_missing()
+
 
 @tracer_outputs.register('xray', condition=HAVE_XRAY)
-class XrayTracer(object):
+class XrayTracer:
 
     emitter = XrayEmitter()
 
@@ -333,12 +415,13 @@ class XrayTracer(object):
     service_name = 'custodian'
 
     @classmethod
-    def initialize(cls):
+    def initialize(cls, config):
         context = XrayContext()
+        sampling = config.get('sample', 'true') == 'true' and True or False
         xray_recorder.configure(
             emitter=cls.use_daemon is False and cls.emitter or None,
             context=context,
-            sampling=True,
+            sampling=sampling,
             context_missing='LOG_ERROR')
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
@@ -389,6 +472,9 @@ class XrayTracer(object):
         xray_recorder.end_segment()
         if not self.use_daemon:
             self.emitter.flush()
+            log.info(
+                ('View XRay Trace https://console.aws.amazon.com/xray/home?region=%s#/'
+                 'traces/%s' % (self.ctx.options.region, self.segment.trace_id)))
         self.metadata.clear()
 
 
@@ -433,7 +519,7 @@ class ApiStats(DeltaStats):
 
 
 @blob_outputs.register('s3')
-class S3Output(DirectoryOutput):
+class S3Output(BlobOutput):
     """
     Usage:
 
@@ -447,65 +533,28 @@ class S3Output(DirectoryOutput):
     permissions = ('S3:PutObject',)
 
     def __init__(self, ctx, config):
-        self.ctx = ctx
-        self.config = config
-        self.output_path = self.get_output_path(self.config['url'])
-        self.s3_path, self.bucket, self.key_prefix = utils.parse_s3(
-            self.output_path)
-        self.root_dir = tempfile.mkdtemp()
-        self.transfer = None
-
-    def __repr__(self):
-        return "<%s to bucket:%s prefix:%s>" % (
-            self.__class__.__name__,
-            self.bucket,
-            self.key_prefix)
-
-    def get_output_path(self, output_url):
-        if '{' not in output_url:
-            date_path = datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
-            return self.join(
-                output_url, self.ctx.policy.name, date_path)
-        return output_url.format(**self.get_output_vars())
-
-    @staticmethod
-    def join(*parts):
-        return "/".join([s.strip('/') for s in parts])
-
-    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        from boto3.s3.transfer import S3Transfer
-        if exc_type is not None:
-            log.exception("Error while executing policy")
-        log.debug("Uploading policy logs")
-        self.compress()
+        super().__init__(ctx, config)
+        # can't use a local session as we dont want an unassumed session cached.
         self.transfer = S3Transfer(
             self.ctx.session_factory(assume=False).client('s3'))
-        self.upload()
-        shutil.rmtree(self.root_dir)
-        log.debug("Policy Logs uploaded")
 
-    def upload(self):
-        for root, dirs, files in os.walk(self.root_dir):
-            for f in files:
-                key = "%s%s" % (
-                    self.key_prefix,
-                    "%s/%s" % (
-                        root[len(self.root_dir):], f))
-                key = key.strip('/')
-                self.transfer.upload_file(
-                    os.path.join(root, f), self.bucket, key,
-                    extra_args={
-                        'ACL': 'bucket-owner-full-control',
-                        'ServerSideEncryption': 'AES256'})
+    def upload_file(self, path, key):
+        self.transfer.upload_file(
+            path, self.bucket, key,
+            extra_args={
+                'ACL': 'bucket-owner-full-control',
+                'ServerSideEncryption': 'AES256'})
 
 
 @clouds.register('aws')
-class AWS(object):
+class AWS(Provider):
 
     display_name = 'AWS'
     resource_prefix = 'aws'
     # legacy path for older plugins
     resources = PluginRegistry('resources')
+    # import paths for resources
+    resource_map = ResourceMap
 
     def initialize(self, options):
         """
@@ -513,7 +562,7 @@ class AWS(object):
         _default_region(options)
         _default_account_id(options)
         if options.tracer and options.tracer.startswith('xray') and HAVE_XRAY:
-            XrayTracer.initialize()
+            XrayTracer.initialize(utils.parse_url_config(options.tracer))
 
         return options
 
@@ -528,7 +577,7 @@ class AWS(object):
         """Return a set of policies targetted to the given regions.
 
         Supports symbolic regions like 'all'. This will automatically
-        filter out policies if their being targetted to a region that
+        filter out policies if they are being targetted to a region that
         does not support the service. Global services will target a
         single region (us-east-1 if only all specified, else first
         region in the list).
@@ -541,12 +590,12 @@ class AWS(object):
         service_region_map, resource_service_map = get_service_region_map(
             options.regions, policy_collection.resource_types)
         if 'all' in options.regions:
-            enabled_regions = set([
+            enabled_regions = {
                 r['RegionName'] for r in
                 get_profile_session(options).client('ec2').describe_regions(
                     Filters=[{'Name': 'opt-in-status',
                               'Values': ['opt-in-not-required', 'opted-in']}]
-                ).get('Regions')])
+                ).get('Regions')}
         for p in policy_collection:
             if 'aws.' in p.resource_type:
                 _, resource_type = p.resource_type.split('.', 1)
@@ -580,8 +629,7 @@ class AWS(object):
 
                 if len(options.regions) > 1 or 'all' in options.regions and getattr(
                         options, 'output_dir', None):
-                    options_copy.output_dir = (
-                        options.output_dir.rstrip('/') + '/%s' % region)
+                    options_copy.output_dir = join_output(options.output_dir, region)
                 policies.append(
                     Policy(p.data, options_copy,
                            session_factory=policy_collection.session_factory()))
@@ -594,8 +642,16 @@ class AWS(object):
             options)
 
 
+def join_output(output_dir, suffix):
+    if '{region}' in output_dir:
+        return output_dir.rstrip('/')
+    if output_dir.endswith('://'):
+        return output_dir + suffix
+    return output_dir.rstrip('/') + '/%s' % suffix
+
+
 def fake_session():
-    session = boto3.Session(
+    session = boto3.Session(  # nosec nosemgrep
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')

@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 3,
+                    "hour": 15,
+                    "minute": 21,
+                    "second": 34,
+                    "microsecond": 701000
+                },
+                "configurationItemStatus": "ResourceDiscovered",
+                "configurationStateId": "1617477694701",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:eks:us-east-2:644160558196:cluster/kapil-dev",
+                "resourceType": "AWS::EKS::Cluster",
+                "resourceId": "kapil-dev",
+                "resourceName": "kapil-dev",
+                "awsRegion": "us-east-2",
+                "availabilityZone": "Regional",
+                "tags": {},
+                "relatedEvents": [],
+                "relationships": [],
+                "configuration": "{\"Arn\":\"arn:aws:eks:us-east-2:644160558196:cluster/kapil-dev\",\"CertificateAuthorityData\":\"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EUXdNekU1TVRVME5sb1hEVE14TURRd01URTVNVFUwTmxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTEE0CjdYN3h0dHVSQzdNQVpGQWxMQnIxYWo5SVJ3UWFWVjE5c0x2RDRJNzRCZzRjTmxDYTlCNTVLcVlPNHVnMk5nZC8KU3YxS0ZrZ2hEM1pXdlZHd3NHVjl1RjQ3SGRsc1ovN1N4NkRuZkdyZGVCQnQxTis3aS9TYWh1c2RTYTFPUW5aMgo5cmdyWi84dlhYUnlSalFpdUx0Lzd3dVUwQ2RVejhwQTZFQWFZWXNVdkpCTGhwWUU2RzVHS3owNENIM1ZLa1F0CitGWXo1RDMxNTBGOTBSbnAwOFB4REVIYWRmRFNQenVpd094cXFLWWhrY1F1dkNTOHByYVRkcjZ3U25WTXhaTVMKVWduZzV5bWU1eGM5VjBTRkZ2ZmdTWFRiNTZPWFF2M0JyUjlEcGZRRzZmSGRJR3hhcjZ4UEg2eFdaYWpySU5iTgpzSmZuR2UzY1ZZSUIwUGdYaENzQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFFMDhpSHBhZjQxeDlNeXZQTGI1YUhTK0lFdEMKeWFxaktoZWFIbDNJMHcxWXhQZmordU5vaExnamQxZTY2SE1xbWhTQ2FpRkppOE1wTDdmZnUwTXFRaHdoZkprbApiV2lTSlJmMWhWek4wbFhPQy9JTEFxdUQ1VVY2M2F1QVROdnc2Rm1oVnd2L3dCKzZzNWxOVGVDS1ZnRUNnQ3p5CjQ4Ui80SFFqcWtKekwvRkFKcW11WDB6cW9NL1NNNVh2VUJzS3ZCRWlFd1JmSnZWYVJZTjZBL3p1YnZhQmNOVGIKVHAxTFNnbzE4NmdCRE9wNHp1bHV3emZiTG9weFFpTWE3WThTSm1PdEhGejdrQmRVYkE4UWcrSEh6Sy9ocDVhdgo4Y0g1bFQzL05TVEZvNlRJbjVoSUhHZGtGRXJjM3oxOVM1ckkrYlJDY0VONm91dGN1RmRaenlkWi9Nbz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo\\u003d\",\"Endpoint\":\"https://C14FFAA56074291F46DD0987C6C1BA14.gr7.us-east-2.eks.amazonaws.com\",\"Name\":\"kapil-dev\",\"ResourcesVpcConfig\":{\"SecurityGroupIds\":[\"sg-0f3863656b1ca8068\"],\"SubnetIds\":[\"subnet-05b873ed614f61c42\",\"subnet-0bc174a1c1bcb2a86\",\"subnet-025a6f66a50cd9554\",\"subnet-0ad5ce0a5d8b73777\",\"subnet-0749aa840c9f962e3\",\"subnet-075a3a6c7547c41eb\"]},\"RoleArn\":\"arn:aws:iam::644160558196:role/eksctl-kapil-dev-cluster-ServiceRole-1N32U4UXOOS7Z\",\"Version\":\"1.18\"}",
+                "supplementaryConfiguration": {}
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbLTYzLDI3LC02OCwtMywyMCw4NCwtMTIsNjQsMTIxLDg4LDM4LC0xMjIsLTIsLTEyOCwtNSwxMDgsLTc1LDEsLTYsMTExLC0xMDIsMTI2LC01NSwtMTMsMTYsLTEyNiwtMTE5LC02NSw1OSwtNzUsNzEsLTEwNyw4Myw0MSw1NSwtOCwxMTUsOCw3LC0xMTMsLTQ2LDEsMTE5LC05MSwtNzYsLTEwLC03NCw5NywxMTksLTgxLDE4LDI4LDMxLDEwOCwtNDEsLTEwNiwtODIsMTI1LC0yLDEyNywtODYsOTksLTI0LC00LDExLC01MywtODgsNTgsLTcyLC0xOCwtMTA2LDExLC01MiwtMTA2LDEyLDEwOCwtMzMsLTEwMyw1MywtMTE1LDQ2LC0xMTksMTA1LC0zNyw2MCwtNDEsMzEsLTEyNCwtNyw1Nyw4OSwtOTgsLTM5LC03MiwtODYsMTE3LC0zMCwtNDEsNTIsNzEsLTI0LDExNiw0OCwtNDgsLTEwMCwtMzQsLTIyLC00MSwtNCw0NCw0LDExMywtNTUsODMsNjIsLTc1LDQzLDUxLDEwMiwtNDMsLTYzLC0zLC0zOCw5MywtMTEyLC03MSwtOCwxMTMsNDUsMTYsNjQsLTEyLC0yMSwtNzksLTEwOSwxMDksNTUsLTYzLDE0LC03OSwtMTIxLDg4LDgwLDUzLDExOSwtNTksMTA0LC03MSwtNSw5MCwtNDYsLTExNCwtMTI3LC0xMjEsMTExLC0yLC03MSwxMjEsLTgyLDg1LC0zNCwtMTEyLDEwNCwtMTQsLTEwMSw3OF0sIm1hdGVyaWFsU2V0U2VyaWFsTnVtYmVyIjoxLCJpdlBhcmFtZXRlclNwZWMiOnsiaXYiOlstOTAsMTQsODcsNjMsMzYsNjksNDgsOTgsLTY5LC0xMjAsLTEyNywtMTcsLTMsNTEsLTc2LDk3XX19",
+        "ResponseMetadata": {}
+    }
+}

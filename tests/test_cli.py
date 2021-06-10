@@ -1,18 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import os
 import sys
@@ -24,7 +11,7 @@ from c7n import cli, version, commands
 from c7n.resolver import ValuesFrom
 from c7n.resources import aws
 from c7n.schema import ElementSchema, generate
-from c7n.utils import yaml_dump
+from c7n.utils import yaml_dump, yaml_load
 
 from .common import BaseTest, TextTestIO
 
@@ -105,12 +92,9 @@ class VersionTest(CliTest):
 
     def test_debug_version(self):
         output = self.get_output(["custodian", "version", "--debug"])
-        # Among other things, this should print sys.path
-        # Normalize double escaped backslashes for Windows
-        output = output.replace('\\\\', '\\')
-
         self.assertIn(version.version, output)
-        self.assertIn(sys.path[0], output)
+        self.assertIn('botocore==', output)
+        self.assertIn('python-dateutil==', output)
 
 
 class ValidateTest(CliTest):
@@ -173,10 +157,32 @@ class ValidateTest(CliTest):
 
 class SchemaTest(CliTest):
 
+    def test_schema_outline(self):
+        stdout, stderr = self.run_and_expect_success([
+            "custodian", "schema", "--outline", "--json", "aws"])
+        data = json.loads(stdout)
+        self.assertEqual(list(data.keys()), ["aws"])
+        self.assertTrue(len(data['aws']) > 100)
+        self.assertEqual(
+            sorted(data['aws']['aws.ec2'].keys()), ['actions', 'filters'])
+        self.assertTrue(len(data['aws']['aws.ec2']['actions']) > 10)
+
+    def test_schema_alias(self):
+        stdout, stderr = self.run_and_expect_success([
+            "custodian", "schema", "aws.network-addr"])
+        self.assertIn("aws.elastic-ip:", stdout)
+
+    def test_schema_alias_unqualified(self):
+        stdout, stderr = self.run_and_expect_success([
+            "custodian", "schema", "network-addr"])
+        self.assertIn("aws.elastic-ip:", stdout)
+
     def test_schema(self):
 
         # no options
-        self.run_and_expect_success(["custodian", "schema"])
+        stdout, stderr = self.run_and_expect_success(["custodian", "schema"])
+        data = yaml_load(stdout)
+        assert data['resources']
 
         # summary option
         self.run_and_expect_success(["custodian", "schema", "--summary"])
@@ -225,8 +231,8 @@ class SchemaTest(CliTest):
 
         output = self.get_output(["custodian", "schema"])
         self.assertIn("aws.ec2", output)
-        self.assertIn("azure.vm", output)
-        self.assertIn("gcp.instance", output)
+        # self.assertIn("azure.vm", output)
+        # self.assertIn("gcp.instance", output)
 
         output = self.get_output(["custodian", "schema", "aws"])
         self.assertIn("aws.ec2", output)
@@ -427,31 +433,7 @@ class LogsTest(CliTest):
         }
         yaml_file = self.write_policy_file({"policies": [p_data]})
         output_dir = os.path.join(os.path.dirname(__file__), "data", "logs")
-        self.run_and_expect_success(["custodian", "logs", "-s", output_dir, yaml_file])
-
-
-class TabCompletionTest(CliTest):
-    """ Tests for argcomplete tab completion. """
-
-    def test_schema_completer(self):
-        self.assertIn("aws.rds", cli.schema_completer("rd"))
-        self.assertIn("aws.s3.", cli.schema_completer("s3"))
-        self.assertListEqual([], cli.schema_completer("invalidResource."))
-        self.assertIn("aws.rds.actions", cli.schema_completer("rds."))
-        self.assertIn("aws.s3.filters.", cli.schema_completer("s3.filters"))
-        self.assertIn("aws.s3.filters.event", cli.schema_completer("s3.filters.eve"))
-        self.assertListEqual([], cli.schema_completer("rds.actions.foo.bar"))
-
-    def test_schema_completer_wrapper(self):
-
-        class MockArgs(object):
-            summary = False
-
-        args = MockArgs()
-        self.assertIn("aws.rds", cli._schema_tab_completer("rd", args))
-
-        args.summary = True
-        self.assertListEqual([], cli._schema_tab_completer("rd", args))
+        self.run_and_expect_failure(["custodian", "logs", "-s", output_dir, yaml_file], 1)
 
 
 class RunTest(CliTest):
@@ -591,8 +573,7 @@ class MetricsTest(CliTest):
         end = datetime.utcnow()
         start = end - timedelta(14)
         period = 24 * 60 * 60 * 14
-
-        out = self.get_output(
+        self.run_and_expect_failure(
             [
                 "custodian",
                 "metrics",
@@ -603,45 +584,8 @@ class MetricsTest(CliTest):
                 "--period",
                 str(period),
                 yaml_file,
-            ]
-        )
-
-        self.assertEqual(
-            json.loads(out),
-            {
-                "ec2-tag-compliance-v6": {
-                    u"Durations": [],
-                    u"Errors": [
-                        {
-                            u"Sum": 0.0,
-                            u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                            u"Unit": u"Count",
-                        }
-                    ],
-                    u"Invocations": [
-                        {
-                            u"Sum": 4.0,
-                            u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                            u"Unit": u"Count",
-                        }
-                    ],
-                    u"ResourceCount": [
-                        {
-                            u"Average": 1.0,
-                            u"Sum": 2.0,
-                            u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                            u"Unit": u"Count",
-                        }
-                    ],
-                    u"Throttles": [
-                        {
-                            u"Sum": 0.0,
-                            u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                            u"Unit": u"Count",
-                        }
-                    ],
-                }
-            },
+            ],
+            1
         )
 
     def test_metrics_get_endpoints(self):
@@ -649,7 +593,7 @@ class MetricsTest(CliTest):
         #
         # Test for defaults when --start is not supplied
         #
-        class FakeOptions(object):
+        class FakeOptions:
             start = end = None
             days = 5
 

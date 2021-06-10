@@ -1,26 +1,14 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import ipaddress
-import six
 import sqlite3
 
 from .utils import row_factory
 
 
-class IPResolver(object):
+class IPResolver:
     """Resolve as much info as we can about a given ip.
 
     Typically this is a two level lookup.
@@ -92,7 +80,7 @@ class IPResolver(object):
             # to revisit. also potentially an option on ip string
             # prefix match as a sanity base.
             elif not info:
-                n = ipaddress.IPv4Address(six.text_type(ip))
+                n = ipaddress.IPv4Address(str(ip))
                 found = False
                 for service, cidr_set in self.aws_cidrs.items():
                     for cidr in cidr_set:

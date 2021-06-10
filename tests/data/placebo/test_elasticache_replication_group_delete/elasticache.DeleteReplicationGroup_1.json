@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroup": {
+            "ReplicationGroupId": "c7n-delete",
+            "Description": " ",
+            "GlobalReplicationGroupInfo": {},
+            "Status": "deleting",
+            "PendingModifiedValues": {},
+            "AutomaticFailover": "enabled",
+            "MultiAZ": "disabled",
+            "SnapshotRetentionLimit": 0,
+            "SnapshotWindow": "09:00-10:00",
+            "TransitEncryptionEnabled": false,
+            "AtRestEncryptionEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}

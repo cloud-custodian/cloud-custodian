@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 
 import base64
@@ -20,7 +9,9 @@ import zlib
 from .core import EventAction
 from c7n import utils
 from c7n.exceptions import PolicyValidationError
+from c7n.manager import resources as aws_resources
 from c7n.resolver import ValuesFrom
+from c7n.version import version
 
 
 class BaseNotify(EventAction):
@@ -177,6 +168,7 @@ class Notify(BaseNotify):
             'event': event,
             'account_id': self.manager.config.account_id,
             'account': alias,
+            'version': version,
             'region': self.manager.config.region,
             'execution_id': self.manager.ctx.execution_id,
             'execution_start': self.manager.ctx.start_time,
@@ -299,3 +291,13 @@ class Notify(BaseNotify):
             MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
+
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        if 'notify' in resource_class.action_registry:
+            return
+
+        resource_class.action_registry.register('notify', cls)
+
+
+aws_resources.subscribe(Notify.register_resource)

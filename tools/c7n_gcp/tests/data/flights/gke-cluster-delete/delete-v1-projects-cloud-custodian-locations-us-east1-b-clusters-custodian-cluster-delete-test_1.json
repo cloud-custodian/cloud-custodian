@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 08 Sep 2020 15:27:47 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "451",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operation-1599578867105-b86f0adb",
+    "zone": "us-east1-b",
+    "operationType": "DELETE_CLUSTER",
+    "status": "RUNNING",
+    "selfLink": "https://container.googleapis.com/v1/projects/875659966653/zones/us-east1-b/operations/operation-1599578867105-b86f0adb",
+    "targetLink": "https://container.googleapis.com/v1/projects/875659966653/zones/us-east1-b/clusters/custodian-cluster-delete-test",
+    "startTime": "2020-09-08T15:27:47.105730926Z"
+  }
+}

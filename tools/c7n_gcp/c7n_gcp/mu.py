@@ -1,25 +1,14 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-# import base64
+import base64
 from collections import namedtuple
 import json
 import logging
 import hashlib
 
 from c7n_gcp.client import errors
-from c7n.mu import custodian_archive as base_archive
+from c7n.mu import generate_requirements, get_exec_options, custodian_archive as base_archive
 from c7n.utils import local_session
 
 from googleapiclient.errors import HttpError
@@ -27,7 +16,14 @@ from googleapiclient.errors import HttpError
 log = logging.getLogger('c7n_gcp.mu')
 
 
-def custodian_archive(packages=None):
+OUTPUT_PACKAGE_MAP = {
+    'metrics.gcp': 'google-cloud-monitoring',
+    'log.gcp': 'google-cloud-logging',
+    'blob.gs': 'google-cloud-storage',
+}
+
+
+def custodian_archive(packages=None, deps=()):
     if not packages:
         packages = []
     packages.append('c7n_gcp')
@@ -37,22 +33,24 @@ def custodian_archive(packages=None):
     # but for pure python packages, if we have a local install and its
     # relatively small, it might be faster to just upload.
     #
+    # note we pin requirements to the same versions installed locally.
     requirements = set()
-    requirements.add('jmespath')
-    requirements.add('retrying')
-    requirements.add('python-dateutil')
-    requirements.add('ratelimiter>=1.2.0.post0')
-    requirements.add('google-auth>=1.4.1')
-    requirements.add('google-auth-httplib2>=0.0.3')
-    requirements.add('google-api-python-client>=1.7.3')
-
+    requirements.update((
+        'jmespath',
+        'retrying',
+        'python-dateutil',
+        'ratelimiter',
+        'google-auth',
+        'google-auth-httplib2',
+        'google-api-python-client'))
+    requirements.update(deps)
     archive.add_contents(
         'requirements.txt',
-        '\n'.join(sorted(requirements)))
+        generate_requirements(requirements, ignore=('setuptools',), include_self=True))
     return archive
 
 
-class CloudFunctionManager(object):
+class CloudFunctionManager:
 
     def __init__(self, session_factory, region):
         self.session_factory = session_factory
@@ -201,7 +199,7 @@ def delta_resource(old_config, new_config, ignore=()):
     return found
 
 
-class CloudFunction(object):
+class CloudFunction:
 
     def __init__(self, func_data, archive=None):
         self.func_data = func_data
@@ -316,8 +314,26 @@ class PolicyFunction(CloudFunction):
     def __init__(self, policy, archive=None, events=()):
         self.policy = policy
         self.func_data = self.policy.data['mode']
-        self.archive = archive or custodian_archive()
+        self.archive = archive or custodian_archive(
+            deps=self.get_output_deps())
         self._events = events
+
+    def get_output_deps(self):
+        deps = []
+        self.policy.ctx.initialize()
+
+        outputs = (
+            ('metrics', self.policy.ctx.metrics),
+            ('blob', self.policy.ctx.output),
+            ('log', self.policy.ctx.logs)
+        )
+        for (output_type, instance) in outputs:
+            if not instance:
+                continue
+            if f"{output_type}.{instance.type}" not in OUTPUT_PACKAGE_MAP:
+                continue
+            deps.append(OUTPUT_PACKAGE_MAP[f"{output_type}.{instance.type}"])
+        return deps
 
     @property
     def name(self):
@@ -330,8 +346,10 @@ class PolicyFunction(CloudFunction):
     def get_archive(self):
         self.archive.add_contents('main.py', PolicyHandlerTemplate)
         self.archive.add_contents(
-            'config.json', json.dumps(
-                {'policies': [self.policy.data]}, indent=2))
+            'config.json', json.dumps({
+                'execution-options': get_exec_options(self.policy.options),
+                'policies': [self.policy.data]},
+                indent=2))
         self.archive.close()
         return self.archive
 
@@ -341,7 +359,7 @@ class PolicyFunction(CloudFunction):
         return config
 
 
-class EventSource(object):
+class EventSource:
 
     def __init__(self, session, data=None):
         self.data = data
@@ -453,14 +471,66 @@ class PubSubSource(EventSource):
 
         client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
-    def add(self):
+    def add(self, func):
         self.ensure_topic()
 
-    def remove(self):
+    def remove(self, func):
         if not self.data.get('topic').startswith(self.prefix):
             return
-        client = self.session.client('topic', 'v1', 'projects.topics')
+        client = self.session.client('pubsub', 'v1', 'projects.topics')
         client.execute_command('delete', {'topic': self.get_topic_param()})
+
+
+class SecurityCenterSubscriber(EventSource):
+
+    def __init__(self, session, data, resource):
+        self.session = session
+        self.data = data
+        self.resource = resource
+
+    def notification_name(self):
+        return "custodian-auto-scc-{}".format(self.resource.type)
+
+    def ensure_notification_config(self):
+        """Verify the notification config exists.
+
+        Returns the notification config name.
+        """
+        client = self.session.client('securitycenter', 'v1', 'organizations.notificationConfigs')
+        config_name = "organizations/{}/notificationConfigs/{}".format(self.data["org"],
+         self.notification_name())
+        try:
+            client.execute_command('get', {'name': config_name})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+        else:
+            return config_name
+
+        config_body = {
+            'name': self.notification_name(),
+            'description': 'auto created by cloud custodian \
+                for resource {}'.format(self.resource.type),
+            'pubsubTopic': "projects/{}/topics/{}".format(self.session.get_default_project(),
+             self.data['topic']),
+            'streamingConfig': {
+                "filter": "resource.type=\"{}\"".format(self.resource.resource_type.scc_type)
+            }
+        }
+        client.execute_command('create', {
+            'configId': self.notification_name(),
+            'parent': 'organizations/{}'.format(self.data["org"]),
+            'body': config_body})
+        return config_name
+
+    def add(self, func):
+        self.ensure_notification_config()
+
+    def remove(self, func):
+        client = self.session.client('securitycenter', 'v1', 'organizations.notificationConfigs')
+        config_name = "organizations/{}/notificationConfigs/{}".format(self.data["org"],
+         self.notification_name())
+        client.execute_command('delete', {'name': config_name})
 
 
 class PeriodicEvent(EventSource):
@@ -573,6 +643,7 @@ class PeriodicEvent(EventSource):
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
                 'topicName': target.get_topic_param(),
+                'data': base64.b64encode("{\"schedule\": true}".encode('utf-8')).decode('utf-8'),
             }
         return job
 

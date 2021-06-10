@@ -1,19 +1,6 @@
-# Copyright 2018-2019 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
@@ -25,7 +12,6 @@ import logging
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.manager import resources
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema,
@@ -79,54 +65,31 @@ class SecurityHubFindingFilter(Filter):
 
         SecurityHub Findings Filter
         """
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_class.filter_registry.register('finding', klass)
+        if 'post-finding' not in resource_class.action_registry:
+            return
+        if not resource_class.has_arn():
+            return
+        resource_class.filter_registry.register('finding', klass)
 
 
-resources.subscribe(resources.EVENT_REGISTER, SecurityHubFindingFilter.register_resources)
-
-
-@execution.register('hub-action')
 @execution.register('hub-finding')
 class SecurityHub(LambdaMode):
-    """
-    Execute a policy lambda in response to security hub finding event or action.
+    """Deploy a policy lambda that executes on security hub finding ingestion events.
 
     .. example:
 
-    This policy will provision a lambda and security hub custom action.
-    The action can be invoked on a finding or insight result (collection
-    of findings). The action name will have the resource type prefixed as
-    custodian actions are resource specific.
+    This policy will provision a lambda that will process findings from
+    guard duty (note custodian also has support for guard duty events directly)
+    on iam users by removing access keys.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
        policy:
          - name: remediate
-           resource: aws.ec2
+           resource: aws.iam-user
            mode:
-             type: hub-action
+             type: hub-finding
              role: MyRole
-           actions:
-            - snapshot
-            - type: set-instance-profile
-              name: null
-            - stop
-
-    .. example:
-
-    This policy will provision a lambda that will process high alert findings from
-    guard duty (note custodian also has support for guard duty events directly).
-
-    .. code-block: yaml
-
-       policy:
-         - name: remediate
-           resource: aws.iam
            filters:
              - type: event
                key: detail.findings[].ProductFields.aws/securityhub/ProductName
@@ -141,6 +104,7 @@ class SecurityHub(LambdaMode):
     so these modes work for resources that security hub doesn't natively support.
 
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
+
     """
 
     schema = type_schema(
@@ -220,7 +184,7 @@ class SecurityHub(LambdaMode):
             resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
-                set((self.policy.options.account_id,)) != {
+                {self.policy.options.account_id} != {
                     rarn.account_id for rarn in resource_arns}):
             msg = ('hub-mode not configured for multi-account member-role '
                    'but multiple resource accounts found')
@@ -261,6 +225,34 @@ class SecurityHub(LambdaMode):
         return resources
 
 
+@execution.register('hub-action')
+class SecurityHubAction(SecurityHub):
+    """Deploys a policy lambda as a Security Hub Console Action.
+
+    .. example:
+
+    This policy will provision a lambda and security hub custom
+    action. The action can be invoked on a finding or insight result
+    (collection of findings) from within the console. The action name
+    will have the resource type prefixed as custodian actions are
+    resource specific.
+
+    .. code-block:: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.ec2
+           mode:
+             type: hub-action
+             role: MyRole
+           actions:
+            - snapshot
+            - type: set-instance-profile
+              name: null
+            - stop
+    """
+
+
 FindingTypes = {
     "Software and Configuration Checks",
     "TTPs",
@@ -284,6 +276,9 @@ class PostFinding(Action):
     such that further findings generate updates.
 
     Example generate a finding for accounts that don't have shield enabled.
+
+    Note with Cloud Custodian (0.9+) you need to enable the Custodian integration
+    to post-findings, see Getting Started with :ref:`Security Hub <aws-securityhub>`.
 
     :example:
 
@@ -310,9 +305,10 @@ class PostFinding(Action):
     """ # NOQA
 
     FindingVersion = "2018-10-08"
-    ProductName = "default"
 
     permissions = ('securityhub:BatchImportFindings',)
+
+    resource_type = ""
 
     schema_alias = True
     schema = type_schema(
@@ -323,6 +319,10 @@ class PostFinding(Action):
             'policy.description, or if not defined in policy then policy.name'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
+        severity_label={
+            "type": "string", 'default': 'INFORMATIONAL',
+            "enum": ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        },
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
@@ -388,7 +388,7 @@ class PostFinding(Action):
             self.manager.session_factory).client(
                 "securityhub", region_name=region_name)
 
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        now = datetime.now(tzutc()).isoformat()
         # default batch size to one to work around security hub console issue
         # which only shows a single resource in a finding.
         batch_size = self.data.get('batch_size', 1)
@@ -446,21 +446,19 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
-            finding_id = '{}/{}/{}/{}'.format(
+            finding_id = '{}/{}/{}/{}'.format(  # nosec
                 self.manager.config.region,
                 self.manager.config.account_id,
-                hashlib.md5(json.dumps(
+                hashlib.md5(json.dumps(  # nosemgrep
                     policy.data).encode('utf8')).hexdigest(),
-                hashlib.md5(json.dumps(list(sorted(
+                hashlib.md5(json.dumps(list(sorted(  # nosemgrep
                     [r[model.id] for r in resources]))).encode(
                         'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
-            "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
-                region,
-                self.manager.config.account_id,
-                self.manager.config.account_id,
-                self.ProductName,
+            "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
+                get_partition(self.manager.config.region),
+                region
             ),
             "AwsAccountId": self.manager.config.account_id,
             # Long search chain for description values, as this was
@@ -479,9 +477,12 @@ class PostFinding(Action):
             "RecordState": "ACTIVE",
         }
 
-        severity = {'Product': 0, 'Normalized': 0}
+        severity = {'Product': 0, 'Normalized': 0, 'Label': 'INFORMATIONAL'}
         if self.data.get("severity") is not None:
             severity["Product"] = self.data["severity"]
+        if self.data.get("severity_label") is not None:
+            severity["Label"] = self.data["severity_label"]
+        # severity_normalized To be deprecated per https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html#asff-severity # NOQA
         if self.data.get("severity_normalized") is not None:
             severity["Normalized"] = self.data["severity_normalized"]
         if severity:
@@ -532,6 +533,20 @@ class PostFinding(Action):
 
         return filter_empty(finding)
 
+    def format_envelope(self, r):
+        details = {}
+        envelope = filter_empty({
+            'Id': self.manager.get_arns([r])[0],
+            'Region': self.manager.config.region,
+            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Partition': get_partition(self.manager.config.region),
+            'Details': {self.resource_type: details},
+            'Type': self.resource_type
+        })
+        return envelope, details
+
+    filter_empty = staticmethod(filter_empty)
+
     def format_resource(self, r):
         raise NotImplementedError("subclass responsibility")
 
@@ -539,6 +554,7 @@ class PostFinding(Action):
 class OtherResourcePostFinding(PostFinding):
 
     fields = ()
+    resource_type = 'Other'
 
     def format_resource(self, r):
         details = {}
@@ -566,11 +582,11 @@ class OtherResourcePostFinding(PostFinding):
 
         details['c7n:resource-type'] = self.manager.type
         other = {
-            'Type': 'Other',
+            'Type': self.resource_type,
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
             'Partition': get_partition(self.manager.config.region),
-            'Details': {'Other': filter_empty(details)}
+            'Details': {self.resource_type: filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
         if tags:
@@ -578,15 +594,10 @@ class OtherResourcePostFinding(PostFinding):
         return other
 
     @classmethod
-    def register_resource(klass, registry, event):
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_manager.action_registry.register('post-finding', klass)
+    def register_resource(klass, registry, resource_class):
+        if 'post-finding' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-finding', klass)
 
 
-AWS.resources.subscribe(
-    AWS.resources.EVENT_FINAL,
-    OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)

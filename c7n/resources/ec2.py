@@ -1,18 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import base64
 import itertools
 import operator
@@ -20,7 +7,6 @@ import random
 import re
 import zlib
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -39,6 +25,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
 from c7n.resources.iam import CheckPermissions
@@ -48,72 +35,6 @@ RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-
-@resources.register('ec2')
-class EC2(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ec2'
-        arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
-        id = 'InstanceId'
-        filter_name = 'InstanceIds'
-        filter_type = 'list'
-        name = 'PublicDnsName'
-        date = 'LaunchTime'
-        dimension = 'InstanceId'
-        config_type = "AWS::EC2::Instance"
-
-        default_report_fields = (
-            'CustodianDate',
-            'InstanceId',
-            'tag:Name',
-            'InstanceType',
-            'LaunchTime',
-            'VpcId',
-            'PrivateIpAddress',
-        )
-
-    filter_registry = filters
-    action_registry = actions
-
-    # if we have to do a fallback scenario where tags don't come in describe
-    permissions = ('ec2:DescribeTags',)
-
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeEC2(self)
-        elif source_type == 'config':
-            return query.ConfigSource(self)
-        raise ValueError('invalid source %s' % source_type)
 
 
 class DescribeEC2(query.DescribeSource):
@@ -171,6 +92,70 @@ class DescribeEC2(query.DescribeSource):
         return resources
 
 
+@resources.register('ec2')
+class EC2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
+        cfn_type = config_type = "AWS::EC2::Instance"
+        id_prefix = 'i-'
+
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
+
+    filter_registry = filters
+    action_registry = actions
+
+    # if we have to do a fallback scenario where tags don't come in describe
+    permissions = ('ec2:DescribeTags',)
+    source_mapping = {
+        'describe': DescribeEC2,
+        'config': query.ConfigSource
+    }
+
+    def __init__(self, ctx, data):
+        super(EC2, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
+
+    def resources(self, query=None):
+        q = self.resource_query()
+        if q is not None:
+            query = query or {}
+            query['Filters'] = q
+        return super(EC2, self).resources(query=query)
+
+    def resource_query(self):
+        qf = []
+        qf_names = set()
+        # allow same name to be specified multiple times and append the queries
+        # under the same name
+        for q in self.queries:
+            qd = q.query()
+            if qd['Name'] in qf_names:
+                for qf in qf:
+                    if qd['Name'] == qf['Name']:
+                        qf['Values'].extend(qd['Values'])
+            else:
+                qf_names.add(qd['Name'])
+                qf.append(qd)
+        return qf
+
+
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -205,7 +190,7 @@ class ComputePermissions(CheckPermissions):
                 [p[0] for p in profile_arns],
                 self.manager.get_resource_manager(
                     'iam-profile').get_resources(
-                        [p[1] for p in profile_arns]))}
+                        [p[0].split('/', 1)[-1] for p in profile_arns]))}
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
@@ -244,29 +229,6 @@ class StateTransitionAge(AgeFilter):
         if dates:
             return parse(dates[0][1:-1])
         return None
-
-
-class StateTransitionFilter(object):
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for.
-
-    For more details see
-     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['State']['Name'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
 
 
 @filters.register('ebs')
@@ -384,7 +346,7 @@ class DisableApiTermination(Filter):
         return attr_val['DisableApiTermination']['Value']
 
 
-class InstanceImageBase(object):
+class InstanceImageBase:
 
     def prefetch_instance_images(self, instances):
         image_ids = [i['ImageId'] for i in instances if 'c7n:instance-image' not in i]
@@ -477,13 +439,16 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
 
 @filters.register('offhour')
-class InstanceOffHour(OffHour, StateTransitionFilter):
+class InstanceOffHour(OffHour):
     """Custodian OffHour filter
 
     Filters running EC2 instances with the intent to stop at a given hour of
     the day. A list of days to excluded can be included as a list of strings
     with the format YYYY-MM-DD. Alternatively, the list (using the same syntax)
     can be taken from a specified url.
+
+    Note: You can disable filtering of only running instances by setting
+    `state-filter: false`
 
     :Example:
 
@@ -526,34 +491,45 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
               - stop
     """
 
+    schema = type_schema(
+        'offhour', rinherit=OffHour.schema,
+        **{'state-filter': {'type': 'boolean'}})
+    schema_alias = False
+
     valid_origin_states = ('running',)
 
     def process(self, resources, event=None):
-        return super(InstanceOffHour, self).process(
-            self.filter_instance_state(resources))
+        if self.data.get('state-filter', True):
+            return super(InstanceOffHour, self).process(
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
+        else:
+            return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
-class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+class EC2NetworkLocation(net_filters.NetworkLocation):
 
     valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
                            'stopped')
 
     def process(self, resources, event=None):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
-class InstanceOnHour(OnHour, StateTransitionFilter):
+class InstanceOnHour(OnHour):
     """Custodian OnHour filter
 
     Filters stopped EC2 instances with the intent to start at a given hour of
     the day. A list of days to excluded can be included as a list of strings
     with the format YYYY-MM-DD. Alternatively, the list (using the same syntax)
     can be taken from a specified url.
+
+    Note: You can disable filtering of only stopped instances by setting
+    `state-filter: false`
 
     :Example:
 
@@ -596,11 +572,19 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
               - start
     """
 
+    schema = type_schema(
+        'onhour', rinherit=OnHour.schema,
+        **{'state-filter': {'type': 'boolean'}})
+    schema_alias = False
+
     valid_origin_states = ('stopped',)
 
     def process(self, resources, event=None):
-        return super(InstanceOnHour, self).process(
-            self.filter_instance_state(resources))
+        if self.data.get('state-filter', True):
+            return super(InstanceOnHour, self).process(
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
+        else:
+            return super(InstanceOnHour, self).process(resources)
 
 
 @filters.register('ephemeral')
@@ -780,7 +764,7 @@ class UserData(ValueFilter):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter, StateTransitionFilter):
+class SingletonFilter(Filter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -815,7 +799,7 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     def process(self, instances, event=None):
         return super(SingletonFilter, self).process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
 
     def __call__(self, i):
         if self.in_asg(i):
@@ -898,11 +882,117 @@ class SsmStatus(ValueFilter):
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
 
+@EC2.filter_registry.register('ssm-compliance')
+class SsmCompliance(Filter):
+    """Filter ec2 instances by their ssm compliance status.
+
+    :Example:
+
+    Find non-compliant ec2 instances.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-ssm-compliance
+            resource: ec2
+            filters:
+              - type: ssm-compliance
+                compliance_types:
+                  - Association
+                  - Patch
+                severity:
+                  - CRITICAL
+                  - HIGH
+                  - MEDIUM
+                  - LOW
+                  - UNSPECIFIED
+                states:
+                  - NON_COMPLIANT
+                eval_filters:
+                 - type: value
+                   key: ExecutionSummary.ExecutionTime
+                   value_type: age
+                   value: 30
+                   op: less-than
+    """
+    schema = type_schema(
+        'ssm-compliance',
+        **{'required': ['compliance_types'],
+           'compliance_types': {'type': 'array', 'items': {'type': 'string'}},
+           'severity': {'type': 'array', 'items': {'type': 'string'}},
+           'op': {'enum': ['or', 'and']},
+           'eval_filters': {'type': 'array', 'items': {
+                            'oneOf': [
+                                {'$ref': '#/definitions/filters/valuekv'},
+                                {'$ref': '#/definitions/filters/value'}]}},
+           'states': {'type': 'array',
+                      'default': ['NON_COMPLIANT'],
+                      'items': {
+                          'enum': [
+                              'COMPLIANT',
+                              'NON_COMPLIANT'
+                          ]}}})
+    permissions = ('ssm:ListResourceComplianceSummaries',)
+    annotation = 'c7n:ssm-compliance'
+
+    def process(self, resources, event=None):
+        op = self.data.get('op', 'or') == 'or' and any or all
+        eval_filters = []
+        for f in self.data.get('eval_filters', ()):
+            vf = ValueFilter(f)
+            vf.annotate = False
+            eval_filters.append(vf)
+
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        filters = [
+            {
+                'Key': 'Status',
+                'Values': self.data['states'],
+                'Type': 'EQUAL'
+            },
+            {
+                'Key': 'ComplianceType',
+                'Values': self.data['compliance_types'],
+                'Type': 'EQUAL'
+            }
+        ]
+        severity = self.data.get('severity')
+        if severity:
+            filters.append(
+                {
+                    'Key': 'OverallSeverity',
+                    'Values': severity,
+                    'Type': 'EQUAL'
+                })
+
+        resource_map = {}
+        pager = client.get_paginator('list_resource_compliance_summaries')
+        for page in pager.paginate(Filters=filters):
+            items = page['ResourceComplianceSummaryItems']
+            for i in items:
+                if not eval_filters:
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
+                    continue
+                if op([f.match(i) for f in eval_filters]):
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
+
+        results = []
+        for r in resources:
+            result = resource_map.get(r['InstanceId'])
+            if result:
+                r[self.annotation] = result
+                results.append(r)
+
+        return results
+
+
 @actions.register('set-monitoring')
-class MonitorInstances(BaseAction, StateTransitionFilter):
+class MonitorInstances(BaseAction):
     """Action on EC2 Instances to enable/disable detailed monitoring
 
-    The differents states of detailed monitoring status are :
+    The different states of detailed monitoring status are :
     'disabled'|'disabling'|'enabled'|'pending'
     (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
 
@@ -956,8 +1046,91 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
                 raise
 
 
+@EC2.action_registry.register('set-metadata-access')
+class SetMetadataServerAccess(BaseAction):
+    """Set instance metadata server access for an instance.
+
+    :example:
+
+    Require instances to use IMDSv2
+
+    .. code-block:: yaml
+
+       policies:
+         - name: ec2-require-imdsv2
+           resource: ec2
+           filters:
+             - MetadataOptions.HttpToken: optional
+           actions:
+             - type: set-metadata-access
+               tokens: required
+
+    :example:
+
+    Disable metadata server access
+
+    .. code-block: yaml
+
+       policies:
+         - name: ec2-disable-imds
+           resource: ec2
+           filters:
+             - MetadataOptions.HttpEndpoint: enabled
+           actions:
+             - type: set-metadata-access
+               endpoint: disabled
+
+    Reference: https://amzn.to/2XOuxpQ
+    """
+
+    AllowedValues = {
+        'HttpEndpoint': ['enabled', 'disabled'],
+        'HttpTokens': ['required', 'optional'],
+        'HttpPutResponseHopLimit': list(range(1, 65))
+    }
+
+    schema = type_schema(
+        'set-metadata-access',
+        anyOf=[{'required': ['endpoint']},
+               {'required': ['tokens']},
+               {'required': ['hop-limit']}],
+        **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
+           'tokens': {'enum': AllowedValues['HttpTokens']},
+           'hop-limit': {'type': 'integer', 'minimum': 1, 'maximum': 64}}
+    )
+    permissions = ('ec2:ModifyInstanceMetadataOptions',)
+
+    def get_params(self):
+        return filter_empty({
+            'HttpEndpoint': self.data.get('endpoint'),
+            'HttpTokens': self.data.get('tokens'),
+            'HttpPutResponseHopLimit': self.data.get('hop-limit')})
+
+    def process(self, resources):
+        params = self.get_params()
+        for k, v in params.items():
+            allowed_values = list(self.AllowedValues[k])
+            allowed_values.remove(v)
+            resources = self.filter_resources(
+                resources, 'MetadataOptions.%s' % k, allowed_values)
+
+        if not resources:
+            return
+
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            self.manager.retry(
+                client.modify_instance_metadata_options,
+                ignore_err_codes=('InvalidInstanceId.NotFound',),
+                InstanceId=r['InstanceId'],
+                **params)
+
+
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
+
+    resource_type = 'AwsEc2Instance'
+
     def format_resource(self, r):
         ip_addresses = jmespath.search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
@@ -976,11 +1149,12 @@ class InstanceFinding(PostFinding):
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
             details["SubnetId"] = r["SubnetId"]
-        if "IamInstanceProfile" in r:
+        # config will use an empty key
+        if "IamInstanceProfile" in r and r['IamInstanceProfile']:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {
-            "Type": "AwsEc2Instance",
+            "Type": self.resource_type,
             "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
                 utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
                 self.manager.config.region,
@@ -988,7 +1162,7 @@ class InstanceFinding(PostFinding):
                 r["InstanceId"]),
             "Region": self.manager.config.region,
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsEc2Instance": filter_empty(details)},
+            "Details": {self.resource_type: filter_empty(details)},
         }
 
         instance = filter_empty(instance)
@@ -996,7 +1170,7 @@ class InstanceFinding(PostFinding):
 
 
 @actions.register('start')
-class Start(BaseAction, StateTransitionFilter):
+class Start(BaseAction):
     """Starts a previously stopped EC2 instance.
 
     :Example:
@@ -1025,7 +1199,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1081,7 +1255,7 @@ def extract_instance_id(state_error):
 
 
 @actions.register('resize')
-class Resize(BaseAction, StateTransitionFilter):
+class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
@@ -1111,10 +1285,8 @@ class Resize(BaseAction, StateTransitionFilter):
         return perms
 
     def process(self, resources):
-        stopped_instances = self.filter_instance_state(
-            resources, ('stopped',))
-        running_instances = self.filter_instance_state(
-            resources, ('running',))
+        stopped_instances = self.filter_resources(resources, 'State.Name', ('stopped',))
+        running_instances = self.filter_resources(resources, 'State.Name', ('running',))
 
         if self.data.get('restart') and running_instances:
             Stop({'terminate-ephemeral': False},
@@ -1162,8 +1334,8 @@ class Resize(BaseAction, StateTransitionFilter):
 
 
 @actions.register('stop')
-class Stop(BaseAction, StateTransitionFilter):
-    """Stops a running EC2 instances
+class Stop(BaseAction):
+    """Stops or hibernates a running EC2 instances
 
     :Example:
 
@@ -1176,10 +1348,27 @@ class Stop(BaseAction, StateTransitionFilter):
               - instance-state-name: running
             actions:
               - stop
+
+          - name: ec2-hibernate-instances
+            resources: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - type: stop
+                hibernate: true
+
+
+    Note when using hiberate, instances not configured for hiberation
+    will just be stopped.
     """
     valid_origin_states = ('running',)
 
-    schema = type_schema('stop', **{'terminate-ephemeral': {'type': 'boolean'}})
+    schema = type_schema(
+        'stop',
+        **{'terminate-ephemeral': {'type': 'boolean'},
+           'hibernate': {'type': 'boolean'}})
+
+    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1197,8 +1386,17 @@ class Stop(BaseAction, StateTransitionFilter):
                 persistent.append(i)
         return ephemeral, persistent
 
+    def split_on_hibernate(self, instances):
+        enabled, disabled = [], []
+        for status, i in zip(self.has_hibernate.search(instances), instances):
+            if status is True:
+                enabled.append(i)
+            else:
+                disabled.append(i)
+        return enabled, disabled
+
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1210,15 +1408,22 @@ class Stop(BaseAction, StateTransitionFilter):
                 client.terminate_instances,
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
+            if self.data.get('hibernate', False):
+                enabled, persistent = self.split_on_hibernate(persistent)
+                if enabled:
+                    self._run_instances_op(
+                        client.stop_instances,
+                        [i['InstanceId'] for i in enabled],
+                        Hibernate=True)
             self._run_instances_op(
                 client.stop_instances,
                 [i['InstanceId'] for i in persistent])
         return instances
 
-    def _run_instances_op(self, op, instance_ids):
+    def _run_instances_op(self, op, instance_ids, **kwargs):
         while instance_ids:
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids)
+                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
@@ -1226,8 +1431,8 @@ class Stop(BaseAction, StateTransitionFilter):
 
 
 @actions.register('reboot')
-class Reboot(BaseAction, StateTransitionFilter):
-    """reboots a previously running EC2 instance.
+class Reboot(BaseAction):
+    """Reboots a previously running EC2 instance.
 
     :Example:
 
@@ -1255,7 +1460,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1290,7 +1495,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
 
 @actions.register('terminate')
-class Terminate(BaseAction, StateTransitionFilter):
+class Terminate(BaseAction):
     """ Terminate a set of instances.
 
     While ec2 offers a bulk delete api, any given instance can be configured
@@ -1324,7 +1529,7 @@ class Terminate(BaseAction, StateTransitionFilter):
         return permissions
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1360,7 +1565,20 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    """Snapshots volumes attached to an EC2 instance
+    """Snapshot the volumes attached to an EC2 instance.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot when using
+      'copy-tags`.  If no tags are specified, then the tag
+      `custodian_snapshot` is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :Example:
 
@@ -1373,12 +1591,15 @@ class Snapshot(BaseAction):
               - type: snapshot
                 copy-tags:
                   - Name
+                tags:
+                    custodian_snapshot: True
     """
 
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'},
            'exclude-boot': {'type': 'boolean', 'default': False}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
@@ -1433,16 +1654,9 @@ class Snapshot(BaseAction):
                 resource['InstanceId'], err_code)
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', [])
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @actions.register('modify-security-groups')
@@ -1479,7 +1693,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @actions.register('autorecover-alarm')
-class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+class AutorecoverAlarm(BaseAction):
     """Adds a cloudwatch metric alarm to recover an EC2 instance.
 
     This action takes effect on instances that are NOT part
@@ -1509,7 +1723,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self.filter_asg_membership.process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
         client = utils.local_session(
@@ -1542,7 +1756,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction, StateTransitionFilter):
+class SetInstanceProfile(BaseAction):
     """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
@@ -1574,7 +1788,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
     valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')
@@ -1751,7 +1965,7 @@ EC2_VALID_FILTERS = {
     'vpc-id': str}
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     @classmethod
     def parse(cls, data):
@@ -1789,7 +2003,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -1797,7 +2011,7 @@ class QueryFilter(object):
 
 @filters.register('instance-attribute')
 class InstanceAttribute(ValueFilter):
-    """EC2 Instance Value FIlter on a given instance attribute.
+    """EC2 Instance Value Filter on a given instance attribute.
 
     Filters EC2 Instances with the given instance attribute
 
@@ -1869,6 +2083,7 @@ class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         id = 'LaunchTemplateId'
+        id_prefix = 'lt-'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
@@ -1913,7 +2128,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
                         tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
-        elif isinstance(rids[0], six.string_types):
+        elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
 
@@ -1953,7 +2168,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 continue
             templates.setdefault(
                 (t['LaunchTemplateId'],
-                 t['Version']), []).append(a['AutoScalingGroupName'])
+                 t.get('Version', '$Default')), []).append(a['AutoScalingGroupName'])
         return templates
 
 
@@ -1963,9 +2178,28 @@ class ReservedInstance(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'ReservedInstancesId'
+        id_prefix = ""
         date = 'Start'
         enum_spec = (
             'describe_reserved_instances', 'ReservedInstances', None)
         filter_name = 'ReservedInstancesIds'
         filter_type = 'list'
         arn_type = "reserved-instances"
+
+
+@resources.register('ec2-host')
+class DedicatedHost(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Dedicated Hosts.
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        name = id = 'HostId'
+        id_prefix = 'h-'
+        enum_spec = ('describe_hosts', 'Hosts', None)
+        arn_type = "dedicated-host"
+        filter_name = 'HostIds'
+        filter_type = 'list'
+        date = 'AllocationTime'
+        cfn_type = config_type = 'AWS::EC2::Host'
+        permissions_enum = ('ec2:DescribeHosts',)

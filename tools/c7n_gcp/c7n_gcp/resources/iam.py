@@ -1,24 +1,19 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import re
+
+from c7n.utils import type_schema
 
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('project-role')
 class ProjectRole(QueryResourceManager):
-
+    """GCP Project Role
+    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """
     class resource_type(TypeInfo):
         service = 'iam'
         version = 'v1'
@@ -27,7 +22,9 @@ class ProjectRole(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = "name"
+        name = id = "name"
+        default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
+        asset_type = "iam.googleapis.com/Role"
 
         @staticmethod
         def get(client, resource_info):
@@ -50,6 +47,10 @@ class ServiceAccount(QueryResourceManager):
         scope_key = 'name'
         scope_template = 'projects/{}'
         id = "name"
+        name = 'email'
+        default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
+        asset_type = "iam.googleapis.com/ServiceAccount"
+        metric_key = 'resource.labels.unique_id'
 
         @staticmethod
         def get(client, resource_info):
@@ -60,16 +61,110 @@ class ServiceAccount(QueryResourceManager):
                         resource_info['email_id'])})
 
 
+@ServiceAccount.action_registry.register('delete')
+class DeleteServiceAccount(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ("iam.serviceAccounts.delete",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('enable')
+class EnableServiceAccount(MethodAction):
+    schema = type_schema('enable')
+    method_spec = {'op': 'enable'}
+    permissions = ("iam.serviceAccounts.enable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('disable')
+class DisableServiceAccount(MethodAction):
+    schema = type_schema('disable')
+    method_spec = {'op': 'disable'}
+    permissions = ("iam.serviceAccounts.disable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@resources.register('service-account-key')
+class ServiceAccountKey(ChildResourceManager):
+    """GCP Resource
+    https://cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts.keys
+    """
+    def _get_parent_resource_info(self, child_instance):
+        project_id, sa = re.match(
+            'projects/(.*?)/serviceAccounts/(.*?)/keys/.*',
+            child_instance['name']).groups()
+        return {'project_id': project_id,
+                'email_id': sa}
+
+    def get_resource_query(self):
+        """Does nothing as self does not need query values unlike its parent
+        which receives them with the use_child_query flag."""
+        pass
+
+    class resource_type(ChildTypeInfo):
+        service = 'iam'
+        version = 'v1'
+        component = 'projects.serviceAccounts.keys'
+        enum_spec = ('list', 'keys[]', [])
+        scope = None
+        scope_key = 'name'
+        name = id = 'name'
+        default_report_fields = ['name', 'privateKeyType', 'keyAlgorithm',
+          'validAfterTime', 'validBeforeTime', 'keyOrigin', 'keyType']
+        parent_spec = {
+            'resource': 'service-account',
+            'child_enum_params': [
+                ('name', 'name')
+            ],
+            'use_child_query': True
+        }
+        asset_type = "iam.googleapis.com/ServiceAccountKey"
+        scc_type = "google.iam.ServiceAccountKey"
+        permissions = ("iam.serviceAccounts.list",)
+
+        @staticmethod
+        def get(client, resource_info):
+            project, sa, key = re.match(
+                '.*?/projects/(.*?)/serviceAccounts/(.*?)/keys/(.*)',
+                resource_info['resourceName']).groups()
+            return client.execute_query(
+                'get', {
+                    'name': 'projects/{}/serviceAccounts/{}/keys/{}'.format(
+                        project, sa, key)})
+
+
+@ServiceAccountKey.action_registry.register('delete')
+class DeleteServiceAccountKey(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ("iam.serviceAccountKeys.delete",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-
+    """GCP Organization Role
+    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """
     class resource_type(TypeInfo):
         service = 'iam'
         version = 'v1'
         component = 'roles'
         enum_spec = ('list', 'roles[]', None)
         scope = "global"
-        id = "name"
+        name = id = "name"
+        default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
+        asset_type = "iam.googleapis.com/Role"
 
         @staticmethod
         def get(client, resource_info):

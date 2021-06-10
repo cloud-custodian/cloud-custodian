@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "E3SPE6T0EJSAA4",
+        "DistributionConfig": {
+            "CallerReference": "6441605581961",
+            "Comment": "",
+            "Enabled": true,
+            "Logging": {
+                "Enabled": true,
+                "IncludeCookies": false,
+                "Bucket": "test-logging.s3.amazonaws.com",
+                "Prefix": ""
+            }
+        }
+    }
+}

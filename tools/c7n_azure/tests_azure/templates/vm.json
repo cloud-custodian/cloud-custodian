@@ -15,7 +15,7 @@
     "publicIPAddressName": "myPublicIP",
     "publicIPAddressType": "Dynamic",
     "vmName": "cctestvm",
-    "vmSize": "Standard_A1",
+    "vmSize": "Standard_A1_v2",
     "virtualNetworkName": "MyVNET",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
@@ -106,7 +106,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Basic_A0"
+          "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
           "computerName": "[concat('vm', uniqueString(resourceGroup().id))]",
@@ -145,7 +145,32 @@
           }
         }
       }
+    },
+    {
+    "name": "[concat(variables('vmName'), '/script1')]",
+    "type": "Microsoft.Compute/virtualMachines/extensions",
+    "location": "[resourceGroup().location]",
+    "apiVersion": "2019-03-01",
+    "dependsOn": [
+      "[concat('Microsoft.Compute/virtualMachines/', concat(variables('vmName')))]"
+    ],
+    "tags": {
+      "displayName": "config-app"
+    },
+    "properties": {
+      "publisher": "Microsoft.Azure.Extensions",
+      "type": "CustomScript",
+      "typeHandlerVersion": "2.1",
+      "autoUpgradeMinorVersion": true,
+      "settings": {
+        "skipDos2Unix":false,
+        "timestamp":123456789
+      },
+      "protectedSettings": {
+         "commandToExecute": "echo foo"
+      }
     }
+  }
   ],
   "outputs": {
     "hostname": {

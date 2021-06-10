@@ -1,7 +1,9 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 
-class AzureSerializer(object):
+class AzureSerializer:
 
     def deserialize(self, cassette_string):
         return json.loads(cassette_string)

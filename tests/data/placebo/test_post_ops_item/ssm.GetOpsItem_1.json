@@ -37,7 +37,7 @@
                     "Type": "SearchableString"
                 },
                 "/aws/resources": {
-                    "Value": "[{\"arn\": \"arn:aws:lambda:us-east-1::function:custodian-aws\"}]",
+                    "Value": "[{\"arn\": \"arn:aws:lambda:us-east-1:644160558196:function:custodian-aws\"}]",
                     "Type": "SearchableString"
                 },
                 "/custodian/dedup": {

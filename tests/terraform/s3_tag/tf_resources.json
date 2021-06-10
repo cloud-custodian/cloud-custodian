@@ -1,0 +1,42 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_s3_bucket": {
+            "example": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::my-custodian-test-bucket",
+                "bucket": "my-custodian-test-bucket",
+                "bucket_domain_name": "my-custodian-test-bucket.s3.amazonaws.com",
+                "bucket_prefix": null,
+                "bucket_regional_domain_name": "my-custodian-test-bucket.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "my-custodian-test-bucket",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": {
+                    "original-tag": "original-value"
+                },
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        }
+    }
+}
