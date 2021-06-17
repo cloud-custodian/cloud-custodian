@@ -486,7 +486,7 @@ class DaxTagging(Tag):
         mid = self.manager.resource_type.id
         for r in resources:
             try:
-                client.tag_resource(ResourceName=r[mid], Tags=tags)
+                client.tag_resource(ResourceName=r['ClusterArn'], Tags=tags)
             except (client.exceptions.ClusterNotFoundFault,
                     client.exceptions.InvalidARNFault,
                     client.exceptions.InvalidClusterStateFault) as e:
