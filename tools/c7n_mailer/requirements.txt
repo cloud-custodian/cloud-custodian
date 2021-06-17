@@ -7,13 +7,13 @@ datadog==0.34.1
 decorator==5.0.9; python_version >= "3.5"
 idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 importlib-metadata==4.5.0; python_version >= "3.6" and python_version < "3.8"
-jinja2==2.11.3; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+jinja2==3.0.1; python_version >= "3.6"
 jmespath==0.10.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 jsonpatch==1.32; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 jsonpointer==2.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
 jsonschema==3.2.0
 ldap3==2.9
-markupsafe==2.0.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+markupsafe==2.0.1; python_version >= "3.6"
 pyasn1==0.4.8
 pyrsistent==0.17.3; python_version >= "3.5"
 python-dateutil==2.8.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
