@@ -26,7 +26,7 @@ class DataPipeline(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'datapipeline'
         arn_type = 'dataPipeline'
-        id = 'id'
+        id = 'pipelineId'
         name = 'name'
         dimension = 'name'
         batch_detail_spec = (
