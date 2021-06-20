@@ -51,6 +51,7 @@ ResourceMap = {
     "azure.storage": "c7n_azure.resources.storage.Storage",
     "azure.storage-container": "c7n_azure.resources.storage_container.StorageContainer",
     "azure.subscription": "c7n_azure.resources.subscription.Subscription",
+    "azure.user-assigned-identity": "c7n_azure.resources.msi.UserAssignedIdentity",
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
