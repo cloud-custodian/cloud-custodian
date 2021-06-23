@@ -115,6 +115,35 @@ class ProxyUrlTest(BaseTest):
             proxy_url = utils.get_proxy_url('http://web.site')
             self.assertEqual(proxy_url, 'http://mock.all.proxy.server:8000')
 
+    def test_http_proxy_with_no_proxy_without_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, None)
+
+    def test_http_proxy_with_no_proxy_mismatch_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, 'http://mock.http.proxy.server:8000')
+
+    def test_http_proxy_with_no_proxy_match_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site:8080')
+            self.assertEqual(proxy_url, None)
 
 class UtilTest(BaseTest):
 

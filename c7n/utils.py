@@ -14,7 +14,7 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies
+from urllib.request import getproxies, proxy_bypass
 
 
 from dateutil.parser import ParserError, parse
@@ -609,6 +609,23 @@ def get_proxy_url(url):
         'all://' + url_parts['netloc'],
         'all'
     ]
+
+    # Remove username:password if present in netloc.
+    target = re.sub(r'^.*@', '', url_parts['netloc'])
+
+    # Append a port based on scheme if not provided in netloc.
+    target_url_port = target.split(':')
+    if len(target_url_port) == 1:
+        if url_parts['scheme'] == 'http':
+            target_url_port.append('80')
+        elif url_parts['scheme'] == 'https':
+            target_url_port.append('443')
+        target = ':'.join(target_url_port)
+
+    # Determine if proxy should be used based on no_proxy entries.
+    # Note this does not support no_proxy ip or cidr entries.
+    if proxy_bypass(target):
+        return None
 
     for key in proxy_keys:
         if key in proxies:
