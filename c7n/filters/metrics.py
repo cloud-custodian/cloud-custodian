@@ -164,7 +164,7 @@ class MetricsFilter(Filter):
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
-                 'Value': resource[self.model.dimension_field or self.model.dimension]}]
+                 'Value': resource[self.model.dimension]}]
 
     def get_user_dimensions(self):
         dims = []

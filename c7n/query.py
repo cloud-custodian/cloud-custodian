@@ -844,7 +844,6 @@ class TypeInfo(metaclass=TypeMeta):
     # resource id can be passed as this value. further customizations
     # of dimensions require subclass metrics filter.
     dimension = None
-    dimension_field = None
 
     # AWS Cloudformation type
     cfn_type = None
