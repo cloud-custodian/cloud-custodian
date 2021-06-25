@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Could not find model \"arn:aws:sagemaker:us-east-1:644160558196:model/sagemaker-model\".",
+            "Code": "ValidationException"
+        },
+        "ResponseMetadata": {}
+    }
+}
