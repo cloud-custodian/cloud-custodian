@@ -236,6 +236,10 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2021
+            'AwsEc2Subnet',
+            'AwsElasticBeanstalkEnvironment',
+            'AwsEc2NetworkAcl',
             # newer wave q1 2021,
             'AwsS3AccountPublicAccessBlock',
             'AwsSsmPatchCompliance',

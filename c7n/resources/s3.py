@@ -50,7 +50,7 @@ except ImportError:
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -745,17 +745,29 @@ class BucketActionBase(BaseAction):
         }
 
     def process(self, buckets):
-        with self.executor_factory(max_workers=3) as w:
+        return self._process_with_futures(buckets)
+
+    def _process_with_futures(self, buckets, *args, max_workers=3, **kwargs):
+        errors = 0
+        results = []
+        with self.executor_factory(max_workers=max_workers) as w:
             futures = {}
-            results = []
             for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
+                futures[w.submit(self.process_bucket, b, *args, **kwargs)] = b
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error('error modifying bucket:%s\n%s',
-                                   b['Name'], f.exception())
+                    b = futures[f]
+                    self.log.error(
+                        'error modifying bucket: policy:%s action:%s bucket:%s error:%s',
+                        self.manager.data.get('name'), self.name, b['Name'], f.exception()
+                    )
+                    errors += 1
+                    continue
                 results += filter(None, [f.result()])
-            return results
+        if errors:
+            self.log.error('encountered %d errors while processing %s', errors, self.name)
+            raise PolicyExecutionError('%d resources failed', errors)
+        return results
 
 
 class BucketFilterBase(Filter):
@@ -1031,7 +1043,7 @@ class BucketNotificationFilter(ValueFilter):
 
 
 @filters.register('bucket-logging')
-class BucketLoggingFilter(Filter):
+class BucketLoggingFilter(BucketFilterBase):
     """Filter based on bucket logging configuration.
 
     :example:
@@ -1094,14 +1106,14 @@ class BucketLoggingFilter(Filter):
             session = local_session(self.manager.session_factory)
             self.account_name = get_account_alias_from_sts(session)
 
-        variables = {
-            'account_id': self.manager.config.account_id,
+        variables = self.get_std_format_args(b)
+        variables.update({
             'account': self.account_name,
-            'region': self.manager.config.region,
             'source_bucket_name': b['Name'],
+            'source_bucket_region': get_region(b),
             'target_bucket_name': self.data.get('target_bucket'),
             'target_prefix': self.data.get('target_prefix'),
-        }
+        })
         data = format_string_values(self.data, **variables)
         target_bucket = data.get('target_bucket')
         target_prefix = data.get('target_prefix', b['Name'] + '/')
@@ -1633,39 +1645,44 @@ class ToggleLogging(BucketActionBase):
         return self
 
     def process(self, resources):
-        enabled = self.data.get('enabled', True)
-
-        # Account name for variable expansion
         session = local_session(self.manager.session_factory)
-        account_name = get_account_alias_from_sts(session)
+        kwargs = {
+            "enabled": self.data.get('enabled', True),
+            "session": session,
+            "account_name": get_account_alias_from_sts(session),
+        }
 
-        for r in resources:
-            client = bucket_client(session, r)
-            is_logging = bool(r.get('Logging'))
+        return self._process_with_futures(resources, **kwargs)
 
-            if enabled:
-                variables = {
-                    'account_id': self.manager.config.account_id,
-                    'account': account_name,
-                    'region': self.manager.config.region,
-                    'source_bucket_name': r['Name'],
-                    'target_bucket_name': self.data.get('target_bucket'),
-                    'target_prefix': self.data.get('target_prefix'),
-                }
-                data = format_string_values(self.data, **variables)
-                config = {
-                    'TargetBucket': data.get('target_bucket'),
-                    'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
-                }
-                if not is_logging or r.get('Logging') != config:
-                    client.put_bucket_logging(
-                        Bucket=r['Name'],
-                        BucketLoggingStatus={'LoggingEnabled': config}
-                    )
+    def process_bucket(self, r, enabled=None, session=None, account_name=None):
+        client = bucket_client(session, r)
+        is_logging = bool(r.get('Logging'))
 
-            elif not enabled and is_logging:
+        if enabled:
+            variables = self.get_std_format_args(r)
+            variables.update({
+                'account': account_name,
+                'source_bucket_name': r['Name'],
+                'source_bucket_region': get_region(r),
+                'target_bucket_name': self.data.get('target_bucket'),
+                'target_prefix': self.data.get('target_prefix'),
+            })
+            data = format_string_values(self.data, **variables)
+            config = {
+                'TargetBucket': data.get('target_bucket'),
+                'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
+            }
+            if not is_logging or r.get('Logging') != config:
                 client.put_bucket_logging(
-                    Bucket=r['Name'], BucketLoggingStatus={})
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={'LoggingEnabled': config}
+                )
+                r['Logging'] = config
+
+        elif not enabled and is_logging:
+            client.put_bucket_logging(
+                Bucket=r['Name'], BucketLoggingStatus={})
+            r['Logging'] = {}
 
 
 @actions.register('attach-encrypt')

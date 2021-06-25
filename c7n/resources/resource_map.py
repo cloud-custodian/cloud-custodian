@@ -56,6 +56,7 @@ ResourceMap = {
     "aws.efs": "c7n.resources.efs.ElasticFileSystem",
     "aws.efs-mount-target": "c7n.resources.efs.ElasticFileSystemMountTarget",
     "aws.eks": "c7n.resources.eks.EKS",
+    "aws.eks-nodegroup": "c7n.resources.eks.NodeGroup",
     "aws.elasticbeanstalk": "c7n.resources.elasticbeanstalk.ElasticBeanstalk",
     "aws.elasticbeanstalk-environment": (
         "c7n.resources.elasticbeanstalk.ElasticBeanstalkEnvironment"),
@@ -175,6 +176,7 @@ ResourceMap = {
     "aws.sns": "c7n.resources.sns.SNS",
     "aws.sns-subscription": "c7n.resources.sns.SNSSubscription",
     "aws.sqs": "c7n.resources.sqs.SQS",
+    "aws.ssm-document": "c7n.resources.ssm.SSMDocument",
     "aws.ssm-activation": "c7n.resources.ssm.SSMActivation",
     "aws.ssm-managed-instance": "c7n.resources.ssm.ManagedInstance",
     "aws.ssm-parameter": "c7n.resources.ssm.SSMParameter",
@@ -183,6 +185,7 @@ ResourceMap = {
     "aws.streaming-distribution": "c7n.resources.cloudfront.StreamingDistribution",
     "aws.subnet": "c7n.resources.vpc.Subnet",
     "aws.support-case": "c7n.resources.support.SupportCase",
+    "aws.swf-domain": "c7n.resources.swf.SimpleWorkflowDomain",
     "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
     "aws.transit-gateway": "c7n.resources.vpc.TransitGateway",
     "aws.user-pool": "c7n.resources.cognito.CognitoUserPool",

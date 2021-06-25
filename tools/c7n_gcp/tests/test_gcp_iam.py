@@ -42,6 +42,54 @@ class ServiceAccountTest(BaseTest):
              'unique_id': '110936229421407410679'})
         self.assertEqual(resource['displayName'], 'devtest')
 
+    def test_disable(self):
+        factory = self.replay_flight_data('iam-service-account-disable')
+        p = self.load_policy({
+            'name': 'sa-disable',
+            'resource': 'gcp.service-account',
+            'actions': ['disable']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'name': resources[0]["name"]})
+        self.assertTrue(result['disabled'])
+
+    def test_enable(self):
+        factory = self.replay_flight_data('iam-service-account-enable')
+        p = self.load_policy({
+            'name': 'sa-enable',
+            'resource': 'gcp.service-account',
+            'actions': ['enable']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'name': resources[0]["name"]})
+        self.assertIsNone(result.get('disabled'))
+
+    def test_delete(self):
+        factory = self.replay_flight_data('iam-service-account-delete')
+        p = self.load_policy({
+            'name': 'sa-delete',
+            'resource': 'gcp.service-account',
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        try:
+            client.execute_query('get', {'name': resources[0]["name"]})
+            self.fail('found deleted service account')
+        except HttpError as e:
+            self.assertTrue("Account deleted" in str(e))
+
 
 class ServiceAccountKeyTest(BaseTest):
 

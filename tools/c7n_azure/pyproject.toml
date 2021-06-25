@@ -42,7 +42,7 @@ azure-mgmt-managementgroups = "1.0.0b1"
 azure-mgmt-network = "^17.1.0"
 azure-mgmt-resourcegraph = "^7.0.0"
 azure-mgmt-resource = "^16.0.0"
-azure-mgmt-rdbms = "^8.0.0"
+azure-mgmt-rdbms = "^8.1.0"
 azure-mgmt-search = "^8.0.0"
 azure-mgmt-sql = "^1.0.0"
 azure-mgmt-storage = "^17.0.0"
@@ -78,6 +78,9 @@ azure-storage-file-share = "^12.4.1"
 cryptography = "^3.4.6"
 azure-mgmt-msi = "^1.0.0"
 jmespath = "^0.10.0"
+azure-mgmt-servicefabric = "^1.0.0"
+azure-mgmt-trafficmanager = "^0.51.0"
+azure-mgmt-frontdoor = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency
