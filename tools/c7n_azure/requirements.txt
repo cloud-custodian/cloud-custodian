@@ -9,9 +9,9 @@ azure-cosmosdb-table==1.0.6
 azure-functions==1.7.2; python_version >= "3" and python_version < "4"
 azure-graphrbac==0.61.1
 azure-identity==1.6.0
-azure-keyvault-certificates==4.2.1
-azure-keyvault-keys==4.3.1
-azure-keyvault-secrets==4.2.0
+azure-keyvault-certificates==4.3.0
+azure-keyvault-keys==4.4.0
+azure-keyvault-secrets==4.3.0
 azure-keyvault==4.1.0
 azure-mgmt-apimanagement==1.0.0
 azure-mgmt-applicationinsights==1.0.0
@@ -24,7 +24,7 @@ azure-mgmt-containerinstance==7.0.0
 azure-mgmt-containerregistry==8.0.0b1
 azure-mgmt-containerservice==15.1.0
 azure-mgmt-core==1.2.2
-azure-mgmt-cosmosdb==6.3.0
+azure-mgmt-cosmosdb==6.4.0
 azure-mgmt-costmanagement==1.0.0
 azure-mgmt-databricks==1.0.0b1
 azure-mgmt-datafactory==1.1.0

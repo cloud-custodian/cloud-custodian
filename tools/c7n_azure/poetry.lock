@@ -186,7 +186,7 @@ azure-keyvault-secrets = ">=4.1,<5.0"
 
 [[package]]
 name = "azure-keyvault-certificates"
-version = "4.2.1"
+version = "4.3.0"
 description = "Microsoft Azure Key Vault Certificates Client Library for Python"
 category = "main"
 optional = false
@@ -195,11 +195,11 @@ python-versions = "*"
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
 azure-core = ">=1.7.0,<2.0.0"
-msrest = ">=0.6.0"
+msrest = ">=0.6.21"
 
 [[package]]
 name = "azure-keyvault-keys"
-version = "4.3.1"
+version = "4.4.0"
 description = "Microsoft Azure Key Vault Keys Client Library for Python"
 category = "main"
 optional = false
@@ -209,11 +209,12 @@ python-versions = "*"
 azure-common = ">=1.1,<2.0"
 azure-core = ">=1.7.0,<2.0.0"
 cryptography = ">=2.1.4"
-msrest = ">=0.6.0"
+msrest = ">=0.6.21"
+six = ">=1.12.0"
 
 [[package]]
 name = "azure-keyvault-secrets"
-version = "4.2.0"
+version = "4.3.0"
 description = "Microsoft Azure Key Vault Secrets Client Library for Python"
 category = "main"
 optional = false
@@ -222,7 +223,7 @@ python-versions = "*"
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
 azure-core = ">=1.7.0,<2.0.0"
-msrest = ">=0.6.0"
+msrest = ">=0.6.21"
 
 [[package]]
 name = "azure-mgmt-apimanagement"
@@ -367,7 +368,7 @@ azure-core = ">=1.9.0,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-cosmosdb"
-version = "6.3.0"
+version = "6.4.0"
 description = "Microsoft Azure Cosmos DB Management Client Library for Python"
 category = "main"
 optional = false
@@ -1406,16 +1407,16 @@ azure-keyvault = [
     {file = "azure_keyvault-4.1.0-py2.py3-none-any.whl", hash = "sha256:5fa0438f7f6e2e79543f2724957acf77c3c187e558f4d030a4f9b7493b9f946d"},
 ]
 azure-keyvault-certificates = [
-    {file = "azure-keyvault-certificates-4.2.1.zip", hash = "sha256:ea651883ad00d0a9a25b38e51feff7111f6c7099c6fb2597598da5bb21d3451c"},
-    {file = "azure_keyvault_certificates-4.2.1-py2.py3-none-any.whl", hash = "sha256:9959a1e49cac4dfaa8e7e36c86fe7d7c4159a3b76a29788d042d41ec41200a8b"},
+    {file = "azure-keyvault-certificates-4.3.0.zip", hash = "sha256:4e0a9bae9fd4c222617fbce6b31f97e2e0622774479de3c387239cbfbb828d87"},
+    {file = "azure_keyvault_certificates-4.3.0-py2.py3-none-any.whl", hash = "sha256:c332e2d35d25d52e8f8601c0a213a693b2bd664e1429e952c4da6e40e30bbe6f"},
 ]
 azure-keyvault-keys = [
-    {file = "azure-keyvault-keys-4.3.1.zip", hash = "sha256:fbf67bca913ebf68b9075ee9d2e2b899dc3c7892cc40abfe1b08220a382f6ed9"},
-    {file = "azure_keyvault_keys-4.3.1-py2.py3-none-any.whl", hash = "sha256:25cf889bbcafd8dee0e068fd48d84e24e11143bf85e35c68d997a222e4a0f7fb"},
+    {file = "azure-keyvault-keys-4.4.0.zip", hash = "sha256:7792ad0d5e63ad9eafa68bdce5de91b3ffcc7ca7a6afdc576785e6a2793caed0"},
+    {file = "azure_keyvault_keys-4.4.0-py2.py3-none-any.whl", hash = "sha256:e12c5554f7f0d5547e52cc2e725e94825fb40db1dbde7c39ec8a7f1fd150c46d"},
 ]
 azure-keyvault-secrets = [
-    {file = "azure-keyvault-secrets-4.2.0.zip", hash = "sha256:1083ab900da5ec63c518ffef49d9fdca02c81ddffdf80c52c03cd9da479e021f"},
-    {file = "azure_keyvault_secrets-4.2.0-py2.py3-none-any.whl", hash = "sha256:08b8aa518590c394477514f4a0a5d9e557a00ff164de9f6f6e7b112f8d5e6aa1"},
+    {file = "azure-keyvault-secrets-4.3.0.zip", hash = "sha256:26279ba3a6c727deba1fb61f549496867baddffbf062bd579d6fd2bc04e95276"},
+    {file = "azure_keyvault_secrets-4.3.0-py2.py3-none-any.whl", hash = "sha256:fa4d780565520534939a4b1b4e87908f0c88b4423f6005c7a381ac01d6b32233"},
 ]
 azure-mgmt-apimanagement = [
     {file = "azure-mgmt-apimanagement-1.0.0.zip", hash = "sha256:3ad7e2c3d20dd0141f9e2c0ae923121f7cbe7333bb314850e6f8b606636e3589"},
@@ -1462,8 +1463,8 @@ azure-mgmt-core = [
     {file = "azure_mgmt_core-1.2.2-py2.py3-none-any.whl", hash = "sha256:d36bd595dff6a1509ed52a89ee8dd88b83200320a6afa60fb4186afcb8978ce5"},
 ]
 azure-mgmt-cosmosdb = [
-    {file = "azure-mgmt-cosmosdb-6.3.0.zip", hash = "sha256:4135104da5b0f3f0a7249abcd8da55936603e50aaaf2868e5f739a717cf20b3d"},
-    {file = "azure_mgmt_cosmosdb-6.3.0-py2.py3-none-any.whl", hash = "sha256:bc61f00d25732306454d5cd19e53c49c75aee3451295ebe3b7a4f2edb3df5456"},
+    {file = "azure-mgmt-cosmosdb-6.4.0.zip", hash = "sha256:fb6b8ab80ab97214b94ae9e462ba1c459b68a3af296ffc26317ebd3ff500e00b"},
+    {file = "azure_mgmt_cosmosdb-6.4.0-py2.py3-none-any.whl", hash = "sha256:aa10e728be4706189173916e7ecb49da98a8b96fbacbec1d2b48ca6cdad3efc9"},
 ]
 azure-mgmt-costmanagement = [
     {file = "azure-mgmt-costmanagement-1.0.0.zip", hash = "sha256:bf6d8fd5cddc330d7e2204157ea72b08c01580de4aa94c97709dc117b046f482"},

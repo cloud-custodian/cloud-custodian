@@ -86,6 +86,15 @@ class SessionTest(BaseTest):
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
 
+    @patch('c7n_azure.session._run_command')
+    def test_initialize_session_cli(self, mock_run):
+        mock_run.return_value = \
+            f'{{"id":"{DEFAULT_SUBSCRIPTION_ID}", "tenantId":"{DEFAULT_TENANT_ID}"}}'
+
+        s = Session()
+
+        self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+
     @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
     def test_initialize_session_authentication_error(self, mock_log, mock_cred):
