@@ -253,7 +253,7 @@ class TestModelInstance(BaseTest):
         self.assertGreaterEqual(len(resources), 1)
 
     def test_filter_model(self):
-        session_factory = self.record_flight_data("test_sagemaker_model_filter")
+        session_factory = self.replay_flight_data("test_sagemaker_model_filter")
         p = self.load_policy(
             {
                 "name": "query-model",
