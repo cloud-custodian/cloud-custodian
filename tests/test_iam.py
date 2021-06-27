@@ -1185,16 +1185,19 @@ def test_iam_group_delete(test, iam_user_group):
         time.sleep(3)
 
     p = test.load_policy(pdata, session_factory=session_factory)
-    with pytest.raises(ClientError) as ecm:
-        p.push(event)
-    assert ecm.value.response[
-        'Error']['Code'] == 'DeleteConflict'
+    resources = p.push(event)
+
+    a = p.resource_manager.actions[0]
+    ok, err = a.split_resources_by_results(resources)
+    assert len(err) == 1
+    assert 'DeleteConflict' in a.results.get_resource_status(err[0])[-1]['reason']
 
     pdata['actions'] = [{'type': 'delete', 'force': True}]
 
     p = test.load_policy(pdata, session_factory=session_factory)
     resources = p.push(event)
-    assert len(resources) == 1
+    ok, err = a.split_resources_by_results(resources)
+    assert len(ok) == 1
 
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_group(GroupName=resources[0]['GroupName'])

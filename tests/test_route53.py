@@ -3,10 +3,8 @@
 import time
 import logging
 
-import pytest
 from pytest_terraform import terraform
 
-from botocore.exceptions import ClientError
 from .common import BaseTest
 
 
@@ -121,14 +119,20 @@ def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
     output = test.capture_logging('custodian.actions', level=logging.WARNING)
 
     p = test.load_policy(pdata, session_factory=session_factory)
-    with pytest.raises(ClientError) as ecm:
-        p.run()
-    assert ecm.value.response['Error']['Code'] == 'HostedZoneNotEmpty'
+    resources = p.run()
+    a = p.resource_manager.actions[0]
+    ok, err = a.split_resources_by_results(resources)
+    assert len(ok) == 0
+    assert len(err) == 1
+    assert "HostedZoneNotEmpty" in a.results.get_resource_status(err[0])[-1]["reason"]
     assert "set force to remove all records in zone" in output.getvalue()
 
     pdata['actions'] = [{'type': 'delete', 'force': True}]
     p = test.load_policy(pdata, session_factory=session_factory)
-    p.run()
+    resources = p.run()
+    ok, err = a.split_resources_by_results(resources)
+    assert len(ok) == 1
+    assert len(err) == 0
 
     if test.recording:
         time.sleep(3)

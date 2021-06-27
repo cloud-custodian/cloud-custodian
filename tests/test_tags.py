@@ -6,8 +6,9 @@ module to test some universal tagging infrastructure not directly exposed.
 import time
 from mock import MagicMock, call
 
+from c7n.actions import Action
 from c7n.tags import universal_retry, coalesce_copy_user_tags
-from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
@@ -273,8 +274,10 @@ class CopyRelatedResourceTag(BaseTest):
             session_factory=session_factory
         )
 
-        with self.assertRaises(PolicyExecutionError):
-            p.run()
+        resources = p.run()
+        a = Action()
+        ok, err = a.split_resources_by_results(resources)
+        self.assertEqual(len(resources), len(err))
 
     def test_copy_related_resource_tag_validate(self):
         p = self.load_policy(

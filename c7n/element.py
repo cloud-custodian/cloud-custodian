@@ -2,9 +2,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
-
 from c7n.executor import ThreadPoolExecutor
+from c7n.utils import split_by_expression
 
 
 class Element:
@@ -33,22 +32,33 @@ class Element:
         being called and thus can act as a point of lazy initialization.
         """
 
-    def filter_resources(self, resources, key_expr, allowed_values=()):
+    def filter_resources(self, resources, key_expr, allowed_values=(), exclude=()):
         # many filters implementing a resource state transition only allow
         # a given set of starting states, this method will filter resources
         # and issue a warning log, as implicit filtering in filters means
         # our policy metrics are off, and they should be added as policy
         # filters.
         resource_count = len(resources)
-        search_expr = key_expr
-        if not search_expr.startswith('[].'):
-            search_expr = '[].' + key_expr
-        results = [r for value, r in zip(
-            jmespath.search(search_expr, resources), resources)
-            if value in allowed_values]
-        if resource_count != len(results):
-            self.log.warning(
-                "%s implicitly filtered %d of %d resources key:%s on %s",
-                self.type, len(results), resource_count, key_expr,
-                (', '.join(allowed_values)))
-        return results
+        match, nomatch = self.split_resources(
+            resources, key_expr, allowed_values=allowed_values, exclude=exclude
+        )
+        if resource_count != len(match):
+            msg = "%s implicitly filtered %d of %d resources key:%s" % (
+                self.type,
+                len(match),
+                resource_count,
+                key_expr,
+            )
+            if allowed_values:
+                msg += " on %s" % (
+                    ', '.join(['no value' if v is None else v for v in allowed_values])
+                )
+            if exclude:
+                msg += " excluding %s" % (
+                    ', '.join(['no value' if v is None else v for v in exclude])
+                )
+            self.log.warning(msg)
+        return match
+
+    def split_resources(self, resources, key_expr, allowed_values=(), exclude=()):
+        return split_by_expression(resources, key_expr, allowed_values, exclude)

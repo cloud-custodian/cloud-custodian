@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
+from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB, SetSslListenerPolicy
@@ -199,7 +200,10 @@ class SSLPolicyTest(BaseTest):
                 "name": "testpolicy",
                 "attributes": ["AES128-SHA256", "Protocol-TLSv1"]}]},
             session_factory=session_factory)
-        self.assertRaises(AttributeError, policy.run)
+        resources = policy.run()
+        a = Action()
+        ok, err = a.split_resources_by_results(resources)
+        self.assertEqual(len(err), 1)
 
     def test_set_ssl_listener_policy(self):
         session_factory = self.replay_flight_data("test_set_ssl_listener")

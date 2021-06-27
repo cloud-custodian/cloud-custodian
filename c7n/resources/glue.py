@@ -339,6 +339,12 @@ class GlueClassifier(QueryResourceManager):
         arn_type = 'classifier'
         cfn_type = 'AWS::Glue::Classifier'
 
+    def augment(self, resources):
+        # copy the name from the classifier value to top for easy reference
+        for r in resources:
+            r['Name'] = list(r.values())[0]['Name']
+        return resources
+
 
 @GlueClassifier.action_registry.register('delete')
 class DeleteClassifier(BaseAction):

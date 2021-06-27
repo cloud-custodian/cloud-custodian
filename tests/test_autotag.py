@@ -124,6 +124,7 @@ class AutoTagCreator(BaseTest):
         auto_tag_user = AutoTagUser()
         auto_tag_user.data = {"tag": "CreatorName", "principal_id_tag": "CreatorId"}
         auto_tag_user.manager = MagicMock()
+        auto_tag_user.id_key = 'InstanceId'
         result = auto_tag_user.process(resources, event)
         self.assertEqual(result["CreatorName"], "c7nbot")
         self.assertEqual(result["CreatorId"], "AIDAJEZOTH6YPO3DY45QW")

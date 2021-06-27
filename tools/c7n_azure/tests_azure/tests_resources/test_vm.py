@@ -100,7 +100,8 @@ class VMTest(BaseTest):
 
     fake_running_vms = [{
         'resourceGroup': 'TEST_VM',
-        'name': 'cctestvm'
+        'name': 'cctestvm',
+        'id': 'cctestvm'
     }]
 
     @arm_template('vm.json')
