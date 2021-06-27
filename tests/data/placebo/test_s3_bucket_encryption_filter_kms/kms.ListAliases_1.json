@@ -1,0 +1,25 @@
+{
+  "status_code": 200,
+  "data": {
+    "Truncated": false,
+    "ResponseMetadata": {
+      "HTTPStatusCode": 200,
+      "RequestId": "6ced1cc1-54f8-11e6-abc3-27fbd89a0a2d",
+      "HTTPHeaders": {
+        "x-amzn-requestid": "6ced1cc1-54f8-11e6-abc3-27fbd89a0a2d",
+        "content-length": "731",
+        "server": "Server",
+        "connection": "keep-alive",
+        "date": "Thu, 28 Jul 2016 19:21:03 GMT",
+        "content-type": "application/x-amz-json-1.1"
+      }
+    },
+    "Aliases": [
+      {
+        "AliasArn": "arn:aws:kms:us-east-1:108891588060:alias/aws/s3",
+        "AliasName": "alias/aws/s3",
+        "TargetKeyId": "079a6f7d-5f8a-4da1-a465-30aa099b9688"
+      }
+    ]
+  }
+}
