@@ -3146,9 +3146,14 @@ class KMSKeyResolverMixin:
         for r in regions:
             client = local_session(self.manager.session_factory).client('kms', region_name=r)
             try:
-                self.arns[r] = client.describe_key(
+                key_meta = client.describe_key(
                     KeyId=self.data.get('key')
-                ).get('KeyMetadata').get('Arn')
+                ).get('KeyMetadata', {})
+                self.arns[r] = {
+                    'Arn': key_meta.get('Arn'),
+                    'KeyManager': key_meta.get('KeyManager'),
+                    'Description': key_meta.get('Description')
+                }
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))
@@ -3260,7 +3265,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             return True
         elif crypto == 'aws:kms' and algo == 'aws:kms':
             if key:
-                if rule.get('KMSMasterKeyID') == key:
+                if rule.get('KMSMasterKeyID') == key['Arn']:
                     return True
                 else:
                     return False
@@ -3273,8 +3278,18 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     """Action enables default encryption on S3 buckets
 
     `enabled`: boolean Optional: Defaults to True
+
     `crypto`: aws:kms | AES256` Optional: Defaults to AES256
+
     `key`: arn, alias, or kms id key
+
+    `bucket-key`: boolean Optional:
+    Defaults to True.
+    Reduces amount of API traffic from Amazon S3 to KMS and can reduce KMS request
+    costsby up to 99 percent. Requires kms:Decrypt permissions for copy and upload
+    on the AWS KMS Key Policy.
+
+    Bucket Key Docs: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html
 
     :example:
 
@@ -3288,6 +3303,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                   # enabled: true <------ optional (true by default)
                     crypto: aws:kms
                     key: 1234abcd-12ab-34cd-56ef-1234567890ab
+                    bucket-key: true
 
               - name: s3-enable-default-encryption-kms-alias
                 resource: s3
@@ -3296,11 +3312,13 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                   # enabled: true <------ optional (true by default)
                     crypto: aws:kms
                     key: alias/some/alias/key
+                    bucket-key: true
 
               - name: s3-enable-default-encryption-aes256
                 resource: s3
                 actions:
                   - type: set-bucket-encryption
+                  # bucket-key: true <--- optional (true by default for AWS SSE)
                   # crypto: AES256 <----- optional (AES256 by default)
                   # enabled: true <------ optional (true by default)
 
@@ -3318,7 +3336,8 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             'type': {'enum': ['set-bucket-encryption']},
             'enabled': {'type': 'boolean'},
             'crypto': {'enum': ['aws:kms', 'AES256']},
-            'key': {'type': 'string'}
+            'key': {'type': 'string'},
+            'bucket-key': {'type': 'boolean'}
         },
         'dependencies': {
             'key': {
@@ -3345,21 +3364,36 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                                    futures[future]['Name'])
 
     def process_bucket(self, bucket):
+        default_key_desc = 'Default master key that protects my S3 objects when no other key is defined' # noqa
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         if not self.data.get('enabled', True):
             s3.delete_bucket_encryption(Bucket=bucket['Name'])
             return
         algo = self.data.get('crypto', 'AES256')
-        config = {'Rules': [
-            {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': algo}}
-        ]}
+
+        # bucket key defaults to True for alias/aws/s3 and AES256 (Amazon SSE)
+        # and ignores False values for that crypto
+        bucket_key = self.data.get('bucket-key', True)
+        config = {
+            'Rules': [
+                {
+                    'ApplyServerSideEncryptionByDefault': {
+                        'SSEAlgorithm': algo,
+                    },
+                    'BucketKeyEnabled': bucket_key
+                }
+            ]
+        }
+
         if algo == 'aws:kms':
             key = self.get_key(bucket)
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
-            (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
-                ['KMSMasterKeyID']) = key
+
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
+                'KMSMasterKeyID': key['Arn'],
+                'BucketKeyEnabled': bucket_key
+            }
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
