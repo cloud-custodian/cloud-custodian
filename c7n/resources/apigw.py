@@ -159,6 +159,7 @@ class RestApi(query.QueryResourceManager):
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
 
+
 @RestApi.filter_registry.register('metrics')
 class Metrics(MetricsFilter):
 
