@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "custodian-test-bucket-encryption-key",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 6,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 18,
+                    "second": 18,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "aws-fossalytics",
+            "ID": "07fa29f4277968d4e6b54603e37c62999cb1f4b1a53c20c3be5252554fb9684e"
+        }
+    }
+}
