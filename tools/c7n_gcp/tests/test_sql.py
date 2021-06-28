@@ -56,19 +56,22 @@ class SqlInstanceTest(BaseTest):
         factory = self.record_flight_data('sqlinstance-start', project_id=project_id)
         # factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
         p = self.load_policy(
-            {'name': 'istart',
-             'resource': 'gcp.sql-instance',
-             'filters': [
-                {
-                    'name': 'custodiansqltest'
-                },
-                {
-                    'type': 'value',
-                    'key': 'state',
-                    'op': 'equal',
-                    'value': 'RUNNABLE'
-                }],
-             'actions': ['start']},
+            {
+                'name': 'istart',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiansqltest'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'state',
+                        'op': 'equal',
+                        'value': 'RUNNABLE'
+                    }
+                ],
+                'actions': ['start']
+            },
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
