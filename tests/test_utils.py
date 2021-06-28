@@ -145,6 +145,7 @@ class ProxyUrlTest(BaseTest):
             proxy_url = utils.get_proxy_url('http://web.site:8080')
             self.assertEqual(proxy_url, None)
 
+
 class UtilTest(BaseTest):
 
     def test_merge_dict_list(self):
@@ -155,7 +156,7 @@ class UtilTest(BaseTest):
 
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
-                    'eventSource': ['ec2.amazonaws.com']},
+                        'eventSource': ['ec2.amazonaws.com']},
              'detail-type': ['AWS API Call via CloudTrail']}
         b = {'detail': {'userIdentity': {
             'userName': [{'anything-but': 'deputy'}]}}}
