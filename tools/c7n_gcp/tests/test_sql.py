@@ -52,22 +52,27 @@ class SqlInstanceTest(BaseTest):
 
     def test_start_instance(self):
         project_id = 'cloud-custodian'
-        instance_name = 'custodiansqltest'
-        factory = self.record_flight_data('sqlinstance-start', project_id=project_id)
-        # factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
         p = self.load_policy(
             {
                 'name': 'istart',
                 'resource': 'gcp.sql-instance',
                 'filters': [
                     {
-                        'name': 'custodiansqltest'
+                        'name': 'custodiantestsql'
                     },
                     {
                         'type': 'value',
                         'key': 'state',
                         'op': 'equal',
                         'value': 'RUNNABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.activationPolicy',
+                        'op': 'equal',
+                        'value': 'NEVER'
                     }
                 ],
                 'actions': ['start']
