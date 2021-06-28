@@ -3379,8 +3379,8 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                 {
                     'ApplyServerSideEncryptionByDefault': {
                         'SSEAlgorithm': algo,
-                        'BucketKeyEnabled': bucket_key
-                    }
+                    },
+                    'BucketKeyEnabled': bucket_key
                 }
             ]
         }
