@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudwatch:us-east-2:644160558196:alarm:TestAlarm",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -3,6 +3,7 @@
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
@@ -44,6 +45,28 @@ class KafkaSGFilter(SecurityGroupFilter):
 class KafkaSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "BrokerNodeGroupInfo.ClientSubnets[]"
+
+
+@Kafka.filter_registry.register('kms-key')
+class KafkaKmsFilter(KmsRelatedFilter):
+    """
+
+    Filter a kafka cluster's data-volume encryption by its associcated kms key
+    and optionally the aliasname of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: kafka-kms-key-filter
+            resource: kafka
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: alias/aws/kafka
+    """
+    RelatedIdsExpression = 'EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
 
 
 @Kafka.action_registry.register('set-monitoring')

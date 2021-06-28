@@ -273,7 +273,7 @@ class TestEcsTaskDefinition(BaseTest):
             session_factory=session_factory,
         )
         arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1"
-        resources = p.resource_manager.get_source('describe').get_resources([arn])
+        resources = p.resource_manager.get_resources([arn])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["taskDefinitionArn"], arn)
         self.assertEqual(
