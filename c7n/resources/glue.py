@@ -22,7 +22,7 @@ class GlueConnection(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'glue'
-        enum_spec = ('get_connections', 'ConnectionList', None)
+        enum_spec = ('get_connections', 'ConnectionList', {'HidePassword': True})
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"

@@ -10,7 +10,7 @@ package_data = \
 {'': ['*'], 'c7n_mailer': ['msg-templates/*']}
 
 install_requires = \
-['Jinja2>=2.11,<3.0',
+['Jinja2>=3.0,<4.0',
  'boto3>=1.11.12,<2.0.0',
  'datadog>=0.34.0,<0.35.0',
  'jsonpatch>=1.25,<2.0',

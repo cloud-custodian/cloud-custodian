@@ -74,7 +74,6 @@ class GCPMetricsFilter(Filter):
         filters:
         - type: metrics
           name: firewallinsights.googleapis.com/subnet/firewall_hit_count
-          resource-key: name
           aligner: ALIGN_COUNT
           days: 14
           value: 1
@@ -84,7 +83,6 @@ class GCPMetricsFilter(Filter):
     schema = type_schema(
         'metrics',
         **{'name': {'type': 'string'},
-          'resource-key': {'type': 'string'},
           'metric-key': {'type': 'string'},
           'group-by-fields': {'type': 'array', 'items': {'type': 'string'}},
           'days': {'type': 'number'},
@@ -109,8 +107,7 @@ class GCPMetricsFilter(Filter):
         duration = timedelta(days)
 
         self.metric = self.data['name']
-        self.resource_key = self.data.get('resource-key', self.manager.resource_type.name)
-        self.metric_key = self.data.get('metric-key', self.manager.resource_type.metric_key)
+        self.metric_key = self.data.get('metric-key') or self.manager.resource_type.metric_key
         self.aligner = self.data.get('aligner', 'ALIGN_NONE')
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
@@ -162,12 +159,11 @@ class GCPMetricsFilter(Filter):
         resource_filter = []
         batch_size = len(self.filter)
         for r in resources:
-            resource_name = jmespath.search(self.resource_key, r)
+            resource_name = self.manager.resource_type.get_metric_resource_name(r)
             resource_filter_item = '{} = "{}"'.format(self.metric_key, resource_name)
             resource_filter.append(resource_filter_item)
             resource_filter.append(' OR ')
             batch_size += len(resource_filter_item) + 4
-
             if batch_size >= BATCH_SIZE:
                 resource_filter.pop()
                 batched_resources.append(resource_filter)
@@ -201,8 +197,7 @@ class GCPMetricsFilter(Filter):
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
-
-        resource_name = jmespath.search(self.resource_key, resource)
+        resource_name = self.manager.resource_type.get_metric_resource_name(resource)
         metric = self.resource_metric_dict.get(resource_name)
         if not metric and not self.missing_value:
             return False

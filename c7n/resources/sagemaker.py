@@ -280,6 +280,7 @@ class Model(QueryResourceManager):
             r.setdefault('Tags', []).extend(tags)
             return r
 
+        resources = super(Model, self).augment(resources)
         return list(map(_augment, resources))
 
 

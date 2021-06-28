@@ -1,0 +1,208 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/applicationGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-arm-service-request-id": [
+                        "5ca2767c-1559-4c88-b7d5-a02c84e050bc"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 21 Jun 2021 17:48:35 GMT"
+                    ],
+                    "content-length": [
+                        "9057"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "ccgatewayc129bfa71a47",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47",
+                                "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "ca6c4ec5-521f-4e14-a04b-5300f0a2392b",
+                                    "sku": {
+                                        "name": "Standard_Small",
+                                        "tier": "Standard",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "appGatewayIpConfig",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/gatewayIPConfigurations/appGatewayIpConfig",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/virtualNetworks/ccvnetc129bfa71a47/subnets/ccvnetc129bfa71a47"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "authenticationCertificates": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "appGatewayFrontendIP",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/frontendIPConfigurations/appGatewayFrontendIP",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.0.0.6",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/virtualNetworks/ccvnetc129bfa71a47/subnets/ccvnetc129bfa71a47"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/httpListeners/appGatewayHttpListener"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "appGatewayFrontendPort",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/frontendPorts/appGatewayFrontendPort",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/httpListeners/appGatewayHttpListener"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "appGatewayBackendPool",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/backendAddressPools/appGatewayBackendPool",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [
+                                                    {
+                                                        "ipAddress": "10.0.0.4"
+                                                    },
+                                                    {
+                                                        "ipAddress": "10.0.0.5"
+                                                    }
+                                                ],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/requestRoutingRules/rule1"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "appGatewayBackendHttpSettings",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/backendHttpSettingsCollection/appGatewayBackendHttpSettings",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "requestTimeout": 30,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/requestRoutingRules/rule1"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "appGatewayHttpListener",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/httpListeners/appGatewayHttpListener",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/frontendIPConfigurations/appGatewayFrontendIP"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/frontendPorts/appGatewayFrontendPort"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/requestRoutingRules/rule1"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "rule1",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/requestRoutingRules/rule1",
+                                            "etag": "W/\"54a2b174-70a8-42fd-b3d7-3eca7c63da18\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/httpListeners/appGatewayHttpListener"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/backendAddressPools/appGatewayBackendPool"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_app-gateway/providers/Microsoft.Network/applicationGateways/ccgatewayc129bfa71a47/backendHttpSettingsCollection/appGatewayBackendHttpSettings"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

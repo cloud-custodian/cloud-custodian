@@ -117,11 +117,13 @@ class UserCredentialReportTest(BaseTest):
             'filters': [
                 {'UserName': 'test1'},
                 {"type": "credential",
+                 "report_max_age": 1543724277,
                  "key": "access_keys.last_rotated",
                  "value": 30,
                  'op': 'gt',
                  "value_type": "age"},
                 {"type": "credential",
+                 "report_max_age": 1543724277,
                  "key": "access_keys.active",
                  "value": True,
                  "op": "eq"}],
@@ -137,26 +139,52 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(len(keys), 2)
 
     def test_credential_access_key_reverse_filter_delete(self):
+        access_key_filters = [
+            {"type": "credential",
+             "report_max_age": 1585865564,
+             "key": "access_keys.last_used_date",
+             "value": 90,
+             'op': 'gte',
+             "value_type": "age"},
+            {"type": "credential",
+             "report_max_age": 1585865564,
+             "key": "access_keys.last_rotated",
+             "value": 90,
+             "op": "gte",
+             'value_type': 'age'}]
+
+        # Given:
+        # - Two access key filters
+        # - A single user with two access keys
+        # - Each access key matching one filter but not the other
+        #
+        # Nesting the access key filters inside an 'or' block
+        # should yield 2 matched keys, while the default 'and'
+        # behavior should match 1.
+
         factory = self.replay_flight_data(
             'test_iam_user_credential_reverse_filter_delete'
         )
         p = self.load_policy({
-            'name': 'user-cred-multi-reverse',
+            'name': 'user-cred-multi-reverse-or',
             'resource': 'iam-user',
             'filters': [
                 {'UserName': 'zscholl'},
-                {"type": "credential",
-                 "report_max_age": 1585865564,
-                 "key": "access_keys.last_used_date",
-                 "value": 90,
-                 'op': 'gte',
-                 "value_type": "age"},
-                {"type": "credential",
-                 "report_max_age": 1585865564,
-                 "key": "access_keys.last_rotated",
-                 "value": 90,
-                 "op": "gte",
-                 'value_type': 'age'}],
+                {'or': access_key_filters}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 2)
+
+        factory = self.replay_flight_data(
+            'test_iam_user_credential_reverse_filter_delete'
+        )
+        p = self.load_policy({
+            'name': 'user-cred-multi-reverse-and',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'zscholl'},
+                *access_key_filters],
             'actions': [
                 {'type': 'remove-keys',
                  'disable': True,

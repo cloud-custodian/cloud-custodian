@@ -90,12 +90,10 @@ class AzureCredential:
         elif self._auth_params.get('enable_cli_auth'):
             auth_name = 'Azure CLI'
             self._credential = AzureCliCredential()
-            account_info, error = _run_command('az account show --output json')
+            account_info = _run_command('az account show --output json')
             account_json = json.loads(account_info)
             self._auth_params['subscription_id'] = account_json['id']
             self._auth_params['tenant_id'] = account_json['tenantId']
-            if error is not None:
-                raise Exception('Unable to query TenantId and SubscriptionId')
 
         if subscription_id_override is not None:
             self._auth_params['subscription_id'] = subscription_id_override
