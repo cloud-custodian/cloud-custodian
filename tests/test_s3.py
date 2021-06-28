@@ -318,6 +318,39 @@ class BucketEncryption(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_s3_bucket_encryption_bucket_key(self):
+        session_factory = self.replay_flight_data("test_s3_bucket_encryption_bucket_key")
+
+        bname = "custodian-test-bucket-encryption-key"
+
+        self.patch(s3.S3, "executor-factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        policy = self.load_policy(
+            {
+                "name": "test_s3_bucket_encryption_bucket_key",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "Name": bname
+                    },
+                    {
+                        "type": "bucket-encryption",
+                        "state": False
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption"
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("s3")
+        resp = client.get_bucket_encryption(Bucket=bname)
+        self.assertTrue(resp['ServerSideEncryptionConfiguration']['Rules'][0]['BucketKeyEnabled'])
+
 
 class BucketInventory(BaseTest):
 
