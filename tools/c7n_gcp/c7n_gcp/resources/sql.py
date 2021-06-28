@@ -27,6 +27,8 @@ class SqlInstance(QueryResourceManager):
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
         asset_type = "sqladmin.googleapis.com/Instance"
+        scc_type = "google.cloud.sql.Instance"
+        metric_key = 'resource.labels.database_id'
         perm_service = 'cloudsql'
 
         @staticmethod
@@ -34,6 +36,10 @@ class SqlInstance(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
+
+        @staticmethod
+        def get_metric_resource_name(resource):
+            return "{}:{}".format(resource["project"], resource["name"])
 
 
 class SqlInstanceAction(MethodAction):

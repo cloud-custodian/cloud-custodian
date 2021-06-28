@@ -3,6 +3,7 @@
 import time
 
 from .common import BaseTest, load_data
+import jmespath
 
 
 class KafkaTest(BaseTest):
@@ -100,3 +101,26 @@ class KafkaTest(BaseTest):
         client = factory().client('kafka')
         cluster = client.describe_cluster(ClusterArn=resources[0]['ClusterArn']).get('ClusterInfo')
         self.assertEqual(cluster['State'], 'DELETING')
+
+    def test_kafka_cluster_kms_filter(self):
+        session_factory = self.replay_flight_data('test_kafka_cluster_kms_filter')
+        kms = session_factory().client('kms')
+        expression = 'EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
+        p = self.load_policy(
+            {
+                'name': 'kafka-kms-filter',
+                'resource': 'kafka',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/kafka'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=(jmespath.search(expression, resources[0])))
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/kafka')

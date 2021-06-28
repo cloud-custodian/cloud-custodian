@@ -61,23 +61,7 @@ class Table(query.QueryResourceManager):
 
 @Table.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-kms-key-filters
-                resource: dynamodb-table
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/dynamodb)"
-                    op: regex
-    """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
@@ -499,10 +483,9 @@ class DaxTagging(Tag):
     permissions = ('dax:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-        mid = self.manager.resource_type.id
         for r in resources:
             try:
-                client.tag_resource(ResourceName=r[mid], Tags=tags)
+                client.tag_resource(ResourceName=r['ClusterArn'], Tags=tags)
             except (client.exceptions.ClusterNotFoundFault,
                     client.exceptions.InvalidARNFault,
                     client.exceptions.InvalidClusterStateFault) as e:

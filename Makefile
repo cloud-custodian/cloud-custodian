@@ -107,3 +107,28 @@ lint:
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
+
+analyzer-bandit:
+	bandit -i -s B101,B311 \
+	-r tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n
+
+
+analyzer-semgrep:
+	semgrep --error --verbose --config p/security-audit \
+	 tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n

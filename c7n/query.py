@@ -364,7 +364,11 @@ class ConfigSource:
             if isinstance(stags, str):
                 stags = json.loads(stags)
             if isinstance(stags, list):
-                resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']} for t in stags]
+                resource['Tags'] = [
+                    {u'Key': t.get('key', t.get('tagKey')),
+                     u'Value': t.get('value', t.get('tagValue'))}
+                    for t in stags
+                ]
             elif isinstance(stags, dict):
                 resource['Tags'] = [{u'Key': k, u'Value': v} for k, v in stags.items()]
 

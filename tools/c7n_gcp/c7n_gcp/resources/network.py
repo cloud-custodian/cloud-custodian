@@ -23,6 +23,15 @@ class Network(QueryResourceManager):
             "name", "description", "creationTimestamp",
             "autoCreateSubnetworks", "IPv4Range", "gatewayIPv4"]
         asset_type = "compute.googleapis.com/Network"
+        scc_type = "google.compute.Network"
+
+        @staticmethod
+        def get(client, resource_info):
+            path_param_re = re.compile('.*?/projects/(.*?)/global/networks/(.*)')
+            project, network = path_param_re.match(
+                resource_info["resourceName"]).groups()
+            return client.execute_query(
+                'get', {'project': project, 'network': network})
 
 
 @resources.register('subnet')
@@ -39,13 +48,18 @@ class Subnet(QueryResourceManager):
             "name", "description", "creationTimestamp", "ipCidrRange",
             "gatewayAddress", "region", "state"]
         asset_type = "compute.googleapis.com/Subnetwork"
+        scc_type = "google.compute.Subnetwork"
+        metric_key = "resource.labels.subnetwork_name"
 
         @staticmethod
         def get(client, resource_info):
+
+            path_param_re = re.compile(
+                '.*?/projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
+            project, region, subnet = path_param_re.match(
+                resource_info["resourceName"]).groups()
             return client.execute_query(
-                'get', {'project': resource_info['project_id'],
-                        'region': resource_info['location'],
-                        'subnetwork': resource_info['subnetwork_name']})
+                'get', {'project': project, 'region': region, 'subnetwork': subnet})
 
 
 class SubnetAction(MethodAction):
@@ -119,6 +133,8 @@ class Firewall(QueryResourceManager):
             name, "description", "network", "priority", "creationTimestamp",
             "logConfig.enabled", "disabled"]
         asset_type = "compute.googleapis.com/Firewall"
+        scc_type = "google.compute.Firewall"
+        metric_key = 'metric.labels.firewall_name'
 
         @staticmethod
         def get(client, resource_info):

@@ -39,6 +39,46 @@ def ecs_taggable(model, r):
     return len(path_parts) > 2
 
 
+class ContainerConfigSource(ConfigSource):
+
+    preserve_empty = ()
+    preserve_case = {'Tags'}
+    mapped_keys = {}
+
+    @classmethod
+    def remap_keys(cls, resource):
+        for k, v in cls.mapped_keys.items():
+            if v in resource:
+                continue
+            if k not in resource:
+                continue
+            resource[v] = resource.pop(k)
+        return resource
+
+    @classmethod
+    def lower_keys(cls, data):
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                if k in cls.preserve_case:
+                    continue
+                lk = k[0].lower() + k[1:]
+                data[lk] = data.pop(k)
+                # describe doesn't return empty list/dict by default
+                if isinstance(v, (list, dict)) and not v and lk not in cls.preserve_empty:
+                    data.pop(lk)
+                elif isinstance(v, (dict, list)):
+                    data[lk] = cls.lower_keys(v)
+        elif isinstance(data, list):
+            return list(map(cls.lower_keys, data))
+        return data
+
+    def load_resource(self, item):
+        resource = self.lower_keys(super().load_resource(item))
+        if self.mapped_keys:
+            return self.remap_keys(resource)
+        return resource
+
+
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
@@ -145,6 +185,15 @@ class ECSServiceDescribeSource(ECSClusterResourceDescribeSource):
         return results
 
 
+class ECSServiceConfigSource(ContainerConfigSource):
+    perserve_empty = {
+        'placementConstraints', 'placementStrategy',
+        'serviceRegistries', 'Tags', 'loadBalancers'}
+
+    mapped_keys = {
+        'role': 'roleArn', 'cluster': 'clusterArn'}
+
+
 @resources.register('ecs-service')
 class Service(query.ChildResourceManager):
 
@@ -157,14 +206,13 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
-        cfn_type = 'AWS::ECS::Service'
+        config_type = cfn_type = 'AWS::ECS::Service'
 
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-ecs-service'
-        return source
+    source_mapping = {
+        'config': ECSServiceConfigSource,
+        'describe-child': ECSServiceDescribeSource,
+        'describe': ECSServiceDescribeSource,
+    }
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(Service, self).get_resources(ids, cache, augment=False)
@@ -506,30 +554,9 @@ class DescribeTaskDefinition(DescribeSource):
         return results
 
 
-class ConfigECSTaskDefinition(ConfigSource):
+class ConfigECSTaskDefinition(ContainerConfigSource):
 
     preserve_empty = {'mountPoints', 'portMappings', 'volumesFrom'}
-    preserve_case = {'Tags'}
-
-    @classmethod
-    def lowerKeys(cls, data):
-        if isinstance(data, dict):
-            for k, v in list(data.items()):
-                if k in cls.preserve_case:
-                    continue
-                lk = k[0].lower() + k[1:]
-                data[lk] = data.pop(k)
-                # describe doesn't return empty list/dict by default
-                if isinstance(v, (list, dict)) and not v and lk not in cls.preserve_empty:
-                    data.pop(lk)
-                elif isinstance(v, (dict, list)):
-                    data[lk] = cls.lowerKeys(v)
-        elif isinstance(data, list):
-            return list(map(cls.lowerKeys, data))
-        return data
-
-    def load_resource(self, item):
-        return self.lowerKeys(super().load_resource(item))
 
 
 @resources.register('ecs-task-definition')
@@ -546,6 +573,9 @@ class TaskDefinition(query.QueryResourceManager):
         'config': ConfigECSTaskDefinition,
         'describe': DescribeTaskDefinition
     }
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(TaskDefinition, self).get_resources(ids, cache, augment=False)
 
 
 @TaskDefinition.action_registry.register('delete')

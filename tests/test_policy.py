@@ -236,6 +236,10 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2021
+            'AwsEc2Subnet',
+            'AwsElasticBeanstalkEnvironment',
+            'AwsEc2NetworkAcl',
             # newer wave q1 2021,
             'AwsS3AccountPublicAccessBlock',
             'AwsSsmPatchCompliance',
@@ -337,6 +341,8 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
+            'AWS::EKS::Cluster',
+            'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall'
         }
@@ -423,7 +429,7 @@ class PolicyMetaLint(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'healthcheck', 'event-rule-target',
+            'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []

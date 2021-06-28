@@ -810,6 +810,25 @@ class NormalizeTag(Action):
 
 class UniversalTag(Tag):
     """Applies one or more tags to the specified resources.
+
+    :example:
+
+        .. code-block :: yaml
+
+            policies:
+            - name: multiple-tags-example
+              comment: |
+                Tags any secrets missing either the Environment or ResourceOwner tag
+              resource: aws.secrets-manager
+              filters:
+                - or:
+                  - "tag:Environment": absent
+                  - "tag:ResourceOwner": absent
+              actions:
+                - type: tag
+                  tags:
+                    Environment: Staging
+                    ResourceOwner: Avengers
     """
 
     batch_size = 20

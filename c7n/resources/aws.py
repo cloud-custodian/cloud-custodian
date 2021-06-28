@@ -651,7 +651,7 @@ def join_output(output_dir, suffix):
 
 
 def fake_session():
-    session = boto3.Session(
+    session = boto3.Session(  # nosec nosemgrep
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')

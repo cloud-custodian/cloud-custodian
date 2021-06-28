@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import itertools
+from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -12,13 +14,19 @@ from c7n.filters.core import parse_date, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource)
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
+
+
+class DescribeAlarm(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('alarm')
@@ -35,6 +43,12 @@ class Alarm(QueryResourceManager):
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeAlarm,
+        'config': ConfigSource
+    }
 
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -454,6 +468,87 @@ class LogGroupMetrics(MetricsFilter):
         return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
 
 
+@resources.register('log-metric')
+class LogMetric(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'logs'
+        enum_spec = ('describe_metric_filters', 'metricFilters', None)
+        arn = False
+        id = name = 'filterName'
+        date = 'creationTime'
+        cfn_type = 'AWS::Logs::MetricFilter'
+
+
+@LogMetric.filter_registry.register('alarm')
+class LogMetricAlarmFilter(ValueFilter):
+    """
+    Filter log metric filters based on associated alarms.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: log-metrics-with-alarms
+            resource: aws.log-metric
+            filters:
+              - type: alarm
+                key: AlarmName
+                value: present
+    """
+
+    schema = type_schema('alarm', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:MetricAlarms'
+    FetchThreshold = 10  # below this number of resources, fetch alarms individually
+
+    def augment(self, resources):
+        """Add alarm details to log metric filter resources
+
+        This includes all alarms where the metric name and namespace match
+        a log metric filter's metric transformation.
+        """
+
+        if len(resources) < self.FetchThreshold:
+            client = local_session(self.manager.session_factory).client('cloudwatch')
+            for r in resources:
+                r[self.annotation_key] = list(itertools.chain(*(
+                    self.manager.retry(
+                        client.describe_alarms_for_metric,
+                        Namespace=t['metricNamespace'],
+                        MetricName=t['metricName'])['MetricAlarms']
+                    for t in r.get('metricTransformations', ())
+                )))
+        else:
+            alarms = self.manager.get_resource_manager('aws.alarm').resources()
+
+            # We'll be matching resources to alarms based on namespace and
+            # metric name - this lookup table makes that smoother
+            alarms_by_metric = defaultdict(list)
+            for alarm in alarms:
+                alarms_by_metric[(alarm['Namespace'], alarm['MetricName'])].append(alarm)
+
+            for r in resources:
+                r[self.annotation_key] = list(itertools.chain(*(
+                    alarms_by_metric.get((t['metricNamespace'], t['metricName']), [])
+                    for t in r.get('metricTransformations', ())
+                )))
+
+    def get_permissions(self):
+        return [
+            *self.manager.get_resource_manager('aws.alarm').get_permissions(),
+            'cloudwatch:DescribeAlarmsForMetric'
+        ]
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+
+        matched = []
+        for r in resources:
+            if any((self.match(alarm) for alarm in r[self.annotation_key])):
+                matched.append(r)
+        return matched
+
+
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
     """Action to set the retention period (in days) for CloudWatch log groups
@@ -612,23 +707,6 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
 
 @LogGroup.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: cw-log-group-kms-key-filter
-            resource: log-group
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/cw)"
-                op: regex
-    """
 
     RelatedIdsExpression = 'kmsKeyId'
 

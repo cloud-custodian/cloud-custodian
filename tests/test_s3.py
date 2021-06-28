@@ -2116,7 +2116,7 @@ class S3Test(BaseTest):
                     {
                         "type": "toggle-logging",
                         "target_bucket": bname,
-                        "target_prefix": "{account}/{source_bucket_name}",
+                        "target_prefix": "{account}/{source_bucket_region}/{source_bucket_name}/",
                     }
                 ],
             },
@@ -2125,6 +2125,10 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"],
+            "{}/{}/{}/".format(account_name, client.meta.region_name, bname)
+        )
 
         if self.recording:
             time.sleep(5)
@@ -2162,6 +2166,9 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"], "{}/{}/".format(self.account_id, bname)
+        )
 
         if self.recording:
             time.sleep(5)

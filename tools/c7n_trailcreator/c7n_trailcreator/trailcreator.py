@@ -364,7 +364,7 @@ class TrailDB:
             time.sleep(3)
             self.conn.commit()
 
-    def get_type_record_stats(self, account_id, region):
+    def get_type_record_stats(self, account_id, region):  # nosec
         self.cursor.execute('''
             select rtype, count(*) as rcount
             from events
@@ -374,7 +374,7 @@ class TrailDB:
         ''' % (account_id, region))
         return self.cursor.fetchall()
 
-    def get_resource_owners(self, resource_type, account_id, region):
+    def get_resource_owners(self, resource_type, account_id, region):  # nosec
         self.cursor.execute('''
            select user_id, resource_ids
            from events

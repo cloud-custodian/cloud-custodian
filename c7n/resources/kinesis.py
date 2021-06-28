@@ -7,6 +7,7 @@ from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
+from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
 
 
@@ -278,6 +279,49 @@ class DescribeVideoStream(DescribeSource):
         return universal_augment(self.manager, super().augment(resources))
 
 
+@resources.register('kinesis-analyticsv2')
+class KinesisAnalyticsAppV2(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "kinesisanalyticsv2"
+        enum_spec = ('list_applications', 'ApplicationSummaries', None)
+        detail_spec = ('describe_application', 'ApplicationName',
+                       'ApplicationName', 'ApplicationDetail')
+        name = "ApplicationName"
+        arn = id = "ApplicationARN"
+        arn_type = 'application'
+        universal_taggable = object()
+        cfn_type = 'AWS::KinesisAnalyticsV2::Application'
+        permission_prefix = "kinesisanalytics"
+
+    permissions = ("kinesisanalytics:DescribeApplication",)
+
+    def augment(self, resources):
+        return universal_augment(self, super().augment(resources))
+
+
+@KinesisAnalyticsAppV2.action_registry.register('delete')
+class KinesisAnalyticsAppV2Delete(Action):
+
+    schema = type_schema('delete')
+    permissions = ("kinesisanalytics:DeleteApplication",)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('kinesisanalyticsv2')
+        for r in resources:
+            client.delete_application(
+                ApplicationName=r['ApplicationName'],
+                CreateTimestamp=r['CreateTimestamp'])
+
+
+@KinesisAnalyticsAppV2.filter_registry.register('subnet')
+class KinesisAnalyticsSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = 'ApplicationConfigurationDescription.' \
+        'VpcConfigurationDescriptions[].SubnetIds[]'
+
+
 @resources.register('kinesis-video')
 class KinesisVideoStream(QueryResourceManager):
     retry = staticmethod(
@@ -329,22 +373,5 @@ class DeleteVideoStream(Action):
 
 @KinesisVideoStream.filter_registry.register('kms-key')
 class KmsFilterVideoStream(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the alias name
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: kinesis-video-stream-kms-key
-                resource: aws.kinesis-video
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/)"
-                    op: regex
-    """
 
     RelatedIdsExpression = 'KmsKeyId'

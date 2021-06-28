@@ -9,6 +9,7 @@ documentation = "https://cloudcustodian.io/docs/"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
@@ -24,7 +25,7 @@ google-cloud-monitoring = "^0.34.0"
 google-cloud-storage = "^1.28.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "~6.0.0"
+pytest = "^6.0.0"
 c7n = {path = "../..", develop = true}
 
 [build-system]

@@ -3,11 +3,89 @@
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n import tags
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n import tags, query
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
+    ChildResourceManager, ChildDescribeSource
+from c7n.utils import local_session, type_schema, get_retry
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
+from .ecs import ContainerConfigSource
+
+
+@query.sources.register('describe-eks-nodegroup')
+class NodeGroupDescribeSource(ChildDescribeSource):
+
+    def get_query(self):
+        query = super(NodeGroupDescribeSource, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('eks')
+        for cluster_name, nodegroup_name in resources:
+            nodegroup = client.describe_nodegroup(
+                clusterName=cluster_name,
+                nodegroupName=nodegroup_name)['nodegroup']
+            if 'tags' in nodegroup:
+                nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+            results.append(nodegroup)
+        return results
+
+
+@resources.register('eks-nodegroup')
+class NodeGroup(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+
+        service = 'eks'
+        arn = 'nodegroupArn'
+        arn_type = 'nodegroup'
+        id = 'nodegroupArn'
+        name = 'nodegroupName'
+        enum_spec = ('list_nodegroups', 'nodegroups', None)
+        parent_spec = ('eks', 'clusterName', None)
+        permissions_enum = ('eks:DescribeNodegroup',)
+        date = 'createdAt'
+
+    source_mapping = {
+        'describe-child': NodeGroupDescribeSource,
+        'describe': NodeGroupDescribeSource,
+    }
+
+
+@NodeGroup.action_registry.register('delete')
+class DeleteNodeGroup(Action):
+    """Delete node group(s)."""
+
+    schema = type_schema('delete')
+    permissions = ('eks:DeleteNodegroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        retry = get_retry(('Throttling',))
+        for r in resources:
+            try:
+                retry(client.delete_nodegroup,
+                      clusterName=r['clusterName'],
+                      nodegroupName=r['nodegroupName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+class EKSDescribeSource(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            if 'tags' not in r:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+        return resources
+
+
+class EKSConfigSource(ContainerConfigSource):
+    mapped_keys = {'certificateAuthorityData': 'certificateAuthority'}
 
 
 @resources.register('eks')
@@ -21,15 +99,12 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
-        cfn_type = 'AWS::EKS::Cluster'
+        config_type = cfn_type = 'AWS::EKS::Cluster'
 
-    def augment(self, resources):
-        resources = super(EKS, self).augment(resources)
-        for r in resources:
-            if 'tags' not in r:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
-        return resources
+    source_mapping = {
+        'config': EKSConfigSource,
+        'describe': EKSDescribeSource
+    }
 
 
 @EKS.filter_registry.register('subnet')
