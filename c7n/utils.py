@@ -619,7 +619,7 @@ def get_proxy_url(url):
 
     # Determine if proxy should be used based on no_proxy entries.
     # Note this does not support no_proxy ip or cidr entries.
-    if proxy_bypass(url_parts['hostname'] + ':' + url_parts['port']):
+    if proxy_bypass(url_parts['hostname'] + ':' + str(url_parts['port'])):
         return None
 
     for key in proxy_keys:
