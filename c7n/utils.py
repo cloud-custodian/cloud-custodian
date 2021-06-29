@@ -617,9 +617,14 @@ def get_proxy_url(url):
         elif url_parts['scheme'] == 'https':
             url_parts['port'] = '443'
 
+    if url_parts['hostname'] is None:
+        hostname = ''
+    else:
+        hostname = url_parts['hostname']
+
     # Determine if proxy should be used based on no_proxy entries.
     # Note this does not support no_proxy ip or cidr entries.
-    if proxy_bypass(url_parts['hostname'] + ':' + str(url_parts['port'])):
+    if proxy_bypass(hostname + ':' + str(url_parts['port'])):
         return None
 
     for key in proxy_keys:
