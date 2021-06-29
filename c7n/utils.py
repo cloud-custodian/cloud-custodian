@@ -591,7 +591,7 @@ def parse_url_config(url):
         url += "://"
     conf = config.Bag()
     parsed = urlparse.urlparse(url)
-    for k in ('scheme', 'netloc', 'path'):
+    for k in ('scheme', 'netloc', 'path', 'hostname', 'port'):
         conf[k] = getattr(parsed, k)
     for k, v in urlparse.parse_qs(parsed.query).items():
         conf[k] = v[0]
@@ -610,21 +610,16 @@ def get_proxy_url(url):
         'all'
     ]
 
-    # Remove username:password if present in netloc.
-    target = re.sub(r'^.*@', '', url_parts['netloc'])
-
-    # Append a port based on scheme if not provided in netloc.
-    target_url_port = target.split(':')
-    if len(target_url_port) == 1:
+    # Set port if not defined explicitly in url.
+    if url_parts['port'] is None:
         if url_parts['scheme'] == 'http':
-            target_url_port.append('80')
+            url_parts['port'] = '80'
         elif url_parts['scheme'] == 'https':
-            target_url_port.append('443')
-        target = ':'.join(target_url_port)
+            url_parts['port'] = '443'
 
     # Determine if proxy should be used based on no_proxy entries.
     # Note this does not support no_proxy ip or cidr entries.
-    if proxy_bypass(target):
+    if proxy_bypass(url_parts['hostname'] + ':' + url_parts['port']):
         return None
 
     for key in proxy_keys:
