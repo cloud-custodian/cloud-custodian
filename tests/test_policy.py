@@ -16,7 +16,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
-from c7n.policy import ConfigPollRuleMode, PullMode
+from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
@@ -535,6 +535,40 @@ class PolicyMetaLint(BaseTest):
             self.fail(
                 "Missing permissions %d on \n\t%s"
                 % (len(missing), "\n\t".join(sorted(missing)))
+            )
+
+    def test_deprecation_dates(self):
+        def check_deprecations(source):
+            issues = set()
+            for dep in getattr(source, 'deprecations', ()):
+                when = dep.removed_after
+                if when is not None:
+                    name = f"{source.__module__}.{source.__name__}"
+                    if not isinstance(when, str):
+                        issues.add(f"{name}: \"{dep}\", removed_after attribute must be a string")
+                        continue
+                    try:
+                        datetime.strptime(when, "%Y-%m-%d")
+                    except ValueError:
+                        issues.add(f"{name}: \"{dep}\", removed_after must be a valid date"
+                                   f" in the format 'YYYY-MM-DD', got '{when}'")
+            return issues
+        issues = check_deprecations(Policy)
+        for name, cloud in clouds.items():
+            for resource_name, resource in cloud.resources.items():
+                issues = issues.union(check_deprecations(resource))
+                for fname, f in resource.filter_registry.items():
+                    if fname in ('and', 'or', 'not'):
+                        continue
+                    issues = issues.union(check_deprecations(f))
+                for aname, a in resource.action_registry.items():
+                    issues = issues.union(check_deprecations(a))
+        for name, mode in execution.items():
+            issues = issues.union(check_deprecations(mode))
+        if issues:
+            self.fail(
+                "Deprecation validation issues with \n\t%s" %
+                "\n\t".join(sorted(issues))
             )
 
 

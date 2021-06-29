@@ -18,7 +18,9 @@ class CommandsValidateTest(BaseTest):
                 "tests/data/test_policies/dup-policies.yml"],
             debug=False,
             subparser="validate",
-            verbose=False)
+            verbose=False,
+            check_deprecations="yes",
+        )
 
         with self.assertRaises(yaml.YAMLError) as err:
             validate_yaml_policies(yaml_validate_options)
@@ -32,7 +34,9 @@ class CommandsValidateTest(BaseTest):
                 "tests/data/test_policies/dup-policy-keys.yml"],
             debug=False,
             subparser="validate",
-            verbose=False)
+            verbose=False,
+            check_deprecations="yes",
+        )
 
         with self.assertRaises(yaml.YAMLError) as err:
             validate_yaml_policies(yaml_validate_options)
@@ -49,6 +53,7 @@ class CommandsValidateTest(BaseTest):
             debug=False,
             subparser="validate",
             verbose=False,
+            check_deprecations="yes",
         )
         with self.assertRaises((SystemExit, ValueError)) as exit:
             validate_yaml_policies(yaml_validate_options)
