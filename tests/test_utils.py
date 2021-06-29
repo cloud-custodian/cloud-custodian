@@ -80,15 +80,36 @@ class UrlConfTest(BaseTest):
 
         self.assertEqual(
             dict(utils.parse_url_config('')),
-            {'netloc': '', 'hostname': None, 'port': None, 'path': '', 'scheme': '', 'url': ''})
+            {
+                'netloc': '',
+                'hostname': None,
+                'port': None,
+                'path': '',
+                'scheme': '',
+                'url': ''
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'hostname': None, 'port': None, 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'hostname': None,
+                'port': None,
+                'url': 'aws://'
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws://')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'hostname': None, 'port': None, 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'hostname': None,
+                'port': None,
+                'url': 'aws://'
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('http://example.com:8080')),
