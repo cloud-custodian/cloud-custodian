@@ -91,9 +91,10 @@ class SessionTest(BaseTest):
         mock_run.return_value = \
             f'{{"id":"{DEFAULT_SUBSCRIPTION_ID}", "tenantId":"{DEFAULT_TENANT_ID}"}}'
 
-        s = Session()
-
-        self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+        with patch.dict(os.environ, {}, clear=True):
+            s = Session()
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
 
     @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
