@@ -9,6 +9,7 @@ import json
 import hashlib
 import logging
 
+from c7n import deprecated
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
@@ -294,7 +295,7 @@ class PostFinding(Action):
            - type: post-finding
              description: |
                 Shield should be enabled on account to allow for DDOS protection (1 time 3k USD Charge).
-             severity_normalized: 6
+             severity_label: LOW
              types:
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
              recommendation: "Enable shield"
@@ -303,6 +304,10 @@ class PostFinding(Action):
              compliance_status: FAILED
 
     """ # NOQA
+
+    deprecations = (
+        deprecated.field('severity_normalized', 'severity_label'),
+    )
 
     FindingVersion = "2018-10-08"
 

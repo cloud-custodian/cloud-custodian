@@ -20,7 +20,7 @@ from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
-from c7n import utils
+from c7n import deprecated, utils
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
@@ -241,6 +241,11 @@ class PolicyExecutionMode:
                 MetricName=m)
             values[m] = results['Datapoints']
         return values
+
+    def get_deprecations(self):
+        # The execution mode itself doesn't have a data dict, so we grab the
+        # mode part from the policy data dict itself.
+        return deprecated.check_deprecations(self, data=self.policy.data.get('mode', {}))
 
 
 class ServerlessExecutionMode(PolicyExecutionMode):
@@ -960,6 +965,7 @@ class PolicyConditions:
         return iter_filters(self.filters, block_end=block_end)
 
     def convert_deprecated(self):
+        """These deprecated attributes are now recorded as deprecated against the policy."""
         filters = []
         if 'region' in self.policy.data:
             filters.append({'region': self.policy.data['region']})
@@ -979,10 +985,23 @@ class PolicyConditions:
                 'value': self.policy.data['end']})
         return filters
 
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        deprecations = []
+        for f in self.filters:
+            deprecations.extend(f.get_deprecations())
+        return deprecations
+
 
 class Policy:
 
     log = logging.getLogger('custodian.policy')
+
+    deprecations = (
+        deprecated.field('region', 'region in condition block'),
+        deprecated.field('start', 'value filter in condition block'),
+        deprecated.field('end', 'value filter in condition block'),
+    )
 
     def __init__(self, data, options, session_factory=None):
         self.data = data
@@ -1079,9 +1098,9 @@ class Policy:
         if not variables:
             variables = {}
 
+        partition = utils.get_partition(self.options.region)
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                partition = utils.get_partition(self.options.region)
                 self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
                     (partition, self.options.account_id, self.data['mode']['role'])
 
@@ -1089,6 +1108,7 @@ class Policy:
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
+            'partition': partition,
             'region': self.options.region,
             # non-standard runtime variables from local filter/action vocabularies
             #
@@ -1106,6 +1126,7 @@ class Policy:
             'bucket_region': '{bucket_region}',
             'bucket_name': '{bucket_name}',
             'source_bucket_name': '{source_bucket_name}',
+            'source_bucket_region': '{source_bucket_region}',
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
@@ -1226,3 +1247,7 @@ class Policy:
                 except Exception as e:
                     raise ValueError(
                         "Policy: %s Date/Time not parsable: %s, %s" % (policy_name, i, e))
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        return deprecated.check_deprecations(self, "policy")

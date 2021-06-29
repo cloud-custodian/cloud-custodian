@@ -68,6 +68,7 @@ def get_rendered_jinja(
         resources=resources,
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -100,6 +101,7 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],

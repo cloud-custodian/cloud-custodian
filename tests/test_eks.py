@@ -3,6 +3,44 @@
 import time
 from .common import BaseTest
 
+from pytest_terraform import terraform
+
+
+@terraform('eks_nodegroup_delete')
+def test_eks_nodegroup_delete(test, eks_nodegroup_delete):
+    aws_region = 'eu-central-1'
+    session_factory = test.replay_flight_data('test_eks_nodegroup_delete', region=aws_region)
+
+    client = session_factory().client('eks')
+    eks_cluster_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.cluster_name']
+    eks_nodegroup_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.node_group_name']
+
+    p = test.load_policy(
+        {
+            'name': 'eks-nodegroup-delete',
+            'resource': 'eks-nodegroup',
+            'filters': [
+                {'clusterName': eks_cluster_name},
+                {'and': [
+                    {'tag:Name': eks_nodegroup_name},
+                    {'tag:ClusterName': eks_cluster_name},
+                ]},
+            ],
+            'actions': [{'type': 'delete'}],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    nodegroup = client.describe_nodegroup(
+        clusterName=eks_cluster_name,
+        nodegroupName=eks_nodegroup_name
+    )['nodegroup']
+    test.assertEqual(nodegroup['status'], 'DELETING')
+
 
 class EKS(BaseTest):
 
