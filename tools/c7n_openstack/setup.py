@@ -31,7 +31,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-openstack',
-    'version': '0.1.2',
+    'version': '0.1.3',
     'description': 'Cloud Custodian - OpenStack Provider',
     'license': 'Apache-2.0',
     'classifiers': [
