@@ -19,7 +19,7 @@ from dateutil.parser import parse as parse_date
 
 from botocore.exceptions import ClientError
 
-
+from c7n import deprecated
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
@@ -909,6 +909,9 @@ class UnusedIamRole(IamRoleUsage):
               - type: used
                 state: false
     """
+    deprecations = (
+        deprecated.filter("use the 'used' filter with 'state' attribute"),
+    )
 
     schema = type_schema('unused')
 

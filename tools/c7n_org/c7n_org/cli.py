@@ -410,15 +410,18 @@ def report(config, output, use, output_dir, accounts,
     writer.writerows(rows)
 
 
-def _get_env_creds(account, session, region):
-    env = {}
+def _get_env_creds(account, session, region, env=None):
+    env = env or {}
     if account["provider"] == 'aws':
         creds = session._session.get_credentials()
         env['AWS_ACCESS_KEY_ID'] = creds.access_key
         env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
         env['AWS_SESSION_TOKEN'] = creds.token
         env['AWS_DEFAULT_REGION'] = region
+        env['AWS_REGION'] = region
         env['AWS_ACCOUNT_ID'] = account["account_id"]
+        # we're explicitly setting credential and region configuratio
+        env.pop('AWS_PROFILE', None)
     elif account["provider"] == 'azure':
         env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
     elif account["provider"] == 'gcp':
@@ -434,9 +437,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
     except ClientError:
         return 1
 
-    env = os.environ.copy()
-    env.update(_get_env_creds(account, session, region))
-
+    env = _get_env_creds(account, session, region, dict(os.environ))
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
 

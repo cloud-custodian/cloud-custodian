@@ -75,6 +75,22 @@ class SqlInstanceStop(MethodAction):
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
 
 
+@SqlInstance.action_registry.register('start')
+class SqlInstanceStart(MethodAction):
+
+    schema = type_schema('start')
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                'instance': instance,
+                'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
+
+
 @resources.register('sql-user')
 class SqlUser(ChildResourceManager):
 

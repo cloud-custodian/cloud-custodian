@@ -302,6 +302,13 @@ class BooleanGroupFilter(Filter):
     def __bool__(self):
         return True
 
+    def get_deprecations(self):
+        """Return any matching deprecations for the nested filters."""
+        deprecations = []
+        for f in self.filters:
+            deprecations.extend(f.get_deprecations())
+        return deprecations
+
 
 class Or(BooleanGroupFilter):
 
