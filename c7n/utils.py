@@ -591,7 +591,7 @@ def parse_url_config(url):
         url += "://"
     conf = config.Bag()
     parsed = urlparse.urlparse(url)
-    for k in ('scheme', 'netloc', 'path', 'hostname', 'port'):
+    for k in ('scheme', 'netloc', 'path'):
         conf[k] = getattr(parsed, k)
     for k, v in urlparse.parse_qs(parsed.query).items():
         conf[k] = v[0]
@@ -601,30 +601,27 @@ def parse_url_config(url):
 
 def get_proxy_url(url):
     proxies = getproxies()
-    url_parts = parse_url_config(url)
+    parsed = urlparse.urlparse(url)
 
     proxy_keys = [
-        url_parts['scheme'] + '://' + url_parts['netloc'],
-        url_parts['scheme'],
-        'all://' + url_parts['netloc'],
+        parsed.scheme + '://' + parsed.netloc,
+        parsed.scheme,
+        'all://' + parsed.netloc,
         'all'
     ]
 
     # Set port if not defined explicitly in url.
-    if url_parts['port'] is None:
-        if url_parts['scheme'] == 'http':
-            url_parts['port'] = '80'
-        elif url_parts['scheme'] == 'https':
-            url_parts['port'] = '443'
+    port = parsed.port
+    if port is None and parsed.scheme == 'http':
+        port = 80
+    elif port is None and parsed.scheme == 'https':
+        port = 443
 
-    if url_parts['hostname'] is None:
-        hostname = ''
-    else:
-        hostname = url_parts['hostname']
+    hostname = parsed.hostname is not None and parsed.hostname or ''
 
     # Determine if proxy should be used based on no_proxy entries.
     # Note this does not support no_proxy ip or cidr entries.
-    if proxy_bypass(hostname + ':' + str(url_parts['port'])):
+    if proxy_bypass("%s:%s" % (hostname, port)):
         return None
 
     for key in proxy_keys:

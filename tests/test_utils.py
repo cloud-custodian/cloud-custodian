@@ -71,8 +71,6 @@ class UrlConfTest(BaseTest):
             dict(utils.parse_url_config('aws://target?format=json&region=us-west-2')),
             dict(url='aws://target?format=json&region=us-west-2',
                  netloc='target',
-                 hostname='target',
-                 port=None,
                  path='',
                  scheme='aws',
                  region='us-west-2',
@@ -82,8 +80,6 @@ class UrlConfTest(BaseTest):
             dict(utils.parse_url_config('')),
             {
                 'netloc': '',
-                'hostname': None,
-                'port': None,
                 'path': '',
                 'scheme': '',
                 'url': ''
@@ -95,8 +91,6 @@ class UrlConfTest(BaseTest):
                 'path': '',
                 'scheme': 'aws',
                 'netloc': '',
-                'hostname': None,
-                'port': None,
                 'url': 'aws://'
             })
 
@@ -106,8 +100,6 @@ class UrlConfTest(BaseTest):
                 'path': '',
                 'scheme': 'aws',
                 'netloc': '',
-                'hostname': None,
-                'port': None,
                 'url': 'aws://'
             })
 
@@ -115,8 +107,6 @@ class UrlConfTest(BaseTest):
             dict(utils.parse_url_config('http://example.com:8080')),
             dict(url='http://example.com:8080',
                  netloc='example.com:8080',
-                 hostname='example.com',
-                 port=8080,
                  path='',
                  scheme='http'))
 
