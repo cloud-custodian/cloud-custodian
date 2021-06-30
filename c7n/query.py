@@ -751,14 +751,14 @@ class TypeMeta(type):
             identifier = cls.config_type
         elif cls.cfn_type:
             identifier = cls.cfn_type
-        elif cls.__doc__:
-            identifier = "Docstring"
-        elif cls.arn_type:
+        elif cls.arn_type and cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
-        elif cls.enum_spec:
+        elif cls.enum_spec and cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.enum_spec[1])
-        else:
+        elif cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.id)
+        else:
+            identifier = cls.__name__
         return "<TypeInfo %s>" % identifier
 
 
