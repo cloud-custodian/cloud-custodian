@@ -616,6 +616,9 @@ def get_proxy_url(url):
             url_parts['port'] = '80'
         elif url_parts['scheme'] == 'https':
             url_parts['port'] = '443'
+        else:
+            url_parts['port'] = ''
+
 
     if url_parts['hostname'] is None:
         hostname = ''
