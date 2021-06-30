@@ -28,4 +28,4 @@ sphinxcontrib-jsmath==1.0.1; python_version >= "3.5"
 sphinxcontrib-qthelp==1.0.3; python_version >= "3.5"
 sphinxcontrib-serializinghtml==1.1.5; python_version >= "3.5"
 typing-extensions==3.10.0.0
-urllib3==1.26.5; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.5"
+urllib3==1.26.6; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.5"
