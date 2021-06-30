@@ -619,7 +619,6 @@ def get_proxy_url(url):
         else:
             url_parts['port'] = ''
 
-
     if url_parts['hostname'] is None:
         hostname = ''
     else:
