@@ -1,0 +1,142 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/92b282108436c43a75508be7868d9e34",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/cloud-custodian/cloud-custodian",
+                "GeneratorId": "ebs-finding",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ],
+                "CreatedAt": "2021-07-01T22:51:01.755837+00:00",
+                "UpdatedAt": "2021-07-01T23:06:04.202780+00:00",
+                "Severity": {
+                    "Product": 10,
+                    "Label": "INFORMATIONAL",
+                    "Normalized": 10
+                },
+                "Title": "EBS Testing",
+                "Description": "EBS Testing",
+                "ProductFields": {
+                    "resource": "ebs-snapshot",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.9.12",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/cloud-custodian/cloud-custodian/us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/92b282108436c43a75508be7868d9e34",
+                    "aws/securityhub/ProductName": "Cloud Custodian",
+                    "aws/securityhub/CompanyName": "Cloud Custodian"
+                },
+                "Resources": [
+                    {
+                        "Type": "Other",
+                        "Id": "arn:aws:ec2:us-east-1:644160558196:snapshot/snap-083a14886f4681675",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Tags": {
+                            "c7n:FindingId:EBS Testing": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/92b282108436c43a75508be7868d9e34:2021-07-01T22:51:01.755837+00:00",
+                            "Test": "Test"
+                        },
+                        "Details": {
+                            "Other": {
+                                "Encrypted": "False",
+                                "OwnerId": "644160558196",
+                                "Progress": "100%",
+                                "SnapshotId": "snap-083a14886f4681675",
+                                "StartTime": "2020-04-25T17:58:02.497000+00:00",
+                                "State": "completed",
+                                "VolumeId": "vol-04c1b309bb8d18d71",
+                                "VolumeSize": "8",
+                                "Tags": "[\n{\n\"Key\": \"c7n:FindingId:EBS Testing\",\n\"Value\": \"us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/92b282108436c43a75508be7868d9e34:2021-07-01T22:51:01.755837+00:00\"\n},\n{\n\"Key\": \"Test\",\n\"Value\": \"Test\"\n}\n]",
+                                "c7n:resource-type": "ebs-snapshot"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ACTIVE",
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "INFORMATIONAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/AWS Security Best Practices"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/230644c2c860997cb2541d91f258a10f",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/cloud-custodian/cloud-custodian",
+                "GeneratorId": "ebs-finding",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ],
+                "CreatedAt": "2021-07-01T22:51:01.755837+00:00",
+                "UpdatedAt": "2021-07-01T23:06:04.202780+00:00",
+                "Severity": {
+                    "Product": 10,
+                    "Label": "INFORMATIONAL",
+                    "Normalized": 10
+                },
+                "Title": "EBS Testing",
+                "Description": "EBS Testing",
+                "ProductFields": {
+                    "resource": "ebs-snapshot",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.9.12",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/cloud-custodian/cloud-custodian/us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/230644c2c860997cb2541d91f258a10f",
+                    "aws/securityhub/ProductName": "Cloud Custodian",
+                    "aws/securityhub/CompanyName": "Cloud Custodian"
+                },
+                "Resources": [
+                    {
+                        "Type": "Other",
+                        "Id": "arn:aws:ec2:us-east-1:644160558196:snapshot/snap-0ef116d892da25144",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Tags": {
+                            "test-backup": "true",
+                            "c7n:FindingId:EBS Testing": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/230644c2c860997cb2541d91f258a10f:2021-07-01T22:51:01.755837+00:00",
+                            "aws:backup:source-resource": "6eebb97a-9bb6-4f74-b986-954eba222c34"
+                        },
+                        "Details": {
+                            "Other": {
+                                "Description": "This snapshot is created by the AWS Backup service.",
+                                "Encrypted": "False",
+                                "OwnerId": "644160558196",
+                                "Progress": "100%",
+                                "SnapshotId": "snap-0ef116d892da25144",
+                                "StartTime": "2020-07-30T14:59:24.693000+00:00",
+                                "State": "completed",
+                                "VolumeId": "vol-02e9c0677eba008b5",
+                                "VolumeSize": "100",
+                                "Tags": "[\n{\n\"Key\": \"test-backup\",\n\"Value\": \"true\"\n},\n{\n\"Key\": \"c7n:FindingId:EBS Testing\",\n\"Value\": \"us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/230644c2c860997cb2541d91f258a10f:2021-07-01T22:51:01.755837+00:00\"\n},\n{\n\"Key\": \"aws:backup:source-resource\",\n\"Value\": \"6eebb97a-9bb6-4f74-b986-954eba222c34\"\n}\n]",
+                                "c7n:resource-type": "ebs-snapshot"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ACTIVE",
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "INFORMATIONAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/AWS Security Best Practices"
+                    ]
+                }
+            }
+        ]
+    }
+}
