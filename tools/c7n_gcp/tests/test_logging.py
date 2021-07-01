@@ -104,12 +104,6 @@ class LogProjectMetricTest(BaseTest):
             session_factory=factory)
         resource = p.run()
         self.assertEqual(len(resource), 1)
-        self.assertEqual(
-            p.resource_manager.get_urns(resource),
-            [
-                'gcp:logging::cloud-custodian:project-metric/test',
-            ],
-        )
 
     def test_get_project_metric(self):
         project_id = 'cloud-custodian'
@@ -172,9 +166,19 @@ class LogExclusionTest(BaseTest):
         event = event_data('log-create-project-exclusion.json')
         resource = exec_mode.run(event, None)
         self.assertEqual(resource[0]['name'], exclusion_name)
-        self.assertEqual(
-            p.resource_manager.get_urns(resource),
-            [
-                'gcp:logging::cloud-custodian:exclusion/qwerty',
-            ],
-        )
+
+
+class TestBucketAccessControlList(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        bucket = 'for_test_12345678'
+        factory = self.replay_flight_data('bucket-access-control-list-query', project_id)
+        p = self.load_policy({
+            'name': 'gcp-bucket-access-control-list',
+            'resource': 'gcp.bucket-access-control-list',
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 5)
+        self.assertEqual(resources[0]['bucket'], bucket)

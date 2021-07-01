@@ -1,0 +1,97 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Jul 2021 11:01:52 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5525",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "custodian-auto-audit-epam-046-mysql_database_no_root_login",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-epam-046-mysql_database_no_root_login",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"cloudsql.users.create\" OR \"cloudsql.instances.create\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-06-18T10:15:14.160967336Z",
+        "updateTime": "2021-06-18T10:15:14.160967336Z"
+      },
+      {
+        "name": "custodian-auto-audit-epam-077-no_admin_name_for_google_sql",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-epam-077-no_admin_name_for_google_sql",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"cloudsql.users.create\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-05-27T14:20:40.260528645Z",
+        "updateTime": "2021-05-27T14:20:40.260528645Z"
+      },
+      {
+        "name": "custodian-auto-audit-epam-gcp-ed-001-corporate_login_credentials",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-epam-gcp-ed-001-corporate_login_credentials",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"SetIamPolicy\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-06-23T10:30:12.355853321Z",
+        "updateTime": "2021-06-23T10:30:12.355853321Z"
+      },
+      {
+        "name": "custodian-auto-audit-epam-gcp-ed-016-object_versioning_enabled_on_log-buckets",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-epam-gcp-ed-016-object_versioning_enabled_on_log-buckets",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"google.logging.v2.ConfigServiceV2.CreateSink\" OR \"google.logging.v2.ConfigServiceV2.UpdateSink\" OR \"storage.buckets.update\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-06-04T10:10:04.964567937Z",
+        "updateTime": "2021-06-04T10:10:04.964567937Z"
+      },
+      {
+        "name": "custodian-auto-audit-makaka-policy",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-makaka-policy",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"v1.compute.disks.insert\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-22T15:56:31.547803614Z",
+        "updateTime": "2021-03-22T15:56:31.547803614Z"
+      },
+      {
+        "name": "custodian-auto-audit-policy",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-policy",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"v1.compute.disks.createSnapshot\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-22T15:50:17.500204307Z",
+        "updateTime": "2021-03-22T16:22:29.905555221Z"
+      },
+      {
+        "name": "custodian-auto-audit-role-get",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-role-get",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"google.iam.admin.v1.CreateServiceAccountKey\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-28T13:33:28.626985092Z",
+        "updateTime": "2021-03-29T08:52:29.529750738Z"
+      },
+      {
+        "name": "test",
+        "destination": "storage.googleapis.com/for_test_12345678",
+        "filter": "resource.type=\"gce_instance\"",
+        "writerIdentity": "serviceAccount:p443732426401-948649@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2021-04-22T14:45:25.955408836Z",
+        "updateTime": "2021-04-22T14:45:25.955408836Z",
+        "description": "for test of buvket"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      }
+    ]
+  }
+}

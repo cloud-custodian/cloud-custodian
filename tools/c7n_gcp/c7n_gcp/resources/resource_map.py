@@ -21,6 +21,7 @@ ResourceMap = {
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
+    "gcp.bucket-access-control-list": "c7n_gcp.resources.logging.BucketAccessControlList",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
