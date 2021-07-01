@@ -5,7 +5,7 @@ from c7n.filters.core import ValueFilter
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
 # TODO .. folder, billing account, org sink
 # how to map them given a project level root entity sans use of c7n-org
@@ -83,6 +83,68 @@ class LogProjectSinkBucketFilter(ValueFilter):
 
         # call value filter on the bucket object
         return super().__call__(sink[self.cache_key])
+
+
+@resources.register('bucket-access-control-list')
+class BucketAccessControlList(ChildResourceManager):
+    """
+    GC resource: https://cloud.google.com/storage/docs/json_api/v1/bucketAccessControls/list
+
+    :example:
+
+    Finds storage buckets with publicly accessible Stackdriver logs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: epam-gc-public_storage_buckets_logs
+            description: |
+              There are Storage Buckets with publicly accessible Stackdriver logs
+            resource: gcp.bucket-access-control-list
+            filters:
+              - type: value
+                key: entity
+                value: [allUsers, allAuthenticatedUsers]
+                op: in
+    """
+    class resource_type(ChildTypeInfo):
+        service = 'storage'
+        version = 'v1'
+        component = 'bucketAccessControls'
+        scope = 'bucket'
+        enum_spec = ('list', 'items[]', None)
+        name = id = 'buckets'
+        default_report_fields = [name, 'items']
+        asset_type = 'storage.googleapis.com/Bucket'
+        permissions = ('storage.buckets.list',)
+        parent_spec = {
+            'resource': 'log-project-sink',
+            'child_enum_params': [
+                ('name', 'bucket',),
+            ]}
+
+    def _fetch_resources(self, query):
+        if not query:
+            query = {}
+
+        resources = []
+        annotation_key = self.resource_type.get_parent_annotation_key()
+        parent_query = self.get_parent_resource_query()
+        parent_resource_manager = self.get_resource_manager(
+            resource_type=self.resource_type.parent_spec['resource'],
+            data=({'query': parent_query} if parent_query else {})
+        )
+
+        for parent_instance in parent_resource_manager.resources():
+            if parent_instance['destination'].startswith('storage'):
+                bucket = parent_instance['destination'].split('/')[1]
+                query.update({'bucket': bucket})
+                children = super(ChildResourceManager, self)._fetch_resources(query)
+                for child_instance in children:
+                    child_instance[annotation_key] = parent_instance
+                    resources.append(child_instance)
+
+        return resources
 
 
 @LogProjectSink.action_registry.register('delete')

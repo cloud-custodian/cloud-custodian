@@ -1,0 +1,80 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "ADPycdsRQpZXUK3nA4wBt9_JxSxZLU3SQxVXmc_7zAvtfho4vYLscQzLsQ_z0GZDV3PEw1YS3hlJMXMETgJVFUzFiYU",
+    "etag": "CBw=",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 01 Jul 2021 11:01:53 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Thu, 01 Jul 2021 11:01:53 GMT",
+    "content-length": "2470",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b/for_test_12345678/acl?alt=json"
+  },
+  "body": {
+    "kind": "storage#bucketAccessControls",
+    "items": [
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "for_test_12345678/project-editors-443732426401",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678/acl/project-editors-443732426401",
+        "bucket": "for_test_12345678",
+        "entity": "project-editors-443732426401",
+        "role": "OWNER",
+        "etag": "CBw=",
+        "projectTeam": {
+          "projectNumber": "443732426401",
+          "team": "editors"
+        }
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "for_test_12345678/project-owners-443732426401",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678/acl/project-owners-443732426401",
+        "bucket": "for_test_12345678",
+        "entity": "project-owners-443732426401",
+        "role": "OWNER",
+        "etag": "CBw=",
+        "projectTeam": {
+          "projectNumber": "443732426401",
+          "team": "owners"
+        }
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "for_test_12345678/user-p443732426401-948649@gcp-sa-logging.iam.gserviceaccount.com",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678/acl/user-p443732426401-948649@gcp-sa-logging.iam.gserviceaccount.com",
+        "bucket": "for_test_12345678",
+        "entity": "user-p443732426401-948649@gcp-sa-logging.iam.gserviceaccount.com",
+        "role": "OWNER",
+        "email": "p443732426401-948649@gcp-sa-logging.iam.gserviceaccount.com",
+        "etag": "CBw="
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "for_test_12345678/project-viewers-443732426401",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678/acl/project-viewers-443732426401",
+        "bucket": "for_test_12345678",
+        "entity": "project-viewers-443732426401",
+        "role": "READER",
+        "etag": "CBw=",
+        "projectTeam": {
+          "projectNumber": "443732426401",
+          "team": "viewers"
+        }
+      },
+      {
+        "kind": "storage#bucketAccessControl",
+        "id": "for_test_12345678/user-443732426401@cloudbuild.gserviceaccount.com",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/for_test_12345678/acl/user-443732426401@cloudbuild.gserviceaccount.com",
+        "bucket": "for_test_12345678",
+        "entity": "user-443732426401@cloudbuild.gserviceaccount.com",
+        "role": "READER",
+        "email": "443732426401@cloudbuild.gserviceaccount.com",
+        "etag": "CBw="
+      }
+    ]
+  }
+}
