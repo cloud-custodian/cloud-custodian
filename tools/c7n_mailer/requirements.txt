@@ -1,12 +1,12 @@
 attrs==21.2.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-boto3==1.17.96; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
-botocore==1.20.96; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
+boto3==1.17.102; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
+botocore==1.20.102; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 certifi==2021.5.30; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 chardet==4.0.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 datadog==0.34.1
 decorator==5.0.9; python_version >= "3.5"
 idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-importlib-metadata==4.5.0; python_version >= "3.6" and python_version < "3.8"
+importlib-metadata==4.6.0; python_version >= "3.6" and python_version < "3.8"
 jinja2==3.0.1; python_version >= "3.6"
 jmespath==0.10.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 jsonpatch==1.32; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
@@ -15,7 +15,7 @@ jsonschema==3.2.0
 ldap3==2.9
 markupsafe==2.0.1; python_version >= "3.6"
 pyasn1==0.4.8
-pyrsistent==0.17.3; python_version >= "3.5"
+pyrsistent==0.18.0; python_version >= "3.6"
 python-dateutil==2.8.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
 python-http-client==3.3.2; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 pyyaml==5.4.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
@@ -26,5 +26,5 @@ sendgrid==6.7.1; (python_version >= "2.7" and python_full_version < "3.0.0") or 
 six==1.16.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 starkbank-ecdsa==1.1.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 typing-extensions==3.10.0.0; python_version >= "3.6" and python_version < "3.8"
-urllib3==1.26.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
+urllib3==1.26.6; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
 zipp==3.4.1; python_version >= "3.6" and python_version < "3.8"
