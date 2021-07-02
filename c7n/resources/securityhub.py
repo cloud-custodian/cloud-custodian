@@ -400,10 +400,10 @@ class PostFinding(Action):
         stats = Counter()
         for resource_set in chunks(resources, batch_size):
             findings = []
-            for k, v in self.group_resources(resource_set).items():
-                for resource in v:
+            for key, grouped_resources in self.group_resources(resource_set).items():
+                for resource in grouped_resources:
                     stats['Finding'] += 1
-                    if k == self.NEW_FINDING:
+                    if key == self.NEW_FINDING:
                         finding_id = None
                         created_at = now
                         updated_at = now
@@ -415,7 +415,7 @@ class PostFinding(Action):
                     finding = self.get_finding(
                         [resource], finding_id, created_at, updated_at)
                     findings.append(finding)
-                    if k == self.NEW_FINDING:
+                    if key == self.NEW_FINDING:
                         stats['New'] += 1
                         # Tag resources with new finding ids
                         tag_action = self.manager.action_registry.get('tag')
