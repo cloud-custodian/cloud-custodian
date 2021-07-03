@@ -243,18 +243,11 @@ def commit_date(commit):
     return datetime.fromtimestamp(float(commit.author.time), tzinfo)
 
 
-def policy_path_matcher(path, allowed_prefixes=()):
-    print(path)
-    if allowed_prefixes:
-        found = False
-        for a in allowed_prefixes:
-            if path.startswith(a):
-                found = True
-                break
-        if not found:
-            return False
-    if (path.endswith('.yaml') or path.endswith('.yml')) and not path.startswith('.'):
-        return True
+def policy_path_matcher(path, patterns=('*.yaml', '*.yml')):
+    for p in patterns:
+        if fnmatch(path, p):
+            return True
+    return False
 
 
 class PolicyRepo:
