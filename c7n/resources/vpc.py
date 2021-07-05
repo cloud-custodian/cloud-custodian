@@ -1231,7 +1231,6 @@ class SGPermission(Filter):
 
         pfx_list_ids = perm.get('PrefixListIds', [])
         for pfx_list_id in pfx_list_ids:
-            print(pfx_list_id)
             ec2 = local_session(self.manager.session_factory).client('ec2')
             pfx_filter = [
                 {
