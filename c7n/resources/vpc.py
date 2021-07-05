@@ -1242,7 +1242,6 @@ class SGPermission(Filter):
             pfx_list = ec2.describe_managed_prefix_lists(
                 Filters=pfx_filter
             )['PrefixLists'][0]
-            print(pfx_list)
 
             if vf(pfx_list):
                 return True
