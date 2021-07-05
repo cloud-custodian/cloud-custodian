@@ -1087,7 +1087,7 @@ class SGPermission(Filter):
         'IpRanges', 'PrefixListIds'}
     filter_attrs = {
         'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
-        'SelfReference', 'Description', 'SGReferences'}
+        'SelfReference', 'Description', 'SGReferences', 'PrefixLists'}
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
     attrs.add('match-operator')
@@ -1221,6 +1221,34 @@ class SGPermission(Filter):
                 return True
         return False
 
+    def process_pfx_lists(self, perm):
+        pfx_lists = self.data.get('PrefixLists')
+        if not pfx_lists:
+            return None
+
+        vf = ValueFilter(pfx_lists, self.manager)
+        vf.annotate = False
+
+        pfx_list_ids = perm.get('PrefixListIds', [])
+        for pfx_list_id in pfx_list_ids:
+            print(pfx_list_id)
+            ec2 = local_session(self.manager.session_factory).client('ec2')
+            pfx_filter = [
+                {
+                    'Name': 'prefix-list-id',
+                    'Values': [pfx_list_id['PrefixListId']]
+                }
+            ]
+            pfx_list = ec2.describe_managed_prefix_lists(
+                Filters=pfx_filter
+            )['PrefixLists'][0]
+            print(pfx_list)
+
+            if vf(pfx_list):
+                return True
+
+        return False
+
     def expand_permissions(self, permissions):
         """Expand each list of cidr, prefix list, user id group pair
         by port/protocol as an individual rule.
@@ -1259,6 +1287,7 @@ class SGPermission(Filter):
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
             perm_matches['sg-refs'] = self.process_sg_references(perm, owner_id)
+            perm_matches['pfx-lists'] = self.process_pfx_lists(perm)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
@@ -1298,7 +1327,8 @@ SGPermissionSchema = {
     'Description': {},
     'Cidr': {},
     'CidrV6': {},
-    'SGReferences': {}
+    'SGReferences': {},
+    'PrefixLists': {}
 }
 
 
