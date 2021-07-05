@@ -390,6 +390,9 @@ class DescribePolicy(DescribeSource):
                     continue
         return results
 
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
@@ -411,8 +414,6 @@ class Policy(QueryResourceManager):
         'describe': DescribePolicy,
         'config': ConfigSource
     }
-
-    augment = universal_augment
 
 
 class PolicyQueryParser(QueryParser):
