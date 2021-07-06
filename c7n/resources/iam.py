@@ -28,7 +28,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
     get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
@@ -390,6 +390,9 @@ class DescribePolicy(DescribeSource):
                     continue
         return results
 
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
@@ -405,6 +408,7 @@ class Policy(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        universal_taggable = object()
 
     source_mapping = {
         'describe': DescribePolicy,
