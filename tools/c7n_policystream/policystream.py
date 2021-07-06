@@ -881,12 +881,12 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
-@click.option('--policy-dir', multiple=True, default=[],
-              help="Only look at policy files in the given directories")
+@click.option('--policy-pattern', multiple=True, default=[],
+              help="Only look at policy files matching the giving glob pattern (including dir)")
 @click.option('--sort', multiple=True, default=["reverse", "time"],
               type=click.Choice(SORT_TYPE.keys()),
               help="Git sort ordering")
-def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_dir=()):
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_pattern=()):
     """Stream git history policy changes to destination.
 
 
@@ -913,8 +913,8 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None,
     if sort:
         sort = reduce(operator.or_, [SORT_TYPE[s] for s in sort])
     matcher = None
-    if policy_dir:
-        matcher = partial(policy_path_matcher, allowed_prefixes=policy_dir)
+    if policy_pattern:
+        matcher = partial(policy_path_matcher, patterns=policy_pattern)
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
