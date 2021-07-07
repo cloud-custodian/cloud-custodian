@@ -318,6 +318,39 @@ class BucketEncryption(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_s3_bucket_encryption_bucket_key(self):
+        session_factory = self.replay_flight_data("test_s3_bucket_encryption_bucket_key")
+
+        bname = "custodian-test-bucket-encryption-key"
+
+        self.patch(s3.S3, "executor-factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        policy = self.load_policy(
+            {
+                "name": "test_s3_bucket_encryption_bucket_key",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "Name": bname
+                    },
+                    {
+                        "type": "bucket-encryption",
+                        "state": False
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption"
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("s3")
+        resp = client.get_bucket_encryption(Bucket=bname)
+        self.assertTrue(resp['ServerSideEncryptionConfiguration']['Rules'][0]['BucketKeyEnabled'])
+
 
 class BucketInventory(BaseTest):
 
@@ -2116,7 +2149,7 @@ class S3Test(BaseTest):
                     {
                         "type": "toggle-logging",
                         "target_bucket": bname,
-                        "target_prefix": "{account}/{source_bucket_name}",
+                        "target_prefix": "{account}/{source_bucket_region}/{source_bucket_name}/",
                     }
                 ],
             },
@@ -2125,6 +2158,10 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"],
+            "{}/{}/{}/".format(account_name, client.meta.region_name, bname)
+        )
 
         if self.recording:
             time.sleep(5)
@@ -2162,6 +2199,9 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"], "{}/{}/".format(self.account_id, bname)
+        )
 
         if self.recording:
             time.sleep(5)

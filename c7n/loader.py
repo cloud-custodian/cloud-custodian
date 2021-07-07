@@ -7,6 +7,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 import logging
+import re
 import os
 
 from c7n.exceptions import PolicyValidationError
@@ -141,3 +142,28 @@ class PolicyLoader:
         # ie we should defer this to callers
         # [p.validate() for p in collection]
         return collection
+
+
+class SourceLocator:
+    def __init__(self, filename):
+        self.filename = filename
+        self.policies = None
+
+    def find(self, name):
+        """Find returns the file and line number for the policy."""
+        if self.policies is None:
+            self.load_file()
+        line = self.policies.get(name, None)
+        if line is None:
+            return ""
+        filename = os.path.basename(self.filename)
+        return f"{filename}:{line}"
+
+    def load_file(self):
+        self.policies = {}
+        r = re.compile(r'^\s+(-\s+)?name: ([\w-]+)\s*$')
+        with open(self.filename) as f:
+            for i, line in enumerate(f, 1):
+                m = r.search(line)
+                if m:
+                    self.policies[m.group(2)] = i

@@ -164,9 +164,11 @@ class Notify(BaseNotify):
     def process(self, resources, event=None):
         alias = utils.get_account_alias_from_sts(
             utils.local_session(self.manager.session_factory))
+        partition = utils.get_partition(self.manager.config.region)
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
+            'partition': partition,
             'account': alias,
             'version': version,
             'region': self.manager.config.region,

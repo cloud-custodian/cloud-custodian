@@ -269,3 +269,132 @@ class TestSSM(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "mi-1111aa111aa11a111")
+
+    def test_get_ssm_documents(self):
+        session_factory = self.replay_flight_data("test_get_ssm_documents")
+        p = self.load_policy(
+            {
+                "name": "retrieve-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "yyyyyyyyyyyy")
+
+    def test_ssm_document_remove_sharing(self):
+        session_factory = self.replay_flight_data("test_ssm_document_remove_sharing")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "remove-sharing-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-sharing",
+                        "remove": "matched"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        permissions = client.describe_document_permission(
+            Name='Test-Document-1',
+            PermissionType='Share'
+        )
+        self.assertEqual(len(permissions.get('AccountIds')), 1)
+        self.assertEqual(permissions.get('AccountIds'), ['xxxxxxxxxxxx'])
+
+    def test_ssm_document_add_sharing(self):
+        session_factory = self.replay_flight_data("test_ssm_document_add_sharing")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "add-sharing-ssm-documents",
+                "resource": "ssm-document",
+                "actions": [
+                    {
+                        "type": "set-sharing",
+                        "add": ['yyyyyyyyyyyy']
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        permissions = client.describe_document_permission(
+            Name='Test-Document-1',
+            PermissionType='Share'
+        )
+        self.assertEqual(len(permissions.get('AccountIds')), 2)
+        self.assertEqual(permissions.get('AccountIds'), ['xxxxxxxxxxxx', 'yyyyyyyyyyyy'])
+
+    def test_ssm_document_delete(self):
+        session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "delete-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        try:
+            client.get_document(
+                Name='Test-Document-1',
+            )
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocument)
+
+    def test_ssm_document_delete_error(self):
+        session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "delete-ssm-documents-error",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        try:
+            p.run()
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
