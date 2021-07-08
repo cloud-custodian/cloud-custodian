@@ -360,9 +360,9 @@ class PillTest(CustodianTestCore):
 
         session = boto3.Session(region_name=region)
         if not zdata:
-            # pill = placebo.attach(session, test_dir)
-            pill = BluePill()
-            pill.attach(session, test_dir)            
+            pill = placebo.attach(session, test_dir)
+            # pill = BluePill()
+            # pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
 

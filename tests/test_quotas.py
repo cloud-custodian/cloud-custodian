@@ -4,7 +4,7 @@
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources.quotas import ServiceQuota
-from c7n.utils import local_session, yaml_load
+from c7n.utils import local_session
 
 from .common import BaseTest
 
@@ -26,8 +26,8 @@ class TestQuotas(BaseTest):
                 "key": "[].Status",
                 "value": "CASE_CLOSED",
                 "op": "in",
-                "value_type": "swap"}]
-            },
+                "value_type": "swap"}
+            ]},
             session_factory=session_factory
         )
         resources = p.run()
@@ -42,8 +42,8 @@ class TestQuotas(BaseTest):
                 "QuotaCode": "L-355B2B67"}],
             "actions": [{
                 "type": "request-increase",
-                "multiplier": 1.2}],
-            },
+                "multiplier": 1.2}
+            ]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -61,9 +61,9 @@ class TestQuotas(BaseTest):
             "resource": "aws.service-quota",
             "filters": [
                 {"UsageMetric": "present"},
-                {"type": "usage-metric"
-                 "limit": 20}]
-            },
+                {"type": "usage-metric",
+                 "limit": 20}
+            ]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
