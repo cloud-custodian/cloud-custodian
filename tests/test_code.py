@@ -215,3 +215,45 @@ class CodePipeline(BaseTest):
         if self.recording:
             time.sleep(2)
         self.assertFalse(client.list_pipelines().get('pipelines'))
+
+
+class CodeDeploy(BaseTest):
+
+    def test_delete_codedeploy_application(self):
+        factory = self.replay_flight_data('test_delete_codedeploy_application')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-delete-application",
+                "resource": "codedeploy-application",
+                "filters": [{"linkedToGitHub": False}],
+                "actions": ["delete"],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        if self.recording:
+            time.sleep(2)
+        self.assertFalse(client.list_applications().get('applications'))
+
+    def test_stop_codedeploy_deployment(self):
+        factory = self.replay_flight_data('test_stop_codedeploy_deployment')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-stop-deployment",
+                "resource": "codedeploy-deployment",
+                "filters": [{"status": "InProgress"}],
+                "actions": ["stop"],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        if self.recording:
+            time.sleep(10)
+        deployment = client.get_deployment(deploymentId=resources[0]['deploymentId'])
+        self.assertEqual(deployment.get('deploymentInfo').get('status'), 'Stopped')
+        self.assertEqual(deployment.get(
+            'deploymentInfo').get('errorInformation').get('code'), 'MANUAL_STOP')
+        self.assertEqual(deployment.get(
+            'deploymentInfo').get('autoRollbackConfiguration').get('enabled'), True)

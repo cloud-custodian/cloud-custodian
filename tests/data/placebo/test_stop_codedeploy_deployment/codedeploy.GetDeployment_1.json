@@ -5,17 +5,11 @@
             "applicationName": "HelloWorld",
             "deploymentGroupName": "c7n-test",
             "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
-            "deploymentId": "d-RWRBOFSZB",
-            "previousRevision": {
-                "revisionType": "String",
-                "string": {
-                    "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
-                }
-            },
+            "deploymentId": "d-7WYX6QSZB",
             "revision": {
                 "revisionType": "String",
                 "string": {
-                    "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    "sha256": "e1615cc1ab04e56a59e93b669ac3054fbad29edd0c3403eb5b926d1ce7c06793"
                 }
             },
             "status": "Stopped",
@@ -29,9 +23,9 @@
                 "month": 7,
                 "day": 12,
                 "hour": 16,
-                "minute": 18,
-                "second": 11,
-                "microsecond": 170000
+                "minute": 39,
+                "second": 47,
+                "microsecond": 834000
             },
             "completeTime": {
                 "__class__": "datetime",
@@ -39,9 +33,9 @@
                 "month": 7,
                 "day": 12,
                 "hour": 16,
-                "minute": 18,
-                "second": 33,
-                "microsecond": 863000
+                "minute": 40,
+                "second": 25,
+                "microsecond": 511000
             },
             "deploymentOverview": {
                 "Pending": 0,
@@ -61,8 +55,8 @@
             },
             "updateOutdatedInstancesOnly": false,
             "rollbackInfo": {
-                "rollbackDeploymentId": "d-WN38GASZB",
-                "rollbackMessage": "Deployment d-RWRBOFSZB terminated. Automatic rollback is triggered with a DeploymentId d-WN38GASZB."
+                "rollbackDeploymentId": "d-8SBZDGSZB",
+                "rollbackMessage": "Deployment d-7WYX6QSZB terminated. Automatic rollback is triggered with a DeploymentId d-8SBZDGSZB."
             },
             "deploymentStyle": {
                 "deploymentType": "BLUE_GREEN",

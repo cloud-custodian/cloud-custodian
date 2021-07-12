@@ -3,45 +3,38 @@
     "data": {
         "deploymentsInfo": [
             {
-                "applicationName": "c7n-test",
-                "deploymentGroupName": "c7n-deployment-group",
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
                 "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
-                "deploymentId": "d-ZA4ITMPZB",
+                "deploymentId": "d-7WYX6QSZB",
                 "revision": {
                     "revisionType": "String",
                     "string": {
-                        "sha256": "6c7015743716459d7fa1fc359664de136ca215afa0bea28efa1f744b38dff164"
+                        "sha256": "e1615cc1ab04e56a59e93b669ac3054fbad29edd0c3403eb5b926d1ce7c06793"
                     }
                 },
-                "status": "Failed",
-                "errorInformation": {
-                    "code": "INVALID_LAMBDA_CONFIGURATION",
-                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The input AppSpec file is a not well-formed yaml. The template cannot be parsed."
-                },
+                "status": "InProgress",
                 "createTime": {
                     "__class__": "datetime",
                     "year": 2021,
                     "month": 7,
                     "day": 12,
-                    "hour": 13,
-                    "minute": 49,
-                    "second": 5,
-                    "microsecond": 937000
+                    "hour": 16,
+                    "minute": 39,
+                    "second": 47,
+                    "microsecond": 834000
                 },
-                "completeTime": {
-                    "__class__": "datetime",
-                    "year": 2021,
-                    "month": 7,
-                    "day": 12,
-                    "hour": 13,
-                    "minute": 49,
-                    "second": 6,
-                    "microsecond": 769000
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 1,
+                    "Succeeded": 0,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
                 },
                 "creator": "user",
                 "ignoreApplicationStopFailures": false,
                 "updateOutdatedInstancesOnly": false,
-                "rollbackInfo": {},
                 "deploymentStyle": {
                     "deploymentType": "BLUE_GREEN",
                     "deploymentOption": "WITH_TRAFFIC_CONTROL"
