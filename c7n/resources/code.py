@@ -309,7 +309,7 @@ class CodeDeployDeployment(QueryResourceManager):
             None, 'deploymentsInfo', None)
         name = id = 'deploymentId'
         # couldn't find a real cloudformation type
-        cfn_type = None
+        cfn_type = "AWS::CodeDeploy::Deployment"
         arn_type = ""
         date = 'createTime'
 
