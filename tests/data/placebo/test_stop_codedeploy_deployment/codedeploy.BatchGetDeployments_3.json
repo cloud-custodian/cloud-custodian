@@ -1,0 +1,1183 @@
+{
+    "status_code": 200,
+    "data": {
+        "deploymentsInfo": [
+            {
+                "applicationName": "c7n-test",
+                "deploymentGroupName": "c7n-deployment-group",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-5LC4HNRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "622d61932a8041957a206db910a5cf05d6d3901ef895a5e59f856cfc36a4531c"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_FUNCTION",
+                    "message": "The deployment failed because either the target Lambda function myLambdaFunction does not exist or the specified function version or alias cannot be found"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 20,
+                    "second": 38,
+                    "microsecond": 196000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 20,
+                    "second": 39,
+                    "microsecond": 451000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "c7n-test",
+                "deploymentGroupName": "c7n-deployment-group",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-B83QXORZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "622d61932a8041957a206db910a5cf05d6d3901ef895a5e59f856cfc36a4531c"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "IAM_ROLE_PERMISSIONS",
+                    "message": "The IAM role arn:aws:iam::644160558196:role/custodian-codebuild does not give you permission to perform operations in the following AWS service: AWSLambda. Contact your AWS administrator if you need help. If you are an AWS administrator, you can grant permissions to your users or groups by creating IAM policies."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 19,
+                    "second": 19,
+                    "microsecond": 865000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 19,
+                    "second": 20,
+                    "microsecond": 899000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-FYV14TRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "status": "Succeeded",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 34,
+                    "microsecond": 221000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 37,
+                    "microsecond": 584000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 1,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-XO44KSRZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "f1239ec7da0b0ed0e509a30abe18648517df125afc915b37d80a960a3e02c6c2"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The Lambda function alias version does not match the current version in AppSpec file."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 2,
+                    "microsecond": 54000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 3,
+                    "microsecond": 431000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-LWN2NWRZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The Lambda function alias version does not match the current version in AppSpec file."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 415000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 32,
+                    "second": 25,
+                    "microsecond": 329000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-QRQYJ2RZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "9f8f15275508b675a6006cf24f8f189102441664f68867f4e25bc62225057ad1"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_FUNCTION",
+                    "message": "The deployment failed because either the target Lambda function test-python does not exist or the specified function version or alias cannot be found"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 51,
+                    "microsecond": 790000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 53,
+                    "microsecond": 133000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-GST77RSZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Succeeded",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 11,
+                    "microsecond": 970000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 15,
+                    "microsecond": 264000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 1,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "description": "This is a rollback deployment triggered automatically to roll back the deployment d-1FHY78SZB",
+                "creator": "codeDeployRollback",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackTriggeringDeploymentId": "d-1FHY78SZB",
+                    "rollbackMessage": "Deployment d-GST77RSZB is triggered to roll back deployment d-1FHY78SZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-53EUEMRZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Succeeded",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 36,
+                    "second": 39,
+                    "microsecond": 503000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 36,
+                    "second": 42,
+                    "microsecond": 945000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 1,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "description": "This is a rollback deployment triggered automatically to roll back the deployment d-KHPLSJRZB",
+                "creator": "codeDeployRollback",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackTriggeringDeploymentId": "d-KHPLSJRZB",
+                    "rollbackMessage": "Deployment d-53EUEMRZB is triggered to roll back deployment d-KHPLSJRZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-CJI2JLSZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Succeeded",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 0,
+                    "microsecond": 316000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 4,
+                    "microsecond": 560000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 1,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "description": "This is a rollback deployment triggered automatically to roll back the deployment d-LDEN0MSZB",
+                "creator": "codeDeployRollback",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackTriggeringDeploymentId": "d-LDEN0MSZB",
+                    "rollbackMessage": "Deployment d-CJI2JLSZB is triggered to roll back deployment d-LDEN0MSZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-FKZ9LPRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "9ac5d77a60911bb22fa54c79a10929737912e4046e68b0a7b84466ea2ce8e74d"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The target function alias cannot be null or empty."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 12,
+                    "microsecond": 965000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 13,
+                    "microsecond": 978000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-KHPLSJRZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Stopped",
+                "errorInformation": {
+                    "code": "MANUAL_STOP",
+                    "message": "the deployment is cancelled due to an abort request"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 35,
+                    "second": 52,
+                    "microsecond": 913000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 36,
+                    "second": 39,
+                    "microsecond": 116000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "description": "This is a rollback deployment triggered automatically to roll back the deployment d-5A7VF0RZB",
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "autoRollbackConfiguration": {
+                    "enabled": true,
+                    "events": [
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackDeploymentId": "d-53EUEMRZB",
+                    "rollbackMessage": "Deployment d-KHPLSJRZB terminated. Automatic rollback is triggered with a DeploymentId d-53EUEMRZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-1FHY78SZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Stopped",
+                "errorInformation": {
+                    "code": "MANUAL_STOP",
+                    "message": "the deployment is cancelled due to an abort request"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 3,
+                    "microsecond": 79000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 11,
+                    "microsecond": 465000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "autoRollbackConfiguration": {
+                    "enabled": true,
+                    "events": [
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackDeploymentId": "d-GST77RSZB",
+                    "rollbackMessage": "Deployment d-1FHY78SZB terminated. Automatic rollback is triggered with a DeploymentId d-GST77RSZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-QLQ409RZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "f5a71c3e5a646bcce8330f65f00a3e2f16bd21605ef05e1b5f273fc417057da4"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_FUNCTION",
+                    "message": "The deployment failed because a Lambda validation function cannot be found while executing lifecycle event LambdaFunctionToValidateBeforeTrafficShift"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 28,
+                    "microsecond": 911000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 30,
+                    "microsecond": 968000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-DC365BRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "6e5bbb844a3e95d3ff3f67476b7eefbd7ae71751041958461c5d6653a9d16612"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The Lambda function alias version does not match the current version in AppSpec file."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 27,
+                    "second": 6,
+                    "microsecond": 21000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 27,
+                    "second": 8,
+                    "microsecond": 216000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-5A7VF0RZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Stopped",
+                "errorInformation": {
+                    "code": "MANUAL_STOP",
+                    "message": "the deployment is cancelled due to an abort request"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 33,
+                    "second": 42,
+                    "microsecond": 713000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 33,
+                    "second": 56,
+                    "microsecond": 556000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "autoRollbackConfiguration": {
+                    "enabled": true,
+                    "events": [
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackDeploymentId": "d-G3BHZMRZB",
+                    "rollbackMessage": "Deployment d-5A7VF0RZB terminated. Automatic rollback is triggered with a DeploymentId d-G3BHZMRZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-LDEN0MSZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Stopped",
+                "errorInformation": {
+                    "code": "MANUAL_STOP",
+                    "message": "the deployment is cancelled due to an abort request"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 52,
+                    "microsecond": 169000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 59,
+                    "microsecond": 912000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "autoRollbackConfiguration": {
+                    "enabled": true,
+                    "events": [
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackDeploymentId": "d-CJI2JLSZB",
+                    "rollbackMessage": "Deployment d-LDEN0MSZB terminated. Automatic rollback is triggered with a DeploymentId d-CJI2JLSZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-419LZRRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "9ac5d77a60911bb22fa54c79a10929737912e4046e68b0a7b84466ea2ce8e74d"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The target function alias cannot be null or empty."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 45,
+                    "microsecond": 875000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 46,
+                    "microsecond": 989000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-G3BHZMRZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "249dc82ef9162bd311b0209ab285227f4ff86ffaa8ff6ac6cfc044cbf557b72d"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Succeeded",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 33,
+                    "second": 57,
+                    "microsecond": 178000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 34,
+                    "second": 0,
+                    "microsecond": 405000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 1,
+                    "Failed": 0,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "description": "This is a rollback deployment triggered automatically to roll back the deployment d-5A7VF0RZB",
+                "creator": "codeDeployRollback",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackTriggeringDeploymentId": "d-5A7VF0RZB",
+                    "rollbackMessage": "Deployment d-G3BHZMRZB is triggered to roll back deployment d-5A7VF0RZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-KRU3AMRZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "9e5179eb6f96f466f11668a5d7f15499ea805ce0df261b89310c925ed7f6608a"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_FUNCTION",
+                    "message": "The deployment failed because either the target Lambda function custodian-code does not exist or the specified function version or alias cannot be found"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 17,
+                    "microsecond": 898000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 19,
+                    "microsecond": 123000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            },
+            {
+                "applicationName": "HelloWorld",
+                "deploymentGroupName": "c7n-test",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-KL8N7MSZB",
+                "previousRevision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                    }
+                },
+                "status": "Stopped",
+                "errorInformation": {
+                    "code": "MANUAL_STOP",
+                    "message": "the deployment is cancelled due to an abort request"
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 43,
+                    "microsecond": 852000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 50,
+                    "microsecond": 988000
+                },
+                "deploymentOverview": {
+                    "Pending": 0,
+                    "InProgress": 0,
+                    "Succeeded": 0,
+                    "Failed": 1,
+                    "Skipped": 0,
+                    "Ready": 0
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "autoRollbackConfiguration": {
+                    "enabled": true,
+                    "events": [
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {
+                    "rollbackDeploymentId": "d-DCWYO3SZB",
+                    "rollbackMessage": "Deployment d-KL8N7MSZB terminated. Automatic rollback is triggered with a DeploymentId d-DCWYO3SZB."
+                },
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

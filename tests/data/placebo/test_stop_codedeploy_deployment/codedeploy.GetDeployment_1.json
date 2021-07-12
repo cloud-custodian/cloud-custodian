@@ -1,0 +1,78 @@
+{
+    "status_code": 200,
+    "data": {
+        "deploymentInfo": {
+            "applicationName": "HelloWorld",
+            "deploymentGroupName": "c7n-test",
+            "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+            "deploymentId": "d-RWRBOFSZB",
+            "previousRevision": {
+                "revisionType": "String",
+                "string": {
+                    "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                }
+            },
+            "revision": {
+                "revisionType": "String",
+                "string": {
+                    "sha256": "d7b6ae9ec3d6b5f6b059e460f9d475b046ad1d9574bf1cc4bac0e9c3bfab24c8"
+                }
+            },
+            "status": "Stopped",
+            "errorInformation": {
+                "code": "MANUAL_STOP",
+                "message": "the deployment is cancelled due to an abort request"
+            },
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 7,
+                "day": 12,
+                "hour": 16,
+                "minute": 18,
+                "second": 11,
+                "microsecond": 170000
+            },
+            "completeTime": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 7,
+                "day": 12,
+                "hour": 16,
+                "minute": 18,
+                "second": 33,
+                "microsecond": 863000
+            },
+            "deploymentOverview": {
+                "Pending": 0,
+                "InProgress": 0,
+                "Succeeded": 0,
+                "Failed": 1,
+                "Skipped": 0,
+                "Ready": 0
+            },
+            "creator": "user",
+            "ignoreApplicationStopFailures": false,
+            "autoRollbackConfiguration": {
+                "enabled": true,
+                "events": [
+                    "DEPLOYMENT_STOP_ON_REQUEST"
+                ]
+            },
+            "updateOutdatedInstancesOnly": false,
+            "rollbackInfo": {
+                "rollbackDeploymentId": "d-WN38GASZB",
+                "rollbackMessage": "Deployment d-RWRBOFSZB terminated. Automatic rollback is triggered with a DeploymentId d-WN38GASZB."
+            },
+            "deploymentStyle": {
+                "deploymentType": "BLUE_GREEN",
+                "deploymentOption": "WITH_TRAFFIC_CONTROL"
+            },
+            "instanceTerminationWaitTimeStarted": false,
+            "fileExistsBehavior": "DISALLOW",
+            "deploymentStatusMessages": [],
+            "computePlatform": "Lambda"
+        },
+        "ResponseMetadata": {}
+    }
+}

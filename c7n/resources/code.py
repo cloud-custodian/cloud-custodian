@@ -9,6 +9,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
+from c7n import query
 
 from .securityhub import OtherResourcePostFinding
 
@@ -264,4 +265,69 @@ class DeletePipeline(BaseAction):
             try:
                 self.manager.retry(client.delete_pipeline, name=r['name'])
             except client.exceptions.PipelineNotFoundException:
+                continue
+
+
+@resources.register('codedeploy-application')
+class CodeDeployApplication(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_applications', 'applications', None)
+        batch_detail_spec = (
+            'batch_get_applications', 'applicationNames',
+            None, 'applicationsInfo', None)
+        id = 'applicationId'
+        name = 'applicationName'
+        date = 'createTime'
+        cfn_type = "AWS::CodeDeploy::Application"
+
+
+@CodeDeployApplication.action_registry.register('delete')
+class DeleteApplication(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('codepipeline:DeletePipeline',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_application, applicationName=r['applicationName'])
+            except client.exceptions.InvalidApplicationNameException:
+                continue
+
+
+@resources.register('codedeploy-deployment')
+class CodeDeployDeployment(QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_deployments', 'deployments', None)
+        batch_detail_spec = (
+            'batch_get_deployments', 'deploymentIds',
+            None, 'deploymentsInfo', None)
+        name = id = 'deploymentId'
+        # couldn't find a real cloudformation type
+        cfn_type = None
+        date = 'createTime'
+
+
+@CodeDeployDeployment.action_registry.register('stop')
+class StopDeployment(BaseAction):
+    """Stop/Delete a currently running deployment in CodeDeploy.
+       Roll back is set to True by default
+    """
+
+    schema = type_schema('stop', autorollbackenabled={"type": "boolean"})
+    permissions = ('codedeploy:StopTask',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.stop_deployment,
+                      deploymentId=r['deploymentId'],
+                      autoRollbackEnabled=self.data.get('autorollbackenabled', True))
+            except client.exceptions.DeploymentAlreadyCompletedException:
                 continue

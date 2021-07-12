@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "status": "Succeeded",
+        "statusMessage": "No more commands will be scheduled for execution in the deployment instances",
+        "ResponseMetadata": {}
+    }
+}

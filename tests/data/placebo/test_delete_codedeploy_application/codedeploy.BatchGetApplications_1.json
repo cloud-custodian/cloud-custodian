@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "applicationsInfo": [
+            {
+                "applicationId": "8d248423-964d-44e7-be82-2dcf93e81a61",
+                "applicationName": "c7n-test",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 45,
+                    "second": 27,
+                    "microsecond": 818000
+                },
+                "linkedToGitHub": false,
+                "computePlatform": "Lambda"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

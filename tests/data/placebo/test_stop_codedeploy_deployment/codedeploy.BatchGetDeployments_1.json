@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "deploymentsInfo": [
+            {
+                "applicationName": "c7n-test",
+                "deploymentGroupName": "c7n-deployment-group",
+                "deploymentConfigName": "CodeDeployDefault.LambdaAllAtOnce",
+                "deploymentId": "d-ZA4ITMPZB",
+                "revision": {
+                    "revisionType": "String",
+                    "string": {
+                        "sha256": "6c7015743716459d7fa1fc359664de136ca215afa0bea28efa1f744b38dff164"
+                    }
+                },
+                "status": "Failed",
+                "errorInformation": {
+                    "code": "INVALID_LAMBDA_CONFIGURATION",
+                    "message": "The deployment failed because the AppSpec file that specifies the AWS Lambda deployment configuration is missing or has an invalid configuration. The input AppSpec file is a not well-formed yaml. The template cannot be parsed."
+                },
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 5,
+                    "microsecond": 937000
+                },
+                "completeTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 6,
+                    "microsecond": 769000
+                },
+                "creator": "user",
+                "ignoreApplicationStopFailures": false,
+                "updateOutdatedInstancesOnly": false,
+                "rollbackInfo": {},
+                "deploymentStyle": {
+                    "deploymentType": "BLUE_GREEN",
+                    "deploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "instanceTerminationWaitTimeStarted": false,
+                "fileExistsBehavior": "DISALLOW",
+                "deploymentStatusMessages": [],
+                "computePlatform": "Lambda"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
