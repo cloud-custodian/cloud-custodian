@@ -9,7 +9,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
-import query
+import c7n.query
 
 from .securityhub import OtherResourcePostFinding
 
