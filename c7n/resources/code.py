@@ -279,6 +279,7 @@ class CodeDeployApplication(QueryResourceManager):
         id = 'applicationId'
         name = 'applicationName'
         date = 'createTime'
+        arn_type = ""
         cfn_type = "AWS::CodeDeploy::Application"
 
 
@@ -309,6 +310,7 @@ class CodeDeployDeployment(QueryResourceManager):
         name = id = 'deploymentId'
         # couldn't find a real cloudformation type
         cfn_type = None
+        arn_type = ""
         date = 'createTime'
 
 
@@ -319,7 +321,7 @@ class StopDeployment(BaseAction):
     """
 
     schema = type_schema('stop', autorollbackenabled={"type": "boolean"})
-    permissions = ('codedeploy:StopTask',)
+    permissions = ('codedeploy:StopDeployment',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('codedeploy')
