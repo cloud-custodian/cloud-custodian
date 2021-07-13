@@ -294,7 +294,7 @@ class DeleteApplication(BaseAction):
         for r in resources:
             try:
                 self.manager.retry(client.delete_application, applicationName=r['applicationName'])
-            except (client.exceptions.InvalidApplicationNameException, 
+            except (client.exceptions.InvalidApplicationNameException,
             client.exceptions.ApplicationDoesNotExistException):
                 continue
 
