@@ -1193,7 +1193,7 @@ def coalesce_copy_user_tags(resource, copy_tags, user_tags):
             copy_keys = set()
 
     if isinstance(user_tags, dict):
-        user_tags = [{'Key': k, 'Value': v} for k, v in user_tags.items()]
+        user_tags = utils.convert_tags(user_tags, list)
 
     user_keys = {t['Key'] for t in user_tags}
     tags_diff = list(copy_keys.difference(user_keys))

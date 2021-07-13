@@ -110,7 +110,7 @@ class TagMessageBroker(Tag):
             try:
                 client.create_tags(
                     ResourceArn=r['BrokerArn'],
-                    Tags={t['Key']: t['Value'] for t in new_tags})
+                    Tags=convert_tags(new_tags, dict))
             except client.exceptions.ResourceNotFound:
                 continue
 
