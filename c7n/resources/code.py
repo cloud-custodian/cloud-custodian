@@ -279,7 +279,7 @@ class CodeDeployApplication(QueryResourceManager):
         id = 'applicationId'
         name = 'applicationName'
         date = 'createTime'
-        arn_type = ""
+        arn_type = "application"
         cfn_type = "AWS::CodeDeploy::Application"
 
 
@@ -294,7 +294,8 @@ class DeleteApplication(BaseAction):
         for r in resources:
             try:
                 self.manager.retry(client.delete_application, applicationName=r['applicationName'])
-            except client.exceptions.InvalidApplicationNameException:
+            except (client.exceptions.InvalidApplicationNameException, 
+            client.exceptions.ApplicationDoesNotExistException):
                 continue
 
 
@@ -303,14 +304,15 @@ class CodeDeployDeployment(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'codedeploy'
-        enum_spec = ('list_deployments', 'deployments', None)
+        enum_spec = ('list_deployments', 'deployments', {'includeOnlyStatuses': [
+            'Created', 'Queued', 'InProgress', 'Baking', 'Ready']})
         batch_detail_spec = (
             'batch_get_deployments', 'deploymentIds',
             None, 'deploymentsInfo', None)
         name = id = 'deploymentId'
         # couldn't find a real cloudformation type
         cfn_type = None
-        arn_type = ""
+        arn_type = "deploymentgroup"
         date = 'createTime'
 
 
