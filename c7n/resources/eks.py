@@ -28,7 +28,7 @@ class NodeGroupDescribeSource(ChildDescribeSource):
                 clusterName=cluster_name,
                 nodegroupName=nodegroup_name)['nodegroup']
             if 'tags' in nodegroup:
-                nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+                nodegroup['Tags'] = convert_tags(nodegroup['tags'], list)
             results.append(nodegroup)
         return results
 
