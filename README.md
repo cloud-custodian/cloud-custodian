@@ -211,11 +211,24 @@ For specific instructions for AWS, Azure, and GCP, visit the relevant getting st
 Get Involved
 ------------
 
--   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian)
--   [GitHub](https://github.com/cloud-custodian/cloud-custodian)
--   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian)
--   [Reddit](https://reddit.com/r/cloudcustodian)
--   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian)
+-   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
+-   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - Real time chat if you're looking for help
+-   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
+-   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
+-   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA/) - We're working on adding tutorials and other useful information, as well as meeting videos
+
+Community Resources
+-------------------
+
+We have a regular community meeting that is open to all users and developers of every skill level.
+Joining the [mailing list](https://groups.google.com/forum/#!forum/cloud-custodian) will automatically send you a meeting invite. 
+See the notes below for more technical information on joining the meeting. 
+
+- [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
+- [Community Meeting Notes Archive](https://github.com/cloud-custodian/community/discussions)
+
+
 
 Additional Tools
 ----------------
