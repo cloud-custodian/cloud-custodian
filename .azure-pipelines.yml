@@ -44,9 +44,8 @@ jobs:
       architecture: 'x64'
   # bin directory is in .dockerignore
   - script: |
-      python -m pip install --upgrade pip
-      pip install docker click pytest pyyaml
+      python3 -m pip install --upgrade pip
+      pip3 install docker click pytest pyyaml six
   # build a docker image and sanity test
   - script: |
-      python tools/dev/dockerpkg.py build -t build --verbose --test -i cli
-
+      python3 tools/dev/dockerpkg.py build -t build --verbose --test -i cli

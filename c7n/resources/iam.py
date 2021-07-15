@@ -20,7 +20,7 @@ from dateutil.parser import parse as parse_date
 
 from botocore.exceptions import ClientError
 
-
+from c7n import deprecated
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
@@ -30,7 +30,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
     get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
@@ -392,6 +392,9 @@ class DescribePolicy(DescribeSource):
                     continue
         return results
 
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
@@ -407,6 +410,7 @@ class Policy(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        universal_taggable = object()
 
     source_mapping = {
         'describe': DescribePolicy,
@@ -911,6 +915,9 @@ class UnusedIamRole(IamRoleUsage):
               - type: used
                 state: false
     """
+    deprecations = (
+        deprecated.filter("use the 'used' filter with 'state' attribute"),
+    )
 
     schema = type_schema('unused')
 
@@ -1419,7 +1426,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if (r['Arn'] not in profiles or r['InstanceProfileName'] not in profiles):
+            if (r['Arn'] not in profiles and r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (

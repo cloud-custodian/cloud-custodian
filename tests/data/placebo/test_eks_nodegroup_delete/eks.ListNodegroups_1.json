@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "nodegroups": [
+            "deleted-example",
+            "not_deleted_example"
+        ]
+    }
+}

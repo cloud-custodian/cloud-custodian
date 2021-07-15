@@ -243,9 +243,11 @@ def commit_date(commit):
     return datetime.fromtimestamp(float(commit.author.time), tzinfo)
 
 
-def policy_path_matcher(path):
-    if (path.endswith('.yaml') or path.endswith('.yml')) and not path.startswith('.'):
-        return True
+def policy_path_matcher(path, patterns=('*.yaml', '*.yml')):
+    for p in patterns:
+        if fnmatch(path, p):
+            return True
+    return False
 
 
 class PolicyRepo:
@@ -778,7 +780,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
         else:
             repo = pygit2.Repository(repo_path)
             if repo.status():
-                log.warning('repo %s not clean skipping update')
+                log.warning('repo %s not clean skipping update', r['name'])
                 continue
             log.debug("Syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
@@ -879,10 +881,12 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
+@click.option('--policy-pattern', multiple=True, default=[],
+              help="Only look at policy files matching the giving glob pattern (including dir)")
 @click.option('--sort', multiple=True, default=["reverse", "time"],
               type=click.Choice(SORT_TYPE.keys()),
               help="Git sort ordering")
-def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None):
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_pattern=()):
     """Stream git history policy changes to destination.
 
 
@@ -908,6 +912,9 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         after = parse(after)
     if sort:
         sort = reduce(operator.or_, [SORT_TYPE[s] for s in sort])
+    matcher = None
+    if policy_pattern:
+        matcher = partial(policy_path_matcher, patterns=policy_pattern)
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
@@ -919,7 +926,7 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         else:
             repo = pygit2.Repository(repo_uri)
         load_available()
-        policy_repo = PolicyRepo(repo_uri, repo)
+        policy_repo = PolicyRepo(repo_uri, repo, matcher)
         change_count = 0
 
         with contextlib.closing(transport(stream_uri, assume)) as t:

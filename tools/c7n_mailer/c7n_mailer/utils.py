@@ -68,6 +68,7 @@ def get_rendered_jinja(
         resources=resources,
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -100,6 +101,7 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -187,6 +189,12 @@ def resource_format(resource, resource_type):
             "%s-%s" % (
                 resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
+            resource['AllocatedStorage'])
+    elif resource_type == 'rds-cluster':
+        return "%s %s %s" % (
+            resource['DBClusterIdentifier'],
+            "%s-%s" % (
+                resource['Engine'], resource['EngineVersion']),
             resource['AllocatedStorage'])
     elif resource_type == 'asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
