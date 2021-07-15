@@ -611,12 +611,12 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
 
 class TestCEL(BaseTest):
-    def test_celfilter_lambda_runtime(self):
-        session_factory = self.replay_flight_data("test_celfilter_lambda_runtime")
+    def test_cel_lambda_runtime(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_runtime")
 
         p = self.load_policy(
             {
-                "name": "lambda-runtime",
+                "name": "cel-lambda-runtime",
                 "resource": "lambda",
                 "filters": [
                     {
@@ -636,7 +636,7 @@ class TestCEL(BaseTest):
 
         p = self.load_policy(
             {
-                "name": "cel_lambda_related_kms_key",
+                "name": "cel-lambda-related-kms-key",
                 "resource": "lambda",
                 "filters": [
                     {
@@ -656,12 +656,12 @@ class TestCEL(BaseTest):
             ['36812ccf-daaf-49b1-a24b-0eef254ffe41']
         )
 
-    def test_cel_lambda_related_sg(self):
-        session_factory = self.replay_flight_data("test_cel_lambda_related_sg")
+    def test_cel_lambda_related_sgs(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_sgs")
 
         p = self.load_policy(
             {
-                "name": "cel_lambda_related_sg",
+                "name": "cel-lambda-related-sg",
                 "resource": "lambda",
                 "filters": [
                     {
@@ -684,7 +684,7 @@ class TestCEL(BaseTest):
 
         p = self.load_policy(
             {
-                "name": "cel_lambda_related_subnet",
+                "name": "cel-lambda-related-subnets",
                 "resource": "lambda",
                 "filters": [
                     {

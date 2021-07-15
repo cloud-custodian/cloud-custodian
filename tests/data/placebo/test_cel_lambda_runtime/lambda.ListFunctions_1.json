@@ -1,18 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "77c3c920-5701-4e69-923f-bc5b6bb26f31",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Fri, 12 Jul 2019 17:53:34 GMT",
-                "content-type": "application/json",
-                "content-length": "39079",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "77c3c920-5701-4e69-923f-bc5b6bb26f31"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "Functions": [
             {
                 "FunctionName": "resource-fixer",
@@ -25,7 +14,7 @@
                 "Timeout": 603,
                 "MemorySize": 128,
                 "LastModified": "2019-07-12T17:42:22.098+0000",
-                "CodeSha256": "3hDkJfWqXvGPUnNMu/35S0SMIPSbz50bleO/Elz3Qcc=",
+                "CodeSha256": "test",
                 "Version": "$LATEST",
                 "VpcConfig": {
                     "SubnetIds": [
@@ -55,7 +44,7 @@
                 "Timeout": 60,
                 "MemorySize": 512,
                 "LastModified": "2019-07-12T16:08:01.519+0000",
-                "CodeSha256": "4oAC20hFsF52y4MT9uY2BW/yKce2ekd6Zj9RkmxWMbU=",
+                "CodeSha256": "test",
                 "Version": "$LATEST",
                 "TracingConfig": {
                     "Mode": "PassThrough"

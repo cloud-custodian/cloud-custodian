@@ -2047,12 +2047,13 @@ class TestSpotFleetRequest(BaseTest):
 
         
 class TestCEL(BaseTest):
-    def test_celfilter_ec2_tags(self):
-        session_factory = self.replay_flight_data("test_celfilter_ec2_tags")
+
+    def test_cel_ec2_tags(self):
+        session_factory = self.replay_flight_data("test_cel_ec2_tags")
 
         p = self.load_policy(
             {
-                "name": "celfilter-ec2-tags",
+                "name": "cel-ec2-tags",
                 "resource": "ec2",
                 "filters": [
                     {
@@ -2067,12 +2068,12 @@ class TestCEL(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_instance_image_mixin(self):
-        session_factory = self.replay_flight_data("test_instance_image_mixin")
+    def test_cel_ec2_instance_image(self):
+        session_factory = self.replay_flight_data("test_cel_ec2_instance_image")
 
         p = self.load_policy(
             {
-                "name": "celfilter-ec2-instanceimagemixin",
+                "name": "celfilter-ec2-instance-image",
                 "resource": "ec2",
                 "filters": [
                     {

@@ -21,16 +21,6 @@
                 ]
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "e34202b8-d45a-44f5-8272-a9f4840109a4",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e34202b8-d45a-44f5-8272-a9f4840109a4",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "13102",
-                "date": "Fri, 12 Jul 2019 17:53:36 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

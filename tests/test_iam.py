@@ -2179,7 +2179,7 @@ class TestCEL(BaseTest):
 
         p = self.load_policy(
             {
-                "name": "celfilter-iam-credentialreport",
+                "name": "cel-iam-credential-report",
                 "resource": "iam-user",
                 "filters": [
                     {
