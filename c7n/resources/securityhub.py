@@ -431,8 +431,9 @@ class PostFinding(Action):
                             self.manager).process([resource])
                     else:
                         stats['Update'] += 1
-            import_response = client.batch_import_findings(
-                Findings=findings)
+            import_response = self.manager.retry(
+                client.batch_import_findings, Findings=findings
+            )
             if import_response['FailedCount'] > 0:
                 stats['Failed'] += import_response['FailedCount']
                 self.log.error(
