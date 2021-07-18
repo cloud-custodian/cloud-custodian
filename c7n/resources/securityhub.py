@@ -400,6 +400,7 @@ class PostFinding(Action):
         stats = Counter()
         for resource_set in chunks(resources, batch_size):
             findings = []
+            tag_action = self.manager.action_registry.get('tag')
             for key, grouped_resources in self.group_resources(resource_set).items():
                 for resource in grouped_resources:
                     stats['Finding'] += 1
@@ -415,22 +416,20 @@ class PostFinding(Action):
                     finding = self.get_finding(
                         [resource], finding_id, created_at, updated_at)
                     findings.append(finding)
-                    if key == self.NEW_FINDING:
-                        stats['New'] += 1
-                        # Tag resources with new finding ids
-                        tag_action = self.manager.action_registry.get('tag')
-                        if tag_action is None:
-                            continue
-                        tag_action({
-                            'key': '{}:{}'.format(
-                                'c7n:FindingId',
-                                self.data.get(
-                                    'title', self.manager.ctx.policy.name)),
-                            'value': '{}:{}'.format(
-                                finding['Id'], created_at)},
-                            self.manager).process([resource])
-                    else:
-                        stats['Update'] += 1
+                if key == self.NEW_FINDING:
+                    stats['New'] += len(grouped_resources)
+                    # Tag resources with new finding ids
+                    if tag_action is None:
+                        continue
+                    tag_action({
+                        'key': '{}:{}'.format(
+                            'c7n:FindingId',
+                            self.data.get(
+                                'title', self.manager.ctx.policy.name)),
+                        'value': '{}:{}'.format(
+                            finding['Id'], created_at)}, self.manager).process(grouped_resources)
+                else:
+                    stats['Update'] += len(grouped_resources)
             import_response = client.batch_import_findings(
                 Findings=findings)
             if import_response['FailedCount'] > 0:
