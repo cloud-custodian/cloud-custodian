@@ -429,9 +429,6 @@ class PostFinding(Action):
                     stats['Update'] += 1
         import_response = client.batch_import_findings(
             Findings=findings)
-        # print(findings)
-        # print(import_response)
-        # print(len(findings))
         if import_response['FailedCount'] > 0:
             stats['Failed'] += import_response['FailedCount']
             self.log.error(
