@@ -445,13 +445,6 @@ class PostFinding(Action):
             for resource_set in chunks(resources, batch_size):
                 futures[w.submit(self.process_findings, resource_set)] = resource_set
             for f in as_completed(futures):
-                if f.exception():
-                    b = futures[f]
-                    self.log.error(
-                        "Error on bucket:%s region:%s policy:%s error: %s",
-                        b['Name'], b.get('Location', 'unknown'),
-                        self.manager.data.get('name'), f.exception())
-                    continue
                 reporter += f.result()
         self.log.debug(
             "policy:%s securityhub %d findings resources %d new %d updated %d failed",
