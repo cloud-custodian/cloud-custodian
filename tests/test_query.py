@@ -5,7 +5,7 @@ import logging
 import os
 
 
-from c7n.query import ResourceQuery, RetryPageIterator
+from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo
 from c7n.resources.vpc import InternetGateway
 
 from botocore.config import Config
@@ -94,6 +94,9 @@ class ResourceQueryTest(BaseTest):
         self.assertEqual(len(resources), 3)
         resources = q.get(p.resource_manager, ["igw-3d9e3d56"])
         self.assertEqual(len(resources), 1)
+
+    def test_type_info(self):
+        assert repr(TypeInfo) == "<TypeInfo TypeInfo>"
 
 
 class ConfigSourceTest(BaseTest):

@@ -47,6 +47,7 @@ ResourceMap = {
     "aws.ec2": "c7n.resources.ec2.EC2",
     "aws.ec2-reserved": "c7n.resources.ec2.ReservedInstance",
     "aws.ec2-host": "c7n.resources.ec2.DedicatedHost",
+    "aws.ec2-spot-fleet-request": "c7n.resources.ec2.SpotFleetRequest",
     "aws.ecr": "c7n.resources.ecr.ECR",
     "aws.ecs": "c7n.resources.ecs.ECSCluster",
     "aws.ecs-container-instance": "c7n.resources.ecs.ContainerInstance",
