@@ -2,6 +2,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter
+from concurrent.futures import as_completed
 from datetime import datetime
 from dateutil.tz import tzutc
 import jmespath
@@ -387,38 +388,33 @@ class PostFinding(Action):
             grouped_resources.setdefault(finding_tag, []).append(r)
         return grouped_resources
 
-    def process(self, resources, event=None):
+    def process_findings(self, resource_set):
+        stats = Counter()
+        findings = []
         region_name = self.data.get('region', self.manager.config.region)
         client = local_session(
             self.manager.session_factory).client(
-                "securityhub", region_name=region_name)
-
+                "securityhub", region_name=region_name)        
         now = datetime.now(tzutc()).isoformat()
-        # default batch size to one to work around security hub console issue
-        # which only shows a single resource in a finding.
-        batch_size = self.data.get('batch_size', 1)
-        stats = Counter()
-        for resource_set in chunks(resources, batch_size):
-            findings = []
-            tag_action = self.manager.action_registry.get('tag')
-            for key, grouped_resources in self.group_resources(resource_set).items():
-                for resource in grouped_resources:
-                    stats['Finding'] += 1
-                    if key == self.NEW_FINDING:
-                        finding_id = None
-                        created_at = now
-                        updated_at = now
-                    else:
-                        finding_id, created_at = self.get_finding_tag(
-                            resource).split(':', 1)
-                        updated_at = now
-
-                    finding = self.get_finding(
-                        [resource], finding_id, created_at, updated_at)
-                    findings.append(finding)
+        for key, grouped_resources in self.group_resources(resource_set).items():
+            for resource in grouped_resources:
+                stats['Finding'] += 1
                 if key == self.NEW_FINDING:
-                    stats['New'] += len(grouped_resources)
+                    finding_id = None
+                    created_at = now
+                    updated_at = now
+                else:
+                    finding_id, created_at = self.get_finding_tag(
+                        resource).split(':', 1)
+                    updated_at = now
+
+                finding = self.get_finding(
+                    [resource], finding_id, created_at, updated_at)
+                findings.append(finding)
+                if key == self.NEW_FINDING:
+                    stats['New'] += 1
                     # Tag resources with new finding ids
+                    tag_action = self.manager.action_registry.get('tag')
                     if tag_action is None:
                         continue
                     tag_action({
@@ -427,22 +423,46 @@ class PostFinding(Action):
                             self.data.get(
                                 'title', self.manager.ctx.policy.name)),
                         'value': '{}:{}'.format(
-                            finding['Id'], created_at)}, self.manager).process(grouped_resources)
+                            finding['Id'], created_at)},
+                        self.manager).process([resource])
                 else:
-                    stats['Update'] += len(grouped_resources)
-            import_response = client.batch_import_findings(
-                Findings=findings)
-            if import_response['FailedCount'] > 0:
-                stats['Failed'] += import_response['FailedCount']
-                self.log.error(
-                    "import_response=%s" % (import_response))
+                    stats['Update'] += 1
+        import_response = client.batch_import_findings(
+            Findings=findings)
+        # print(findings)
+        # print(import_response)
+        # print(len(findings))
+        if import_response['FailedCount'] > 0:
+            stats['Failed'] += import_response['FailedCount']
+            self.log.error(
+                "import_response=%s" % (import_response))
+        return stats
+
+    def process(self, resources, event=None):
+        # default batch size to one to work around security hub console issue
+        # which only shows a single resource in a finding.
+        batch_size = self.data.get('batch_size', 1)
+        reporter = Counter()
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}        
+            for resource_set in chunks(resources, batch_size):
+                futures[w.submit(self.process_findings, resource_set)] = resource_set
+            for f in as_completed(futures):
+                if f.exception():
+                    b = futures[f]
+                    self.log.error(
+                        "Error on bucket:%s region:%s policy:%s error: %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        self.manager.data.get('name'), f.exception())
+                    continue
+                reporter += f.result()
         self.log.debug(
             "policy:%s securityhub %d findings resources %d new %d updated %d failed",
             self.manager.ctx.policy.name,
-            stats['Finding'],
-            stats['New'],
-            stats['Update'],
-            stats['Failed'])
+            reporter['Finding'],
+            reporter['New'],
+            reporter['Update'],
+            reporter['Failed'])
 
     def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
