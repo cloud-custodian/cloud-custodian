@@ -2045,7 +2045,7 @@ class TestSpotFleetRequest(BaseTest):
         )["SpotFleetRequestConfigs"]
         self.assertEqual(len(sfrs), 3)
 
-        
+
 class TestCEL(BaseTest):
 
     def test_cel_ec2_tags(self):

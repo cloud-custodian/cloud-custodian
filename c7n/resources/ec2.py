@@ -2206,7 +2206,7 @@ class DedicatedHost(query.QueryResourceManager):
         cfn_type = config_type = 'AWS::EC2::Host'
         permissions_enum = ('ec2:DescribeHosts',)
 
-      
+
 @resources.register('ec2-spot-fleet-request')
 class SpotFleetRequest(query.QueryResourceManager):
     """Custodian resource for managing EC2 Spot Fleet Requests.
@@ -2259,7 +2259,7 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             TargetCapacity=desired,
         )
 
-        
+
 @filters.register('cel', condition=((sys.version_info.major, sys.version_info.minor) > (3, 6)))
 class CELFilter(BaseCELFilter, InstanceImageBase):
     """
