@@ -31,7 +31,7 @@ from c7n.filters.core import (
     EventFilter,
     AgeFilter,
     ReduceFilter,
-    CELFilter,
+    # CELFilter,
     OPERATORS,
     VALUE_TYPES,
 )
@@ -199,8 +199,8 @@ def generate(resource_types=()):
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
             'age': AgeFilter.schema,
-            'reduce': ReduceFilter.schema,
-            'cel': CELFilter.schema,
+            'reduce': ReduceFilter.schema
+            # 'cel': CELFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
@@ -243,8 +243,8 @@ def generate(resource_types=()):
                              '$ref': '#/definitions/policy/properties/conditions'}}},
                         {'$ref': '#/definitions/filters/value'},
                         {'$ref': '#/definitions/filters/event'},
-                        {'$ref': '#/definitions/filters/valuekv'},
-                        {'$ref': '#/definitions/filters/cel'}]}},
+                        {'$ref': '#/definitions/filters/valuekv'}]}},
+                        # {'$ref': '#/definitions/filters/cel'}]}},
                 # these should be deprecated for conditions
                 'region': {'type': 'string'},
                 'tz': {'type': 'string'},
