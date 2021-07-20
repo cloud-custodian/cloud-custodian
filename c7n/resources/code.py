@@ -285,7 +285,7 @@ class CodeDeployApplication(QueryResourceManager):
         universal_taggable = True
 
     def augment(self, resources):
-        resources = super(CodeDeployApplication, self).augment(resources)
+        resources = super().augment(resources)
         client = local_session(self.session_factory).client('codedeploy')
         for r in resources:
             arn = self.generate_arn(r['applicationName'])
