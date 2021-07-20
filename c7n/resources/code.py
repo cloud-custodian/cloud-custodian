@@ -290,7 +290,7 @@ class CodeDeployApplication(QueryResourceManager):
         for r in resources:
             arn = self.generate_arn(r['applicationName'])
             r['Tags'] = client.list_tags_for_resource(
-                ResourceArn=self.generate_arn(r['applicationName'], separator=':')).get('Tags', [])
+                ResourceArn=arn).get('Tags', [])
         return resources
 
     def get_arns(self, resources):
