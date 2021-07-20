@@ -2171,26 +2171,3 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
-
-
-class TestCEL(BaseTest):
-    def test_cel_iam_credential_report(self):
-        session_factory = self.replay_flight_data("test_cel_iam_credential_report")
-
-        p = self.load_policy(
-            {
-                "name": "cel-iam-credential-report",
-                "resource": "iam-user",
-                "filters": [
-                    {
-                        "type": "cel",
-                        "expr": "resource.credentials().password_enabled",
-                    },
-                ],
-            },
-            session_factory=session_factory,
-            cache=True,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 2)

@@ -1039,7 +1039,7 @@ if (sys.version_info.major, sys.version_info.minor) > (3, 6):
 
         def __init__(self, data, manager):
             super().__init__(data, manager)
-            assert data["type"].lower() == "cel"
+            # assert data["type"].lower() == "cel"
             # throw error if expr missing?
             # or run and just return resources as if empty filter applied?
             self.expr = data.get("expr")

@@ -8,7 +8,6 @@ import json
 import io
 from datetime import timedelta
 import itertools
-import sys
 import time
 
 # Used to parse saml provider metadata configuration.
@@ -24,7 +23,6 @@ from c7n import deprecated
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
-from c7n.filters import CELFilter as BaseCELFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -2588,45 +2586,3 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
-
-
-@User.filter_registry.register('cel', condition=(
-    (sys.version_info.major, sys.version_info.minor) > (3, 6)))
-class CELFilter(BaseCELFilter, CredentialReport):
-    schema = type_schema(
-        'cel',
-        type='object',
-        required=['type'],
-        properties={
-            'type': {'enum': ['cel']},
-            'expr': {'type': 'string'}
-        },
-        report_generate={
-            'title': 'Generate a report if none is present.',
-            'default': True,
-            'type': 'boolean'},
-        report_delay={
-            'title': 'Number of seconds to wait for report generation.',
-            'default': 10,
-            'type': 'number'},
-        report_max_age={
-            'title': 'Number of seconds to consider a report valid.',
-            'default': 60 * 60 * 24,
-            'type': 'number'}
-    )
-
-    list_sub_objects = (
-        ('access_key_1_', 'access_keys'),
-        ('access_key_2_', 'access_keys'),
-        ('cert_1_', 'certs'),
-        ('cert_2_', 'certs'))
-
-    permissions = ('iam:GenerateCredentialReport',
-                   'iam:GetCredentialReport')
-
-    def get_credential_report(self, resource):
-        report = super(CELFilter, self).get_credential_report()
-        if report is None:
-            return []
-        info = report.get(resource['UserName'])
-        return info
