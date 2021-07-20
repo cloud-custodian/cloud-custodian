@@ -986,6 +986,7 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        filter_type = "scalar"
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBSnapshots',)
 

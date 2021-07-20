@@ -181,6 +181,7 @@ ResourceMap = {
     "aws.sns-subscription": "c7n.resources.sns.SNSSubscription",
     "aws.sqs": "c7n.resources.sqs.SQS",
     "aws.ssm-document": "c7n.resources.ssm.SSMDocument",
+    "aws.ssm-data-sync": "c7n.resources.ssm.SSMDataSync",
     "aws.ssm-activation": "c7n.resources.ssm.SSMActivation",
     "aws.ssm-managed-instance": "c7n.resources.ssm.ManagedInstance",
     "aws.ssm-parameter": "c7n.resources.ssm.SSMParameter",
