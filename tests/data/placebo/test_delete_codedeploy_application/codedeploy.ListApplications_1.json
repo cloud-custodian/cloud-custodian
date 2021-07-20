@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "applications": [
-            "c7n-test"
+            "HelloWorld"
         ],
         "ResponseMetadata": {}
     }
