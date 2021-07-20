@@ -236,6 +236,22 @@ class CodeDeploy(BaseTest):
             time.sleep(2)
         self.assertFalse(client.list_applications().get('applications'))
 
+    def test_tag_untag_codedeploy_application(self):
+        factory = self.replay_flight_data('test_tag_untag_codedeploy_application')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-delete-application",
+                "resource": "codedeploy-application",
+                "filters": [{"tag:c7n": "test"}],
+                "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        arn = p.resource_manager.generate_arn(resources[0]["applicationName"])
+        self.assertEqual(len(client.list_tags_for_resource(ResourceArn=arn).get('Tags')), 0)
+
     def test_stop_codedeploy_deployment(self):
         factory = self.replay_flight_data('test_stop_codedeploy_deployment')
         p = self.load_policy(

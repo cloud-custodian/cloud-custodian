@@ -8,7 +8,8 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, generate_arn
+import functools
 
 from .securityhub import OtherResourcePostFinding
 
@@ -281,6 +282,34 @@ class CodeDeployApplication(QueryResourceManager):
         date = 'createTime'
         arn_type = "application"
         cfn_type = "AWS::CodeDeploy::Application"
+        universal_taggable = True
+
+    def augment(self, resources):
+        resources = super(CodeDeployApplication, self).augment(resources)
+        client = local_session(self.session_factory).client('codedeploy')
+        for r in resources:
+            arn = self.generate_arn(r['applicationName'])
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceArn=self.generate_arn(r['applicationName'], separator=':')).get('Tags', [])
+        return resources
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(r['applicationName']))
+        return arns
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                account_id=self.config.account_id,
+                resource_type=self.resource_type.arn_type,
+                separator=':')
+        return self._generate_arn
 
 
 @CodeDeployApplication.action_registry.register('delete')
