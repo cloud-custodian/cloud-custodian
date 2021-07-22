@@ -283,9 +283,9 @@ class CodeDeploy(BaseTest):
                 "resource": "codedeploy-deploymentgroup",
                 "filters": [
                     {
-                    "type": "value", 
-                    "key": "targetRevision.revisionType", 
-                    "value": "S3"
+                        "type": "value",
+                        "key": "targetRevision.revisionType",
+                        "value": "S3"
                     }
                 ],
                 "actions": [{"type": "delete"}],
@@ -297,4 +297,5 @@ class CodeDeploy(BaseTest):
         with self.assertRaises(ClientError) as e:
             client.get_deployment_group(applicationName=resources[0]['applicationName'],
             deploymentGroupName=resources[0]['deploymentGroupName'])
-        self.assertEqual(e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')
+        self.assertEqual(
+            e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')

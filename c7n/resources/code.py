@@ -6,9 +6,10 @@ import jmespath
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn, chunks
+from c7n.utils import local_session, type_schema, generate_arn
 import functools
 from c7n import query
 
@@ -388,7 +389,7 @@ class DescribeDeploymentGroup(query.ChildDescribeSource):
             r['Tags'] = self.manager.retry(
                 client.list_tags_for_resource, ResourceArn=rarn).get('Tags')
         return results
-        
+
 
 @resources.register('codedeploy-deploymentgroup')
 class CodeDeployDeploymentGroup(ChildResourceManager):
@@ -415,6 +416,7 @@ class CodeDeployDeploymentGroup(ChildResourceManager):
         for r in resources:
             arns.append(self.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName']))
         return arns
+
 
 @CodeDeployDeploymentGroup.action_registry.register('delete')
 class DeleteDeploymentGroup(BaseAction):
