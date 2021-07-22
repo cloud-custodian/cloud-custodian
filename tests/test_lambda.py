@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 from mock import patch
+import pytest
+import sys
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
@@ -610,6 +612,8 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
 
+@pytest.mark.skipif(
+    (sys.version_info.major, sys.version_info.minor) < (3, 7), reason="needs py 3.7")
 class TestCEL(BaseTest):
     def test_cel_lambda_runtime(self):
         session_factory = self.replay_flight_data("test_cel_lambda_runtime")

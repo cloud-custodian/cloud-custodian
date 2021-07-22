@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+import pytest
+import sys
 import time
 
 import datetime
@@ -2046,6 +2048,8 @@ class TestSpotFleetRequest(BaseTest):
         self.assertEqual(len(sfrs), 3)
 
 
+@pytest.mark.skipif(
+    (sys.version_info.major, sys.version_info.minor) < (3, 7), reason="needs py 3.7")
 class TestCEL(BaseTest):
 
     def test_cel_ec2_tags(self):
