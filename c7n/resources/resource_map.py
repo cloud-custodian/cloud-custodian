@@ -29,6 +29,7 @@ ResourceMap = {
     "aws.codecommit": "c7n.resources.code.CodeRepository",
     "aws.codedeploy-application": "c7n.resources.code.CodeDeployApplication",
     "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
+    "aws.codedeploy-deploymentgroup": "c7n.resources.code.CodeDeployDeploymentGroup",
     "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
     "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
     "aws.config-rule": "c7n.resources.config.ConfigRule",

@@ -6,10 +6,11 @@ import jmespath
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema, generate_arn, chunks
 import functools
+from c7n import query
 
 from .securityhub import OtherResourcePostFinding
 
@@ -363,4 +364,72 @@ class StopDeployment(BaseAction):
                       autoRollbackEnabled=self.data.get('autorollbackenabled', True))
             except (client.exceptions.DeploymentAlreadyCompletedException,
             client.exceptions.DeploymentDoesNotExistException):
+                continue
+
+
+@query.sources.register('describe-deployment-group')
+class DescribeDeploymentGroup(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super().get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        results = []
+        for parent_id, group_name in resources:
+            dg = self.manager.retry(
+                client.get_deployment_group, applicationName=parent_id,
+                deploymentGroupName=group_name).get('deploymentGroupInfo')
+            results.append(dg)
+        for r in results:
+            rarn = self.manager.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName'])
+            r['Tags'] = self.manager.retry(
+                client.list_tags_for_resource, ResourceArn=rarn).get('Tags')
+        return results
+        
+
+@resources.register('codedeploy-deploymentgroup')
+class CodeDeployDeploymentGroup(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        parent_spec = ('codedeploy-application', 'applicationName', None)
+        enum_spec = ('list_deployment_groups', 'deploymentGroups', None)
+        id = 'deploymentGroupId'
+        name = 'deploymentGroupName'
+        arn_type = "deploymentgroup"
+        cfn_type = 'AWS::CodeDeploy::DeploymentGroup'
+        arn_separator = ':'
+        permission_prefix = 'codedeploy'
+        universal_taggable = True
+
+    source_mapping = {
+        'describe-child': DescribeDeploymentGroup
+    }
+
+    @property
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName']))
+        return arns
+
+@CodeDeployDeploymentGroup.action_registry.register('delete')
+class DeleteDeploymentGroup(BaseAction):
+    """Delete a deployment group tied to an application.
+    """
+
+    schema = type_schema('delete')
+    permissions = ('codedeploy:DeleteDeploymentGroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_deployment_group,
+                      applicationName=r['applicationName'],
+                      deploymentGroupName=r['deploymentGroupName'])
+            except client.exceptions.InvalidDeploymentGroupNameException:
                 continue

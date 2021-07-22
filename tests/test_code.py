@@ -4,6 +4,7 @@ import time
 from .common import BaseTest, event_data
 
 from c7n.resources.aws import shape_validate
+from botocore.exceptions import ClientError
 
 
 class CodeArtifact(BaseTest):
@@ -273,3 +274,27 @@ class CodeDeploy(BaseTest):
             'deploymentInfo').get('errorInformation').get('code'), 'MANUAL_STOP')
         self.assertEqual(deployment.get(
             'deploymentInfo').get('autoRollbackConfiguration').get('enabled'), True)
+
+    def test_codedeploy_deploymentgroup_delete(self):
+        factory = self.replay_flight_data('test_codedeploy_deploymentgroup_delete')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-delete-deploymentgroup",
+                "resource": "codedeploy-deploymentgroup",
+                "filters": [
+                    {
+                    "type": "value", 
+                    "key": "targetRevision.revisionType", 
+                    "value": "S3"
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        with self.assertRaises(ClientError) as e:
+            client.get_deployment_group(applicationName=resources[0]['applicationName'],
+            deploymentGroupName=resources[0]['deploymentGroupName'])
+        self.assertEqual(e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')
