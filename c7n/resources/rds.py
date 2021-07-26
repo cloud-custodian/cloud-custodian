@@ -969,13 +969,15 @@ class DescribeRDSSnapshot(DescribeSource):
         return snaps
 
 
-class ConfigSnapshotRDS(ConfigSource):
+class ConfigSnapshotRDS(ConfigRDS):
 
     def load_resource(self, item):
         resource = super().load_resource(item)
-        for k in list(resource.keys()):
-            if k.startswith('Db'):
-                resource["DB%s" % k[2:]] = resource[k]
+        attrs = {}
+        for a in item.get('supplementaryConfiguration', {}).get('DBSnapshotAttributes', []):
+            attrs[a['attributeName']] = a['attributeValues']
+        if attrs:
+            resource['c7n:attributes'] = attrs
         return resource
 
 
@@ -1192,12 +1194,14 @@ class CrossAccountAccess(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         for r in resource_set:
-            attrs = {t['AttributeName']: t['AttributeValues']
-             for t in self.manager.retry(
-                client.describe_db_snapshot_attributes,
-                DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
-                    'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
-            r[self.attributes_key] = attrs
+            if self.attributes_key not in r:
+                attrs = {
+                    t['AttributeName']: t['AttributeValues']
+                    for t in self.manager.retry(
+                        client.describe_db_snapshot_attributes,
+                        DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
+                            'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
+                r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
