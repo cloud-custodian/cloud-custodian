@@ -462,7 +462,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         if source_type in self.source_mapping:
             self.source_mapping.get(source_type)(self)
         if source_type in sources:
-            return souces[source_type](self)
+            return sources[source_type](self)
         raise KeyError("Invalid Source %s" % source_type)
 
     @classmethod
