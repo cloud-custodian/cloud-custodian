@@ -1,0 +1,262 @@
+{
+    "status_code": 200,
+    "data": {
+        "SpotFleetRequestConfigs": [
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 22,
+                    "minute": 17,
+                    "second": 16,
+                    "microsecond": 818000
+                },
+                "SpotFleetRequestConfig": {
+                    "AllocationStrategy": "capacityOptimized",
+                    "OnDemandAllocationStrategy": "lowestPrice",
+                    "ClientToken": "1616019435496",
+                    "ExcessCapacityTerminationPolicy": "Default",
+                    "FulfilledCapacity": 0.0,
+                    "OnDemandFulfilledCapacity": 0.0,
+                    "IamFleetRole": "arn:aws:iam::644160558196:role/aws-ec2-spot-fleet-tagging-role",
+                    "LaunchTemplateConfigs": [
+                        {
+                            "LaunchTemplateSpecification": {
+                                "LaunchTemplateId": "lt-028f71b1ea05a9ec9",
+                                "Version": "1"
+                            },
+                            "Overrides": [
+                                {
+                                    "InstanceType": "c3.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "m3.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t2.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "c4.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "r3.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "c5n.large",
+                                    "WeightedCapacity": 1.0
+                                }
+                            ]
+                        }
+                    ],
+                    "TargetCapacity": 1,
+                    "OnDemandTargetCapacity": 0,
+                    "TerminateInstancesWithExpiration": true,
+                    "Type": "request",
+                    "ValidFrom": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ValidUntil": {
+                        "__class__": "datetime",
+                        "year": 2022,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ReplaceUnhealthyInstances": false,
+                    "InstanceInterruptionBehavior": "terminate"
+                },
+                "SpotFleetRequestId": "sfr-094f969e-31c4-48a6-8274-644160558196",
+                "SpotFleetRequestState": "cancelled_terminating"
+            },
+            {
+                "ActivityStatus": "error",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 22,
+                    "minute": 21,
+                    "second": 30,
+                    "microsecond": 318000
+                },
+                "SpotFleetRequestConfig": {
+                    "AllocationStrategy": "capacityOptimized",
+                    "OnDemandAllocationStrategy": "lowestPrice",
+                    "ClientToken": "1616019689145",
+                    "ExcessCapacityTerminationPolicy": "Default",
+                    "FulfilledCapacity": 0.0,
+                    "OnDemandFulfilledCapacity": 0.0,
+                    "IamFleetRole": "arn:aws:iam::644160558196:role/aws-ec2-spot-fleet-tagging-role",
+                    "LaunchTemplateConfigs": [
+                        {
+                            "LaunchTemplateSpecification": {
+                                "LaunchTemplateId": "lt-028f71b1ea05a9ec9",
+                                "Version": "1"
+                            },
+                            "Overrides": [
+                                {
+                                    "InstanceType": "t3a.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t3.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t2.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "m1.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t3a.large",
+                                    "WeightedCapacity": 1.0
+                                }
+                            ]
+                        }
+                    ],
+                    "TargetCapacity": 1,
+                    "OnDemandTargetCapacity": 0,
+                    "TerminateInstancesWithExpiration": true,
+                    "Type": "maintain",
+                    "ValidFrom": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ValidUntil": {
+                        "__class__": "datetime",
+                        "year": 2022,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ReplaceUnhealthyInstances": false,
+                    "InstanceInterruptionBehavior": "terminate"
+                },
+                "SpotFleetRequestId": "sfr-20704b88-c112-4227-b878-a5011b6b8c56",
+                "SpotFleetRequestState": "active"
+            },
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 22,
+                    "minute": 20,
+                    "second": 6,
+                    "microsecond": 811000
+                },
+                "SpotFleetRequestConfig": {
+                    "AllocationStrategy": "capacityOptimized",
+                    "OnDemandAllocationStrategy": "lowestPrice",
+                    "ClientToken": "1616019605146",
+                    "ExcessCapacityTerminationPolicy": "Default",
+                    "FulfilledCapacity": 0.0,
+                    "OnDemandFulfilledCapacity": 0.0,
+                    "IamFleetRole": "arn:aws:iam::644160558196:role/aws-ec2-spot-fleet-tagging-role",
+                    "LaunchTemplateConfigs": [
+                        {
+                            "LaunchTemplateSpecification": {
+                                "LaunchTemplateId": "lt-028f71b1ea05a9ec9",
+                                "Version": "1"
+                            },
+                            "Overrides": [
+                                {
+                                    "InstanceType": "t3a.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t3.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t2.medium",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "m1.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t3a.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "m2.xlarge",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t3.large",
+                                    "WeightedCapacity": 1.0
+                                },
+                                {
+                                    "InstanceType": "t2.large",
+                                    "WeightedCapacity": 1.0
+                                }
+                            ]
+                        }
+                    ],
+                    "TargetCapacity": 1,
+                    "OnDemandTargetCapacity": 0,
+                    "TerminateInstancesWithExpiration": true,
+                    "Type": "request",
+                    "ValidFrom": {
+                        "__class__": "datetime",
+                        "year": 2021,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ValidUntil": {
+                        "__class__": "datetime",
+                        "year": 2022,
+                        "month": 3,
+                        "day": 17,
+                        "hour": 22,
+                        "minute": 16,
+                        "second": 32,
+                        "microsecond": 0
+                    },
+                    "ReplaceUnhealthyInstances": false,
+                    "InstanceInterruptionBehavior": "terminate"
+                },
+                "SpotFleetRequestId": "sfr-29464b0d-efb4-4be8-965d-85e762f41bcf",
+                "SpotFleetRequestState": "cancelled_terminating"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

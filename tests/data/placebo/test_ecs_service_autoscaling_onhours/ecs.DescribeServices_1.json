@@ -1,0 +1,195 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test-cluster/custodian-service-autoscaling-test",
+                "serviceName": "custodian-service-autoscaling-test",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 0,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "EC2",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/test:1",
+                "deploymentConfiguration": {
+                    "deploymentCircuitBreaker": {
+                        "enable": false,
+                        "rollback": false
+                    },
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/2250466774619741758",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/test:1",
+                        "desiredCount": 0,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "failedTasks": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 14,
+                            "minute": 59,
+                            "second": 9,
+                            "microsecond": 646000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 11,
+                            "second": 55,
+                            "microsecond": 569000
+                        },
+                        "launchType": "EC2",
+                        "rolloutState": "COMPLETED",
+                        "rolloutStateReason": "ECS deployment ecs-svc/2250466774619741758 completed."
+                    }
+                ],
+                "events": [
+                    {
+                        "id": "c6aa04e3-b135-4adb-9b26-7e7e1e18110a",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 11,
+                            "second": 55,
+                            "microsecond": 577000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) has reached a steady state."
+                    },
+                    {
+                        "id": "92a2c403-6f7b-4a94-8b85-337676fba3b8",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 10,
+                            "second": 38,
+                            "microsecond": 780000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) was unable to place a task because no container instance met all of its requirements. Reason: No Container Instances were found in your cluster. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "0e848174-38a3-4e93-9591-5c324fae9b38",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 7,
+                            "second": 1,
+                            "microsecond": 964000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) has reached a steady state."
+                    },
+                    {
+                        "id": "23115190-67d2-41f1-8612-b6dd3f49203c",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 2,
+                            "second": 20,
+                            "microsecond": 928000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) was unable to place a task because no container instance met all of its requirements. Reason: No Container Instances were found in your cluster. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "32dfe3f0-ec57-4ace-a69a-91a62e3ec549",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 0,
+                            "second": 47,
+                            "microsecond": 56000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) has reached a steady state."
+                    },
+                    {
+                        "id": "c09e7622-a2c8-4ee9-804b-2e3d8389245f",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 15,
+                            "minute": 0,
+                            "second": 47,
+                            "microsecond": 55000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) (deployment ecs-svc/2250466774619741758) deployment completed."
+                    },
+                    {
+                        "id": "1dbed5d5-6e77-47df-a3da-9a499514214c",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 3,
+                            "day": 17,
+                            "hour": 14,
+                            "minute": 59,
+                            "second": 14,
+                            "microsecond": 111000
+                        },
+                        "message": "(service custodian-service-autoscaling-test) was unable to place a task because no container instance met all of its requirements. Reason: No Container Instances were found in your cluster. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 14,
+                    "minute": 59,
+                    "second": 9,
+                    "microsecond": 646000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [
+                    {
+                        "type": "spread",
+                        "field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "type": "spread",
+                        "field": "instanceId"
+                    }
+                ],
+                "schedulingStrategy": "REPLICA",
+                "tags": [
+                    {
+                        "key": "OffHoursPrevious",
+                        "value": "Min=1:Max=5:Desired=1"
+                    }
+                ],
+                "createdBy": "arn:aws:iam::644160558196:role/aws-reserved/sso.amazonaws.com/us-west-2/AWSReservedSSO_AWSAdministratorAccess_1c1c1a251c128ef2",
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}
