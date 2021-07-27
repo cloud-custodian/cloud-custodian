@@ -649,8 +649,8 @@ class LayerCrossAccount(CrossAccountAccessFilter):
                     client.get_layer_version_policy,
                     LayerName=r['LayerName'],
                     VersionNumber=r['Version']).get('Policy')
-            if rpolicy:
-                r['c7n:Policy'] = rpolicy
+                if rpolicy:
+                    r['c7n:Policy'] = rpolicy
         return super(LayerCrossAccount, self).process(resources)
 
     def get_resource_policy(self, r):
