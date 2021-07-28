@@ -18,6 +18,19 @@
                         "python3.8"
                     ]
                 }
+            },
+            {
+                "LayerName": "c7n-test",
+                "LayerArn": "arn:aws:lambda:us-east-1:644160558196:layer:c7n-test",
+                "LatestMatchingVersion": {
+                    "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:c7n-test:1",
+                    "Version": 1,
+                    "Description": "second test layer",
+                    "CreatedDate": "2021-07-28T17:51:31.295+0000",
+                    "CompatibleRuntimes": [
+                        "python3.8"
+                    ]
+                }
             }
         ]
     }

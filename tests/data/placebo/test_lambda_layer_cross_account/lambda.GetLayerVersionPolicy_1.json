@@ -3,6 +3,6 @@
     "data": {
         "ResponseMetadata": {},
         "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"xaccount2\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"lambda:GetLayerVersion\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:layer:c7n-botocore1-20-33-boto31-17-33:1\"}]}",
-        "RevisionId": "8d22322b-628b-4f27-af65-2db33020baf0"
+        "RevisionId": "23d7f01d-6216-49c4-8eb4-c395afcfb47d"
     }
 }
