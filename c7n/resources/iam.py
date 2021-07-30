@@ -400,7 +400,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', None)
+        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'

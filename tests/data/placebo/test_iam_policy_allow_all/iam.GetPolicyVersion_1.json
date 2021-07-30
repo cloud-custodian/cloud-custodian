@@ -1,31 +1,21 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b0c6c9a5-dbff-11e6-a291-af5f80ef2d32", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b0c6c9a5-dbff-11e6-a291-af5f80ef2d32", 
-                "date": "Mon, 16 Jan 2017 15:23:11 GMT", 
-                "content-length": "759", 
-                "content-type": "text/xml"
-            }
-        }, 
         "PolicyVersion": {
+            "Document": "%7B%0A%20%20%20%20%22Version%22%3A%20%222012-10-17%22%2C%0A%20%20%20%20%22Statement%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Sid%22%3A%20%22Everything%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Action%22%3A%20%22%2A%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Resource%22%3A%20%22%2A%22%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%5D%0A%7D",
+            "VersionId": "v1",
+            "IsDefaultVersion": true,
             "CreateDate": {
-                "hour": 18, 
-                "__class__": "datetime", 
-                "month": 2, 
-                "second": 46, 
-                "microsecond": 0, 
-                "year": 2015, 
-                "day": 6, 
-                "minute": 39
-            }, 
-            "VersionId": "v1", 
-            "Document": "%7B%0A%20%20%22Version%22%3A%20%222012-10-17%22%2C%0A%20%20%22Statement%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%22Action%22%3A%20%22%2A%22%2C%0A%20%20%20%20%20%20%22Resource%22%3A%20%22%2A%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D", 
-            "IsDefaultVersion": true
-        }
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 7,
+                "day": 30,
+                "hour": 3,
+                "minute": 4,
+                "second": 40,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
     }
 }
