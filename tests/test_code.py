@@ -253,28 +253,6 @@ class CodeDeploy(BaseTest):
         arn = p.resource_manager.generate_arn(resources[0]["applicationName"])
         self.assertEqual(len(client.list_tags_for_resource(ResourceArn=arn).get('Tags')), 0)
 
-    def test_stop_codedeploy_deployment(self):
-        factory = self.replay_flight_data('test_stop_codedeploy_deployment')
-        p = self.load_policy(
-            {
-                "name": "codedeploy-stop-deployment",
-                "resource": "codedeploy-deployment",
-                "filters": [{"status": "InProgress"}],
-                "actions": ["stop"],
-            },
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = factory().client('codedeploy')
-        if self.recording:
-            time.sleep(10)
-        deployment = client.get_deployment(deploymentId=resources[0]['deploymentId'])
-        self.assertEqual(deployment.get('deploymentInfo').get('status'), 'Stopped')
-        self.assertEqual(deployment.get(
-            'deploymentInfo').get('errorInformation').get('code'), 'MANUAL_STOP')
-        self.assertEqual(deployment.get(
-            'deploymentInfo').get('autoRollbackConfiguration').get('enabled'), True)
-
     def test_codedeploy_deploymentgroup_delete(self):
         factory = self.replay_flight_data('test_codedeploy_deploymentgroup_delete')
         p = self.load_policy(

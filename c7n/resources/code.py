@@ -347,27 +347,6 @@ class CodeDeployDeployment(QueryResourceManager):
         date = 'createTime'
 
 
-@CodeDeployDeployment.action_registry.register('stop')
-class StopDeployment(BaseAction):
-    """Stop/Delete a currently running deployment in CodeDeploy.
-       Roll back is set to True by default
-    """
-
-    schema = type_schema('stop', autorollbackenabled={"type": "boolean", 'default': True})
-    permissions = ('codedeploy:StopDeployment',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('codedeploy')
-        for r in resources:
-            try:
-                self.manager.retry(client.stop_deployment,
-                      deploymentId=r['deploymentId'],
-                      autoRollbackEnabled=self.data.get('autorollbackenabled', True))
-            except (client.exceptions.DeploymentAlreadyCompletedException,
-            client.exceptions.DeploymentDoesNotExistException):
-                continue
-
-
 @query.sources.register('describe-deployment-group')
 class DescribeDeploymentGroup(query.ChildDescribeSource):
 
