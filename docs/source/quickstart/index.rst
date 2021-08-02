@@ -27,43 +27,35 @@ specific cloud.
 Linux and Mac OS
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian for AWS, run::
+To install Cloud Custodian ::
 
   python3 -m venv custodian
   source custodian/bin/activate
-  pip install c7n       # Install AWS package
+  pip install c7n       # This includes AWS support
 
-To install Cloud Custodian for Azure, run::
+To install Cloud Custodian for Azure, additionally run::
 
-  python3 -m venv custodian
-  source custodian/bin/activate
   pip install c7n_azure # Install Azure package
 
-To install Cloud Custodian for GCP, run::
+To install Cloud Custodian for GCP, additionally run::
 
-  python3 -m venv custodian
-  source custodian/bin/activate
   pip install c7n_gcp   # Install GCP Package
 
 Windows (CMD/PowerShell)
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian for AWS, run::
+To install Cloud Custodian run::
 
   python3 -m venv custodian
   ./custodian/bin/activate
-  pip install c7n
+  pip install c7n    # This includes AWS support
 
-To install Cloud Custodian for Azure, run::
+To install Cloud Custodian for Azure, additionally run::
 
-  python3 -m venv custodian
-  ./custodian/bin/activate
   pip install c7n_azure
 
-To install Cloud Custodian for GCP, run::
+To install Cloud Custodian for GCP, additionally run::
 
-  python3 -m venv custodian
-  ./custodian/bin/activate
   pip install c7n_gcp
 
 Docker
