@@ -5,12 +5,12 @@ import jmespath
 
 
 class TestApacheAirflow(BaseTest):
-    def test_mwaa_environment_value_filter(self):
-        session_factory = self.replay_flight_data('test_mwaa_environment_value_filter')
+    def test_airflow_environment_value_filter(self):
+        session_factory = self.replay_flight_data('test_airflow_environment_value_filter')
         p = self.load_policy(
             {
-                "name": "mwaa-name-filter",
-                "resource": "mwaa",
+                "name": "airflow-name-filter",
+                "resource": "airflow",
                 "filters": [
                     {
                         "type": "value",
@@ -27,14 +27,14 @@ class TestApacheAirflow(BaseTest):
         self.assertEqual(resources[0]['Name'], 'testEnvironment')
         self.assertEqual(resources[0]['c7n:MatchedFilters'], ['Name'])
     
-    def test_mwaa_environment_kms_filter(self):
-        session_factory = self.replay_flight_data('test_mwaa_environment_kms_filter')
+    def test_airflow_environment_kms_filter(self):
+        session_factory = self.replay_flight_data('test_airflow_environment_kms_filter')
         kms = session_factory().client('kms')
         expression = 'KmsKey'
         p = self.load_policy(
             {
-                "name": "mwaa-kms-filter",
-                "resource": "mwaa",
+                "name": "airflow-kms-filter",
+                "resource": "airflow",
                 "filters": [
                     {
                         "type": "kms-key",
@@ -51,13 +51,13 @@ class TestApacheAirflow(BaseTest):
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/mwaa')
 
 
-    def test_mwaa_environment_tag(self):
-        session_factory = self.replay_flight_data('test_mwaa_environment_tag')
+    def test_airflow_environment_tag(self):
+        session_factory = self.replay_flight_data('test_airflow_environment_tag')
         new_tag = {'env': 'dev'}
         p = self.load_policy(
             {
-                'name': 'mwaa-tag',
-                'resource': 'mwaa',
+                'name': 'airflow-tag',
+                'resource': 'airflow',
                 'filters': [{
                     'tag:env': 'absent'
                 }],
@@ -71,18 +71,18 @@ class TestApacheAirflow(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         name = resources[0].get('Name')
-        mwaa = session_factory().client('mwaa')
-        call = mwaa.get_environment(Name=name)
+        airflow = session_factory().client('mwaa')
+        call = airflow.get_environment(Name=name)
         self.assertEqual(new_tag, call['Environment'].get('Tags'))    
     
 
-    def test_mwaa_environment_untag(self):
-        session_factory = self.replay_flight_data('test_mwaa_environment_untag')
+    def test_airflow_environment_untag(self):
+        session_factory = self.replay_flight_data('test_airflow_environment_untag')
         new_tag = {'env': 'dev'}
         p = self.load_policy(
             {
-                'name': 'mwaa-untag',
-                'resource': 'mwaa',
+                'name': 'airflow-untag',
+                'resource': 'airflow',
                 'filters': [{
                     'tag:env': 'dev'
                 }],
@@ -96,6 +96,6 @@ class TestApacheAirflow(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         name = resources[0].get('Name')
-        mwaa = session_factory().client('mwaa')
-        call = mwaa.get_environment(Name=name)
+        airflow = session_factory().client('mwaa')
+        call = airflow.get_environment(Name=name)
         self.assertEqual({}, call['Environment'].get('Tags'))

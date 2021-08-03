@@ -3,6 +3,7 @@
 ResourceMap = {
     "aws.account": "c7n.resources.account.Account",
     "aws.acm-certificate": "c7n.resources.acm.Certificate",
+    "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
     "aws.alarm": "c7n.resources.cw.Alarm",
     "aws.ami": "c7n.resources.ami.AMI",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
@@ -128,7 +129,6 @@ ResourceMap = {
     "aws.message-broker": "c7n.resources.mq.MessageBroker",
     "aws.message-config": "c7n.resources.mq.MessageConfig",
     "aws.ml-model": "c7n.resources.ml.MLModel",
-    "aws.mwaa": "c7n.resources.mwaa.ApacheAirflow",
     "aws.nat-gateway": "c7n.resources.vpc.NATGateway",
     "aws.network-acl": "c7n.resources.vpc.NetworkAcl",
     "aws.elastic-ip": "c7n.resources.vpc.NetworkAddress",

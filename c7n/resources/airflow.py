@@ -5,7 +5,7 @@ from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeIn
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
-@resources.register('mwaa')
+@resources.register('airflow')
 class ApacheAirflow(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'mwaa'
@@ -18,7 +18,7 @@ class ApacheAirflow(QueryResourceManager):
     
     permissions = (
         'environment:GetEnvironment',
-        'environment:ListEnvironments',
+        'environment:ListEnvironments'
     )
 
     def augment(self, resources):
@@ -39,8 +39,8 @@ class ApacheAirflowKmsFilter(KmsRelatedFilter):
     .. code-block:: yaml
 
         policies:
-          - name: mwaa-kms-key-filter
-            resource: mwaa
+          - name: airflow-kms-key-filter
+            resource: airflow
             filters:
               - type: kms-key
                 key: c7n:AliasName
@@ -57,8 +57,8 @@ class TagApacheAirflow(Tag):
     .. code-block:: yaml
 
             policies:
-              - name: tag-mwaa
-                resource: mwaa
+              - name: tag-airflow
+                resource: airflow
                 filters:
                   - "tag:target-tag": absent
                 actions:
@@ -69,8 +69,8 @@ class TagApacheAirflow(Tag):
 
     permissions = ('environment:TagResource',)
 
-    def process_resource_set(self, client, mwaa, new_tags):
-        for r in mwaa:
+    def process_resource_set(self, client, airflow, new_tags):
+        for r in airflow:
             try:
                 client.tag_resource(
                     ResourceArn=r['Arn'],
@@ -88,8 +88,8 @@ class UntagApacheAirflow(RemoveTag):
     .. code-block:: yaml
 
             policies:
-              - name: mwaa-remove-tag
-                resource: mmwaa
+              - name: airflow-remove-tag
+                resource: airflow
                 filters:
                   - "tag:OutdatedTag": present
                 actions:
@@ -99,8 +99,8 @@ class UntagApacheAirflow(RemoveTag):
 
     permissions = ('environment:UntagResource',)
 
-    def process_resource_set(self, client, mq, tags):
-        for r in mq:
+    def process_resource_set(self, client, airflow, tags):
+        for r in airflow:
             try:
                 client.untag_resource(ResourceArn=r['Arn'], tagKeys=tags)
             except client.exceptions.ResourceNotFound:
