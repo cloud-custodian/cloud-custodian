@@ -33,11 +33,11 @@ To install Cloud Custodian ::
   source custodian/bin/activate
   pip install c7n       # This includes AWS support
 
-To install Cloud Custodian for Azure, additionally run::
+To install Cloud Custodian for Azure, you will also need to run::
 
   pip install c7n_azure # Install Azure package
 
-To install Cloud Custodian for GCP, additionally run::
+To install Cloud Custodian for GCP, you will also need to run::
 
   pip install c7n_gcp   # Install GCP Package
 
@@ -50,11 +50,11 @@ To install Cloud Custodian run::
   ./custodian/bin/activate
   pip install c7n    # This includes AWS support
 
-To install Cloud Custodian for Azure, additionally run::
+To install Cloud Custodian for Azure, you will also need to run::
 
   pip install c7n_azure
 
-To install Cloud Custodian for GCP, additionally run::
+To install Cloud Custodian for GCP, you will also need to run::
 
   pip install c7n_gcp
 
