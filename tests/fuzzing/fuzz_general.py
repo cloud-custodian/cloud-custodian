@@ -1,9 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 import os
 import sys
 import atheris
+
 
 with atheris.instrument_imports():
     import json
@@ -13,6 +13,7 @@ with atheris.instrument_imports():
 	SnapshotQueryParser as QueryParser
     )
     from c7n import utils
+
 
 def fuzz_general(data):
     fdp = atheris.FuzzedDataProvider(data)
@@ -38,9 +39,11 @@ def fuzz_general(data):
     except PolicyValidationError:
         None
 
+
 def main():
     atheris.Setup(sys.argv, fuzz_general)
     atheris.Fuzz()
+
 
 if __name__ == "__main__":
     main()
