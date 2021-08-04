@@ -16,10 +16,11 @@ class ApacheAirflow(QueryResourceManager):
         arn = 'Arn'
         arn_type = 'environment'
         cfn_type = 'AWS::MWAA::Environment'
+        permission_prefix = 'airflow'
 
     permissions = (
-        'environment:GetEnvironment',
-        'environment:ListEnvironments'
+        'airflow:GetEnvironment',
+        'airflow:ListEnvironments',
     )
 
     def augment(self, resources):
@@ -70,7 +71,7 @@ class TagApacheAirflow(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('environment:TagResource',)
+    permissions = ('airflow:TagResource',)
 
     def process_resource_set(self, client, airflow, new_tags):
         for r in airflow:
@@ -100,7 +101,7 @@ class UntagApacheAirflow(RemoveTag):
                     tags: ["OutdatedTag"]
     """
 
-    permissions = ('environment:UntagResource',)
+    permissions = ('airflow:UntagResource',)
 
     def process_resource_set(self, client, airflow, tags):
         for r in airflow:
