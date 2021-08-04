@@ -549,9 +549,13 @@ class ResourceTagger:
         return resources, policy.resource_manager
 
 
-def get_bucket_path(prefix, account, region, day, month, year):
-    prefix = "%(prefix)s/AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
-        'prefix': prefix.strip('/'), 'account': account, 'region': region}
+def get_bucket_path(prefix, account, region, day, month, year, org_id=None):
+    if org_id:
+        prefix = "%(prefix)s/AWSLogs/%(org_id)s/%(account)s/CloudTrail/%(region)s/" % {
+            'prefix': prefix.strip('/'), 'org_id': org_id, 'account': account, 'region': region}
+    else:
+        prefix = "%(prefix)s/AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
+            'prefix': prefix.strip('/'), 'account': account, 'region': region}
     prefix = prefix.lstrip('/')
     date_prefix = None
     if day:
@@ -602,6 +606,7 @@ def cli():
 @cli.command('load-s3')
 @click.option('--bucket', required=True, help="Cloudtrail Bucket")
 @click.option('--prefix', help="CloudTrail Prefix", default="")
+@click.option('--org-id', required=False, help="For organization trails")
 @click.option('--account', required=True, help="Account to process trail records for")
 @click.option('--region', required=True, help="Region to process trail records for")
 @click.option('--resource-map', required=True,
@@ -612,12 +617,12 @@ def cli():
 @click.option("--year", help="Only process trail events for the given year")
 @click.option("--assume", help="Assume role for trail bucket access")
 @click.option("--profile", help="AWS cli profile for trail bucket access")
-def load(bucket, prefix, account, region, resource_map, db, day, month, year,
+def load(bucket, prefix, account, org_id, region, resource_map, db, day, month, year,
          assume, profile):
     """Ingest cloudtrail events from s3 into resource owner db.
     """
     load_resource_map(resource_map)
-    prefix = get_bucket_path(prefix, account, region, day, month, year)
+    prefix = get_bucket_path(prefix, account, region, day, month, year, org_id)
     session_factory = SessionFactory(region=region, profile=profile, assume_role=assume)
     process_bucket(session_factory, bucket, prefix, db)
 

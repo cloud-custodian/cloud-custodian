@@ -16,46 +16,60 @@ See also the readme in the GitHub repository.
 Install Cloud Custodian
 -----------------------
 
-Cloud Custodian is a Python application and supports Python 3 on Linux, MacOS and
-Windows.
+These instructions will install Cloud Custodian. Cloud Custodian is a Python
+application that supports Python 3 on Linux, MacOS and Windows. We recommend
+using Python 3.6 or higher.
 
-We recommend using Python 3.6 or higher.
+NOTE: Ensure you install the correct follow-on package depending on the cloud
+you are deploying to, otherwise you won't have the right modules for that
+specific cloud.
 
 Linux and Mac OS
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian, just run::
+To install Cloud Custodian ::
 
-  $ python3 -m venv custodian
-  $ source custodian/bin/activate
-  (custodian) $ pip install c7n       #Install AWS package
-  (custodian) $ pip install c7n_azure #Install Azure package
-  (custodian) $ pip install c7n_gcp   #Install GCP Package
+  python3 -m venv custodian
+  source custodian/bin/activate
+  pip install c7n       # This includes AWS support
+
+To install Cloud Custodian for Azure, you will also need to run::
+
+  pip install c7n_azure # Install Azure package
+
+To install Cloud Custodian for GCP, you will also need to run::
+
+  pip install c7n_gcp   # Install GCP Package
 
 Windows (CMD/PowerShell)
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian, just run::
+To install Cloud Custodian run::
 
-  $ python3 -m venv custodian
-  $ ./custodian/Scripts/activate
-  (custodian) $ pip install c7n       #Install AWS package
-  (custodian) $ pip install c7n_azure #Install Azure package
-  (custodian) $ pip install c7n_gcp   #Install GCP Package
+  python3 -m venv custodian
+  ./custodian/bin/activate
+  pip install c7n    # This includes AWS support
 
+To install Cloud Custodian for Azure, you will also need to run::
+
+  pip install c7n_azure
+
+To install Cloud Custodian for GCP, you will also need to run::
+
+  pip install c7n_gcp
 
 Docker
 ++++++
 
-To install via docker, just run::
+To install via docker, run::
 
-  $ docker pull cloudcustodian/c7n
+  docker pull cloudcustodian/c7n
 
 You'll need to export cloud provider credentials to the container
 when executing. One example, if you're using environment variables for provider
 credentials::
 
-  $ docker run -it \
+  docker run -it \
     -v $(pwd)/output:/home/custodian/output \
     -v $(pwd)/policy.yml:/home/custodian/policy.yml \
     --env-file <(env | grep "^AWS\|^AZURE\|^GOOGLE") \
@@ -82,11 +96,11 @@ filters and actions for each resource.
 Drill down to get more information about available policy settings for each
 resource, where the model for the command is::
 
-  $ custodian schema <cloud>.<resource>.<category>.<item>
+  custodian schema <cloud>.<resource>.<category>.<item>
 
 For example::
 
-  $ custodian schema aws.s3.filters.is-log-target
+  custodian schema aws.s3.filters.is-log-target
 
 provides the following information::
 
@@ -127,7 +141,7 @@ provides the following information::
 Additionally, you can use the schema command to view information on the different
 supported modes in Cloud Custodian::
 
-  $ custodian schema mode
+  custodian schema mode
 
 .. _cloud-providers:
 
@@ -149,14 +163,14 @@ validate it separately:
 
 .. code-block:: bash
 
-  $ custodian validate custodian.yml
+  custodian validate custodian.yml
 
 You can also check which resources are identified by the policy, without
 running any actions on the resources:
 
 .. code-block:: bash
 
-  $ custodian run --dryrun -s . custodian.yml
+  custodian run --dryrun -s . custodian.yml
 
 .. _monitor-cc:
 
@@ -223,7 +237,8 @@ schema.json file.
 Tab Completion
 --------------
 
-To enable command-line tab completion for `custodian` on bash do the following one-time steps:
+To enable command-line tab completion for `custodian` on bash do the following
+one-time steps:
 
 Run:
 
