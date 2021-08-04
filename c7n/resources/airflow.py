@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
+
 
 @resources.register('airflow')
 class ApacheAirflow(QueryResourceManager):
@@ -15,7 +16,7 @@ class ApacheAirflow(QueryResourceManager):
         arn = 'Arn'
         arn_type = 'environment'
         cfn_type = 'AWS::MWAA::Environment'
-    
+
     permissions = (
         'environment:GetEnvironment',
         'environment:ListEnvironments'
@@ -26,6 +27,7 @@ class ApacheAirflow(QueryResourceManager):
         for r in resources:
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
+
 
 @ApacheAirflow.filter_registry.register('kms-key')
 class ApacheAirflowKmsFilter(KmsRelatedFilter):
@@ -47,6 +49,7 @@ class ApacheAirflowKmsFilter(KmsRelatedFilter):
                 value: alias/aws/mwaa
     """
     RelatedIdsExpression = 'KmsKey'
+
 
 @ApacheAirflow.action_registry.register('tag')
 class TagApacheAirflow(Tag):
