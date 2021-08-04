@@ -105,8 +105,7 @@ class WorkspaceImage(QueryResourceManager):
         name = id = 'ImageId'
         universal_taggable = True
 
-    def augment(self, resources):
-        return universal_augment(self, resources)
+    augment = universal_augment
 
 @WorkspaceImage.filter_registry.register('cross-account')
 class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
