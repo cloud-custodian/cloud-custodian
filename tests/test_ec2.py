@@ -664,17 +664,18 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_ec2_normalize_tag(self):
-        session_factory = self.replay_flight_data("test_ec2_normalize_tag")
+        session_factory = self.replay_flight_data("test_ec2_normalize_tag", region="us-west-2")
 
         policy = self.load_policy(
             {
                 "name": "ec2-test-normalize-tag-lower",
                 "resource": "ec2",
-                "filters": [{"tag:Testing-lower": "not-null"}],
+                "filters": [{"tag:Testing-lower": "not-null"}, {"State.Name": "running"}],
                 "actions": [
                     {"type": "normalize-tag", "key": "Testing-lower", "action": "lower"}
                 ],
             },
+            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -684,11 +685,12 @@ class TestTag(BaseTest):
             {
                 "name": "ec2-test-normalize-tag-upper",
                 "resource": "ec2",
-                "filters": [{"tag:Testing-upper": "not-null"}],
+                "filters": [{"tag:Testing-upper": "not-null"}, {"State.Name": "running"}],
                 "actions": [
                     {"type": "normalize-tag", "key": "Testing-upper", "action": "upper"}
                 ],
             },
+            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -698,11 +700,12 @@ class TestTag(BaseTest):
             {
                 "name": "ec2-test-normalize-tag-title",
                 "resource": "ec2",
-                "filters": [{"tag:Testing-title": "not-null"}],
+                "filters": [{"tag:Testing-title": "not-null"}, {"State.Name": "running"}],
                 "actions": [
                     {"type": "normalize-tag", "key": "Testing-title", "action": "title"}
                 ],
             },
+            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -712,20 +715,27 @@ class TestTag(BaseTest):
             {
                 "name": "ec2-test-normalize-tag-strip",
                 "resource": "ec2",
-                "filters": [{"tag:Testing-strip": "not-null"}],
+                "filters": [{"tag:Testing-strip": "not-null"}, {"State.Name": "running"}],
                 "actions": [
                     {
                         "type": "normalize-tag",
                         "key": "Testing-strip",
                         "action": "strip",
-                        "value": "blah",
+                        "value": " ",
                     }
                 ],
             },
+            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("resourcegroupstaggingapi")
+        tag_mapping = client.get_resources(
+            ResourceTypeFilters=["ec2:instance"])["ResourceTagMappingList"]
+        tag_values = {*(t["Value"] for t in tag_mapping[0]["Tags"])}
+        self.assertLessEqual({"UPPER", "lower", "Title", "strip"}, tag_values)
 
     def test_ec2_rename_tag(self):
         session_factory = self.replay_flight_data("test_ec2_rename_tag")

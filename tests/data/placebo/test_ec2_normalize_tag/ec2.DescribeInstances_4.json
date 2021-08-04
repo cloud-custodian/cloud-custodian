@@ -121,12 +121,12 @@
                         "SourceDestCheck": true,
                         "Tags": [
                             {
-                                "Key": "Testing-upper",
-                                "Value": "uPpEr"
+                                "Key": "Testing-title",
+                                "Value": "Title"
                             },
                             {
-                                "Key": "Testing-title",
-                                "Value": "tItLe"
+                                "Key": "Testing-upper",
+                                "Value": "UPPER"
                             },
                             {
                                 "Key": "Testing-lower",

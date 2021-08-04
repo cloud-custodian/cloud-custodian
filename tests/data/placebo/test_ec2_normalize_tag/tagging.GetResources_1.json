@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ec2:us-west-2:644160558196:instance/i-0fa0fa6c1e2de6f8a",
+                "Tags": [
+                    {
+                        "Key": "Testing-title",
+                        "Value": "Title"
+                    },
+                    {
+                        "Key": "Testing-lower",
+                        "Value": "lower"
+                    },
+                    {
+                        "Key": "Testing-upper",
+                        "Value": "UPPER"
+                    },
+                    {
+                        "Key": "Testing-strip",
+                        "Value": "strip"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
