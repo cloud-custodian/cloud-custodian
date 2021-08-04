@@ -16,6 +16,7 @@ from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import jmespath
+import re
 import time
 
 from c7n.manager import resources as aws_resources
@@ -704,29 +705,49 @@ class NormalizeTag(Action):
           - name: ec2-service-transform-lower
             resource: ec2
             comment: |
-              ec2-service-tag-value-to-lower
+              Transform a tag value to lower case
             query:
               - instance-state-name: running
             filters:
-              - "tag:testing8882": present
+              - "tag:service": present
             actions:
               - type: normalize-tag
-                key: lower_key
+                key: service
                 action: lower
 
           - name: ec2-service-strip
             resource: ec2
             comment: |
-              ec2-service-tag-strip-blah
+              Strip characters from the beginning or end of a tag value
             query:
               - instance-state-name: running
             filters:
-              - "tag:testing8882": present
+              - "tag:service": present
             actions:
               - type: normalize-tag
-                key: strip_key
+                key: service
                 action: strip
-                value: blah
+                value: ' '
+
+          - name: ec2-service-replace
+            resource: ec2
+            comment: |
+              Replace tag values if they match defined regex patterns
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:service": present
+            actions:
+              - type: normalize-tag
+                key: service
+                action: replace
+                pattern: '.*deprecated.*name.*pattern.*'
+                value: my-app
+              - type: normalize-tag
+                key: service
+                action: replace
+                pattern: '.*other.*app'
+                value: other-app
 
     """
 
@@ -737,9 +758,21 @@ class NormalizeTag(Action):
         action={'type': 'string',
                 'items': {
                     'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        pattern={'type': 'string'},
         value={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
+
+    def validate(self):
+        if 'pattern' in self.data and self.data.get('action') != 'replace':
+            raise PolicyValidationError(
+                "'pattern' can only be used with 'action: replace' %s" % (
+                    self.manager.data,))
+        if 'pattern' not in self.data and self.data.get('action') == 'replace':
+            raise PolicyValidationError(
+                "'pattern' is required when using 'action: replace' %s" % (
+                    self.manager.data,))
+        return self
 
     def create_tag(self, client, ids, key, value):
 
@@ -809,6 +842,13 @@ class NormalizeTag(Action):
                     new_value = r.title()
                 elif action == 'strip' and value and value in r:
                     new_value = r.strip(value)
+                elif action == 'replace':
+                    pattern = self.data['pattern']  # pattern is required with action=replace
+                    if re.match(pattern, r):
+                        new_value = value
+                    else:
+                        self.log.debug(
+                            "'%s' doesn't match pattern '%s', skipping replace" % (r, pattern))
                 if new_value:
                     futures.append(
                         w.submit(self.process_transform, new_value, resource_set[r]))
