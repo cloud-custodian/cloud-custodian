@@ -56,17 +56,19 @@ class UniversalTagTest(BaseTest):
         self.patch(time, "sleep", sleep)
         method = MagicMock()
         method.side_effect = [
-            {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "ThrottlingException"}}},
+            {"FailedResourcesMap": {
+                "arn:abc": {"ErrorCode": "ThrottlingException"},
+                "arn:def": {"ErrorCode": "InternalServiceException"}}},
             {"Result": 32},
         ]
         self.assertEqual(
-            universal_retry(method, ["arn:abc", "arn:def"]), {"Result": 32}
+            universal_retry(method, ["arn:abc", "arn:def", "arn:ghi"]), {"Result": 32}
         )
         sleep.assert_called_once()
         self.assertTrue(
             method.call_args_list == [
+                call(ResourceARNList=["arn:abc", "arn:def", "arn:ghi"]),
                 call(ResourceARNList=["arn:abc", "arn:def"]),
-                call(ResourceARNList=["arn:abc"]),
             ]
         )
 

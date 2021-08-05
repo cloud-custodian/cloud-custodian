@@ -1133,12 +1133,12 @@ def universal_retry(method, ResourceARNList, **kw):
             return response
 
         errors = {}
-        throttles = set()
+        retriable = set()
 
         for f_arn in failures:
             error_code = failures[f_arn]['ErrorCode']
-            if error_code == 'ThrottlingException':
-                throttles.add(f_arn)
+            if error_code in ('ThrottlingException', 'InternalServiceException'):
+                retriable.add(f_arn)
             elif error_code == 'ResourceNotFoundException':
                 continue
             else:
@@ -1148,10 +1148,10 @@ def universal_retry(method, ResourceARNList, **kw):
             raise Exception("Resource Tag Errors %s" % (errors))
 
         if idx == max_attempts - 1:
-            raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
+            raise Exception("Resource Tag Retries Exhausted %s" % (", ".join(retriable)))
 
         time.sleep(delay)
-        ResourceARNList = list(throttles)
+        ResourceARNList = list(retriable)
 
 
 def coalesce_copy_user_tags(resource, copy_tags, user_tags):
