@@ -3139,7 +3139,8 @@ class KMSKeyResolverMixin:
         self.manager = manager
 
     def resolve_keys(self, buckets):
-        if 'key' not in self.data:
+        key = self.data.get('key')
+        if not key:
             return None
 
         regions = {get_region(b) for b in buckets}
@@ -3147,9 +3148,14 @@ class KMSKeyResolverMixin:
             client = local_session(self.manager.session_factory).client('kms', region_name=r)
             try:
                 key_meta = client.describe_key(
-                    KeyId=self.data.get('key')
+                    KeyId=key
                 ).get('KeyMetadata', {})
                 self.arns[r] = {
+                    # c7n:Key is the value provided in the policy filter data.
+                    # This may overlap with the key ID or ARN, but can also be
+                    # an alias.
+                    'c7n:Key': key,
+                    'KeyId': key_meta.get('KeyId'),
                     'Arn': key_meta.get('Arn'),
                     'KeyManager': key_meta.get('KeyManager'),
                     'Description': key_meta.get('Description')
@@ -3265,7 +3271,10 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             return True
         elif crypto == 'aws:kms' and algo == 'aws:kms':
             if key:
-                if rule.get('KMSMasterKeyID') == key['Arn']:
+                # The default encryption rule can specify a key by alias,
+                # ID or full ARN. Match against any of those attributes.
+                key_ids = {key[k] for k in ('Arn', 'KeyId', 'c7n:Key')}
+                if rule.get('KMSMasterKeyID') in key_ids:
                     return True
                 else:
                     return False

@@ -2300,6 +2300,7 @@ class KeyPair(query.QueryResourceManager):
         id = 'KeyPairId'
         id_prefix = 'key-'
         filter_name = 'KeyNames'
+        filter_type = 'list'
 
 
 @KeyPair.filter_registry.register('unused')
