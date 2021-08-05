@@ -94,7 +94,6 @@ class WorkspacesTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
 
     def test_workspaces_image_tags(self):
         session_factory = self.replay_flight_data('test_workspaces_image_tag')
@@ -119,7 +118,6 @@ class WorkspacesTest(BaseTest):
         workspaces = session_factory().client('workspaces')
         call = workspaces.describe_tags(ResourceId=imageId)
         self.assertEqual({'Key': 'env', 'Value': 'dev'}, call['TagList'][0])
-
 
     def test_workspaces_image_permissions(self):
         session_factory = self.replay_flight_data('test_workspaces_image_cross_account')

@@ -107,6 +107,7 @@ class WorkspaceImage(QueryResourceManager):
 
     augment = universal_augment
 
+
 @WorkspaceImage.filter_registry.register('cross-account')
 class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
 
@@ -125,7 +126,8 @@ class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
         for r in resources:
             found = False
             try:
-                accts = client.describe_workspace_image_permissions(ImageId=r['ImageId']).get('ImagePermissions')
+                accts = client.describe_workspace_image_permissions(
+                    ImageId=r['ImageId']).get('ImagePermissions')
                 for a in accts:
                     account_id = a['SharedAccountId']
                     if (account_id not in allowed_accounts):
@@ -137,5 +139,5 @@ class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
                 self.log.error(
                     "Error getting Workspace Image Permissions: %s error: %s",
                     r['ImageId'], e)
-            
+
         return results
