@@ -1090,7 +1090,7 @@ class IamPolicyFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 6)
 
     def test_iam_unattached_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_unattached")
@@ -1104,7 +1104,7 @@ class IamPolicyFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 202)
+        self.assertEqual(len(resources), 1)
 
 
 class IamPolicy(BaseTest):
@@ -1157,7 +1157,7 @@ class IamPolicy(BaseTest):
                     {
                         "type": "value",
                         "key": "PolicyName",
-                        "value": "AdministratorAccess",
+                        "value": "MyAdminPolicy",
                     },
                     "has-allow-all",
                 ],
