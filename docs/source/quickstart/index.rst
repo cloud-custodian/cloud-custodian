@@ -261,10 +261,8 @@ https://groups.google.com/forum/#!forum/cloud-custodian`_ will automatically sen
 you a meeting invite. See the notes below for more technical information on
 joining the meeting. 
 
- * `Community Meeting Videos
-https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x`_
- * `Community Meeting Notes Archive
-(https://github.com/cloud-custodian/community/discussions`_
+ * `Community Meeting Videos <https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x>`_
+ * `Community Meeting Notes Archive <https://github.com/cloud-custodian/community/discussions>`_
 
 
 Troubleshooting
