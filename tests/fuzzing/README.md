@@ -5,13 +5,13 @@ Fuzzing as a concept aims to stress-test the code under analysis. Traditional fu
 
 Although fuzzing has proven high successful in many cases, e.g. [OSS-Fuzz](https://github.com/google/oss-fuzz) Cloud-custodian is not well-suited for fuzzing and there is likely not a lot to come for. The reasons being:
 - Cloud-custodian has a very flat architecture. There is not a ton of complex parsing routines in the library.
-- The threat model of cloud custodian means we dont deal with a lot of untrusted input. 
+- The threat model of cloud custodian means we dont deal with a lot of untrusted input.
 
-Important dependencies e.g. `jsonschema` and `pyyaml` are alrady being fuzzed by OSS-Fuzz [here](https://github.com/google/oss-fuzz/tree/master/projects/jsonschema) and [here](https://github.com/google/oss-fuzz/tree/master/projects/pyyaml) respectively.
+Important dependencies e.g. `jsonschema` and `pyyaml` are already being fuzzed by OSS-Fuzz [here](https://github.com/google/oss-fuzz/tree/master/projects/jsonschema) and [here](https://github.com/google/oss-fuzz/tree/master/projects/pyyaml) respectively.
 
 
 ## Cloud-custodian fuzzing
-We keep a small set of fuzzers based on the [Atheris](https://github.com/google/atheris) fuzzer. 
+We keep a small set of fuzzers based on the [Atheris](https://github.com/google/atheris) fuzzer.
 
 At the moment we run the fuzzers by hand. To install and run these fuzzers, you can follow the steps after having cloned Cloud-custodian:
 ```
