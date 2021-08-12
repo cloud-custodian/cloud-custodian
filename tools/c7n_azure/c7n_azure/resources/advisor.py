@@ -7,7 +7,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('advisor')
 class Advisor(ArmResourceManager):
-    """Advisor Resource
+    """Azure Advisor Resource
 
     :example:
 
