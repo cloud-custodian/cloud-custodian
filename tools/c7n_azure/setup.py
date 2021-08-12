@@ -28,6 +28,7 @@ install_requires = \
  'azure-keyvault-keys>=4.3.1,<5.0.0',
  'azure-keyvault-secrets>=4.2.0,<5.0.0',
  'azure-keyvault>=4.1.0,<5.0.0',
+ 'azure-mgmt-advisor>=9.0.0,<10.0.0',
  'azure-mgmt-apimanagement>=1.0.0,<2.0.0',
  'azure-mgmt-applicationinsights>=1.0.0,<2.0.0',
  'azure-mgmt-authorization>=1.0.0,<2.0.0',

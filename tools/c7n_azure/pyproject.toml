@@ -18,6 +18,7 @@ classifiers=[
 python = "^3.6"
 
 azure-mgmt-authorization = "^1.0.0"
+azure-mgmt-advisor = "^9.0.0"
 azure-mgmt-apimanagement = "^1.0.0"
 azure-mgmt-applicationinsights = "^1.0.0"
 azure-mgmt-batch = "^15.0.0"
