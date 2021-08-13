@@ -5,8 +5,8 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('advisor')
-class Advisor(ArmResourceManager):
+@resources.register('advisor-recommendations')
+class AdvisorRecommendations(ArmResourceManager):
     """Azure Advisor Resource
 
     :example:
@@ -17,7 +17,7 @@ class Advisor(ArmResourceManager):
 
         policies:
         - name: list-advisor-security-recommendations
-          resource: azure.advisor
+          resource: azure.advisor-recommendations
           filters:
             - type: value
               key: properties.category
@@ -39,6 +39,7 @@ class Advisor(ArmResourceManager):
             'properties.impact',
             'properties.impactedField',
             'properties.impactedValue',
+            'properties.shortDescription.problem',
             'properties.lastUpdated'
         )
         resource_type = 'Microsoft.Advisor/recommendations'
