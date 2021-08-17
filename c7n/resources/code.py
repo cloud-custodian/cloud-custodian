@@ -9,8 +9,7 @@ from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn
-import functools
+from c7n.utils import local_session, type_schema
 from c7n import query
 
 from .securityhub import OtherResourcePostFinding
@@ -302,7 +301,6 @@ class CodeDeployApplication(QueryResourceManager):
 
 @CodeDeployApplication.action_registry.register('delete')
 class DeleteApplication(BaseAction):
-
     schema = type_schema('delete')
     permissions = ('codedeploy:DeleteApplication',)
 
@@ -375,7 +373,6 @@ class CodeDeployDeploymentGroup(ChildResourceManager):
         'describe-child': DescribeDeploymentGroup
     }
 
-    @property
     def get_arns(self, resources):
         arns = []
         for r in resources:
