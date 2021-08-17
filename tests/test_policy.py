@@ -247,6 +247,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2021
+            'AwsEcsService',
+            'AwsRdsEventSubscription',
             # q2 2021
             'AwsEcsTaskDefinition',
             'AwsEcsCluster',
