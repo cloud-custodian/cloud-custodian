@@ -298,9 +298,9 @@ class CodeDeployApplication(QueryResourceManager):
         return [self.generate_arn(r['applicationName']) for r in resources]
 
 
-
 @CodeDeployApplication.action_registry.register('delete')
 class DeleteApplication(BaseAction):
+
     schema = type_schema('delete')
     permissions = ('codedeploy:DeleteApplication',)
 
