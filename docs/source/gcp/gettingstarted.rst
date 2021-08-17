@@ -24,8 +24,8 @@ Option 1: Install released packages to local Python Environment
 
 .. code-block:: bash
 
-    $ pip install c7n
-    $ pip install c7n_gcp
+    pip install c7n
+    pip install c7n_gcp
 
 
 Option 2: Install latest from the repository
@@ -33,9 +33,9 @@ Option 2: Install latest from the repository
 
 .. code-block:: bash
 
-    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-    $ pip install -e ./cloud-custodian
-    $ pip install -e ./cloud-custodian/tools/c7n_gcp
+    git clone https://github.com/cloud-custodian/cloud-custodian.git
+    pip install -e ./cloud-custodian
+    pip install -e ./cloud-custodian/tools/c7n_gcp
 
 .. _gcp_authenticate:
 
