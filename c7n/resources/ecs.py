@@ -7,7 +7,7 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
-from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
+from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, convert_tags
 from c7n import query
 from c7n.query import DescribeSource, ConfigSource
 import jmespath
@@ -20,7 +20,7 @@ def ecs_tag_normalize(resources):
     """normalize tag format on ecs resources to match common aws format."""
     for r in resources:
         if 'tags' in r:
-            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in r['tags']]
+            r['Tags'] = convert_tags(r['tags'], list)
             r.pop('tags')
 
 
@@ -747,7 +747,7 @@ class TagEcsResource(Tag):
 
     def process_resource_set(self, client, resources, tags):
         mid = self.manager.resource_type.id
-        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        tags = convert_tags(tags, list, lower=True)
         old_arns = 0
         for r in resources:
             if not ecs_taggable(self.manager.resource_type, r):

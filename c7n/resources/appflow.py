@@ -4,7 +4,7 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, convert_tags
 
 
 @resources.register('app-flow')
@@ -22,7 +22,7 @@ class AppFlow(QueryResourceManager):
         resources = super(AppFlow, self).augment(resources)
         for r in resources:
             if 'tags' in r:
-                r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+                r['Tags'] = convert_tags(r['tags'], list)
         return resources
 
 
@@ -46,7 +46,7 @@ class TagAppFlowResource(Tag):
     permissions = ('appflow:TagResource',)
 
     def process_resource_set(self, client, resources, new_tags):
-        tags = {t.get('Key'): t.get('Value') for t in new_tags}
+        tags = convert_tags(new_tags, dict)
         for r in resources:
             client.tag_resource(resourceArn=r['flowArn'], tags=tags)
 

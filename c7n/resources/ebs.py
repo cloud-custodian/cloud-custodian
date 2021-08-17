@@ -32,6 +32,7 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    convert_tags
 )
 from c7n.resources.ami import AMI
 
@@ -993,8 +994,7 @@ class CopyInstanceTags(BaseAction):
     def get_volume_tags(self, volume, instance, attachment):
         only_tags = self.data.get('tags', [])  # specify which tags to copy
         copy_tags = []
-        extant_tags = dict([
-            (t['Key'], t['Value']) for t in volume.get('Tags', [])])
+        extant_tags = convert_tags(volume.get('Tags'), dict)
 
         for t in instance.get('Tags', ()):
             if only_tags and not t['Key'] in only_tags:

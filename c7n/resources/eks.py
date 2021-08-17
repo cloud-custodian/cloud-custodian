@@ -6,7 +6,7 @@ from c7n.manager import resources
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, convert_tags
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
@@ -28,7 +28,7 @@ class NodeGroupDescribeSource(ChildDescribeSource):
                 clusterName=cluster_name,
                 nodegroupName=nodegroup_name)['nodegroup']
             if 'tags' in nodegroup:
-                nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+                nodegroup['Tags'] = convert_tags(nodegroup['tags'], list)
             results.append(nodegroup)
         return results
 
@@ -80,7 +80,7 @@ class EKSDescribeSource(DescribeSource):
         for r in resources:
             if 'tags' not in r:
                 continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+            r['Tags'] = convert_tags(r['tags'], list)
         return resources
 
 
@@ -136,7 +136,7 @@ class EKSTag(tags.Tag):
                 self.manager.retry(
                     client.tag_resource,
                     resourceArn=r['arn'],
-                    tags={t['Key']: t['Value'] for t in tags})
+                    tags=convert_tags(tags, dict))
             except client.exceptions.ResourceNotFoundException:
                 continue
 

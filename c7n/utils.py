@@ -783,3 +783,59 @@ def get_human_size(size, precision=2):
         size = size / 1024.0
 
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def convert_tags(tags, form, strip_aws=False, lower=False):
+    """
+    Convert tags between single dictionary and
+    a list of Key/Value dicts like what ec2 expects.
+
+    `form` argument can be either `list` or `dict` classes
+
+    `strip_aws` is a boolean to control whether or not to strip
+    the tags prefixed with `aws:`.
+
+    `lower` is a boolean to allow the list form to use the lowercase
+    key/value instead of Key/Value.
+    """
+
+    key = "key" if lower else "Key"
+    value = "value" if lower else "Value"
+
+    def _normalize(tags, form):
+        r = [] if form is list else {}
+        if not tags:
+            return r
+
+        if isinstance(tags, dict):
+            if form is list:
+                r = [{key: k, value: v} for k, v in tags.items()]
+            else:
+                r = dict(tags)
+
+        elif isinstance(tags, list):
+            for t in tags:
+                # convert from known other list forms
+                # `key` is used in some resources like ecs and datapipeline
+                # `tagKey` is used in config
+                k = t.get("Key", t.get("key", t.get("tagKey")))
+                if k:
+                    v = t.get("Value", t.get("value", t.get("tagValue")))
+                    if form is list:
+                        r.append({key: k, value: v})
+                    else:
+                        r[k] = v
+        return r
+
+    if form not in (dict, list):
+        raise ValueError("form must be either dict or list class")
+
+    r = _normalize(tags, form)
+    if r and strip_aws:
+        if form is list:
+            r = [t for t in r if not t[key].startswith("aws:")]
+        elif form is dict:
+            for k in list(r):
+                if k.startswith("aws:"):
+                    r.pop(k)
+    return r

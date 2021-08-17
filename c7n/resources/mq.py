@@ -6,7 +6,7 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, convert_tags
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 
@@ -30,7 +30,7 @@ class MessageBroker(QueryResourceManager):
     def augment(self, resources):
         super(MessageBroker, self).augment(resources)
         for r in resources:
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
+            r['Tags'] = convert_tags(r.get('Tags'), list)
         return resources
 
 
@@ -110,7 +110,7 @@ class TagMessageBroker(Tag):
             try:
                 client.create_tags(
                     ResourceArn=r['BrokerArn'],
-                    Tags={t['Key']: t['Value'] for t in new_tags})
+                    Tags=convert_tags(new_tags, dict))
             except client.exceptions.ResourceNotFound:
                 continue
 

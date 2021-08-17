@@ -44,7 +44,7 @@ from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import local_session, dumps
+from c7n.utils import local_session, dumps, convert_tags
 
 log = logging.getLogger('custodian.reports')
 
@@ -186,7 +186,7 @@ class Formatter:
         return self.fields.keys()
 
     def extract_csv(self, record):
-        tag_map = {t['Key']: t['Value'] for t in record.get('Tags', ())}
+        tag_map = convert_tags(record.get('Tags'), dict)
         return _get_values(record, self.fields.values(), tag_map)
 
     def uniq_by_id(self, records):

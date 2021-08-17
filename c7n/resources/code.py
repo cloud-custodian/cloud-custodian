@@ -8,7 +8,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, convert_tags
 
 from .securityhub import OtherResourcePostFinding
 
@@ -78,8 +78,7 @@ class ConfigBuild(ConfigSource):
 
     def load_resource(self, item):
         item_config = item['configuration']
-        item_config['Tags'] = [
-            {'Key': t['key'], 'Value': t['value']} for t in item_config.get('tags')]
+        item_config['Tags'] = convert_tags(item_config.get('tags'), list)
 
         # AWS Config garbage mangle undo.
 

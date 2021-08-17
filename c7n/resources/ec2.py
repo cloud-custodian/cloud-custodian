@@ -26,7 +26,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, convert_tags
 
 from c7n.resources.iam import CheckPermissions
 from c7n.resources.securityhub import PostFinding
@@ -1161,7 +1161,7 @@ class InstanceFinding(PostFinding):
                 self.manager.config.account_id,
                 r["InstanceId"]),
             "Region": self.manager.config.region,
-            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Tags": convert_tags(r.get("Tags"), dict),
             "Details": {self.resource_type: filter_empty(details)},
         }
 
@@ -1904,15 +1904,14 @@ class PropagateSpotTags(BaseAction):
         # Now we find the tags we can copy : either all, either those
         # indicated with 'only_tags' parameter.
         copy_keys = self.data.get('only_tags', [])
-        request_tags = {t['Key']: t['Value'] for t in request['Tags']
-                        if not t['Key'].startswith('aws:')}
+        request_tags = convert_tags(request.get("Tags"), dict, strip_aws=True)
         if copy_keys:
             for k in set(copy_keys).difference(request_tags):
                 del request_tags[k]
 
         update_instances = []
         for i in instances:
-            instance_tags = {t['Key']: t['Value'] for t in i.get('Tags', [])}
+            instance_tags = convert_tags(i.get("Tags"), dict)
             # We may overwrite tags, but if the operation changes no tag,
             # we will not proceed.
             for k, v in request_tags.items():
@@ -1930,7 +1929,7 @@ class PropagateSpotTags(BaseAction):
             client.create_tags(
                 DryRun=self.manager.config.dryrun,
                 Resources=iset,
-                Tags=[{'Key': k, 'Value': v} for k, v in request_tags.items()])
+                Tags=convert_tags(request_tags, list))
 
         self.log.debug(
             "action:%s tags updated on instances:%r" % (

@@ -17,7 +17,8 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date
+from c7n.utils import (
+    local_session, type_schema, select_keys, get_human_size, parse_date, convert_tags)
 
 from .securityhub import PostFinding
 
@@ -41,8 +42,7 @@ class DescribeLambda(query.DescribeSource):
             config = func.pop('Configuration')
             config.update(func)
             if 'Tags' in config:
-                config['Tags'] = [
-                    {'Key': k, 'Value': v} for k, v in config['Tags'].items()]
+                config['Tags'] = convert_tags(config.get('Tags'), list)
             resources.append(config)
         return resources
 

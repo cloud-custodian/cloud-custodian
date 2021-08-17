@@ -16,7 +16,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema,
-    chunks, dumps, filter_empty, get_partition
+    chunks, dumps, filter_empty, get_partition, convert_tags
 )
 from c7n.version import version
 
@@ -362,23 +362,11 @@ class PostFinding(Action):
                         finding_type, " | ".join([ns for ns in FindingTypes])))
 
     def get_finding_tag(self, resource):
-        finding_tag = None
-        tags = resource.get('Tags', [])
-
+        tags = convert_tags(resource.get('Tags'), dict)
         finding_key = '{}:{}'.format('c7n:FindingId',
             self.data.get('title', self.manager.ctx.policy.name))
 
-        # Support Tags as dictionary
-        if isinstance(tags, dict):
-            return tags.get(finding_key)
-
-        # Support Tags as list of {'Key': 'Value'}
-        for t in tags:
-            key = t['Key']
-            value = t['Value']
-            if key == finding_key:
-                finding_tag = value
-        return finding_tag
+        return tags.get(finding_key)
 
     def group_resources(self, resources):
         grouped_resources = {}
@@ -546,7 +534,7 @@ class PostFinding(Action):
         envelope = filter_empty({
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
-            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Tags': convert_tags(r.get('Tags'), dict),
             'Partition': get_partition(self.manager.config.region),
             'Details': {self.resource_type: details},
             'Type': self.resource_type
@@ -596,7 +584,7 @@ class OtherResourcePostFinding(PostFinding):
             'Partition': get_partition(self.manager.config.region),
             'Details': {self.resource_type: filter_empty(details)}
         }
-        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        tags = convert_tags(r.get('Tags'), dict)
         if tags:
             other['Tags'] = tags
         return other

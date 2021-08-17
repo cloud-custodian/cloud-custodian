@@ -190,9 +190,7 @@ class TagTrim(Action):
         # Can't really go in batch parallel without some heuristics
         # without some more complex matching wrt to grouping resources
         # by common tags populations.
-        tag_map = {
-            t['Key']: t['Value'] for t in i.get('Tags', [])
-            if not t['Key'].startswith('aws:')}
+        tag_map = utils.convert_tags(i.get('Tags'), dict, strip_aws=True)
 
         # Space == 0 means remove all but specified
         if self.space and len(tag_map) + self.space <= self.max_tag_count:
@@ -402,7 +400,7 @@ class Tag(Action):
         if tags is None:
             tags = []
         else:
-            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            tags = utils.convert_tags(tags, list)
 
         if msg:
             tags.append({'Key': tag, 'Value': msg})
@@ -533,7 +531,7 @@ class RenameTag(Action):
         old_key = self.data.get('old_key', None)
         resource_set = {}
         for r in instances:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            tags = utils.convert_tags(r.get('Tags'), dict)
             if tags[old_key] not in resource_set:
                 resource_set[tags[old_key]] = []
             resource_set[tags[old_key]].append(r)
@@ -543,7 +541,7 @@ class RenameTag(Action):
         old_key = self.data.get('old_key', None)
         res = 0
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            tags = utils.convert_tags(r.get('Tags'), dict)
             if old_key not in tags.keys():
                 resources.pop(res)
             res += 1
@@ -772,7 +770,7 @@ class NormalizeTag(Action):
         key = self.data.get('key', None)
         resource_set = {}
         for r in instances:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            tags = utils.convert_tags(r.get('Tags'), dict)
             if tags[key] not in resource_set:
                 resource_set[tags[key]] = []
             resource_set[tags[key]].append(r)
@@ -782,7 +780,7 @@ class NormalizeTag(Action):
         key = self.data.get('key', None)
         res = 0
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            tags = utils.convert_tags(r.get('Tags'), dict)
             if key not in tags.keys():
                 resources.pop(res)
             res += 1
@@ -1073,8 +1071,7 @@ class CopyRelatedResourceTag(Tag):
 
     def process_resource(self, client, r, related_tags, tag_keys, tag_action):
         tags = {}
-        resource_tags = {
-            t['Key']: t['Value'] for t in r.get('Tags', []) if not t['Key'].startswith('aws:')}
+        resource_tags = utils.convert_tags(r.get('Tags'), dict, strip_aws=True)
 
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
@@ -1085,7 +1082,7 @@ class CopyRelatedResourceTag(Tag):
         if not tags:
             return
         if not isinstance(tag_action, UniversalTag):
-            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            tags = utils.convert_tags(tags, list)
         tag_action.process_resource_set(client, [r], tags)
         return True
 
@@ -1097,7 +1094,7 @@ class CopyRelatedResourceTag(Tag):
         r_id = manager.resource_type.id
 
         return {
-            r[r_id]: {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            r[r_id]: utils.convert_tags(r.get('Tags'), dict)
             for r in manager.get_resources(list(ids))
         }
 
@@ -1196,7 +1193,7 @@ def coalesce_copy_user_tags(resource, copy_tags, user_tags):
             copy_keys = set()
 
     if isinstance(user_tags, dict):
-        user_tags = [{'Key': k, 'Value': v} for k, v in user_tags.items()]
+        user_tags = utils.convert_tags(user_tags, list)
 
     user_keys = {t['Key'] for t in user_tags}
     tags_diff = list(copy_keys.difference(user_keys))

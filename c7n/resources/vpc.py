@@ -18,7 +18,7 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, convert_tags)
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -580,8 +580,8 @@ class SecurityGroupDiff:
             return delta
 
     def get_tag_delta(self, source, target):
-        source_tags = {t['Key']: t['Value'] for t in source.get('Tags', ())}
-        target_tags = {t['Key']: t['Value'] for t in target.get('Tags', ())}
+        source_tags = convert_tags(source.get('Tags'), dict)
+        target_tags = convert_tags(target.get('Tags'), dict)
         target_keys = set(target_tags.keys())
         source_keys = set(source_tags.keys())
         removed = source_keys.difference(target_keys)
@@ -695,13 +695,9 @@ class SecurityGroupPatch:
                              for k in tag_delta['removed']])
         tags = []
         if 'added' in tag_delta:
-            tags.extend(
-                [{'Key': k, 'Value': v}
-                 for k, v in tag_delta['added'].items()])
+            tags.extend(convert_tags(tag_delta['added'], list))
         if 'updated' in tag_delta:
-            tags.extend(
-                [{'Key': k, 'Value': v}
-                 for k, v in tag_delta['updated'].items()])
+            tags.extend(convert_tags(tag_delta['updated'], list))
         if tags:
             self.retry(
                 client.create_tags, Resources=[group['GroupId']], Tags=tags)

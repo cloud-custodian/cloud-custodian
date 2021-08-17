@@ -17,7 +17,7 @@ from c7n.manager import resources
 
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.utils import (
-    local_session, chunks, type_schema, get_retry, set_annotation)
+    local_session, chunks, type_schema, get_retry, set_annotation, convert_tags)
 
 from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -341,7 +341,7 @@ class SetS3Logging(BaseAction):
                     'Value': self.data['bucket']})
 
                 prefix_template = self.data['prefix']
-                info = {t['Key']: t['Value'] for t in elb.get('Tags', ())}
+                info = convert_tags(elb.get('Tags'), dict)
                 info['DNSName'] = elb.get('DNSName', '')
                 info['AccountId'] = elb['LoadBalancerArn'].split(':')[4]
                 info['LoadBalancerName'] = elb['LoadBalancerName']

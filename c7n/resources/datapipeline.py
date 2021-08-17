@@ -8,7 +8,7 @@ from c7n.actions import BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, get_retry, type_schema
+from c7n.utils import chunks, local_session, get_retry, type_schema, convert_tags
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
@@ -66,9 +66,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
         for pipe_desc in results['pipelineDescriptionList']:
             pipe = pipe_map[pipe_desc['pipelineId']]
-            pipe['Tags'] = [
-                {'Key': t['key'], 'Value': t['value']}
-                for t in pipe_desc['tags']]
+            pipe['Tags'] = convert_tags(pipe_desc['tags'], list)
             for field in pipe_desc['fields']:
                 key = field['key']
                 if not key.startswith('@'):
@@ -154,7 +152,7 @@ class TagPipeline(Tag):
     permissions = ('datapipeline:AddTags',)
 
     def process_resource_set(self, client, pipelines, tags):
-        tag_array = [dict(key=t['Key'], value=t['Value']) for t in tags]
+        tag_array = convert_tags(tags, list, lower=True)
         for pipeline in pipelines:
             try:
                 client.add_tags(pipelineId=pipeline['id'], tags=tag_array)

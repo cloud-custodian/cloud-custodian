@@ -510,6 +510,100 @@ class UtilTest(BaseTest):
             {'k': '{limit}',
              'b': '21'})
 
+    def test_convert_tags(self):
+        tbl = []
+
+        # expect EMPTY results
+        for i in ([], {}, None, "just a string"):
+            tbl.append((i, list, []))
+            tbl.append((i, dict, {}))
+
+        tbl.extend([
+            # LIST inputs
+            # normal list to dict
+            ([{"Key": "tag1", "Value": "value1"}], dict, {"tag1": "value1"}),
+            # same output as input
+            ([{"Key": "tag1", "Value": "value1"}], list, [{"Key": "tag1", "Value": "value1"}]),
+            # lowercase list to dict
+            ([{"key": "tag1", "value": "value1"}], dict, {"tag1": "value1"}),
+            # lowercase to uppercase list
+            ([{"key": "tag1", "value": "value1"}], list, [{"Key": "tag1", "Value": "value1"}]),
+            # some of the inputs do not have a key
+            ([{"key": "tag1", "value": "value1"}, {"nokey": "noval"}], dict, {"tag1": "value1"}),
+            # no inputs have a key
+            ([{"nokey": "tag1", "value": "value1"}], dict, {}),
+            # handle tagKey/tagValue format
+            ([{"tagKey": "tag", "tagValue": "value"}], dict, {"tag": "value"}),
+            ([{"tagKey": "tag", "tagValue": "value"}], list, [{"Key": "tag", "Value": "value"}]),
+
+            # DICT inputs
+            ({"tag1": "value1"}, list, [{"Key": "tag1", "Value": "value1"}]),
+            ({"tag1": "value1"}, dict, {"tag1": "value1"}),
+        ])
+
+        for row in tbl:
+            tags, form, expected = row
+            assert utils.convert_tags(tags, form) == expected
+
+    def test_convert_tags_strip_aws(self):
+        tags_dict = {
+            "tag1": "value1",
+            "tag2": "value2",
+            "aws:tag": "aws:value",
+        }
+        tags_list = [
+            {"Key": "tag1", "Value": "value1"},
+            {"Key": "tag2", "Value": "value2"},
+            {"Key": "aws:tag", "Value": "aws:value"},
+        ]
+        assert utils.convert_tags(tags_list, dict) == tags_dict
+
+        # do not strip aws tags
+        for i in (tags_list, tags_dict):
+            tags = utils.convert_tags(i, dict, strip_aws=False)
+            assert set(list(tags)) == {"tag1", "tag2", "aws:tag"}
+
+            tags = utils.convert_tags(i, list, strip_aws=False)
+            assert set([t['Key'] for t in tags]) == {"tag1", "tag2", "aws:tag"}
+
+        # strip aws tags
+        for i in (tags_list, tags_dict):
+            tags = utils.convert_tags(i, dict, strip_aws=True)
+            assert set(list(tags)) == {"tag1", "tag2"}
+
+            tags = utils.convert_tags(i, list, strip_aws=True)
+            assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
+
+    def test_convert_tags_lower(self):
+        tags_dict = {
+            "tag1": "value1",
+            "tag2": "value2",
+        }
+        tags_list = [
+            {"tagKey": "tag1", "tagValue": "value1"},
+            {"tagKey": "tag2", "tagValue": "value2"},
+        ]
+        tags = utils.convert_tags(tags_dict, list)
+        assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['Value'] for t in tags]) == {"value1", "value2"}
+
+        tags = utils.convert_tags(tags_list, list)
+        assert set([t['Key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['Value'] for t in tags]) == {"value1", "value2"}
+
+        tags = utils.convert_tags(tags_dict, list, lower=True)
+        assert set([t['key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['value'] for t in tags]) == {"value1", "value2"}
+
+        tags = utils.convert_tags(tags_list, list, lower=True)
+        assert set([t['key'] for t in tags]) == {"tag1", "tag2"}
+        assert set([t['value'] for t in tags]) == {"value1", "value2"}
+
+    def test_convert_tags_invalid(self):
+        # form can only be dict or list
+        self.assertRaises(ValueError, utils.convert_tags, None, str)
+        self.assertRaises(ValueError, utils.convert_tags, None, tuple)
+
 
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters

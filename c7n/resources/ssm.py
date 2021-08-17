@@ -12,7 +12,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
-from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
+from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty, convert_tags
 from c7n.version import version
 
 from .aws import shape_validate
@@ -561,8 +561,7 @@ class PostItem(Action):
                     self.manager.data.get('name'))),
             Priority=self.data.get('priority'),
             Source="Cloud Custodian",
-            Tags=[{'Key': k, 'Value': v} for k, v in self.data.get(
-                'tags', self.manager.data.get('tags', {})).items()],
+            Tags=convert_tags(self.data.get('tags', self.manager.data.get('tags', {})), list),
             Notifications=[{'Arn': a} for a in self.data.get('topics', ())],
             OperationalData={
                 '/aws/dedup': {

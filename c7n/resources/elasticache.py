@@ -16,7 +16,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, chunks, snapshot_identifier, type_schema)
+    local_session, chunks, snapshot_identifier, type_schema, convert_tags)
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
@@ -414,8 +414,8 @@ class CopyClusterTags(BaseAction):
                 if cid not in clusters:
                     continue
 
-                cluster_tags = {t['Key']: t['Value'] for t in clusters[cid]['Tags']}
-                snap_tags = {t['Key']: t['Value'] for t in s.get('Tags', ())}
+                cluster_tags = convert_tags(clusters[cid]['Tags'], dict)
+                snap_tags = convert_tags(s.get('Tags'), dict)
 
                 for k, v in cluster_tags.items():
                     if copyable_tags and k not in copyable_tags:
@@ -439,7 +439,7 @@ class CopyClusterTags(BaseAction):
             self.manager.retry(
                 client.add_tags_to_resource,
                 ResourceName=arn,
-                Tags=[{'Key': k, 'Value': v} for k, v in copy_tags.items()])
+                Tags=convert_tags(copy_tags, list))
 
 
 def _cluster_eligible_for_snapshot(cluster):

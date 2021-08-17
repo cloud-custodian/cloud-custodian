@@ -57,7 +57,7 @@ from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier, convert_tags)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import OtherResourcePostFinding
 
@@ -1099,7 +1099,7 @@ class RestoreInstance(BaseAction):
                 max_workers=min(10, len(resources) or 1)) as w:
             futures = {}
             for r in resources:
-                tags = {t['Key']: t['Value'] for t in r['Tags']}
+                tags = convert_tags(r.get('Tags'), dict)
                 if not set(tags).issuperset(self.restore_keys):
                     self.log.warning(
                         "snapshot:%s missing restore tags",
@@ -1135,7 +1135,7 @@ class RestoreInstance(BaseAction):
 
     def get_restore_from_tags(self, snapshot):
         params, post_modify = {}, {}
-        tags = {t['Key']: t['Value'] for t in snapshot['Tags']}
+        tags = convert_tags(snapshot.get('Tags'), dict)
 
         params['DBInstanceIdentifier'] = snapshot['DBInstanceIdentifier']
         params['DBSnapshotIdentifier'] = snapshot['DBSnapshotIdentifier']
@@ -1387,8 +1387,7 @@ class RegionCopySnapshot(BaseAction):
         target_client = self.manager.session_factory(
             region=self.data['target_region']).client('rds')
         target_key = self.data.get('target_key')
-        tags = [{'Key': k, 'Value': v} for k, v
-                in self.data.get('tags', {}).items()]
+        tags = convert_tags(self.data.get('tags'), list)
 
         for snapshot_set in chunks(resource_set, 5):
             for r in snapshot_set:

@@ -5,7 +5,7 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, convert_tags
 
 from .aws import shape_validate
 
@@ -28,10 +28,7 @@ class Kafka(QueryResourceManager):
         for r in resources:
             if 'Tags' not in r:
                 continue
-            tags = []
-            for k, v in r['Tags'].items():
-                tags.append({'Key': k, 'Value': v})
-            r['Tags'] = tags
+            r['Tags'] = convert_tags(r.get('Tags'), list)
         return resources
 
 
