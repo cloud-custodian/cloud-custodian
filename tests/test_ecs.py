@@ -136,6 +136,70 @@ class TestEcsService(BaseTest):
         self.assertEqual(svc_current['networkConfiguration'][
             'awsvpcConfiguration']['assignPublicIp'], 'DISABLED')
 
+    def test_ecs_service_autoscaling_offhours(self):
+        session_factory = self.replay_flight_data("test_ecs_service_autoscaling_offhours")
+        test_service_name = 'custodian-service-autoscaling-test'
+
+        p = self.load_policy(
+            {
+                "name": "all-ecs-to-autoscaling",
+                "resource": "ecs-service",
+                "filters": [
+                    {"serviceName": test_service_name}
+                ],
+                "actions": [
+                    {
+                        'type': 'resize',
+                        'min-capacity': 0,
+                        'desired': 0,
+                        'save-options-tag': 'OffHoursPrevious',
+                        'suspend-scaling': True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 1)
+
+        client = session_factory().client("ecs")
+        svc_current = client.describe_services(
+            cluster="arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+            services=[test_service_name]
+        )["services"][0]
+        self.assertEqual(svc_current['desiredCount'], 0)
+
+    def test_ecs_service_autoscaling_onhours(self):
+        session_factory = self.replay_flight_data("test_ecs_service_autoscaling_onhours")
+        test_service_name = 'custodian-service-autoscaling-test'
+
+        p = self.load_policy(
+            {
+                "name": "all-ecs-to-autoscaling",
+                "resource": "ecs-service",
+                "filters": [
+                    {"serviceName": test_service_name}
+                ],
+                "actions": [
+                    {
+                        'type': 'resize',
+                        'restore-options-tag': 'OffHoursPrevious',
+                        'restore-scaling': True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 1)
+
+        client = session_factory().client("ecs")
+        svc_current = client.describe_services(
+            cluster="arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+            services=[test_service_name]
+        )["services"][0]
+        self.assertEqual(svc_current['desiredCount'], 1)
+
     def test_ecs_service_delete(self):
         session_factory = self.replay_flight_data("test_ecs_service_delete")
         p = self.load_policy(

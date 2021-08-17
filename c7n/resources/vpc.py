@@ -1211,7 +1211,7 @@ class SGPermission(Filter):
         if not sg_perm:
             return False
 
-        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p.get('UserId', '') == owner_id]
         sg_resources = self.manager.get_resources(sg_group_ids)
         vf = ValueFilter(sg_refs, self.manager)
         vf.annotate = False
@@ -2300,6 +2300,7 @@ class KeyPair(query.QueryResourceManager):
         id = 'KeyPairId'
         id_prefix = 'key-'
         filter_name = 'KeyNames'
+        filter_type = 'list'
 
 
 @KeyPair.filter_registry.register('unused')

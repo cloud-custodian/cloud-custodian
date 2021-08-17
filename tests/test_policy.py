@@ -200,6 +200,17 @@ class PolicyMetaLint(BaseTest):
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
 
+    def test_filter_spec(self):
+        missing_fspec = []
+        for k, v in manager.resources.items():
+            if v.resource_type.filter_name is None:
+                continue
+            if not v.resource_type.filter_type:
+                missing_fspec.append(k)
+        if missing_fspec:
+            self.fail('aws resources missing filter specs: %s' % (
+                ', '.join(missing_fspec)))
+
     def test_ec2_id_prefix(self):
         missing_prefix = []
         for k, v in manager.resources.items():
