@@ -283,35 +283,21 @@ class CodeDeployApplication(QueryResourceManager):
         name = 'applicationName'
         date = 'createTime'
         arn_type = "application"
+        arn_separator = ":"
         cfn_type = "AWS::CodeDeploy::Application"
         universal_taggable = True
 
     def augment(self, resources):
         resources = super().augment(resources)
         client = local_session(self.session_factory).client('codedeploy')
-        for r in resources:
-            arn = self.generate_arn(r['applicationName'])
+        for r, arn in zip(resources, self.get_arns(resources)):
             r['Tags'] = client.list_tags_for_resource(
                 ResourceArn=arn).get('Tags', [])
         return resources
 
     def get_arns(self, resources):
-        arns = []
-        for r in resources:
-            arns.append(self.generate_arn(r['applicationName']))
-        return arns
+        return [self.generate_arn(r['applicationName']) for r in resources]
 
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.resource_type.service,
-                region=self.config.region,
-                account_id=self.config.account_id,
-                resource_type=self.resource_type.arn_type,
-                separator=':')
-        return self._generate_arn
 
 
 @CodeDeployApplication.action_registry.register('delete')
