@@ -5,6 +5,7 @@ import itertools
 import operator
 import random
 import re
+import sys
 import zlib
 
 from botocore.exceptions import ClientError
@@ -22,6 +23,7 @@ from c7n.filters import (
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+from c7n.filters import CELFilter as BaseCELFilter
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -2256,3 +2258,17 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+
+@filters.register('cel', condition=((sys.version_info.major, sys.version_info.minor) > (3, 6)))
+class CELFilter(BaseCELFilter, InstanceImageBase):
+    """
+    EC2-specific implementation of CELFilter
+    """
+
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event):
+        super().prefetch_instance_images(resources)
+        return BaseCELFilter.process(self, resources)

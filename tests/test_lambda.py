@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 from mock import patch
+import pytest
+import sys
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
@@ -608,3 +610,98 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+@pytest.mark.skipif(
+    (sys.version_info.major, sys.version_info.minor) < (3, 7), reason="needs py 3.7")
+class TestCEL(BaseTest):
+    def test_cel_lambda_runtime(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_runtime")
+
+        p = self.load_policy(
+            {
+                "name": "cel-lambda-runtime",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": "resource[\"Runtime\"] == \"python3.7\""
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_cel_lambda_related_kms_key(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_kms_key")
+
+        p = self.load_policy(
+            {
+                "name": "cel-lambda-related-kms-key",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_kms_keys(resource)
+                                    .exists(key, key['c7n:AliasName'].glob('*alias/skunk/trails'))
+                                """
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:matched-kms-key'],
+            ['36812ccf-daaf-49b1-a24b-0eef254ffe41']
+        )
+
+    def test_cel_lambda_related_sgs(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_sgs")
+
+        p = self.load_policy(
+            {
+                "name": "cel-lambda-related-sg",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_sgs(resource).exists(
+                                    sg, sg.Tags.exists(
+                                        t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"""
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            cache=True
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-security-groups'], ['sg-01a111b11c1defg1h'])
+
+    def test_cel_lambda_related_subnets(self):
+        session_factory = self.replay_flight_data("test_cel_lambda_related_subnets")
+
+        p = self.load_policy(
+            {
+                "name": "cel-lambda-related-subnets",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": """get_related_subnets(resource).exists(
+                                    sg, sg.Tags.exists(
+                                        t, t.Key == \"TestTag\" && t.Value == \"TestValue\"))"""
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            cache=True
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-07c118e47bb84cee7'])

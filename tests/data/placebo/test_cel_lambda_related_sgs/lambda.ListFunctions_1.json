@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "test-cel-lambda-related-sgs",
+                "FunctionArn": "arn:aws:lambda:us-east-1:012345678910:function:test-cel-lambda-related-sgs",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::012345678910:role/service-role/test-cel-lambda-related-sgs-role",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 299,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2021-04-02T14:13:48.295+0000",
+                "CodeSha256": "test",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-01a111b11c1defg1h"
+                    ],
+                    "VpcId": "vpc-0a00a00a0aaa0aaa0"
+                },
+                "TracingConfig": {},
+                "RevisionId": "test"
+            }
+        ]
+    }
+}

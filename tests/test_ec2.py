@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+import pytest
+import sys
 import time
 
 import datetime
@@ -2044,3 +2046,48 @@ class TestSpotFleetRequest(BaseTest):
         sfrs = client.describe_spot_fleet_requests(
         )["SpotFleetRequestConfigs"]
         self.assertEqual(len(sfrs), 3)
+
+
+@pytest.mark.skipif(
+    (sys.version_info.major, sys.version_info.minor) < (3, 7), reason="needs py 3.7")
+class TestCEL(BaseTest):
+
+    def test_cel_ec2_tags(self):
+        session_factory = self.replay_flight_data("test_cel_ec2_tags")
+
+        p = self.load_policy(
+            {
+                "name": "cel-ec2-tags",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": "absent(resource[\"Tags\"].key(\"OwnerContact\"))",
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_cel_ec2_instance_image(self):
+        session_factory = self.replay_flight_data("test_cel_ec2_instance_image")
+
+        p = self.load_policy(
+            {
+                "name": "celfilter-ec2-instance-image",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "cel",
+                        "expr": "now - resource.image().CreationDate >= duration(\"90d\")"
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

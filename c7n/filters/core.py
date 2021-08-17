@@ -11,7 +11,9 @@ import ipaddress
 import logging
 import operator
 import re
+import sys
 
+from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 from distutils import version
@@ -22,7 +24,7 @@ from c7n.element import Element
 from c7n.exceptions import PolicyValidationError
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
+from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date, dumps
 from c7n.manager import iter_filters
 
 
@@ -989,3 +991,167 @@ class ReduceFilter(BaseValueFilter):
             return items[::-1]
         else:
             return sorted(items, key=key, reverse=(self.order == 'desc'))
+
+
+if (sys.version_info.major, sys.version_info.minor) > (3, 6):
+    import celpy
+    import celpy.c7nlib
+    import celpy.celtypes
+    from celpy.evaluation import CELEvalError
+
+    class CELFilter(Filter):
+        """Generic CEL filter using CEL-Python
+
+        CELFilter enables Custodian policy filters to be written as
+        simple Google Common Expression Language (CEL) expressions.
+        The celpy package exposes Custodian-specific functionality
+        via the c7nlib module. Functions from this module can be used
+        to write CEL expressions that carry out Custodian filtering logic.
+
+        To pull all EC2 instances that are marked as running in Production
+        via a tag, you can access the EC2 resource's values, and use c7nlib's
+        key() function to compare the stored value of the tag.
+
+        :example:
+
+        .. code-block:: yaml
+
+          - name: ec2-prod-tags-cel
+            resource: ec2
+            filters:
+              - type: cel
+                expr: resource['Tags'].key('OwnerContact')['Value'] == 'Production'
+
+        Similarly, to find EC2 instances that are running on outdated AMIs
+        (i.e. images older than 90 days), you can make use of the `now` field
+        to make comparisons using the current date and time.
+
+        :example:
+
+        .. code-block:: yaml
+
+          - name: ec2-aged-amis-cel
+            resource: ec2
+            filters:
+              - type: cel
+                expr: now - resource.image().CreationDate >= duration('90d')
+        """
+
+        def __init__(self, data, manager):
+            super().__init__(data, manager)
+            # assert data["type"].lower() == "cel"
+            # throw error if expr missing?
+            # or run and just return resources as if empty filter applied?
+            self.expr = data.get("expr")
+            self.parser = None
+            self.cel_env = None
+            self.cel_ast = None
+            self.decls = {
+                "resource": celpy.celtypes.MapType,
+                "now": celpy.celtypes.TimestampType
+            }
+            self.decls.update(celpy.c7nlib.DECLARATIONS)
+            self.resource_cache = {}
+
+        schema = {
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['type'],
+            'properties': {
+                'type': {'enum': ['cel']},
+                'expr': {'type': 'string'}
+            }
+        }
+        schema_alias = True
+        annotate = True
+        required_keys = {'cel', 'expr'}
+
+        def validate(self):
+            for filter in self.manager.data["filters"]:
+                if 'expr' not in filter:
+                    raise PolicyValidationError(
+                        f"""CEL filters can only be used with provided expressions in
+                        {self.manager.data}"""
+                    )
+
+            self.cel_env = celpy.Environment(
+                annotations=self.decls,
+                runner_class=celpy.c7nlib.C7N_Interpreted_Runner
+            )
+            self.cel_ast = self.cel_env.compile(self.data["expr"])
+            return self
+
+        def process(self, resources, event=None, filter=Filter):
+            filtered_resources = []
+            cel_prgm = self.cel_env.program(self.cel_ast, functions=celpy.c7nlib.FUNCTIONS)
+
+            for r in resources:
+                self.resource_cache.clear()
+                cel_activation = {
+                    "resource": celpy.json_to_cel(r),
+                    "now": celpy.celtypes.TimestampType(datetime.datetime.utcnow()),
+                }
+
+                with celpy.c7nlib.C7NContext(filter=self):
+                    try:
+                        cel_result = cel_prgm.evaluate(cel_activation, self)
+                        # TODO: address cel_prgm returning a CELEvalError rather than raising it
+                        if cel_result:
+                            filtered_resources.append(r)
+                            related_ids = self.resource_cache.get('related_ids')
+                            ids = [str(r) for r in related_ids if r]
+                            if ids:
+                                self._add_annotations(ids, r)
+
+                    # if CEL expression errors out from attempting to access non-existent resource
+                    # fields, let the policy author know by appending None object and logging
+                    except TypeError as e:
+                        if e.args[0] == "'CELEvalError' object is not iterable":
+                            try:
+                                filtered_resources.append(dumps(CELEvalError(*e.args)))
+                            except TypeError:
+                                logging.warning(
+                                    f"Error trying to serialize {CELEvalError(*e.args)}"
+                                )
+                                filtered_resources.append(None)
+
+            return filtered_resources
+
+        def get_related(self, related_ids):
+            resource_manager = self.get_resource_manager()
+            model = resource_manager.get_model()
+
+            if len(related_ids) < self.FetchThreshold:
+                related = resource_manager.get_resources(list(related_ids))
+                return related
+            else:
+                related = resource_manager.resources()
+
+            return [r for r in related
+                    if r[model.id] in related_ids]
+
+        def get_related_kms(self, client, related_ids):
+            if related_ids:
+                related = self.get_related(related_ids)
+
+                for r in related:
+                    try:
+                        alias_info = self.manager.retry(client.list_aliases, KeyId=r.get('KeyId'))
+                    except ClientError as e:
+                        self.log.warning(e)
+                        continue
+                    r['c7n:AliasName'] = alias_info.get('Aliases')[0].get('AliasName', '')
+                return related
+            else:
+                return []
+
+        def _add_annotations(self, related_ids, resource):
+            if self.AnnotationKey is not None:
+                akey = f'c7n:{self.AnnotationKey}'
+                resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
+else:
+    # define a dummy class to be imported by resource files
+    # to prevent failure when trying to run tests in py36 envs
+    class CELFilter(Filter):
+        def __init__(self, data, manager):
+            super().__init__(data, manager)

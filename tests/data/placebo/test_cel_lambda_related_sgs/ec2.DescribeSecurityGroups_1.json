@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [],
+                "GroupId": "sg-01a111b11c1defg1h",
+                "IpPermissionsEgress": [],
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ],
+                "VpcId": "vpc-0a00a00a0aaa0aaa0"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

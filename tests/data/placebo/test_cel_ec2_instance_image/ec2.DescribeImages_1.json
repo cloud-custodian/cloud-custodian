@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2020-04-22T13:38:44.000Z",
+                "ImageId": "ami-0bb2558585a6d1b06",
+                "ImageLocation": "644160558196/dev2",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "644160558196",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03ed69e2c00783291",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    }
+                ],
+                "Description": "",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "dev2",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
