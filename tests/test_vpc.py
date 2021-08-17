@@ -2196,7 +2196,6 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
     def test_security_group_reference_egress_filter(self):
@@ -2219,7 +2218,6 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
     def test_egress_ipv6(self):

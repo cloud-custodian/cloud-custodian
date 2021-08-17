@@ -10,6 +10,7 @@ See also the readme in the GitHub repository.
 * :ref:`cloud-providers`
 * :ref:`monitor-cc`
 * :ref:`tab-completion`
+* :ref:`community`
 
 .. _install-cc:
 
@@ -249,6 +250,20 @@ Run:
 Now launch a new shell (or refresh your bash environment by sourcing the appropriate
 file).
 
+.. _community
+
+Community Resources
+-------------------
+
+We have a regular community meeting that is open to all users and developers of
+every skill level. Joining the `mailing list
+https://groups.google.com/forum/#!forum/cloud-custodian`_ will automatically send
+you a meeting invite. See the notes below for more technical information on
+joining the meeting. 
+
+ * `Community Meeting Videos <https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x>`_
+ * `Community Meeting Notes Archive <https://github.com/cloud-custodian/community/discussions>`_
+
 
 Troubleshooting
 +++++++++++++++
@@ -262,3 +277,6 @@ If you have other errors, or for tcsh support, see `the argcomplete docs
 
 If you are invoking `custodian` via the `python` executable tab completion will not work.
 You must invoke `custodian` directly.
+
+
+
