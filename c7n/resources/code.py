@@ -331,7 +331,6 @@ class CodeDeployDeployment(QueryResourceManager):
         date = 'createTime'
 
 
-@query.sources.register('describe-deployment-group')
 class DescribeDeploymentGroup(query.ChildDescribeSource):
 
     def get_query(self):
