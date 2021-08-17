@@ -39,6 +39,7 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 log = logging.getLogger('custodian.serverless')
 
 LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
+LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
 
@@ -1409,13 +1410,14 @@ class CloudWatchLogSubscription:
 
     def remove(self, func):
         lambda_client = self.session.client('lambda')
-        found = None
+        found = False
         for group in self.log_groups:
             try:
                 response = lambda_client.remove_permission(
                     FunctionName=func.name,
                     StatementId=group['logGroupName'][1:].replace('/', '-'))
                 log.debug("Removed lambda permission result: %s" % response)
+                found = True
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
             try:
@@ -1427,7 +1429,7 @@ class CloudWatchLogSubscription:
                 found = True
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
-        return True
+        return found
 
 
 class SQSSubscription:
