@@ -225,7 +225,7 @@ class CodeDeploy(BaseTest):
         p = self.load_policy(
             {
                 "name": "codedeploy-delete-application",
-                "resource": "codedeploy-application",
+                "resource": "codedeploy-app",
                 "filters": [{"linkedToGitHub": False}],
                 "actions": ["delete"],
             },
@@ -241,8 +241,8 @@ class CodeDeploy(BaseTest):
         factory = self.replay_flight_data('test_tag_untag_codedeploy_application')
         p = self.load_policy(
             {
-                "name": "codedeploy-delete-application",
-                "resource": "codedeploy-application",
+                "name": "codedeploy-tag-application",
+                "resource": "codedeploy-app",
                 "filters": [{"tag:c7n": "test"}],
                 "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
             },
@@ -258,7 +258,7 @@ class CodeDeploy(BaseTest):
         p = self.load_policy(
             {
                 "name": "codedeploy-delete-deploymentgroup",
-                "resource": "codedeploy-deploymentgroup",
+                "resource": "codedeploy-group",
                 "filters": [
                     {
                         "type": "value",

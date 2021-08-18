@@ -269,7 +269,7 @@ class DeletePipeline(BaseAction):
                 continue
 
 
-@resources.register('codedeploy-application')
+@resources.register('codedeploy-app')
 class CodeDeployApplication(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -353,12 +353,12 @@ class DescribeDeploymentGroup(query.ChildDescribeSource):
         return results
 
 
-@resources.register('codedeploy-deploymentgroup')
+@resources.register('codedeploy-group')
 class CodeDeployDeploymentGroup(ChildResourceManager):
 
     class resource_type(TypeInfo):
         service = 'codedeploy'
-        parent_spec = ('codedeploy-application', 'applicationName', None)
+        parent_spec = ('codedeploy-app', 'applicationName', None)
         enum_spec = ('list_deployment_groups', 'deploymentGroups', None)
         id = 'deploymentGroupId'
         name = 'deploymentGroupName'
