@@ -5,7 +5,7 @@ Generic Resource Tag / Filters and Actions wrapper
 
 These work for the whole family of resources associated
 to ec2 (subnets, vpc, security-groups, volumes, instances,
-snapshots) and resources that suport Amazon's Resource Groups Tagging API
+snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
 from collections import Counter
