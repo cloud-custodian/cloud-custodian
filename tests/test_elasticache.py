@@ -4,6 +4,7 @@ from c7n.resources.elasticache import _cluster_eligible_for_snapshot
 
 from .common import BaseTest
 
+
 class TestElastiCacheCluster(BaseTest):
 
     def test_eligibility_snapshot(self):
