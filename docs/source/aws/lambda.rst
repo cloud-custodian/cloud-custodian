@@ -43,7 +43,7 @@ policy filters, and apply the policy actions to matching resources.
 CloudTrail API Calls
 ++++++++++++++++++++
 
-Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
+Lambdas can receive CWE over CloudTrail API calls with seconds of delay at P99.
 
 .. code-block:: yaml
 
@@ -62,11 +62,12 @@ Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
 
-#. For CloudTrail events we need to reference the source API call.
+#. For CloudTrail events we need to reference the source API call. In the code
+   block example below this is the ``source:`` key.
 
 #. To work transparently with existing resource policies, we also need to
    specify how to extract the resource IDs from the event via JMESPath so that
-   the resources can be queried.
+   the resources can be queried. In the code block example below this is the ``ids:`` key. 
 
 For very common API calls for policies, some `shortcuts
 <https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
@@ -80,11 +81,15 @@ have been defined to allow for easier policy writing as for the
         event: RunInstances
         ids: "responseElements.instancesSet.items[].instanceId"
 
+Refer to the `AWS execution modes documention
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#cloudtrail>`_ for a
+list of configuration options for this execution mode: 
+
 
 EC2 Instance State Events
 +++++++++++++++++++++++++
 
-Lambdas can receive EC2 instance state events in real time (seconds delay).
+Policies can react to EC2 instance state events in real time. 
 
 .. code-block:: yaml
 
@@ -103,6 +108,9 @@ Lambdas can receive EC2 instance state events in real time (seconds delay).
          - mark
          - terminate
 
+Refer to `AWS execution modes documentation
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#ec2-instance-state>`_
+for a list of configuration options for this execution mode: 
 
 Periodic Function
 +++++++++++++++++
