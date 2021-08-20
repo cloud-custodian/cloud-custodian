@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "directConnectGateways": [
+            {
+                "directConnectGatewayId": "dc-gateway-id",
+                "directConnectGatewayName": "dc-gateway-name",
+                "amazonSideAsn": 65432,
+                "ownerAccount": "XXXXXXXXXXXX",
+                "directConnectGatewayState": "available"
+            },
+            {
+                "directConnectGatewayId": "directconnect-gateway-id2",
+                "directConnectGatewayName": "directconnect-gateway-name2",
+                "amazonSideAsn": 6543210,
+                "ownerAccount": "XXXXXXXXXXXX",
+                "directConnectGatewayState": "available"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

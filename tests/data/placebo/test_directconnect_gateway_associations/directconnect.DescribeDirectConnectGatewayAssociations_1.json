@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "directConnectGatewayAssociations": [
+            {
+                "directConnectGatewayId": "dc-gateway-id",
+                "directConnectGatewayOwnerAccount": "XXXXXXXXXXXX",
+                "associationState": "associated",
+                "associatedGateway": {
+                    "id": "vgw-0cf69670ccb32b594",
+                    "type": "virtualPrivateGateway",
+                    "ownerAccount": "XXXXXXXXXXXX",
+                    "region": "us-east-1"
+                },
+                "associationId": "1a8988db-6459-4a06-97c5-968535458e06",
+                "allowedPrefixesToDirectConnectGateway": [
+                    {
+                        "cidr": "192.0.20.0/28"
+                    }
+                ],
+                "virtualGatewayId": "vgw-0cf69670ccb32b594",
+                "virtualGatewayRegion": "us-east-1",
+                "virtualGatewayOwnerAccount": "XXXXXXXXXXXX"
+            },
+            {
+                "directConnectGatewayId": "dc-gateway-id",
+                "directConnectGatewayOwnerAccount": "XXXXXXXXXXXX",
+                "associationState": "associated",
+                "associatedGateway": {
+                    "id": "vgw-06c6b18b097ae206f",
+                    "type": "virtualPrivateGateway",
+                    "ownerAccount": "XYZXYZXYZXYZ",
+                    "region": "us-east-1"
+                },
+                "associationId": "68aa863c-83f5-431d-aca8-10af34239f90",
+                "allowedPrefixesToDirectConnectGateway": [
+                    {
+                        "cidr": "192.0.28.0/30"
+                    }
+                ],
+                "virtualGatewayId": "vgw-06c6b18b097ae206f",
+                "virtualGatewayRegion": "us-east-1",
+                "virtualGatewayOwnerAccount": "XYZXYZXYZXYZ"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "virtualInterfaces": [
+            {
+                "ownerAccount": "XXXXXXXXXXXX",
+                "virtualInterfaceId": "test-id",
+                "location": "EqDC2",
+                "connectionId": "testConnectionId",
+                "virtualInterfaceType": "private",
+                "virtualInterfaceName": "vif-test-name",
+                "vlan": 123,
+                "asn": 12345,
+                "amazonSideAsn": 12345,
+                "amazonAddress": "10.0.0.0/8",
+                "customerAddress": "10.0.0.0/8",
+                "addressFamily": "ipv4",
+                "virtualInterfaceState": "available",
+                "mtu": 1500,
+                "jumboFrameCapable": true,
+                "virtualGatewayId": "",
+                "directConnectGatewayId": "test-dc-gateway-id",
+                "routeFilterPrefixes": [],
+                "bgpPeers": [
+                    {
+                        "bgpPeerId": "test-bgpPeerId",
+                        "asn": 65432,
+                        "addressFamily": "ipv4",
+                        "amazonAddress": "10.0.0.0/8",
+                        "customerAddress": "10.0.0.0/8",
+                        "bgpPeerState": "available",
+                        "bgpStatus": "up",
+                        "awsDeviceV2": "test-awsDeviceV2"
+                    }
+                ],
+                "region": "us-east-1",
+                "awsDeviceV2": "test-awsDeviceV2",
+                "tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
