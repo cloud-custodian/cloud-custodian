@@ -12,29 +12,29 @@ package_data = \
 install_requires = \
 ['argcomplete (>=1.12.3,<2.0.0)',
  'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.17.102,<2.0.0)',
- 'botocore (>=1.20.102,<2.0.0)',
- 'c7n (>=0.9.13,<0.10.0)',
+ 'boto3 (>=1.18.21,<2.0.0)',
+ 'botocore (>=1.21.21,<2.0.0)',
+ 'c7n (>=0.9.14,<0.10.0)',
  'click>=7.0,<8.0',
- 'importlib-metadata (>=4.6.0,<5.0.0)',
+ 'importlib-metadata (>=4.6.4,<5.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
  'pyrsistent (>=0.18.0,<0.19.0)',
- 'python-dateutil (>=2.8.1,<3.0.0)',
+ 'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=5.4.1,<6.0.0)',
- 's3transfer (>=0.4.2,<0.5.0)',
+ 's3transfer (>=0.5.0,<0.6.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.9,<0.9.0)',
  'typing-extensions (>=3.10.0.0,<4.0.0.0)',
  'urllib3 (>=1.26.6,<2.0.0)',
- 'zipp (>=3.4.1,<4.0.0)']
+ 'zipp (>=3.5.0,<4.0.0)']
 
 entry_points = \
 {'console_scripts': ['c7n-org = c7n_org.cli:cli']}
 
 setup_kwargs = {
     'name': 'c7n-org',
-    'version': '0.6.12',
+    'version': '0.6.13',
     'description': 'Cloud Custodian - Parallel Execution',
     'license': 'Apache-2.0',
     'classifiers': [
