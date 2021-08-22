@@ -19,4 +19,4 @@ class AdvisorRecommendationTest(BaseTest):
             'resource': 'azure.advisor-recommendation'
         })
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertTrue(len(resources) > 0)
