@@ -3,6 +3,7 @@
 from ..azure_common import BaseTest
 import pytest
 
+
 @pytest.mark.skiplive
 class AdvisorRecommendationTest(BaseTest):
     def test_azure_advisor_recommendation_schema_validate(self):
