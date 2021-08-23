@@ -1,7 +1,6 @@
 ---
 name: Question
 about: ask a question about using Custodian
-title: ''
 labels: kind/question
 assignees: ''
 

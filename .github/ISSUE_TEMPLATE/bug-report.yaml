@@ -1,0 +1,76 @@
+name: Bug Report
+description: Report an issue about using Custodian
+labels: [kind/bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: describe-bug
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what happened!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: expected-bahavior
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What were you expecting to happen?
+      value: "It did this instead of this"
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: What Operating System?
+      options:
+        - Mac OSX
+        - Windows
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: What version of Python on your system?
+      placeholder: Python 3.x.x
+    validations:
+      required: true
+  - type: dropdown
+    id: cloud-provider
+    attributes:
+      label: Cloud Provider
+      description: What cloud provider are you using?
+      options:
+        - Amazon Web Services (AWS)
+        - Microsoft Azure
+        - Google Cloud (GCP)
+        - Kubernetes (Alpha)
+        - OpenStack (Alpha)
+    validations:
+      required: true
+  - type: textarea
+    id: policy
+    attributes:
+      label: Policy
+      description: Please copy and paste the policy you're trying to run if applicable. Please exclude any account/sensitive information. This will be automatically formatted into code, so no need for backticks.  
+      render: shell
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log/traceback output
+      description: Please copy and paste any relevant log output. Please exclude any account/sensitive information. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: textarea
+    id: extra-context
+    attributes:
+      label: Extra information or context
+      description: Add any other context about the problem here.
