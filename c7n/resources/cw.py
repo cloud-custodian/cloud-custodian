@@ -705,6 +705,59 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         return results
 
 
+@LogGroup.filter_registry.register('subscription-filter')
+class LogSubscriptionFilter(ValueFilter):
+    """Filters CloudWatch log groups by subscriptions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-groups-with-subscriptions
+                resource: log-group
+                filters:
+                  - type: subscription-filter
+                    key: destinationArn
+                    value: arn:aws:lambda:us-east-1:123456789876:function:forwarder
+    """
+    schema = type_schema('subscription-filter', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:SubscriptionFilters'
+    permissions = ('logs:DescribeSubscriptionFilters',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
+        results = []
+        with self.executor_factory(max_workers=1) as w:
+            futures = []
+            for rset in chunks(resources, 50):
+                futures.append(
+                    w.submit(
+                        self.process_resource_set, client, rset))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error checking log groups subscription-filters %s",
+                        f.exception())
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, client, resources):
+        results = []
+        for r in resources:
+            filters = self.manager.retry(
+                client.describe_subscription_filters,
+                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+            if not any(filters):
+                continue
+            for f in filters:
+                r.setdefault(self.annotation_key, []).append(f)
+            if (len(self.data) == 1) or any((self.match(sub) for sub in r[self.annotation_key])):
+                results.append(r)
+        return results
+
+
 @LogGroup.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 
