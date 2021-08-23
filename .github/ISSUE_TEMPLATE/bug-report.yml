@@ -25,25 +25,12 @@ body:
       value: "It did this instead of this"
     validations:
       required: true
-  - type: dropdown
-    id: operating-system
+  - type: textarea
+    id: version
     attributes:
-      label: Operating System
-      description: What Operating System?
-      options:
-        - Mac OSX
-        - Windows
-        - Linux
-    validations:
-      required: true
-  - type: input
-    id: python-version
-    attributes:
-      label: Python Version
-      description: What version of Python on your system?
-      placeholder: Python 3.x.x
-    validations:
-      required: true
+      label: Cloud Custodian version and dependency information
+      description: Please run `custodian version --debug` and paste the output here
+      render: shell
   - type: dropdown
     id: cloud-provider
     attributes:
