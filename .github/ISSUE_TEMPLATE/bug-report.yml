@@ -6,14 +6,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thank you for taking the time to fill out this bug report!
   - type: textarea
     id: describe-bug
     attributes:
       label: Describe the bug
       description: A clear and concise description of what the bug is.
       placeholder: Tell us what happened!
-      value: "A bug happened!"
+      value: "When I entered 2 + 2, I got the answer 6."
     validations:
       required: true
   - type: textarea
@@ -22,20 +22,20 @@ body:
       label: Describe the bug
       description: A clear and concise description of what you expected to happen.
       placeholder: What were you expecting to happen?
-      value: "It did this instead of this"
+      value: "I expected 2 + 2 to equal 4, but instead 2 + 2 equaled 6!"
     validations:
       required: true
   - type: textarea
     id: version
     attributes:
       label: Cloud Custodian version and dependency information
-      description: Please run `custodian version --debug` and paste the output here
+      description: Please run `custodian version --debug` and paste the output here.
       render: shell
   - type: dropdown
     id: cloud-provider
     attributes:
       label: Cloud Provider
-      description: What cloud provider are you using?
+      description: Which cloud provider are you using?
       options:
         - Amazon Web Services (AWS)
         - Microsoft Azure
@@ -48,13 +48,13 @@ body:
     id: policy
     attributes:
       label: Policy
-      description: Please copy and paste the policy you're trying to run if applicable. Please exclude any account/sensitive information. This will be automatically formatted into code, so no need for backticks.  
+      description: Please copy and paste the policy you are trying to run if applicable. Please exclude any account/sensitive information. Your response will be automatically formatted into YAML, so code-formatting markdown is not necessary.
       render: shell
   - type: textarea
     id: logs
     attributes:
       label: Relevant log/traceback output
-      description: Please copy and paste any relevant log output. Please exclude any account/sensitive information. This will be automatically formatted into code, so no need for backticks.
+      description: Please copy and paste any relevant log output. Please exclude any account/sensitive information. Your response will be automatically formatted into YAML, so code-formatting markdown is not necessary.
       render: shell
   - type: textarea
     id: extra-context

@@ -6,14 +6,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this feature enhancement!
+        Thank you for taking the time to fill out this feature enhancement!
   - type: textarea
     id: describe-feature
     attributes:
       label: Describe the feature
       description: Is your feature request related to a problem?  
       placeholder: Please describe
-      value: "I'm always frustrated when ..."
+      value: "I am always frustrated when ..."
     validations:
       required: true
   - type: textarea
@@ -28,10 +28,10 @@ body:
   - type: textarea
     id: describe-alternatives
     attributes:
-      label: Describe alternatives you've considered
+      label: Describe alternatives you have considered
       description: A clear and concise description of any alternative solutions or features you've considered.
       placeholder: What would a solution look like?
-      value: "I thought about doing it this way too ..."
+      value: "Some of the other solutions or features I have considered are ..."
     validations:
       required: true
   - type: textarea
