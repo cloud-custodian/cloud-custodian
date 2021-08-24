@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 from c7n.filters import ValueFilter
 
 
@@ -60,6 +60,7 @@ class DirectConnectGatewayAssociations(ValueFilter):
     An example of this is filtering Gateway resources to find any instances
     associated with resources in an AWS account outside of a provided whitelist.
     """
+    schema = type_schema('associations', rinherit=ValueFilter.schema)
     permissions = ('directconnect:DescribeDirectConnectGatewayAssociations',)
 
     def process(self, resources, event=None):
