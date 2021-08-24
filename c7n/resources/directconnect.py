@@ -24,7 +24,6 @@ class DirectConnect(QueryResourceManager):
     augment = universal_augment
 
 
-# works with service group tagging
 @resources.register('directconnect-vif')
 class DirectConnectVirtualInterface(QueryResourceManager):
 
@@ -52,6 +51,29 @@ class DirectConnectGateway(QueryResourceManager):
 
 @DirectConnectGateway.filter_registry.register('associations')
 class DirectConnectGatewayAssociations(ValueFilter):
+    """Filters Direct Connect Gateways by attached Associations
+
+    This pulls a Direct Connect Gateway resource's Assocations and adds
+    them as a new field to each resource, and allows us to filter resources
+    based on these Associations.
+
+    An example of this is filtering Gateway resources to find any instances
+    associated with resources in an AWS account outside of a provided whitelist.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: directconnect-gateway-unapproved-associations
+                resource: directconnect-gateway
+                filters:
+                  - type: associations
+                    key: directConnectGatewayAssociations[].associatedGateway.ownerAccount
+                    value: ["XXXXXXXXXXX", "YYYYYYYYYYYY", "ZZZZZZZZZZZZ", "XYZXYZXYZXYZ"]
+                    op: intersect
+
+    """
     def process(self, resources, event=None):
 
         client = local_session(self.manager.session_factory).client('directconnect')
