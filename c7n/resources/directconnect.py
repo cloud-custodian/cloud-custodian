@@ -59,21 +59,9 @@ class DirectConnectGatewayAssociations(ValueFilter):
 
     An example of this is filtering Gateway resources to find any instances
     associated with resources in an AWS account outside of a provided whitelist.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: directconnect-gateway-unapproved-associations
-                resource: directconnect-gateway
-                filters:
-                  - type: associations
-                    key: directConnectGatewayAssociations[].associatedGateway.ownerAccount
-                    value: ["XXXXXXXXXXX", "YYYYYYYYYYYY", "ZZZZZZZZZZZZ", "XYZXYZXYZXYZ"]
-                    op: intersect
-
     """
+    permissions = ('directconnect:DescribeDirectConnectGatewayAssociations',)
+
     def process(self, resources, event=None):
 
         client = local_session(self.manager.session_factory).client('directconnect')
