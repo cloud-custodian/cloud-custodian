@@ -32,6 +32,7 @@ class Config(Bag):
             'region': os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
             'regions': (),
             'cache': '',
+            'vars': None,  # file
             'profile': None,
             'account_id': None,
             'assume_role': None,

@@ -39,7 +39,7 @@ def policy_command(f):
         if not validate:
             log.debug('Policy validation disabled')
 
-        vars = _load_vars(options)
+        variables = _load_vars(options)
 
         errors = 0
         all_policies = PolicyCollection.from_data({}, options)
@@ -121,7 +121,7 @@ def policy_command(f):
 
         # Variable expansion and non schema validation (not optional)
         for p in policies:
-            p.expand_variables(p.get_variables())
+            p.expand_variables(p.get_variables(variables))
             p.validate()
 
         return f(options, list(policies))
@@ -130,17 +130,15 @@ def policy_command(f):
 
 
 def _load_vars(options):
-    vars = None
+    variables = {}
     if options.vars:
         try:
-            vars = load_file(options.vars)
+            variables = load_file(options.vars)
         except IOError as e:
             log.error('Problem loading vars file "{}": {}'.format(options.vars, e.strerror))
             sys.exit(1)
 
-    # TODO - provide builtin vars here (such as account)
-
-    return vars
+    return variables
 
 
 def _print_no_policies_warning(options, policies):
