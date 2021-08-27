@@ -29,11 +29,14 @@ resources never became available.
 Cloud Custodian Integration
 ===========================
 
-Custodian provides for policy level execution against any CWE event stream.
-Each Custodian policy can be deployed as an independent Lambda function. The
-only difference between a Custodian policy that runs in Lambda and one that
-runs directly from the CLI in poll mode is the specification of the
-subscription of the events in the mode config block of the policy.
+Custodian provides for policy level execution against any `Amazon CloudWatch
+Event
+<https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html>`_
+stream. Henceforth "CloudWatch Events" will be abbreviated as CWE. Each
+Custodian policy can be deployed as an independent Lambda function. The only
+difference between a Custodian policy that runs in Lambda and one that runs
+directly from the CLI in poll mode is the specification of the subscription of
+the events in the mode config block of the policy.
 
 Internally Custodian will reconstitute current state for all the resources
 in the event, execute the policy against them, match against the
@@ -43,7 +46,7 @@ policy filters, and apply the policy actions to matching resources.
 CloudTrail API Calls
 ++++++++++++++++++++
 
-Lambdas can receive CWE over CloudTrail API calls with seconds of delay at P99.
+Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99.
 
 .. code-block:: yaml
 
@@ -83,7 +86,7 @@ have been defined to allow for easier policy writing as for the
 
 Refer to the `AWS execution modes documention
 <https://cloudcustodian.io/docs/aws/resources/aws-modes.html#cloudtrail>`_ for a
-list of configuration options for this execution mode: 
+list of other configurable options. 
 
 
 EC2 Instance State Events
@@ -110,7 +113,7 @@ Policies can react to EC2 instance state events in real time.
 
 Refer to `AWS execution modes documentation
 <https://cloudcustodian.io/docs/aws/resources/aws-modes.html#ec2-instance-state>`_
-for a list of configuration options for this execution mode: 
+for a list of configurable options. 
 
 Periodic Function
 +++++++++++++++++
