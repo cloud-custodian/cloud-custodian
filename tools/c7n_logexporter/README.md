@@ -63,6 +63,7 @@ accounts:
 The Cloudwatch Destination needs setup in account and access policy set on CloudWatch Destination to to allow 
 source account access to the Cloudwatch Destination
 
+```
 subscription:
   destination-arn: "arn:aws:logs:us-east-1:111111111111:destination:CustodianCWLogsDestination"
   destination-role: "arn:aws:iam::111111111111:role/CWLtoKinesisRole"
