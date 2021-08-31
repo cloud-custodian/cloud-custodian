@@ -135,9 +135,7 @@ class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
                         found = True
                 if found:
                     results.append(r)
-            except Exception as e:
-                self.log.error(
-                    "Error getting Workspace Image Permissions: %s error: %s",
-                    r['ImageId'], e)
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
         return results
