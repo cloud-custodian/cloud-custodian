@@ -3,6 +3,7 @@
 ResourceMap = {
     "aws.account": "c7n.resources.account.Account",
     "aws.acm-certificate": "c7n.resources.acm.Certificate",
+    "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
     "aws.alarm": "c7n.resources.cw.Alarm",
     "aws.ami": "c7n.resources.ami.AMI",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
@@ -27,6 +28,9 @@ ResourceMap = {
     "aws.artifact-repo": "c7n.resources.artifact.ArtifactRepo",
     "aws.codebuild": "c7n.resources.code.CodeBuildProject",
     "aws.codecommit": "c7n.resources.code.CodeRepository",
+    "aws.codedeploy-app": "c7n.resources.code.CodeDeployApplication",
+    "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
+    "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
     "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
     "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
     "aws.config-rule": "c7n.resources.config.ConfigRule",
