@@ -45,7 +45,7 @@ class Snapshot(QueryResourceManager):
         service = 'ec2'
         arn_type = 'snapshot'
         enum_spec = (
-            'describe_snapshots', 'Snapshots', None)
+            'describe_snapshots', 'Snapshots', {'MaxResults': 1000})
         id = 'SnapshotId'
         id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
