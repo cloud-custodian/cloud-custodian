@@ -728,18 +728,6 @@ class LogSubscriptionFilter(ValueFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('logs')
         results = []
-        for rset in chunks(resources, 50):
-            try:
-                results.extend(self.process_resource_set(client, rset))
-            except Exception as e:
-                self.log.error(
-                    "Error checking log groups subscription-filters %s",
-                    e)
-                continue
-        return results
-
-    def process_resource_set(self, client, resources):
-        results = []
         for r in resources:
             filters = self.manager.retry(
                 client.describe_subscription_filters,
