@@ -17,26 +17,9 @@ body:
     validations:
       required: true
   - type: textarea
-    id: describe-solution
-    attributes:
-      label: Describe your solution
-      description: A clear and concise description of what you want to happen.
-      placeholder: What would a solution look like?
-      value: "It would be better if it did this ..."
-    validations:
-      required: true
-  - type: textarea
-    id: describe-alternatives
-    attributes:
-      label: Describe alternatives you have considered
-      description: A clear and concise description of any alternative solutions or features you've considered.
-      placeholder: What would a solution look like?
-      value: "Some of the other solutions or features I have considered are ..."
-    validations:
-      required: true
-  - type: textarea
     id: extra-context
     attributes:
       label: Extra information or context
-      description: Add any other context about the problem here.
+      description: If you have any workarounds or possible alternatives feel free to add them here.
+
 

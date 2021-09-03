@@ -19,18 +19,12 @@ body:
   - type: textarea
     id: expected-bahavior
     attributes:
-      label: Describe the bug
+      label: What did you expect to happen?
       description: A clear and concise description of what you expected to happen.
       placeholder: What were you expecting to happen?
       value: "I expected 2 + 2 to equal 4, but instead 2 + 2 equaled 6!"
     validations:
       required: true
-  - type: textarea
-    id: version
-    attributes:
-      label: Cloud Custodian version and dependency information
-      description: Please run `custodian version --debug` and paste the output here.
-      render: shell
   - type: dropdown
     id: cloud-provider
     attributes:
@@ -44,6 +38,12 @@ body:
         - OpenStack (Alpha)
     validations:
       required: true
+  - type: textarea
+    id: version
+    attributes:
+      label: Cloud Custodian version and dependency information
+      description: Please run `custodian version --debug` and paste the output here.
+      render: shell
   - type: textarea
     id: policy
     attributes:
