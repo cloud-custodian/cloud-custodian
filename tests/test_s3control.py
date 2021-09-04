@@ -28,7 +28,7 @@ def test_s3_access_point(test, s3_access_point):
     if test.recording:
         time.sleep(2)
 
-    with pytest.raises(ClientError) as ecm:
+    with pytest.raises(ClientError):
         client.get_access_point(
             AccountId=p.options['account_id'], Name=resources[0]['Name']
         )
