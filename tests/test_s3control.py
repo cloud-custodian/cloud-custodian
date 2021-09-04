@@ -6,7 +6,7 @@ import pytest
 from pytest_terraform import terraform
 
 
-@terraform('s3_access_point', teardown=terraform.TEARDOWN_IGNORE, replay=False)
+@terraform('s3_access_point', teardown=terraform.TEARDOWN_IGNORE)
 def test_s3_access_point(test, s3_access_point):
     factory = test.record_flight_data('s3_access_point_query')
     client = factory().client('s3control')
