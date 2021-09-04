@@ -5,7 +5,7 @@ labels: [kind/question]
 body:
   - type: markdown
     attributes:
-      value: |
+      value: >
         Thank you for taking the time to ask a question! Check out [our
         gitter](https://gitter.im/cloud-custodian/cloud-custodian) to interact
         with the community
