@@ -35,6 +35,7 @@ class S3AccessPoint(QueryResourceManager):
         arn_service = 's3'
         arn_type = 'accesspoint'
         cfn_type = 'AWS::S3::AccessPoint'
+        permission_prefix = 's3'
 
     source_mapping = {'describe': AccessPointDescribe}
 
@@ -43,6 +44,7 @@ class S3AccessPoint(QueryResourceManager):
 class AccessPointCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'c7n:Policy'
+    permissions = ('s3:GetAccessPointPolicy',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('s3control')
@@ -61,6 +63,7 @@ class AccessPointCrossAccount(CrossAccountAccessFilter):
 class Delete(Action):
 
     schema = type_schema('delete')
+    permissions = ('s3:DeleteAccessPoint',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('s3control')
@@ -87,6 +90,7 @@ class S3AccessPoint(QueryResourceManager):
         enum_spec = ('list_multi_region_access_points', 'AccessPoints', None)
         arn_service = 's3'
         arn_type = 'accesspoint'
-        cfn_type = 'AWS::S3::MultiRegionAccessPoint '
+        cfn_type = 'AWS::S3::MultiRegionAccessPoint'
+        permission_prefix = 's3'
 
     source_mapping = {'describe': MultiRegionAccessPointDescribe}
