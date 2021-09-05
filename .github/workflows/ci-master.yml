@@ -150,4 +150,4 @@ jobs:
 
       - name: Build Docs
         run: |
-          make sphinx
+          poetry run make sphinx
