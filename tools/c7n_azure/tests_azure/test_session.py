@@ -382,7 +382,6 @@ class SessionTest(BaseTest):
 
     # this seems to be failing on windows ci infra
     # https://github.com/cloud-custodian/cloud-custodian/runs/3506742597
-    @pytest.mark.skipif(platform.system() == 'Windows', reason="Windows CI Issue")
     @patch('c7n_azure.utils.C7nRetryPolicy.__init__', return_value=None)
     def test_retry_policy_override(self, c7n_retry):
         s = Session()
