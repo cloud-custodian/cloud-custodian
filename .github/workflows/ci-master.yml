@@ -68,7 +68,8 @@ jobs:
 
       - name: Test
         run: |
-          . $(PWD)/test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+
+          . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
 
       - name: License Check
         if: contains(matrix.python-version, '3.9')
