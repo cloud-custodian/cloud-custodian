@@ -3,7 +3,6 @@
 import json
 import os
 import re
-import sys
 
 import pytest
 from adal import AdalError
@@ -31,7 +30,6 @@ class SessionTest(BaseTest):
     authorization_file_no_sub = os.path.join(os.path.dirname(__file__),
                                            'data',
                                            'test_auth_file_no_sub.json')
-
 
     def mock_init(self, client_id, secret, tenant, resource):
         pass
