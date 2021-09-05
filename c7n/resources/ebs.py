@@ -45,7 +45,7 @@ class Snapshot(QueryResourceManager):
         service = 'ec2'
         arn_type = 'snapshot'
         enum_spec = (
-            'describe_snapshots', 'Snapshots', {'MaxResults': 1000})
+            'describe_snapshots', 'Snapshots', None)
         id = 'SnapshotId'
         id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
@@ -69,6 +69,8 @@ class Snapshot(QueryResourceManager):
             query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
         return super(Snapshot, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
