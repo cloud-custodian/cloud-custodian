@@ -26,7 +26,7 @@ class AccessPointDescribe(DescribeSource):
 
 
 @resources.register('s3-access-point')
-class S3AccessPoint(QueryResourceManager):
+class AccessPoint(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 's3control'
         id = name = 'Name'
@@ -40,7 +40,7 @@ class S3AccessPoint(QueryResourceManager):
     source_mapping = {'describe': AccessPointDescribe}
 
 
-@S3AccessPoint.filter_registry.register('cross-account')
+@AccessPoint.filter_registry.register('cross-account')
 class AccessPointCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'c7n:Policy'
@@ -59,7 +59,7 @@ class AccessPointCrossAccount(CrossAccountAccessFilter):
         return super().process(resources, event)
 
 
-@S3AccessPoint.action_registry.register('delete')
+@AccessPoint.action_registry.register('delete')
 class Delete(Action):
 
     schema = type_schema('delete')
@@ -83,7 +83,7 @@ class MultiRegionAccessPointDescribe(DescribeSource):
 
 
 @resources.register('s3-access-point-multi')
-class S3AccessPoint(QueryResourceManager):
+class MultiRegionAccessPoint(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 's3control'
         id = name = 'Name'
