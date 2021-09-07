@@ -9,6 +9,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, chunks
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 @resources.register('workspaces')
@@ -89,21 +91,51 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
 @Workspace.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: workspace-kms-key-filter
-            resource: workspaces
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/workspaces)"
-                op: regex
-    """
     RelatedIdsExpression = 'VolumeEncryptionKey'
+
+
+@resources.register('workspaces-image')
+class WorkspaceImage(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'workspaces'
+        enum_spec = ('describe_workspace_images', 'Images', None)
+        arn_type = 'workspaceimage'
+        name = id = 'ImageId'
+        universal_taggable = True
+
+    augment = universal_augment
+
+
+@WorkspaceImage.filter_registry.register('cross-account')
+class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('workspaces:DescribeWorkspaceImagePermissions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        allowed_accounts = set(self.get_accounts())
+        results = []
+        for r in resources:
+            found = False
+            try:
+                accts = client.describe_workspace_image_permissions(
+                    ImageId=r['ImageId']).get('ImagePermissions')
+                for a in accts:
+                    account_id = a['SharedAccountId']
+                    if (account_id not in allowed_accounts):
+                        r.setdefault('c7n:CrossAccountViolations', []).append(account_id)
+                        found = True
+                if found:
+                    results.append(r)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+        return results

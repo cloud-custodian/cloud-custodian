@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import tempfile
+import textwrap
 import unittest
 
 import pytest
@@ -18,7 +19,8 @@ import yaml
 
 from distutils.util import strtobool
 
-from c7n import policy
+from c7n import deprecated, policy
+from c7n.exceptions import DeprecationError
 from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
 from c7n.utils import reset_session_cache
@@ -84,6 +86,7 @@ class CustodianTestCore:
             output_dir='null://',
             log_group='null://',
             cache=False,
+            allow_deprecations=True,
     ):
         pdata = {'policies': [data]}
         if not (config and isinstance(config, Config)):
@@ -98,6 +101,12 @@ class CustodianTestCore:
             config=config)
         # policy non schema validation is also lazy initialization
         [p.validate() for p in collection]
+        if not allow_deprecations:
+            for p in collection:
+                r = deprecated.Report(p)
+                if r:
+                    raise DeprecationError(
+                        f"policy {p.name} contains deprecated usage\n{r.format()}")
         return list(collection)[0]
 
     def _get_policy_config(self, **kw):
@@ -197,6 +206,16 @@ class CustodianTestCore:
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
         self.assertEqual(value, expected)
+
+    def assertDeprecation(self, policy, expected):
+        """Fail if the deprecations aren't found, or doesn't match.
+
+        The expected string is multiline and processed with dedent so the report
+        expected value can line up with the rest of the test.
+        """
+        report = deprecated.report(policy)
+        self.assertTrue(report)
+        self.assertEqual(report.format(), textwrap.dedent(expected).strip())
 
 
 class _TestUtils(unittest.TestCase):

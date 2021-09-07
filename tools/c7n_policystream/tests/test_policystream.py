@@ -280,3 +280,18 @@ class StreamTest(TestUtils):
              ('add', 'lambda-check', 'switch'),
              ('add', 'ec2-check', 'new file'),
              ('moved', 'lambda-check', 'move policy')])
+
+
+@pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
+def test_path_matcher():
+    for p, result in (
+            ('foo/bar.yml', True),
+            ('foo/bar.json', False),
+            ('zoo/rabbit.yaml', True),
+    ):
+        assert policystream.policy_path_matcher(p) is result
+
+    for p, patterns, result in (
+            ('foo/bar.yml', ('dir/*.yaml',), False),
+            ('foo/bar.json', ('foo/*.json',), True)):
+        assert policystream.policy_path_matcher(p, patterns) is result

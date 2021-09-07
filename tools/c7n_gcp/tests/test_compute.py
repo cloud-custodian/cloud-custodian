@@ -169,6 +169,22 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_filter_effective_firewall(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-effective-firewall', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'test-instance-effective-firewall',
+             'resource': 'gcp.instance',
+             'filters': [
+                 {'type': 'effective-firewall',
+                 'key': 'firewalls[*].name',
+                 'value': 'default-allow-ssh',
+                 'op': 'in',
+                 'value_type': 'swap'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class DiskTest(BaseTest):
 

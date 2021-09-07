@@ -208,6 +208,19 @@ class PolicyLambdaProvision(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:HealthEvent' in resources[0])
 
+    def test_phd_mode_sans_details(self):
+        factory = self.replay_flight_data('test_phd_event_mode')
+        p = self.load_policy(
+            {'name': 'ec2-retire',
+             'resource': 'account',
+             'mode': {'type': 'phd'}}, session_factory=factory)
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(factory)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'source': ['aws.health']}
+        )
+
     def test_phd_mode(self):
         factory = self.replay_flight_data('test_phd_event_mode')
         p = self.load_policy(

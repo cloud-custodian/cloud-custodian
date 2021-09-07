@@ -40,7 +40,6 @@ class StorageContainer(ChildArmResourceManager):
         parent_manager_name = 'storage'
         diagnostic_settings_enabled = False
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
-        enable_tag_operations = False
         raise_on_exception = False
         default_report_fields = (
             'name',
@@ -98,8 +97,6 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             'value': {'enum': ['Container', 'Blob', 'None']}
         }
     )
-
-    schema_alias = True
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()

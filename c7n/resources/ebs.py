@@ -16,6 +16,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
     ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -46,6 +47,7 @@ class Snapshot(QueryResourceManager):
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
         id = 'SnapshotId'
+        id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
@@ -67,6 +69,8 @@ class Snapshot(QueryResourceManager):
             query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
         return super(Snapshot, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
@@ -360,6 +364,37 @@ class SnapshotSkipAmiSnapshots(Filter):
         return resources
 
 
+@Snapshot.filter_registry.register('volume')
+class SnapshotVolumeFilter(RelatedResourceFilter):
+    """
+    Filter EBS snapshots by their volume attributes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: snapshot-with-no-volume
+            description: Find any snapshots that do not have a corresponding volume.
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: absent
+          - name: find-snapshots-from-volume
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: vol-foobarbaz
+    """
+
+    RelatedResource = 'c7n.resources.ebs.EBS'
+    RelatedIdsExpression = 'VolumeId'
+    AnnotationKey = 'Volume'
+
+    schema = type_schema(
+        'volume', rinherit=ValueFilter.schema)
+
+
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
     """Deletes EBS snapshots
@@ -610,6 +645,7 @@ class EBS(QueryResourceManager):
         arn_type = 'volume'
         enum_spec = ('describe_volumes', 'Volumes', None)
         name = id = 'VolumeId'
+        id_prefix = 'vol-'
         filter_name = 'VolumeIds'
         filter_type = 'list'
         date = 'createTime'
@@ -1564,7 +1600,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})

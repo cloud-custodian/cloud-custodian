@@ -170,3 +170,109 @@ class ApiAuditMode(FunctionMode):
                 action.process(resources)
 
         return resources
+
+
+@execution.register('gcp-scc')
+class SecurityCenterMode(FunctionMode):
+    """Custodian policy execution on GCP Security Command Center (SCC) findings.
+
+    Deploys as a Cloud Function triggered by SCC findings. This allows
+    you to apply your policies as soon as a SCC finding occurs.
+    See `Security Command Center
+    <https://cloud.google.com/security-command-center/docs/concepts-security-command-center-overview#introduction>`_
+    for more details.
+
+    .. code-block:: yaml
+
+      - name: delete-high-severity-firewall-findings
+        resource: gcp.firewall
+        mode:
+          service-account: SERVICE_ACCOUNT_NAME@PROJECT.iam.gserviceaccount.com
+          type: gcp-scc
+          org: ORG_ID
+        filters:
+        - type: value
+          key: severity
+          value: HIGH
+        actions:
+          - delete
+
+    Default region the function is deployed to is
+    ``us-central1``. In case you want to change that, use the cli
+    ``--region`` flag.
+    """
+
+    schema = type_schema(
+        'gcp-scc',
+        org={'type': 'integer'},
+        required=['org'],
+        rinherit=FunctionMode.schema)
+
+    def resolve_resources(self, event):
+        """Resolve a gcp resource from its scc finding.
+        """
+        if not event["finding"].get("resourceName"):
+            self.policy.log.warning("Could not find resourceName in event")
+            return
+
+        project_id = event["resource"].get("project", "").split('/')[-1]
+        finding_details = {
+            "resourceName": event["finding"]["resourceName"],
+            "project_id": project_id
+        }
+
+        resource = self.policy.resource_manager.get_resource(finding_details)
+        # add finding fields to resource
+        resource.update({"finding": event["finding"]})
+
+        return [resource]
+
+    def _resource_topic(self):
+        return "custodian-auto-scc-{}".format(self.policy.resource_manager.type)
+
+    def _get_function(self):
+        events = [
+            mu.PubSubSource(local_session(self.policy.session_factory),
+            {"topic": self._resource_topic()}),
+            mu.SecurityCenterSubscriber(local_session(self.policy.session_factory),
+             {"topic": self._resource_topic(),
+             "org": self.policy.data["mode"]["org"]}, self.policy.resource_manager)]
+        return mu.PolicyFunction(self.policy, events=events)
+
+    def validate(self):
+        if not self.policy.resource_manager.resource_type.get:
+            raise PolicyValidationError(
+                "Resource:%s does not implement retrieval method get" % (
+                    self.policy.resource_type))
+        if not self.policy.resource_manager.resource_type.scc_type:
+            raise PolicyValidationError(
+                "Resource:%s is not supported by scc currently" % (
+                    self.policy.resource_type))
+
+    def run(self, event, context):
+        """Execute a gcp serverless model"""
+        from c7n.actions import EventAction
+
+        resources = self.resolve_resources(event)
+        if not resources:
+            return
+
+        resources = self.policy.resource_manager.filter_resources(
+            resources, event)
+
+        self.policy.log.info("Filtered resources %d" % len(resources))
+
+        if not resources:
+            return
+
+        self.policy.ctx.metrics.put_metric(
+            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            buffer=False)
+
+        for action in self.policy.resource_manager.actions:
+            if isinstance(action, EventAction):
+                action.process(resources, event)
+            else:
+                action.process(resources)
+
+        return resources

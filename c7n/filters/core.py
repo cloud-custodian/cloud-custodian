@@ -214,9 +214,10 @@ class Filter(Element):
             r[self.matched_annotation_key] = intersect_list(
                 values,
                 r.get(self.matched_annotation_key))
-
-        if not values and block_op != 'or':
-            return
+        elif block_op == 'or':
+            r[self.matched_annotation_key] = union_list(
+                values,
+                r.get(self.matched_annotation_key))
 
 
 class BaseValueFilter(Filter):
@@ -268,6 +269,16 @@ def intersect_list(a, b):
     return res
 
 
+def union_list(a, b):
+    if not b:
+        return a
+    if not a:
+        return b
+    res = a
+    res.extend(x for x in b if x not in a)
+    return res
+
+
 class BooleanGroupFilter(Filter):
 
     def __init__(self, data, registry, manager):
@@ -290,6 +301,13 @@ class BooleanGroupFilter(Filter):
 
     def __bool__(self):
         return True
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the nested filters."""
+        deprecations = []
+        for f in self.filters:
+            deprecations.extend(f.get_deprecations())
+        return deprecations
 
 
 class Or(BooleanGroupFilter):
@@ -581,7 +599,7 @@ class ValueFilter(BaseValueFilter):
                 return op(r, v)
             except TypeError:
                 return False
-        elif r == self.v:
+        elif r == v:
             return True
 
         return False

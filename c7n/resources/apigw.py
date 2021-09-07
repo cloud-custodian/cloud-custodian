@@ -8,7 +8,7 @@ from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
@@ -158,6 +158,14 @@ class RestApi(query.QueryResourceManager):
                 region=self.config.region,
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
+
+
+@RestApi.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'ApiName',
+                 'Value': resource['name']}]
 
 
 @RestApi.filter_registry.register('cross-account')

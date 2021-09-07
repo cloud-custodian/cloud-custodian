@@ -13,7 +13,7 @@ from concurrent.futures import as_completed
 import jmespath
 
 from c7n.actions import (
-    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+    ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
 )
 
 from c7n.exceptions import PolicyValidationError
@@ -106,6 +106,7 @@ class EC2(query.QueryResourceManager):
         date = 'LaunchTime'
         dimension = 'InstanceId'
         cfn_type = config_type = "AWS::EC2::Instance"
+        id_prefix = 'i-'
 
         default_report_fields = (
             'CustodianDate',
@@ -1059,7 +1060,7 @@ class SetMetadataServerAccess(BaseAction):
          - name: ec2-require-imdsv2
            resource: ec2
            filters:
-             - MetadataOptions.HttpsToken: optional
+             - MetadataOptions.HttpToken: optional
            actions:
              - type: set-metadata-access
                tokens: required
@@ -2082,6 +2083,7 @@ class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         id = 'LaunchTemplateId'
+        id_prefix = 'lt-'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
@@ -2176,6 +2178,7 @@ class ReservedInstance(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'ReservedInstancesId'
+        id_prefix = ""
         date = 'Start'
         enum_spec = (
             'describe_reserved_instances', 'ReservedInstances', None)
@@ -2192,6 +2195,7 @@ class DedicatedHost(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'HostId'
+        id_prefix = 'h-'
         enum_spec = ('describe_hosts', 'Hosts', None)
         arn_type = "dedicated-host"
         filter_name = 'HostIds'
@@ -2199,3 +2203,56 @@ class DedicatedHost(query.QueryResourceManager):
         date = 'AllocationTime'
         cfn_type = config_type = 'AWS::EC2::Host'
         permissions_enum = ('ec2:DescribeHosts',)
+
+
+@resources.register('ec2-spot-fleet-request')
+class SpotFleetRequest(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Spot Fleet Requests.
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        name = id = 'SpotFleetRequestId'
+        id_prefix = 'sfr-'
+        enum_spec = ('describe_spot_fleet_requests', 'SpotFleetRequestConfigs', None)
+        filter_name = 'SpotFleetRequestIds'
+        filter_type = 'list'
+        date = 'CreateTime'
+        arn_type = 'spot-fleet-request'
+        cfn_type = 'AWS::EC2::SpotFleet'
+        permissions_enum = ('ec2:DescribeSpotFleetRequests',)
+
+
+SpotFleetRequest.filter_registry.register('offhour', OffHour)
+SpotFleetRequest.filter_registry.register('onhour', OnHour)
+
+
+@SpotFleetRequest.action_registry.register('resize')
+class AutoscalingSpotFleetRequest(AutoscalingBase):
+    permissions = (
+        'ec2:CreateTags',
+        'ec2:ModifySpotFleetRequest',
+    )
+
+    service_namespace = 'ec2'
+    scalable_dimension = 'ec2:spot-fleet-request:TargetCapacity'
+
+    def get_resource_id(self, resource):
+        return 'spot-fleet-request/%s' % resource['SpotFleetRequestId']
+
+    def get_resource_tag(self, resource, key):
+        if 'Tags' in resource:
+            for tag in resource['Tags']:
+                if tag['Key'] == key:
+                    return tag['Value']
+        return None
+
+    def get_resource_desired(self, resource):
+        return int(resource['SpotFleetRequestConfig']['TargetCapacity'])
+
+    def set_resource_desired(self, resource, desired):
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        client.modify_spot_fleet_request(
+            SpotFleetRequestId=resource['SpotFleetRequestId'],
+            TargetCapacity=desired,
+        )

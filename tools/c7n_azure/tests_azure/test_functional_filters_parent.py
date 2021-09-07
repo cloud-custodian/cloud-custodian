@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import azure.keyvault.http_bearer_challenge_cache as kv_cache
 from .azure_common import BaseTest, arm_template, cassette_name
 
 
@@ -8,7 +7,6 @@ class ParentFilterFunctionalTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):
         super(ParentFilterFunctionalTest, self).tearDown(*args, **kwargs)
-        kv_cache._cache = {}
 
     @arm_template('keyvault.json')
     @cassette_name('keyvault-keys')

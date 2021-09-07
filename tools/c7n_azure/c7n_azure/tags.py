@@ -36,7 +36,7 @@ class TagHelper:
             # create a PATCH object with only updates to tags
             tags_patch = GenericResource(tags=tags)
 
-            client.resources.update_by_id(resource['id'], api_version, tags_patch)
+            client.resources.begin_update_by_id(resource['id'], api_version, tags_patch)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):

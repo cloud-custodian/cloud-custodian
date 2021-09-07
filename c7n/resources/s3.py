@@ -50,7 +50,7 @@ except ImportError:
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -745,17 +745,29 @@ class BucketActionBase(BaseAction):
         }
 
     def process(self, buckets):
-        with self.executor_factory(max_workers=3) as w:
+        return self._process_with_futures(buckets)
+
+    def _process_with_futures(self, buckets, *args, max_workers=3, **kwargs):
+        errors = 0
+        results = []
+        with self.executor_factory(max_workers=max_workers) as w:
             futures = {}
-            results = []
             for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
+                futures[w.submit(self.process_bucket, b, *args, **kwargs)] = b
             for f in as_completed(futures):
                 if f.exception():
-                    self.log.error('error modifying bucket:%s\n%s',
-                                   b['Name'], f.exception())
+                    b = futures[f]
+                    self.log.error(
+                        'error modifying bucket: policy:%s action:%s bucket:%s error:%s',
+                        self.manager.data.get('name'), self.name, b['Name'], f.exception()
+                    )
+                    errors += 1
+                    continue
                 results += filter(None, [f.result()])
-            return results
+        if errors:
+            self.log.error('encountered %d errors while processing %s', errors, self.name)
+            raise PolicyExecutionError('%d resources failed', errors)
+        return results
 
 
 class BucketFilterBase(Filter):
@@ -1031,7 +1043,7 @@ class BucketNotificationFilter(ValueFilter):
 
 
 @filters.register('bucket-logging')
-class BucketLoggingFilter(Filter):
+class BucketLoggingFilter(BucketFilterBase):
     """Filter based on bucket logging configuration.
 
     :example:
@@ -1094,14 +1106,14 @@ class BucketLoggingFilter(Filter):
             session = local_session(self.manager.session_factory)
             self.account_name = get_account_alias_from_sts(session)
 
-        variables = {
-            'account_id': self.manager.config.account_id,
+        variables = self.get_std_format_args(b)
+        variables.update({
             'account': self.account_name,
-            'region': self.manager.config.region,
             'source_bucket_name': b['Name'],
+            'source_bucket_region': get_region(b),
             'target_bucket_name': self.data.get('target_bucket'),
             'target_prefix': self.data.get('target_prefix'),
-        }
+        })
         data = format_string_values(self.data, **variables)
         target_bucket = data.get('target_bucket')
         target_prefix = data.get('target_prefix', b['Name'] + '/')
@@ -1633,39 +1645,44 @@ class ToggleLogging(BucketActionBase):
         return self
 
     def process(self, resources):
-        enabled = self.data.get('enabled', True)
-
-        # Account name for variable expansion
         session = local_session(self.manager.session_factory)
-        account_name = get_account_alias_from_sts(session)
+        kwargs = {
+            "enabled": self.data.get('enabled', True),
+            "session": session,
+            "account_name": get_account_alias_from_sts(session),
+        }
 
-        for r in resources:
-            client = bucket_client(session, r)
-            is_logging = bool(r.get('Logging'))
+        return self._process_with_futures(resources, **kwargs)
 
-            if enabled:
-                variables = {
-                    'account_id': self.manager.config.account_id,
-                    'account': account_name,
-                    'region': self.manager.config.region,
-                    'source_bucket_name': r['Name'],
-                    'target_bucket_name': self.data.get('target_bucket'),
-                    'target_prefix': self.data.get('target_prefix'),
-                }
-                data = format_string_values(self.data, **variables)
-                config = {
-                    'TargetBucket': data.get('target_bucket'),
-                    'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
-                }
-                if not is_logging or r.get('Logging') != config:
-                    client.put_bucket_logging(
-                        Bucket=r['Name'],
-                        BucketLoggingStatus={'LoggingEnabled': config}
-                    )
+    def process_bucket(self, r, enabled=None, session=None, account_name=None):
+        client = bucket_client(session, r)
+        is_logging = bool(r.get('Logging'))
 
-            elif not enabled and is_logging:
+        if enabled:
+            variables = self.get_std_format_args(r)
+            variables.update({
+                'account': account_name,
+                'source_bucket_name': r['Name'],
+                'source_bucket_region': get_region(r),
+                'target_bucket_name': self.data.get('target_bucket'),
+                'target_prefix': self.data.get('target_prefix'),
+            })
+            data = format_string_values(self.data, **variables)
+            config = {
+                'TargetBucket': data.get('target_bucket'),
+                'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
+            }
+            if not is_logging or r.get('Logging') != config:
                 client.put_bucket_logging(
-                    Bucket=r['Name'], BucketLoggingStatus={})
+                    Bucket=r['Name'],
+                    BucketLoggingStatus={'LoggingEnabled': config}
+                )
+                r['Logging'] = config
+
+        elif not enabled and is_logging:
+            client.put_bucket_logging(
+                Bucket=r['Name'], BucketLoggingStatus={})
+            r['Logging'] = {}
 
 
 @actions.register('attach-encrypt')
@@ -3122,16 +3139,27 @@ class KMSKeyResolverMixin:
         self.manager = manager
 
     def resolve_keys(self, buckets):
-        if 'key' not in self.data:
+        key = self.data.get('key')
+        if not key:
             return None
 
         regions = {get_region(b) for b in buckets}
         for r in regions:
             client = local_session(self.manager.session_factory).client('kms', region_name=r)
             try:
-                self.arns[r] = client.describe_key(
-                    KeyId=self.data.get('key')
-                ).get('KeyMetadata').get('Arn')
+                key_meta = client.describe_key(
+                    KeyId=key
+                ).get('KeyMetadata', {})
+                self.arns[r] = {
+                    # c7n:Key is the value provided in the policy filter data.
+                    # This may overlap with the key ID or ARN, but can also be
+                    # an alias.
+                    'c7n:Key': key,
+                    'KeyId': key_meta.get('KeyId'),
+                    'Arn': key_meta.get('Arn'),
+                    'KeyManager': key_meta.get('KeyManager'),
+                    'Description': key_meta.get('Description')
+                }
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))
@@ -3243,7 +3271,10 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             return True
         elif crypto == 'aws:kms' and algo == 'aws:kms':
             if key:
-                if rule.get('KMSMasterKeyID') == key:
+                # The default encryption rule can specify a key by alias,
+                # ID or full ARN. Match against any of those attributes.
+                key_ids = {key[k] for k in ('Arn', 'KeyId', 'c7n:Key')}
+                if rule.get('KMSMasterKeyID') in key_ids:
                     return True
                 else:
                     return False
@@ -3256,8 +3287,18 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     """Action enables default encryption on S3 buckets
 
     `enabled`: boolean Optional: Defaults to True
+
     `crypto`: aws:kms | AES256` Optional: Defaults to AES256
+
     `key`: arn, alias, or kms id key
+
+    `bucket-key`: boolean Optional:
+    Defaults to True.
+    Reduces amount of API traffic from Amazon S3 to KMS and can reduce KMS request
+    costsby up to 99 percent. Requires kms:Decrypt permissions for copy and upload
+    on the AWS KMS Key Policy.
+
+    Bucket Key Docs: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html
 
     :example:
 
@@ -3271,6 +3312,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                   # enabled: true <------ optional (true by default)
                     crypto: aws:kms
                     key: 1234abcd-12ab-34cd-56ef-1234567890ab
+                    bucket-key: true
 
               - name: s3-enable-default-encryption-kms-alias
                 resource: s3
@@ -3279,11 +3321,13 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                   # enabled: true <------ optional (true by default)
                     crypto: aws:kms
                     key: alias/some/alias/key
+                    bucket-key: true
 
               - name: s3-enable-default-encryption-aes256
                 resource: s3
                 actions:
                   - type: set-bucket-encryption
+                  # bucket-key: true <--- optional (true by default for AWS SSE)
                   # crypto: AES256 <----- optional (AES256 by default)
                   # enabled: true <------ optional (true by default)
 
@@ -3301,7 +3345,8 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             'type': {'enum': ['set-bucket-encryption']},
             'enabled': {'type': 'boolean'},
             'crypto': {'enum': ['aws:kms', 'AES256']},
-            'key': {'type': 'string'}
+            'key': {'type': 'string'},
+            'bucket-key': {'type': 'boolean'}
         },
         'dependencies': {
             'key': {
@@ -3328,21 +3373,36 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
                                    futures[future]['Name'])
 
     def process_bucket(self, bucket):
+        default_key_desc = 'Default master key that protects my S3 objects when no other key is defined' # noqa
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         if not self.data.get('enabled', True):
             s3.delete_bucket_encryption(Bucket=bucket['Name'])
             return
         algo = self.data.get('crypto', 'AES256')
-        config = {'Rules': [
-            {'ApplyServerSideEncryptionByDefault': {
-                'SSEAlgorithm': algo}}
-        ]}
+
+        # bucket key defaults to True for alias/aws/s3 and AES256 (Amazon SSE)
+        # and ignores False values for that crypto
+        bucket_key = self.data.get('bucket-key', True)
+        config = {
+            'Rules': [
+                {
+                    'ApplyServerSideEncryptionByDefault': {
+                        'SSEAlgorithm': algo,
+                    },
+                    'BucketKeyEnabled': bucket_key
+                }
+            ]
+        }
+
         if algo == 'aws:kms':
             key = self.get_key(bucket)
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
-            (config['Rules'][0]['ApplyServerSideEncryptionByDefault']
-                ['KMSMasterKeyID']) = key
+
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
+                'KMSMasterKeyID': key['Arn'],
+                'BucketKeyEnabled': bucket_key
+            }
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config

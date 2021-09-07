@@ -6,7 +6,7 @@ import tempfile
 
 import yaml
 from azure.common import AzureHttpError
-from azure.storage.queue.models import QueueMessage
+from azure.storage.queue import QueueMessage
 from mock import ANY, Mock, patch
 
 from ..azure_common import BaseTest
@@ -630,7 +630,7 @@ class ContainerHostTest(BaseTest):
     def get_mock_blob(name, md5):
         new_blob = Mock()
         new_blob.name = name
-        new_blob.properties.content_settings.content_md5 = md5
+        new_blob.content_settings.content_md5 = md5
         return new_blob
 
     @staticmethod

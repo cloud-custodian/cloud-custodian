@@ -3,6 +3,7 @@
 from ..azure_common import BaseTest, arm_template, cassette_name
 from mock import patch
 from c7n_azure.resources.generic_arm_resource import GenericArmResource
+from c7n_azure.resources.arm import arm_tags_unsupported
 from c7n.exceptions import PolicyValidationError
 
 
@@ -18,6 +19,14 @@ class ArmResourceTest(BaseTest):
                 'resource': 'azure.armresource'
             }, validate=True)
             self.assertTrue(p)
+
+    def test_tag_operation_enabled(self):
+        r = GenericArmResource(self.test_context, {})
+        # False for excluded resources
+        for t in arm_tags_unsupported:
+            self.assertFalse(r.tag_operation_enabled(t))
+        # Default true
+        self.assertTrue(r.tag_operation_enabled("SomeResource"))
 
     @arm_template('vm.json')
     @cassette_name('common')

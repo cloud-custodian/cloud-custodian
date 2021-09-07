@@ -88,6 +88,7 @@ class KmsCryptoKey(ChildResourceManager):
             'use_child_query': True
         }
         asset_type = "cloudkms.googleapis.com/CryptoKey"
+        scc_type = "google.cloud.kms.CryptoKey"
 
         @staticmethod
         def get(client, resource_info):

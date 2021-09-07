@@ -251,23 +251,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
 @AWSLambda.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: lambda-kms-key-filters
-                  resource: aws.lambda
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/lambda)"
-                      op: regex
-    """
     RelatedIdsExpression = 'KMSKeyArn'
 
 
@@ -660,10 +644,16 @@ class LayerCrossAccount(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
-            r['c7n:Policy'] = self.manager.retry(
-                client.get_layer_version_policy,
-                LayerName=r['LayerName'],
-                VersionNumber=r['Version']).get('Policy')
+            if 'c7n:Policy' in r:
+                continue
+            try:
+                rpolicy = self.manager.retry(
+                    client.get_layer_version_policy,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version']).get('Policy')
+            except client.exceptions.ResourceNotFoundException:
+                rpolicy = {}
+            r['c7n:Policy'] = rpolicy
         return super(LayerCrossAccount, self).process(resources)
 
     def get_resource_policy(self, r):

@@ -1,0 +1,92 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_f277a3f2424192e7/kapil",
+                "id": "644160558196",
+                "user_id": "AROAXEGRT7KTSDWIMAUBP:kapil"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1"
+            }
+        },
+        "aws_s3_access_point": {
+            "example": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-moving-doe",
+                "bucket": "c7n-ap-moving-doe",
+                "domain_name": "c7n-ap-moving-doe-644160558196.s3-accesspoint.us-east-1.amazonaws.com",
+                "has_public_access_policy": true,
+                "id": "644160558196:c7n-ap-moving-doe",
+                "name": "c7n-ap-moving-doe",
+                "network_origin": "Internet",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-moving-doe/object/*\"}]}",
+                "public_access_block_configuration": [
+                    {
+                        "block_public_acls": true,
+                        "block_public_policy": false,
+                        "ignore_public_acls": true,
+                        "restrict_public_buckets": false
+                    }
+                ],
+                "vpc_configuration": []
+            }
+        },
+        "aws_s3_bucket": {
+            "example": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7n-ap-moving-doe",
+                "bucket": "c7n-ap-moving-doe",
+                "bucket_domain_name": "c7n-ap-moving-doe.s3.amazonaws.com",
+                "bucket_prefix": null,
+                "bucket_regional_domain_name": "c7n-ap-moving-doe.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-ap-moving-doe",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": null,
+                "tags_all": {
+                    "App": "CloudCustodian",
+                    "Env": "Dev",
+                    "Owner": "dev@example.com"
+                },
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "random_pet": {
+            "bucket": {
+                "id": "moving-doe",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

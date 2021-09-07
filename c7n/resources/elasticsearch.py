@@ -96,23 +96,7 @@ class Metrics(MetricsFilter):
 
 @ElasticSearchDomain.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: elasticsearch-kms-key
-            resource: aws.elasticsearch
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/es)"
-                op: regex
-    """
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
 
 

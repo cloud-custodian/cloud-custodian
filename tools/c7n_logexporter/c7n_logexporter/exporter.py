@@ -140,8 +140,9 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
                 f['destinationArn'] == subscription['destination-arn'] and
                 f['distribution'] == distribution):
             return
-    client.delete_subscription_filter(
-        logGroupName=group_name, filterName=sub_name)
+        else:
+            client.delete_subscription_filter(
+                logGroupName=group_name, filterName=sub_name)
     client.put_subscription_filter(
         logGroupName=group_name,
         destinationArn=subscription['destination-arn'],
@@ -209,7 +210,7 @@ def subscribe(config, accounts, region, merge, debug):
                 g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
                 allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
-                for l in allLogGroups:
+                for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
                         client, l['logGroupName'], subscription, distribution)
             else:

@@ -225,7 +225,19 @@ class BucketEncryption(BaseTest):
         self.assertEqual(resources[0]["Name"], bname)
 
     def test_s3_bucket_encryption_filter_kms(self):
-        bname = "c7n-bucket-with-encryption"
+        def _get_encryption_rule(key_id):
+            return {
+                "Rules": [
+                    {
+                        "ApplyServerSideEncryptionByDefault": {
+                            "SSEAlgorithm": "aws:kms",
+                            "KMSMasterKeyID": key_id
+                        }
+                    }
+                ]
+            }
+
+        bname_base = "c7n-bucket-with-encryption"
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
 
@@ -234,23 +246,26 @@ class BucketEncryption(BaseTest):
         )
 
         client = session_factory().client("s3")
-        client.create_bucket(Bucket=bname)
-        self.addCleanup(client.delete_bucket, Bucket=bname)
 
-        aws_alias = "arn:aws:kms:us-east-1:108891588060:key/079a6f7d-5f8a-4da1-a465-30aa099b9688"
-        enc = {
-            "Rules": [
-                {
-                    "ApplyServerSideEncryptionByDefault": {
-                        "SSEAlgorithm": "aws:kms", "KMSMasterKeyID": aws_alias
-                    }
-                }
-            ]
+        key_alias = "alias/aws/s3"
+        key_meta = session_factory().client("kms").describe_key(KeyId=key_alias)["KeyMetadata"]
+
+        key_attrs = {
+            'alias': key_alias,
+            'id': key_meta.get('KeyId'),
+            'arn': key_meta.get('Arn')
         }
 
-        client.put_bucket_encryption(
-            Bucket=bname, ServerSideEncryptionConfiguration=enc
-        )
+        for attr, value in key_attrs.items():
+            # Create 3 test buckets. Set a default encryption rule for each
+            # one, using different attributes of the same key.
+            bname = f'{bname_base}-by-{attr}'
+            client.create_bucket(Bucket=bname)
+            client.put_bucket_encryption(
+                Bucket=bname,
+                ServerSideEncryptionConfiguration=_get_encryption_rule(value)
+            )
+            self.addCleanup(client.delete_bucket, Bucket=bname)
 
         p = self.load_policy(
             {
@@ -260,15 +275,15 @@ class BucketEncryption(BaseTest):
                     {
                         "type": "bucket-encryption",
                         "crypto": "aws:kms",
-                        "key": "alias/aws/s3",
+                        "key": key_alias,
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run() or []
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(len(resources), 3)
+        self.assertTrue(all(r["Name"].startswith(bname_base) for r in resources))
 
     def test_s3_filter_bucket_encryption_disabled(self):
         bname = "c7n-bucket-without-default-encryption"
@@ -317,6 +332,39 @@ class BucketEncryption(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_s3_bucket_encryption_bucket_key(self):
+        session_factory = self.replay_flight_data("test_s3_bucket_encryption_bucket_key")
+
+        bname = "custodian-test-bucket-encryption-key"
+
+        self.patch(s3.S3, "executor-factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        policy = self.load_policy(
+            {
+                "name": "test_s3_bucket_encryption_bucket_key",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "Name": bname
+                    },
+                    {
+                        "type": "bucket-encryption",
+                        "state": False
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-encryption"
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("s3")
+        resp = client.get_bucket_encryption(Bucket=bname)
+        self.assertTrue(resp['ServerSideEncryptionConfiguration']['Rules'][0]['BucketKeyEnabled'])
 
 
 class BucketInventory(BaseTest):
@@ -2116,7 +2164,7 @@ class S3Test(BaseTest):
                     {
                         "type": "toggle-logging",
                         "target_bucket": bname,
-                        "target_prefix": "{account}/{source_bucket_name}",
+                        "target_prefix": "{account}/{source_bucket_region}/{source_bucket_name}/",
                     }
                 ],
             },
@@ -2125,6 +2173,10 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"],
+            "{}/{}/{}/".format(account_name, client.meta.region_name, bname)
+        )
 
         if self.recording:
             time.sleep(5)
@@ -2162,6 +2214,9 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(
+            resources[0]["Logging"]["TargetPrefix"], "{}/{}/".format(self.account_id, bname)
+        )
 
         if self.recording:
             time.sleep(5)

@@ -84,7 +84,6 @@ class WebApp(ArmResourceManager):
 @WebApp.filter_registry.register('configuration')
 class ConfigurationFilter(ValueFilter):
     schema = type_schema('configuration', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def __call__(self, i):
         if 'c7n:configuration' not in i:

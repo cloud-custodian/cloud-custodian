@@ -8,6 +8,7 @@ from pytest_terraform import terraform
 
 from .common import BaseTest
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
 
@@ -129,6 +130,56 @@ def test_asg_propagate_tag_action(test, aws_asg):
             InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
     assert 'Owner' in itags
     assert itags['Owner'] == 'Kapil'
+
+
+@terraform("aws_asg_update")
+def test_aws_asg_update(test, aws_asg_update):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    p = test.load_policy(
+        {
+            "name": "asg-update",
+            "resource": "aws.asg",
+            "filters": [{
+                "AutoScalingGroupName": aws_asg_update["aws_autoscaling_group.bar.id"]
+            }],
+            "actions": [{
+                "type": "update",
+                "default-cooldown": 600,
+                "max-instance-lifetime": 604800,
+                "new-instances-protected-from-scale-in": True,
+                "capacity-rebalance": True,
+            }],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    client = factory().client("autoscaling")
+    result = client.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+    )[
+        "AutoScalingGroups"
+    ].pop()
+    test.assertEqual(result["DefaultCooldown"], 600)
+    test.assertEqual(result["MaxInstanceLifetime"], 604800)
+    test.assertTrue(result["NewInstancesProtectedFromScaleIn"])
+    test.assertTrue(result["CapacityRebalance"])
+
+
+def test_aws_asg_update_no_settings(test):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    with test.assertRaises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "asg-update",
+                "resource": "aws.asg",
+                "actions": [{
+                    "type": "update",
+                }],
+            },
+            session_factory=factory,
+        )
 
 
 class AutoScalingTest(BaseTest):

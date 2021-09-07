@@ -77,6 +77,31 @@ class UniversalTagTest(BaseTest):
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
 
+    def test_mark_for_op_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'actions': [{'type': 'mark-for-op', 'op': 'stop'}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                mark-for-op: optional fields deprecated (one of 'hours' or 'days' must be specified)
+            """)
+
+    def test_unmark_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'filters': [{'tag:foo': 'exists'}],
+            'actions': [{'type': 'unmark', 'tags': ['foo']}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                remove-tag: alias 'unmark' has been deprecated
+            """)
+
 
 class CoalesceCopyUserTags(BaseTest):
     def test_copy_bool_user_tags(self):

@@ -12,12 +12,11 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryDataset, QueryDefinition,
                                               QueryFilter, QueryGrouping,
                                               QueryTimePeriod, TimeframeType)
-from azure.mgmt.policyinsights import PolicyInsightsClient
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
-from msrest.exceptions import HttpOperationError
+from azure.core.exceptions import HttpResponseError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -186,7 +185,7 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.get_filter(resource)
             )
-        except HttpOperationError:
+        except HttpResponseError:
             self.log.exception("Could not get metric: %s on %s" % (
                 self.metric, resource['id']))
             return None
@@ -484,7 +483,7 @@ class PolicyCompliantFilter(Filter):
                               d.name in self.definitions]
 
         # Find non-compliant resources
-        client = PolicyInsightsClient(s.get_credentials())
+        client = s.client('azure.mgmt.policyinsights.PolicyInsightsClient')
         query = client.policy_states.list_query_results_for_subscription(
             policy_states_resource='latest', subscription_id=s.subscription_id).value
         non_compliant = [f.resource_id.lower() for f in query
@@ -821,13 +820,11 @@ class CostFilter(ValueFilter):
 
         - ``WeekToDate``
         - ``MonthToDate``
-        - ``YearToDate``
 
       - All days in the previous calendar period:
 
-        - ``TheLastWeek``
         - ``TheLastMonth``
-        - ``TheLastYear``
+        - ``TheLastBillingMonth``
 
     :examples:
 
@@ -925,7 +922,7 @@ class CostFilter(ValueFilter):
 
         client = manager.get_client('azure.mgmt.costmanagement.CostManagementClient')
 
-        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost')}
+        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost', function='Sum')}
 
         grouping = [QueryGrouping(type='Dimension',
                                   name='ResourceGroupName' if is_resource_group else 'ResourceId')]
@@ -950,22 +947,24 @@ class CostFilter(ValueFilter):
             timeframe = 'Custom'
             time_period = QueryTimePeriod(from_property=start_time, to=end_time)
 
-        definition = QueryDefinition(timeframe=timeframe, time_period=time_period, dataset=dataset)
+        definition = QueryDefinition(type='ActualCost',
+                                     timeframe=timeframe,
+                                     time_period=time_period,
+                                     dataset=dataset)
 
         subscription_id = manager.get_session().get_subscription_id()
 
         scope = '/subscriptions/' + subscription_id
 
-        query = client.query.usage_by_scope(scope, definition)
+        query = client.query.usage(scope, definition)
 
         if hasattr(query, '_derserializer'):
             original = query._derserializer._deserialize
             query._derserializer._deserialize = lambda target, data: \
                 original(target, self.fix_wrap_rest_response(data))
 
-        result_list = list(query)[0]
-        result_list = [{result_list.columns[i].name: v for i, v in enumerate(row)}
-                       for row in result_list.rows]
+        result_list = [{query.columns[i].name: v for i, v in enumerate(row)}
+                       for row in query.rows]
 
         for r in result_list:
             if 'ResourceGroupName' in r:

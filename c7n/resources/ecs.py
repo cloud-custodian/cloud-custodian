@@ -5,12 +5,14 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
+from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.query import DescribeSource, ConfigSource
 import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
-from c7n.actions import AutoTagUser
+from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
 
 
@@ -36,6 +38,46 @@ def ecs_taggable(model, r):
     if path_parts[0] not in NEW_ARN_STYLE:
         return True
     return len(path_parts) > 2
+
+
+class ContainerConfigSource(ConfigSource):
+
+    preserve_empty = ()
+    preserve_case = {'Tags'}
+    mapped_keys = {}
+
+    @classmethod
+    def remap_keys(cls, resource):
+        for k, v in cls.mapped_keys.items():
+            if v in resource:
+                continue
+            if k not in resource:
+                continue
+            resource[v] = resource.pop(k)
+        return resource
+
+    @classmethod
+    def lower_keys(cls, data):
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                if k in cls.preserve_case:
+                    continue
+                lk = k[0].lower() + k[1:]
+                data[lk] = data.pop(k)
+                # describe doesn't return empty list/dict by default
+                if isinstance(v, (list, dict)) and not v and lk not in cls.preserve_empty:
+                    data.pop(lk)
+                elif isinstance(v, (dict, list)):
+                    data[lk] = cls.lower_keys(v)
+        elif isinstance(data, list):
+            return list(map(cls.lower_keys, data))
+        return data
+
+    def load_resource(self, item):
+        resource = self.lower_keys(super().load_resource(item))
+        if self.mapped_keys:
+            return self.remap_keys(resource)
+        return resource
 
 
 @resources.register('ecs')
@@ -144,6 +186,15 @@ class ECSServiceDescribeSource(ECSClusterResourceDescribeSource):
         return results
 
 
+class ECSServiceConfigSource(ContainerConfigSource):
+    perserve_empty = {
+        'placementConstraints', 'placementStrategy',
+        'serviceRegistries', 'Tags', 'loadBalancers'}
+
+    mapped_keys = {
+        'role': 'roleArn', 'cluster': 'clusterArn'}
+
+
 @resources.register('ecs-service')
 class Service(query.ChildResourceManager):
 
@@ -156,14 +207,13 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         supports_trailevents = True
-        cfn_type = 'AWS::ECS::Service'
+        config_type = cfn_type = 'AWS::ECS::Service'
 
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-ecs-service'
-        return source
+    source_mapping = {
+        'config': ECSServiceConfigSource,
+        'describe-child': ECSServiceDescribeSource,
+        'describe': ECSServiceDescribeSource,
+    }
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(Service, self).get_resources(ids, cache, augment=False)
@@ -476,33 +526,25 @@ class StopTask(BaseAction):
                     raise
 
 
-@resources.register('ecs-task-definition')
-class TaskDefinition(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ecs'
-        arn = id = name = 'taskDefinitionArn'
-        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        cfn_type = 'AWS::ECS::TaskDefinition'
-        arn_type = 'task-definition'
+class DescribeTaskDefinition(DescribeSource):
 
     def get_resources(self, ids, cache=True):
         if cache:
-            resources = self._get_cached_resources(ids)
+            resources = self.manager._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
             resources = self.augment(ids)
             return resources
         except ClientError as e:
-            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            self.manager.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
 
     def augment(self, resources):
         results = []
-        client = local_session(self.session_factory).client('ecs')
+        client = local_session(self.manager.session_factory).client('ecs')
         for task_def_set in resources:
-            response = self.retry(
+            response = self.manager.retry(
                 client.describe_task_definition,
                 taskDefinition=task_def_set,
                 include=['TAGS'])
@@ -511,6 +553,30 @@ class TaskDefinition(query.QueryResourceManager):
             results.append(r)
         ecs_tag_normalize(results)
         return results
+
+
+class ConfigECSTaskDefinition(ContainerConfigSource):
+
+    preserve_empty = {'mountPoints', 'portMappings', 'volumesFrom'}
+
+
+@resources.register('ecs-task-definition')
+class TaskDefinition(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ecs'
+        arn = id = name = 'taskDefinitionArn'
+        enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
+        cfn_type = config_type = 'AWS::ECS::TaskDefinition'
+        arn_type = 'task-definition'
+
+    source_mapping = {
+        'config': ConfigECSTaskDefinition,
+        'describe': DescribeTaskDefinition
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(TaskDefinition, self).get_resources(ids, cache, augment=False)
 
 
 @TaskDefinition.action_registry.register('delete')
@@ -801,3 +867,39 @@ TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
 Service.action_registry.register('auto-tag-user', AutoTagUser)
 Task.action_registry.register('auto-tag-user', AutoTagUser)
 ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
+
+Service.filter_registry.register('offhour', OffHour)
+Service.filter_registry.register('onhour', OnHour)
+
+
+@Service.action_registry.register('resize')
+class AutoscalingECSService(AutoscalingBase):
+    permissions = (
+        'ecs:UpdateService',
+        'ecs:TagResource',
+        'ecs:UntagResource',
+    )
+
+    service_namespace = 'ecs'
+    scalable_dimension = 'ecs:service:DesiredCount'
+
+    def get_resource_id(self, resource):
+        return resource['serviceArn'].split(':')[-1]
+
+    def get_resource_tag(self, resource, key):
+        if 'Tags' in resource:
+            for tag in resource['Tags']:
+                if tag['Key'] == key:
+                    return tag['Value']
+        return None
+
+    def get_resource_desired(self, resource):
+        return int(resource['desiredCount'])
+
+    def set_resource_desired(self, resource, desired):
+        client = local_session(self.manager.session_factory).client('ecs')
+        client.update_service(
+            cluster=resource['clusterArn'],
+            service=resource['serviceName'],
+            desiredCount=desired,
+        )

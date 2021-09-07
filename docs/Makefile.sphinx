@@ -86,7 +86,7 @@ html:
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
-	$(SPHINXBUILD) -W -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 #
 # Remove the copies so folks dont accidentally edit the copy

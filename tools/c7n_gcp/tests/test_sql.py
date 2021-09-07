@@ -50,6 +50,44 @@ class SqlInstanceTest(BaseTest):
                     'instance': instance_name})
         self.assertEqual(result['settings']['activationPolicy'], 'NEVER')
 
+    def test_start_instance(self):
+        project_id = 'cloud-custodian'
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'istart',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'state',
+                        'op': 'equal',
+                        'value': 'RUNNABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.activationPolicy',
+                        'op': 'equal',
+                        'value': 'NEVER'
+                    }
+                ],
+                'actions': ['start']
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['activationPolicy'], 'ALWAYS')
+
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
         instance_name = 'brenttest-5'

@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [
+            {
+                "ServiceCode": "ec2",
+                "ServiceName": "Amazon Elastic Compute Cloud (Amazon EC2)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ec2/L-355B2B67",
+                "QuotaCode": "L-355B2B67",
+                "QuotaName": "Running On-Demand c3.large instances",
+                "Value": 36.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "ec2",
+                "ServiceName": "Amazon Elastic Compute Cloud (Amazon EC2)",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ec2/L-5D81802F",
+                "QuotaCode": "L-5D81802F",
+                "QuotaName": "Running On-Demand c3.xlarge instances",
+                "Value": 36.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9a036cf4-56f8-473e-930e-74e5764b9eae",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "30184",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9a036cf4-56f8-473e-930e-74e5764b9eae"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

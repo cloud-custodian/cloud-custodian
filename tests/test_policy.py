@@ -16,7 +16,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
-from c7n.policy import ConfigPollRuleMode, PullMode
+from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
@@ -188,7 +188,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -199,6 +199,27 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_filter_spec(self):
+        missing_fspec = []
+        for k, v in manager.resources.items():
+            if v.resource_type.filter_name is None:
+                continue
+            if not v.resource_type.filter_type:
+                missing_fspec.append(k)
+        if missing_fspec:
+            self.fail('aws resources missing filter specs: %s' % (
+                ', '.join(missing_fspec)))
+
+    def test_ec2_id_prefix(self):
+        missing_prefix = []
+        for k, v in manager.resources.items():
+            if v.resource_type.service != 'ec2':
+                continue
+            if v.resource_type.id_prefix is None:
+                missing_prefix.append(k)
+        if missing_prefix:
+            self.fail('ec2 resources missing id prefix %s' % (', '.join(missing_prefix)))
 
     def test_cfn_resource_validity(self):
         # for resources which are annotated with cfn_type ensure that it is
@@ -226,7 +247,17 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2021
+            'AwsEcsService',
+            'AwsRdsEventSubscription',
+            # q2 2021
+            'AwsEcsTaskDefinition',
+            'AwsEcsCluster',
+            'AwsEc2Subnet',
+            'AwsElasticBeanstalkEnvironment',
+            'AwsEc2NetworkAcl',
             # newer wave q1 2021,
+            'AwsS3AccountPublicAccessBlock',
             'AwsSsmPatchCompliance',
             # newer wave q4 2020
             'AwsApiGatewayRestApi',
@@ -266,6 +297,7 @@ class PolicyMetaLint(BaseTest):
         # for several of these we express support as filter or action instead
         # of a resource.
         whitelist = {
+            'AWS::Config::ConformancePackCompliance',
             'AWS::NetworkFirewall::FirewallPolicy',
             'AWS::NetworkFirewall::Firewall',
             'AWS::NetworkFirewall::RuleGroup',
@@ -273,6 +305,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
+            'AWS::ECS::TaskDefinition',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
             'AWS::S3::AccountPublicAccessBlock',
@@ -322,7 +355,15 @@ class PolicyMetaLint(BaseTest):
             raise AssertionError(
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
+        # config service can't be bothered to update their sdk correctly
+        invalid_ignore = {
+            'AWS::EKS::Cluster',
+            'AWS::ECS::Service',
+            'AWS::ECS::TaskDefinition',
+            'AWS::NetworkFirewall::Firewall'
+        }
         bad_types = resource_config_types.difference(config_types)
+        bad_types = bad_types.difference(invalid_ignore)
         if bad_types:
             raise AssertionError(
                 "Invalid config types \n %s" % ('\n'.join(bad_types)))
@@ -340,7 +381,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -404,7 +445,7 @@ class PolicyMetaLint(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'healthcheck', 'event-rule-target',
+            'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []
@@ -510,6 +551,40 @@ class PolicyMetaLint(BaseTest):
             self.fail(
                 "Missing permissions %d on \n\t%s"
                 % (len(missing), "\n\t".join(sorted(missing)))
+            )
+
+    def test_deprecation_dates(self):
+        def check_deprecations(source):
+            issues = set()
+            for dep in getattr(source, 'deprecations', ()):
+                when = dep.removed_after
+                if when is not None:
+                    name = f"{source.__module__}.{source.__name__}"
+                    if not isinstance(when, str):
+                        issues.add(f"{name}: \"{dep}\", removed_after attribute must be a string")
+                        continue
+                    try:
+                        datetime.strptime(when, "%Y-%m-%d")
+                    except ValueError:
+                        issues.add(f"{name}: \"{dep}\", removed_after must be a valid date"
+                                   f" in the format 'YYYY-MM-DD', got '{when}'")
+            return issues
+        issues = check_deprecations(Policy)
+        for name, cloud in clouds.items():
+            for resource_name, resource in cloud.resources.items():
+                issues = issues.union(check_deprecations(resource))
+                for fname, f in resource.filter_registry.items():
+                    if fname in ('and', 'or', 'not'):
+                        continue
+                    issues = issues.union(check_deprecations(f))
+                for aname, a in resource.action_registry.items():
+                    issues = issues.union(check_deprecations(a))
+        for name, mode in execution.items():
+            issues = issues.union(check_deprecations(mode))
+        if issues:
+            self.fail(
+                "Deprecation validation issues with \n\t%s" %
+                "\n\t".join(sorted(issues))
             )
 
 

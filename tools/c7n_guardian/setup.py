@@ -16,6 +16,7 @@ setup(
     long_description=description,
     long_description_content_type='text/markdown',
     classifiers=[
+        "License :: OSI Approved :: Apache Software License",
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],

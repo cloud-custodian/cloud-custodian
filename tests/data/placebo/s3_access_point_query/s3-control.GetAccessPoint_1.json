@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Name": "c7n-ap-moving-doe",
+        "Bucket": "c7n-ap-moving-doe",
+        "NetworkOrigin": "Internet",
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": false,
+            "RestrictPublicBuckets": false
+        },
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 9,
+            "day": 4,
+            "hour": 14,
+            "minute": 50,
+            "second": 56,
+            "microsecond": 0
+        },
+        "Alias": "c7n-ap-moving-doe-4zh4cmmki3my5asuwpqiocjgrqknsuse1a-s3alias",
+        "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-moving-doe",
+        "Endpoints": {
+            "ipv4": "s3-accesspoint.us-east-1.amazonaws.com",
+            "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+            "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+            "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com"
+        }
+    }
+}
