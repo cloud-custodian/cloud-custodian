@@ -24,7 +24,7 @@
             },
             "properties": {
                 "createMode": "Default",
-                "version": "5.6",
+                "version": "5.7",
                 "administratorLogin": "adminuser",
                 "administratorLoginPassword": "[concat('Pass1!@', variables('suffix'))]",
                 "storageProfile": {

@@ -83,3 +83,54 @@ class WorkspacesTest(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['VolumeEncryptionKey'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/workspaces')
+
+    def test_workspaces_image_query(self):
+        session_factory = self.replay_flight_data("test_workspaces_image_query")
+        p = self.load_policy(
+            {
+                "name": "workspaces-image-query-test",
+                "resource": "workspaces-image"
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_workspaces_image_tags(self):
+        session_factory = self.replay_flight_data('test_workspaces_image_tag')
+        new_tag = {'env': 'dev'}
+        p = self.load_policy(
+            {
+                'name': 'workspaces-image-tag',
+                'resource': 'workspaces-image',
+                'filters': [{
+                    'tag:env': 'absent'
+                }],
+                'actions': [{
+                    'type': 'tag',
+                    'tags': new_tag
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        imageId = resources[0].get('ImageId')
+        workspaces = session_factory().client('workspaces')
+        call = workspaces.describe_tags(ResourceId=imageId)
+        self.assertEqual({'Key': 'env', 'Value': 'dev'}, call['TagList'][0])
+
+    def test_workspaces_image_permissions(self):
+        session_factory = self.replay_flight_data('test_workspaces_image_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-image-cross-account',
+                'resource': 'workspaces-image',
+                'filters': [{
+                    'type': 'cross-account'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['XXXXXXXXXXXX'])

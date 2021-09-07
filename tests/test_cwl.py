@@ -70,6 +70,21 @@ class LogGroupTest(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['kmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/cw')
 
+    def test_subscription_filter(self):
+        factory = self.replay_flight_data("test_log_group_subscription_filter")
+        p = self.load_policy(
+            {
+                "name": "subscription-filter",
+                "resource": "log-group",
+                "filters": [{"type": "subscription-filter"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:SubscriptionFilters"][0]["destinationArn"],
+            "arn:aws:lambda:us-east-2:1111111111111:function:CloudCustodian")
+
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")
         p = self.load_policy({

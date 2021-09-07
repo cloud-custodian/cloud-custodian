@@ -610,7 +610,7 @@ class SSMDocument(QueryResourceManager):
             {
                 'Key': 'Owner',
                 'Values': ['Self']}]})
-        name = 'Name'
+        name = id = 'Name'
         date = 'RegistrationDate'
         arn_type = 'Document'
 
