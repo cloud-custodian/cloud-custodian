@@ -1662,10 +1662,10 @@ class DeleteNetworkInterface(BaseAction):
                 op: glob
                 key: Description
                 value: "AWS Lambda VPC ENI*"
-              - "tag:custodian_status": absent
+              - "tag:maid_status": absent
             actions:
               - type: mark-for-op
-                tag: custodian_status
+                tag: maid_status
                 msg: "Orphaned Lambda VPC ENI: {op}@{action_date}"
                 op: delete
                 days: 1
@@ -1675,7 +1675,7 @@ class DeleteNetworkInterface(BaseAction):
             resource: eni
             filters:
               - type: marked-for-op
-                tag: custodian_status
+                tag: maid_status
                 op: delete
             actions:
               - type: delete

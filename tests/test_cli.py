@@ -575,7 +575,7 @@ class MetricsTest(CliTest):
                         "resource": "ec2",
                         "mode": {"type": "ec2-instance-state", "events": ["running"]},
                         "filters": [
-                            {"tag:custodian_status": "absent"},
+                            {"tag:maid_status": "absent"},
                             {
                                 "or": [
                                     {"tag:App": "absent"},
