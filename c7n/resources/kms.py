@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
+from datetime import datetime, timezone
 import json
 from collections import defaultdict
 from functools import lru_cache
@@ -398,4 +399,11 @@ class KmsPostFinding(PostFinding):
             select_keys(r, [
                 'AWSAccount', 'CreationDate', 'KeyId',
                 'KeyManager', 'Origin', 'KeyState'])))
+
+        # Securityhub expects a unix timestamp for CreationDate
+        if 'CreationDate' in payload and isinstance(payload['CreationDate'], datetime):
+            payload['CreationDate'] = (
+                payload['CreationDate'].replace(tzinfo=timezone.utc).timestamp()
+            )
+
         return envelope

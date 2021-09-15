@@ -373,13 +373,13 @@ class KMSTagging(BaseTest):
         rfinding = p.resource_manager.actions[0].format_resource(
             resources[0])
         self.maxDiff = None
-        rfinding['Details']['AwsKmsKey'].pop('CreationDate')
         self.assertEqual(
             rfinding,
             {'Details': {'AwsKmsKey': {
                 'KeyId': '44d25a5c-7efa-44ed-8436-b9511ea921b3',
                 'KeyManager': 'CUSTOMER',
                 'KeyState': 'Enabled',
+                'CreationDate': 1493967398.394,
                 'Origin': 'AWS_KMS'}},
              'Id': 'arn:aws:kms:us-west-2:644160558196:alias/44d25a5c-7efa-44ed-8436-b9511ea921b3',
              'Partition': 'aws',
