@@ -14,7 +14,7 @@ For the notify action in the policy to work you must have setup the c7n_mailer t
 https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer
 
 Mailer Setup Guide:
-https://devops4solutions.com/cloud-custodian-configure-email/
+https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_mailer/README.md
 
 
 
