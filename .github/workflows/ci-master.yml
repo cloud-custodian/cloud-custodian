@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - master
+      - main
   pull_request:
     branches:
       - master
+      - main
 
 jobs:
   Lint:
@@ -44,11 +46,8 @@ jobs:
       - name: Bootstrap poetry
         shell: bash
         run: |
-          python -m pip install --upgrade poetry==1.1.8
-
-      - name: Configure poetry
-        shell: bash
-        run: poetry config virtualenvs.in-project true
+          curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
+            | python - -y --version 1.1.8
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -62,13 +61,23 @@ jobs:
         shell: bash
         run: timeout 10s poetry run pip --version || rm -rf .venv
 
+      - name: Virtualenv
+        shell: bash
+        run: |
+          if [ -d .venv ];
+             echo "cached virtualenv"
+          then
+          else
+             python -m venv .venv
+          endif
+          source .venv/bin/activate
+
       - name: Install Deps
         run: |
           make install-poetry
 
       - name: Test
         run: |
-
           . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
 
       - name: License Check
