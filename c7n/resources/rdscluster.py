@@ -23,17 +23,11 @@ log = logging.getLogger('custodian.rds-cluster')
 class DescribeCluster(DescribeSource):
 
     def get_resources(self, ids):
-        """Support server side filtering on arns
-        """
-        if ids[0].startswith('arn:'):
-            filters = [
-                {
-                    'Name': 'db-cluster-id',
-                    'Values': ids
-                },
-            ]
-            params = {'Filters': filters}
-        return self.query.filter(self.manager, **params)
+        return self.query.filter(
+            self.manager,
+            **{
+                'Filters': [
+                    {'Name': 'db-cluster-id', 'Values': ids}]})
 
     def augment(self, resources):
         for r in resources:
