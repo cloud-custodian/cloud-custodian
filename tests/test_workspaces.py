@@ -84,6 +84,28 @@ class WorkspacesTest(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['VolumeEncryptionKey'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/workspaces')
 
+    def test_workspaces_terminate(self):
+        session_factory = self.replay_flight_data('test_workspaces_terminate')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-terminate',
+                'resource': 'workspaces',
+                'filters': [{
+                    'tag:DeleteMe': 'present'
+                }],
+                'actions': [{
+                    'type': 'terminate'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        workspaceId = resources[0].get('WorkspaceId')
+        client = session_factory().client('workspaces')
+        call = client.describe_workspaces(WorkspaceIds=[workspaceId])
+        self.assertEqual(call['Workspaces'][0]['State'], 'TERMINATING')
+
     def test_workspaces_image_query(self):
         session_factory = self.replay_flight_data("test_workspaces_image_query")
         p = self.load_policy(
