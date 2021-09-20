@@ -64,7 +64,8 @@ jobs:
       - name: Virtualenv
         shell: bash
         run: |
-          if [ -d .venv ]; then
+          if [[ -d .venv ]]
+          then
              echo "cached virtualenv"
           else
              python -m venv .venv
