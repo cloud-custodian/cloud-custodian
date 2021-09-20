@@ -64,12 +64,11 @@ jobs:
       - name: Virtualenv
         shell: bash
         run: |
-          if [ -d .venv ];
+          if [ -d .venv ]; then
              echo "cached virtualenv"
-          then
           else
              python -m venv .venv
-          endif
+          fi
           source .venv/bin/activate
 
       - name: Install Deps
