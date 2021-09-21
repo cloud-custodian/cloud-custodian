@@ -31,7 +31,7 @@ jobs:
     needs: Lint
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.9]
     steps:
       - uses: actions/checkout@v2
@@ -49,16 +49,6 @@ jobs:
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
             | python - -y --version 1.1.8
 
-      - name: Update PATH
-        if: ${{ matrix.os != 'Windows' }}
-        shell: bash
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Update Path for Windows
-        if: ${{ matrix.os == 'Windows' }}
-        shell: bash
-        run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
-
       - name: Set up cache
         uses: actions/cache@v2
         id: cache
@@ -74,16 +64,32 @@ jobs:
       - name: Virtualenv
         shell: bash
         run: |
+          echo $OSTYPE
           if [[ -d .venv ]]
           then
              echo "cached virtualenv"
           else
              python -m venv .venv
           fi
-          source .venv/bin/activate
+
+      - name: Update PATH
+        if: ${{ matrix.os != 'Windows' }}
+        shell: bash
+        run: |
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+
+      - name: Update Path for Windows
+        if: ${{ matrix.os == 'Windows' }}
+        shell: bash
+        run: |
+          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+          echo "$PWD\.venv\bin" >> $GITHUB_PATH
 
       - name: Install Deps
         run: |
+          pip install -U pip
+          pip install -U wheel
           make install-poetry
 
       - name: Test
