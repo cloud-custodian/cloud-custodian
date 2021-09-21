@@ -85,7 +85,7 @@ pkg-publish-wheel:
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 test-poetry:
-	. $(PWD)/test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+	. test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
 
 test:
 	./bin/tox -e py38
