@@ -2,10 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import os
-import platform
 import re
-import sys
-from importlib import reload
 
 import pytest
 from adal import AdalError
@@ -33,13 +30,6 @@ class SessionTest(BaseTest):
     authorization_file_no_sub = os.path.join(os.path.dirname(__file__),
                                            'data',
                                            'test_auth_file_no_sub.json')
-
-    def setUp(self):
-        super(SessionTest, self).setUp()
-
-    def tearDown(self):
-        super(SessionTest, self).tearDown()
-        reload(sys.modules['c7n_azure.session'])
 
     def mock_init(self, client_id, secret, tenant, resource):
         pass
@@ -259,7 +249,7 @@ class SessionTest(BaseTest):
                                 constants.ENV_CLIENT_SECRET: 'secret',
                                 constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME: 'test'
                             }, clear=True):
-                with patch('c7n_azure.utils.ManagedGroupHelper.get_subscriptions_list',
+                with patch('c7n_azure.session.ManagedGroupHelper.get_subscriptions_list',
                            return_value=[]):
                     s = Session()
                     self.assertEqual(s.get_function_target_subscription_name(), 'test')
@@ -301,9 +291,8 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.management + ".default",
                          client._client._config.credential_scopes[0])
 
-    @patch('c7n_azure.utils.get_keyvault_secret', return_value='{}')
+    @patch('c7n_azure.session.get_keyvault_secret', return_value='{}')
     def test_compare_auth_params(self, _1):
-        reload(sys.modules['c7n_azure.session'])
         with patch.dict(os.environ,
                         {
                             constants.ENV_TENANT_ID: 'tenant',
@@ -324,10 +313,9 @@ class SessionTest(BaseTest):
         self.assertFalse(file_params.pop('enable_cli_auth', None))
         self.assertEqual(env_params, file_params)
 
-    @patch('c7n_azure.utils.get_keyvault_secret',
+    @patch('c7n_azure.session.get_keyvault_secret',
            return_value='{"client_id": "client", "client_secret": "secret"}')
     def test_kv_patch(self, _1):
-        reload(sys.modules['c7n_azure.session'])
         with patch.dict(os.environ,
                         {
                             constants.ENV_TENANT_ID: 'tenant',
@@ -343,11 +331,9 @@ class SessionTest(BaseTest):
             self.assertEqual(auth_params.get('client_id'), 'client')
             self.assertEqual(auth_params.get('client_secret'), 'secret')
 
-    @patch('c7n_azure.utils.get_keyvault_secret')
+    @patch('c7n_azure.session.get_keyvault_secret')
     @patch('c7n_azure.session.log.error')
     def test_initialize_session_kv_authentication_error(self, mock_log, mock_get_kv_secret):
-        reload(sys.modules['c7n_azure.session'])
-
         with self.assertRaises(SystemExit):
             mock_get_kv_secret.side_effect = HTTPError()
 
@@ -380,10 +366,7 @@ class SessionTest(BaseTest):
         result = s.get_auth_endpoint(constants.STORAGE_AUTH_ENDPOINT)
         self.assertEqual('https://storage.azure.com/', result)
 
-    # this seems to be failing on windows ci infra
-    # https://github.com/cloud-custodian/cloud-custodian/runs/3506742597
-    @pytest.mark.skipif(platform.system() == 'Windows', reason="Windows CI Issue")
-    @patch('c7n_azure.utils.C7nRetryPolicy.__init__', return_value=None)
+    @patch('c7n_azure.session.C7nRetryPolicy.__init__', return_value=None)
     def test_retry_policy_override(self, c7n_retry):
         s = Session()
         s.client('azure.mgmt.compute.ComputeManagementClient')

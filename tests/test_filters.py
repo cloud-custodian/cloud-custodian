@@ -1391,6 +1391,7 @@ class TestReduceFilter(BaseFilterTest):
                 "limit": 1
             }
         )
+        f.validate()
         rs = f.process(resources)
         self.assertEqual(
             [r['InstanceId'] for r in rs],
