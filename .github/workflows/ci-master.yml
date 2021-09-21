@@ -108,8 +108,12 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          . test.env && poetry run pytest -n auto tests tools
-
+          if [[ "$OSTYPE" == "msys" ]]
+          then
+            . test.env && poetry run pytest tests tools
+          else
+            . test.env && poetry run pytest -n auto tests tools
+          fi
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
         run: |
