@@ -58,7 +58,10 @@ jobs:
 
       - name: Update PATH
         shell: bash
+        env:
+          CACHE_STATUS: ${{ steps.cache.outputs.cache-hit }}
         run: |
+          echo "cache - $CACHE_STATUS"
           if [[ "$OSTYPE" == "msys" ]]
           then
             echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
@@ -76,7 +79,7 @@ jobs:
         run: poetry run pip --version || rm -rf .venv
 
       - name: Virtualenv
-        if: steps.cache.outputs.cache-hit == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           if [[ -d .venv ]]
@@ -88,7 +91,7 @@ jobs:
 
 
       - name: Install Deps
-        if: steps.cache.outputs.cache-hit == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           pip install -U pip
           pip install -U wheel
