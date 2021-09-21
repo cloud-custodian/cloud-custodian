@@ -73,20 +73,18 @@ jobs:
           fi
 
       - name: Update PATH
-        if: ${{ matrix.os != 'Windows' }}
         shell: bash
         run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
-
-      - name: Update Path for Windows
-        if: ${{ matrix.os == 'Windows' }}
-        shell: bash
-        run: |
-          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
-          echo "$PWD\.venv\bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+          if [[ "$OSTYPE" == "msys" ]]
+          then
+            echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+            echo "$PWD\.venv\bin" >> $GITHUB_PATH
+            echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+          else
+            echo "$HOME/.local/bin" >> $GITHUB_PATH
+            echo "$PWD/.venv/bin" >> $GITHUB_PATH
+            echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+          fi
 
       - name: Install Deps
         run: |
