@@ -108,7 +108,7 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          . test.env && poetry run pytest -n auto tests
+          . test.env && poetry run pytest -n auto tests tools
 
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
