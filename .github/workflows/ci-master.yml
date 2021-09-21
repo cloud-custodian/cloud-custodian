@@ -64,7 +64,6 @@ jobs:
       - name: Virtualenv
         shell: bash
         run: |
-          echo $OSTYPE
           if [[ -d .venv ]]
           then
              echo "cached virtualenv"
@@ -88,15 +87,13 @@ jobs:
 
       - name: Install Deps
         run: |
-          echo `which pip`
-          echo `which poetry`
           pip install -U pip
           pip install -U wheel
           make install-poetry
 
       - name: Test
         run: |
-          . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+          make test-poetry
 
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')

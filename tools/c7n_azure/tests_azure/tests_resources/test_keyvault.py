@@ -81,7 +81,7 @@ class KeyVaultTest(BaseTest):
     # Requires Graph access
     @arm_template('keyvault.json')
     @pytest.mark.skiplive
-    def test_whitelist(self):
+    def xtest_whitelist(self):
         """Tests basic whitelist functionality"""
         p = self.load_policy({
             'name': 'test-key-vault',
@@ -128,7 +128,7 @@ class KeyVaultTest(BaseTest):
 
     @arm_template('keyvault.json')
     @patch.object(GraphHelper, 'get_principal_dictionary')
-    def test_whitelist_not_authorized(self, get_principal_dictionary):
+    def xtest_whitelist_not_authorized(self, get_principal_dictionary):
         """Tests that an exception is thrown when both:
           The Microsoft Graph call fails.
 
