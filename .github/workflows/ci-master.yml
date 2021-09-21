@@ -76,6 +76,7 @@ jobs:
         run: poetry run pip --version || rm -rf .venv
 
       - name: Virtualenv
+        if: steps.cache.outputs.cache-hit == 'false'
         shell: bash
         run: |
           if [[ -d .venv ]]
@@ -87,6 +88,7 @@ jobs:
 
 
       - name: Install Deps
+        if: steps.cache.outputs.cache-hit == 'false'
         run: |
           pip install -U pip
           pip install -U wheel
@@ -95,7 +97,7 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+          . test.env && pytest -n auto tests tools
 
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
