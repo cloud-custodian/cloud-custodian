@@ -80,7 +80,6 @@ jobs:
             echo "$PWD/.venv/bin" >> $GITHUB_PATH
             echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
           fi
-          poetry config virtualenvs.create false
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
@@ -98,6 +97,7 @@ jobs:
              python -m venv .venv
           fi
           ls .venv
+          poetry config virtualenvs.create false
 
       - name: Install Deps
         if: steps.cache.outputs.cache-hit != 'true'
