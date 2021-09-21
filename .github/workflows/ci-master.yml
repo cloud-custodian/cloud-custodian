@@ -61,7 +61,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
 
       - name: Update PATH
         shell: bash
@@ -102,16 +102,20 @@ jobs:
         run: |
           pip install -U pip
           pip install -U wheel
-          make install-poetry
-
+          poetry install
+          if [[ "$OSTYPE" == "msys" ]]
+          then
+            ls .venv
+            ls .venv\Scripts
+          fi
       - name: Test
         shell: bash
         run: |
           if [[ "$OSTYPE" == "msys" ]]
           then
-            . test.env && poetry run pytest tests
+            . test.env && poetry run pytest -n auto tests
           else
-            . test.env && poetry run pytest -n auto tests tools
+            . test.env && poetry run pytest -n auto tests
           fi
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
