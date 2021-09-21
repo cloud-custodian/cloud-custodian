@@ -49,6 +49,16 @@ jobs:
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
             | python - -y --version 1.1.8
 
+      - name: Update PATH
+        if: ${{ matrix.os != 'Windows' }}
+        shell: bash
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Update Path for Windows
+        if: ${{ matrix.os == 'Windows' }}
+        shell: bash
+        run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+
       - name: Set up cache
         uses: actions/cache@v2
         id: cache
