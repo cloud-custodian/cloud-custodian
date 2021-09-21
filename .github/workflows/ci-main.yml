@@ -103,22 +103,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -U wheel
-          if [[ "$OSTYPE" == "msys" ]]
-          then
-            make install-poetry-windows
-          else
-            make install-poetry
-          fi
+          make install-poetry
 
       - name: Test
         shell: bash
         run: |
-          if [[ "$OSTYPE" == "msys" ]]
-          then
-            . test.env && poetry run pytest -n auto tests
-          else
-            . test.env && poetry run pytest -n auto tests
-          fi
+          . test.env && poetry run pytest -n auto tests
+
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
         run: |
