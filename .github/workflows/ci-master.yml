@@ -101,8 +101,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          python -m pip install –upgrade pip
-          pip install -U wheel
+          python -m pip install –U pip
+          pip install -U wheelp
           poetry install
           if [[ "$OSTYPE" == "msys" ]]
           then
