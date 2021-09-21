@@ -107,7 +107,7 @@ jobs:
           if [[ "$OSTYPE" == "msys" ]]
           then
             ls .venv
-            ls .venv\Scripts
+            ls .venv\\Scripts
           fi
 
       - name: Test
