@@ -99,6 +99,7 @@ jobs:
 
       - name: Install Deps
         if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
         run: |
           pip install -U pip
           pip install -U wheel
