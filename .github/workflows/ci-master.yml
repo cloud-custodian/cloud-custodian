@@ -99,6 +99,6 @@ jobs:
           . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
 
       - name: License Check
-        if: contains(matrix.python-version, '3.9')
+        if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
         run: |
           poetry run python tools/dev/license-check.py
