@@ -62,6 +62,7 @@ jobs:
           CACHE_STATUS: ${{ steps.cache.outputs.cache-hit }}
         run: |
           echo "cache - $CACHE_STATUS"
+          echo "cur-dir - $PWD"
           if [[ "$OSTYPE" == "msys" ]]
           then
             echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
@@ -100,7 +101,7 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          . test.env && pytest -n auto tests tools
+          . test.env && poetry run pytest -n auto tests tools
 
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
