@@ -78,6 +78,7 @@ jobs:
         run: |
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
 
       - name: Update Path for Windows
         if: ${{ matrix.os == 'Windows' }}
@@ -85,9 +86,12 @@ jobs:
         run: |
           echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
           echo "$PWD\.venv\bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
 
       - name: Install Deps
         run: |
+          echo `which pip`
+          echo `which poetry`
           pip install -U pip
           pip install -U wheel
           make install-poetry
