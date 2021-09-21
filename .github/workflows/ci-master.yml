@@ -94,7 +94,12 @@ jobs:
 
       - name: Test
         run: |
-          . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+          if [[ "$OSTYPE" == "msys" ]]
+          then
+            source .\test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+          else
+            . test.env && poetry run python -m pytest -n auto -p no:sugar -q tests tools
+          fi
 
       - name: License Check
         if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
