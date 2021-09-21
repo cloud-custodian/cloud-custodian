@@ -80,6 +80,7 @@ jobs:
             echo "$PWD/.venv/bin" >> $GITHUB_PATH
             echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
           fi
+          poetry config virtualenvs.create false
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
@@ -96,7 +97,7 @@ jobs:
           else
              python -m venv .venv
           fi
-
+          ls .venv
 
       - name: Install Deps
         if: steps.cache.outputs.cache-hit != 'true'
@@ -110,7 +111,7 @@ jobs:
         run: |
           if [[ "$OSTYPE" == "msys" ]]
           then
-            . test.env && poetry run pytest tests tools
+            . test.env && poetry run pytest tests
           else
             . test.env && poetry run pytest -n auto tests tools
           fi
