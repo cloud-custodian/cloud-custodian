@@ -15,7 +15,7 @@ install-poetry:
 install-poetry-windows:
 	current_dir = $(shell pwd)
 	poetry install
-	for pkg in $(PKG_SET_WIN32); do cd $$pkg && poetry install && cd $$current_dir; done
+	for pkg in $(PKG_SET_WIN32); do echo "Install $$pkg" && cd $$pkg && poetry install && cd $$current_dir; done
 
 pkg-rebase:
 	rm -f poetry.lock
