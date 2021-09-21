@@ -2,6 +2,8 @@ SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
 PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform
 
+PKG_SET_WIN32 = tools\c7n_gcp tools\c7n_azure tools\c7n_kube tools\c7n_openstack tools\c7n_mailer tools\c7n_logexporter tools\c7n_policystream tools\c7n_trailcreator tools\c7n_org tools\c7n_sphinxext tools\c7n_terraform
+
 install:
 	python3 -m venv .
 	. bin/activate && pip install -r requirements-dev.txt
@@ -9,6 +11,16 @@ install:
 install-poetry:
 	poetry install
 	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
+
+install-poetry-windows:
+	current_dir = $(shell pwd)
+	poetry install
+	for pkg in $(PKG_SET_WIN32)
+        do
+         cd $$pkg
+         poetry install
+         cd $$current_dir
+        done
 
 pkg-rebase:
 	rm -f poetry.lock
