@@ -10,7 +10,7 @@ install:
 
 install-poetry:
 	poetry install
-	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install && cd ../..; done
+	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry -vvv install && cd ../..; done
 
 install-poetry-windows:
 	current_dir = $(shell pwd)
