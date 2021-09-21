@@ -102,7 +102,7 @@ jobs:
         shell: bash
         run: |
           python -m pip install --upgrade pip
-          pip install -U wheelp
+          pip install -U wheel
           poetry install
           if [[ "$OSTYPE" == "msys" ]]
           then
