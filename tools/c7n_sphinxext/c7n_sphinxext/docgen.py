@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import difflib
 from functools import partial
 import hashlib
 import logging
@@ -252,17 +253,27 @@ def main(provider, output_dir, group_by):
         pdb.post_mortem(sys.exc_info()[-1])
 
 
-def write_modified_file(fpath, content):
+def write_modified_file(fpath, content, diff_changes=False):
     content_md5 = hashlib.md5(content.encode('utf8'))
+    file_md5 = disk_content = None
 
     if os.path.exists(fpath):
         with open(fpath, 'rb') as fh:
-            file_md5 = hashlib.md5(fh.read())
-    else:
-        file_md5 = None
+            disk_content = fh.read()
+
+    if disk_content:
+        file_md5 = hashlib.md5(content.encode('utf8'))
 
     if file_md5 and content_md5.hexdigest() == file_md5.hexdigest():
         return False
+
+    if diff_changes:
+        sys.stdout.writelines(
+            difflib.context_diff(
+                content.split('\n'),
+                disk_content.split('\n'),
+                fromfile='a/%s' % fpath, tofile='b/%s' % fpath)
+        )
 
     with open(fpath, 'w') as fh:
         fh.write(content)
@@ -290,6 +301,8 @@ def _main(provider, output_dir, group_by):
     written = 0
     groups = {}
 
+    diff_changes = True
+
     for r in provider_class.resources.values():
         group = group_by(r)
         if not isinstance(group, list):
@@ -304,7 +317,8 @@ def _main(provider, output_dir, group_by):
         written += write_modified_file(
             rpath, t.render(
                 provider_name=provider,
-                resource=r))
+                resource=r),
+            diff_changes=not written)
 
     # Create files for all groups
     for key, group in sorted(groups.items()):
