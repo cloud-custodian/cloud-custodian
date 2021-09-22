@@ -62,6 +62,7 @@ class DirectConnectGatewayAssociations(ValueFilter):
     """
     schema = type_schema('associations', rinherit=ValueFilter.schema)
     permissions = ('directconnect:DescribeDirectConnectGatewayAssociations',)
+    annotation_key = 'c7n:directConnectGatewayAssociations'
 
     def process(self, resources, event=None):
 
@@ -69,7 +70,7 @@ class DirectConnectGatewayAssociations(ValueFilter):
 
         def _augment(r):
             try:
-                r['directConnectGatewayAssociations'] = self.manager.retry(
+                r[self.annotation_key] = self.manager.retry(
                     client.describe_direct_connect_gateway_associations,
                     directConnectGatewayId=r['directConnectGatewayId']).get(
                     'directConnectGatewayAssociations')
@@ -83,5 +84,11 @@ class DirectConnectGatewayAssociations(ValueFilter):
             return r
 
         with self.executor_factory(max_workers=3) as w:
+            results = []
             resources = list(filter(None, w.map(_augment, resources)))
-            return super().process(resources, event)
+            for r in resources:
+                for association in r[self.annotation_key]:
+                    if self.match(association):
+                        results.append(r)
+                        break
+            return results

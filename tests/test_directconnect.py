@@ -65,9 +65,9 @@ class DirectConnectGatewayTest(BaseTest):
                 "filters": [
                     {
                         "type": "associations",
-                        "key": "directConnectGatewayAssociations[].associatedGateway.ownerAccount",
-                        "value": ["XXXXXXXXXXX", "YYYYYYYYYYYY", "ZZZZZZZZZZZZ", "XYZXYZXYZXYZ"],
-                        "op": "intersect"
+                        "key": "associatedGateway.ownerAccount",
+                        "op": "not-in",
+                        "value": ["XXXXXXXXXXXX", "YYYYYYYYYYYY", "ZZZZZZZZZZZZ", "XYZXYZXYZXYZ"]
                     }
                 ]
             },

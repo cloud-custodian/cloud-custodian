@@ -9,7 +9,7 @@
                 "associatedGateway": {
                     "id": "vgw-0cf69670ccb32b594",
                     "type": "virtualPrivateGateway",
-                    "ownerAccount": "XXXXXXXXXXXX",
+                    "ownerAccount": "AAAAAAAAAAAA",
                     "region": "us-east-1"
                 },
                 "associationId": "1a8988db-6459-4a06-97c5-968535458e06",
