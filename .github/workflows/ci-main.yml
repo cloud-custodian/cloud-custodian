@@ -119,12 +119,7 @@ jobs:
           COV_RUN: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
         run: |
           echo "code cov $COV_RUN"
-#          if [[ "$COV_RUN" == "true" ]]
-#          then
-#           make test-poetry-cov
-#         else
           make test-poetry
-#          fi
 
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v2
