@@ -1,4 +1,4 @@
-name: "CI"
+oname: "CI"
 
 on:
   push:
@@ -48,13 +48,14 @@ jobs:
     needs: Lint
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
+        # , macos-latest, windows-latest]
         python-version: [3.9]
         include:
-          - os: ubuntu-latest
-            python-version: 3.6
-          - os: ubuntu-latest
-            python-version: 3.7
+#          - os: ubuntu-latest
+#            python-version: 3.6
+#          - os: ubuntu-latest
+#            python-version: 3.7
           - os: ubuntu-latest
             python-version: 3.8
     steps:
@@ -119,8 +120,15 @@ jobs:
           COV_RUN: ${{ contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu') }}
         run: |
           echo "code cov $COV_RUN"
-          . test.env && poetry run pytest -n auto tests tools
-
+          if [[ "$COV_RUN" == "true" ]]
+          then
+            . test.env && poetry run pytest -n auto tests tools \
+              --cov c7n --cov tools/c7n_azure/c7n_azure \
+              --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
+              --cov tools/c7n_mailer/c7n_mailer
+          else
+            . test.env && poetry run pytest -n auto tests tools
+          fi
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v2
         if: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
