@@ -93,7 +93,7 @@ jobs:
       - name: Build Docs
         shell: bash
         run: |
-          poetry run make sphinx
+          make sphinx
 
   Tests:
     runs-on: "${{ matrix.os }}"
