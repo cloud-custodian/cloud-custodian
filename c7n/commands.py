@@ -481,6 +481,8 @@ def schema_cmd(options):
     if len(components) == 3:
         cls = resource_info['classes'][category][item]
         _print_cls_schema(cls)
+        if category == 'actions':
+            print("Permissions: " + str(cls().get_permissions()))
 
         return
 
