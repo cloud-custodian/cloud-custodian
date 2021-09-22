@@ -93,22 +93,23 @@ jobs:
       - name: Build Docs
         shell: bash
         run: |
-          make sphinx
+          poetry run make sphinx
 
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
+        # , macos-latest, windows-latest]
         python-version: [3.9]
         include:
           - os: ubuntu-latest
             python-version: 3.8
-          - os: ubuntu-latest
-            python-version: 3.7
-          - os: ubuntu-latest
-            python-version: 3.6
+#          - os: ubuntu-latest
+#            python-version: 3.7
+#          - os: ubuntu-latest
+#            python-version: 3.6
     steps:
       - uses: actions/checkout@v2
         with:
