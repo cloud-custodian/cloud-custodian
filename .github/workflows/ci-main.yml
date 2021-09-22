@@ -122,13 +122,16 @@ jobs:
           echo "code cov $COV_RUN"
           if [[ "$COV_RUN" == "true" ]]
           then
+            echo "Running Coverage Test"
             . test.env && poetry run pytest -n auto tests tools \
               --cov c7n --cov tools/c7n_azure/c7n_azure \
               --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
               --cov tools/c7n_mailer/c7n_mailer
           else
+            echo "Running Sans Coverage Test"          
             . test.env && poetry run pytest -n auto tests tools
           fi
+
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v2
         if: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
