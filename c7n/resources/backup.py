@@ -2,9 +2,37 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.utils import local_session
+
+
+class DescribeBackup(DescribeSource):
+
+    def augment(self, resources):
+        super(DescribeBackup, self).augment(resources)
+        client = local_session(self.manager.session_factory).client('backup')
+        results = []
+        for r in resources:
+            try:
+                tags = client.list_tags(ResourceArn=r['BackupPlanArn']).get('Tags', {})
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            results.append(r)
+        return results
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('backup')
+        resources = []
+
+        for rid in resource_ids:
+            try:
+                resources.append(
+                    client.get_backup_plan(BackupPlanId=rid)['BackupPlan'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+        return resources
 
 
 @resources.register('backup-plan')
@@ -20,28 +48,24 @@ class BackupPlan(QueryResourceManager):
         config_type = cfn_type = 'AWS::Backup::BackupPlan'
         universal_taggable = object()
 
-    def augment(self, resources):
-        super(BackupPlan, self).augment(resources)
-        client = local_session(self.session_factory).client('backup')
-        results = []
-        for r in resources:
-            try:
-                tags = client.list_tags(ResourceArn=r['BackupPlanArn']).get('Tags', {})
-            except client.exceptions.ResourceNotFoundException:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-            results.append(r)
+    source_mapping = {
+        'describe': DescribeBackup,
+        'config': ConfigSource
+    }
 
-        return results
+
+class DescribeVault(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super(DescribeVault, self).augment(resources))
 
     def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.session_factory).client('backup')
+        client = local_session(self.manager.session_factory).client('backup')
         resources = []
-
         for rid in resource_ids:
             try:
                 resources.append(
-                    client.get_backup_plan(BackupPlanId=rid)['BackupPlan'])
+                    client.describe_backup_vault(BackupVaultName=rid))
             except client.exceptions.ResourceNotFoundException:
                 continue
         return resources
@@ -58,20 +82,6 @@ class BackupVault(QueryResourceManager):
         arn_type = 'backup-vault'
         universal_taggable = object()
         config_type = cfn_type = 'AWS::Backup::BackupVault'
-
-    def augment(self, resources):
-        return universal_augment(self, super(BackupVault, self).augment(resources))
-
-    def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.session_factory).client('backup')
-        resources = []
-        for rid in resource_ids:
-            try:
-                resources.append(
-                    client.describe_backup_vault(BackupVaultName=rid))
-            except client.exceptions.ResourceNotFoundException:
-                continue
-        return self.augment(resources)
 
 
 @BackupVault.filter_registry.register('kms-key')
