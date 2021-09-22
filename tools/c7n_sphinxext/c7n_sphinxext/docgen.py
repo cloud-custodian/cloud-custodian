@@ -268,7 +268,7 @@ def write_modified_file(fpath, content, diff_changes=False):
     if file_md5 and content_md5.hexdigest() == file_md5.hexdigest():
         return False
 
-    if diff_changes:
+    if diff_changes and disk_content:
         sys.stdout.writelines(
             difflib.context_diff(
                 content.split('\n'),

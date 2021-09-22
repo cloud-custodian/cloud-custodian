@@ -68,7 +68,11 @@ jobs:
         uses: actions/cache@v2
         id: sphinx
         with:
-          path: docs/build
+          path: |
+            docs/build
+            docs/source/aws/resources
+            docs/source/gcp/resources
+            docs/source/azure/resources
           key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}
 
       - name: Update PATH
