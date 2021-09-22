@@ -127,8 +127,8 @@ jobs:
               --cov c7n --cov tools/c7n_azure/c7n_azure \
               --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
               --cov tools/c7n_mailer/c7n_mailer
+            poetry run coverage xml
           else
-            echo "Running Sans Coverage Test"          
             . test.env && poetry run pytest -n auto tests tools
           fi
 
