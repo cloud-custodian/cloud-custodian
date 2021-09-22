@@ -121,8 +121,8 @@ jobs:
           echo "code cov $COV_RUN"
 #          if [[ "$COV_RUN" == "true" ]]
 #          then
- #           make test-poetry-cov
- #         else
+#           make test-poetry-cov
+#         else
           make test-poetry
 #          fi
 
