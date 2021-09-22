@@ -755,115 +755,104 @@ class TypeMeta(type):
             identifier = cls.config_type
         elif cls.cfn_type:
             identifier = cls.cfn_type
-        elif cls.arn_type:
+        elif cls.arn_type and cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
-        elif cls.enum_spec:
+        elif cls.enum_spec and cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.enum_spec[1])
-        else:
+        elif cls.service:
             identifier = "AWS::%s::%s" % (cls.service.title(), cls.id)
+        else:
+            identifier = cls.__name__
         return "<TypeInfo %s>" % identifier
 
 
 class TypeInfo(metaclass=TypeMeta):
-    """Resource Type Metadata"""
 
-    ###########
+    """
+    Resource Type Metadata
+
+
+    **Required**
+
+    :param id: Identifier used for apis
+    :param name: Used for display
+    :param service: Which aws service (per sdk) has the api for this resource
+    :param enum_spec: Used to query the resource by describe-sources
+
+    **Permissions - Optional**
+
+    :param permission_prefix: Permission string prefix if not service
+    :param permissions_enum: Permissions for resource enumeration/get.
+        Normally we autogen but in some cases we need to specify statically
+    :param permissions_augment: Permissions for resource augment
+
+    **Arn handling / generation metadata - Optional**
+
+    :param arn: Arn resource attribute, when describe format has arn
+    :param arn_type: Type, used for arn construction, also required for universal tag augment
+    :param arn_separator: How arn type is separated from rest of arn
+    :param arn_service: For services that need custom labeling for arns
+
+    **Resource retrieval - Optional**
+
+    :param filter_name: When fetching a single resource via enum_spec this is technically optional,
+        but effectively required for serverless event policies else we have to enumerate the
+        population
+    :param filter_type: filter_type, scalar or list
+    :param detail_spec: Used to enrich the resource descriptions returned by enum_spec
+    :param batch_detail_spec: Used when the api supports getting resource details enmasse
+
+    **Misc - Optional**
+
+    :param default_report_fields: Used for reporting, array of fields
+    :param date: Latest date associated to resource, generally references either create date or
+        modified date
+    :param dimension: Defines that resource has cloud watch metrics and the resource id can be
+        passed as this value. Further customizations of dimensions require subclass metrics filter
+    :param cfn_type: AWS Cloudformation type
+    :param config_type: AWS Config Service resource type name
+    :param universal_taggable: Whether or not resource group tagging api can be used, in which case
+        we'll automatically register tag actions/filters. Note: values of True will register legacy
+        tag filters/actions, values of object() will just register current standard
+        tag/filters/actions.
+    :param global_resource: Denotes if this resource exists across all regions (iam, cloudfront,
+        r53)
+    :param metrics_namespace: Generally we utilize a service to namespace mapping in the metrics
+        filter. However some resources have a type specific namespace (ig. ebs)
+    :param id_prefix: Specific to ec2 service resources used to disambiguate a resource by its id
+
+    """
+
     # Required
-
-    # id field, should be the identifier used for apis
     id = None
-
-    # name field, used for display
     name = None
-
-    # which aws service (per sdk) has the api for this resource.
     service = None
-
-    # used to query the resource by describe-sources
     enum_spec = None
 
-    ###########
-    # Optional
-
-    ############
     # Permissions
-
-    # Permission string prefix if not service
     permission_prefix = None
-
-    # Permissions for resource enumeration/get. Normally we autogen
-    # but in some cases we need to specify statically
     permissions_enum = None
-
-    # Permissions for resourcee augment
     permissions_augment = None
 
-    ###########
     # Arn handling / generation metadata
-
-    # arn resource attribute, when describe format has arn
     arn = None
-
-    # type, used for arn construction, also required for universal tag augment
     arn_type = None
-
-    # how arn type is separated from rest of arn
     arn_separator = "/"
-
-    # for services that need custom labeling for arns
     arn_service = None
 
-    ##########
     # Resource retrieval
-
-    # filter_name, when fetching a single resource via enum_spec
-    # technically optional, but effectively required for serverless
-    # event policies else we have to enumerate the population.
     filter_name = None
-
-    # filter_type, scalar or list
     filter_type = None
-
-    # used to enrich the resource descriptions returned by enum_spec
     detail_spec = None
-
-    # used when the api supports getting resource details enmasse
     batch_detail_spec = None
 
-    ##########
     # Misc
-
-    # used for reporting, array of fields
     default_report_fields = ()
-
-    # date, latest date associated to resource, generally references
-    # either create date or modified date.
     date = None
-
-    # dimension, defines that resource has cloud watch metrics and the
-    # resource id can be passed as this value. further customizations
-    # of dimensions require subclass metrics filter.
     dimension = None
-
-    # AWS Cloudformation type
     cfn_type = None
-
-    # AWS Config Service resource type name
     config_type = None
-
-    # Whether or not resource group tagging api can be used, in which
-    # case we'll automatically register tag actions/filters.
-    #
-    # Note values of True will register legacy tag filters/actions, values
-    # of object() will just register current standard tag/filters/actions.
     universal_taggable = False
-
-    # Denotes if this resource exists across all regions (iam, cloudfront, r53)
     global_resource = False
-
-    # Generally we utilize a service to namespace mapping in the metrics filter
-    # however some resources have a type specific namespace (ig. ebs)
     metrics_namespace = None
-
-    # specific to ec2 service resources used to disambiguate a resource by its id
     id_prefix = None

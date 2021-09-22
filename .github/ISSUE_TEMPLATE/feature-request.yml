@@ -1,0 +1,25 @@
+name: Feature Request
+description: Suggest an idea for this project
+labels: [kind/enhancement]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill out this feature enhancement!
+  - type: textarea
+    id: describe-feature
+    attributes:
+      label: Describe the feature
+      description: Is your feature request related to a problem?  
+      placeholder: Please describe
+      value: "I am always frustrated when ..."
+    validations:
+      required: true
+  - type: textarea
+    id: extra-context
+    attributes:
+      label: Extra information or context
+      description: If you have any workarounds or possible alternatives feel free to add them here.
+
+

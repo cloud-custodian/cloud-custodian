@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The specified accesspoint does not exist",
+            "Code": "NoSuchAccessPoint",
+            "AccessPointName": "c7n-ap-moving-doe"
+        },
+        "HostId": "8CK0js/iX9/HLg1cmbXLfugyZ6SH73N7BktxPymcAmpz/O6cukdPSYTLIXDQZEj3LUD8GNelJ/g=",
+        "ResponseMetadata": {}
+    }
+}

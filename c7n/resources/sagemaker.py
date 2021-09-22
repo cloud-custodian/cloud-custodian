@@ -99,7 +99,8 @@ class SagemakerTransformJob(QueryResourceManager):
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
-        filter_name = 'TransformJobArn'
+        filter_name = 'NameContains'
+        filter_type = 'scalar'
         permission_augment = ('sagemaker:DescribeTransformJob', 'sagemaker:ListTags')
 
     def __init__(self, ctx, data):

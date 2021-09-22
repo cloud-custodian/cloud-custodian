@@ -37,7 +37,7 @@ whitelist_packages = set(
         'ldap3',  # mailer dependency, LGPL
         'sphinx-markdown-tables',  # docgen - GPL
         'docutils',  # docgen - couple of different licenses but bulk is public domain
-        'chardet',  # requests dep - LPGL
+        # 'chardet',  # requests dep - LPGL
         'websocket-client',  # c7n_kube dep - LGPL-2.1
         #
         # packages with bad metadata

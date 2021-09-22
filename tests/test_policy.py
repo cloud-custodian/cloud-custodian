@@ -188,7 +188,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -199,6 +199,17 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_filter_spec(self):
+        missing_fspec = []
+        for k, v in manager.resources.items():
+            if v.resource_type.filter_name is None:
+                continue
+            if not v.resource_type.filter_type:
+                missing_fspec.append(k)
+        if missing_fspec:
+            self.fail('aws resources missing filter specs: %s' % (
+                ', '.join(missing_fspec)))
 
     def test_ec2_id_prefix(self):
         missing_prefix = []
@@ -236,6 +247,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2021
+            'AwsEcsService',
+            'AwsRdsEventSubscription',
             # q2 2021
             'AwsEcsTaskDefinition',
             'AwsEcsCluster',
@@ -367,7 +381,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:

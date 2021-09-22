@@ -3,6 +3,7 @@
 ResourceMap = {
     "aws.account": "c7n.resources.account.Account",
     "aws.acm-certificate": "c7n.resources.acm.Certificate",
+    "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
     "aws.alarm": "c7n.resources.cw.Alarm",
     "aws.ami": "c7n.resources.ami.AMI",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
@@ -27,6 +28,9 @@ ResourceMap = {
     "aws.artifact-repo": "c7n.resources.artifact.ArtifactRepo",
     "aws.codebuild": "c7n.resources.code.CodeBuildProject",
     "aws.codecommit": "c7n.resources.code.CodeRepository",
+    "aws.codedeploy-app": "c7n.resources.code.CodeDeployApplication",
+    "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
+    "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
     "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
     "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
     "aws.config-rule": "c7n.resources.config.ConfigRule",
@@ -162,6 +166,8 @@ ResourceMap = {
     "aws.route-table": "c7n.resources.vpc.RouteTable",
     "aws.rrset": "c7n.resources.route53.ResourceRecordSet",
     "aws.s3": "c7n.resources.s3.S3",
+    "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
+    "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
     "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
     "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
     "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
@@ -183,6 +189,7 @@ ResourceMap = {
     "aws.sns-subscription": "c7n.resources.sns.SNSSubscription",
     "aws.sqs": "c7n.resources.sqs.SQS",
     "aws.ssm-document": "c7n.resources.ssm.SSMDocument",
+    "aws.ssm-data-sync": "c7n.resources.ssm.SSMDataSync",
     "aws.ssm-activation": "c7n.resources.ssm.SSMActivation",
     "aws.ssm-managed-instance": "c7n.resources.ssm.ManagedInstance",
     "aws.ssm-parameter": "c7n.resources.ssm.SSMParameter",
@@ -201,5 +208,6 @@ ResourceMap = {
     "aws.vpn-gateway": "c7n.resources.vpc.VPNGateway",
     "aws.waf": "c7n.resources.waf.WAF",
     "aws.waf-regional": "c7n.resources.waf.RegionalWAF",
-    "aws.workspaces": "c7n.resources.workspaces.Workspace"
+    "aws.workspaces": "c7n.resources.workspaces.Workspace",
+    "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage"
 }

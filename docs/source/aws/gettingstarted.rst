@@ -157,14 +157,14 @@ Given that, you can run Cloud Custodian with
 .. code-block:: bash
 
   # Validate the configuration (note this happens by default on run)
-  $ custodian validate policy.yml
+  custodian validate policy.yml
 
   # Dryrun on the policies (no actions executed) to see what resources
   # match each policy.
-  $ custodian run --dryrun -s out policy.yml
+  custodian run --dryrun -s out policy.yml
 
   # Run the policy
-  $ custodian run -s out policy.yml
+  custodian run -s out policy.yml
 
 .. _monitor-aws-cc:
 
@@ -173,15 +173,15 @@ Monitor AWS
 
 You can generate CloudWatch metrics by specifying the ``--metrics`` flag and specifying ``aws``::
 
-  $ custodian run -s <output_directory> --metrics aws <policyfile>.yml
+  custodian run -s <output_directory> --metrics aws <policyfile>.yml
 
 You can also upload Cloud Custodian logs to CloudWatch logs::
 
-  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
+  custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
 
 And you can output logs and resource records to S3::
 
-  $ custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
+  custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
 
 If Custodian is being run without Assume Roles, all output will be put into the same account.
 Custodian is built with the ability to be run from different accounts and leverage STS
@@ -200,4 +200,4 @@ as well, either on the command line or in an environment variable:
 
 .. code-block:: bash
 
-  $ AWS_DEFAULT_REGION=us-west-1
+  AWS_DEFAULT_REGION=us-west-1

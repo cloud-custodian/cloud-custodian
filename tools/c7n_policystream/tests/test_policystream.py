@@ -26,6 +26,9 @@ email = "policyauthor@example.com"
 name = "WatchFolk"
 """
 
+if os.name == 'nt':
+    pytest.skip('policystream not supported on windows', allow_module_level=True)
+
 
 class GitRepo:
 
