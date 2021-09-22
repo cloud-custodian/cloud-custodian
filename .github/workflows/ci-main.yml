@@ -119,7 +119,7 @@ jobs:
           COV_RUN: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
         run: |
           echo "code cov $COV_RUN"
-          make test-poetry
+          . test.env && poetry run pytest -n auto tests tools
 
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v2
