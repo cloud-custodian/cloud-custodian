@@ -6,6 +6,7 @@ import hashlib
 import logging
 import operator
 import os
+import sys
 
 import click
 import yaml
@@ -248,7 +249,7 @@ def main(provider, output_dir, group_by):
     try:
         _main(provider, output_dir, group_by)
     except Exception:
-        import traceback, pdb, sys
+        import traceback, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
@@ -300,8 +301,6 @@ def _main(provider, output_dir, group_by):
     files = []
     written = 0
     groups = {}
-
-    diff_changes = True
 
     for r in provider_class.resources.values():
         group = group_by(r)
