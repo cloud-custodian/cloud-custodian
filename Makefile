@@ -8,7 +8,7 @@ install:
 
 install-poetry:
 	poetry install
-	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
+	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install && cd ../..; done
 
 pkg-rebase:
 	rm -f poetry.lock
@@ -79,6 +79,13 @@ pkg-publish-wheel:
 
 test-poetry:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
+
+test-poetry-cov:
+	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov c7n --cov tools/c7n_azure/c7n_azure \
+            --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
+            --cov tools/c7n_mailer/c7n_mailer \
+            tests tools {posargs}
 
 test:
 	./bin/tox -e py38
