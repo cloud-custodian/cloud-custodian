@@ -87,7 +87,6 @@ class BackupVault(QueryResourceManager):
         universal_taggable = object()
         config_type = cfn_type = 'AWS::Backup::BackupVault'
 
-
     source_mapping = {
         'describe': DescribeVault,
         'config': ConfigSource
