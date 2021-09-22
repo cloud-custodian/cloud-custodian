@@ -76,10 +76,9 @@ def get_doc_policies(resources):
     return policies
 
 
-#  'azure', 'gcp', 'k8s'))
-@pytest.mark.parametrize("provider_name", ('aws',))
+@pytest.mark.parametrize("provider_name", ('aws', 'azure', 'gcp', 'k8s'))
 def test_doc_examples(provider_name):
-    load_resources(('aws.*',))
+    load_resources()
     loader = PolicyLoader(Config.empty())
     provider = clouds.get(provider_name)
     policies = get_doc_policies(provider.resources)

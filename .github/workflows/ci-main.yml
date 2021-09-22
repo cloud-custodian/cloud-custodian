@@ -64,6 +64,13 @@ jobs:
           path: .venv
           key: venv-docs-${{ runner.os }}-3.9-${{ hashFiles('**/poetry.lock') }}
 
+      - name: Set up doc cache
+        uses: actions/cache@v2
+        id: sphinx
+        with:
+          path: docs/build
+          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}
+
       - name: Update PATH
         shell: bash
         run: |
