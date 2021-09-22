@@ -67,14 +67,14 @@ jobs:
       - name: Update PATH
         shell: bash
         run: |
-          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
-          echo "$PWD\.venv\Scripts" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
-        run: poetry run pip --version || rm -rf .venv
+        run: poetry run custodian version || rm -rf .venv
 
       - name: Virtualenv
         if: steps.cache.outputs.cache-hit != 'true'
@@ -150,7 +150,7 @@ jobs:
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
         shell: bash
-        run: poetry run pip --version || rm -rf .venv
+        run: poetry run custodian version || rm -rf .venv
 
       - name: Virtualenv
         if: steps.cache.outputs.cache-hit != 'true'
