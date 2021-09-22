@@ -178,3 +178,25 @@ class WorkspacesTest(BaseTest):
         client = session_factory().client('workspaces')
         call = client.describe_workspace_images(ImageIds=[imageId])
         self.assertEqual(call['Images'], [])
+
+    def test_workspaces_image_delete_associated_error(self):
+        session_factory = self.replay_flight_data('test_workspaces_image_delete_associated_error')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-image-del',
+                'resource': 'workspaces-image',
+                'filters': [{
+                    'tag:DeleteMe': 'present'
+                }],
+                'actions': [{
+                    'type': 'delete'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        imageId = resources[0].get('ImageId')
+        client = session_factory().client('workspaces')
+        call = client.describe_workspace_images(ImageIds=[imageId])
+        self.assertTrue(call['Images'])
