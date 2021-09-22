@@ -52,11 +52,11 @@ jobs:
         python-version: [3.9]
         include:
           - os: ubuntu-latest
-            python-version: 3.6
+            python-version: 3.8
           - os: ubuntu-latest
             python-version: 3.7
           - os: ubuntu-latest
-            python-version: 3.8
+            python-version: 3.6
     steps:
       - uses: actions/checkout@v2
         with:
