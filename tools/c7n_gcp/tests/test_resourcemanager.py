@@ -4,12 +4,13 @@ import logging
 import os
 import sys
 import time
+from unittest import mock
 
 import pytest
 
 from c7n_gcp.resources.resourcemanager import HierarchyAction
 from gcp_common import BaseTest
-from mock import mock
+
 
 from c7n.exceptions import ResourceLimitExceeded
 
