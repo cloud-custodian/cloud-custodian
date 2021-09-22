@@ -10,10 +10,12 @@ from c7n.utils import local_session
 class DescribeBackup(DescribeSource):
 
     def augment(self, resources):
-        super(DescribeBackup, self).augment(resources)
+        resources = super(DescribeBackup, self).augment(resources)
         client = local_session(self.manager.session_factory).client('backup')
         results = []
         for r in resources:
+            plan = r.pop('BackupPlan', {})
+            r.update(plan)
             try:
                 tags = client.list_tags(ResourceArn=r['BackupPlanArn']).get('Tags', {})
             except client.exceptions.ResourceNotFoundException:
@@ -28,8 +30,10 @@ class DescribeBackup(DescribeSource):
 
         for rid in resource_ids:
             try:
-                resources.append(
-                    client.get_backup_plan(BackupPlanId=rid)['BackupPlan'])
+                r = client.get_backup_plan(BackupPlanId=rid)
+                plan = r.pop('BackupPlan', {})
+                r.update(plan)
+                resources.append(r)
             except client.exceptions.ResourceNotFoundException:
                 continue
         return resources
@@ -41,7 +45,7 @@ class BackupPlan(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'backup'
         enum_spec = ('list_backup_plans', 'BackupPlansList', None)
-        detail_spec = ('get_backup_plan', 'BackupPlanId', 'BackupPlanId', 'BackupPlan')
+        detail_spec = ('get_backup_plan', 'BackupPlanId', 'BackupPlanId', None)
         id = 'BackupPlanName'
         name = 'BackupPlanId'
         arn = 'BackupPlanArn'
@@ -82,6 +86,12 @@ class BackupVault(QueryResourceManager):
         arn_type = 'backup-vault'
         universal_taggable = object()
         config_type = cfn_type = 'AWS::Backup::BackupVault'
+
+
+    source_mapping = {
+        'describe': DescribeVault,
+        'config': ConfigSource
+    }
 
 
 @BackupVault.filter_registry.register('kms-key')
