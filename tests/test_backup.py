@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+import time
+import json
 
 
 class BackupTest(BaseTest):
@@ -99,3 +101,104 @@ class BackupVaultTest(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/backup')
+
+    def test_backup_vault_modify_add_remove_statements(self):
+        session_factory = self.replay_flight_data(
+            "test_backup_vault_modify_add_remove_statements"
+        )
+        client = session_factory().client("backup")
+        backup_vault = client.create_backup_vault(
+            BackupVaultName="test_backup_vault_modify_add_remove_statements"
+        )
+
+        backup_vault_name = backup_vault["BackupVaultName"]
+        backup_vault_arn = backup_vault["BackupVaultArn"]
+
+        p = self.load_policy(
+            {
+                "name": "test-backup-vault-modify-policy-add-statements",
+                "resource": "backup-vault",
+                "filters": [
+                    {"BackupVaultName": backup_vault_name}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "AddMe",
+                                "Effect": "Allow",
+                                "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
+                                "Action": ["backup:PutBackupVaultAccessPolicy"],
+                                "Resource": backup_vault_arn,
+                            }
+                        ],
+                        "remove-statements": ["RemoveMe"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(30)
+
+        self.assertEqual(len(resources), 1)
+        data = json.loads(
+            client.get_backup_vault_access_policy(
+                BackupVaultName=resources[0]["BackupVaultName"]
+            )["Policy"]
+        )
+
+        self.assertTrue("AddMe" in [s["Sid"] for s in data.get("Statement", ())])
+        self.assertFalse("RemoveMe" in [s["Sid"] for s in data.get("Statement", ())])
+
+    def test_backup_vault_modify_empty_statements(self):
+        session_factory = self.replay_flight_data(
+            "test_backup_vault_modify_empty_statements"
+        )
+        client = session_factory().client("backup")
+        backup_vault = client.create_backup_vault(
+            BackupVaultName="test_backup_vault_modify_empty_statements"
+        )
+
+        backup_vault_name = backup_vault["BackupVaultName"]
+        backup_vault_arn = backup_vault["BackupVaultArn"]
+
+        p = self.load_policy(
+            {
+                "name": "test_backup_vault_modify_empty_statements",
+                "resource": "backup-vault",
+                "filters": [
+                    {"BackupVaultName": backup_vault_name}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "AddMe",
+                                "Effect": "Allow",
+                                "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
+                                "Action": ["backup:PutBackupVaultAccessPolicy"],
+                                "Resource": backup_vault_arn,
+                            }
+                        ],
+                        "remove-statements": ["RemoveMe"],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(30)
+
+        self.assertEqual(len(resources), 1)
+        data = json.loads(
+            client.get_backup_vault_access_policy(
+                BackupVaultName=resources[0]["BackupVaultName"]
+            )["Policy"]
+        )
+
+        self.assertTrue("AddMe" in [s["Sid"] for s in data.get("Statement", ())])

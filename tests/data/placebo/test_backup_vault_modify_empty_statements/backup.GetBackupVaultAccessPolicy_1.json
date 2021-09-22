@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Cryopd arn:aws:backup:us-east-1:123456789123:backup-vault:test_backup_vault_modify_empty_statements has no associated policy.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {}
+    }
+}
