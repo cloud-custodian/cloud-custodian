@@ -78,10 +78,10 @@ pkg-publish-wheel:
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 test-poetry:
-	. test.env && poetry run pytest -n auto tests tools
+	. $(PWD)/test.env && poetry run pytest -n auto tests tools
 
 test-poetry-cov:
-	. test.env && poetry run pytest -n auto \
+	. $(PWD)/test.env && poetry run pytest -n auto \
             --cov c7n --cov tools/c7n_azure/c7n_azure \
             --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
             --cov tools/c7n_mailer/c7n_mailer \
