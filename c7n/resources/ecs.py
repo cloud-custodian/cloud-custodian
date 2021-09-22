@@ -91,7 +91,7 @@ class ECSCluster(query.QueryResourceManager):
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
-        cfn_type = 'AWS::ECS::Cluster'
+        config_type = cfn_type = 'AWS::ECS::Cluster'
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)

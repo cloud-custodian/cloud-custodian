@@ -298,22 +298,15 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            'AWS::Backup::BackupPlan',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
-            'AWS::Backup::BackupVault',
             'AWS::Config::ConformancePackCompliance',
             'AWS::NetworkFirewall::FirewallPolicy',
-            'AWS::NetworkFirewall::Firewall',
             'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
-            'AWS::ECS::Cluster'
-            'AWS::ECS::TaskDefinition',
-            'AWS::ECR::Repository',
-            'AWS::EFS::FileSystem',
             'AWS::EFS::AccessPoint',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',

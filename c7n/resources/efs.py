@@ -27,7 +27,7 @@ class ElasticFileSystem(QueryResourceManager):
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
-        cfn_type = 'AWS::EFS::FileSystem'
+        config_type = cfn_type = 'AWS::EFS::FileSystem'
 
     augment = universal_augment
 

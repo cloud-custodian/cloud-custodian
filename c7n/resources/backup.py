@@ -17,7 +17,7 @@ class BackupPlan(QueryResourceManager):
         id = 'BackupPlanName'
         name = 'BackupPlanId'
         arn = 'BackupPlanArn'
-        cfn_type = 'AWS::Backup::BackupPlan'
+        config_type = cfn_type = 'AWS::Backup::BackupPlan'
         universal_taggable = object()
 
     def augment(self, resources):
@@ -57,7 +57,7 @@ class BackupVault(QueryResourceManager):
         arn = 'BackupVaultArn'
         arn_type = 'backup-vault'
         universal_taggable = object()
-        cfn_type = 'AWS::Backup::BackupVault'
+        config_type = cfn_type = 'AWS::Backup::BackupVault'
 
     def augment(self, resources):
         return universal_augment(self, super(BackupVault, self).augment(resources))
