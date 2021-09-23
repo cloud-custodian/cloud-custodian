@@ -147,7 +147,7 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 # Verify the install
 #  - policystream is not in ci due to libgit2 compilation needed
 #  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
+RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
 """
 
 
