@@ -87,8 +87,7 @@ jobs:
         id: cache_check
         shell: bash
         run: |
-          poetry run custodian version && echo "::set-output name=venv::success" \
-          || rm -rf .venv && echo "::set-output name=venv::recreate"
+          poetry run custodian version && echo "::set-output name=venv::success" || rm -rf .venv && echo "::set-output name=venv::recreate"
 
       - name: Virtualenv
         if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.venv != 'success'
@@ -165,13 +164,17 @@ jobs:
         id: cache_check
         shell: bash
         run: |
-          poetry run custodian version && echo "::set-output name=venv::success" \
-          || rm -rf .venv && echo "::set-output name=venv::recreate"
+          poetry run custodian version && echo "::set-output name=venv::success" || rm -rf .venv && echo "::set-output name=venv::recreate"
 
       - name: Virtualenv
         if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.venv != 'success'
         shell: bash
+        env:
+          CHECK_VENV: ${{ steps.cache_check.venv }}
+          CACHE_HIT: ${{ steps.cache.cache-hit }}
         run: |
+          echo "check venv $CHECK_VENV"
+          echo "cache hit $CACHE_HIT"
           python -m venv .venv
 
       - name: Install Deps
