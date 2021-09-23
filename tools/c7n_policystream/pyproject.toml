@@ -20,7 +20,7 @@ c7n-policystream = 'policystream:cli'
 
 [tool.poetry.dependencies]
 python = "^3.6"
-click = "^7.0"
+click = "^8.0"
 requests = "^2.22.0"
 pyyaml = "^5.3"
 pygit2 = "~1.5"
