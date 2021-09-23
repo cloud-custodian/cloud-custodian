@@ -13,6 +13,14 @@ importlib-metadata = {version = ">=0.23,<5", markers = "python_version == \"3.6\
 test = ["coverage", "flake8", "pexpect", "wheel"]
 
 [[package]]
+name = "atheris"
+version = "2.0.3"
+description = "A coverage-guided fuzzer for Python and Python extensions."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -833,12 +841,23 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "aaee5dea3803fff02da6646517366d2ac0913548f09e464020b68aefb5d19de1"
+content-hash = "06dcc8f09845bed0dfdac001f84fda10351644b3b994989e2299823c4405d176"
 
 [metadata.files]
 argcomplete = [
     {file = "argcomplete-1.12.3-py2.py3-none-any.whl", hash = "sha256:291f0beca7fd49ce285d2f10e4c1c77e9460cf823eef2de54df0c0fec88b0d81"},
     {file = "argcomplete-1.12.3.tar.gz", hash = "sha256:2c7dbffd8c045ea534921e63b0be6fe65e88599990d8dc408ac8c542b72a5445"},
+]
+atheris = [
+    {file = "atheris-2.0.3-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:ecfb27c06d772e90cb3a893256b22353cbf2b0cad5323df12c752399e482b640"},
+    {file = "atheris-2.0.3-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:c1aae8594a3e9401f3dacefdfe3240da19c58462f3e97eb4e22602e28fb03dda"},
+    {file = "atheris-2.0.3-cp37-cp37m-macosx_11_0_x86_64.whl", hash = "sha256:bc0410542d65023225761156c57894821a96d76b617c4fa9985090e31d98e00d"},
+    {file = "atheris-2.0.3-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:f53c3142e736affa7c2578079acef5f3b4d6e539bde4c3c1a0014767010ab085"},
+    {file = "atheris-2.0.3-cp38-cp38-macosx_11_0_x86_64.whl", hash = "sha256:6d05239db6b3701227fe5c1f5a60e863e40d0b5700a19ceffe7e98e0a07657ce"},
+    {file = "atheris-2.0.3-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:8c141ffd5a7bedf6d0381040a804e3ebd653742fb6f935922f8f5dd8ab47c88e"},
+    {file = "atheris-2.0.3-cp39-cp39-macosx_11_0_x86_64.whl", hash = "sha256:f964686cd2f759b47ba373aed346e9d9fdc13040466bd71b4e8548061e1bc605"},
+    {file = "atheris-2.0.3-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:d6c8cb21a7ddf1da0fe510b40450b6a9a5d38130e67b4b612f440085e9fa525c"},
+    {file = "atheris-2.0.3.tar.gz", hash = "sha256:0f9288dc986f2ed5c7d2953b8d678da8423b8c9d6472f9052f26b81777715d53"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
