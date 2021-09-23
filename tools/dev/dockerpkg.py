@@ -17,7 +17,9 @@ import os
 import time
 import subprocess
 import sys
+import tempfile
 import traceback
+import uuid
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +28,7 @@ import click
 log = logging.getLogger("dockerpkg")
 
 BUILD_STAGE = """\
+# syntax = docker/dockerfile:1.3
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
 FROM {base_build_image} as build-env
@@ -35,18 +38,21 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
+
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
-    | python3 - -y --version 1.1.9
+ | python3 - -y --version 1.1.9
+
+RUN echo $HOME
+ENV VIRTUAL_ENV="/usr/local" PATH="$PATH:/root/.poetry/bin"
 
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
-RUN . /usr/local/bin/activate && pip install -q wheel && \
-      pip install -U pip
-RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+RUN --mount=type=cache,target=/root/.cache poetry install --no-dev
+RUN --mount=type=cache,target=/root/.cache pip install -q wheel && pip install -U pip
+RUN --mount=type=cache,target=/root/.cache pip install -q aws-xray-sdk psutil jsonpatch
 
 # Add provider packages
 ADD tools/c7n_gcp /src/tools/c7n_gcp
@@ -60,9 +66,8 @@ RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
 ARG providers="azure gcp kube openstack"
-RUN . /usr/local/bin/activate && \\
-    for pkg in $providers; do cd tools/c7n_$pkg && \\
-    $HOME/.poetry/bin/poetry install && cd ../../; done
+RUN --mount=type=cache,target=/root/.cache \
+ for pkg in $providers; do cd tools/c7n_$pkg && poetry install --no-dev && cd ../../; done
 
 RUN mkdir /output
 """
@@ -273,7 +278,9 @@ def cli():
 @click.option("-q", "--quiet", is_flag=True)
 @click.option("-i", "--image", multiple=True)
 @click.option("-v", "--verbose", is_flag=True)
-def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
+@click.option("--cache-dir", type=click.Path())
+@click.option("--platform", multiple=True)
+def build(provider, registry, tag, image, quiet, push, test, scan, verbose, cache_dir, platform):
     """Build custodian docker images...
 
     python tools/dev/dockerpkg.py --test -i cli -i org -i mailer
@@ -497,38 +504,35 @@ def push_image(client, image_id, image_refs):
                 log.info("other %s" % (line,))
 
 
-def build_image(client, image_name, image_def, dfile_path, build_args):
+def build_image(client, image_name, image_def, dfile_path, build_args, cache_dir=None, platform=()):
     log.info("Building %s image (--verbose for build output)" % image_name)
-
     labels = get_labels(image_def)
-    stream = client.api.build(
-        path=os.path.abspath(os.getcwd()),
-        dockerfile=dfile_path,
-        buildargs=build_args,
-        labels=labels,
-        rm=True,
-        pull=True,
-        decode=True,
-    )
+    params =  ["docker", "buildx", "build", "--progress", "plain", "--load"]
 
-    built_image_id = None
-    for chunk in stream:
-        if "stream" in chunk:
-            log.debug(chunk["stream"].strip())
-        elif "status" in chunk:
-            log.debug(chunk["status"].strip())
-        elif "aux" in chunk:
-            built_image_id = chunk["aux"].get("ID")
-    assert built_image_id
-    if built_image_id.startswith("sha256:"):
-        built_image_id = built_image_id[7:]
+    for k, v in labels.items():
+        params.append('--label=%s=%s' % (k, v))
+    for p in platform:
+        params.append('--platform %s' % p)
+    for bkey, bvalue in build_args.items():
+        params.append('--build-arg')
+        params.append('%s=%s' % (bkey, bvalue))
+    if cache_dir:
+        params.append("--cache-from=type=local,src=%s" % cache_dir)
+        params.append("--cache-to=type=local,src=%s" % cache_dir)
 
-    built_image = client.images.get(built_image_id)
-    log.info(
-        "Built %s image Id:%s Size:%s"
-        % (image_name, built_image_id[:12], human_size(built_image.attrs["Size"]),)
-    )
+    build_tag = "%s:%s" % (image_name, str(uuid.uuid4()))
+    params.append('--tag=%s' % build_tag)
 
+    with tempfile.NamedTemporaryFile() as fh:
+        params.append('.')
+        subprocess.check_call(params)
+
+        built_image = client.images.get(build_tag)
+        built_image_id = built_image.id
+        log.info(
+            "Built %s image Id:%s Size:%s"
+            % (image_name, built_image_id[:12], human_size(built_image.attrs["Size"]),)
+        )
     return built_image_id[:12]
 
 

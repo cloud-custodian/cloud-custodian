@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:1.3
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
 FROM debian:10-slim as build-env
@@ -7,16 +8,20 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 - -y --version 1.1.9
+
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py  | python3 - -y --version 1.1.9
+
+RUN echo $HOME
+ENV VIRTUAL_ENV="/usr/local" PATH="$PATH:/root/.poetry/bin"
 
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
-RUN . /usr/local/bin/activate && pip install -q wheel &&       pip install -U pip
-RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+RUN --mount=type=cache,target=/root/.cache poetry install --no-dev
+RUN --mount=type=cache,target=/root/.cache pip install -q wheel && pip install -U pip
+RUN --mount=type=cache,target=/root/.cache pip install -q aws-xray-sdk psutil jsonpatch
 
 # Add provider packages
 ADD tools/c7n_gcp /src/tools/c7n_gcp
@@ -30,9 +35,7 @@ RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
 ARG providers="azure gcp kube openstack"
-RUN . /usr/local/bin/activate && \
-    for pkg in $providers; do cd tools/c7n_$pkg && \
-    $HOME/.poetry/bin/poetry install && cd ../../; done
+RUN --mount=type=cache,target=/root/.cache  for pkg in $providers; do cd tools/c7n_$pkg && poetry install --no-dev && cd ../../; done
 
 RUN mkdir /output
 
@@ -55,7 +58,7 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 # Verify the install
 #  - policystream is not in ci due to libgit2 compilation needed
 #  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
+RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
 
 FROM gcr.io/distroless/python3-debian10
 
