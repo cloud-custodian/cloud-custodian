@@ -28,6 +28,7 @@ jsonschema = "^3.2.0"
 argcomplete = "^1.11.1"
 python-dateutil = "^2.8.1"
 pyyaml = "^5.3"
+attrs = "^21"
 tabulate = "^0.8.6"
 importlib-metadata = ">1.7.0;python_version<3.8"
 

@@ -17,7 +17,6 @@ import os
 import time
 import subprocess
 import sys
-import tempfile
 import traceback
 import uuid
 from datetime import datetime
@@ -67,7 +66,8 @@ RUN rm -R tools/c7n_openstack/tests
 # Install requested providers
 ARG providers="azure gcp kube openstack"
 RUN --mount=type=cache,target=/root/.cache \
- for pkg in $providers; do cd tools/c7n_$pkg && poetry install --no-dev && cd ../../; done
+ for pkg in $providers; do cd tools/c7n_$pkg && echo "install $pkg" \
+ && poetry install --no-dev && cd ../../; done
 
 RUN mkdir /output
 """
@@ -317,7 +317,7 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose, cach
         _, image_name = path.split("/")
         if image and image_name not in image:
             continue
-        image_id = build_image(client, image_name, image_def, path, build_args)
+        image_id = build_image(client, image_name, image_def, path, build_args, cache_dir)
         image_refs = tag_image(client, image_id, image_def, registry, image_tags)
         if test:
             test_image(image_id, image_name, provider)
@@ -507,32 +507,32 @@ def push_image(client, image_id, image_refs):
 def build_image(client, image_name, image_def, dfile_path, build_args, cache_dir=None, platform=()):
     log.info("Building %s image (--verbose for build output)" % image_name)
     labels = get_labels(image_def)
-    params =  ["docker", "buildx", "build", "--progress", "plain", "--load"]
+    params = ["docker", "buildx", "build", "--progress", "plain", "--load"]
 
     for k, v in labels.items():
         params.append('--label=%s=%s' % (k, v))
     for p in platform:
         params.append('--platform %s' % p)
+    build_args = build_args or {}
     for bkey, bvalue in build_args.items():
         params.append('--build-arg')
         params.append('%s=%s' % (bkey, bvalue))
     if cache_dir:
         params.append("--cache-from=type=local,src=%s" % cache_dir)
-        params.append("--cache-to=type=local,src=%s" % cache_dir)
+        params.append("--cache-to=type=local,dest=%s" % cache_dir)
 
     build_tag = "%s:%s" % (image_name, str(uuid.uuid4()))
     params.append('--tag=%s' % build_tag)
 
-    with tempfile.NamedTemporaryFile() as fh:
-        params.append('.')
-        subprocess.check_call(params)
+    params.append('.')
+    subprocess.check_call(params)
 
-        built_image = client.images.get(build_tag)
-        built_image_id = built_image.id
-        log.info(
-            "Built %s image Id:%s Size:%s"
-            % (image_name, built_image_id[:12], human_size(built_image.attrs["Size"]),)
-        )
+    built_image = client.images.get(build_tag)
+    built_image_id = built_image.id
+    log.info(
+        "Built %s image Id:%s Size:%s"
+        % (image_name, built_image_id[:12], human_size(built_image.attrs["Size"]),)
+    )
     return built_image_id[:12]
 
 

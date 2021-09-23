@@ -35,7 +35,7 @@ RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
 ARG providers="azure gcp kube openstack"
-RUN --mount=type=cache,target=/root/.cache  for pkg in $providers; do cd tools/c7n_$pkg && poetry install --no-dev && cd ../../; done
+RUN --mount=type=cache,target=/root/.cache  for pkg in $providers; do cd tools/c7n_$pkg && echo "install $pkg"  && poetry install --no-dev && cd ../../; done
 
 RUN mkdir /output
 
