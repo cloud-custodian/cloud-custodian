@@ -471,7 +471,8 @@ def test_image(image_id, image_name, providers):
     if providers not in (None, ()):
         env["CUSTODIAN_PROVIDERS"] = " ".join(providers)
     subprocess.check_call(
-        [Path(sys.executable).parent / "pytest", "-p", "no:terraform", "-v", "tests/test_docker.py"],
+        [Path(sys.executable).parent / "pytest", "-p",
+         "no:terraform", "-v", "tests/test_docker.py"],
         env=env,
         stderr=subprocess.STDOUT,
     )
