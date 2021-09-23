@@ -164,7 +164,7 @@ jobs:
         id: cache_check
         shell: bash
         run: |
-          poetry run custodian version && echo "::set-output name=venv::success" || rm -rf .venv && echo "::set-output name=venv::recreate"
+          (poetry run custodian version && echo "::set-output name=venv::success") || (rm -rf .venv && echo "::set-output name=venv::recreate")
 
       - name: Virtualenv
         if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
