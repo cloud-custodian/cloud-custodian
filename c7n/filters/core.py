@@ -256,6 +256,26 @@ class BaseValueFilter(Filter):
             r = ValueRegex(regex).get_resource_value(r)
         return r
 
+    def _validate_value_regex(self, regex):
+        """Specific validation for `value_regex` type
+
+        The `value_regex` type works a little differently.  In
+        particular it doesn't support OPERATORS that perform
+        operations on a list of values, specifically 'intersect',
+        'contains', 'difference', 'in' and 'not-in'
+        """
+        # Sanity check that we can compile
+        try:
+            pattern = re.compile(regex)
+            if pattern.groups != 1:
+                raise PolicyValidationError(
+                    "value_regex must have a single capturing group: %s" %
+                    self.data)
+        except re.error as e:
+            raise PolicyValidationError(
+                "Invalid value_regex: %s %s" % (e, self.data))
+        return self
+
 
 def intersect_list(a, b):
     if b is None:
@@ -511,26 +531,6 @@ class ValueFilter(BaseValueFilter):
         if 'value_regex' in self.data:
             return self._validate_value_regex(self.data['value_regex'])
 
-        return self
-
-    def _validate_value_regex(self, regex):
-        """Specific validation for `value_regex` type
-
-        The `value_regex` type works a little differently.  In
-        particular it doesn't support OPERATORS that perform
-        operations on a list of values, specifically 'intersect',
-        'contains', 'difference', 'in' and 'not-in'
-        """
-        # Sanity check that we can compile
-        try:
-            pattern = re.compile(regex)
-            if pattern.groups != 1:
-                raise PolicyValidationError(
-                    "value_regex must have a single capturing group: %s" %
-                    self.data)
-        except re.error as e:
-            raise PolicyValidationError(
-                "Invalid value_regex: %s %s" % (e, self.data))
         return self
 
     def __call__(self, i):

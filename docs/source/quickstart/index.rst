@@ -250,14 +250,14 @@ Run:
 Now launch a new shell (or refresh your bash environment by sourcing the appropriate
 file).
 
-.. _community
+.. _community:
 
 Community Resources
 -------------------
 
 We have a regular community meeting that is open to all users and developers of
 every skill level. Joining the `mailing list
-https://groups.google.com/forum/#!forum/cloud-custodian`_ will automatically send
+<https://groups.google.com/forum/#!forum/cloud-custodian>`_ will automatically send
 you a meeting invite. See the notes below for more technical information on
 joining the meeting. 
 

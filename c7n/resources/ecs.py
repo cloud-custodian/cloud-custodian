@@ -80,6 +80,14 @@ class ContainerConfigSource(ConfigSource):
         return resource
 
 
+class ClusterDescribe(query.DescribeSource):
+
+    def augment(self, resources):
+        resources = super(ClusterDescribe, self).augment(resources)
+        ecs_tag_normalize(resources)
+        return resources
+
+
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
@@ -91,12 +99,12 @@ class ECSCluster(query.QueryResourceManager):
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
-        cfn_type = 'AWS::ECS::Cluster'
+        config_type = cfn_type = 'AWS::ECS::Cluster'
 
-    def augment(self, resources):
-        resources = super(ECSCluster, self).augment(resources)
-        ecs_tag_normalize(resources)
-        return resources
+    source_mapping = {
+        'describe': ClusterDescribe,
+        'config': query.ConfigSource
+    }
 
 
 @ECSCluster.filter_registry.register('metrics')

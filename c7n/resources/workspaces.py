@@ -3,6 +3,7 @@
 import functools
 import itertools
 
+from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -95,6 +96,53 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'VolumeEncryptionKey'
 
 
+@Workspace.action_registry.register('terminate')
+class TerminateWorkspace(BaseAction):
+    """
+    Terminates a Workspace
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-workspace
+          resource: workspaces
+          filters:
+            - "tag:DeleteMe": present
+          actions:
+            - terminate
+    """
+
+    schema = type_schema('terminate')
+    permissions = ('workspaces:TerminateWorkspaces',)
+    valid_origin_states = (
+        'PENDING',
+        'AVAILABLE',
+        'IMPAIRED',
+        'UNHEALTHY',
+        'REBOOTING',
+        'STARTING',
+        'REBUILDING',
+        'RESTORING',
+        'MAINTENANCE',
+        'ADMIN_MAINTENANCE',
+        'UPDATING',
+        'STOPPING',
+        'STOPPED',
+        'ERROR'
+    )
+
+    def process(self, resources):
+
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('workspaces')
+
+        for resource_set in chunks(resources, size=25):
+            ids = [{'WorkspaceId': w['WorkspaceId']} for w in resource_set]
+            client.terminate_workspaces(TerminateWorkspaceRequests=ids)
+
+
 @resources.register('workspaces-image')
 class WorkspaceImage(QueryResourceManager):
 
@@ -139,3 +187,42 @@ class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
                 continue
 
         return results
+
+
+@WorkspaceImage.action_registry.register('delete')
+class DeleteWorkspaceImage(BaseAction):
+    """
+    Deletes a Workspace Image
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-workspace-img
+          resource: workspaces-image
+          filters:
+            - "tag:DeleteMe": present
+          actions:
+            - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('workspaces:DeleteWorkspaceImage',)
+    valid_origin_states = ('AVAILABLE', 'ERROR',)
+
+    def process(self, resources):
+
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for r in resources:
+            try:
+                client.delete_workspace_image(ImageId=r['ImageId'])
+            except client.exceptions.InvalidResourceStateException as e:
+                self.log.error(f"Error deleting workspace image: {r['ImageId']} error: {e}")
+                continue
+            except client.exceptions.ResourceAssociatedException as e:
+                self.log.error(f"Error deleting workspace image: {r['ImageId']} error: {e}")
+                continue
+            except client.exceptions.ResourceNotFoundException:
+                continue

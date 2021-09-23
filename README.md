@@ -227,7 +227,7 @@ See the notes below for more technical information on joining the meeting.
 
 - [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
 - [Community Meeting Notes Archive](https://github.com/cloud-custodian/community/discussions)
-
+- [Upcoming Community Events](https://cloudcustodian.io/events/)
 
 
 Additional Tools

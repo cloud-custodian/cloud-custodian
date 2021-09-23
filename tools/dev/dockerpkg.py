@@ -35,7 +35,8 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
+    | python3 - -y --version 1.1.9
 
 WORKDIR /src
 
@@ -43,7 +44,8 @@ WORKDIR /src
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
-RUN . /usr/local/bin/activate && pip install -q wheel
+RUN . /usr/local/bin/activate && pip install -q wheel && \
+      pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
 # Add provider packages
