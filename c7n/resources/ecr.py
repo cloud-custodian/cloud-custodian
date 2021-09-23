@@ -37,7 +37,7 @@ class ECR(QueryResourceManager):
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
-        cfn_type = 'AWS::ECR::Repository'
+        config_type = cfn_type = 'AWS::ECR::Repository'
 
     source_mapping = {
         'describe': DescribeECR,

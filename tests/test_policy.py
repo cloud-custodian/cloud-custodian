@@ -87,10 +87,10 @@ class PolicyMetaLint(BaseTest):
         assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
 
     def test_resource_type_repr(self):
-        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ecr'})
+        policy = self.load_policy({'name': 'airflow', 'resource': 'aws.airflow'})
         # check the repr absent a config type but with a cfn type
         assert policy.resource_manager.resource_type.config_type is None
-        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::ECR::Repository>'
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::MWAA::Environment>'
 
     def test_schema_plugin_name_mismatch(self):
         # todo iterate over all clouds not just aws resources
@@ -247,6 +247,10 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q4 2021
+            'AwsEcrContainerImage',
+            'AwsEc2VpnConnection',
+            'AwsAutoScalingLaunchConfiguration',
             # q3 2021
             'AwsEcsService',
             'AwsRdsEventSubscription',
@@ -296,16 +300,18 @@ class PolicyMetaLint(BaseTest):
 
         # for several of these we express support as filter or action instead
         # of a resource.
+
         whitelist = {
+            'AWS::Backup::BackupSelection',
+            'AWS::Backup::RecoveryPoint',
             'AWS::Config::ConformancePackCompliance',
             'AWS::NetworkFirewall::FirewallPolicy',
-            'AWS::NetworkFirewall::Firewall',
             'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
-            'AWS::ECS::TaskDefinition',
+            'AWS::EFS::AccessPoint',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
             'AWS::S3::AccountPublicAccessBlock',

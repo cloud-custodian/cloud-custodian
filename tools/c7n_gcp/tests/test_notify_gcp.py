@@ -1,10 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest import mock
+
 from gcp_common import BaseTest
 from c7n_gcp.client import Session
-
-import mock
 
 
 class NotifyTest(BaseTest):
