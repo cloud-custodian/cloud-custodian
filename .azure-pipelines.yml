@@ -45,6 +45,7 @@ jobs:
   # bin directory is in .dockerignore
   - script: |
       python3 -m pip install --upgrade pip
+      docker buildx create --use
       pip3 install docker click pytest pyyaml six
   # build a docker image and sanity test
   - script: |
