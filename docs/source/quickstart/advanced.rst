@@ -244,7 +244,7 @@ This might be useful if you're trying to minimize the amount of API call volume
 or response time. 
 These needs are usually specific to certain use cases and cloud resources.
 
-:caution box: Usage of this feature should consider trade offs as some features
+Caution: Usage of this feature should consider trade offs as some features
 such as caching might not be as effective. 
 
 Support for Server-side filters is defined per-resource and handled in the
@@ -261,16 +261,16 @@ For example, this policy:
 
 .. code-block:: yaml
 
-policies:
-  - name: garbage-collect--snapshots
-    resource: aws.ebs-snapshot
-    filters:
-        - type: age
-          days: 7
-          op: ge
-        - "tag:custodian_snapshot": present
-    actions:
-        - delete
+  policies:
+    - name: garbage-collect--snapshots
+      resource: aws.ebs-snapshot
+      filters:
+          - type: age
+            days: 7
+            op: ge
+          - "tag:custodian_snapshot": present
+      actions:
+          - delete
       
 If you have a large amount of snapshots, it would be inefficent to send this
 query to the client to process, so we can take advantage of some server-side
@@ -278,12 +278,12 @@ filtering to minimize traffic.
 
 .. code-block:: yaml
 
-policies:
-  - name: garbage-collect-snapshots
-    resource: aws.ebs-snapshot
-    query:
-      - Name: "tag:environment"
-        Values: ["dev"]
+  policies:
+    - name: garbage-collect-snapshots
+      resource: aws.ebs-snapshot
+      query:
+        - Name: "tag:environment"
+          Values: ["dev"]
 
 With these changes, server-side filters make sure you only query snapshots in
 the "dev" environment without needing to send the information to the client.
@@ -293,17 +293,17 @@ efficient method of cleaning up EBS snapshots
 
 .. code-block:: yaml
 
-policies:
-  - name: garbage-collect-snapshots-advanced
-    resource: aws.ebs-snapshot
-    query:
-      - Name: "tag-key"
-        Values: ["custodian_snapshot"]
-    filters:
-      - type: age
-        days: 7
-        op: greater-than    
-    actions:
+  policies:
+    - name: garbage-collect-snapshots-advanced
+      resource: aws.ebs-snapshot
+      query:
+        - Name: "tag-key"
+          Values: ["custodian_snapshot"]
+      filters:
+        - type: age
+          days: 7
+          op: greater-than    
+      actions:
         - delete
 
 In this example, we are using the query block to use a server-side filter to
