@@ -251,11 +251,11 @@ Support for Server-side filters is defined per-resource and handled in the
 query block of a policy.  
 
 In this example will use a server side policy to garbage collect EBS snapshots, the `query schema is defined
-here.<https://github.com/cloud-custodian/cloud-custodian/blob/bb5dc8d5f1b2c9500e26d02630b64742dffcb432/c7n/resources/ebs.py#L134-L146>`_
+here<https://github.com/cloud-custodian/cloud-custodian/blob/bb5dc8d5f1b2c9500e26d02630b64742dffcb432/c7n/resources/ebs.py#L134-L146>`_
 
 Check the documentation for `the list of
-filters<https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshots>`_,
-do note, they are put in the query stanza, not the filter stanza. 
+filters<https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshots>`_
+, do note, they are put in the query stanza, not the filter stanza. 
 
 For example, this policy:
 
