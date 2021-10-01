@@ -256,7 +256,6 @@ class Notify(BaseNotify):
             MessageAttributes=attrs
         )
         return result['MessageId']
-        
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue'].format(**message)
