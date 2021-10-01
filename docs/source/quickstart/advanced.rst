@@ -231,3 +231,90 @@ To remove the default fields and only add the desired ones, the ``--no-default-f
 flag can be specified and then specific fields can be added in, e.g.::
 
   custodian report -s out --no-default-fields --field Image=ImageId policy.yml
+
+Server-Side Filters
+-------------------
+
+By default Cloud Custodian fetches all the resources on a cloud and filters on
+the client side. 
+In certain cases Cloud Custodian can suppport server-side filtering on certain classes of
+resources. 
+
+This might be useful if you're trying to minimize the amount of API call volume
+or response time. 
+These needs are usually specific to certain use cases and cloud resources.
+
+:caution box: Usage of this feature should consider trade offs as some features
+such as caching might not be as effective. 
+
+Support for Server-side filters is defined per-resource and handled in the
+query block of a policy.  
+
+In this example will use a server side policy to garbage collect EBS snapshots, the `query schema is defined
+here.<https://github.com/cloud-custodian/cloud-custodian/blob/bb5dc8d5f1b2c9500e26d02630b64742dffcb432/c7n/resources/ebs.py#L134-L146>`_
+
+Check the documentation for `the list of
+filters<https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshots>`_,
+do note, they are put in the query stanza, not the filter stanza. 
+
+For example, this policy:
+
+.. code-block:: yaml
+
+policies:
+  - name: garbage-collect--snapshots
+    resource: aws.ebs-snapshot
+    filters:
+        - type: age
+          days: 7
+          op: ge
+        - "tag:custodian_snapshot": present
+    actions:
+        - delete
+      
+If you have a large amount of snapshots, it would be inefficent to send this
+query to the client to process, so we can take advantage of some server-side
+filtering to minimize traffic. 
+
+.. code-block:: yaml
+
+policies:
+  - name: garbage-collect-snapshots
+    resource: aws.ebs-snapshot
+    query:
+      - Name: "tag:environment"
+        Values: ["dev"]
+
+With these changes, server-side filters make sure you only query snapshots in
+the "dev" environment without needing to send the information to the client.
+
+Now let's combine server-side and client-side filtering to create a more
+efficient method of cleaning up EBS snapshots
+
+.. code-block:: yaml
+
+policies:
+  - name: garbage-collect-snapshots-advanced
+    resource: aws.ebs-snapshot
+    query:
+      - Name: "tag-key"
+        Values: ["custodian_snapshot"]
+    filters:
+      - type: age
+        days: 7
+        op: greater-than    
+    actions:
+        - delete
+
+In this example, we are using the query block to use a server-side filter to
+check the tag-key for any snapshot tagged custodian_snapshot. 
+Custodian will then take those results, and apply it to the filters block, which
+is executed next, this time on the client. 
+
+For most use cases, using the client side filter is the recommendation. 
+As a real example, if you have 100,000 snapshots, the server side filter can be used
+to do the heavy lifting, and the client-side can then throw out all the matches
+newer than 7 days. 
+This is one of those use cases where using the server-side filter resulted in
+improved performance and latency, however, it is strongly recommended that you
+evaluate the usage of server-side filters on a case-by-case basis and not a general best practice.
