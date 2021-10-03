@@ -644,10 +644,16 @@ class LayerCrossAccount(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
-            r['c7n:Policy'] = self.manager.retry(
-                client.get_layer_version_policy,
-                LayerName=r['LayerName'],
-                VersionNumber=r['Version']).get('Policy')
+            if 'c7n:Policy' in r:
+                continue
+            try:
+                rpolicy = self.manager.retry(
+                    client.get_layer_version_policy,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version']).get('Policy')
+            except client.exceptions.ResourceNotFoundException:
+                rpolicy = {}
+            r['c7n:Policy'] = rpolicy
         return super(LayerCrossAccount, self).process(resources)
 
     def get_resource_policy(self, r):

@@ -285,7 +285,9 @@ class TestSSM(BaseTest):
             },
             session_factory=session_factory,
         )
+
         resources = p.run()
+        self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "yyyyyyyyyyyy")
 
     def test_ssm_document_remove_sharing(self):
@@ -330,7 +332,7 @@ class TestSSM(BaseTest):
                         "type": "set-sharing",
                         "add": ['yyyyyyyyyyyy']
                     }
-                ]
+                ],
             },
             session_factory=session_factory,
         )
@@ -394,7 +396,107 @@ class TestSSM(BaseTest):
             },
             session_factory=session_factory,
         )
+
         try:
             p.run()
         except Exception as e:
             self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
+
+    def test_get_data_sync_resources(self):
+        session_factory = self.replay_flight_data("test_get_data_sync_resources")
+        p = self.load_policy(
+            {
+                "name": "ssm-get-data-sync-resources",
+                "resource": "ssm-data-sync"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_data_sync_kms_key_filter(self):
+        session_factory = self.replay_flight_data("test_data_sync_kms_filter")
+        p = self.load_policy(
+            {
+                "name": "ssm-get-data-sync-resources",
+                "resource": "ssm-data-sync",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "data-sync-kms-key",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resource = p.run()
+        self.assertEqual(len(resource), 1)
+        self.assertEqual(resource[0]["S3Destination"]["BucketName"], "data-sync-destination-bucket")
+
+    def test_data_sync_value_filter(self):
+        session_factory = self.replay_flight_data("test_data_sync_value_filter")
+        p = self.load_policy(
+            {
+                "name": "ssm-data-sync-value-filter",
+                "resource": "ssm-data-sync",
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'S3Destination.BucketName',
+                        'value': ['c7n-ssm'],
+                        'op': 'in'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["S3Destination"]["BucketName"], "c7n-ssm")
+
+    def test_data_sync_delete(self):
+        session_factory = self.replay_flight_data("test_data_sync_delete")
+        p = self.load_policy(
+            {
+                "name": "ssm-delete-data-sync-resources",
+                "resource": "ssm-data-sync",
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'S3Destination.BucketName',
+                        'value': ['data-sync-destination-bucket'],
+                        'op': 'in'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        p.run()
+        client = session_factory().client('ssm', region_name='us-east-1')
+        data_syncs = client.list_resource_data_sync(SyncType='SyncToDestination')
+        self.assertEqual(len(data_syncs.get('ResourceDataSyncItems')), 1)
+
+    def test_data_sync_delete_error(self):
+        session_factory = self.replay_flight_data("test_data_sync_delete_error")
+        p = self.load_policy(
+            {
+                "name": "ssm-delete-data-sync-resources",
+                "resource": "ssm-data-sync",
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        data_syncs = p.run()
+        self.assertEqual(len(data_syncs), 3)

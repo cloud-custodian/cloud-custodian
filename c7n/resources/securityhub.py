@@ -335,7 +335,7 @@ class PostFinding(Action):
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
-        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10, 'default': 1},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 100, 'default': 1},
         types={
             "type": "array",
             "minItems": 1,
@@ -398,43 +398,46 @@ class PostFinding(Action):
         # which only shows a single resource in a finding.
         batch_size = self.data.get('batch_size', 1)
         stats = Counter()
-        for key, grouped_resources in self.group_resources(resources).items():
-            for resource_set in chunks(grouped_resources, batch_size):
-                stats['Finding'] += 1
-                if key == self.NEW_FINDING:
-                    finding_id = None
-                    created_at = now
-                    updated_at = now
-                else:
-                    finding_id, created_at = self.get_finding_tag(
-                        resource_set[0]).split(':', 1)
-                    updated_at = now
+        for resource_set in chunks(resources, batch_size):
+            findings = []
+            for key, grouped_resources in self.group_resources(resource_set).items():
+                for resource in grouped_resources:
+                    stats['Finding'] += 1
+                    if key == self.NEW_FINDING:
+                        finding_id = None
+                        created_at = now
+                        updated_at = now
+                    else:
+                        finding_id, created_at = self.get_finding_tag(
+                            resource).split(':', 1)
+                        updated_at = now
 
-                finding = self.get_finding(
-                    resource_set, finding_id, created_at, updated_at)
-                import_response = client.batch_import_findings(
-                    Findings=[finding])
-                if import_response['FailedCount'] > 0:
-                    stats['Failed'] += import_response['FailedCount']
-                    self.log.error(
-                        "import_response=%s" % (import_response))
-                if key == self.NEW_FINDING:
-                    stats['New'] += len(resource_set)
-                    # Tag resources with new finding ids
-                    tag_action = self.manager.action_registry.get('tag')
-                    if tag_action is None:
-                        continue
-                    tag_action({
-                        'key': '{}:{}'.format(
-                            'c7n:FindingId',
-                            self.data.get(
-                                'title', self.manager.ctx.policy.name)),
-                        'value': '{}:{}'.format(
-                            finding['Id'], created_at)},
-                        self.manager).process(resource_set)
-                else:
-                    stats['Update'] += len(resource_set)
-
+                    finding = self.get_finding(
+                        [resource], finding_id, created_at, updated_at)
+                    findings.append(finding)
+                    if key == self.NEW_FINDING:
+                        stats['New'] += 1
+                        # Tag resources with new finding ids
+                        tag_action = self.manager.action_registry.get('tag')
+                        if tag_action is None:
+                            continue
+                        tag_action({
+                            'key': '{}:{}'.format(
+                                'c7n:FindingId',
+                                self.data.get(
+                                    'title', self.manager.ctx.policy.name)),
+                            'value': '{}:{}'.format(
+                                finding['Id'], created_at)},
+                            self.manager).process([resource])
+                    else:
+                        stats['Update'] += 1
+            import_response = self.manager.retry(
+                client.batch_import_findings, Findings=findings
+            )
+            if import_response['FailedCount'] > 0:
+                stats['Failed'] += import_response['FailedCount']
+                self.log.error(
+                    "import_response=%s" % (import_response))
         self.log.debug(
             "policy:%s securityhub %d findings resources %d new %d updated %d failed",
             self.manager.ctx.policy.name,

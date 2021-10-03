@@ -18,7 +18,7 @@ except ImportError:
 try:
     from google.cloud.logging import Client as LogClient
     from google.cloud.logging.handlers import CloudLoggingHandler
-    from google.cloud.logging.resource import Resource
+    from google.cloud.logging import Resource
 except ImportError:
     LogClient = None
 

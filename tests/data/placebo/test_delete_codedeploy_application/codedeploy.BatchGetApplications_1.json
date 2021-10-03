@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "applicationsInfo": [
+            {
+                "applicationId": "38b7c7b7-2fbd-46a9-a7ef-8233d81a462f",
+                "applicationName": "HelloWorld",
+                "createTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 50,
+                    "microsecond": 963000
+                },
+                "linkedToGitHub": false,
+                "computePlatform": "Lambda"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
