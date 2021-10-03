@@ -197,6 +197,8 @@ ResourceMap = {
     "aws.subnet": "c7n.resources.vpc.Subnet",
     "aws.support-case": "c7n.resources.support.SupportCase",
     "aws.swf-domain": "c7n.resources.swf.SimpleWorkflowDomain",
+    "aws.transfer-server": "c7n.resources.transfer.TransferServer",
+    "aws.transfer-user": "c7n.resources.transfer.TransferUser",
     "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
     "aws.transit-gateway": "c7n.resources.vpc.TransitGateway",
     "aws.user-pool": "c7n.resources.cognito.CognitoUserPool",
