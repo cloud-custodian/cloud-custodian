@@ -507,7 +507,6 @@ class StatsDMetricsOutput(Metrics):
         self.client = DogStatsd(namespace='cloud-custodian')
 
     def _format_metric(self, key, value, unit, dimensions):
-        time_now = datetime.datetime.utcnow()
         message = {
             'metric': key,
             'value': value,
