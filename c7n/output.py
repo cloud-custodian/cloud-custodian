@@ -16,7 +16,7 @@ import shutil
 import tempfile
 import time
 import uuid
-
+from datadog import DogStatsd
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -495,3 +495,41 @@ class BlobOutput(DirectoryOutput):
 
     def upload_file(self, path, key):
         raise NotImplementedError("subclass responsibility")
+
+
+@metrics_outputs.register('statsd')
+class StatsDMetricsOutput(Metrics):
+    def __init__(self, ctx, config=None):
+        super(StatsDMetricsOutput, self).__init__(ctx, config)
+
+        self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
+        self.region = self.config.get('region')
+        self.client = DogStatsd(namespace='cloud-custodian')
+
+    def _format_metric(self, key, value, unit, dimensions):
+        time_now = datetime.datetime.utcnow()
+        message = {
+            'metric': key,
+            'value': value,
+            'tags': []
+        }
+
+        tags = [
+            'account_id:{}'.format(self.ctx.options.account_id or ''),
+            'region:{}'.format(self.ctx.options.region),
+            'policy:{}'.format(self.ctx.policy.name),
+            'resource_type:{}'.format(self.ctx.policy.resource_type),
+        ]
+        for k, v in dimensions.items():
+            tags.append('%s:%s' % (k, v))
+
+        message['tags'] = tags
+        return message
+
+    def _put_metrics(self, ns, metrics):
+        for metric in metrics:
+            self.client.gauge(
+                metric['metric'],
+                metric['value'],
+                metric['tags']
+            )
