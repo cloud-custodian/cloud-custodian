@@ -57,8 +57,9 @@ class StopServer(BaseAction):
             self.log.exception(
                 "Exception stopping server:\n %s" % e)
 
+
 @TransferServer.action_registry.register('start')
-class StopServer(BaseAction):
+class StartServer(BaseAction):
     """Action to start a Transfer Server
 
     :example:
@@ -91,11 +92,11 @@ class StopServer(BaseAction):
             client.start_server(ServerId=server['ServerId'])
         except ClientError as e:
             self.log.exception(
-                "Exception stopping server:\n %s" % e)
+                "Exception starting server:\n %s" % e)
 
 
 @TransferServer.action_registry.register('delete')
-class StopServer(BaseAction):
+class DeleteServer(BaseAction):
     """Action to delete a Transfer Server
 
     :example:
@@ -122,7 +123,8 @@ class StopServer(BaseAction):
             client.delete_server(ServerId=server['ServerId'])
         except ClientError as e:
             self.log.exception(
-                "Exception stopping server:\n %s" % e)
+                "Exception deleting server:\n %s" % e)
+
 
 @resources.register('transfer-user')
 class TransferUser(ChildResourceManager):
@@ -139,4 +141,3 @@ class TransferUser(ChildResourceManager):
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(TransferUser, self).get_resources(ids, cache, augment=False)
-
