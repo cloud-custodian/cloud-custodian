@@ -55,7 +55,7 @@ class Subnet(QueryResourceManager):
         def get(client, resource_info):
 
             path_param_re = re.compile(
-                '.*?/projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
+                '.*?projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
             project, region, subnet = path_param_re.match(
                 resource_info["resourceName"]).groups()
             return client.execute_query(
