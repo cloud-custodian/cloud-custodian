@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema, jmespath_search
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
-from c7n_gcp.actions import MethodAction
+from c7n.utils import local_session, type_schema
+from c7n.filters.core import OPERATORS
+from c7n.filters import ValueFilter
 
 
 @resources.register('bq-dataset')
@@ -152,3 +155,37 @@ class DeleteBQTable(MethodAction):
             'datasetId': r['tableReference']['datasetId'],
             'tableId': r['tableReference']['tableId']
         }
+
+
+@BigQueryTable.filter_registry.register('encryption-configuration-bigquery-filter')
+class RetentionPolicyBucketFilter(ValueFilter):
+    schema = type_schema('encryption-configuration-bigquery-filter',
+                         rinherit=ValueFilter.schema, )
+    permissions = ('storage.buckets.list',)
+
+    def _perform_op(self, a, b):
+        if self.data['value'] == 'present' and a:
+            return True
+        if self.data['value'] == 'absent' and a is None:
+            return True
+        if a is not None:
+            op = OPERATORS[self.data.get('op', 'eq')]
+            return op(a, b)
+        return False
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        client = session.client(service_name='bigquery', version='v2', component='tables')
+        # Getting project_id from client
+        project = session.get_default_project()
+        accepted_resources = []
+        value = self.data['value']
+        for resource in resources:
+            encryption_configuration = client.execute_query('get', {
+                'projectId': project, 'datasetId': resource['tableReference']['datasetId'],
+                'tableId': resource['tableReference']['tableId']})
+            jmespath_key = jmespath.search(self.data['key'], encryption_configuration)
+            if self._perform_op(jmespath_key, value):
+                accepted_resources.append(resource)
+
+        return accepted_resources

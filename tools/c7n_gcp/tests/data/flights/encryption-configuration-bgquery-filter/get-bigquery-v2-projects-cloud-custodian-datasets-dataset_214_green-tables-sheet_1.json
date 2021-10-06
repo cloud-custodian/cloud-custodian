@@ -1,0 +1,41 @@
+{
+  "headers": {
+    "etag": "X7AnOqw8zAl0WF/SfU+hrQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 06 Oct 2021 10:56:29 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "773",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/dataset_214_green/tables/sheet?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#table",
+    "etag": "X7AnOqw8zAl0WF/SfU+hrQ==",
+    "id": "gcp-lab-custodian:dataset_214_green.sheet",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/dataset_214_green/tables/sheet",
+    "tableReference": {
+      "projectId": "gcp-lab-custodian",
+      "datasetId": "dataset_214_green",
+      "tableId": "sheet"
+    },
+    "numBytes": "0",
+    "numLongTermBytes": "0",
+    "numRows": "0",
+    "creationTime": "1633514374279",
+    "expirationTime": "1633517974279",
+    "lastModifiedTime": "1633514374412",
+    "type": "TABLE",
+    "location": "us-central1",
+    "encryptionConfiguration": {
+      "kmsKeyName": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-213-test-green/cryptoKeys/crypto-key-213-test-green"
+    }
+  }
+}

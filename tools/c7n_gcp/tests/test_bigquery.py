@@ -30,7 +30,8 @@ class BigQueryDataSetTest(BaseTest):
 class BigQueryJobTest(BaseTest):
 
     def test_query(self):
-        factory = self.replay_flight_data('bq-job-query')
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('bq-job-query', project_id=project_id)
         p = self.load_policy({
             'name': 'bq-job-get',
             'resource': 'gcp.bq-job'},
@@ -130,3 +131,23 @@ class BigQueryTableTest(BaseTest):
         if self.recording:
             time.sleep(1)
         self.assertEqual(len(resources), 1)
+
+
+    def test_encryption_configuration_bigquery_filter(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'encryption-configuration-bgquery-filter', project_id=project_id)
+        p = self.load_policy({
+            'name': 'bq-table-get',
+            'resource': 'gcp.bq-table',
+            'filters': [{
+                'type': 'encryption-configuration-bigquery-filter',
+                'key': 'encryptionConfiguration.kmsKeyName',
+                'value': 'present'
+            }]
+        }, session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'bigquery#table')
