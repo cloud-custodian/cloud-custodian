@@ -147,7 +147,7 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 # Verify the install
 #  - policystream is not in ci due to libgit2 compilation needed
 #  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
+RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
 """
 
 
@@ -471,7 +471,8 @@ def test_image(image_id, image_name, providers):
     if providers not in (None, ()):
         env["CUSTODIAN_PROVIDERS"] = " ".join(providers)
     subprocess.check_call(
-        [Path(sys.executable).parent / "pytest", "-v", "tests/test_docker.py"],
+        [Path(sys.executable).parent / "pytest", "-p",
+         "no:terraform", "-v", "tests/test_docker.py"],
         env=env,
         stderr=subprocess.STDOUT,
     )
