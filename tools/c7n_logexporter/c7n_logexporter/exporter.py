@@ -765,19 +765,20 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
 
     client = session.client('logs')
 
-    paginator = client.get_paginator('describe_log_groups')
-    for p in paginator.paginate():
-        found = False
-        for _group in p['logGroups']:
-            if _group['logGroupName'] == group:
-                group = _group
-                found = True
+    if isinstance(group, str):
+        paginator = client.get_paginator('describe_log_groups')
+        for p in paginator.paginate():
+            found = False
+            for _group in p['logGroups']:
+                if _group['logGroupName'] == group:
+                    group = _group
+                    found = True
+                    break
+            if found:
                 break
-        if found:
-            break
 
-    if not found:
-        raise ValueError("Log group %s not found." % group)
+        if not found:
+            raise ValueError("Log group %s not found." % group)
 
     if prefix:
         prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
