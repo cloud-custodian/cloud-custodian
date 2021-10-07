@@ -3221,7 +3221,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
-    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey')
+    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
 
     def process(self, buckets, event=None):
@@ -3299,6 +3299,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             # implies the AWS-managed key.
             key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
             return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
+
 
 @actions.register('set-bucket-encryption')
 class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
