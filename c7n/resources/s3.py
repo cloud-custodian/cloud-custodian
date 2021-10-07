@@ -3417,10 +3417,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
 
-            config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
-                'KMSMasterKeyID': key['Arn'],
-                'BucketKeyEnabled': bucket_key
-            }
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key['Arn']
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
