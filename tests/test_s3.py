@@ -3435,6 +3435,9 @@ class S3Test(BaseTest):
         self.assertEqual(rules["SSEAlgorithm"], "aws:kms")
         self.assertEqual(rules["KMSMasterKeyID"], kms_alias_id)
 
+        bname = "custodian-enable-bucket-encryption-kms-bad-alias"
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
         p = self.load_policy(
             {
                 "name": "s3-enable-bucket-encryption-bad-alias",
@@ -3457,12 +3460,8 @@ class S3Test(BaseTest):
         if self.recording:
             time.sleep(5)
 
-        response = client.get_bucket_encryption(Bucket=bname)
-        rules = response["ServerSideEncryptionConfiguration"]["Rules"][0][
-            "ApplyServerSideEncryptionByDefault"
-        ]
-        self.assertEqual(rules["SSEAlgorithm"], "aws:kms")
-        self.assertIsNone(rules.get("KMSMasterKeyID"))
+        with self.assertRaises(ClientError):
+            client.get_bucket_encryption(Bucket=bname)
 
     def test_enable_bucket_encryption_aes256(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
