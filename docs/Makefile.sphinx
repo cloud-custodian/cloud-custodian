@@ -59,6 +59,9 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf $(SRCDIR)/generated
+	rm -f $(SRCDIR)/aws/resources/*
+	rm -f $(SRCDIR)/gcp/resources/*
+	rm -f $(SRCDIR)/azure/resources/*
 
 html:
 #	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
