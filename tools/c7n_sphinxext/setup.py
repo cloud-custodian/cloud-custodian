@@ -10,15 +10,15 @@ package_data = \
 {'': ['*'], 'c7n_sphinxext': ['_templates/*']}
 
 install_requires = \
-['Pygments>=2.6.1,<3.0.0',
+['Pygments>=2.10.0,<3.0.0',
  'Sphinx>=3.0,<3.1',
  'argcomplete (>=1.12.3,<2.0.0)',
  'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.18.21,<2.0.0)',
- 'botocore (>=1.21.21,<2.0.0)',
+ 'boto3 (>=1.18.46,<2.0.0)',
+ 'botocore (>=1.21.46,<2.0.0)',
  'c7n (>=0.9.14,<0.10.0)',
- 'click>=7.1.2,<8.0.0',
- 'importlib-metadata (>=4.6.4,<5.0.0)',
+ 'click>=8.0,<9.0',
+ 'importlib-metadata (>=4.8.1,<5.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
  'pyrsistent (>=0.18.0,<0.19.0)',
@@ -30,9 +30,9 @@ install_requires = \
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'sphinx_rtd_theme>=0.4.3,<0.5.0',
  'tabulate (>=0.8.9,<0.9.0)',
- 'typing-extensions (>=3.10.0.0,<4.0.0.0)',
+ 'typing-extensions (>=3.10.0.2,<4.0.0.0)',
  'typing-extensions>=3.7.4,<4.0.0',
- 'urllib3 (>=1.26.6,<2.0.0)',
+ 'urllib3 (>=1.26.7,<2.0.0)',
  'zipp (>=3.5.0,<4.0.0)']
 
 entry_points = \

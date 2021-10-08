@@ -35,7 +35,7 @@ importlib-metadata = ">1.7.0;python_version<3.8"
 pytest = "^6.0.0"
 coverage = "^5.0.3"
 placebo = "^0.9.0"
-pytest-xdist = "^1.31.0"
+pytest-xdist = "^2.0"
 pytest-cov = "^2.8.1"
 pytest-terraform = "^0.5.0"
 mock = "^4.0.1"
@@ -48,7 +48,7 @@ psutil = "^5.7.0"
 # wheel = "==0.30.0"
 twine = "^3.1.1"
 pytest-sugar = "^0.9.2"
-click = "^7.1.2"
+click = "^8.0"
 
 [tool.black]
 skip-string-normalization = true
