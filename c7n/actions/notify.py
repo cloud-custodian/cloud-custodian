@@ -250,11 +250,12 @@ class Notify(BaseNotify):
             for k, v in user_attributes.items():
                 if k != 'mtype':
                     attrs[k] = {'DataType': 'String', 'StringValue': v}
-        client.publish(
+        result = client.publish(
             TopicArn=topic_arn,
             Message=self.pack(message),
             MessageAttributes=attrs
         )
+        return result['MessageId']
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue'].format(**message)
