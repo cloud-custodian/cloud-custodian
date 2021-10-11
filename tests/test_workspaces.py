@@ -200,3 +200,58 @@ class WorkspacesTest(BaseTest):
         client = session_factory().client('workspaces')
         call = client.describe_workspace_images(ImageIds=[imageId])
         self.assertTrue(call['Images'])
+
+    def test_workspaces_directory_subnet_sg(self):
+        factory = self.replay_flight_data("test_workspaces_directory_subnet_sg")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-sg-subnet",
+                "resource": "workspaces-directory",
+                "filters": [
+                    {'type': 'subnet',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Public'},
+                    {'type': 'security-group',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Private'}],
+                'actions': [{
+                    'type': 'tag',
+                    'key': 'c7n',
+                    'value': 'test'
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90675153fc')
+        client = factory().client('workspaces')
+        tags = client.describe_tags(ResourceId=resources[0]['DirectoryId'])
+        self.assertEqual({'Key': 'c7n', 'Value': 'test'}, tags['TagList'][0])
+
+    def test_workspaces_directory_client_properties(self):
+        factory = self.replay_flight_data("test_workspaces_directory_client_properties")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-sg-subnet",
+                "resource": "workspaces-directory",
+                "filters": [
+                    {'type': 'client-properties',
+                     'key': 'ReconnectEnabled',
+                     'value': 'ENABLED'}],
+                'actions': [{
+                    'type': 'modify-client-properties',
+                    'attributes': {
+                        'ClientProperties': {'ReconnectEnabled': 'DISABLED'}
+                    }
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90675153fc')
+        client = factory().client('workspaces')
+        cp = client.describe_client_properties(ResourceIds=['d-90675153fc'])
+        self.assertEqual({'ReconnectEnabled': 'DISABLED'}, cp.get(
+            'ClientPropertiesList')[0].get('ClientProperties'))
