@@ -2539,5 +2539,6 @@ class PrefixList(query.QueryResourceManager):
         name = 'PrefixListName'
         id = 'PrefixListId'
         id_prefix = 'pl-'
+        universal_taggable = object()
 
     source_mapping = {'describe': PrefixListDescribe}
