@@ -153,7 +153,7 @@ class TagTrim(Action):
                   - ASV
                   - CMDBEnvironment
                   - downtime
-                  - maid_status
+                  - custodian_status
     """
     max_tag_count = 50
 
@@ -253,7 +253,7 @@ class TagActionFilter(Filter):
             - type: marked-for-op
               # The default tag used is maid_status
               # but that is configurable
-              tag: maid_status
+              tag: custodian_status
               op: stop
               # Another optional tag is skew
               tz: utc
