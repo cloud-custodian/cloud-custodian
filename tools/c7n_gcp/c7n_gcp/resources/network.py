@@ -103,7 +103,9 @@ class SetFlowLog(SubnetAction):
             'project': params['project'],
             'region': params['region'],
             'subnetwork': params['subnetwork'],
-            'body': {'fingerprint': r['fingerprint'], 'enableFlowLogs': self.data.get('state', True)}
+            'body': {
+                'fingerprint': r['fingerprint'],
+                'enableFlowLogs': self.data.get('state', True)}
         }
 
 
