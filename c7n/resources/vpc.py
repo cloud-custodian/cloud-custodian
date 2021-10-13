@@ -2518,3 +2518,26 @@ class CreateFlowLogs(BaseAction):
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+
+class PrefixListDescribe(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        query = {'Filters': [
+            {'Name': 'prefix-list-id',
+             'Values': ids}]}
+        return self.query.filter(self.manager, **query)
+
+
+@resources.register('prefix-list')
+class PrefixList(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'prefix-list'
+        enum_spec = ('describe_managed_prefix_lists', 'PrefixLists', None)
+        name = 'PrefixListName'
+        id = 'PrefixListId'
+        id_prefix = 'pl-'
+
+    source_mapping = {'describe': PrefixListDescribe}
