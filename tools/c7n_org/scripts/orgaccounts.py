@@ -10,6 +10,7 @@ from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import yaml_dump
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
+NAME_TEMPLATE = "{name}"
 
 log = logging.getLogger('orgaccounts')
 
@@ -19,6 +20,10 @@ log = logging.getLogger('orgaccounts')
     '--role',
     default=ROLE_TEMPLATE,
     help="Role template for accounts in the config, defaults to %s" % ROLE_TEMPLATE)
+@click.option(
+    '--name',
+    default=NAME_TEMPLATE,
+    help="Name template for accounts in the config, defaults to %s" % NAME_TEMPLATE)
 @click.option('--ou', multiple=True, default=["/"],
               help="Only export the given subtrees of an organization")
 @click.option('-r', '--regions', multiple=True,
@@ -31,7 +36,7 @@ log = logging.getLogger('orgaccounts')
 @click.option('-a', '--active', is_flag=True, default=False, help="Get only active accounts")
 @click.option('-i', '--ignore', multiple=True,
   help="list of accounts that won't be added to the config file")
-def main(role, ou, assume, profile, output, regions, active, ignore):
+def main(role, name, ou, assume, profile, output, regions, active, ignore):
     """Generate a c7n-org accounts config file using AWS Organizations
 
     With c7n-org you can then run policies or arbitrary scripts across
@@ -57,6 +62,7 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
         for k, v in a.get('Tags', {}).items():
             tags.append("{}:{}".format(k, v))
 
+        a['OrgId'] = a['Arn'].split('/')[1]
         if not role.startswith('arn'):
             arn_role = "arn:aws:iam::{}:role/{}".format(a['Id'], role)
         else:
@@ -64,9 +70,12 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
         ainfo = {
             'account_id': a['Id'],
             'email': a['Email'],
+            'display_name': a['Name'],
             'name': a['Name'],
+            'org_id': a['OrgId'],
             'tags': tags,
             'role': arn_role}
+        ainfo['name'] = name.format(**ainfo)
         if regions:
             ainfo['regions'] = list(regions)
         if 'Tags' in a and a['Tags']:

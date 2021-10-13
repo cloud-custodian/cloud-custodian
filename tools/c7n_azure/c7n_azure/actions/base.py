@@ -46,14 +46,15 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
         )
 
     def _log_modified_resource(self, resource, message):
-        template = "Action '{}' modified '{}' in resource group '{}'."
+        if resource.get('type', '').lower() == 'resourcegroups':
+            template = "Action '{action}' modified resource group '{name}'. {message}"
+        else:
+            template = "Action '{action}' modified '{name}' in resource group '{rg}'. {message}"
+
         name = resource.get('name', 'unknown')
         rg = resource.get('resourceGroup', 'unknown')
 
-        if message:
-            template += ' ' + message
-
-        self.log.info(template.format(self.type, name, rg),
+        self.log.info(template.format(action=self.type, name=name, rg=rg, message=message or ''),
                       extra=self._get_action_log_metadata(resource))
 
     def _get_action_log_metadata(self, resource):
@@ -65,8 +66,8 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
 
         for r in resources:
             try:
-                message = self._process_resource(r)
-                self._log_modified_resource(r, message)
+                result = self._process_resource(r)
+                self._log_modified_resource(r, result)
             except Exception as e:
                 # only executes during test runs
                 if "pytest" in sys.modules:
@@ -96,8 +97,8 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
 
         for r in resources:
             try:
-                message = self._process_resource(r, event)
-                self._log_modified_resource(r, message)
+                result = self._process_resource(r, event)
+                self._log_modified_resource(r, result)
             except Exception as e:
                 # only executes during test runs
                 if "pytest" in sys.modules:

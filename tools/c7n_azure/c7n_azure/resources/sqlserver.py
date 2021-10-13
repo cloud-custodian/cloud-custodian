@@ -7,11 +7,13 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.utils import ThreadHelper
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.utils import type_schema
+from c7n.filters.core import ValueFilter, Filter
 
-AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
+AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
 
 
@@ -82,6 +84,130 @@ class SqlServer(ArmResourceManager):
         )
 
 
+@SqlServer.filter_registry.register('azure-ad-administrators')
+class AzureADAdministratorsFilter(ValueFilter):
+    """
+    Provides a value filter targetting the Azure AD Administrator of this
+    SQL Server.
+
+    Here is an example of the available fields:
+
+    .. code-block:: json
+
+      "administratorType": "ActiveDirectory",
+      "login": "bob@contoso.com",
+      "sid": "00000011-1111-2222-2222-123456789111",
+      "tenantId": "00000011-1111-2222-2222-123456789111",
+      "azureADOnlyAuthentication": true
+
+    :examples:
+
+    Find SQL Servers without AD Administrator
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sqlserver-no-ad-admin
+            resource: azure.sqlserver
+            filters:
+              - type: azure-ad-administrators
+                key: login
+                value: absent
+
+    """
+
+    schema = type_schema('azure-ad-administrators', rinherit=ValueFilter.schema)
+
+    def __call__(self, i):
+        if 'administrators' not in i['properties']:
+            client = self.manager.get_client()
+            administrators = list(
+                client.server_azure_ad_administrators
+                .list_by_server(i['resourceGroup'], i['name'])
+            )
+
+            # This matches the expanded schema, and despite the name
+            # there can only be a single administrator, not an array.
+            if administrators:
+                i['properties']['administrators'] = \
+                    administrators[0].serialize(True).get('properties', {})
+            else:
+                i['properties']['administrators'] = {}
+
+        return super(AzureADAdministratorsFilter, self).__call__(i['properties']['administrators'])
+
+
+@SqlServer.filter_registry.register('vulnerability-assessment')
+class VulnerabilityAssessmentFilter(Filter):
+    """
+    Filter sql servers by whether they have recurring vulnerability scans
+    enabled.
+
+    :example:
+
+    Find SQL servers without vulnerability assessments enabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-no-va
+            resource: azure.sql-server
+            filters:
+              - type: vulnerability-assessment
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'vulnerability-assessment',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqldatabase.vulnerability-assessment-filter')
+
+    def __init__(self, data, manager=None):
+        super(VulnerabilityAssessmentFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'c7n:vulnerability_assessment' not in resource['properties']:
+                va = list(client.server_vulnerability_assessments.list_by_server(
+                    resource['resourceGroup'],
+                    resource['name']))
+
+                # there can only be a single instance named "Default".
+                if va:
+                    resource['c7n:vulnerability_assessment'] = \
+                        va[0].serialize(True).get('properties', {})
+                else:
+                    resource['c7n:vulnerability_assessment'] = {}
+
+            if resource['c7n:vulnerability_assessment']\
+                    .get('recurringScans', {})\
+                    .get('isEnabled', False) == self.enabled:
+                result.append(resource)
+
+        return result
+
+
 @SqlServer.filter_registry.register('firewall-rules')
 class SqlServerFirewallRulesFilter(FirewallRulesFilter):
     def _query_rules(self, resource):
@@ -131,7 +257,7 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
             resource['name'])
 
         for r in query:
-            if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':
+            if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':  # nosec
                 return ['AzureServices']
         return []
 

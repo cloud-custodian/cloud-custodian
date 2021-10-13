@@ -6,9 +6,11 @@ import jmespath
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
+from c7n import query
 
 from .securityhub import OtherResourcePostFinding
 
@@ -264,4 +266,133 @@ class DeletePipeline(BaseAction):
             try:
                 self.manager.retry(client.delete_pipeline, name=r['name'])
             except client.exceptions.PipelineNotFoundException:
+                continue
+
+
+@resources.register('codedeploy-app')
+class CodeDeployApplication(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_applications', 'applications', None)
+        batch_detail_spec = (
+            'batch_get_applications', 'applicationNames',
+            None, 'applicationsInfo', None)
+        id = 'applicationId'
+        name = 'applicationName'
+        date = 'createTime'
+        arn_type = "application"
+        arn_separator = ":"
+        cfn_type = "AWS::CodeDeploy::Application"
+        universal_taggable = True
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        client = local_session(self.session_factory).client('codedeploy')
+        for r, arn in zip(resources, self.get_arns(resources)):
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceArn=arn).get('Tags', [])
+        return resources
+
+    def get_arns(self, resources):
+        return [self.generate_arn(r['applicationName']) for r in resources]
+
+
+@CodeDeployApplication.action_registry.register('delete')
+class DeleteApplication(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('codedeploy:DeleteApplication',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_application, applicationName=r['applicationName'])
+            except (client.exceptions.InvalidApplicationNameException,
+            client.exceptions.ApplicationDoesNotExistException):
+                continue
+
+
+@resources.register('codedeploy-deployment')
+class CodeDeployDeployment(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_deployments', 'deployments', {'includeOnlyStatuses': [
+            'Created', 'Queued', 'InProgress', 'Baking', 'Ready']})
+        batch_detail_spec = (
+            'batch_get_deployments', 'deploymentIds',
+            None, 'deploymentsInfo', None)
+        name = id = 'deploymentId'
+        # couldn't find a real cloudformation type
+        cfn_type = None
+        arn_type = "deploymentgroup"
+        date = 'createTime'
+
+
+class DescribeDeploymentGroup(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super().get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        results = []
+        for parent_id, group_name in resources:
+            dg = self.manager.retry(
+                client.get_deployment_group, applicationName=parent_id,
+                deploymentGroupName=group_name).get('deploymentGroupInfo')
+            results.append(dg)
+        for r in results:
+            rarn = self.manager.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName'])
+            r['Tags'] = self.manager.retry(
+                client.list_tags_for_resource, ResourceArn=rarn).get('Tags')
+        return results
+
+
+@resources.register('codedeploy-group')
+class CodeDeployDeploymentGroup(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        parent_spec = ('codedeploy-app', 'applicationName', None)
+        enum_spec = ('list_deployment_groups', 'deploymentGroups', None)
+        id = 'deploymentGroupId'
+        name = 'deploymentGroupName'
+        arn_type = "deploymentgroup"
+        cfn_type = 'AWS::CodeDeploy::DeploymentGroup'
+        arn_separator = ':'
+        permission_prefix = 'codedeploy'
+        universal_taggable = True
+
+    source_mapping = {
+        'describe-child': DescribeDeploymentGroup
+    }
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName']))
+        return arns
+
+
+@CodeDeployDeploymentGroup.action_registry.register('delete')
+class DeleteDeploymentGroup(BaseAction):
+    """Delete a deployment group tied to an application.
+    """
+
+    schema = type_schema('delete')
+    permissions = ('codedeploy:DeleteDeploymentGroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_deployment_group,
+                      applicationName=r['applicationName'],
+                      deploymentGroupName=r['deploymentGroupName'])
+            except client.exceptions.InvalidDeploymentGroupNameException:
                 continue

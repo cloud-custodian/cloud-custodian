@@ -3,6 +3,7 @@
 import time
 
 from gcp_common import BaseTest, event_data
+from googleapiclient.errors import HttpError
 
 
 class FirewallTest(BaseTest):
@@ -18,6 +19,62 @@ class FirewallTest(BaseTest):
             'project_id': 'cloud-custodian'})
         self.assertEqual(fw['name'], 'allow-inbound-xyz')
 
+    def test_firewall_modify(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('firewall-modify', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'fdelete',
+             'resource': 'gcp.firewall',
+             'filters': [{'name': 'test'}],
+             'actions': [{'type': 'modify', 'priority': 500, 'targetTags': ['newtag']}]
+             },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'project': project_id, 'firewall': 'test'})
+        self.assertEqual(result["targetTags"][0], 'newtag')
+        self.assertEqual(result["priority"], 500)
+
+    def test_firewall_delete(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('firewall-delete', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'fdelete',
+             'resource': 'gcp.firewall',
+             'filters': [{'name': 'test'}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        client = p.resource_manager.get_client()
+        try:
+            result = client.execute_query(
+                'get', {'project': project_id,
+                        'firewall': 'test'})
+            self.fail('found deleted firewall: %s' % result)
+        except HttpError as e:
+            self.assertTrue("was not found" in str(e))
+
+
+class NetworkTest(BaseTest):
+
+    def test_network_get(self):
+        factory = self.replay_flight_data(
+            'network-get-resource', project_id='cloud-custodian')
+        p = self.load_policy({'name': 'network', 'resource': 'gcp.vpc'},
+                             session_factory=factory)
+        network = p.resource_manager.get_resource({
+            "resourceName":
+                "//compute.googleapis.com/projects/cloud-custodian/"
+                "global/networks/default"})
+        self.assertEqual(network['name'], 'default')
+        self.assertEqual(network['autoCreateSubnetworks'], True)
+
 
 class SubnetTest(BaseTest):
 
@@ -27,9 +84,10 @@ class SubnetTest(BaseTest):
         p = self.load_policy({'name': 'subnet', 'resource': 'gcp.subnet'},
                              session_factory=factory)
         subnet = p.resource_manager.get_resource({
-            "location": "us-central1",
+            "resourceName":
+                "//compute.googleapis.com/projects/cloud-custodian/"
+                "regions/us-central1/subnetworks/default",
             "project_id": "cloud-custodian",
-            "subnetwork_id": "4686700484947109325",
             "subnetwork_name": "default"})
         self.assertEqual(subnet['name'], 'default')
         self.assertEqual(subnet['privateIpGoogleAccess'], True)

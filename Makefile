@@ -1,6 +1,6 @@
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
-PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext
+PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform
 
 install:
 	python3 -m venv .
@@ -8,7 +8,7 @@ install:
 
 install-poetry:
 	poetry install
-	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
+	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install && cd ../..; done
 
 pkg-rebase:
 	rm -f poetry.lock
@@ -38,7 +38,7 @@ pkg-update:
 
 pkg-show-update:
 	poetry show -o
-	for pkg in $(PKG_SET); do cd $$pkg && poetry show -o && cd ../..; done
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
 
 pkg-freeze-setup:
 	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
@@ -80,11 +80,21 @@ pkg-publish-wheel:
 test-poetry:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
 
+test-poetry-cov:
+	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov c7n --cov tools/c7n_azure/c7n_azure \
+            --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
+            --cov tools/c7n_mailer/c7n_mailer \
+            tests tools {posargs}
+
 test:
 	./bin/tox -e py38
 
 ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
+
+ttest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
 
 sphinx:
 # if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
@@ -103,4 +113,30 @@ lint:
 	flake8 c7n tests tools
 
 clean:
+	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
+
+analyzer-bandit:
+	bandit -i -s B101,B311 \
+	-r tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n
+
+
+analyzer-semgrep:
+	semgrep --error --verbose --config p/security-audit \
+	 tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n

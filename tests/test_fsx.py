@@ -402,6 +402,14 @@ class TestFSx(BaseTest):
         self.assertTrue(len(fs), 1)
         self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
 
+    def test_fsx_arn_in_event(self):
+        session_factory = self.replay_flight_data('test_fsx_resource')
+        p = self.load_policy({'name': 'test-fsx', 'resource': 'fsx'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(
+            ["arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896"])
+        self.assertEqual(len(resources), 1)
+
 
 class TestFSxBackup(BaseTest):
     def test_fsx_backup_delete(self):

@@ -27,6 +27,8 @@ class SqlInstance(QueryResourceManager):
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
         asset_type = "sqladmin.googleapis.com/Instance"
+        scc_type = "google.cloud.sql.Instance"
+        metric_key = 'resource.labels.database_id'
         perm_service = 'cloudsql'
 
         @staticmethod
@@ -34,6 +36,10 @@ class SqlInstance(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
+
+        @staticmethod
+        def get_metric_resource_name(resource):
+            return "{}:{}".format(resource["project"], resource["name"])
 
 
 class SqlInstanceAction(MethodAction):
@@ -67,6 +73,22 @@ class SqlInstanceStop(MethodAction):
         return {'project': project,
                 'instance': instance,
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
+
+
+@SqlInstance.action_registry.register('start')
+class SqlInstanceStart(MethodAction):
+
+    schema = type_schema('start')
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                'instance': instance,
+                'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
 
 
 @resources.register('sql-user')

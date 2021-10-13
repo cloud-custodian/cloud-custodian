@@ -8,8 +8,9 @@ from collections import Counter
 import logging
 import os
 import time
-import subprocess
+import subprocess  # nosec
 import sys
+from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -27,7 +28,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
-from c7n.reports.csvout import Formatter, fs_record_set
+from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty
 
@@ -60,6 +61,8 @@ CONFIG_SCHEMA = {
             ],
             'properties': {
                 'name': {'type': 'string'},
+                'display_name': {'type': 'string'},
+                'org_id': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {
                     'type': 'string',
@@ -81,6 +84,7 @@ CONFIG_SCHEMA = {
             'required': ['subscription_id'],
             'properties': {
                 'subscription_id': {'type': 'string'},
+                'region': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
                 'vars': {'type': 'object'},
@@ -161,6 +165,11 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
+    accounts = comma_expand(accounts)
+    policies = comma_expand(policies)
+    tags = comma_expand(tags)
+    policy_tags = comma_expand(policy_tags)
+
     # Filter out custodian log messages on console output if not
     # at warning level or higher, see LogFilter docs and #2674
     for h in logging.getLogger().handlers:
@@ -194,7 +203,21 @@ def resolve_regions(regions, account):
         return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
-    return regions
+
+    return comma_expand(regions)
+
+
+def comma_expand(values):
+    resolved_values = []
+    if not values:
+        return []
+    for v in values:
+        if ',' in v:
+            resolved_values.extend([n.strip() for n in v.split(',')])
+        elif v:
+            resolved_values.append(v)
+    # unique the set
+    return list(dict.fromkeys(resolved_values))
 
 
 def get_session(account, session_name, region):
@@ -226,6 +249,8 @@ def get_session(account, session_name, region):
 
 def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     filtered_accounts = []
+    accounts = comma_expand(accounts)
+    not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
         if not_accounts and a['name'] in not_accounts:
             continue
@@ -288,7 +313,20 @@ def report_account(account, region, policies_config, output_path, cache_path, de
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
+        if p.ctx.output.type == "s3":
+            delta = timedelta(days=1)
+            begin_date = datetime.now() - delta
+
+            policy_records = record_set(
+                p.session_factory,
+                p.ctx.output.config['netloc'],
+                strip_output_path(p.ctx.output.config['path'], p.name),
+                begin_date
+            )
+        else:
+            policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region
@@ -381,20 +419,23 @@ def report(config, output, use, output_dir, accounts,
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, formatter.headers())
+    writer = csv.writer(output, formatter.headers(), quoting=csv.QUOTE_ALL)
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
 
-def _get_env_creds(account, session, region):
-    env = {}
+def _get_env_creds(account, session, region, env=None):
+    env = env or {}
     if account["provider"] == 'aws':
         creds = session._session.get_credentials()
         env['AWS_ACCESS_KEY_ID'] = creds.access_key
         env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
         env['AWS_SESSION_TOKEN'] = creds.token
         env['AWS_DEFAULT_REGION'] = region
+        env['AWS_REGION'] = region
         env['AWS_ACCOUNT_ID'] = account["account_id"]
+        # we're explicitly setting credential and region configuratio
+        env.pop('AWS_PROFILE', None)
     elif account["provider"] == 'azure':
         env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
     elif account["provider"] == 'gcp':
@@ -410,14 +451,12 @@ def run_account_script(account, region, output_dir, debug, script_args):
     except ClientError:
         return 1
 
-    env = os.environ.copy()
-    env.update(_get_env_creds(account, session, region))
-
+    env = _get_env_creds(account, session, region, dict(os.environ))
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
 
     if debug:
-        subprocess.check_call(args=script_args, env=env)
+        subprocess.check_call(args=script_args, env=env)  # nosec
         return 0
 
     output_dir = os.path.join(output_dir, account['name'], region)
@@ -426,7 +465,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
-            return subprocess.call(
+            return subprocess.call(  # nosec
                 args=script_args, env=env, stdout=stdout, stderr=stderr)
 
 
@@ -495,7 +534,7 @@ def accounts_iterator(config):
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
-             'regions': ['global'],
+             'regions': [a.get('region', 'global')],
              'provider': 'azure',
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}

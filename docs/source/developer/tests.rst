@@ -74,13 +74,13 @@ shell's PATH.
 In addition to a working terraform installation, credentials and configuration for the target cloud will need to be completed.
 `Getting started with Terraform <https://learn.hashicorp.com/terraform>`_
 
-Pytest Terraform looks for matching modules in the ```tests/terraform`` directory.
-So for a test named ```test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
+Pytest Terraform looks for matching modules in the ``tests/terraform`` directory.
+So for a test named ``test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
 
 Here's an example terraform file for the upcoming example.
 It is placed in ``tests/terraform/file_example/main.tf``.
 
-  .. code-block:: terraform
+  ::
 
     resource "local_file" "bar" {
        content = "bar!"
@@ -154,7 +154,7 @@ Recording Custodian Interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Cloud Custodian tests provide a pytest fixture, ``test``, that provides access to
-common unitest methods (such as ``assertEqual``) as well as the placebo based test methods.
+common unittest methods (such as ``assertEqual``) as well as the placebo based test methods.
 In order to write a placebo enabled test two helper methods are provided:
 
   - ``record_flight_data`` - use this when creating the test
@@ -259,7 +259,7 @@ to inspect cloud entities after each test run.
 In this example we create a new SQS and a policy to delete it then assert it is
 deleted. To avoid terraform erroring on teardown `TEARDOWN_IGNORE` is used.
 
-  .. code-block:: terraform
+  ::
 
     provider "aws" {}
 

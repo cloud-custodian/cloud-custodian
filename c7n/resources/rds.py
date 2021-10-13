@@ -53,7 +53,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
-from c7n import tags
+from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
@@ -633,6 +633,9 @@ class CopySnapshotTags(BaseAction):
                   - type: set-snapshot-copy-tags
                     enable: True
     """
+    deprecations = (
+        deprecated.action("use modify-db instead with `CopyTagsToSnapshot`"),
+    )
 
     schema = type_schema(
         'set-snapshot-copy-tags',
@@ -983,6 +986,7 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        filter_type = "scalar"
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBSnapshots',)
 

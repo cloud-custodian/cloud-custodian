@@ -831,7 +831,7 @@ class AppELBModifyListenerPolicy(BaseAction):
     schema = type_schema(
         'modify-listener',
         port={'type': 'integer'},
-        protocol={'enum': ['HTTP', 'HTTPS']},
+        protocol={'enum': ['HTTP', 'HTTPS', 'TCP', 'TLS', 'UDP', 'TCP_UDP', 'GENEVE']},
         sslpolicy={'type': 'string'},
         certificate={'type': 'string'}
     )

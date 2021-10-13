@@ -101,7 +101,7 @@ def test_sqs_set_encryption(test, sqs_set_encryption):
     queue_url = resources[0]["QueueUrl"]
 
     queue_attributes = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["All"])
-    check_master_key = queue_attributes["Attributes"]["KmsMasterKeyId"]
+    check_master_key = queue_attributes["Attributes"].get("KmsMasterKeyId", '')
     test.assertEqual(check_master_key, key_id)
 
 

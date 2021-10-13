@@ -1,36 +1,33 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "KeyMetadata": {
-            "Origin": "AWS_KMS", 
-            "KeyId": "9c4a6837-f9ab-4fa8-8e9b-39fe4307777f", 
-            "Description": "key", 
-            "KeyManager": "CUSTOMER", 
-            "Enabled": false, 
-            "KeyUsage": "ENCRYPT_DECRYPT", 
-            "KeyState": "Disabled", 
+            "AWSAccountId": "644160558196",
+            "KeyId": "5d8168d1-8e77-4495-97f5-0ef5f7b4753a",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/5d8168d1-8e77-4495-97f5-0ef5f7b4753a",
             "CreationDate": {
-                "hour": 17, 
-                "__class__": "datetime", 
-                "month": 11, 
-                "second": 2, 
-                "microsecond": 310000, 
-                "year": 2017, 
-                "day": 10, 
-                "minute": 58
-            }, 
-            "Arn": "arn:aws:kms:us-east-1:015929227155:key/9c4a6837-f9ab-4fa8-8e9b-39fe4307777f", 
-            "AWSAccountId": "015929227155"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "45c9b351-ca20-11e7-9714-0bef0eb02a0c", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "45c9b351-ca20-11e7-9714-0bef0eb02a0c", 
-                "content-length": "339", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 10,
+                "day": 7,
+                "hour": 1,
+                "minute": 53,
+                "second": 54,
+                "microsecond": 155000
+            },
+            "Enabled": true,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
     }
 }

@@ -14,7 +14,7 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies
+from urllib.request import getproxies, proxy_bypass
 
 
 from dateutil.parser import ParserError, parse
@@ -312,9 +312,11 @@ def query_instances(session, client=None, **query):
 CONN_CACHE = threading.local()
 
 
-def local_session(factory):
+def local_session(factory, region=None):
     """Cache a session thread local for up to 45m"""
     factory_region = getattr(factory, 'region', 'global')
+    if region:
+        factory_region = region
     s = getattr(CONN_CACHE, factory_region, {}).get('session')
     t = getattr(CONN_CACHE, factory_region, {}).get('time')
 
@@ -601,14 +603,28 @@ def parse_url_config(url):
 
 def get_proxy_url(url):
     proxies = getproxies()
-    url_parts = parse_url_config(url)
+    parsed = urlparse.urlparse(url)
 
     proxy_keys = [
-        url_parts['scheme'] + '://' + url_parts['netloc'],
-        url_parts['scheme'],
-        'all://' + url_parts['netloc'],
+        parsed.scheme + '://' + parsed.netloc,
+        parsed.scheme,
+        'all://' + parsed.netloc,
         'all'
     ]
+
+    # Set port if not defined explicitly in url.
+    port = parsed.port
+    if port is None and parsed.scheme == 'http':
+        port = 80
+    elif port is None and parsed.scheme == 'https':
+        port = 443
+
+    hostname = parsed.hostname is not None and parsed.hostname or ''
+
+    # Determine if proxy should be used based on no_proxy entries.
+    # Note this does not support no_proxy ip or cidr entries.
+    if proxy_bypass("%s:%s" % (hostname, port)):
+        return None
 
     for key in proxy_keys:
         if key in proxies:
@@ -755,3 +771,15 @@ def select_keys(d, keys):
     for k in keys:
         result[k] = d.get(k)
     return result
+
+
+def get_human_size(size, precision=2):
+    # interesting discussion on 1024 vs 1000 as base
+    # https://en.wikipedia.org/wiki/Binary_prefix
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    suffixIndex = 0
+    while size > 1024:
+        suffixIndex += 1
+        size = size / 1024.0
+
+    return "%.*f %s" % (precision, size, suffixes[suffixIndex])

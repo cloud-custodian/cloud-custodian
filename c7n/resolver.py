@@ -34,10 +34,8 @@ class URIResolver:
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
-            # TODO: in the case of file: content and untrusted
-            # third parties, uri would need sanitization
             req = Request(uri, headers={"Accept-Encoding": "gzip"})
-            with closing(urlopen(req)) as response:
+            with closing(urlopen(req)) as response:  # nosec nosemgrep
                 contents = self.handle_response_encoding(response)
 
         if self.cache:

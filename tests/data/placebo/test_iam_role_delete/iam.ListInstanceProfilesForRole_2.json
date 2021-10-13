@@ -1,0 +1,21 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The role with name test cannot be found."
+        },
+        "ResponseMetadata": {
+            "RequestId": "RequestId",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "x-amzn-requestid",
+                "content-type": "text/xml",
+                "content-length": "284",
+                "date": "Mon, 15 Feb 2021 11:05:26 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

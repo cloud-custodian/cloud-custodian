@@ -7,7 +7,7 @@ from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, Whi
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 from netaddr import IPSet
 from parameterized import parameterized
 import pytest
@@ -138,8 +138,8 @@ class KeyVaultTest(BaseTest):
 
         mock_response = Mock(spec=Response)
         mock_response.status_code = 403
-        mock_response.text = 'forbidden'
-        get_principal_dictionary.side_effect = CloudError(mock_response)
+        mock_response.reason = 'forbidden'
+        get_principal_dictionary.side_effect = HttpResponseError(response=mock_response)
 
         p = self.load_policy({
             'name': 'test-key-vault',
@@ -158,7 +158,7 @@ class KeyVaultTest(BaseTest):
             ]
         })
 
-        with self.assertRaises(CloudError) as e:
+        with self.assertRaises(HttpResponseError) as e:
             p.run()
 
         self.assertEqual(403, e.exception.status_code)

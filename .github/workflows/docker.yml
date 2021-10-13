@@ -22,7 +22,7 @@ jobs:
         # bin directory is in .dockerignore
         run: |
           python -m pip install --upgrade pip
-          pip install docker click pytest pyyaml
+          pip install docker click pytest pyyaml six
           mkdir -p bin
           wget -q -O bin/trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v0.5.4/trivy_0.5.4_Linux-64bit.tar.gz
           cd bin && tar xzf trivy.tgz

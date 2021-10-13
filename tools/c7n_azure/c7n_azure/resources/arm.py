@@ -13,7 +13,11 @@ from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManage
     ChildTypeInfo, TypeMeta
 from c7n_azure.utils import ResourceIdParser
 
-arm_resource_types = {}
+# ARM resources which do not currently support tagging
+# for database it is a C7N known issue (#4543)
+arm_tags_unsupported = ['microsoft.network/dnszones/',
+                        'microsoft.sql/servers/databases',
+                        'microsoft.storage/storageaccounts/blobservices/containers']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
@@ -27,7 +31,6 @@ class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
         'resourceGroup'
     )
     resource_type = None
-    enable_tag_operations = True
 
 
 class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
@@ -51,7 +54,11 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
         return self.augment([r.serialize(True) for r in data])
 
     def tag_operation_enabled(self, resource_type):
-        return self.resource_type.enable_tag_operations
+        return ArmResourceManager.generic_resource_supports_tagging(resource_type)
+
+    @staticmethod
+    def generic_resource_supports_tagging(resource_type):
+        return not resource_type.lower().startswith(tuple(arm_tags_unsupported))
 
     @staticmethod
     def register_arm_specific(registry, resource_class):
@@ -59,10 +66,9 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
         if not issubclass(resource_class, ArmResourceManager):
             return
 
-        arm_resource_types[
-            resource_class.resource_type.resource_type.lower()] = resource_class.resource_type
-
-        if resource_class.resource_type.enable_tag_operations:
+        # Register tag actions for everything except a few non-compliant resources
+        if ArmResourceManager.generic_resource_supports_tagging(
+                resource_class.resource_type.resource_type):
             resource_class.action_registry.register('tag', Tag)
             resource_class.action_registry.register('untag', RemoveTag)
             resource_class.action_registry.register('auto-tag-user', AutoTagUser)

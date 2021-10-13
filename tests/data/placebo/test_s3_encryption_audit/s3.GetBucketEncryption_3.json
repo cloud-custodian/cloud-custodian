@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "ServerSideEncryptionConfigurationNotFoundError",
+            "Message": "The server side encryption configuration was not found",
+            "BucketName": "c7n-aws-s3-encryption-audit-test-c"
+        },
+        "ResponseMetadata": {}
+    }
+}

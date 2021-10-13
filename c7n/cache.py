@@ -3,7 +3,7 @@
 """Provide basic caching services to avoid extraneous queries over
 multiple policies on the same resource type.
 """
-import pickle
+import pickle  # nosec nosemgrep
 
 import os
 import logging
@@ -65,10 +65,10 @@ class InMemoryCache:
         return True
 
     def get(self, key):
-        return self.data.get(pickle.dumps(key))
+        return self.data.get(pickle.dumps(key))  # nosemgrep
 
     def save(self, key, data):
-        self.data[pickle.dumps(key)] = data
+        self.data[pickle.dumps(key)] = data  # nosemgrep
 
     def size(self):
         return sum(map(len, self.data.values()))
@@ -86,7 +86,7 @@ class FileCacheManager:
         self.data = {}
 
     def get(self, key):
-        k = pickle.dumps(key)
+        k = pickle.dumps(key)  # nosemgrep
         return self.data.get(k)
 
     def load(self):
@@ -98,7 +98,7 @@ class FileCacheManager:
                 return False
             with open(self.cache_path, 'rb') as fh:
                 try:
-                    self.data = pickle.load(fh)
+                    self.data = pickle.load(fh)  # nosec nosemgrep
                 except EOFError:
                     return False
             log.debug("Using cache file %s" % self.cache_path)
@@ -106,9 +106,9 @@ class FileCacheManager:
 
     def save(self, key, data):
         try:
-            with open(self.cache_path, 'wb') as fh:
-                self.data[pickle.dumps(key)] = data
-                pickle.dump(self.data, fh, protocol=2)
+            with open(self.cache_path, 'wb') as fh:  # nosec
+                self.data[pickle.dumps(key)] = data  # nosemgrep
+                pickle.dump(self.data, fh, protocol=2)  # nosemgrep
         except Exception as e:
             log.warning("Could not save cache %s err: %s" % (
                 self.cache_path, e))

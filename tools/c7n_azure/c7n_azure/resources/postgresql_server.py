@@ -6,7 +6,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.filters import FirewallRulesFilter
 from netaddr import IPRange, IPSet
 
-AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
+AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 
 
 @resources.register('postgresql-server')

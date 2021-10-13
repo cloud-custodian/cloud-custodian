@@ -69,7 +69,7 @@ class Tag(AzureBaseAction):
 
     def _process_resource(self, resource):
         new_tags = self._get_tags(resource)
-        TagHelper.add_tags(self, resource, new_tags)
+        return TagHelper.add_tags(self, resource, new_tags)
 
     def _get_tags(self, resource):
         return self.data.get('tags') or {Lookup.extract(
@@ -111,7 +111,7 @@ class RemoveTag(AzureBaseAction):
         self.tags_to_delete = self.data.get('tags')
 
     def _process_resource(self, resource):
-        TagHelper.remove_tags(self, resource, self.tags_to_delete)
+        return TagHelper.remove_tags(self, resource, self.tags_to_delete)
 
 
 class AutoTagBase(AzureEventAction):
@@ -170,7 +170,7 @@ class AutoTagBase(AzureEventAction):
         else:
             tag_value = self._get_tag_value_from_resource(resource) or tag_value
 
-        TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
+        return TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
 
     def _get_first_event(self, resource):
 
@@ -308,8 +308,12 @@ class AutoTagUser(AutoTagBase):
             return False
 
     def _get_tag_value_from_resource(self, resource):
-        first_op = self._get_first_event(resource).serialize(True)
-        return self._get_tag_value_from_event({'data': first_op})
+        first_op = self._get_first_event(resource)
+
+        if not first_op:
+            return None
+
+        return self._get_tag_value_from_event({'data': first_op.serialize(True)})
 
 
 class AutoTagDate(AutoTagBase):
@@ -452,7 +456,7 @@ class TagTrim(AzureBaseAction):
                 "Could not find any candidates to trim %s" % resource['id'])
             return
 
-        TagHelper.remove_tags(self, resource, candidates)
+        return TagHelper.remove_tags(self, resource, candidates)
 
 
 DEFAULT_TAG = "custodian_status"
@@ -549,3 +553,4 @@ class TagDelayedAction(AzureBaseAction):
         tags[self.tag] = self.msg
 
         TagHelper.update_resource_tags(self, resource, tags)
+        return {self.tag: self.msg}

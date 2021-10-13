@@ -320,6 +320,17 @@ class OffHoursFilterTest(BaseTest):
         self.assertTrue(off.parser.keys_are_valid(off.get_tag_value(i)))
         self.assertEqual(off.parser.raw_data(off.get_tag_value(i)), {"tz": "pt"})
 
+    def test_offhours_get_value_fallback(self):
+        sched = "off=[(S,1)];on=[(M,6)];tz=pst"
+        off = OffHour({"default_tz": "ct", "fallback-schedule": sched})
+        i = instance(Tags=[])
+        self.assertEqual(off.get_tag_value(i), sched.lower())
+        self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "off"))
+        self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "on"))
+        self.assertTrue(off.parser.keys_are_valid(off.get_tag_value(i)))
+        self.assertEqual(off.parser.raw_data(off.get_tag_value(i)),
+                        {'off': '[(s,1)]', 'on': '[(m,6)]', 'tz': 'pst'})
+
     def test_offhours(self):
         t = datetime.datetime(
             year=2015,

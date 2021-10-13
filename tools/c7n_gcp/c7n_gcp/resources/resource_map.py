@@ -78,6 +78,7 @@ ResourceMap = {
     "gcp.router": "c7n_gcp.resources.network.Router",
     "gcp.service": "c7n_gcp.resources.service.Service",
     "gcp.service-account": "c7n_gcp.resources.iam.ServiceAccount",
+    "gcp.service-account-key": "c7n_gcp.resources.iam.ServiceAccountKey",
     "gcp.snapshot": "c7n_gcp.resources.compute.Snapshot",
     "gcp.sourcerepo": "c7n_gcp.resources.source.SourceRepository",
     "gcp.spanner-database-instance": "c7n_gcp.resources.spanner.SpannerDatabaseInstance",

@@ -48,6 +48,7 @@ class AMI(QueryResourceManager):
         filter_type = 'list'
         name = 'Name'
         date = 'CreationDate'
+        id_prefix = "ami-"
 
     source_mapping = {
         'describe': DescribeImageSource
@@ -124,7 +125,7 @@ class Deregister(BaseAction):
                 try:
                     self.manager.retry(client.delete_snapshot, SnapshotId=s)
                 except ClientError as e:
-                    if e.error['Code'] == 'InvalidSnapshot.InUse':
+                    if e.response['Error']['Code'] == 'InvalidSnapshot.InUse':
                         continue
 
 

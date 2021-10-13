@@ -4,6 +4,7 @@ import time
 from .common import BaseTest, event_data
 
 from c7n.resources.aws import shape_validate
+from botocore.exceptions import ClientError
 
 
 class CodeArtifact(BaseTest):
@@ -215,3 +216,64 @@ class CodePipeline(BaseTest):
         if self.recording:
             time.sleep(2)
         self.assertFalse(client.list_pipelines().get('pipelines'))
+
+
+class CodeDeploy(BaseTest):
+
+    def test_delete_codedeploy_application(self):
+        factory = self.replay_flight_data('test_delete_codedeploy_application')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-delete-application",
+                "resource": "codedeploy-app",
+                "filters": [{"linkedToGitHub": False}],
+                "actions": ["delete"],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        if self.recording:
+            time.sleep(2)
+        self.assertFalse(client.list_applications().get('applications'))
+
+    def test_tag_untag_codedeploy_application(self):
+        factory = self.replay_flight_data('test_tag_untag_codedeploy_application')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-tag-application",
+                "resource": "codedeploy-app",
+                "filters": [{"tag:c7n": "test"}],
+                "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        arn = p.resource_manager.generate_arn(resources[0]["applicationName"])
+        self.assertEqual(len(client.list_tags_for_resource(ResourceArn=arn).get('Tags')), 0)
+
+    def test_codedeploy_deploymentgroup_delete(self):
+        factory = self.replay_flight_data('test_codedeploy_deploymentgroup_delete')
+        p = self.load_policy(
+            {
+                "name": "codedeploy-delete-deploymentgroup",
+                "resource": "codedeploy-group",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "targetRevision.revisionType",
+                        "value": "S3"
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codedeploy')
+        with self.assertRaises(ClientError) as e:
+            client.get_deployment_group(applicationName=resources[0]['applicationName'],
+            deploymentGroupName=resources[0]['deploymentGroupName'])
+        self.assertEqual(
+            e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')

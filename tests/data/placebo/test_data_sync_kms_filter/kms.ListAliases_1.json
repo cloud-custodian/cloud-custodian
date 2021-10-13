@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "data-sync-kms-key",
+                "AliasArn": "arn:aws:kms:us-east-1:012345678910:data-sync-kms-key",
+                "TargetKeyId": "7d9388c0-8c78-4acb-ad3c-b9d1764522b2"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Wed, 10 Jul 2019 11:05:17 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "192"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

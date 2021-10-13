@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
-Generic EC2 Resource Tag / Filters and actions
+Generic Resource Tag / Filters and Actions wrapper
 
 These work for the whole family of resources associated
 to ec2 (subnets, vpc, security-groups, volumes, instances,
-snapshots).
+snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
 from collections import Counter
@@ -23,7 +23,7 @@ from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
-from c7n import utils
+from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
 
@@ -366,6 +366,10 @@ class Tag(Action):
     batch_size = 25
     concurrency = 2
 
+    deprecations = (
+        deprecated.alias('mark'),
+    )
+
     schema = utils.type_schema(
         'tag', aliases=('mark',),
         tags={'type': 'object'},
@@ -436,6 +440,11 @@ class Tag(Action):
 class RemoveTag(Action):
     """Remove tags from ec2 resources.
     """
+
+    deprecations = (
+        deprecated.alias('unmark'),
+        deprecated.alias('untag'),
+    )
 
     batch_size = 100
     concurrency = 2
@@ -588,6 +597,9 @@ class TagDelayedAction(Action):
             - type: mark-for-op
               op: stop
     """
+    deprecations = (
+        deprecated.optional_fields(('hours', 'days')),
+    )
 
     schema = utils.type_schema(
         'mark-for-op',
@@ -810,6 +822,25 @@ class NormalizeTag(Action):
 
 class UniversalTag(Tag):
     """Applies one or more tags to the specified resources.
+
+    :example:
+
+        .. code-block :: yaml
+
+            policies:
+            - name: multiple-tags-example
+              comment: |
+                Tags any secrets missing either the Environment or ResourceOwner tag
+              resource: aws.secrets-manager
+              filters:
+                - or:
+                  - "tag:Environment": absent
+                  - "tag:ResourceOwner": absent
+              actions:
+                - type: tag
+                  tags:
+                    Environment: Staging
+                    ResourceOwner: Avengers
     """
 
     batch_size = 20

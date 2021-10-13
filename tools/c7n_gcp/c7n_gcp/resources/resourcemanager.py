@@ -26,8 +26,15 @@ class Organization(QueryResourceManager):
         default_report_fields = [
             "name", "displayName", "creationTime", "lifecycleState"]
         asset_type = "cloudresourcemanager.googleapis.com/Organization"
+        scc_type = "google.cloud.resourcemanager.Organization"
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.organizations.get',)
+
+        @staticmethod
+        def get(client, resource_info):
+            org = resource_info['resourceName'].rsplit('/', 1)[-1]
+            return client.execute_query(
+                'get', {'name': "organizations/" + org})
 
 
 @Organization.action_registry.register('set-iam-policy')
@@ -87,6 +94,7 @@ class Project(QueryResourceManager):
         default_report_fields = [
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Project"
+        scc_type = "google.cloud.resourcemanager.Project"
         perm_service = 'resourcemanager'
         labels = True
         labels_op = 'update'
@@ -98,6 +106,11 @@ class Project(QueryResourceManager):
                         'name': resource['name'],
                         'parent': resource['parent'],
                         'labels': labels}}
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'projectId': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
     def get_resource_query(self):
         # https://cloud.google.com/resource-manager/reference/rest/v1/projects/list

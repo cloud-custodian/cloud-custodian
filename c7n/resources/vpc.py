@@ -1211,7 +1211,7 @@ class SGPermission(Filter):
         if not sg_perm:
             return False
 
-        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p.get('UserId', '') == owner_id]
         sg_resources = self.manager.get_resources(sg_group_ids)
         vf = ValueFilter(sg_refs, self.manager)
         vf.annotate = False
@@ -1781,6 +1781,7 @@ class TransitGateway(query.QueryResourceManager):
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
         name = id = 'TransitGatewayId'
         arn = "TransitGatewayArn"
+        id_prefix = "tgw-"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
         cfn_type = 'AWS::EC2::TransitGateway'
@@ -1810,6 +1811,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         service = 'ec2'
         enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
+        id_prefix = 'tgw-attach-'
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
@@ -2003,6 +2005,7 @@ class NetworkAddress(query.QueryResourceManager):
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
+        id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
@@ -2295,7 +2298,9 @@ class KeyPair(query.QueryResourceManager):
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         name = 'KeyName'
         id = 'KeyPairId'
+        id_prefix = 'key-'
         filter_name = 'KeyNames'
+        filter_type = 'list'
 
 
 @KeyPair.filter_registry.register('unused')

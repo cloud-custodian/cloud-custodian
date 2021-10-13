@@ -121,7 +121,6 @@ class ResizePlan(AzureBaseAction):
         },
         'additionalProperties': False
     }
-    schema_alias = True
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()  # type azure.mgmt.web.WebSiteManagementClient

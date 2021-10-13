@@ -24,6 +24,7 @@ class SpannerInstance(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
+        metric_key = "resource.labels.instance_id"
 
         @staticmethod
         def get(client, resource_info):

@@ -119,6 +119,29 @@ class RDSClusterTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rdscluster_kms_alias(self):
+        session_factory = self.replay_flight_data("test_rdscluster_kms_alias", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-aws-kms-key-filter",
+                "resource": "rds-cluster",
+                "source": "config",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/)",
+                        "op": "regex",
+                    }
+                ],
+            },
+            config={"region": "us-east-2"},
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rdscluster_delete(self):
         self.remove_augments()
         session_factory = self.replay_flight_data("test_rdscluster_delete")

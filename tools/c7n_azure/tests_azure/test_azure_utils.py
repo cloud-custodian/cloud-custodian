@@ -4,16 +4,19 @@ import sys
 import time
 import types
 
-from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
-from c7n_azure.tags import TagHelper
-from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math, PortsRangeHelper,
-                             ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             get_keyvault_secret, get_service_tag_ip_space, is_resource_group_id,
-                             is_resource_group)
-from mock import patch, Mock
-
-from c7n.config import Bag
 import pytest
+from azure.mgmt.managementgroups.models import DescendantInfo
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
+                             PortsRangeHelper, ResourceIdParser, StringUtils,
+                             custodian_azure_send_override,
+                             get_keyvault_auth_endpoint, get_keyvault_secret,
+                             get_service_tag_ip_space, is_resource_group,
+                             is_resource_group_id)
+from mock import Mock, patch
+from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
+
+from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
 
 try:
     from importlib import reload
@@ -31,6 +34,13 @@ RESOURCE_ID_CHILD = (
     "databases/testdb" % DEFAULT_SUBSCRIPTION_ID)
 
 GUID = '00000000-0000-0000-0000-000000000000'
+
+
+def _get_descendant_info(**kwargs):
+    info = DescendantInfo()
+    for k, v in kwargs.items():
+        setattr(info, k, v)
+    return info
 
 
 class UtilsTest(BaseTest):
@@ -184,7 +194,7 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.naming_hash(source, 10), '16aba5393a')
         self.assertNotEqual(StringUtils.naming_hash(source), StringUtils.naming_hash(source2))
 
-    @patch('azure.mgmt.applicationinsights.operations.ComponentsOperations.get',
+    @patch('azure.mgmt.applicationinsights.v2015_05_01.operations.ComponentsOperations.get',
            return_value=type(str('result_data'), (), {'instrumentation_key': GUID}))
     def test_app_insights_get_instrumentation_key(self, mock_handler_run):
         self.assertEqual(AppInsightsHelper.get_instrumentation_key('azure://' + GUID), GUID)
@@ -258,43 +268,31 @@ class UtilsTest(BaseTest):
         self.assertEqual(logger_debug.call_count, 3)
         self.assertEqual(logger_warning.call_count, 3)
 
-    managed_group_return_value = Bag({
-        'properties': {
-            'name': 'dev',
-            'type': '/providers/Micrsoft.Management/managementGroups',
-            'children': [
-                Bag({'name': DEFAULT_SUBSCRIPTION_ID,
-                     'type': '/subscriptions'}),
-                Bag({'name': 'east',
-                     'type': '/providers/Microsoft.Management/managementGroups',
-                     'children': [{
-                         'type': '/subscriptions',
-                         'name': GUID}]})
-            ],
-        }
-    })
-    managed_group_return_value['serialize'] = lambda self=managed_group_return_value: self
+    managed_group_return_value = [
+        _get_descendant_info(type='managementGroups/subscriptions', name=DEFAULT_SUBSCRIPTION_ID),
+        _get_descendant_info(type='Microsoft.Management/managementGroups'),
+        _get_descendant_info(type='Microsoft.Management/managementGroups/subscriptions', name=GUID)
+    ]
 
     @patch((
         'azure.mgmt.managementgroups.operations'
-        '.management_groups_operations.ManagementGroupsOperations.get'),
+        '.ManagementGroupsOperations.get_descendants'),
         return_value=managed_group_return_value)
     def test_managed_group_helper(self, _1):
-        sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
+        sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', self.session)
         self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])
 
-    @patch('msrestazure.azure_active_directory.MSIAuthentication')
-    def test_get_keyvault_secret(self, _1):
+    def test_get_keyvault_secret(self):
         mock = Mock()
         mock.value = '{"client_id": "client", "client_secret": "secret"}'
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
                    return_value=None), \
-                patch('azure.keyvault.v7_0.KeyVaultClient.get_secret', return_value=mock):
+                patch('azure.keyvault.secrets.SecretClient.get_secret', return_value=mock):
 
             reload(sys.modules['c7n_azure.utils'])
 
             result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412')
-            self.assertEqual(result, mock.value)
+            self.assertEqual(mock.value, result)
 
     # Test relies on substitute data in Azure Common, not designed for live data
     @pytest.mark.skiplive
@@ -334,3 +332,11 @@ class UtilsTest(BaseTest):
     def test_is_resource_group(self):
         self.assertTrue(is_resource_group({'type': 'resourceGroups'}))
         self.assertFalse(is_resource_group({'type': 'virtualMachines'}))
+
+    def test_get_keyvault_auth_public(self):
+        auth = get_keyvault_auth_endpoint(AZURE_PUBLIC_CLOUD)
+        self.assertEqual('https://vault.azure.net', auth)
+
+    def test_get_keyvault_auth_china(self):
+        auth = get_keyvault_auth_endpoint(AZURE_CHINA_CLOUD)
+        self.assertEqual('https://vault.azure.cn', auth)

@@ -908,6 +908,12 @@ class RDSSnapshotTest(BaseTest):
             ]
         )
 
+        self.assertDeprecation(p, """
+            policy 'rds-enable-snapshot-tag-copy'
+              actions:
+                set-snapshot-copy-tags: action has been deprecated (use modify-db instead with `CopyTagsToSnapshot`)
+            """)  # noqa: E501
+
     def test_rds_snapshot_copy_tags_disable(self):
         session_factory = self.replay_flight_data("test_rds_snapshot_copy_tags_disable")
         client = session_factory(region="us-east-1").client("rds")
