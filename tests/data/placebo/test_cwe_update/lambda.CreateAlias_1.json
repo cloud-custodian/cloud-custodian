@@ -1,0 +1,11 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-bucket-policy:Dev",
+        "Name": "Dev",
+        "FunctionVersion": "81",
+        "Description": "",
+        "RevisionId": "4a42e0ec-8f04-4295-9ecd-98db9f295c6e"
+    }
+}

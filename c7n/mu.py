@@ -24,7 +24,7 @@ import zipfile
 # Its also used for release engineering on our pypi uploads
 try:
     from importlib import metadata as pkgmd
-except ImportError:
+except ImportError:  # pragma: no cover
     try:
         import importlib_metadata as pkgmd
     except (ImportError, FileNotFoundError):
@@ -363,6 +363,83 @@ def custodian_archive(packages=None):
     return PythonPackageArchive(sorted(modules))
 
 
+class ResourceTags:
+
+    # - cloud watch event rules
+    # - config rules
+    # - lambda functions
+    # - security hub action?
+
+    arn_attribute = 'Arn'
+    arn_param = 'ResourceArn'
+
+    def __init__(self, client):
+        self.client = client
+
+    def process(self, previous, current_tags, created=False, update=False):
+        # for resources that support tagging on update, set update: True
+        # and we'll just process removals, and return tags for update
+        resource_arn = self._get_arn(previous)
+        old_tags = created and {}
+        if not created:
+            old_tags = self._get_tags(previous)
+        tadd, tremove = self.diff(old_tags, current_tags)
+        changed = bool(tadd) or bool(tremove)
+        if tadd and not update:
+            log.debug("Updating resource tags: %s" % resource_arn)
+            self.client.tag_resource(**{
+                self.arn_param: resource_arn, 'Tags': tadd})
+        if tremove:
+            log.debug("Removing stale resource tags: %s" % resource_arn)
+            self.client.untag_resource(**{
+                self.arn_param: resource_arn, 'TagKeys': tremove})
+        if update:
+            return tadd
+        return changed
+
+    def _get_tags(self, resource):
+        tag_params = {self.arn_param: self._get_arn(resource)}
+        return {
+            t['Key']: t['Value'] for t in
+            self.client.list_tags_for_resource(
+                **tag_params).get('Tags', [])}
+
+    def _get_arn(self, resource):
+        return resource[self.arn_attribute]
+
+    def diff(self, old_tags, new_tags):
+        add = {}
+        remove = set()
+        for k, v in new_tags.items():
+            if k not in old_tags or old_tags[k] != v:
+                add[k] = v
+        for k in old_tags:
+            if k not in new_tags:
+                remove.add(k)
+        return add, list(remove)
+
+
+class KVResourceTags(ResourceTags):
+
+    def diff(self, old_tags, new_tags):
+        add, remove = super().diff(old_tags, new_tags)
+        return [{'Key': k, 'Value': v} for k, v in add.items()], remove
+
+
+class LambdaTags(ResourceTags):
+
+    arn_param = 'Resource'
+
+    def _get_arn(self, resource):
+        base_arn = resource.get('Configuration', resource)['FunctionArn']
+        if base_arn.count(':') > 6:  # trim version/alias
+            base_arn = base_arn.rsplit(':', 1)[0]
+        return base_arn
+
+    def _get_tags(self, resource):
+        return resource.get('Tags', ())
+
+
 class LambdaManager:
     """ Provides CRUD operations around lambda functions
     """
@@ -382,8 +459,7 @@ class LambdaManager:
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(
-            func, role, s3_uri, qualifier=alias)
+        result, changed = self._create_or_update(func, role, s3_uri)
         func.arn = result['FunctionArn']
         if alias and changed:
             func.alias = self.publish_alias(result, alias)
@@ -426,6 +502,8 @@ class LambdaManager:
                 elif set(old_config[k]['SecurityGroupIds']) != set(
                         new_config[k]['SecurityGroupIds']):
                     changed.append(k)
+            elif k == 'Tags':
+                continue
             elif k not in old_config:
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
@@ -439,23 +517,12 @@ class LambdaManager:
                 changed.append(k)
         return changed
 
-    @staticmethod
-    def diff_tags(old_tags, new_tags):
-        add = {}
-        remove = set()
-        for k, v in new_tags.items():
-            if k not in old_tags or old_tags[k] != v:
-                add[k] = v
-        for k in old_tags:
-            if k not in new_tags:
-                remove.add(k)
-        return add, list(remove)
-
     def _create_or_update(self, func, role=None, s3_uri=None, qualifier=None):
         role = func.role or role
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
         existing = self.get(func.name, qualifier)
+        tagger = LambdaTags(self.client)
 
         if s3_uri:
             # TODO: support versioned buckets
@@ -480,13 +547,13 @@ class LambdaManager:
             new_config = func.get_config()
             new_config['Role'] = role
 
-            if self._update_tags(existing, new_config.pop('Tags', {})):
-                changed = True
+            changed = tagger.process(existing, func.tags)
 
             config_changed = self.delta_function(old_config, new_config)
             if config_changed:
                 log.debug("Updating function: %s config %s",
                           func.name, ", ".join(sorted(config_changed)))
+                new_config.pop('Tags', None)
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
             if self._update_concurrency(existing, func):
@@ -497,6 +564,7 @@ class LambdaManager:
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
             self._update_concurrency(None, func)
+            tagger.process(result, func.tags, created=True)
             changed = True
 
         return result, changed
@@ -517,25 +585,6 @@ class LambdaManager:
         self.client.put_function_concurrency(
             FunctionName=func.name,
             ReservedConcurrentExecutions=func.concurrency)
-
-    def _update_tags(self, existing, new_tags):
-        # tag dance
-        base_arn = existing['Configuration']['FunctionArn']
-        if base_arn.count(':') > 6:  # trim version/alias
-            base_arn = base_arn.rsplit(':', 1)[0]
-
-        tags_to_add, tags_to_remove = self.diff_tags(
-            existing.get('Tags', {}), new_tags)
-        changed = False
-        if tags_to_add:
-            log.debug("Updating function tags: %s" % base_arn)
-            self.client.tag_resource(Resource=base_arn, Tags=tags_to_add)
-            changed = True
-        if tags_to_remove:
-            log.debug("Removing function stale tags: %s" % base_arn)
-            self.client.untag_resource(Resource=base_arn, TagKeys=tags_to_remove)
-            changed = True
-        return changed
 
     def _upload_func(self, s3_uri, func, archive):
         from boto3.s3.transfer import S3Transfer, TransferConfig
@@ -962,6 +1011,15 @@ class AWSEventBase:
         return self._client
 
 
+class EventRuleTags(KVResourceTags):
+
+    arn_param = 'ResourceARN'
+
+    def _get_arn(self, resource):
+        # put rule returns rulearn, get returns arn
+        return resource.get('Arn', resource.get('RuleArn'))
+
+
 class CloudWatchEventSource(AWSEventBase):
     """Subscribe a lambda to cloud watch events.
 
@@ -1110,16 +1168,21 @@ class CloudWatchEventSource(AWSEventBase):
         if schedule:
             params['ScheduleExpression'] = schedule
 
+        tagger = EventRuleTags(self.client)
         rule = self.get(func.name)
-
         if rule and self.delta(rule, params):
             log.debug("Updating cwe rule for %s" % func.name)
+            # work around a bug in event bridge, put rule supports
+            # tags on create but not on update.
+            tagger.process(rule, func.tags)
             response = self.client.put_rule(**params)
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
+            params['Tags'], _ = tagger.diff({}, func.tags)
             response = self.client.put_rule(**params)
         else:
             response = {'RuleArn': rule['Arn']}
+            tagger.process(rule, func.tags)
 
         client = self.session.client('lambda')
         try:
@@ -1592,6 +1655,11 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
+class ConfigRuleTags(KVResourceTags):
+
+    arn_attribute = 'ConfigRuleArn'
+
+
 class ConfigRule(AWSEventBase):
     """Use a lambda as a custom config rule.
     """
@@ -1672,13 +1740,18 @@ class ConfigRule(AWSEventBase):
     def add(self, func):
         rule = self.get(func.name)
         params = self.get_rule_params(func)
+        tagger = ConfigRuleTags(self.client)
 
         if rule and self.delta(rule, params):
             log.debug("Updating config rule for %s" % self)
             rule.update(params)
-            return LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
+            tupdate = tagger.process(rule, func.tags, update=True)
+            LambdaRetry(
+                self.client.put_config_rule, ConfigRule=rule, Tags=tupdate)
+            return rule
         elif rule:
             log.debug("Config rule up to date")
+            tagger.process(rule, func.tags)
             return
         client = self.session.client('lambda')
         try:
@@ -1692,7 +1765,10 @@ class ConfigRule(AWSEventBase):
             pass
 
         log.debug("Adding config rule for %s" % func.name)
-        return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
+        tags, _ = tagger.diff({}, func.tags)
+        LambdaRetry(
+            self.client.put_config_rule, ConfigRule=params, Tags=tags)
+        return rule
 
     def remove(self, func):
         rule = self.get(func.name)

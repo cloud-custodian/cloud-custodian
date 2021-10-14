@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "custodian-s3-bucket-policy",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-bucket-policy",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "custodian_policy.run",
+            "CodeSize": 462135,
+            "Description": "cloud-custodian lambda policy",
+            "Timeout": 900,
+            "MemorySize": 512,
+            "LastModified": "2020-12-29T04:52:49.910+0000",
+            "CodeSha256": "o6BBKObvqp7MBQCwjR2jV+ca5Fz/zw4JIPUm/Zd5S5I=",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": ""
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "96802919-dee0-4d9f-b93f-19fe3693b20a",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip"
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-s3-bucket-policy-da36aa99-62f3-4ee5-8371-c645db51e0e4?versionId=wLc53UpjJqaJjEaLhJR4n97u.8FX1Oj1&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJ3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCICPX%2Ft991Jrq%2F%2Bv0hOFUdKmDCHTBrxuodUklVRFGxJtDAiEA7XIF%2Flh%2FQiQJQcEB0KCBXlHdQW6XCg6B8f1Kh28iaysqtAMIVRAAGgw3NDk2Nzg5MDI4MzkiDFt%2BEn%2FyO%2FNR7zecOCqRA%2Fgh3LmyW9fLC58RAfFoB2gJFfTu7DEMVJNlyWEVhW%2FNnmOoA2xo5pod%2FYPwrZ1UYn3G%2FSE5JCdnz%2F35hYznO2gjzB9QZjxlRXzxRJT4xaZMNgDqW5Q8equsOTHx39B676%2B0Q9l6ARf8LAzR3%2F%2BVwSqQK6AX2IdG1ILuykrKnuJ4Ux30pMYFFNaMvR66F3yCdriuABW%2FZrhTgc1zIRxIOWYUabnz6HB61yxk34CmpEakaZUwKl2awIh05hNgjY0YHjuv5UBB2JH4lGExS42U%2Fv28%2Fr28Wy%2FspAMBPKtIG5kFTyDjjchmoRTFfZn3e4nGVB8wNLESOhOS2gdMvBH%2B25LXVvbz1giFjZNsxb9G%2Br1MrRUWPfPycgh61JYwpQRCHaZwAghvAThPPEd737yEbVZNsJpPQ1GKJ4PXp%2FZAGr4bXJQly9DtqWovMyF4YyjC2dFtkI71MjBAJ2G%2B3GuI%2BE8euCpcCJzt8aPAlvtZcBjzOTJxgm9qyMsze%2B3%2BJtuldA1bIzX0ZRrG62o13Z%2FZ5yNWMOvgqv8FOusBto1maf2m9VuJvd%2B2x8rTBYD%2BQtMlxuGpduqOuU3ag1Zhh9kRgL%2BFSxgbnAcLsFPAdxfwePNBIVYNe7iHlHhWtmBDQNViOaeqKNL%2FUTkoogo%2BajdHZoBRZL602Jrgeskf4p%2FmoCHdguqp%2BUawS6ClK2PWR2BJ%2FlQkiPrEWYiX%2FclHy7xcScTmU%2BUj7YoU%2FQgS4zMxaMtoEEF5kaMmGAKHkAudsFzKWUQhETc80tfnJ0sUbTELi7bTPRIV8pWKgU0qmFX8WykT23jcMTsyBtmhYe0o1sp3CstuXoVUf8hV5BmXR9xywuUXyd%2Bn6g%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20201229T045251Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=ASIA25DCYHY35K37NQX6%2F20201229%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4c1cdbc7900a7808dc060c95296b1b7f0adc8b72004e862ffd5f882211daef46"
+        },
+        "Tags": {
+            "App": "Custodian"
+        }
+    }
+}

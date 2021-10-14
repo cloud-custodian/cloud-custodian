@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "custodian-s3-bucket-policy",
+        "Arn": "arn:aws:events:us-east-1:644160558196:rule/custodian-s3-bucket-policy",
+        "EventPattern": "{\"detail-type\": [\"AWS API Call via CloudTrail\"], \"detail\": {\"eventSource\": [\"s3.amazonaws.com\"], \"eventName\": [\"CreateBucket\", \"PutBucketPolicy\"]}}",
+        "State": "ENABLED",
+        "Description": "cloud-custodian lambda policy",
+        "EventBusName": "default",
+        "CreatedBy": "644160558196",
+        "ResponseMetadata": {}
+    }
+}

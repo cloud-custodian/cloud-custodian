@@ -1,19 +1,19 @@
 {
-    "status_code": 201,
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "FunctionName": "custodian-sg-modifyable",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modifyable",
-        "Runtime": "python3.8",
+        "FunctionName": "custodian-s3-bucket-policy",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-bucket-policy:82",
+        "Runtime": "python2.7",
         "Role": "arn:aws:iam::644160558196:role/custodian-mu",
         "Handler": "custodian_policy.run",
-        "CodeSize": 462022,
+        "CodeSize": 462200,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2020-12-29T05:07:35.219+0000",
-        "CodeSha256": "6oofkN1P2kVeckc3meQSWwu9qdwkSknnZI++qEaXZ20=",
-        "Version": "1",
+        "LastModified": "2020-12-29T04:52:51.470+0000",
+        "CodeSha256": "qQb5PwQ1oqKhguRI6qu+GOTDckwn7t/YVRDmzLXnVc8=",
+        "Version": "82",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
@@ -22,7 +22,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "1cbbcbe4-1d06-4bd7-80f5-76c8b967a9d7",
+        "RevisionId": "27b770ed-4287-4b41-857e-bdde6f25f6c4",
         "State": "Active",
         "LastUpdateStatus": "Successful",
         "PackageType": "Zip"
