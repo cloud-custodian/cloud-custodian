@@ -3137,3 +3137,33 @@ class TestUnusedKeys(BaseTest):
                     ]
                 }
             )
+
+
+class TestPrefixList(BaseTest):
+
+    def test_prefix_list_query(self):
+        factory = self.replay_flight_data("test_prefix_list_query")
+        p = self.load_policy(
+            {'name': 'prefix-get', 'resource': 'aws.prefix-list'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            ["pl-02d12d37020480a5f", "pl-0c79279cd77a6e7c2"])
+        assert len(resources) == 2
+
+    def test_prefix_entry(self):
+        factory = self.replay_flight_data("test_prefix_list_entry")
+        p = self.load_policy(
+            {'name': 'prefix-get',
+             'resource': 'aws.prefix-list',
+             'filters': [
+                 {'PrefixListName': 'All VPC CIDR'},
+                 {'type': 'entry',
+                  'key': 'Cidr',
+                  'value': '172.31.2.10/32',
+                  'value_type': 'cidr',
+                  'op': 'contains'}
+             ]},
+            session_factory=factory)
+        resources = p.run()
+        assert 'c7n:matched-entries' in resources[0]
+        assert 'c7n:prefix-entries' in resources[0]

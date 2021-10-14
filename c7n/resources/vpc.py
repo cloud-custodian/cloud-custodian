@@ -2554,12 +2554,12 @@ class Entry(Filter):
     annotation_key = 'c7n:prefix-entries'
     match_annotation_key = 'c7n:matched-entries'
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
             if self.annotation_key in r:
                 continue
-            r[self.annotation_key] = client.describe_prefix_list_entries(
+            r[self.annotation_key] = client.get_managed_prefix_list_entries(
                 PrefixListId=r['PrefixListId']).get('Entries', ())
 
         vf = ValueFilter(self.data)
