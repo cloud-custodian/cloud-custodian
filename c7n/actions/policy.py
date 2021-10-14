@@ -103,7 +103,7 @@ class ModifyPolicyBase(BaseAction):
         self.manager = manager
 
     def add_statements(self, policy_statements):
-        current = {s.get('Sid', statement_id(s)) : s for s in policy_statements}
+        current = {s.get('Sid', statement_id(s)): s for s in policy_statements}
         additional = {s.get('Sid', statement_id(s)): s for s in self.data.get('add-statements', [])}
         current.update(additional)
         return list(current.values()), bool(additional)
