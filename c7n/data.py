@@ -40,6 +40,7 @@ class NullSession:
     """dummy session"""
 
 
+@sources.register('static')
 class StaticSource:
     def __init__(self, queries):
         self.queries = queries
