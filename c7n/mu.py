@@ -1181,7 +1181,7 @@ class CloudWatchEventSource(AWSEventBase):
         except ClientError:
             pass
 
-    def remove(self, func):
+    def remove(self, func, remove_permission=False):
         if self.get(func.event_name):
             log.info("Removing cwe targets and rule %s", func.event_name)
             try:
@@ -1196,6 +1196,10 @@ class CloudWatchEventSource(AWSEventBase):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
+            # typically the entire function will be deleted so we dont
+            # need to bother with removing the permission explicitly
+            if not remove_permission:
+                return True
             client = self.session.client("lambda")
             try:
                 LambdaConflictRetry(
@@ -1692,7 +1696,7 @@ class ConfigRule(AWSEventBase):
         if ('MaximumExecutionFrequency' in params and
                 rule['MaximumExecutionFrequency'] != params['MaximumExecutionFrequency']):
             return True
-        if rule.get('Description', '') != rule.get('Description', ''):
+        if rule.get('Description', '') != params.get('Description', ''):
             return True
         return False
 
@@ -1721,7 +1725,7 @@ class ConfigRule(AWSEventBase):
         log.debug("Adding config rule for %s" % func.name)
         return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
-    def remove(self, func):
+    def remove(self, func, remove_permission=False):
         rule = self.get(func.name)
         if not rule:
             return
@@ -1731,6 +1735,9 @@ class ConfigRule(AWSEventBase):
                 ConfigRuleName=func.name)
         except self.client.exceptions.NoSuchConfigRuleException:
             pass
+
+        if not remove_permission:
+            return True
 
         client = self.session.client("lambda")
         try:
