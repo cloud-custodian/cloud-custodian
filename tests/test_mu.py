@@ -943,7 +943,6 @@ class PolicyLambdaProvision(Publish):
         mgr.publish(pl, "Dev", role="arn:aws:iam::532725030595:role/custodian-mu")
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
-        events[0]
 
         cw_client = session_factory().client('events')
 
