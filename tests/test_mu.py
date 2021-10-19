@@ -27,7 +27,8 @@ from c7n.mu import (
     PythonPackageArchive,
     SNSSubscription,
     SQSSubscription,
-    CloudWatchEventSource
+    CloudWatchEventSource,
+    CloudWatchLogSubscription
 )
 
 from .common import (
@@ -126,7 +127,7 @@ class Publish(BaseTest):
         self.assertEqual(result["Runtime"], "python3.6")
 
 
-class PolicyLambdaProvision(BaseTest):
+class PolicyLambdaProvision(Publish):
 
     role = "arn:aws:iam::644160558196:role/custodian-mu"
 
@@ -959,6 +960,29 @@ class PolicyLambdaProvision(BaseTest):
 
         # subsequent calls to resume an already enabled rule should be a no-op
         events[0].resume(pl)
+
+    def test_cloudwatch_log_subscription(self):
+        session_factory = self.replay_flight_data("test_cloudwatch_log_subscription")
+        func = self.make_func(role=ROLE)
+        LambdaManager(session_factory).publish(func)
+        cwls = CloudWatchLogSubscription(
+            session_factory,
+            [
+                {
+                    "logGroupName": "/aws/lambda/test",
+                    "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/test:*",
+                }
+            ],
+            "foo"
+        )
+        cwls.add(func)
+        lambda_client = session_factory().client("lambda")
+        policy = lambda_client.get_policy(FunctionName="test-foo-bar")
+        self.assertTrue(policy)
+
+        cwls.remove(func)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
 
 
 class PythonArchiveTest(unittest.TestCase):
