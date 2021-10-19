@@ -6,8 +6,7 @@
             "Rules": [
                 {
                     "ApplyServerSideEncryptionByDefault": {
-                        "SSEAlgorithm": "aws:kms",
-                        "KMSMasterKeyID": "7d48c7f6-0fa9-4b45-a65b-21d9e62af6db"
+                        "SSEAlgorithm": "aws:kms"
                     },
                     "BucketKeyEnabled": false
                 }

@@ -10,6 +10,7 @@ import os
 import time
 import subprocess  # nosec
 import sys
+from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -27,7 +28,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
-from c7n.reports.csvout import Formatter, fs_record_set
+from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty
 
@@ -312,7 +313,20 @@ def report_account(account, region, policies_config, output_path, cache_path, de
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
+        if p.ctx.output.type == "s3":
+            delta = timedelta(days=1)
+            begin_date = datetime.now() - delta
+
+            policy_records = record_set(
+                p.session_factory,
+                p.ctx.output.config['netloc'],
+                strip_output_path(p.ctx.output.config['path'], p.name),
+                begin_date
+            )
+        else:
+            policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region

@@ -2,6 +2,6 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "Location": "/c7n-bucket-with-encryption-by-arn"
+        "Location": "/c7n-bucket-with-encryption-by-aliasarn"
     }
 }

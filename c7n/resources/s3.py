@@ -3150,16 +3150,26 @@ class KMSKeyResolverMixin:
                 key_meta = client.describe_key(
                     KeyId=key
                 ).get('KeyMetadata', {})
+                key_id = key_meta.get('KeyId')
+
+                # We need a complete set of alias identifiers (names and ARNs)
+                # to fully evaluate bucket encryption filters.
+                key_aliases = client.list_aliases(
+                    KeyId=key_id
+                ).get('Aliases', [])
+
                 self.arns[r] = {
-                    # c7n:Key is the value provided in the policy filter data.
-                    # This may overlap with the key ID or ARN, but can also be
-                    # an alias.
-                    'c7n:Key': key,
-                    'KeyId': key_meta.get('KeyId'),
+                    'KeyId': key_id,
                     'Arn': key_meta.get('Arn'),
                     'KeyManager': key_meta.get('KeyManager'),
-                    'Description': key_meta.get('Description')
+                    'Description': key_meta.get('Description'),
+                    'Aliases': [
+                        alias[attr]
+                        for alias in key_aliases
+                        for attr in ('AliasArn', 'AliasName')
+                    ],
                 }
+
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))
@@ -3171,7 +3181,7 @@ class KMSKeyResolverMixin:
         key = self.arns.get(region)
         if not key:
             self.log.warning('Unable to resolve key %s for bucket %s in region %s',
-                             key, bucket.get('Name'), region)
+                             self.data['key'], bucket.get('Name'), region)
         return key
 
 
@@ -3211,7 +3221,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
-    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey')
+    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
 
     def process(self, buckets, event=None):
@@ -3270,16 +3280,25 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         if crypto == 'AES256' and algo == 'AES256':
             return True
         elif crypto == 'aws:kms' and algo == 'aws:kms':
-            if key:
-                # The default encryption rule can specify a key by alias,
-                # ID or full ARN. Match against any of those attributes.
-                key_ids = {key[k] for k in ('Arn', 'KeyId', 'c7n:Key')}
-                if rule.get('KMSMasterKeyID') in key_ids:
-                    return True
-                else:
-                    return False
-            else:
-                return True
+            if not key:
+                # There are two broad reasons to have an empty value for
+                # the regional key here:
+                #
+                # * The policy did not specify a key, in which case this
+                #   filter should match _all_ buckets with a KMS default
+                #   encryption rule.
+                #
+                # * The policy specified a key that could not be
+                #   resolved, in which case this filter shouldn't match
+                #   any buckets.
+                return 'key' not in self.data
+
+            # The default encryption rule can specify a key ID,
+            # key ARN, alias name or alias ARN. Match against any of
+            # those attributes. A rule specifying KMS with no master key
+            # implies the AWS-managed key.
+            key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
+            return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
 
 
 @actions.register('set-bucket-encryption')
@@ -3399,10 +3418,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
 
-            config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
-                'KMSMasterKeyID': key['Arn'],
-                'BucketKeyEnabled': bucket_key
-            }
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key['Arn']
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
