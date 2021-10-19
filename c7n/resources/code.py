@@ -278,8 +278,7 @@ class CodeDeployApplication(QueryResourceManager):
         batch_detail_spec = (
             'batch_get_applications', 'applicationNames',
             None, 'applicationsInfo', None)
-        id = 'applicationId'
-        name = 'applicationName'
+        id = name = 'applicationName'
         date = 'createTime'
         arn_type = "application"
         arn_separator = ":"
