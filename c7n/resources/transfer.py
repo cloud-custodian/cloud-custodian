@@ -1,11 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from botocore.exceptions import ClientError
-
 from c7n.actions import BaseAction
 from c7n.manager import resources
+from concurrent.futures import as_completed
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, ChildDescribeSource
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, chunks
 
 
 @resources.register('transfer-server')
@@ -45,17 +44,22 @@ class StopServer(BaseAction):
         if not len(resources):
             return
 
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_server, resources))
-
-    def process_server(self, server):
+        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        try:
-            client.stop_server(ServerId=server['ServerId'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception stopping server:\n %s" % e)
+        with self.executor_factory(max_workers=2) as w:
+            for server_set in chunks(resources, size=5):
+                futures.append(w.submit(self.process_server_set, client, server_set))
+            for f in as_completed(futures):
+                r = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Exception stopping transfer server %s:\n %s",
+                        r['ServerId'], f.exception())
+
+    def process_server_set(self, client, server_set):
+        for s in server_set:
+            client.stop_server(ServerId=s['ServerId'])
 
 
 @TransferServer.action_registry.register('start')
@@ -82,17 +86,22 @@ class StartServer(BaseAction):
         if not len(resources):
             return
 
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_server, resources))
-
-    def process_server(self, server):
+        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        try:
-            client.start_server(ServerId=server['ServerId'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception starting server:\n %s" % e)
+        with self.executor_factory(max_workers=2) as w:
+            for server_set in chunks(resources, size=5):
+                futures.append(w.submit(self.process_server_set, client, server_set))
+            for f in as_completed(futures):
+                r = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Exception starting transfer server %s:\n %s",
+                        r['ServerId'], f.exception())
+
+    def process_server_set(self, client, server_set):
+        for s in server_set:
+            client.start_server(ServerId=s['ServerId'])
 
 
 @TransferServer.action_registry.register('delete')
@@ -113,17 +122,24 @@ class DeleteServer(BaseAction):
     permissions = ("transfer:DeleteServer",)
 
     def process(self, resources):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_server, resources))
-
-    def process_server(self, server):
+        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        try:
-            client.delete_server(ServerId=server['ServerId'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting server:\n %s" % e)
+        with self.executor_factory(max_workers=2) as w:
+            for server_set in chunks(resources, size=5):
+                futures.append(w.submit(self.process_server_set, client, server_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting transfer server \n %s",
+                        f.exception())
+
+    def process_server_set(self, client, server_set):
+        for s in server_set:
+            try:
+                client.delete_server(ServerId=s['ServerId'])
+            except client.exceptions.NotFoundException:
+                pass
 
 
 class DescribeTransferUser(ChildDescribeSource):
@@ -183,17 +199,23 @@ class DeleteUser(BaseAction):
     permissions = ("transfer:DeleteUser",)
 
     def process(self, resources):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_user, resources))
-
-    def process_user(self, user):
+        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        try:
+        with self.executor_factory(max_workers=2) as w:
+            for user_set in chunks(resources, size=5):
+                futures.append(w.submit(self.process_user_set, client, user_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception deleting transfer user \n %s",
+                        f.exception())
 
-            client.delete_user(
-                ServerId=user['Arn'].split('/')[1],
-                UserName=user['UserName'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting user:\n %s" % e)
+    def process_user_set(self, client, user_set):
+        for u in user_set:
+            try:
+                client.delete_user(
+                    ServerId=u['Arn'].split('/')[1],
+                    UserName=u['UserName'])
+            except client.exceptions.NotFoundException:
+                pass
