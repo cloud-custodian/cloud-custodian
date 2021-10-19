@@ -143,6 +143,7 @@ class DescribeTransferUser(ChildDescribeSource):
             results.append(tu)
         return results
 
+
 @resources.register('transfer-user')
 class TransferUser(ChildResourceManager):
 
@@ -162,3 +163,37 @@ class TransferUser(ChildResourceManager):
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(TransferUser, self).get_resources(ids, cache, augment=False)
+
+
+@TransferUser.action_registry.register('delete')
+class DeleteUser(BaseAction):
+    """Action to delete a Transfer User
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: transfer-user-delete
+                resource: transfer-user
+                actions:
+                  - delete
+    """
+    schema = type_schema('delete')
+    permissions = ("transfer:DeleteUser",)
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_user, resources))
+
+    def process_user(self, user):
+        client = local_session(
+            self.manager.session_factory).client('transfer')
+        try:
+
+            client.delete_user(
+                ServerId=user['Arn'].split('/')[1],
+                UserName=user['UserName'])
+        except ClientError as e:
+            self.log.exception(
+                "Exception deleting user:\n %s" % e)
