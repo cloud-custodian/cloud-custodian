@@ -639,7 +639,7 @@ class PolicyLambdaProvision(Publish):
                  'Name': 'Account sechub', 'Description': 'sechub'}},
             hub_action.get(mu_policy.name))
         hub_action.update(mu_policy)
-        hub_action.remove(mu_policy)
+        hub_action.remove(mu_policy, func_deleted=True)
         self.assertEqual(
             hub_action.get(mu_policy.name),
             {'event': False, 'action': None})
@@ -920,14 +920,14 @@ class PolicyLambdaProvision(Publish):
         self.assertTrue(len(events) > 0)
 
         for e in events:
-            e.remove(pl, remove_permission=True)
+            e.remove(pl, func_deleted=False)
 
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="custodian-test")
 
         # we should be able to call the remove again even tho it's already gone
         for e in events:
-            e.remove(pl, remove_permission=True)
+            e.remove(pl, func_deleted=False)
 
     def test_pause_resume_policy(self):
         session_factory = self.replay_flight_data("test_pause_resume_policy")
@@ -980,7 +980,7 @@ class PolicyLambdaProvision(Publish):
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
 
-        cwls.remove(func)
+        cwls.remove(func, func_deleted=True)
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="test-foo-bar")
 

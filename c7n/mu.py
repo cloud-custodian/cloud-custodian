@@ -404,7 +404,7 @@ class LambdaManager:
 
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
-            e.remove(func)
+            e.remove(func, func_deleted=True)
         log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
@@ -982,7 +982,7 @@ class AWSEventBase:
             LambdaConflictRetry(
                 client.remove_permission,
                 FunctionName=func.name,
-                StatementId=func.name,
+                StatementId=func.event_name,
             )
             return True
         except client.ResourceNotFoundException:
@@ -1198,7 +1198,7 @@ class CloudWatchEventSource(AWSEventBase):
         except ClientError:
             pass
 
-    def remove(self, func, remove_permission=False):
+    def remove(self, func, func_deleted=False):
         if self.get(func.event_name):
             log.info("Removing cwe targets and rule %s", func.event_name)
             try:
@@ -1213,7 +1213,7 @@ class CloudWatchEventSource(AWSEventBase):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
-            self.remove_permissions(func, remove_permission)
+            self.remove_permissions(func, remove_permission=not func_deleted)
             return True
 
 
@@ -1283,8 +1283,8 @@ class SecurityHubAction:
         self.cwe.update(func)
         self.add(func)
 
-    def remove(self, func):
-        self.cwe.remove(func)
+    def remove(self, func, func_deleted=False):
+        self.cwe.remove(func, func_deleted)
         client = local_session(self.session_factory).client('securityhub')
         client.delete_action_target(ActionTargetArn=self._get_arn())
 
@@ -1358,20 +1358,21 @@ class BucketLambdaNotification:
 
         return True
 
-    def remove(self, func):
+    def remove(self, func, func_deleted):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         if not found:
             return
 
         lambda_client = self.session.client('lambda')
-        try:
-            response = lambda_client.remove_permission(
-                FunctionName=func['FunctionName'],
-                StatementId=self.bucket['Name'])
-            log.debug("Removed lambda permission result: %s" % response)
-        except lambda_client.exceptions.ResourceNotFoundException:
-            pass
+        if not func_deleted:
+            try:
+                response = lambda_client.remove_permission(
+                    FunctionName=func['FunctionName'],
+                    StatementId=self.bucket['Name'])
+                log.debug("Removed lambda permission result: %s" % response)
+            except lambda_client.exceptions.ResourceNotFoundException:
+                pass
 
         notifies['LambdaFunctionConfigurations'].remove(found)
         s3.put_bucket_notification_configuration(
@@ -1418,18 +1419,19 @@ class CloudWatchLogSubscription:
                 filterPattern=self.filter_pattern,
                 destinationArn=func.alias or func.arn)
 
-    def remove(self, func):
+    def remove(self, func, func_deleted):
         lambda_client = self.session.client('lambda')
         found = False
         for group in self.log_groups:
-            try:
-                response = lambda_client.remove_permission(
-                    FunctionName=func.name,
-                    StatementId=group['logGroupName'][1:].replace('/', '-'))
-                log.debug("Removed lambda permission result: %s" % response)
-                found = True
-            except lambda_client.exceptions.ResourceNotFoundException:
-                pass
+            if func_deleted:
+                try:
+                    response = lambda_client.remove_permission(
+                        FunctionName=func.name,
+                        StatementId=group['logGroupName'][1:].replace('/', '-'))
+                    log.debug("Removed lambda permission result: %s" % response)
+                    found = True
+                except lambda_client.exceptions.ResourceNotFoundException:
+                    pass
             try:
                 response = self.client.delete_subscription_filter(
                     logGroupName=group['logGroupName'],
@@ -1487,7 +1489,7 @@ class SQSSubscription:
                     BatchSize=self.batch_size)
             return modified
 
-    def remove(self, func):
+    def remove(self, func, func_deleted):
         client = local_session(self.session_factory).client('lambda')
         event_mappings = {
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
@@ -1532,7 +1534,7 @@ class SNSSubscription:
             try:
                 lambda_client.add_permission(
                     FunctionName=func.name,
-                    StatementId='sns-topic-' + topic_name,
+                    StatementId=statement_id,
                     SourceArn=arn,
                     Action='lambda:InvokeFunction',
                     Principal='sns.amazonaws.com')
@@ -1547,7 +1549,7 @@ class SNSSubscription:
             sns_client.subscribe(
                 TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
-    def remove(self, func):
+    def remove(self, func, func_deleted):
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         sns_client = session.client('sns')
@@ -1555,14 +1557,15 @@ class SNSSubscription:
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
 
-            try:
-                response = lambda_client.remove_permission(
-                    FunctionName=func.name,
-                    StatementId=statement_id)
-                log.debug("Removed lambda permission result: %s" % response)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
+            if func_deleted:
+                try:
+                    response = lambda_client.remove_permission(
+                        FunctionName=func.name,
+                        StatementId=statement_id)
+                    log.debug("Removed lambda permission result: %s" % response)
+                except ClientError as e:
+                    if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                        raise
 
             paginator = sns_client.get_paginator('list_subscriptions_by_topic')
 
@@ -1731,7 +1734,7 @@ class ConfigRule(AWSEventBase):
         log.debug("Adding config rule for %s" % func.name)
         return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
-    def remove(self, func, remove_permission=False):
+    def remove(self, func, func_deleted=False):
         rule = self.get(func.name)
         if not rule:
             return
@@ -1741,5 +1744,5 @@ class ConfigRule(AWSEventBase):
                 ConfigRuleName=func.name)
         except self.client.exceptions.NoSuchConfigRuleException:
             pass
-        self.remove_permissions(func, remove_permission)
+        self.remove_permissions(func, remove_permission=not func_deleted)
         return True
