@@ -55,7 +55,7 @@ class StopServer(BaseAction):
                 r = futures[f]
                 if f.exception():
                     self.log.warning(
-                        "Exception deleting transfer server:%s error:\n%s",
+                        "Exception stoping transfer server:%s error:\n%s",
                         r['ServerId'], f.exception())
                     continue
 
