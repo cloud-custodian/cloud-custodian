@@ -154,7 +154,7 @@ class TransferUser(ChildResourceManager):
         enum_spec = ('list_users', 'Users', None)
         detail_spec_spec = ('describe_user', 'UserName', None)
         parent_spec = ('transfer-server', 'ServerId', True)
-        name = id = ''
+        name = id = 'UserName'
         cfn_type = 'AWS::Transfer::User'
 
     source_mapping = {
