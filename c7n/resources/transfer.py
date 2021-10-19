@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, ChildDescribeSource
 from c7n.utils import local_session, type_schema
 
 
@@ -126,6 +126,23 @@ class DeleteServer(BaseAction):
                 "Exception deleting server:\n %s" % e)
 
 
+class DescribeTransferUser(ChildDescribeSource):
+
+    def get_query(self):
+        query = super().get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('transfer')
+        results = []
+        for parent_id, user in resources:
+            tu = self.manager.retry(
+                client.describe_user, ServerId=parent_id,
+                UserName=user['UserName']).get('User')
+            results.append(tu)
+        return results
+
 @resources.register('transfer-user')
 class TransferUser(ChildResourceManager):
 
@@ -136,8 +153,12 @@ class TransferUser(ChildResourceManager):
         enum_spec = ('list_users', 'Users', None)
         detail_spec_spec = ('describe_user', 'UserName', None)
         parent_spec = ('transfer-server', 'ServerId', True)
-        name = id = 'UserName'
+        name = id = ''
         cfn_type = 'AWS::Transfer::User'
+
+    source_mapping = {
+        'describe-child': DescribeTransferUser
+    }
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(TransferUser, self).get_resources(ids, cache, augment=False)

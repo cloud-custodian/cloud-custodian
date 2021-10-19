@@ -54,3 +54,15 @@ class TestTransferServer(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+class TransferUser(BaseTest):
+
+    def test_resources(self):
+        session_factory = self.replay_flight_data("test_transfer_server")
+        p = self.load_policy(
+            {"name": "server", "resource": "transfer-user"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "test")
