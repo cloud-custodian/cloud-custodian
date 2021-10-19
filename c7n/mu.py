@@ -971,6 +971,23 @@ class AWSEventBase:
             self._client = self.session.client(self.client_service)
         return self._client
 
+    def remove_permissions(self, func, remove_permission):
+        # typically the entire function will be deleted so we dont
+        # need to bother with removing the permission explicitly
+        if not remove_permission:
+            return True
+
+        client = self.session.client("lambda")
+        try:
+            LambdaConflictRetry(
+                client.remove_permission,
+                FunctionName=func.name,
+                StatementId=func.name,
+            )
+            return True
+        except client.ResourceNotFoundException:
+            pass
+
 
 class CloudWatchEventSource(AWSEventBase):
     """Subscribe a lambda to cloud watch events.
@@ -1196,18 +1213,7 @@ class CloudWatchEventSource(AWSEventBase):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
-            # typically the entire function will be deleted so we dont
-            # need to bother with removing the permission explicitly
-            if not remove_permission:
-                return True
-            client = self.session.client("lambda")
-            try:
-                LambdaConflictRetry(
-                    client.remove_permission,
-                    FunctionName=func.name,
-                    StatementId=func.event_name)
-            except client.ResourceNotFoundException:
-                pass
+            self.remove_permissions(func, remove_permission)
             return True
 
 
@@ -1735,17 +1741,5 @@ class ConfigRule(AWSEventBase):
                 ConfigRuleName=func.name)
         except self.client.exceptions.NoSuchConfigRuleException:
             pass
-
-        if not remove_permission:
-            return True
-
-        client = self.session.client("lambda")
-        try:
-            LambdaConflictRetry(
-                client.remove_permission,
-                FunctionName=func.name,
-                StatementId=func.name,
-            )
-            return True
-        except client.ResourceNotFoundException:
-            pass
+        self.remove_permissions(func, remove_permission)
+        return True

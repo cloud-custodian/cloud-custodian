@@ -900,6 +900,30 @@ class PolicyLambdaProvision(BaseTest):
             },
         )
 
+    def test_remove_permissions_from_event_cloudtrail(self):
+        session_factory = self.replay_flight_data("test_remove_permissions_event")
+        p = self.load_policy({
+            "resource": "ec2",
+            "name": "test",
+            "mode": {"type": "cloudtrail", "events": ["RunInstances"]}},
+            session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl, True)
+        mgr.publish(pl, "Dev", role=ROLE)
+        events = pl.get_events(session_factory)
+
+        lambda_client = session_factory().client("lambda")
+        policy = lambda_client.get_policy(FunctionName="custodian-test")
+        self.assertTrue(policy)
+        self.assertTrue(len(events) > 0)
+
+        for e in events:
+            e.remove(pl, remove_permission=True)
+
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="custodian-test")
+
 
 class PythonArchiveTest(unittest.TestCase):
 
