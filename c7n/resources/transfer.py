@@ -4,7 +4,7 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from concurrent.futures import as_completed
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, ChildDescribeSource
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('transfer-server')
@@ -44,22 +44,23 @@ class StopServer(BaseAction):
         if not len(resources):
             return
 
-        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        with self.executor_factory(max_workers=2) as w:
-            for server_set in chunks(resources, size=5):
-                futures.append(w.submit(self.process_server_set, client, server_set))
+        with self.executor_factory(
+                max_workers=min(10, len(resources) or 1)) as w:
+            futures = {}
+            for r in resources:
+                futures[w.submit(self.process_server, client, r)] = r
             for f in as_completed(futures):
                 r = futures[f]
                 if f.exception():
-                    self.log.error(
-                        "Exception stopping transfer server %s:\n %s",
+                    self.log.warning(
+                        "Exception deleting transfer server:%s error:\n%s",
                         r['ServerId'], f.exception())
+                    continue
 
-    def process_server_set(self, client, server_set):
-        for s in server_set:
-            client.stop_server(ServerId=s['ServerId'])
+    def process_server(self, client, server):
+        client.stop_server(ServerId=server['ServerId'])
 
 
 @TransferServer.action_registry.register('start')
@@ -86,22 +87,23 @@ class StartServer(BaseAction):
         if not len(resources):
             return
 
-        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        with self.executor_factory(max_workers=2) as w:
-            for server_set in chunks(resources, size=5):
-                futures.append(w.submit(self.process_server_set, client, server_set))
+        with self.executor_factory(
+                max_workers=min(10, len(resources) or 1)) as w:
+            futures = {}
+            for r in resources:
+                futures[w.submit(self.process_server, client, r)] = r
             for f in as_completed(futures):
                 r = futures[f]
                 if f.exception():
-                    self.log.error(
-                        "Exception starting transfer server %s:\n %s",
+                    self.log.warning(
+                        "Exception starting transfer server:%s error:\n%s",
                         r['ServerId'], f.exception())
+                    continue
 
-    def process_server_set(self, client, server_set):
-        for s in server_set:
-            client.start_server(ServerId=s['ServerId'])
+    def process_server(self, client, server):
+        client.start_server(ServerId=server['ServerId'])
 
 
 @TransferServer.action_registry.register('delete')
@@ -122,24 +124,26 @@ class DeleteServer(BaseAction):
     permissions = ("transfer:DeleteServer",)
 
     def process(self, resources):
-        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        with self.executor_factory(max_workers=2) as w:
-            for server_set in chunks(resources, size=5):
-                futures.append(w.submit(self.process_server_set, client, server_set))
+        with self.executor_factory(
+                max_workers=min(10, len(resources) or 1)) as w:
+            futures = {}
+            for r in resources:
+                futures[w.submit(self.process_server, client, r)] = r
             for f in as_completed(futures):
+                r = futures[f]
                 if f.exception():
-                    self.log.error(
-                        "Exception deleting transfer server \n %s",
-                        f.exception())
+                    self.log.warning(
+                        "Exception deleting transfer server:%s error:\n%s",
+                        r['ServerId'], f.exception())
+                    continue
 
-    def process_server_set(self, client, server_set):
-        for s in server_set:
-            try:
-                client.delete_server(ServerId=s['ServerId'])
-            except client.exceptions.NotFoundException:
-                pass
+    def process_server(self, client, server):
+        try:
+            client.delete_server(ServerId=server['ServerId'])
+        except client.exceptions.NotFoundException:
+            pass
 
 
 class DescribeTransferUser(ChildDescribeSource):
@@ -199,23 +203,25 @@ class DeleteUser(BaseAction):
     permissions = ("transfer:DeleteUser",)
 
     def process(self, resources):
-        futures = []
         client = local_session(
             self.manager.session_factory).client('transfer')
-        with self.executor_factory(max_workers=2) as w:
-            for user_set in chunks(resources, size=5):
-                futures.append(w.submit(self.process_user_set, client, user_set))
+        with self.executor_factory(
+                max_workers=min(10, len(resources) or 1)) as w:
+            futures = {}
+            for r in resources:
+                futures[w.submit(self.process_user, client, r)] = r
             for f in as_completed(futures):
+                r = futures[f]
                 if f.exception():
-                    self.log.error(
-                        "Exception deleting transfer user \n %s",
-                        f.exception())
+                    self.log.warning(
+                        "Exception deleting transfer user:%s error:\n%s",
+                        r['UserName'], f.exception())
+                    continue
 
-    def process_user_set(self, client, user_set):
-        for u in user_set:
-            try:
-                client.delete_user(
-                    ServerId=u['Arn'].split('/')[1],
-                    UserName=u['UserName'])
-            except client.exceptions.NotFoundException:
-                pass
+    def process_user(self, client, user):
+        try:
+            client.delete_user(
+                ServerId=user['Arn'].split('/')[1],
+                UserName=user['UserName'])
+        except client.exceptions.NotFoundException:
+            pass
