@@ -8,7 +8,7 @@ class TestTransferServer(BaseTest):
     def test_resources(self):
         session_factory = self.replay_flight_data("test_transfer_server")
         p = self.load_policy(
-            {"name": "server", "resource": "transfer-server"},
+            {"name": "transfer-server-test-describe", "resource": "transfer-server"},
             session_factory=session_factory,
         )
         resources = p.run()
@@ -61,14 +61,14 @@ class TransferUser(BaseTest):
     def test_resources(self):
         session_factory = self.replay_flight_data("test_transfer_user")
         p = self.load_policy(
-            {"name": "server", "resource": "transfer-user"},
+            {"name": "transfer-user-test-describe", "resource": "transfer-user"},
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "test")
 
-    def test_delete_delete(self):
+    def test_delete_user(self):
         session_factory = self.replay_flight_data("test_transfer_user_delete")
         p = self.load_policy(
             {
