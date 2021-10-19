@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import functools
 import itertools
+import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
@@ -9,9 +10,11 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema, chunks
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
+import c7n.filters.vpc as net_filters
 
 
 @resources.register('workspaces')
@@ -224,5 +227,140 @@ class DeleteWorkspaceImage(BaseAction):
             except client.exceptions.ResourceAssociatedException as e:
                 self.log.error(f"Error deleting workspace image: {r['ImageId']} error: {e}")
                 continue
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@resources.register('workspaces-directory')
+class WorkspaceDirectory(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'workspaces'
+        enum_spec = ('describe_workspace_directories', 'Directories', None)
+        arn_type = 'directory'
+        id = 'DirectoryId'
+        name = 'DirectoryName'
+        universal_taggable = True
+
+    augment = universal_augment
+
+
+@WorkspaceDirectory.filter_registry.register('security-group')
+class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ("WorkspaceSecurityGroupId", "WorkspaceCreationProperties.CustomSecurityGroupId")
+
+    def get_related_ids(self, resources):
+        sg_ids = set()
+        for r in resources:
+            for exp in self.expressions:
+                id = jmespath.search(exp, r)
+                if id:
+                    sg_ids.add(id)
+        return list(sg_ids)
+
+
+@WorkspaceDirectory.filter_registry.register('subnet')
+class WorkSpacesDirectorySg(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetIds[]"
+
+
+@WorkspaceDirectory.filter_registry.register('client-properties')
+class WorkspacesDirectoryClientProperties(ValueFilter):
+    """Filter workspace directories based off workspace client properties.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: workspace-client-credentials
+           resource: aws.workspaces-directory
+           filters:
+            - type: client-properties
+              key: ReconnectEnabled
+              value: ENABLED
+
+    """
+    permissions = ('workspaces:DescribeClientProperties',)
+
+    schema = type_schema('client-properties', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:client-properties'
+
+    def process(self, directories, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        results = []
+        for directory in directories:
+            if self.annotation_key not in directory:
+                try:
+                    client_properties = client.describe_client_properties(
+                        ResourceIds=[directory['DirectoryId']]).get(
+                            'ClientPropertiesList')[0].get('ClientProperties')
+                except client.exceptions.ResourceNotFoundException:
+                    continue
+                directory[self.annotation_key] = client_properties
+
+            if self.match(directory[self.annotation_key]):
+                results.append(directory)
+        return results
+
+
+@WorkspaceDirectory.action_registry.register('modify-client-properties')
+class ModifyClientProperties(BaseAction):
+    """Action to enable/disable credential caching for Workspaces client.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: workspace-directories-credentials-cache
+                resource: aws.workspaces-directory
+                filters:
+                  - type: client-properties
+                    key: ReconnectEnabled
+                    value: ENABLED
+                actions:
+                  - type: modify-client-properties
+                    attributes:
+                      ClientProperties:
+                        ReconnectEnabled: DISABLED
+
+    """
+    schema = type_schema(
+        'modify-client-properties',
+        required=['attributes'],
+        attributes={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'ClientProperties': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['ReconnectEnabled'],
+                    'properties': {
+                        'ReconnectEnabled': {'enum': ['DISABLED', 'ENABLED']}
+                    }
+                }
+            }})
+
+    permissions = ('workspaces:ModifyClientProperties',)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, WorkspacesDirectoryClientProperties):
+                return self
+        raise PolicyValidationError(
+            '`modify-client-properties` may only be used in '
+            'conjunction with `client-properties` filter on %s' % (self.manager.data,))
+
+    def process(self, directories):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for directory in directories:
+            try:
+                client.modify_client_properties(
+                    ResourceId=directory['DirectoryId'], **self.data['attributes'])
             except client.exceptions.ResourceNotFoundException:
                 continue
