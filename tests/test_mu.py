@@ -930,6 +930,11 @@ class PolicyLambdaProvision(Publish):
         for e in events:
             e.remove(pl, func_deleted=False)
 
+        # we should also be able to explicitly remove_permissions even though it's
+        # already gone
+        for e in events:
+            e.remove_permissions(pl, remove_permission=True)
+
     def test_pause_resume_policy(self):
         session_factory = self.replay_flight_data("test_pause_resume_policy")
         p = self.load_policy({
@@ -999,7 +1004,7 @@ class PolicyLambdaProvision(Publish):
         # this shouldn't raise an exception even though we never added it
         sns_sub.remove(func, func_deleted=False)
 
-        # verify the permissions are gone
+        # verify the permissions are not there
         lambda_client = session_factory().client("lambda")
         found_function = lambda_client.get_function(FunctionName="test-foo-bar")
         self.assertTrue(found_function)
@@ -1023,6 +1028,9 @@ class PolicyLambdaProvision(Publish):
         )
 
         bln.add(func)
+        bln.remove(func, func_deleted=False)
+
+        # we should be able to do idempotent removal
         bln.remove(func, func_deleted=False)
 
         # verify the permissions are gone

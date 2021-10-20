@@ -1198,7 +1198,7 @@ class CloudWatchEventSource(AWSEventBase):
         except ClientError:
             pass
 
-    def remove(self, func, func_deleted=False):
+    def remove(self, func, func_deleted=True):
         if self.get(func.event_name):
             log.info("Removing cwe targets and rule %s", func.event_name)
             try:
@@ -1283,7 +1283,7 @@ class SecurityHubAction:
         self.cwe.update(func)
         self.add(func)
 
-    def remove(self, func, func_deleted=False):
+    def remove(self, func, func_deleted=True):
         self.cwe.remove(func, func_deleted)
         client = local_session(self.session_factory).client('securityhub')
         client.delete_action_target(ActionTargetArn=self._get_arn())
@@ -1358,7 +1358,7 @@ class BucketLambdaNotification:
 
         return True
 
-    def remove(self, func, func_deleted):
+    def remove(self, func, func_deleted=True):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         if not found:
@@ -1420,11 +1420,12 @@ class CloudWatchLogSubscription:
                 filterPattern=self.filter_pattern,
                 destinationArn=func.alias or func.arn)
 
-    def remove(self, func, func_deleted):
+    def remove(self, func, func_deleted=True):
         lambda_client = self.session.client('lambda')
         found = False
         for group in self.log_groups:
-            if func_deleted:
+            # if the function isn't deleted we need to do some cleanup
+            if not func_deleted:
                 try:
                     response = lambda_client.remove_permission(
                         FunctionName=func.name,
@@ -1490,7 +1491,7 @@ class SQSSubscription:
                     BatchSize=self.batch_size)
             return modified
 
-    def remove(self, func, func_deleted):
+    def remove(self, func, func_deleted=True):
         client = local_session(self.session_factory).client('lambda')
         event_mappings = {
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
@@ -1550,7 +1551,7 @@ class SNSSubscription:
             sns_client.subscribe(
                 TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
-    def remove(self, func, func_deleted):
+    def remove(self, func, func_deleted=True):
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         sns_client = session.client('sns')
@@ -1558,7 +1559,8 @@ class SNSSubscription:
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
 
-            if func_deleted:
+            # if the function isn't deleted we need to do some cleanup
+            if not func_deleted:
                 try:
                     response = lambda_client.remove_permission(
                         FunctionName=func.name,
@@ -1735,7 +1737,7 @@ class ConfigRule(AWSEventBase):
         log.debug("Adding config rule for %s" % func.name)
         return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
-    def remove(self, func, func_deleted=False):
+    def remove(self, func, func_deleted=True):
         rule = self.get(func.name)
         if not rule:
             return

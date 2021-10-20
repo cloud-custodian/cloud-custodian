@@ -1,36 +1,12 @@
 {
-    "status_code": 200,
+    "status_code": 404,
     "data": {
-        "ResponseMetadata": {},
-        "Configuration": {
-            "FunctionName": "test-foo-bar",
-            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
-            "Runtime": "python3.9",
-            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
-            "Handler": "index.handler",
-            "CodeSize": 168,
-            "Description": "test",
-            "Timeout": 3,
-            "MemorySize": 128,
-            "LastModified": "2021-10-20T22:01:17.435+0000",
-            "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
-            "Version": "$LATEST",
-            "VpcConfig": {
-                "SubnetIds": [],
-                "SecurityGroupIds": [],
-                "VpcId": ""
-            },
-            "TracingConfig": {
-                "Mode": "PassThrough"
-            },
-            "RevisionId": "34f4c902-0b8b-4596-9b3d-f602a4c232d8",
-            "State": "Active",
-            "LastUpdateStatus": "Successful",
-            "PackageType": "Zip"
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+            "Code": "ResourceNotFoundException"
         },
-        "Code": {
-            "RepositoryType": "S3",
-            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/test-foo-bar-46040255-fdef-4872-a05b-ea1736634fd6?versionId=8RYTVTB.76m9DZ6nWYYKZCp1ezhDwj5u&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFYaCXVzLWVhc3QtMSJHMEUCIQDBLs8sjn6lhxzvLBH9qn5SMahdEan7C7%2BEdp3i%2FiGUwwIgNMfmR7Osc406ywf1iAePu5Uzo8l2JePH2EhnipAfaxAqgwQI3v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw3NDk2Nzg5MDI4MzkiDEYezJYCaPxRhl0JxSrXAxQcfKjEzOv8SJ7gTbL8mb1kcsnqSXA54QqxjfGCh5syn1c8zej%2FypJSMvLVu5EXJtxwXR9vsdufuGaroVNZNFcjWK1OjKz7nnNQt1GzJUlpasE9zg%2BTpg4m6XmKr7A2zsH%2BwbVivkR2c4%2BJIOZUDYFy4enpOhD8X0MyP8aNVySrf2nFfB%2FpuWW2YQ0Bj5HkinZYoAKdfUFKSO70w5dXojhUSgxOUrsSswtP04ZCjhWhgeh0THu2UcmjTyaKORTrowB1MCV3RSUGZX22rCBZsAxaetZb4xjaxBJB1FwBcqUywZoIFjs94hjM1x9d%2BapWxwwlGu3VCsoSbbaru7OSwdCCRA9EV%2BpWGx7cVCvUdr1krFufwhBoeZDzBYfBJB6DJpNxEtvusRoKMDV5n%2BVzFnn5PdTrphfmUbr9%2BxjOMI2rr4qJFLElPh2yoCok5lXhuLoHZTQf47BBcfwE6QF0N6mvikWbeajW0m4WJPGn1ZDNNTtuZN%2BKEw2Gee8vnRP%2FS7k54zYC8G7kSEklx5cIVzlvXEN3PNvLDbIYHUj1yS%2FcluyxIwEC0jYiZT6RaYiiAdbqXgZruBa%2FeZaS5bFO7F7Gn3FlaFpmTuER3Mt21tSeywGtuSqKyDCxjsKLBjqlAakxl%2F4tPnGYz6HCC9weSVjEiybIg8DzS6OEZ1xuIt56DyBBFqjMqX9hMcTgRW%2BtnKYDHdn4qENNVQX5GSI5M290V6ffl%2F9mfzdUHuCXTmFGLWxQabJ3%2BhENBVNnPlHVFgKn6yYoFCWjFTNFviBvCEKRe291BEZPSqAKp8WjSNaN%2FwqnMYApAVjwlKjnoV2PTrEFRX%2FSje%2B72Bffx1rrarMg%2F58Oqg%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211020T220740Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY34VRLBNGW%2F20211020%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a42b006645080399dc4283b7829b2ec41f7658e697e5d6b00bdd6c0fd579827c"
-        }
+        "ResponseMetadata": {},
+        "Type": "User",
+        "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar"
     }
 }
