@@ -978,7 +978,7 @@ class PolicyLambdaProvision(Publish):
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
 
-        cwls.remove(func, func_deleted=False)
+        cwls.remove(func, func_deleted=True)
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="test-foo-bar")
 
