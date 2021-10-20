@@ -939,8 +939,7 @@ class PolicyLambdaProvision(Publish):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl, True)
-        # mgr.publish(pl, "Dev", role=ROLE)
-        mgr.publish(pl, "Dev", role="arn:aws:iam::532725030595:role/custodian-mu")
+        mgr.publish(pl, "Dev", role=ROLE)
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
 
@@ -979,9 +978,25 @@ class PolicyLambdaProvision(Publish):
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
 
-        cwls.remove(func, func_deleted=True)
+        cwls.remove(func, func_deleted=False)
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="test-foo-bar")
+
+    def test_sns_subscription_remove_permission_idempotent(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_subscription_remove_permission_idempotent"
+        )
+        func = self.make_func()
+        mgr = LambdaManager(session_factory)
+
+        mgr.publish(func)
+
+        sns_sub = SNSSubscription(
+            session_factory,
+            topic_arns=["arn:aws:sns:us-east-1:644160558196:test-topic"]
+        )
+        # this shouldn't raise an exception even though we never added it
+        sns_sub.remove(func, func_deleted=False)
 
 
 class PythonArchiveTest(unittest.TestCase):
