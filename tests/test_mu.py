@@ -153,7 +153,7 @@ class PolicyLambdaProvision(Publish):
         self.addCleanup(mgr.remove, pl)
 
     def test_config_poll_rule_evaluation(self):
-        session_factory = self.replay_flight_data("test_config_poll_rule_provision")
+        session_factory = self.record_flight_data("test_config_poll_rule_provision")
         p = self.load_policy({
             'name': 'configx',
             'resource': 'aws.kinesis',
@@ -979,7 +979,7 @@ class PolicyLambdaProvision(Publish):
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
 
-        cwls.remove(func, func_deleted=True)
+        cwls.remove(func, func_deleted=False)
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="test-foo-bar")
 
