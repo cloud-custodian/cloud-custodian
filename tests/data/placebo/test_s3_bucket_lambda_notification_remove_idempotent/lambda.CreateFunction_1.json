@@ -11,9 +11,9 @@
         "Description": "test",
         "Timeout": 3,
         "MemorySize": 128,
-        "LastModified": "2021-10-20T19:05:44.900+0000",
+        "LastModified": "2021-10-20T22:01:11.901+0000",
         "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
-        "Version": "5",
+        "Version": "13",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
@@ -22,7 +22,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "08265c2b-ae77-4f60-9aa4-a8988c5b4279",
+        "RevisionId": "feedecc6-2e97-48a4-9b49-721026b9c3f7",
         "State": "Active",
         "LastUpdateStatus": "Successful",
         "PackageType": "Zip"

@@ -21,6 +21,7 @@ from c7n.mu import (
     custodian_archive,
     generate_requirements,
     get_exec_options,
+    BucketLambdaNotification,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -152,7 +153,7 @@ class PolicyLambdaProvision(Publish):
         self.addCleanup(mgr.remove, pl)
 
     def test_config_poll_rule_evaluation(self):
-        session_factory = self.record_flight_data("test_config_poll_rule_provision")
+        session_factory = self.replay_flight_data("test_config_poll_rule_provision")
         p = self.load_policy({
             'name': 'configx',
             'resource': 'aws.kinesis',
@@ -986,7 +987,7 @@ class PolicyLambdaProvision(Publish):
         session_factory = self.replay_flight_data(
             "test_sns_subscription_remove_permission_idempotent"
         )
-        func = self.make_func()
+        func = self.make_func(role=ROLE, runtime="python3.9")
         mgr = LambdaManager(session_factory)
 
         mgr.publish(func)
@@ -997,6 +998,39 @@ class PolicyLambdaProvision(Publish):
         )
         # this shouldn't raise an exception even though we never added it
         sns_sub.remove(func, func_deleted=False)
+
+        # verify the permissions are gone
+        lambda_client = session_factory().client("lambda")
+        found_function = lambda_client.get_function(FunctionName="test-foo-bar")
+        self.assertTrue(found_function)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
+
+    def test_s3_bucket_lambda_notification_remove_idempotent(self):
+        session_factory = self.replay_flight_data(
+            "test_s3_bucket_lambda_notification_remove_idempotent"
+        )
+        func = self.make_func(role=ROLE, runtime="python3.9")
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, func, True)
+
+        mgr.publish(func)
+
+        bln = BucketLambdaNotification(
+            data={},
+            session_factory=session_factory,
+            bucket={"Name": "c7n-ci20210930214353595400000001"}
+        )
+
+        bln.add(func)
+        bln.remove(func, func_deleted=False)
+
+        # verify the permissions are gone
+        lambda_client = session_factory().client("lambda")
+        found_function = lambda_client.get_function(FunctionName="test-foo-bar")
+        self.assertTrue(found_function)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
 
 
 class PythonArchiveTest(unittest.TestCase):

@@ -1368,13 +1368,14 @@ class BucketLambdaNotification:
         if not func_deleted:
             try:
                 response = lambda_client.remove_permission(
-                    FunctionName=func['FunctionName'],
+                    FunctionName=func.name,
                     StatementId=self.bucket['Name'])
                 log.debug("Removed lambda permission result: %s" % response)
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
 
         notifies['LambdaFunctionConfigurations'].remove(found)
+        notifies.pop("ResponseMetadata")
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'],
             NotificationConfiguration=notifies)
