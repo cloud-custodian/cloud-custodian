@@ -1,0 +1,132 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 01 May 2021 11:01:46 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4457",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudasset.googleapis.com/v1/projects/custodian-1291:batchGetAssetsHistory?contentType=RESOURCE&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcustodian-1291%2Fzones%2Fus-east1-d%2Finstances%2Fcustodian&alt=json"
+  },
+  "body": {
+    "assets": [
+      {
+        "window": {
+          "startTime": "2020-12-16T14:00:00Z",
+          "endTime": "2262-04-11T23:47:16.854775807Z"
+        },
+        "asset": {
+          "name": "//compute.googleapis.com/projects/cloud-custodian/zones/us-east1-d/instances/custodian",
+          "assetType": "compute.googleapis.com/Instance",
+          "resource": {
+            "version": "v1",
+            "discoveryDocumentUri": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+            "discoveryName": "Instance",
+            "parent": "//cloudresourcemanager.googleapis.com/projects/628364689359",
+            "data": {
+              "name": "custodian",
+              "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/machineTypes/n1-standard-1",
+              "disks": [
+                {
+                  "diskSizeGb": "32",
+                  "mode": "READ_WRITE",
+                  "index": 0,
+                  "autoDelete": true,
+                  "licenses": [
+                    "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/ubuntu-1404-trusty"
+                  ],
+                  "type": "PERSISTENT",
+                  "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/disks/custodian",
+                  "boot": true,
+                  "interface": "SCSI",
+                  "deviceName": "custodian"
+                }
+              ],
+              "tags": {
+                "fingerprint": "YLj7N4sJwYI=",
+                "items": [
+                  "http-server",
+                  "https-server",
+                  "ci",
+                  "drone",
+                  "custodian"
+                ]
+              },
+              "serviceAccounts": [
+                {
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+                    "https://www.googleapis.com/auth/devstorage.read_only",
+                    "https://www.googleapis.com/auth/logging.write",
+                    "https://www.googleapis.com/auth/monitoring.write",
+                    "https://www.googleapis.com/auth/pubsub"
+                  ],
+                  "email": "628364689359-compute@developer.gserviceaccount.com"
+                }
+              ],
+              "displayDevice": {
+                "enableDisplay": true
+              },
+              "canIpForward": false,
+              "startRestricted": false,
+              "scheduling": {
+                "automaticRestart": true,
+                "preemptible": false,
+                "onHostMaintenance": "MIGRATE"
+              },
+              "networkInterfaces": [
+                {
+                  "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default-07bf749b4b0e8db2",
+                  "accessConfigs": [
+                    {
+                      "name": "External NAT",
+                      "type": "ONE_TO_ONE_NAT",
+                      "natIP": "104.196.149.234",
+                      "networkTier": "PREMIUM"
+                    }
+                  ],
+                  "fingerprint": "u4ioByJWIjQ=",
+                  "name": "nic0",
+                  "networkIP": "10.142.0.2",
+                  "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default"
+                }
+              ],
+              "description": "",
+              "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d",
+              "fingerprint": "ZFtUa3s3ZkI=",
+              "cpuPlatform": "Intel Haswell",
+              "id": "4179518482904332734",
+              "status": "RUNNING",
+              "labels": {
+                "drone": "",
+                "custodian": "",
+                "https-server": "",
+                "ci": "",
+                "http-server": ""
+              },
+              "labelFingerprint": "YLj7N4sJwYI=",
+              "deletionProtection": false,
+              "lastStartTimestamp": "2019-06-05T03:16:53.361-07:00",
+              "lastStopTimestamp": "2019-06-05T03:10:54.684-07:00",
+              "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/instances/custodian",
+              "creationTimestamp": "2016-04-24T01:44:01.573-07:00"
+            },
+            "location": "us-east1-d"
+          },
+          "ancestors": [
+            "projects/628364689359"
+          ],
+          "updateTime": "2020-12-16T14:00:00Z"
+        }
+      }
+    ]
+  }
+}

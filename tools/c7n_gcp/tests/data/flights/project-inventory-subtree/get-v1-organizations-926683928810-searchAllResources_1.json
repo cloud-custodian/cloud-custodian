@@ -1,0 +1,166 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 02 May 2021 18:37:15 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "17962",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudasset.googleapis.com/v1/organizations/926683928810:searchAllResources?assetTypes=cloudresourcemanager.googleapis.com%2FProject&pageSize=500&alt=json"
+  },
+  "body": {
+    "results": [
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/jamisonsdocs-1612473311065",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/543135276412",
+        "displayName": "JamisonsDocs",
+        "location": "global",
+        "labels": {
+          "cost-center": "qa",
+          "owner": "testing"
+        },
+        "additionalAttributes": {
+          "projectId": "jamisonsdocs-1612473311065"
+        },
+        "createTime": "2021-02-04T21:15:11Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/264112811077",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      },
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/norse-ward-302218",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/691395451242",
+        "displayName": "My First Project",
+        "location": "global",
+        "labels": {
+          "cost-center": "qa",
+          "owner": "testing"
+        },
+        "additionalAttributes": {
+          "projectId": "norse-ward-302218"
+        },
+        "createTime": "2021-01-19T18:58:50Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/389734459213",
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/389734459213",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      },
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/updatechart-1609401712091",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/889173927648",
+        "displayName": "UpdateChart",
+        "location": "global",
+        "labels": {
+          "cost-center": "dev",
+          "owner": "dev"
+        },
+        "additionalAttributes": {
+          "projectId": "updatechart-1609401712091"
+        },
+        "createTime": "2020-12-31T08:01:52Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/991785858662",
+          "folders/389734459213",
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/991785858662",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      },
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/jamisonscalendar-1606980909947",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/630795598690",
+        "displayName": "JamisonsCalendarReminders",
+        "location": "global",
+        "labels": {
+          "cost-center": "dev",
+          "owner": "jamison"
+        },
+        "additionalAttributes": {
+          "projectId": "jamisonscalendar-1606980909947"
+        },
+        "createTime": "2020-12-03T07:35:10Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/585341618337",
+          "folders/991785858662",
+          "folders/389734459213",
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/585341618337",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      },
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/c7n-test-target",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/413985786043",
+        "displayName": "C7N Test Target",
+        "location": "global",
+        "labels": {
+          "app": "c7n",
+          "cost-center": "qa",
+          "env_type": "dev",
+          "owner": "testing"
+        },
+        "additionalAttributes": {
+          "projectId": "c7n-test-target"
+        },
+        "createTime": "2020-08-31T20:06:53Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/389734459213",
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/389734459213",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      },
+      {
+        "name": "//cloudresourcemanager.googleapis.com/projects/practical-truck-276716",
+        "assetType": "cloudresourcemanager.googleapis.com/Project",
+        "project": "projects/711388880679",
+        "displayName": "My First Project",
+        "location": "global",
+        "labels": {
+          "cost-center": "qa",
+          "owner": "testing"
+        },
+        "additionalAttributes": {
+          "projectId": "practical-truck-276716"
+        },
+        "createTime": "2020-05-09T16:40:39Z",
+        "state": "ACTIVE",
+        "folders": [
+          "folders/585341618337",
+          "folders/991785858662",
+          "folders/389734459213",
+          "folders/264112811077"
+        ],
+        "organization": "organizations/926683928810",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/folders/585341618337",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Folder"
+      }
+    ]
+  }
+}

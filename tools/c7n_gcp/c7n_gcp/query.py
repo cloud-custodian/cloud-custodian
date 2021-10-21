@@ -101,7 +101,11 @@ class AssetInventory:
         self.manager = manager
 
     def get_resources(self, query):
-        session = local_session(self.manager.session_factory)
+        session = self.manager.session_factory(
+            quota_max_calls=300,
+            quota_period=60,
+            use_rate_limiter=True)
+
         if query is None:
             query = {}
         if 'scope' not in query:
@@ -109,30 +113,63 @@ class AssetInventory:
         if 'assetTypes' not in query:
             query['assetTypes'] = [self.manager.resource_type.asset_type]
 
-        search_client = session.client('cloudasset', 'v1p1beta1', 'resources')
-        resource_client = session.client('cloudasset', 'v1', 'v1')
+        asset_client = session.client('cloudasset', 'v1', 'v1')
         resources = []
+        query['pageSize'] = 500
+        results = list(asset_client.execute_paged_query(
+            'searchAllResources', query))
 
-        results = list(search_client.execute_paged_query('searchAll', query))
-        for resource_set in chunks(itertools.chain(*[rs['results'] for rs in results]), 100):
+        if not results or not results[0]:
+            query.pop('pageSize')
+            log.warning(
+                'asset inventory query on type:%s query:%s no results',
+                self.manager.type, query)
+
+        if not self.manager.resource_type.asset_history:
+            for r in results:
+                resources.extend(r.get('results', ()))
+            return self._describe_format(resources)
+
+        for parent, resource_set in self.group_by_parent(results):
             rquery = {
-                'parent': query['scope'],
+                'parent': self.get_parent(
+                    parent, resource_set, query['scope']),
                 'contentType': 'RESOURCE',
                 'assetNames': [r['name'] for r in resource_set]}
-            for history_result in resource_client.execute_query(
+            for history_result in asset_client.execute_query(
                     'batchGetAssetsHistory', rquery).get('assets', ()):
                 resource = history_result['asset']['resource']['data']
                 resource['c7n:history'] = {
                     'window': history_result['window'],
                     'ancestors': history_result['asset']['ancestors']}
                 resources.append(resource)
-        return resources
+        return self._describe_format(resources)
+
+    def get_parent(self, parent, resource_set, scope):
+        return scope
+
+    def group_by_parent(self, results):
+        return [(None, rset) for rset in chunks(
+            itertools.chain(*[rs.get('results', ()) for rs in results]),
+            100)]
 
     def get_permissions(self):
         return self.permissions
 
     def augment(self, resources):
         return resources
+
+    def _describe_format(self, resources):
+        return resources
+
+    def _common_describe_format(self, r):
+        if 'assetType' not in r:
+            return False
+        r['name'] = r['name'].split('/', 3)[-1]
+        r['parent'] = r.pop('parentFullResourceName').split('/', 3)[-1]
+        r.pop('assetType', None)
+        r.pop('parentAssetType')
+        return True
 
 
 class QueryMeta(type):
@@ -150,6 +187,8 @@ class QueryMeta(type):
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
+    source_mapping = sources
+
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
@@ -158,13 +197,14 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.source.get_permissions()
 
     def get_source(self, source_type):
-        return sources.get(source_type)(self)
+        return self.source_mapping.get(source_type)(self)
 
     def get_client(self):
         return local_session(self.session_factory).client(
             self.resource_type.service,
             self.resource_type.version,
-            self.resource_type.component)
+            self.resource_type.component,
+        )
 
     def get_model(self):
         return self.resource_type
@@ -183,19 +223,46 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.data.get('source', 'describe-gcp')
 
     def get_resource_query(self):
-        if 'query' in self.data:
+        if 'query' not in self.data:
+            return
+        if self.source_type == 'describe-gcp':
             return {'filter': self.data.get('query')}
+        q = {}
+        for i in self.data.get('query'):
+            q.update(i)
+        return q
+
+    def get_resource_manager(self, resource_type, data=None):
+        rm = super().get_resource_manager(resource_type, data)
+        q = self.get_resource_query()
+        # scope is special in gcp and should propagate
+        if q and 'scope' in q:
+            rm.data['query'] = [{'scope': q['scope']}]
+        return rm
 
     def resources(self, query=None):
         q = query or self.get_resource_query()
-        key = self.get_cache_key(q)
-        resources = self._fetch_resources(q)
-        self._cache.save(key, resources)
+        cache_key = self.get_cache_key(q)
+        resources = None
+
+        if self._cache.load():
+            resources = self._cache.get(cache_key)
+            if resources is not None:
+                self.log.debug("Using cached %s: %d" % (
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
+                    len(resources)))
+
+        if resources is None:
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self._fetch_resources(q)
+            self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resources = self.filter_resources(resources)
 
-        # Check if we're out of a policies execution limits.
+        # Check resource limits if we're the current policy execution.
         if self.data == self.ctx.policy.data:
             self.check_resource_limit(len(resources), resource_count)
         return resources
@@ -336,6 +403,7 @@ class TypeInfo(metaclass=TypeMeta):
 
     # cloud asset inventory type
     asset_type = None
+    asset_history = True
 
     @classmethod
     def get_metric_resource_name(cls, resource):

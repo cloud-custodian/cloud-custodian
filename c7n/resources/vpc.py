@@ -1805,7 +1805,7 @@ class TransitAttachmentSource(query.ChildDescribeSource):
 @resources.register('transit-attachment')
 class TransitGatewayAttachment(query.ChildResourceManager):
 
-    child_source = 'transit-attachment'
+    source_mapping = {'describe': TransitAttachmentSource}
 
     class resource_type(query.TypeInfo):
         service = 'ec2'

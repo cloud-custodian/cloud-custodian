@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 01 May 2021 11:01:45 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1190",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudasset.googleapis.com/v1/projects/custodian-1291:searchAllResources?assetTypes=compute.googleapis.com%2FInstance&pageSize=500&alt=json"
+  },
+  "body": {
+    "results": [
+      {
+        "name": "//compute.googleapis.com/projects/cloud-custodian/zones/us-east1-d/instances/custodian",
+        "assetType": "compute.googleapis.com/Instance",
+        "project": "projects/628364689359",
+        "displayName": "custodian",
+        "location": "us-east1-d",
+        "labels": {
+          "ci": "",
+          "custodian": "",
+          "drone": "",
+          "http-server": "",
+          "https-server": ""
+        },
+        "networkTags": [
+          "http-server",
+          "https-server",
+          "ci",
+          "drone",
+          "custodian"
+        ],
+        "additionalAttributes": {
+          "networkInterfaces": [
+            {
+              "accessConfigs": [
+                {
+                  "natIP": "104.196.149.234"
+                }
+              ],
+              "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+              "networkIP": "10.142.0.2"
+            }
+          ]
+        },
+        "createTime": "2016-04-24T08:44:01Z",
+        "state": "RUNNING",
+        "parentFullResourceName": "//cloudresourcemanager.googleapis.com/projects/custodian-1291",
+        "parentAssetType": "cloudresourcemanager.googleapis.com/Project"
+      }
+    ]
+  }
+}

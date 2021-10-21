@@ -24,14 +24,13 @@ class LimitsTest(BaseTest):
             {'name': 'limits',
              "max-resources-percent": 2.5,
              'resource': 'gcp.folder',
-             'query':
-                 [{'parent': parent}]},
+             'query': [{'parent': parent}]},
             session_factory=session_factory)
 
         p.ctx.metrics.flush = mock.MagicMock()
         output = self.capture_logging('custodian.policy', level=logging.ERROR)
         self.assertRaises(ResourceLimitExceeded, p.run)
-        self.assertTrue("policy:limits exceeded resource-limit:2.5% found:1 total:"
+        self.assertTrue("policy:limits exceeded resource-limit:2.5% found:4 total:"
                         in output.getvalue())
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
@@ -118,7 +117,7 @@ class OrganizationTest(BaseTest):
 class FolderTest(BaseTest):
 
     def test_folder_query(self):
-        resource_name = 'folders/112838955399'
+        resource_name = 'folders/264112844077'
         parent = 'organizations/926683928810'
         session_factory = self.replay_flight_data('folder-query')
 
@@ -146,6 +145,28 @@ class ProjectTest(BaseTest):
             "projects/cloud-custodian"})
         self.assertEqual(project['lifecycleState'], 'ACTIVE')
         self.assertEqual(project['name'], 'cloud-custodian')
+
+    def test_inventory_subtree(self):
+        factory = self.replay_flight_data('project-inventory-subtree')
+        p = self.load_policy({
+            'name': 'p-label',
+            'resource': 'gcp.project',
+            'source': 'inventory',
+            'query': [
+                {'subtree': 'folders/264112811077'},
+                {'scope': 'organizations/926683928810'},
+            ],
+        }, session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 6
+        assert {r['projectId'] for r in resources} == {
+            'c7n-test-target',
+            'jamisonscalendar-1606980909947',
+            'jamisonsdocs-1612473311065',
+            'norse-ward-302218',
+            'practical-truck-276716',
+            'updatechart-1609401712091',
+        }
 
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')

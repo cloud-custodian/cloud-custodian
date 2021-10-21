@@ -282,7 +282,7 @@ class RestStage(query.ChildResourceManager):
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
 
-    child_source = 'describe'
+#    child_source = 'describe'
     source_mapping = {
         'describe': DescribeRestStage,
         'config': query.ConfigSource
@@ -373,21 +373,6 @@ class DeleteStage(BaseAction):
                 pass
 
 
-@resources.register('rest-resource')
-class RestResource(query.ChildResourceManager):
-
-    child_source = 'describe-rest-resource'
-
-    class resource_type(query.TypeInfo):
-        service = 'apigateway'
-        parent_spec = ('rest-api', 'restApiId', None)
-        enum_spec = ('get_resources', 'items', None)
-        id = 'id'
-        name = 'path'
-        permissions_enum = ('apigateway:GET',)
-        cfn_type = 'AWS::ApiGateway::Resource'
-
-
 @query.sources.register('describe-rest-resource')
 class DescribeRestResource(query.ChildDescribeSource):
 
@@ -403,6 +388,21 @@ class DescribeRestResource(query.ChildDescribeSource):
             r['restApiId'] = parent_id
             results.append(r)
         return results
+
+
+@resources.register('rest-resource')
+class RestResource(query.ChildResourceManager):
+
+    source_mapping = {'describe': DescribeRestResource}
+
+    class resource_type(query.TypeInfo):
+        service = 'apigateway'
+        parent_spec = ('rest-api', 'restApiId', None)
+        enum_spec = ('get_resources', 'items', None)
+        id = 'id'
+        name = 'path'
+        permissions_enum = ('apigateway:GET',)
+        cfn_type = 'AWS::ApiGateway::Resource'
 
 
 @resources.register('rest-vpclink')

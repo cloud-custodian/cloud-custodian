@@ -1,0 +1,50 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 01 May 2021 11:15:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=184",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "862",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "folders": [
+      {
+        "name": "folders/264112844077",
+        "parent": "organizations/926683928810",
+        "displayName": "apps",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2020-11-05T15:31:46.060Z"
+      },
+      {
+        "name": "folders/486742133355",
+        "parent": "organizations/926683928810",
+        "displayName": "system",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2020-05-10T20:19:54.079Z"
+      },
+      {
+        "name": "folders/487100021141",
+        "parent": "organizations/926683928810",
+        "displayName": "users",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2020-05-10T20:19:53.887Z"
+      },
+      {
+        "name": "folders/780680127726",
+        "parent": "organizations/926683928810",
+        "displayName": "system-gsuite",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2020-04-10T17:16:15.199Z"
+      }
+    ]
+  }
+}

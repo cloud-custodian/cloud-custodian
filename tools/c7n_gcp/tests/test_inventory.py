@@ -10,7 +10,7 @@ class InventoryTest(BaseTest):
     def test_instance_query(self):
         factory = self.replay_flight_data(
             'instance-asset-query',
-            project_id='cloud-custodian'
+            project_id='custodian-1291'
         )
         inventory = self.load_policy(
             {'name': 'fetch',

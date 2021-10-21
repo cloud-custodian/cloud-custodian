@@ -63,6 +63,15 @@ class ResourceManager:
         """return ids that match this resource type's id format."""
         return ids
 
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe')
+
+    def get_source(self, source_type):
+        source_class = self.source_mapping.get(source_type)
+        if source_class:
+            return source_class(self)
+
     @classmethod
     def get_permissions(cls):
         return ()
@@ -91,10 +100,19 @@ class ResourceManager:
         if klass is None:
             raise ValueError(resource_type)
 
-        # if we're already querying via config carry it forward
-        if not data and self.source_type == 'config' and getattr(
-                klass.get_model(), 'config_type', None):
-            return klass(self.ctx, {'source': self.source_type})
+        # propagate source by default if supported
+        if data is None and self.source_type in klass.source_mapping:
+            data = {'source': self.source_type}
+        elif data is None:
+            data = {}
+
+        # if we're using config and its not supported by the resource type fallback
+        if (
+                data.get('source') == 'config' and
+                self.source_type == 'config' and
+                not getattr(self.resource_type, 'config_type', None)):
+            data.pop('source')
+
         return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):

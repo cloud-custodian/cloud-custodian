@@ -220,6 +220,12 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
+
+    source_mapping = {
+        'describe': DescribeSource,
+        'resource-graph': ResourceGraphSource
+    }
+
     class resource_type(TypeInfo):
         pass
 
@@ -233,9 +239,6 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def get_permissions(self):
         return ()
-
-    def get_source(self, source_type):
-        return sources.get(source_type)(self)
 
     def get_session(self):
         if self._session is None:
@@ -260,7 +263,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     @property
     def source_type(self):
-        return self.data.get('source', 'describe-azure')
+        return self.data.get('source', 'describe')
 
     def resources(self, query=None, augment=True):
         cache_key = self.get_cache_key(query)
@@ -320,19 +323,19 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             resource_class.action_registry.register('logic-app', LogicAppAction)
 
     def validate(self):
+        if self.source is None:
+            raise PolicyValidationError(
+                'invalid source: %s for: %s' % (self.source_type, self.type))
         self.source.validate()
 
 
 class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
-    child_source = 'describe-child-azure'
-    parent_manager = None
 
-    @property
-    def source_type(self):
-        source = self.data.get('source', self.child_source)
-        if source == 'describe':
-            source = self.child_source
-        return source
+    source_mapping = {
+        'describe': ChildDescribeSource,
+    }
+
+    parent_manager = None
 
     def get_parent_manager(self):
         if not self.parent_manager:

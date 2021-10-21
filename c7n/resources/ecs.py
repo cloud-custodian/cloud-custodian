@@ -435,7 +435,6 @@ class DeleteService(BaseAction):
                     raise
 
 
-@query.sources.register('describe-ecs-task')
 class ECSTaskDescribeSource(ECSClusterResourceDescribeSource):
 
     def process_cluster_resources(self, client, cluster_id, tasks):
@@ -465,12 +464,7 @@ class Task(query.ChildResourceManager):
         supports_trailevents = True
         cfn_type = 'AWS::ECS::TaskSet'
 
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-ecs-task'
-        return source
+    source_mapping = {'describe': ECSTaskDescribeSource}
 
     def get_resources(self, ids, cache=True, augment=True):
         return super(Task, self).get_resources(ids, cache, augment=False)
@@ -614,27 +608,6 @@ class DeleteTaskDefinition(BaseAction):
                     raise
 
 
-@resources.register('ecs-container-instance')
-class ContainerInstance(query.ChildResourceManager):
-
-    chunk_size = 100
-
-    class resource_type(query.TypeInfo):
-        service = 'ecs'
-        id = name = 'containerInstanceArn'
-        enum_spec = ('list_container_instances', 'containerInstanceArns', None)
-        parent_spec = ('ecs', 'cluster', None)
-        arn = "containerInstanceArn"
-
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-ecs-container-instance'
-        return source
-
-
-@query.sources.register('describe-ecs-container-instance')
 class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
 
     def process_cluster_resources(self, client, cluster_id, container_instances):
@@ -651,6 +624,21 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
             results.extend(r)
         ecs_tag_normalize(results)
         return results
+
+
+@resources.register('ecs-container-instance')
+class ContainerInstance(query.ChildResourceManager):
+
+    chunk_size = 100
+
+    class resource_type(query.TypeInfo):
+        service = 'ecs'
+        id = name = 'containerInstanceArn'
+        enum_spec = ('list_container_instances', 'containerInstanceArns', None)
+        parent_spec = ('ecs', 'cluster', None)
+        arn = "containerInstanceArn"
+
+    source_mapping = {'describe': ECSContainerInstanceDescribeSource}
 
 
 @ContainerInstance.action_registry.register('set-state')
