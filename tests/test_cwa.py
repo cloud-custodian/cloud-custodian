@@ -35,3 +35,44 @@ class AlarmTest(BaseTest):
         self.assertEqual(
             client.describe_alarms(AlarmNames=[alarm_name])["MetricAlarms"], []
         )
+
+    def test_filter_tags(self):
+        factory = self.replay_flight_data("test_alarm_tags_filter")
+        p = self.load_policy(
+            {
+                "name": "filter-alarm-tags",
+                "resource": "alarm",
+                "filters": [
+                    {
+                        'type': 'value',
+                        'key': 'tag:some-tag',
+                        'value': 'some-value',
+                        'op': 'eq'
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('c7n:MatchedFilters'), ['tag:some-tag'])
+
+    def test_add_alarm_tags(self):
+        factory = self.replay_flight_data("test_alarm_add_tags")
+        p = self.load_policy(
+            {
+                "name": "add-alarm-tags",
+                "resource": "alarm",
+                "actions": [{
+                    "type": "tag",
+                    "key": "OwnerName",
+                    "value": "SomeName"
+                }],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue({'Key': 'OwnerName', 'Value': 'SomeName'} in resources[0].get('Tags'))

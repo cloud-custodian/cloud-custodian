@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ApplicationSummaries": [
+            {
+                "ApplicationName": "test1",
+                "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/test1",
+                "ApplicationStatus": "READY",
+                "ApplicationVersionId": 1,
+                "RuntimeEnvironment": "FLINK-1_6"
+            },
+            {
+                "ApplicationName": "test2",
+                "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/test2",
+                "ApplicationStatus": "READY",
+                "ApplicationVersionId": 3,
+                "RuntimeEnvironment": "FLINK-1_8"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

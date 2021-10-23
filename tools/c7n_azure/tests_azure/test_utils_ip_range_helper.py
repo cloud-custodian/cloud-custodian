@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import pytest
+
 from .azure_common import BaseTest, cassette_name
 from c7n_azure.utils import IpRangeHelper
 from netaddr import IPRange, IPSet
@@ -52,6 +54,8 @@ class IpRangeHelperTest(BaseTest):
         expected = IPSet(IPRange('1.2.2.127', '1.2.2.127'))
         self.assertEqual(expected, actual)
 
+    # Service Tag IP lists are dynamic and will always be changing in live tests
+    @pytest.mark.skiplive
     @cassette_name('servicetags')
     def test_parse_alias(self):
         data = {'whatever': ['ServiceTags.ApiManagement.WestUS']}
@@ -59,6 +63,8 @@ class IpRangeHelperTest(BaseTest):
         expected = IPSet(['13.64.39.16/32', '40.112.242.148/31', '40.112.243.240/28'])
         self.assertEqual(expected, actual)
 
+    # Service Tag IP lists are dynamic and will always be changing in live tests
+    @pytest.mark.skiplive
     @cassette_name('servicetags')
     def test_parse_alias_and_blocks(self):
         data = {'whatever': ['ServiceTags.ApiManagement.WestUS', '1.2.2.127', '1.2.2.128/25']}

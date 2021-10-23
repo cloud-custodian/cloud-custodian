@@ -1659,6 +1659,93 @@ class Delete(Action):
             raise
 
 
+@ASG.action_registry.register('update')
+class Update(Action):
+    """Action to update ASG configuration settings
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-asg-instance-lifetime
+                resource: asg
+                filters:
+                  - MaxInstanceLifetime: empty
+                actions:
+                  - type: update
+                    max-instance-lifetime: 604800  # (7 days)
+
+              - name: set-asg-by-policy
+                resource: asg
+                actions:
+                  - type: update
+                    default-cooldown: 600
+                    max-instance-lifetime: 0      # (clear it)
+                    new-instances-protected-from-scale-in: true
+                    capacity-rebalance: true
+    """
+
+    schema = type_schema(
+        'update',
+        **{
+            'default-cooldown': {'type': 'integer', 'minimum': 0},
+            'max-instance-lifetime': {
+                "anyOf": [
+                    {'enum': [0]},
+                    {'type': 'integer', 'minimum': 86400}
+                ]
+            },
+            'new-instances-protected-from-scale-in': {'type': 'boolean'},
+            'capacity-rebalance': {'type': 'boolean'},
+        }
+    )
+    permissions = ("autoscaling:UpdateAutoScalingGroup",)
+    settings_map = {
+        "default-cooldown": "DefaultCooldown",
+        "max-instance-lifetime": "MaxInstanceLifetime",
+        "new-instances-protected-from-scale-in": "NewInstancesProtectedFromScaleIn",
+        "capacity-rebalance": "CapacityRebalance"
+    }
+
+    def validate(self):
+        if not set(self.settings_map).intersection(set(self.data)):
+            raise PolicyValidationError(
+                "At least one setting must be specified from: " +
+                ", ".join(sorted(self.settings_map))
+            )
+        return self
+
+    def process(self, asgs):
+        client = local_session(self.manager.session_factory).client('autoscaling')
+
+        settings = {}
+        for k, v in self.settings_map.items():
+            if k in self.data:
+                settings[v] = self.data.get(k)
+
+        with self.executor_factory(max_workers=2) as w:
+            futures = {}
+            error = None
+            for a in asgs:
+                futures[w.submit(self.process_asg, client, a, settings)] = a
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error("Error while updating asg:%s error:%s" % (
+                        futures[f]['AutoScalingGroupName'],
+                        f.exception()))
+                    error = f.exception()
+            if error:
+                # make sure we stop policy execution if there were errors
+                raise error
+
+    def process_asg(self, client, asg, settings):
+        self.manager.retry(
+            client.update_auto_scaling_group,
+            AutoScalingGroupName=asg['AutoScalingGroupName'],
+            **settings)
+
+
 @resources.register('launch-config')
 class LaunchConfig(query.QueryResourceManager):
 
@@ -1761,3 +1848,69 @@ class LaunchConfigDelete(Action):
             if e.response['Error']['Code'] == 'ValidationError':
                 return
             raise
+
+
+@resources.register('scaling-policy')
+class ScalingPolicy(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'autoscaling'
+        arn_type = "scalingPolicy"
+        id = name = 'PolicyName'
+        date = 'CreatedTime'
+        enum_spec = (
+            'describe_policies', 'ScalingPolicies', None
+        )
+        filter_name = 'PolicyNames'
+        filter_type = 'list'
+        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
+
+
+@ASG.filter_registry.register('scaling-policy')
+class ScalingPolicyFilter(ValueFilter):
+
+    """Filter asg by scaling-policies attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: scaling-policies-with-target-tracking
+            resource: asg
+            filters:
+              - type: scaling-policy
+                key: PolicyType
+                value: "TargetTrackingScaling"
+
+    """
+
+    schema = type_schema(
+        'scaling-policy', rinherit=ValueFilter.schema
+    )
+    schema_alias = False
+    permissions = ("autoscaling:DescribePolicies",)
+    annotate = False  # no default value annotation on policy
+    annotation_key = 'c7n:matched-policies'
+
+    def get_scaling_policies(self, asgs):
+        policies = self.manager.get_resource_manager('scaling-policy').resources()
+        policy_map = {}
+        for policy in policies:
+            policy_map.setdefault(
+                policy['AutoScalingGroupName'], []).append(policy)
+        return policy_map
+
+    def process(self, asgs, event=None):
+        self.policy_map = self.get_scaling_policies(asgs)
+        return super(ScalingPolicyFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        asg_policies = self.policy_map.get(asg['AutoScalingGroupName'], ())
+        matched = []
+        for policy in asg_policies:
+            if self.match(policy):
+                matched.append(policy)
+        if matched:
+            asg[self.annotation_key] = matched
+        return bool(matched)

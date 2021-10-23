@@ -39,7 +39,7 @@ class HdinsightTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @patch('azure.mgmt.hdinsight.operations.ClustersOperations.resize')
+    @patch('azure.mgmt.hdinsight.operations.ClustersOperations.begin_resize')
     @arm_template('hdinsight.json')
     @cassette_name('common')
     def test_resize_hdinsight_cluster_action(self, resize_mock):

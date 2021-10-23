@@ -1,1 +1,5 @@
-click==7.1.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+click==8.0.1; python_version >= "3.6"
+colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.6" and python_full_version >= "3.5.0"
+importlib-metadata==4.8.1; python_version < "3.8" and python_version >= "3.6"
+typing-extensions==3.10.0.2; python_version < "3.8" and python_version >= "3.6"
+zipp==3.5.0; python_version < "3.8" and python_version >= "3.6"

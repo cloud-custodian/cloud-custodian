@@ -99,7 +99,8 @@ class SagemakerTransformJob(QueryResourceManager):
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
-        filter_name = 'TransformJobArn'
+        filter_name = 'NameContains'
+        filter_type = 'scalar'
         permission_augment = ('sagemaker:DescribeTransformJob', 'sagemaker:ListTags')
 
     def __init__(self, ctx, data):
@@ -280,6 +281,7 @@ class Model(QueryResourceManager):
             r.setdefault('Tags', []).extend(tags)
             return r
 
+        resources = super(Model, self).augment(resources)
         return list(map(_augment, resources))
 
 
@@ -565,30 +567,7 @@ class NotebookSubnetFilter(SubnetFilter):
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: sagemaker-kms-key-filters
-            resource: aws.sagemaker-notebook
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/sagemaker)"
-                op: regex
-
-          - name: sagemaker-endpoint-kms-key-filters
-            resource: aws.sagemaker-endpoint-config
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "alias/aws/sagemaker"
-    """
     RelatedIdsExpression = "KmsKeyId"
 
 

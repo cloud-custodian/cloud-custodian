@@ -1,20 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
-from c7n_azure.provider import resources
-from c7n_azure.session import Session
+import logging
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
-from c7n_azure.utils import GraphHelper
-
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
+from c7n_azure.filters import FirewallBypassFilter, FirewallRulesFilter
+from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-
-import logging
-
+from c7n_azure.session import Session
+from c7n_azure.utils import GraphHelper
 from netaddr import IPSet
 
 log = logging.getLogger('custodian.azure.keyvault')
@@ -242,8 +239,8 @@ class WhiteListFilter(Filter):
             return access_policies
 
         if self.graph_client is None:
-            s = Session(resource='https://graph.windows.net')
-            self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
+            s = Session(resource_endpoint_type=GRAPH_AUTH_ENDPOINT)
+            self.graph_client = s.client('azure.graphrbac.GraphRbacManagementClient')
 
         # Retrieve graph objects for all object_id
         object_ids = [p['objectId'] for p in access_policies]

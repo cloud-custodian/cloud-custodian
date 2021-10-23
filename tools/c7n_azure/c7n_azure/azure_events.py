@@ -7,7 +7,8 @@ from c7n.utils import local_session
 
 
 class AzureEvents:
-    """A mapping of resource types to events."""
+    """A mapping of resource types to events.
+       Provides user friendly event names for common events."""
 
     azure_events = {
 
@@ -87,6 +88,10 @@ class AzureEvents:
             'resource_provider': 'Microsoft.Storage/storageAccounts',
             'event': 'write'},
 
+        'StorageContainerWrite': {
+            'resource_provider': 'Microsoft.Storage/storageAccounts/blobServices/containers',
+            'event': 'write'},
+
         'VmWrite': {
             'resource_provider': 'Microsoft.Compute/virtualMachines',
             'event': 'write'},
@@ -134,5 +139,6 @@ class AzureEventSubscription:
         scope = '/subscriptions/%s' % subscription_id
 
         client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
-        event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+        event_subscription = \
+            client.event_subscriptions.begin_create_or_update(scope, name, event_info)
         return event_subscription.result()

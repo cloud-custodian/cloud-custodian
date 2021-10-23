@@ -78,11 +78,13 @@ class FunctionPackage:
                 auth_contents = s.get_functions_auth_string(target_sub_id)
             elif identity['type'] == AUTH_TYPE_MSI:
                 auth_contents = json.dumps({
-                    'use_msi': True, 'subscription_id': target_sub_id})
+                    'use_msi': True, 'subscription_id': target_sub_id,
+                    'tenant_id': s.get_tenant_id()})
             elif identity['type'] == AUTH_TYPE_UAI:
                 auth_contents = json.dumps({
                     'use_msi': True, 'subscription_id': target_sub_id,
-                    'client_id': identity['client_id']})
+                    'client_id': identity['client_id'],
+                    'tenant_id': s.get_tenant_id()})
 
             self.pkg.add_contents(dest=name + '/auth.json', contents=auth_contents)
             self.pkg.add_file(self.function_path,

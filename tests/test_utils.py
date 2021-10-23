@@ -78,15 +78,37 @@ class UrlConfTest(BaseTest):
 
         self.assertEqual(
             dict(utils.parse_url_config('')),
-            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+            {
+                'netloc': '',
+                'path': '',
+                'scheme': '',
+                'url': ''
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws://')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
+
+        self.assertEqual(
+            dict(utils.parse_url_config('http://example.com:8080')),
+            dict(url='http://example.com:8080',
+                 netloc='example.com:8080',
+                 path='',
+                 scheme='http'))
 
 
 class ProxyUrlTest(BaseTest):
@@ -115,6 +137,36 @@ class ProxyUrlTest(BaseTest):
             proxy_url = utils.get_proxy_url('http://web.site')
             self.assertEqual(proxy_url, 'http://mock.all.proxy.server:8000')
 
+    def test_http_proxy_with_no_proxy_without_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, None)
+
+    def test_http_proxy_with_no_proxy_mismatch_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, 'http://mock.http.proxy.server:8000')
+
+    def test_http_proxy_with_no_proxy_match_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site:8080')
+            self.assertEqual(proxy_url, None)
+
 
 class UtilTest(BaseTest):
 
@@ -126,7 +178,7 @@ class UtilTest(BaseTest):
 
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
-                    'eventSource': ['ec2.amazonaws.com']},
+                        'eventSource': ['ec2.amazonaws.com']},
              'detail-type': ['AWS API Call via CloudTrail']}
         b = {'detail': {'userIdentity': {
             'userName': [{'anything-but': 'deputy'}]}}}
@@ -318,6 +370,17 @@ class UtilTest(BaseTest):
                 }
             ],
         )
+
+    def test_camel_case_implicit(self):
+        d = {'ownerId': 'abc',
+             'modifyDateIso': '2021-01-05T13:43:26.749906',
+             'createTimeMillis': '1609854135165',
+             'createTime': '1609854135'}
+        r = utils.camelResource(d, implicitTitle=False, implicitDate=True)
+        assert set(r) == {'ownerId', 'modifyDateIso', 'createTimeMillis', 'createTime'}
+        r.pop('ownerId')
+        for k in r:
+            assert r[k].strftime('%Y/%m/%d') == '2021/01/05'
 
     def test_camel_case(self):
         d = {

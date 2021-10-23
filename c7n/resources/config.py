@@ -1,8 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, CrossAccountAccessFilter
 from c7n.manager import resources
+from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 
@@ -39,6 +40,37 @@ class ConfigRecorder(QueryResourceManager):
         return resources
 
 
+@ConfigRecorder.filter_registry.register('cross-account')
+class ConfigCrossAccountFilter(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        allowed_regions={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('config:DescribeAggregationAuthorizations',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('config')
+
+        allowed_accounts = set(self.get_accounts())
+        allowed_regions = set(self.data.get('allowed_regions', ()))
+
+        matched = []
+        auths = client.describe_aggregation_authorizations().get('AggregationAuthorizations', [])
+
+        for a in auths:
+            if (a['AuthorizedAccountId'] not in allowed_accounts or
+                    (allowed_regions and a['AuthorizedAwsRegion'] not in allowed_regions)):
+                matched.append(a)
+
+        # only 1 config recorder per account
+        resources[0][self.annotation_key] = matched
+        return resources
+
+
 @resources.register('config-rule')
 class ConfigRule(QueryResourceManager):
 
@@ -51,6 +83,7 @@ class ConfigRule(QueryResourceManager):
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'
         cfn_type = 'AWS::Config::ConfigRule'
+        universal_taggable = True
 
 
 @ConfigRule.filter_registry.register('status')

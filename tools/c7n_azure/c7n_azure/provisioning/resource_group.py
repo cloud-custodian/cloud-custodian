@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import ResourceNotFoundError
 
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 
@@ -18,7 +18,7 @@ class ResourceGroupUnit(DeploymentUnit):
     def _get(self, params):
         try:
             return self.client.resource_groups.get(params['name'])
-        except CloudError:
+        except ResourceNotFoundError:
             return None
 
     def _provision(self, params):

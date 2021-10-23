@@ -2,14 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n_azure.provider import resources
-from c7n_azure.query import ChildTypeInfo, ChildResourceManager
+from c7n_azure.query import ChildTypeInfo
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n.filters.core import type_schema
 from c7n_azure.utils import ResourceIdParser
+from msrestazure.tools import parse_resource_id
 
 
 @resources.register('storage-container')
-class StorageContainer(ChildResourceManager):
+class StorageContainer(ChildArmResourceManager):
     """Storage Container Resource
 
     :example:
@@ -38,7 +40,6 @@ class StorageContainer(ChildResourceManager):
         parent_manager_name = 'storage'
         diagnostic_settings_enabled = False
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
-        enable_tag_operations = False
         raise_on_exception = False
         default_report_fields = (
             'name',
@@ -50,6 +51,20 @@ class StorageContainer(ChildResourceManager):
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
                     'account_name': parent_resource['name']}
+
+    def get_resources(self, resource_ids):
+        client = self.get_client()
+        data = [
+            self.get_storage_container(rid, client)
+            for rid in resource_ids
+        ]
+        return self.augment([r.serialize(True) for r in data])
+
+    def get_storage_container(self, resource_id, client):
+        parsed = parse_resource_id(resource_id)
+        return client.blob_containers.get(parsed.get('resource_group'),
+                                          parsed.get('name'),             # Account name
+                                          parsed.get('resource_name'))    # Container name
 
 
 @StorageContainer.action_registry.register('set-public-access')
@@ -82,8 +97,6 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             'value': {'enum': ['Container', 'Blob', 'None']}
         }
     )
-
-    schema_alias = True
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()

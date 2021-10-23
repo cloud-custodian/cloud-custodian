@@ -121,6 +121,38 @@ class TestRestApi(BaseTest):
             client.delete_rest_api(restApiId='am0c2fyskg')
         self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
 
+    def test_rest_api_metrics(self):
+        factory = self.replay_flight_data("test_rest_api_delete")
+        p = self.load_policy(
+            {
+                "name": "unused-rest-api",
+                "resource": "rest-api",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "Count",
+                        "days": 4,
+                        "period": 86400,
+                        "value": 1000,
+                        "op": "less-than",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        test_filter = p.resource_manager.filters[0]
+        resource_payload = {
+            "id": "am0c2fyskg",
+            "name": "c7n-test-2"
+        }
+        test_filter.process(resource_payload)
+        self.assertEqual(
+            test_filter.get_dimensions(resource_payload),
+            [
+                {"Name": "ApiName", "Value": "c7n-test-2"}
+            ],
+        )
+
 
 class TestRestResource(BaseTest):
 
@@ -390,3 +422,70 @@ class TestRestStage(BaseTest):
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
+
+
+class TestRestClientCertificate(BaseTest):
+
+    def test_rest_client_certificate_resource(self):
+        session_factory = self.replay_flight_data('test_rest_client_certificate_resource',
+            region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'list-rest-client-certificates',
+                'resource': 'rest-client-certificate',
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['description'], 'Test certificate')
+
+    def test_rest_stage_client_certificate_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_client_certificate_filter', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+    def test_rest_stage_certificate_filter_config_source(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_certificate_filter_config_source', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'source': 'config',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])

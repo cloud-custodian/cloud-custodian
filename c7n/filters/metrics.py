@@ -97,6 +97,7 @@ class MetricsFilter(Filter):
 
     # ditto for spot fleet
     DEFAULT_NAMESPACE = {
+        'apigateway': 'AWS/ApiGateway',
         'cloudfront': 'AWS/CloudFront',
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',

@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
-Generic EC2 Resource Tag / Filters and actions
+Generic Resource Tag / Filters and Actions wrapper
 
 These work for the whole family of resources associated
 to ec2 (subnets, vpc, security-groups, volumes, instances,
-snapshots).
+snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
 from collections import Counter
@@ -15,7 +15,6 @@ from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import itertools
 import jmespath
 import time
 
@@ -24,7 +23,7 @@ from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
-from c7n import utils
+from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
 
@@ -84,19 +83,18 @@ def universal_augment(self, resources):
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
 
-    m = self.get_model()
-    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
+    rfetch = [r for r in resources if 'Tags' not in r]
 
-    resource_tag_map_list = list(itertools.chain(
-        *[p['ResourceTagMappingList'] for p in paginator.paginate(
-            ResourceTypeFilters=[resource_type])]))
-    resource_tag_map = {
-        r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
-
-    for arn, r in zip(self.get_arns(resources), resources):
-        if 'Tags' in r:
-            continue
-        r['Tags'] = resource_tag_map.get(arn, [])
+    for arn_resource_set in utils.chunks(
+            zip(self.get_arns(rfetch), rfetch), 100):
+        arn_resource_map = dict(arn_resource_set)
+        resource_tag_results = client.get_resources(
+            ResourceARNList=list(arn_resource_map.keys())).get(
+                'ResourceTagMappingList', ())
+        resource_tag_map = {
+            r['ResourceARN']: r['Tags'] for r in resource_tag_results}
+        for arn, r in arn_resource_map.items():
+            r['Tags'] = resource_tag_map.get(arn, [])
 
     return resources
 
@@ -368,6 +366,10 @@ class Tag(Action):
     batch_size = 25
     concurrency = 2
 
+    deprecations = (
+        deprecated.alias('mark'),
+    )
+
     schema = utils.type_schema(
         'tag', aliases=('mark',),
         tags={'type': 'object'},
@@ -438,6 +440,11 @@ class Tag(Action):
 class RemoveTag(Action):
     """Remove tags from ec2 resources.
     """
+
+    deprecations = (
+        deprecated.alias('unmark'),
+        deprecated.alias('untag'),
+    )
 
     batch_size = 100
     concurrency = 2
@@ -590,6 +597,9 @@ class TagDelayedAction(Action):
             - type: mark-for-op
               op: stop
     """
+    deprecations = (
+        deprecated.optional_fields(('hours', 'days')),
+    )
 
     schema = utils.type_schema(
         'mark-for-op',
@@ -812,6 +822,25 @@ class NormalizeTag(Action):
 
 class UniversalTag(Tag):
     """Applies one or more tags to the specified resources.
+
+    :example:
+
+        .. code-block :: yaml
+
+            policies:
+            - name: multiple-tags-example
+              comment: |
+                Tags any secrets missing either the Environment or ResourceOwner tag
+              resource: aws.secrets-manager
+              filters:
+                - or:
+                  - "tag:Environment": absent
+                  - "tag:ResourceOwner": absent
+              actions:
+                - type: tag
+                  tags:
+                    Environment: Staging
+                    ResourceOwner: Avengers
     """
 
     batch_size = 20
@@ -1057,10 +1086,7 @@ class CopyRelatedResourceTag(Tag):
             return
         if not isinstance(tag_action, UniversalTag):
             tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        tag_action.process_resource_set(
-            client,
-            resource_set=[r],
-            tags=tags)
+        tag_action.process_resource_set(client, [r], tags)
         return True
 
     def get_resource_tag_map(self, r_type, ids):

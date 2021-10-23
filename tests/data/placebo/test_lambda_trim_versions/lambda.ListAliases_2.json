@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Aliases": [
+            {
+                "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-check:prod",
+                "Name": "prod",
+                "FunctionVersion": "6",
+                "Description": "",
+                "RevisionId": "ccdfe92e-caee-4ae6-825f-d1c89172f1a3"
+            }
+        ]
+    }
+}

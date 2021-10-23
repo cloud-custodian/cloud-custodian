@@ -14,6 +14,7 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import PostFinding
 
 
@@ -91,7 +92,8 @@ class SQS(QueryResourceManager):
                 ids_normalized.append(i)
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
-        return super(SQS, self).get_resources(ids_normalized, cache)
+        resources = super(SQS, self).get_resources(ids_normalized, cache)
+        return [r for r in resources if Arn.parse(r['QueueArn']).resource in ids_normalized]
 
 
 @SQS.filter_registry.register('metrics')
@@ -122,29 +124,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
 @SQS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-    The KmsMasterId returned for SQS sometimes has the alias name directly in the value.
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sqs-kms-key-filters
-                  resource: aws.sqs
-                  filters:
-                    - or:
-                      - type: value
-                        key: KmsMasterKeyId
-                        value: "^(alias/aws/)"
-                        op: regex
-                      - type: kms-key
-                        key: c7n:AliasName
-                        value: "^(alias/aws/)"
-                        op: regex
-    """
     RelatedIdsExpression = 'KmsMasterKeyId'
 
 

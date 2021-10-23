@@ -210,10 +210,20 @@ class TestValueFilter(unittest.TestCase):
 
     def test_value_type_expr(self):
         resource = {'a': 1, 'b': 1}
+
+        # test explicit op
         vf = filters.factory({
             "type": "value",
             "value": "b",
             "op": 'eq',
+            "value_type": "expr",
+            "key": "a"})
+        self.assertTrue(vf.match(resource))
+
+        # test implicit/fallback op
+        vf = filters.factory({
+            "type": "value",
+            "value": "b",
             "value_type": "expr",
             "key": "a"})
         self.assertTrue(vf.match(resource))
@@ -1381,6 +1391,7 @@ class TestReduceFilter(BaseFilterTest):
                 "limit": 1
             }
         )
+        f.validate()
         rs = f.process(resources)
         self.assertEqual(
             [r['InstanceId'] for r in rs],

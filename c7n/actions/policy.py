@@ -31,7 +31,7 @@ def remove_statements(match_ids, statements, matched=()):
         elif match_ids == 'matched':
             if s in matched:
                 s_found = True
-        elif s['Sid'] in match_ids:
+        elif 'Sid' in s and s['Sid'] in match_ids:
             s_found = True
         if s_found:
             found.append(s)

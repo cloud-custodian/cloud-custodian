@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
@@ -62,6 +63,15 @@ class CloudHSM(QueryResourceManager):
         arn_type = 'cluster'
         name = 'Name'
         detail_spec = ("describe_hsm", "HsmArn", None, None)
+
+    def resources(self, query=None, augment=True):
+        try:
+            return super().resources(query, augment)
+        except ClientError as e:
+            # cloudhsm is not available for new accounts, use cloudhsmV2
+            if 'service is unavailable' in str(e):
+                return []
+            raise
 
 
 @resources.register('hsm-hapg')

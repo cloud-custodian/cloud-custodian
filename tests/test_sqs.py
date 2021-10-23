@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, placebo_dir
 from datetime import datetime
 from dateutil.tz import tzutc
 from pytest_terraform import terraform
@@ -11,6 +11,7 @@ import json
 import logging
 import pytest
 import time
+from pathlib import Path
 
 from c7n.resources.aws import shape_validate, Arn
 
@@ -100,7 +101,7 @@ def test_sqs_set_encryption(test, sqs_set_encryption):
     queue_url = resources[0]["QueueUrl"]
 
     queue_attributes = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["All"])
-    check_master_key = queue_attributes["Attributes"]["KmsMasterKeyId"]
+    check_master_key = queue_attributes["Attributes"].get("KmsMasterKeyId", '')
     test.assertEqual(check_master_key, key_id)
 
 
@@ -136,6 +137,25 @@ def test_sqs_remove_matched(test, sqs_remove_matched):
     data = json.loads(queue_attributes["Attributes"]["Policy"])
 
     test.assertEqual([s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow"])
+
+
+def test_sqs_get_resources_augment(test):
+    session_factory = test.replay_flight_data("test_sqs_get_augment")
+    p = test.load_policy(
+        {"name": "sqs", "resource": "sqs"},
+        session_factory=session_factory)
+    resources = p.resource_manager.get_resources([
+        'https://sqs.us-east-1.amazonaws.com/644160558196/test-queue'])
+    assert len(resources) == 1
+    assert {t['Key']: t['Value'] for t in resources[0]['Tags']} == {
+        'App': 'Args', 'Env': 'Dev'}
+    # assert even though multiple tagged queues in the env we only fetch data
+    # for the one we're processing.
+    dp = Path(placebo_dir('test_sqs_get_augment')) / 'tagging.GetResources_1.json'
+    assert dp.exists()
+    with dp.open() as fh:
+        data = json.load(fh)
+        assert len(data['data']['ResourceTagMappingList']) == 1
 
 
 class QueueTests(BaseTest):

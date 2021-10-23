@@ -11,6 +11,7 @@ Cloud Custodian
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
 Cloud Custodian is a rules engine for managing public cloud accounts and
 resources. It allows users to define policies to enable a well managed
@@ -210,11 +211,24 @@ For specific instructions for AWS, Azure, and GCP, visit the relevant getting st
 Get Involved
 ------------
 
--   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian)
--   [GitHub](https://github.com/cloud-custodian/cloud-custodian)
--   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian)
--   [Reddit](https://reddit.com/r/cloudcustodian)
--   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian)
+-   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
+-   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - Real time chat if you're looking for help
+-   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
+-   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
+-   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA/) - We're working on adding tutorials and other useful information, as well as meeting videos
+
+Community Resources
+-------------------
+
+We have a regular community meeting that is open to all users and developers of every skill level.
+Joining the [mailing list](https://groups.google.com/forum/#!forum/cloud-custodian) will automatically send you a meeting invite. 
+See the notes below for more technical information on joining the meeting. 
+
+- [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
+- [Community Meeting Notes Archive](https://github.com/cloud-custodian/community/discussions)
+- [Upcoming Community Events](https://cloudcustodian.io/events/)
+
 
 Additional Tools
 ----------------
@@ -254,7 +268,7 @@ Security
 --------
 
 If you've found a security related issue, a vulnerability, or a
-potential vulnerability in Cloud CUstodian please let the Cloud
+potential vulnerability in Cloud Custodian please let the Cloud
 [Custodian Security Team](mailto:security@cloudcustodian.io) know with
 the details of the vulnerability. We'll send a confirmation email to
 acknowledge your report, and we'll send an additional email when we've
@@ -263,6 +277,7 @@ identified the issue positively or negatively.
 Code of Conduct
 ---------------
 
-This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
-participating, you are expected to honor this code.
+This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+
+By participating, you are expected to honor this code.
 

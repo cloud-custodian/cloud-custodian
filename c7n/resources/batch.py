@@ -26,13 +26,13 @@ class ComputeEnvironment(QueryResourceManager):
 @ComputeEnvironment.filter_registry.register('security-group')
 class ComputeSGFilter(SecurityGroupFilter):
 
-    RelatedIdsExpression = "computeResources.securityGroupIds"
+    RelatedIdsExpression = "computeResources.securityGroupIds[]"
 
 
 @ComputeEnvironment.filter_registry.register('subnet')
 class ComputeSubnetFilter(SubnetFilter):
 
-    RelatedIdsExpression = "computeResources.subnets"
+    RelatedIdsExpression = "computeResources.subnets[]"
 
 
 @resources.register('batch-definition')

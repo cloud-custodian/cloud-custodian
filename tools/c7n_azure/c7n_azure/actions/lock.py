@@ -91,6 +91,8 @@ class LockAction(AzureBaseAction):
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
 
+        return {"locked": self.lock_type}
+
     def _get_lock_name(self, resource):
         return self.data.get('lock-name', "c7n-policy-{}".format(self.manager.data['name']))
 

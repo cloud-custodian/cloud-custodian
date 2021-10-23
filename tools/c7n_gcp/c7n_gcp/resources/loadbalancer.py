@@ -208,6 +208,7 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
             name, "description", "creationTimestamp", "sslPolicy", "urlMap"
         ]
         asset_type = "compute.googleapis.com/TargetHttpsProxy"
+        scc_type = "google.compute.TargetHttpsProxy"
 
         @staticmethod
         def get(client, resource_info):

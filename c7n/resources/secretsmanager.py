@@ -16,7 +16,7 @@ class SecretsManager(QueryResourceManager):
         service = 'secretsmanager'
         enum_spec = ('list_secrets', 'SecretList', None)
         detail_spec = ('describe_secret', 'SecretId', 'Name', None)
-        cfn_type = 'AWS::SecretsManager::Secret'
+        config_type = cfn_type = 'AWS::SecretsManager::Secret'
         name = id = 'Name'
         arn = 'ARN'
 
@@ -63,7 +63,7 @@ class TagSecretsManagerResource(Tag):
 
     def process_resource_set(self, client, resources, new_tags):
         for r in resources:
-            tags = {t['Key']: t['Value'] for t in r['Tags']}
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', ())}
             for t in new_tags:
                 tags[t['Key']] = t['Value']
             formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]

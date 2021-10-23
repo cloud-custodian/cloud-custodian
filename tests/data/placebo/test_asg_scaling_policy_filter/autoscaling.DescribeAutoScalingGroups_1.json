@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "asg-test-scaling-policy",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160559186:autoScalingGroup:a878af54-f3e4-42be-a2d4-a252531d9938:autoScalingGroupName/asg-test-scaling-policy",
+                "LaunchConfigurationName": "Test-Launch-Config",
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1c",
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-0380da329b114b1ba",
+                        "InstanceType": "t2.micro",
+                        "AvailabilityZone": "us-east-1c",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchConfigurationName": "Test-Launch-Config",
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 14,
+                    "minute": 12,
+                    "second": 21,
+                    "microsecond": 954000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3030eb06,subnet-5114cf19",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "asg-test-scaling-policy",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Creator",
+                        "Value": "test",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "asg-test-scaling-policy",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Purpose",
+                        "Value": "Test Custodian filter for ASG scaling policies",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "asg-test-scaling-policy",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "custodian_downtime",
+                        "Value": "Offhours tz=ET",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160559186:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

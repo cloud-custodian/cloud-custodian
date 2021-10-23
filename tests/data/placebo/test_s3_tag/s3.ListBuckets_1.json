@@ -1,38 +1,25 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "6D98497201F4BF9F",
-            "HostId": "5b3kqR1n4lilEbFFYQpSdm/DMBH6QNc+/P62ZcnO6oTo+PaL8XR+3QtjhokUA2XDf6VoopKIl60=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "5b3kqR1n4lilEbFFYQpSdm/DMBH6QNc+/P62ZcnO6oTo+PaL8XR+3QtjhokUA2XDf6VoopKIl60=",
-                "x-amz-request-id": "6D98497201F4BF9F",
-                "date": "Wed, 28 Mar 2018 10:37:06 GMT",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "Buckets": [
             {
-                "Name": "custodian-tagger",
+                "Name": "my-custodian-test-bucket",
                 "CreationDate": {
                     "__class__": "datetime",
-                    "year": 2018,
-                    "month": 3,
-                    "day": 28,
-                    "hour": 10,
-                    "minute": 37,
-                    "second": 4,
+                    "year": 2021,
+                    "month": 2,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 38,
+                    "second": 48,
                     "microsecond": 0
                 }
             }
         ],
         "Owner": {
-            "DisplayName": "mandeep.bal",
-            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+            "DisplayName": "alfred",
+            "ID": "278eecaaf33ac93d4c62b8214e7a13ed5f9a169ac2f8ce1601e83a2b312a5506"
         }
     }
 }

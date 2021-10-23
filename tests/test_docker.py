@@ -151,7 +151,7 @@ def test_image_metadata(image_name):
 def test_cli_providers_available():
     providers = os.environ.get("CUSTODIAN_PROVIDERS", None)
     if providers is None:
-        providers = {"aws", "azure", "gcp", "k8s"}
+        providers = {"aws", "azure", "gcp", "k8s", "openstack"}
     elif providers == "":
         providers = {"aws"}
     else:

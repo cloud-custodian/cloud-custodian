@@ -38,6 +38,10 @@ class AWSMailerTests(unittest.TestCase):
                 https_proxy
             ]
         )
+        # Clear http proxy
+        MAILER_CONFIG['http_proxy'] = ''
+        MAILER_CONFIG['https_proxy'] = ''
+        config = handle.config_setup(MAILER_CONFIG)
 
     def test_sqs_queue_processor(self):
         mailer_sqs_queue_processor = sqs_queue_processor.MailerSqsQueueProcessor(

@@ -36,7 +36,7 @@ CORE_DEPS = [
     # transport datadog - recursive deps
     'datadog', 'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
-    'requests', 'urllib3', 'idna', 'chardet', 'certifi',
+    'requests', 'urllib3', 'idna', 'charset_normalizer', 'certifi',
     # used by splunk mailer transport
     'jsonpointer', 'jsonpatch',
     # sendgrid dependencies

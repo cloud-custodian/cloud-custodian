@@ -100,7 +100,7 @@ def init_config(policy_config):
 
     # a cli local directory doesn't translate to lambda
     if not exec_options.get('output_dir', '').startswith('s3'):
-        exec_options['output_dir'] = '/tmp'
+        exec_options['output_dir'] = '/tmp'  # nosec
 
     account_id = None
     # we can source account id from the cli parameters to avoid the sts call

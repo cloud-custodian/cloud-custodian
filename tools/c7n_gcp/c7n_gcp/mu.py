@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import base64
 from collections import namedtuple
 import json
 import logging
@@ -45,7 +46,7 @@ def custodian_archive(packages=None, deps=()):
     requirements.update(deps)
     archive.add_contents(
         'requirements.txt',
-        generate_requirements(requirements, include_self=True))
+        generate_requirements(requirements, ignore=('setuptools',), include_self=True))
     return archive
 
 
@@ -470,14 +471,66 @@ class PubSubSource(EventSource):
 
         client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
-    def add(self):
+    def add(self, func):
         self.ensure_topic()
 
-    def remove(self):
+    def remove(self, func):
         if not self.data.get('topic').startswith(self.prefix):
             return
-        client = self.session.client('topic', 'v1', 'projects.topics')
+        client = self.session.client('pubsub', 'v1', 'projects.topics')
         client.execute_command('delete', {'topic': self.get_topic_param()})
+
+
+class SecurityCenterSubscriber(EventSource):
+
+    def __init__(self, session, data, resource):
+        self.session = session
+        self.data = data
+        self.resource = resource
+
+    def notification_name(self):
+        return "custodian-auto-scc-{}".format(self.resource.type)
+
+    def ensure_notification_config(self):
+        """Verify the notification config exists.
+
+        Returns the notification config name.
+        """
+        client = self.session.client('securitycenter', 'v1', 'organizations.notificationConfigs')
+        config_name = "organizations/{}/notificationConfigs/{}".format(self.data["org"],
+         self.notification_name())
+        try:
+            client.execute_command('get', {'name': config_name})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+        else:
+            return config_name
+
+        config_body = {
+            'name': self.notification_name(),
+            'description': 'auto created by cloud custodian \
+                for resource {}'.format(self.resource.type),
+            'pubsubTopic': "projects/{}/topics/{}".format(self.session.get_default_project(),
+             self.data['topic']),
+            'streamingConfig': {
+                "filter": "resource.type=\"{}\"".format(self.resource.resource_type.scc_type)
+            }
+        }
+        client.execute_command('create', {
+            'configId': self.notification_name(),
+            'parent': 'organizations/{}'.format(self.data["org"]),
+            'body': config_body})
+        return config_name
+
+    def add(self, func):
+        self.ensure_notification_config()
+
+    def remove(self, func):
+        client = self.session.client('securitycenter', 'v1', 'organizations.notificationConfigs')
+        config_name = "organizations/{}/notificationConfigs/{}".format(self.data["org"],
+         self.notification_name())
+        client.execute_command('delete', {'name': config_name})
 
 
 class PeriodicEvent(EventSource):
@@ -590,6 +643,7 @@ class PeriodicEvent(EventSource):
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
                 'topicName': target.get_topic_param(),
+                'data': base64.b64encode("{\"schedule\": true}".encode('utf-8')).decode('utf-8'),
             }
         return job
 
