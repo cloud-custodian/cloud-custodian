@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "PrefixLists": [
+            {
+                "PrefixListId": "pl-02d12d37020480a5f",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:644160558196:prefix-list/pl-02d12d37020480a5f",
+                "PrefixListName": "All VPC CIDR",
+                "MaxEntries": 1,
+                "Version": 1,
+                "Tags": [
+                ],
+                "OwnerId": "644160558196"
+            },
+            {
+                "PrefixListId": "pl-0c79279cd77a6e7c2",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:644160558196:prefix-list/pl-0c79279cd77a6e7c2",
+                "PrefixListName": "All VPC CIDR",
+                "MaxEntries": 1,
+                "Version": 1,
+                "Tags": [
+                ],
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

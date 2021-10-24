@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import itertools
+from tools.c7n_gcp.c7n_gcp.filters.iampolicy import IamPolicyFilter
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
@@ -118,6 +119,19 @@ class Project(QueryResourceManager):
             for child in self.data.get('query'):
                 if 'filter' in child:
                     return {'filter': child['filter']}
+
+
+@Project.filter_registry.register('iam-policy')
+class ProjectIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Project resources correctly.
+    """
+    permissions = ('resourcemanager.projects.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
 
 
 @Project.action_registry.register('delete')

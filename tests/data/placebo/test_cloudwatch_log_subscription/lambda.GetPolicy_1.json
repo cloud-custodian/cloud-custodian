@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"aws-lambda-test\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-east-1.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/test:*\"}}}]}",
+        "RevisionId": "638c9f9a-e6ac-4749-a4b6-b2bb56ccb5ff"
+    }
+}
