@@ -226,7 +226,7 @@ class TagTrim(Action):
 class TagActionFilter(Filter):
     """Filter resources for tag specified future action
 
-    Filters resources by a 'custodian_status' tag which specifies a future
+    Filters resources by a 'maid_status' tag which specifies a future
     date for an action.
 
     The filter parses the tag values looking for an 'op@date'
@@ -251,7 +251,7 @@ class TagActionFilter(Filter):
           resource: ec2
           filters:
             - type: marked-for-op
-              # The default tag used is custodian_status
+              # The default tag used is maid_status
               # but that is configurable
               tag: custodian_status
               op: stop
