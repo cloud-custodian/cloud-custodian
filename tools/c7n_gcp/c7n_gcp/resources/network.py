@@ -55,7 +55,7 @@ class Subnet(QueryResourceManager):
         def get(client, resource_info):
 
             path_param_re = re.compile(
-                '.*?/projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
+                '.*?projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
             project, region, subnet = path_param_re.match(
                 resource_info["resourceName"]).groups()
             return client.execute_query(
@@ -99,9 +99,14 @@ class SetFlowLog(SubnetAction):
 
     def get_resource_params(self, m, r):
         params = super(SetFlowLog, self).get_resource_params(m, r)
-        params['body'] = dict(r)
-        params['body']['enableFlowLogs'] = self.data.get('state', True)
-        return params
+        return {
+            'project': params['project'],
+            'region': params['region'],
+            'subnetwork': params['subnetwork'],
+            'body': {
+                'fingerprint': r['fingerprint'],
+                'enableFlowLogs': self.data.get('state', True)}
+        }
 
 
 @Subnet.action_registry.register('set-private-api')

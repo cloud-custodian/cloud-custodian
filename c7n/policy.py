@@ -491,6 +491,11 @@ class LambdaMode(ServerlessExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
+    @property
+    def policy_lambda(self):
+        from c7n import mu
+        return mu.PolicyLambda
+
     def provision(self):
         # auto tag lambda policies with mode and version, we use the
         # version in mugc to effect cleanups.
@@ -511,7 +516,7 @@ class LambdaMode(ServerlessExecutionMode):
                 manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                mu.PolicyLambda(self.policy),
+                self.policy_lambda(self.policy),
                 role=self.policy.options.assume_role)
 
 

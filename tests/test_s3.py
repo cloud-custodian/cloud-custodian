@@ -225,16 +225,16 @@ class BucketEncryption(BaseTest):
         self.assertEqual(resources[0]["Name"], bname)
 
     def test_s3_bucket_encryption_filter_kms(self):
-        def _get_encryption_rule(key_id):
+        def _get_encryption_config(key_id):
+            default_encryption = {
+                "SSEAlgorithm": "aws:kms"
+            }
+            if key_id:
+                default_encryption["KMSMasterKeyID"] = key_id
             return {
-                "Rules": [
-                    {
-                        "ApplyServerSideEncryptionByDefault": {
-                            "SSEAlgorithm": "aws:kms",
-                            "KMSMasterKeyID": key_id
-                        }
-                    }
-                ]
+                "Rules": [{
+                    "ApplyServerSideEncryptionByDefault": default_encryption
+                }]
             }
 
         bname_base = "c7n-bucket-with-encryption"
@@ -249,21 +249,27 @@ class BucketEncryption(BaseTest):
 
         key_alias = "alias/aws/s3"
         key_meta = session_factory().client("kms").describe_key(KeyId=key_alias)["KeyMetadata"]
+        key_arn = key_meta.get('Arn')
+        alias_arn = ''.join((*key_arn.rpartition(':')[:2], key_alias))
 
+        # Create separate buckets to test five ways of specifying the AWS-managed
+        # KMS key for default server-side encryption.
         key_attrs = {
-            'alias': key_alias,
-            'id': key_meta.get('KeyId'),
-            'arn': key_meta.get('Arn')
+            'default': None,
+            'aliasname': key_alias,
+            'aliasarn': alias_arn,
+            'keyid': key_meta.get('KeyId'),
+            'keyarn': key_arn
         }
 
         for attr, value in key_attrs.items():
-            # Create 3 test buckets. Set a default encryption rule for each
+            # Create test buckets. Set a default encryption rule for each
             # one, using different attributes of the same key.
             bname = f'{bname_base}-by-{attr}'
             client.create_bucket(Bucket=bname)
             client.put_bucket_encryption(
                 Bucket=bname,
-                ServerSideEncryptionConfiguration=_get_encryption_rule(value)
+                ServerSideEncryptionConfiguration=_get_encryption_config(value)
             )
             self.addCleanup(client.delete_bucket, Bucket=bname)
 
@@ -272,6 +278,12 @@ class BucketEncryption(BaseTest):
                 "name": "s3-enc-kms",
                 "resource": "s3",
                 "filters": [
+                    {
+                        "type": "value",
+                        "key": "Name",
+                        "op": "glob",
+                        "value": f"{bname_base}*",
+                    },
                     {
                         "type": "bucket-encryption",
                         "crypto": "aws:kms",
@@ -282,8 +294,7 @@ class BucketEncryption(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run() or []
-        self.assertEqual(len(resources), 3)
-        self.assertTrue(all(r["Name"].startswith(bname_base) for r in resources))
+        self.assertEqual(len(resources), len(key_attrs))
 
     def test_s3_filter_bucket_encryption_disabled(self):
         bname = "c7n-bucket-without-default-encryption"
@@ -3435,6 +3446,9 @@ class S3Test(BaseTest):
         self.assertEqual(rules["SSEAlgorithm"], "aws:kms")
         self.assertEqual(rules["KMSMasterKeyID"], kms_alias_id)
 
+        bname = "custodian-enable-bucket-encryption-kms-bad-alias"
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
         p = self.load_policy(
             {
                 "name": "s3-enable-bucket-encryption-bad-alias",
@@ -3457,12 +3471,8 @@ class S3Test(BaseTest):
         if self.recording:
             time.sleep(5)
 
-        response = client.get_bucket_encryption(Bucket=bname)
-        rules = response["ServerSideEncryptionConfiguration"]["Rules"][0][
-            "ApplyServerSideEncryptionByDefault"
-        ]
-        self.assertEqual(rules["SSEAlgorithm"], "aws:kms")
-        self.assertIsNone(rules.get("KMSMasterKeyID"))
+        with self.assertRaises(ClientError):
+            client.get_bucket_encryption(Bucket=bname)
 
     def test_enable_bucket_encryption_aes256(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)

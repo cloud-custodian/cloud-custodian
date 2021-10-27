@@ -2518,3 +2518,60 @@ class CreateFlowLogs(BaseAction):
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+
+class PrefixListDescribe(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        query = {'Filters': [
+            {'Name': 'prefix-list-id',
+             'Values': ids}]}
+        return self.query.filter(self.manager, **query)
+
+
+@resources.register('prefix-list')
+class PrefixList(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'prefix-list'
+        enum_spec = ('describe_managed_prefix_lists', 'PrefixLists', None)
+        name = 'PrefixListName'
+        id = 'PrefixListId'
+        id_prefix = 'pl-'
+        universal_taggable = object()
+
+    source_mapping = {'describe': PrefixListDescribe}
+
+
+@PrefixList.filter_registry.register('entry')
+class Entry(Filter):
+
+    schema = type_schema(
+        'entry', rinherit=ValueFilter.schema)
+    permissions = ('ec2:GetManagedPrefixListEntries',)
+
+    annotation_key = 'c7n:prefix-entries'
+    match_annotation_key = 'c7n:matched-entries'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            if self.annotation_key in r:
+                continue
+            r[self.annotation_key] = client.get_managed_prefix_list_entries(
+                PrefixListId=r['PrefixListId']).get('Entries', ())
+
+        vf = ValueFilter(self.data)
+        vf.annotate = False
+
+        results = []
+        for r in resources:
+            matched = []
+            for e in r[self.annotation_key]:
+                if vf(e):
+                    matched.append(e)
+            if matched:
+                results.append(r)
+                r[self.match_annotation_key] = matched
+        return results

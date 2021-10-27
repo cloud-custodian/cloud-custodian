@@ -737,6 +737,24 @@ class IamUserTest(BaseTest):
             'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
         self.assertEqual(len(resources), 1)
 
+    def test_iam_user_check_permissions_validation(self):
+        invalid_actions = ['', '*', ':', 'iam', 's3:', ':GetObject']
+        valid_actions = ['*:*', 's3:GetObject', 'iam:GetUser']
+
+        def _policy_with_action(action):
+            return {
+                "name": "check-permissions-test-policy",
+                "resource": "aws.iam-user",
+                'filters': [{'type': 'check-permissions', 'match': 'allowed', 'actions': [action]}],
+            }
+
+        for action in invalid_actions:
+            self.assertRaises(PolicyValidationError, self.load_policy, _policy_with_action(action))
+
+        for action in valid_actions:
+            p = self.load_policy(_policy_with_action(action))
+            p.validate()
+
     def test_iam_user_check_permissions(self):
         factory = self.replay_flight_data('test_iam_user_check_permissions')
         p = self.load_policy({

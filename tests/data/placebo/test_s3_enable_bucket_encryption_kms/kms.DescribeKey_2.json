@@ -1,36 +1,33 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "KeyMetadata": {
-            "Origin": "AWS_KMS", 
-            "KeyId": "9c3fc605-5b44-4bb9-ace3-c09f7b641378", 
-            "Description": "Default master key that protects my S3 objects when no other key is defined", 
-            "KeyManager": "AWS", 
-            "Enabled": true, 
-            "KeyUsage": "ENCRYPT_DECRYPT", 
-            "KeyState": "Enabled", 
+            "AWSAccountId": "644160558196",
+            "KeyId": "2192ecc0-3991-4dac-b479-cc08bda8a4de",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/2192ecc0-3991-4dac-b479-cc08bda8a4de",
             "CreationDate": {
-                "hour": 13, 
-                "__class__": "datetime", 
-                "month": 11, 
-                "second": 51, 
-                "microsecond": 432000, 
-                "year": 2017, 
-                "day": 13, 
-                "minute": 54
-            }, 
-            "Arn": "arn:aws:kms:us-east-1:015929227155:key/9c3fc605-5b44-4bb9-ace3-c09f7b641378", 
-            "AWSAccountId": "015929227155"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "4036649b-ca20-11e7-8ef2-2b8733152edb", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4036649b-ca20-11e7-8ef2-2b8733152edb", 
-                "content-length": "405", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 3,
+                "day": 10,
+                "hour": 10,
+                "minute": 27,
+                "second": 46,
+                "microsecond": 408000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my SNS data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
     }
 }

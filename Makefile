@@ -113,6 +113,7 @@ lint:
 	flake8 c7n tests tools
 
 clean:
+	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:

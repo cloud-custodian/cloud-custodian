@@ -502,11 +502,6 @@ class CopySnapshot(BaseAction):
         return self
 
     def process(self, resources):
-        if self.data['target_region'] == self.manager.config.region:
-            self.log.info(
-                "Source and destination region are the same, skipping")
-            return
-
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
@@ -514,8 +509,7 @@ class CopySnapshot(BaseAction):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
 
-        if self.data['target_region'] != self.manager.config.region:
-            cross_region = True
+        cross_region = self.data['target_region'] != self.manager.config.region
 
         params = {}
         params['Encrypted'] = self.data.get('encrypted', True)
