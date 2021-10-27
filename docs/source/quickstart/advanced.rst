@@ -290,7 +290,7 @@ efficient method of cleaning up EBS snapshots
       resource: aws.ebs-snapshot
       query:
         - Name: "tag-key"
-          Values: ["custodian_snapshot"]
+          Values: ["dev"]
       filters:
         - type: age
           days: 7
