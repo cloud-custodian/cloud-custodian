@@ -289,7 +289,7 @@ efficient method of cleaning up EBS snapshots
     - name: garbage-collect-snapshots-advanced
       resource: aws.ebs-snapshot
       query:
-        - Name: "tag-key"
+        - Name: "tag:environment"
           Values: ["dev"]
       filters:
         - type: age
