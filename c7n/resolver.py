@@ -107,7 +107,9 @@ class ValuesFrom:
         'additionalProperties': 'False',
         'required': ['url'],
         'properties': {
-            'url': {'type': 'string'},
+            'url': {'oneOf': [
+                {'type': 'array'},
+                {'type': 'string'}]},
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
@@ -149,8 +151,14 @@ class ValuesFrom:
             contents = self.cache.get(("value-from", key))
             if contents is not None:
                 return contents
-
-        contents = self._get_values()
+        if isinstance(self.data.get('url'), list):
+            urls = self.data['url']
+            contents = set()
+            for url in urls:
+                self.data['url'] = url
+                contents = contents.union(self._get_values())
+        else:
+            contents = self._get_values()
         if self.cache:
             self.cache.save(("value-from", key), contents)
         return contents

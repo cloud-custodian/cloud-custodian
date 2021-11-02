@@ -297,7 +297,9 @@ class SchemaTest(CliTest):
                 'additionalProperties': 'False',
                 'required': ['url'],
                 'properties': {
-                    'url': {'type': 'string'},
+                    'url': {'oneOf': [
+                        {'type': 'array'},
+                        {'type': 'string'}]},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
@@ -309,7 +311,9 @@ class SchemaTest(CliTest):
                 'additionalProperties': 'False',
                 'required': ['url'],
                 'properties': {
-                    'url': {'type': 'string'},
+                    'url': {'oneOf': [
+                        {'type': 'array'},
+                        {'type': 'string'}]},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
