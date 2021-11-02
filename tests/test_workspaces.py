@@ -84,6 +84,28 @@ class WorkspacesTest(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['VolumeEncryptionKey'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/workspaces')
 
+    def test_workspaces_terminate(self):
+        session_factory = self.replay_flight_data('test_workspaces_terminate')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-terminate',
+                'resource': 'workspaces',
+                'filters': [{
+                    'tag:DeleteMe': 'present'
+                }],
+                'actions': [{
+                    'type': 'terminate'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        workspaceId = resources[0].get('WorkspaceId')
+        client = session_factory().client('workspaces')
+        call = client.describe_workspaces(WorkspaceIds=[workspaceId])
+        self.assertEqual(call['Workspaces'][0]['State'], 'TERMINATING')
+
     def test_workspaces_image_query(self):
         session_factory = self.replay_flight_data("test_workspaces_image_query")
         p = self.load_policy(
@@ -134,3 +156,102 @@ class WorkspacesTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['XXXXXXXXXXXX'])
+
+    def test_workspaces_image_delete(self):
+        session_factory = self.replay_flight_data('test_workspaces_image_delete')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-image-del',
+                'resource': 'workspaces-image',
+                'filters': [{
+                    'tag:DeleteMe': 'present'
+                }],
+                'actions': [{
+                    'type': 'delete'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        imageId = resources[0].get('ImageId')
+        client = session_factory().client('workspaces')
+        call = client.describe_workspace_images(ImageIds=[imageId])
+        self.assertEqual(call['Images'], [])
+
+    def test_workspaces_image_delete_associated_error(self):
+        session_factory = self.replay_flight_data('test_workspaces_image_delete_associated_error')
+        p = self.load_policy(
+            {
+                'name': 'workspaces-image-del',
+                'resource': 'workspaces-image',
+                'filters': [{
+                    'tag:DeleteMe': 'present'
+                }],
+                'actions': [{
+                    'type': 'delete'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        imageId = resources[0].get('ImageId')
+        client = session_factory().client('workspaces')
+        call = client.describe_workspace_images(ImageIds=[imageId])
+        self.assertTrue(call['Images'])
+
+    def test_workspaces_directory_subnet_sg(self):
+        factory = self.replay_flight_data("test_workspaces_directory_subnet_sg")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-sg-subnet",
+                "resource": "workspaces-directory",
+                "filters": [
+                    {'type': 'subnet',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Public'},
+                    {'type': 'security-group',
+                     'key': 'tag:NetworkLocation',
+                     'value': 'Private'}],
+                'actions': [{
+                    'type': 'tag',
+                    'key': 'c7n',
+                    'value': 'test'
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90675153fc')
+        client = factory().client('workspaces')
+        tags = client.describe_tags(ResourceId=resources[0]['DirectoryId'])
+        self.assertEqual({'Key': 'c7n', 'Value': 'test'}, tags['TagList'][0])
+
+    def test_workspaces_directory_client_properties(self):
+        factory = self.replay_flight_data("test_workspaces_directory_client_properties")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-sg-subnet",
+                "resource": "workspaces-directory",
+                "filters": [
+                    {'type': 'client-properties',
+                     'key': 'ReconnectEnabled',
+                     'value': 'ENABLED'}],
+                'actions': [{
+                    'type': 'modify-client-properties',
+                    'attributes': {
+                        'ClientProperties': {'ReconnectEnabled': 'DISABLED'}
+                    }
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90675153fc')
+        client = factory().client('workspaces')
+        cp = client.describe_client_properties(ResourceIds=['d-90675153fc'])
+        self.assertEqual({'ReconnectEnabled': 'DISABLED'}, cp.get(
+            'ClientPropertiesList')[0].get('ClientProperties'))

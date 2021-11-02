@@ -38,7 +38,7 @@ pkg-update:
 
 pkg-show-update:
 	poetry show -o
-	for pkg in $(PKG_SET); do cd $$pkg && poetry show -o && cd ../..; done
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
 
 pkg-freeze-setup:
 	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
@@ -113,6 +113,7 @@ lint:
 	flake8 c7n tests tools
 
 clean:
+	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:

@@ -633,12 +633,27 @@ class CheckPermissions(Filter):
 
         policies:
           - name: super-users
-            resource: iam-user
+            resource: aws.iam-user
             filters:
               - type: check-permissions
                 match: allowed
                 actions:
                  - iam:CreateUser
+
+    :example:
+
+    Find users with access to all services and actions
+
+    .. code-block:: yaml
+
+        policies:
+          - name: admin-users
+            resource: aws.iam-user
+            filters:
+              - type: check-permissions
+                match: allowed
+                actions:
+                  - '*:*'
 
     By default permission boundaries are checked.
     """
@@ -656,6 +671,21 @@ class CheckPermissions(Filter):
     schema_alias = True
     policy_annotation = 'c7n:policy'
     eval_annotation = 'c7n:perm-matches'
+
+    def validate(self):
+        # This filter relies on IAM policy simulator APIs. From the docs concerning action names:
+        #
+        # "Each operation must include the service identifier, such as iam:CreateUser. This
+        # operation does not support using wildcards (*) in an action name."
+        #
+        # We can catch invalid actions during policy validation, rather than waiting to hit
+        # runtime exceptions.
+        for action in self.data['actions']:
+            if ':' not in action[1:-1]:
+                raise PolicyValidationError(
+                    "invalid check-permissions action: '%s' must be in the form <service>:<action>"
+                    % (action,))
+        return self
 
     def get_permissions(self):
         if self.manager.type == 'iam-policy':
