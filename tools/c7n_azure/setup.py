@@ -72,8 +72,8 @@ install_requires = \
  'azure-storage-file-share>=12.4.1,<13.0.0',
  'azure-storage-file>=2.1.0,<3.0.0',
  'azure-storage-queue>=12.1.5,<13.0.0',
- 'boto3 (>=1.18.46,<2.0.0)',
- 'botocore (>=1.21.46,<2.0.0)',
+ 'boto3 (>=1.19.4,<2.0.0)',
+ 'botocore (>=1.22.4,<2.0.0)',
  'c7n (>=0.9.14,<0.10.0)',
  'click>=8.0,<9.0',
  'cryptography>=3.4.6,<4.0.0',
@@ -92,7 +92,7 @@ install_requires = \
  'tabulate (>=0.8.9,<0.9.0)',
  'typing-extensions (>=3.10.0.2,<4.0.0.0)',
  'urllib3 (>=1.26.7,<2.0.0)',
- 'zipp (>=3.5.0,<4.0.0)']
+ 'zipp (>=3.6.0,<4.0.0)']
 
 extras_require = \
 {':python_version >= "3" and python_version < "4"': ['azure-functions>=1.0.8,<2.0.0']}
