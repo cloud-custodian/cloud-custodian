@@ -66,6 +66,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
         for pipe_desc in results['pipelineDescriptionList']:
             pipe = pipe_map[pipe_desc['pipelineId']]
+            pipe['pipelineId'] = pipe_desc['pipelineId']
             pipe['Tags'] = [
                 {'Key': t['key'], 'Value': t['value']}
                 for t in pipe_desc['tags']]
