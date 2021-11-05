@@ -2,7 +2,7 @@ adal==1.2.7
 applicationinsights==0.11.10
 apscheduler==3.8.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0" and python_version < "4")
 azure-common==1.1.27
-azure-core==1.19.0
+azure-core==1.20.0
 azure-cosmos==3.2.0
 azure-cosmosdb-nspkg==2.0.2
 azure-cosmosdb-table==1.0.6
@@ -66,15 +66,15 @@ cffi==1.15.0; python_version >= "3.6"
 charset-normalizer==2.0.7; python_full_version >= "3.6.0" and python_version >= "3"
 click==8.0.3; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.6" and python_full_version >= "3.5.0"
-cryptography==3.4.8; python_version >= "3.6"
+cryptography==35.0.0; python_version >= "3.6"
 distlib==0.3.3
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5"
 importlib-metadata==4.8.1; python_version < "3.8" and python_version >= "3.6"
-importlib-resources==5.3.0; python_version >= "3.6" and python_version < "3.7" and (python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "3.7" or python_full_version >= "3.5.0" and python_version < "3.7" and python_version >= "3.6")
+importlib-resources==5.4.0; python_version >= "3.6" and python_version < "3.7" and (python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "3.7" or python_full_version >= "3.5.0" and python_version < "3.7" and python_version >= "3.6")
 isodate==0.6.0
 jmespath==0.10.0; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
 msal-extensions==0.3.0
-msal==1.15.0
+msal==1.16.0
 msrest==0.6.21
 msrestazure==0.6.4
 netaddr==0.7.20
@@ -91,6 +91,6 @@ requests==2.26.0; (python_version >= "2.7" and python_full_version < "3.0.0") or
 six==1.16.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
 typing-extensions==3.10.0.2; python_version < "3.8" and python_version >= "3.6"
 tzdata==2021.5; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.6" and platform_system == "Windows"
-tzlocal==4.0.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.6"
+tzlocal==4.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.6"
 urllib3==1.26.7; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
 zipp==3.6.0; python_version >= "3.6" and python_version < "3.7"
