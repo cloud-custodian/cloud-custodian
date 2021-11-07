@@ -372,7 +372,6 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-#            'AWS::EKS::Cluster',
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall'
