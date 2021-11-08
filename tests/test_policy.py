@@ -247,6 +247,14 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q4 2021 - second wave
+            'AwsXrayEncryptionConfig',
+            'AwsOpenSearchServiceDomain',
+            'AwsEc2VpcEndpointService',
+            'AwsWafRateBasedRule',
+            'AwsWafRegionalRateBasedRule',
+            'AwsEcrRepository',
+            'AwsEksCluster',
             # q4 2021
             'AwsEcrContainerImage',
             'AwsEc2VpnConnection',
@@ -302,6 +310,7 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            'AWS::OpenSearch::Domain',  # this is effectively an alias
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
             'AWS::Config::ConformancePackCompliance',
@@ -363,7 +372,6 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-            'AWS::EKS::Cluster',
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall'
