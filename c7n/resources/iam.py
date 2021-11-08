@@ -785,24 +785,19 @@ class CheckPermissions(Filter):
                 ActionNames=actions).get('EvaluationResults', ())
             return evaluations
 
-        params = dict(PolicySourceArn=arn, ActionNames=actions)
+        params = dict(
+            PolicySourceArn=arn,
+            ActionNames=actions,
+            ignore_err_codes=('NoSuchEntity',))
         if self.boundaries:
             boundary_policy = self.boundaries.get(
                 self.manager.get_arns([r])[0])
             if boundary_policy:
                 params['PermissionsBoundaryPolicyInputList'] = [boundary_policy]
 
-        try:
-            evaluations = self.manager.retry(
-                client.simulate_principal_policy, **params).get('EvaluationResults', ())
-        except client.exceptions.NoSuchEntityException:
-            # If a non-IAM resource references an IAM entity that doesn't exist,
-            # it may indicate an invalid weak reference. Example: AWS Lambda functions
-            # whose roles have been deleted.
-            if not self.manager.type.startswith('iam-'):
-                self.log.warning('%s references non-existent IAM entity %s' %
-                    (r[self.manager.resource_type.id], arn))
-            evaluations = ()
+        evaluations = (self.manager.retry(
+            client.simulate_principal_policy,
+            **params) or {}).get('EvaluationResults', ())
         return evaluations
 
     def get_eval_matcher(self):
