@@ -47,7 +47,7 @@ class StopServer(BaseAction):
         client = local_session(
             self.manager.session_factory).client('transfer')
         with self.executor_factory(
-                max_workers=min(10, len(resources) or 1)) as w:
+                max_workers=min(3, len(resources) or 1)) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(self.process_server, client, r)] = r
@@ -90,7 +90,7 @@ class StartServer(BaseAction):
         client = local_session(
             self.manager.session_factory).client('transfer')
         with self.executor_factory(
-                max_workers=min(10, len(resources) or 1)) as w:
+                max_workers=min(3, len(resources) or 1)) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(self.process_server, client, r)] = r
@@ -127,7 +127,7 @@ class DeleteServer(BaseAction):
         client = local_session(
             self.manager.session_factory).client('transfer')
         with self.executor_factory(
-                max_workers=min(10, len(resources) or 1)) as w:
+                max_workers=min(3, len(resources) or 1)) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(self.process_server, client, r)] = r
@@ -206,7 +206,7 @@ class DeleteUser(BaseAction):
         client = local_session(
             self.manager.session_factory).client('transfer')
         with self.executor_factory(
-                max_workers=min(10, len(resources) or 1)) as w:
+                max_workers=min(3, len(resources) or 1)) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(self.process_user, client, r)] = r
