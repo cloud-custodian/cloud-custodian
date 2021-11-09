@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The role with name c7n_test_check_permissions cannot be found."
+        },
+        "ResponseMetadata": {}
+    }
+}

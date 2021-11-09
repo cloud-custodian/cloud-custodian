@@ -785,15 +785,19 @@ class CheckPermissions(Filter):
                 ActionNames=actions).get('EvaluationResults', ())
             return evaluations
 
-        params = dict(PolicySourceArn=arn, ActionNames=actions)
+        params = dict(
+            PolicySourceArn=arn,
+            ActionNames=actions,
+            ignore_err_codes=('NoSuchEntity',))
         if self.boundaries:
             boundary_policy = self.boundaries.get(
                 self.manager.get_arns([r])[0])
             if boundary_policy:
                 params['PermissionsBoundaryPolicyInputList'] = [boundary_policy]
 
-        evaluations = self.manager.retry(
-            client.simulate_principal_policy, **params).get('EvaluationResults', ())
+        evaluations = (self.manager.retry(
+            client.simulate_principal_policy,
+            **params) or {}).get('EvaluationResults', ())
         return evaluations
 
     def get_eval_matcher(self):
