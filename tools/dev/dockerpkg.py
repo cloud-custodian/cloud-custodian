@@ -64,6 +64,12 @@ RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
     $HOME/.poetry/bin/poetry install && cd ../../; done
 
+RUN apt-get install --yes git && pip install git+https://github.com/clumio-code/azure-sdk-trim@v0.1.0#egg=azure-sdk-trim && \\
+    azure-sdk-trim --azure_dir /usr/local/lib/python3.8/site-packages/azure/mgmt && \\
+    python -m compileall -b /usr/local/lib/python3.8/site-packages/azure && \\
+    find /usr/local/lib/python3.8/site-packages/azure -name '*.py' -delete && \\
+    pip uninstall --yes azure-sdk-trim
+
 RUN mkdir /output
 """
 
@@ -147,7 +153,7 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 # Verify the install
 #  - policystream is not in ci due to libgit2 compilation needed
 #  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
+RUN . /usr/local/bin/activate && pytest -p "no:terraform" tools/c7n_policystream
 """
 
 
