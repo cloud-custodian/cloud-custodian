@@ -29,17 +29,17 @@ def load_policies(options, config):
     return policies
 
 
-def get_events(client, func, session_factory):
+def get_events(client, func, session_factory, region):
     events = []
-    events.extend(get_events_from_tag(client, func, session_factory))
+    events.extend(get_events_from_tag(client, func, session_factory, region))
     if not events:
         log.debug('getting policy events')
-        pevents = get_events_from_policy(client, func, session_factory)
+        pevents = get_events_from_policy(client, func, session_factory, region)
         events.extend(pevents)
     return events
 
 
-def get_events_from_tag(client, func, session_factory):
+def get_events_from_tag(client, func, session_factory, region):
     events = []
     try:
         result = client.get_function(FunctionName=func['FunctionName'])
@@ -64,7 +64,7 @@ def get_events_from_tag(client, func, session_factory):
     return events
 
 
-def get_events_from_policy(client, func, session_factory):
+def get_events_from_policy(client, func, session_factory, region):
     events = []
     try:
         result = client.get_policy(FunctionName=func['FunctionName'])
@@ -129,7 +129,7 @@ def region_gc(options, region, policy_config, policies):
             remove.append(f)
 
     for n in remove:
-        events = get_events(client, n, session_factory)
+        events = get_events(client, n, session_factory, region)
         f = mu.LambdaFunction({
             'name': n['FunctionName'],
             'role': n['Role'],
