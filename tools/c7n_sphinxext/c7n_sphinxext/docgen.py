@@ -263,7 +263,8 @@ def write_modified_file(fpath, content, diff_changes=False):
             disk_content = fh.read()
 
     if disk_content:
-        file_md5 = hashlib.md5(disk_content.encode('utf8'))
+        file_md5 = hashlib.md5(disk_content)
+        disk_content = disk_content.decode('utf8')
 
     if file_md5 and content_md5.hexdigest() == file_md5.hexdigest():
         return False

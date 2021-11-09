@@ -12,9 +12,10 @@ package_data = \
 install_requires = \
 ['argcomplete (>=1.12.3,<2.0.0)',
  'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.18.46,<2.0.0)',
- 'botocore (>=1.21.46,<2.0.0)',
+ 'boto3 (>=1.19.12,<2.0.0)',
+ 'botocore (>=1.22.12,<2.0.0)',
  'c7n (>=0.9.14,<0.10.0)',
+ 'docutils (>=0.17.1,<0.18.0)',
  'google-api-python-client>=2.0,<3.0',
  'google-auth>=2.1.0,<3.0.0',
  'google-cloud-logging>=2.6,<3.0',
@@ -34,7 +35,7 @@ install_requires = \
  'tabulate (>=0.8.9,<0.9.0)',
  'typing-extensions (>=3.10.0.2,<4.0.0.0)',
  'urllib3 (>=1.26.7,<2.0.0)',
- 'zipp (>=3.5.0,<4.0.0)']
+ 'zipp (>=3.6.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-gcp',

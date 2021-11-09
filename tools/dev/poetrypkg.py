@@ -20,12 +20,21 @@ def cli():
     some simple tooling to sync poetry files to setup/pip
     """
     # If there is a global installation of poetry, prefer that.
-    poetry_python_lib = os.path.expanduser('~/.poetry/lib')
-    sys.path.insert(0, os.path.realpath(poetry_python_lib))
-    # poetry env vendored deps
-    sys.path.insert(0,
-        os.path.join(poetry_python_lib, 'poetry', '_vendor', 'py{}.{}'.format(
-            sys.version_info.major, sys.version_info.minor)))
+    poetry_python_lib = Path(os.path.expanduser('~/.poetry/lib'))
+    if poetry_python_lib.exists():
+        sys.path.insert(0, os.path.realpath(poetry_python_lib))
+        # poetry env vendored deps
+        sys.path.insert(
+            0,
+            os.path.join(poetry_python_lib, 'poetry', '_vendor', 'py{}.{}'.format(
+                sys.version_info.major, sys.version_info.minor)))
+
+    # If there is a global installation of poetry, prefer that.
+    cur_poetry_python_lib = Path(os.path.expanduser('~/.local/share/pypoetry/venv/lib'))
+    if cur_poetry_python_lib.exists():
+        sys.path.insert(
+            0,
+            str(list(cur_poetry_python_lib.glob('*'))[0] / "site-packages"))
 
 
 # Override the poetry base template as all our readmes files
