@@ -34,7 +34,7 @@ except ImportError:
 # Static event mapping to help simplify cwe rules creation
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
-from c7n.utils import parse_s3, local_session, get_retry, merge_dict
+from c7n.utils import parse_s3, local_session, get_retry, merge_dict, filter_empty
 
 log = logging.getLogger('custodian.serverless')
 
@@ -520,6 +520,7 @@ class LambdaManager:
         self.client.put_function_concurrency(
             FunctionName=func.name,
             ReservedConcurrentExecutions=func.concurrency)
+        return True
 
     def _update_tags(self, existing, new_tags):
         # tag dance
@@ -964,7 +965,7 @@ class AWSEventBase:
     @property
     def session(self):
         if not self._session:
-            self._session = self.session_factory()
+            self._session = local_session(self.session_factory)
         return self._session
 
     @property
@@ -972,6 +973,32 @@ class AWSEventBase:
         if not self._client:
             self._client = self.session.client(self.client_service)
         return self._client
+
+    def add_permission(
+            self, client, func, StatementId=None, Action=None, Principal=None,
+            SourceArn=None, SourceAccount=None, FunctionName=None, delay=None):
+        # additional parameters we don't use
+        # boto add_permission docs - https://bit.ly/3bQRP4p
+        # RevisionId=None, Qualifier=None, EventSourceToken=None
+        statement = filter_empty({
+            'StatementId': StatementId,
+            'Action': Action,
+            'Principal': Principal,
+            'SourceArn': SourceArn,
+            'SourceAccount': SourceAccount
+        })
+        try:
+            response = client.add_permission(
+                FunctionName=func.name,
+                **statement)
+            log.debug('Add Permission Result %s', response)
+            if delay:
+                time.sleep(delay)
+        except client.exceptions.ResourceConflictException as e:
+            if 'provide a new statement id' in str(e):
+                return True
+            raise
+        return True
 
     def remove_permissions(self, func, remove_permission):
         # typically the entire function will be deleted so we dont
@@ -1151,16 +1178,13 @@ class CloudWatchEventSource(AWSEventBase):
             response = {'RuleArn': rule['Arn']}
 
         client = self.session.client('lambda')
-        try:
-            client.add_permission(
-                FunctionName=func.name,
-                StatementId=func.event_name,
-                SourceArn=response['RuleArn'],
-                Action='lambda:InvokeFunction',
-                Principal='events.amazonaws.com')
-            log.debug('Added lambda invoke cwe rule permission')
-        except client.exceptions.ResourceConflictException:
-            pass
+        self.add_permission(
+            client, func,
+            StatementId=func.event_name,
+            SourceArn=response['RuleArn'],
+            Action='lambda:InvokeFunction',
+            Principal='events.amazonaws.com')
+        log.debug('Added lambda invoke cwe rule permission')
 
         # Add Targets
         found = False
@@ -1291,13 +1315,11 @@ class SecurityHubAction:
         client.delete_action_target(ActionTargetArn=self._get_arn())
 
 
-class BucketLambdaNotification:
+class BucketLambdaNotification(AWSEventBase):
     """ Subscribe a lambda to bucket notifications directly. """
 
     def __init__(self, data, session_factory, bucket):
-        self.data = data
-        self.session_factory = session_factory
-        self.session = session_factory()
+        super().__init__(data, session_factory)
         self.bucket = bucket
 
     def delta(self, src, tgt):
@@ -1329,7 +1351,7 @@ class BucketLambdaNotification:
             'Events': self.data.get('events', ['s3:ObjectCreated:*'])}
         if self.data.get('filters'):
             n_params['Filters'] = {
-                'Key': {'FilterRules': self.filters}}
+                'Key': {'FilterRules': self.data['filters']}}
 
         if found:
             if self.delta(found, n_params):
@@ -1349,11 +1371,7 @@ class BucketLambdaNotification:
             params['SourceArn'] = 'arn:aws:s3:::*'
         else:
             params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
-        try:
-            lambda_client.add_permission(**params)
-        except lambda_client.exceptions.ResourceConflictException:
-            pass
-
+        self.add_permission(lambda_client, func, **params)
         notifies.setdefault('LambdaFunctionConfigurations', []).append(n_params)
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'], NotificationConfiguration=notifies)
@@ -1384,39 +1402,33 @@ class BucketLambdaNotification:
         return True
 
 
-class CloudWatchLogSubscription:
+class CloudWatchLogSubscription(AWSEventBase):
     """ Subscribe a lambda to a log group[s]
     """
 
     iam_delay = 1.5
 
     def __init__(self, session_factory, log_groups, filter_pattern):
+        super().__init__({}, session_factory)
         self.log_groups = log_groups
         self.filter_pattern = filter_pattern
-        self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('logs')
 
     def add(self, func):
         lambda_client = self.session.client('lambda')
+        logs_client = self.session.client('logs')
         for group in self.log_groups:
             log.info(
-                "Creating subscription filter for %s" % group['logGroupName'])
+                "Creating subscription filter for %s", group['logGroupName'])
             region = group['arn'].split(':', 4)[3]
-            try:
-                lambda_client.add_permission(
-                    FunctionName=func.name,
-                    StatementId=group['logGroupName'][1:].replace('/', '-'),
-                    SourceArn=group['arn'],
-                    Action='lambda:InvokeFunction',
-                    Principal='logs.%s.amazonaws.com' % region)
-                log.debug("Added lambda ipo nvoke log group permission")
-                # iam eventual consistency and propagation
-                time.sleep(self.iam_delay)
-            except lambda_client.exceptions.ResourceConflictException:
-                pass
+            self.add_permission(
+                lambda_client, func,
+                StatementId=group['logGroupName'][1:].replace('/', '-'),
+                SourceArn=group['arn'],
+                Action='lambda:InvokeFunction',
+                Principal='logs.%s.amazonaws.com' % region, delay=self.iam_delay)
+            log.debug("Added lambda invoke log group permission")
             # Consistent put semantics / ie no op if extant
-            self.client.put_subscription_filter(
+            logs_client.put_subscription_filter(
                 logGroupName=group['logGroupName'],
                 filterName=func.event_name,
                 filterPattern=self.filter_pattern,
@@ -1424,6 +1436,7 @@ class CloudWatchLogSubscription:
 
     def remove(self, func, func_deleted=True):
         lambda_client = self.session.client('lambda')
+        logs_client = self.session.client('logs')
         found = False
         for group in self.log_groups:
             # if the function isn't deleted we need to do some cleanup
@@ -1437,13 +1450,13 @@ class CloudWatchLogSubscription:
                 except lambda_client.exceptions.ResourceNotFoundException:
                     pass
             try:
-                response = self.client.delete_subscription_filter(
+                response = logs_client.delete_subscription_filter(
                     logGroupName=group['logGroupName'],
                     filterName=func.event_name)
                 log.debug("Removed subscription filter from: %s",
                           group['logGroupName'])
                 found = True
-            except lambda_client.exceptions.ResourceNotFoundException:
+            except logs_client.exceptions.ResourceNotFoundException:
                 pass
         return found
 
@@ -1509,15 +1522,15 @@ class SQSSubscription:
         return found
 
 
-class SNSSubscription:
+class SNSSubscription(AWSEventBase):
     """ Subscribe a lambda to one or more SNS topics.
     """
 
     iam_delay = 1.5
 
     def __init__(self, session_factory, topic_arns):
+        super().__init__({}, session_factory)
         self.topic_arns = topic_arns
-        self.session_factory = session_factory
 
     @staticmethod
     def _parse_arn(arn):
@@ -1527,36 +1540,32 @@ class SNSSubscription:
         return region, topic_name, statement_id
 
     def add(self, func):
-        session = local_session(self.session_factory)
-        lambda_client = session.client('lambda')
+        lambda_client = self.session.client('lambda')
+        sns_client = self.session.client('sns')
+
         for arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(arn)
 
             log.info("Subscribing %s to %s" % (func.name, topic_name))
 
             # Add permission to lambda for sns invocation.
-            try:
-                lambda_client.add_permission(
-                    FunctionName=func.name,
-                    StatementId=statement_id,
-                    SourceArn=arn,
-                    Action='lambda:InvokeFunction',
-                    Principal='sns.amazonaws.com')
-                log.debug("Added permission for sns to invoke lambda")
-                # iam eventual consistency and propagation
-                time.sleep(self.iam_delay)
-            except lambda_client.exceptions.ResourceConflictException:
-                pass
+            self.add_permission(
+                lambda_client, func,
+                StatementId=statement_id,
+                SourceArn=arn,
+                Action='lambda:InvokeFunction',
+                Principal='sns.amazonaws.com',
+                delay=self.iam_delay
+            )
+            log.debug("Added permission for sns to invoke lambda")
 
             # Subscribe the lambda to the topic, idempotent
-            sns_client = session.client('sns')
             sns_client.subscribe(
                 TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
     def remove(self, func, func_deleted=True):
-        session = local_session(self.session_factory)
-        lambda_client = session.client('lambda')
-        sns_client = session.client('sns')
+        lambda_client = self.session.client('lambda')
+        sns_client = self.session.client('sns')
 
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
@@ -1598,16 +1607,13 @@ class BucketSNSNotification(SNSSubscription):
     """ Subscribe a lambda to bucket notifications via SNS. """
 
     def __init__(self, session_factory, bucket, topic=None):
+        super().__init__(session_factory, {})
         # NB: We are overwriting __init__ vs. extending.
-        self.session_factory = session_factory
-        self.session = session_factory()
         self.topic_arns = self.get_topic(bucket) if topic is None else [topic]
-        self.client = self.session.client('sns')
 
     def get_topic(self, bucket):
-        session = local_session(self.session_factory)
-        sns = session.client('sns')
-        s3 = session.client('s3')
+        sns = self.session.client('sns')
+        s3 = self.session.client('s3')
 
         notifies = bucket['Notification']
         if 'TopicConfigurations' not in notifies:
@@ -1718,30 +1724,35 @@ class ConfigRule(AWSEventBase):
         rule = self.get(func.name)
         params = self.get_rule_params(func)
 
-        if rule and self.delta(rule, params):
+        if rule and (self.delta(rule, params) or rule.get('ConfigRuleState') != 'DELETING'):
             log.debug("Updating config rule for %s" % self)
             rule.update(params)
-            return LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
+            rule['ConfigRuleState'] = 'ACTIVE'
+            LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
+        elif rule and rule.get('ConfigRuleState', '') != 'ACTIVE':
+            log.warning('Config rule %s in state transition: %s, try again later',
+                        params['ConfigRuleName'],
+                        rule['ConfigRuleState'])
+            return
         elif rule:
             log.debug("Config rule up to date")
             return
+
         client = self.session.client('lambda')
-        try:
-            client.add_permission(
-                FunctionName=func.name,
-                StatementId=func.name,
-                SourceAccount=func.arn.split(':')[4],
-                Action='lambda:InvokeFunction',
-                Principal='config.amazonaws.com')
-        except client.exceptions.ResourceConflictException:
-            pass
+        self.add_permission(
+            client, func,
+            StatementId=func.name,
+            SourceAccount=func.arn.split(':')[4],
+            Action='lambda:InvokeFunction',
+            Principal='config.amazonaws.com')
 
         log.debug("Adding config rule for %s" % func.name)
         return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
     def remove(self, func, func_deleted=True):
         rule = self.get(func.name)
-        if not rule:
+        if not rule or rule.get('ConfigRuleState', '') == 'DELETING':
+            log.debug('Config rule delete in progress')
             return
         log.info("Removing config rule for %s", func.name)
         try:
