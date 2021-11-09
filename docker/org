@@ -34,7 +34,8 @@ RUN . /usr/local/bin/activate && \
     for pkg in $providers; do cd tools/c7n_$pkg && \
     $HOME/.poetry/bin/poetry install && cd ../../; done
 
-RUN apt-get install --yes git && pip install git+https://github.com/clumio-code/azure-sdk-trim@v0.1.0#egg=azure-sdk-trim && \
+RUN apt-get install --yes git && \
+    pip install git+https://github.com/clumio-code/azure-sdk-trim@v0.1.0#egg=azure-sdk-trim && \
     azure-sdk-trim --azure_dir /usr/local/lib/python3.8/site-packages/azure/mgmt && \
     python -m compileall -b /usr/local/lib/python3.8/site-packages/azure && \
     find /usr/local/lib/python3.8/site-packages/azure -name '*.py' -delete && \
