@@ -457,6 +457,7 @@ class LambdaManager:
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
         existing = self.get(func.name, qualifier)
+        function_updated_waiter = self.client.get_waiter('function_updated')
 
         if s3_uri:
             # TODO: support versioned buckets
@@ -473,6 +474,7 @@ class LambdaManager:
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
                 result = self.client.update_function_code(**params)
+                function_updated_waiter.wait(FunctionName=func.name)
                 changed = True
 
             # TODO/Consider also set publish above to false, and publish

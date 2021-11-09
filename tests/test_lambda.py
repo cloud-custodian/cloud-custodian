@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import time
 from mock import patch
 
 from botocore.exceptions import ClientError
@@ -9,6 +10,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources.aws import shape_validate
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
+from pytest_terraform import terraform
 
 
 SAMPLE_FUNC = """\
@@ -608,3 +610,36 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+@terraform('aws_lambda_check_permissions', teardown=terraform.TEARDOWN_IGNORE)
+def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions):
+    '''Ensure that the check-permissions filter doesn't raise an exception if
+    a Lambda function's role has been deleted.'''
+
+    factory = test.replay_flight_data('test_aws_lambda_check_permission_deleted_role')
+
+    iam_client = factory().client('iam')
+    role_name = aws_lambda_check_permissions['aws_iam_role.lambda.name']
+    function_name = aws_lambda_check_permissions[
+        'aws_lambda_function.test_check_permissions.function_name']
+
+    iam_client.delete_role(RoleName=role_name)
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            'name': 'lambda-check-deleted-role',
+            'resource': 'aws.lambda',
+            'filters': [
+                {'FunctionName': function_name},
+                {'type': 'check-permissions',
+                 'match': 'denied',
+                 'actions': ['iam:CreateUser']}
+            ]
+        },
+        session_factory=factory)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
