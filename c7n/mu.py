@@ -1729,7 +1729,7 @@ class ConfigRule(AWSEventBase):
             rule.update(params)
             rule['ConfigRuleState'] = 'ACTIVE'
             LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
-        elif rule and rule.get('ConfigRuleState', '') != 'ACTIVE':
+        elif rule and rule.get('ConfigRuleState', '') not in ('ACTIVE', 'EVALUATING'):
             log.warning('Config rule %s in state transition: %s, try again later',
                         params['ConfigRuleName'],
                         rule['ConfigRuleState'])
