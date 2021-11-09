@@ -9,7 +9,7 @@ import logging
 import sys
 
 from c7n.credentials import SessionFactory
-from c7n.config import Config
+from c7n.config import Config, Bag
 from c7n.policy import load as policy_load, PolicyCollection
 from c7n import mu
 
@@ -57,10 +57,16 @@ def get_events_from_tag(client, func, session_factory, region):
 
     info = result.get('Tags', {}).get('custodian-info')
     info = dict([t.split('=') for t in info.split(':')])
-    if info['mode'] == 'config-rule':
+    if info['mode'] in ('config-rule', 'config-poll-rule'):
         events.append(mu.ConfigRule({}, session_factory))
-    elif info['mode'] == 'cloudtrail':
+    elif info['mode'] in (
+            'cloudtrail', 'periodic', 'phd',
+            'ec2-instance-state', 'asg-instance-state',
+            'guard-duty', 'hub-finding'):
         events.append(mu.CloudWatchEventSource({}, session_factory))
+    elif info['mode'] == 'hub-action':
+        events.append(mu.SecurityHubAction(Bag({'mode': {}})))
+
     return events
 
 
