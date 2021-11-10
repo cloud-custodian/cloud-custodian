@@ -3,6 +3,8 @@
 import time
 
 from gcp_common import BaseTest, event_data
+from c7n_gcp.resources.network import PortRangeFirewallFilter
+from c7n.filters.vpc import ParseMaxAndMinPorts
 from googleapiclient.errors import HttpError
 
 
@@ -64,6 +66,20 @@ class FirewallTest(BaseTest):
         except HttpError as e:
             self.assertTrue("was not found" in str(e))
 
+    def test_firewall_attached_to_cluster_filter(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'gcp-firewall-attached-to-cluster-filter', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-firewall-attached-to-cluster-filter',
+             'resource': 'gcp.firewall',
+             'filters': ['attached-to-cluster']},
+            session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertTrue(resources[0]['network'].endswith('networks/network-129-green'))
+
 
 class NetworkTest(BaseTest):
 
@@ -78,12 +94,187 @@ class NetworkTest(BaseTest):
                 "global/networks/default"})
         self.assertEqual(network['name'], 'default')
         self.assertEqual(network['autoCreateSubnetworks'], True)
-        self.assertEqual(
-            p.resource_manager.get_urns([network]),
-            [
-                'gcp:compute::cloud-custodian:vpc/default',
-            ],
-        )
+
+    def test_firewall_port_range_filter(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'firewall-port-range-filter', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-firewall',
+             'resource': 'gcp.firewall',
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'op': 'regex',
+                 'value': 'example.*'
+             }, {
+                 'type': 'port-range',
+                 'key': 'allowed[?IPProtocol==\'tcp\'].ports[]',
+                 'required-ports': '20, 50-60',
+                 'allow-partial': False
+             }]}, validate=True, session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_port_range_firewall_filter_is_port_range_token(self):
+        tokens_and_expected_results = {'10-20': True, '15': False}
+
+        for token, expected_result in tokens_and_expected_results.items():
+            actual_result = PortRangeFirewallFilter._is_port_range_token(token)
+
+            self.assertEqual(actual_result, expected_result)
+
+    def test_port_range_firewall_filter_parse_port_token(self):
+        port_token = '25'
+        expected_port = 25
+
+        actual_port = ParseMaxAndMinPorts.parse_port_token(port_token)
+
+        self.assertEqual(actual_port, expected_port)
+
+    def test_port_range_firewall_filter_parse_port_token_as_port_range(self):
+        port_token = '25'
+        expected_range = (25, 25)
+
+        actual_range = PortRangeFirewallFilter._parse_port_token_as_port_range(port_token)
+
+        self.assertEqual(actual_range, expected_range)
+
+    def test_port_range_firewall_filter_parse_port_range_token(self):
+        port_range_token = '35-45'
+        expected_port_range = (35, 45)
+
+        actual_port_range = ParseMaxAndMinPorts.parse_port_range_token(port_range_token)
+
+        self.assertEqual(actual_port_range, expected_port_range)
+
+    def test_port_range_firewall_filter_parse_ranges(self):
+        raw_ranges = '20, 50-51'
+        expected_ports = {(20, 20), (50, 51)}
+
+        actual_ports = PortRangeFirewallFilter._parse_ranges(raw_ranges)
+
+        self.assertEqual(actual_ports, expected_ports)
+
+    def test_port_range_firewall_filter_parse_tokens(self):
+        raw_tokens = '20, 50-51'
+        expected_tokens = ['20', '50-51']
+
+        actual_tokens = PortRangeFirewallFilter._parse_tokens(raw_tokens)
+
+        self.assertEqual(actual_tokens, expected_tokens)
+
+    def test_port_range_firewall_filter_sort_and_merge_intersecting_ranges(self):
+        ranges = {(63, 70), (61, 61), (45, 60), (40, 50), (21, 30), (10, 20)}
+        expected_ranges = [(10, 30), (40, 61), (63, 70)]
+
+        actual_ranges = PortRangeFirewallFilter._sort_and_merge_intersecting_ranges(ranges)
+
+        self.assertEqual(actual_ranges, expected_ranges)
+
+    def test_port_range_firewall_filter_is_range_intersecting_or_touching_another_range(self):
+        ranges_and_expected_results = {
+            ((20, 21), (22, 22)): True,
+            ((20, 21), (21, 22)): True,
+            ((20, 21), (23, 24)): False,
+        }
+
+        for ranges, expected_result in ranges_and_expected_results.items():
+            range1, range2 = ranges
+            actual_result = \
+                PortRangeFirewallFilter._is_range_intersecting_or_touching_another_range(
+                    range1, range2)
+            swap_actual_result = \
+                PortRangeFirewallFilter._is_range_intersecting_or_touching_another_range(
+                    range2, range1)
+
+            self.assertEqual(actual_result, expected_result)
+            self.assertEqual(swap_actual_result, expected_result)
+
+    def test_port_range_firewall_filter_is_subset(self):
+        examples = {
+            1: (({(10, 20)}, {(10, 10), (11, 25)}), True),
+            2: (({(19, 19)}, {(18, 22)}), True),
+            3: (({(20, 24)}, {(20, 21), (22, 24)}), True),
+            4: (({(20, 24)}, {(20, 21), (23, 24)}), False),
+            5: (({(20, 20), (23, 24)}, {(20, 21), (23, 24)}), True),
+        }
+
+        for example, containers_and_expected_results in examples.items():
+            maybe_subset, container = containers_and_expected_results[0]
+            merged_maybe_subset = PortRangeFirewallFilter._sort_and_merge_intersecting_ranges(
+                maybe_subset)
+            merged_container = PortRangeFirewallFilter._sort_and_merge_intersecting_ranges(
+                container)
+            actual_result = PortRangeFirewallFilter._is_subset(
+                merged_maybe_subset, merged_container)
+
+            self.assertEqual(actual_result, containers_and_expected_results[1])
+
+    def test_route_get_insert(self):
+        project_id = 'cloud-custodian'
+        network_name = 'https://www.googleapis.com/compute/v1/projects/' \
+                       'cloud-custodian/regions/us-east1/subnetworks/subnet'
+        factory = self.replay_flight_data('vpc-get-insert', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'gcp-vpc-insert',
+            'resource': 'gcp.vpc',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.subnetworks.insert']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('gcp-vpc-insert.json')
+        subnetworks = exec_mode.run(event, None)
+
+        self.assertEqual(len(subnetworks), 1)
+        self.assertEqual(subnetworks[0]['subnetworks'][0], network_name)
+
+    def test_route_get_add_peering(self):
+        project_id = 'cloud-custodian'
+        network_name = 'https://www.googleapis.com/compute/v1/projects/' \
+                       'cloud-custodian/regions/us-east1/subnetworks/subnet'
+        factory = self.replay_flight_data('vpc-get-add-peering', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'gcp-vpc-add-peering',
+            'resource': 'gcp.vpc',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.subnetworks.addPeering']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('gcp-get-add-peering.json')
+        subnetworks = exec_mode.run(event, None)
+
+        self.assertEqual(len(subnetworks), 1)
+        self.assertEqual(subnetworks[0]['subnetworks'][0], network_name)
+
+    def test_vpc_dns_policy_filter(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('vpc-dns-policy-filter-get', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'vpc-dns-policy',
+            'resource': 'gcp.vpc',
+            'filters': [{'not': [{
+                'type': 'vpc-dns-policy-filter',
+                'key': 'enableLogging',
+                'op': 'eq',
+                'value': True
+            }]}]
+        },
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'kseoji')
 
 
 class SubnetTest(BaseTest):
