@@ -2088,7 +2088,7 @@ class LaunchTemplate(query.QueryResourceManager):
         service = 'ec2'
         date = 'CreateTime'
         enum_spec = (
-            'describe_launch_templates', 'LaunchTemplates', None)
+            'describe_launch_template_versions', 'LaunchTemplates', None)
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"

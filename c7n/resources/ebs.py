@@ -276,7 +276,7 @@ class SnapshotUnusedFilter(Filter):
     def get_permissions(self):
         return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
-            for m in ('asg', 'launch-config', 'ami')]))
+            for m in ('asg', 'launch-config', 'ami', 'launch-template-version')]))
 
     def _pull_asg_snapshots(self):
         asgs = self.manager.get_resource_manager('asg').resources()
