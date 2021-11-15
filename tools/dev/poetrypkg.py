@@ -123,7 +123,8 @@ def gen_setup(package_dir):
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-o', '--output', default='setup.py')
-def gen_frozensetup(package_dir, output):
+@click.option('-x', '--exclude', multiple=True)
+def gen_frozensetup(package_dir, output, exclude):
     """Generate a frozen setup suitable for distribution.
     """
     from poetry.core.masonry.builders import sdist
@@ -138,7 +139,7 @@ def gen_frozensetup(package_dir, output):
 
         @classmethod
         def convert_dependencies(cls, package, dependencies):
-            reqs, default = locked_deps(package, poetry)
+            reqs, default = locked_deps(package, poetry, exclude)
             resolve_source_deps(poetry, package, reqs, frozen=True)
             return reqs, default
 
@@ -184,10 +185,16 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
             seen.add(cdep)
 
 
-def locked_deps(package, poetry):
+def locked_deps(package, poetry, exclude=()):
     reqs = []
     packages = poetry.locker.locked_repository(False).packages
+
+    project_deps = {
+        r.name: r for r in poetry.package.requires}
     for p in packages:
+        if p.name in exclude:
+            reqs.append(project_deps[p.name].to_pep_508())
+            continue
         dep = p.to_dependency()
         line = "{}=={}".format(p.name, p.version)
         requirement = dep.to_pep_508()
