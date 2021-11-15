@@ -5,18 +5,6 @@ variables:
 - group: CustodianCoreCI
 
 jobs:
-- job: 'CustodianOmniSSM'
-  displayName: 'Tool Tests - OmniSSM'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  steps:
-  - checkout: self
-    fetchDepth: 1
-  - task: GoTool@0
-    inputs:
-      version: '1.12.6'
-  - script: make test
-    workingDirectory: tools/omnissm/
 
 - job: 'CustodianDockerBuild'
   displayName: 'Docker Build'
