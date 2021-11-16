@@ -295,7 +295,7 @@ class Disk(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
-                        'resourceId': resource_info['disk_id']})
+                        'disk': resource_info['disk_id']})
 
         @staticmethod
         def get_label_params(resource, all_labels):
