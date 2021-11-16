@@ -42,7 +42,7 @@ pkg-show-update:
 
 pkg-freeze-setup:
 	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg; done
+	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg -x sendgrid -r starkbank-ecdsa; done
 
 pkg-gen-setup:
 	python3 tools/dev/poetrypkg.py gen-setup -p .
