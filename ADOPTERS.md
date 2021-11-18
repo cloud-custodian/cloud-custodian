@@ -4,7 +4,6 @@ There are some unreferenceable users that are leveraging Cloud Custodian that ar
 
 There are many additional adopters of Cloud Custodian in the evaluating phase that will be added to this list as they transition to production deployments.
 
-- Amazon Web Services
 - Capital One
 - Code 42
 - Grupo
