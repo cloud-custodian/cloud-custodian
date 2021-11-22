@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import itertools
-from tools.c7n_gcp.c7n_gcp.filters.iampolicy import IamPolicyFilter
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
