@@ -180,7 +180,7 @@ class LambdaTest(BaseTest):
                 'name': 'lambda-check',
                 'resource': 'lambda',
                 'filters': [
-                    {'FunctionName': 'custodian-log-age'},
+                    {'FunctionName': 'custodian-ec2-public'},
                     {'type': 'check-permissions',
                      'match': 'allowed',
                      'actions': ['iam:ListUsers']}]
@@ -188,6 +188,11 @@ class LambdaTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         assert not resources
+
+        # Re-run, without respecting permission boundaries
+        p.data['filters'][1]['boundaries'] = False
+        resources = p.run()
+        assert len(resources) == 1
 
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")

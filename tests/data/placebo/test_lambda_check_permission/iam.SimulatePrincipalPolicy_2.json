@@ -5,7 +5,7 @@
             {
                 "EvalActionName": "iam:ListUsers",
                 "EvalResourceName": "arn:aws:iam::644160558196:user/",
-                "EvalDecision": "explicitDeny",
+                "EvalDecision": "allowed",
                 "MatchedStatements": [
                     {
                         "SourcePolicyId": "ReadOnlyAccess",
@@ -18,18 +18,6 @@
                             "Line": 1070,
                             "Column": 4
                         }
-                    },
-                    {
-                        "SourcePolicyId": "IAMBlockRead",
-                        "SourcePolicyType": "Permissions Boundary Policy",
-                        "StartPosition": {
-                            "Line": 3,
-                            "Column": 19
-                        },
-                        "EndPosition": {
-                            "Line": 14,
-                            "Column": 10
-                        }
                     }
                 ],
                 "MissingContextValues": [],
@@ -37,7 +25,7 @@
                     "AllowedByOrganizations": true
                 },
                 "PermissionsBoundaryDecisionDetail": {
-                    "AllowedByPermissionsBoundary": false
+                    "AllowedByPermissionsBoundary": true
                 }
             }
         ],
