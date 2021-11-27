@@ -394,7 +394,7 @@ class Snapshot(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'snapshot_id': resource_info['snapshot_id']})
+                        'snapshot': resource_info['snapshot_id']})
 
 
 @Snapshot.action_registry.register('delete')
