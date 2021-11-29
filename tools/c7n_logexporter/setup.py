@@ -35,7 +35,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-logexporter',
-    'version': '0.4.13',
+    'version': '0.4.14',
     'description': 'Cloud Custodian - Cloud Watch Log S3 exporter',
     'license': 'Apache-2.0',
     'classifiers': [

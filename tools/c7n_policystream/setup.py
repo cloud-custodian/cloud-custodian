@@ -17,7 +17,7 @@ install_requires = \
  'importlib-metadata (>=4.8.1,<5.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
- 'pygit2>=1.5,<1.6',
+ 'pygit2>=1.7,<1.8',
  'pyrsistent (>=0.18.0,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=5.4.1,<6.0.0)',
@@ -35,7 +35,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-policystream',
-    'version': '0.4.13',
+    'version': '0.4.14',
     'description': 'Cloud Custodian - Git Commits as Logical Policy Changes',
     'license': 'Apache-2.0',
     'classifiers': [

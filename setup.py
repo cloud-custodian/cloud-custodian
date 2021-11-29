@@ -29,7 +29,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n',
-    'version': '0.9.14',
+    'version': '0.9.15',
     'description': 'Cloud Custodian - Policy Rules Engine',
     'license': 'Apache-2.0',
     'classifiers': [

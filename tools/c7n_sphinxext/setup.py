@@ -43,7 +43,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.13',
+    'version': '1.1.14',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'license': 'Apache-2.0',
     'classifiers': [

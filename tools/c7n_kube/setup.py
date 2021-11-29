@@ -36,7 +36,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.13',
+    'version': '0.2.14',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'license': 'Apache-2.0',
     'classifiers': [

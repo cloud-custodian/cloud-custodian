@@ -34,7 +34,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-terraform',
-    'version': '0.1.4',
+    'version': '0.1.5',
     'description': 'Cloud Custodian Provider for evaluating Terraform',
     'license': 'Apache-2.0',
     'classifiers': [

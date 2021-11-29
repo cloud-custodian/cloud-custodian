@@ -35,7 +35,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-org',
-    'version': '0.6.13',
+    'version': '0.6.14',
     'description': 'Cloud Custodian - Parallel Execution',
     'license': 'Apache-2.0',
     'classifiers': [
