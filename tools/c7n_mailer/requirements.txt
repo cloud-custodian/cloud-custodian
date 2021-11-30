@@ -22,9 +22,8 @@ pyyaml==5.4.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (p
 redis==3.5.3; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 requests==2.26.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 s3transfer==0.5.0; python_version >= "3.6"
-sendgrid==6.9.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+sendgrid (>=6.1.1,<7.0.0); (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6"
-starkbank-ecdsa==1.1.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 typing-extensions==3.10.0.2; python_version >= "3.6" and python_version < "3.8"
 urllib3==1.26.7; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.6"
 zipp==3.6.0; python_version >= "3.6" and python_version < "3.8"

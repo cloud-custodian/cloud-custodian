@@ -4,11 +4,10 @@
         "ResponseMetadata": {},
         "AccessPointList": [
             {
-                "Name": "c7n-ap-moving-doe",
+                "Name": "c7n-ap-liberal-anemone",
                 "NetworkOrigin": "Internet",
-                "Bucket": "c7n-ap-moving-doe",
-                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-moving-doe",
-                "Alias": "c7n-ap-moving-doe-4zh4cmmki3my5asuwpqiocjgrqknsuse1a-s3alias"
+                "Bucket": "c7n-ap-liberal-anemone",
+                "AccessPointArn": "arn:aws:s3:us-east-2:644160558196:accesspoint/c7n-ap-liberal-anemone"
             }
         ]
     }

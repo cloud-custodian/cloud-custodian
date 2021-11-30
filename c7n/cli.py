@@ -122,6 +122,9 @@ def _report_options(p):
         '--format', default='csv', choices=['csv', 'grid', 'simple', 'json'],
         help="Format to output data in (default: %(default)s). "
         "Options include simple, grid, csv, json")
+    p.add_argument(
+        '--all-findings', default=False, action="store_true",
+        help="Outputs all findings per resource. Defaults to a single finding per resource. ")
 
 
 def _metrics_options(p):
