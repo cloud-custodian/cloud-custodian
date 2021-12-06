@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-b182bbc9-fecd-4503-9e3a-24bdb2733abb",
+                "FileSystemId": "fs-0d3f38476c955d214",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0d3f38476c955d214",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 51,
+                    "second": 7,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "secured-efs",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1cbcbea-2ce1-4794-90b1-fe58da4ce954",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "secured-efs"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ]
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-a1b107d5-bb3a-476c-bc9e-a4b3f00c8fdc",
+                "FileSystemId": "fs-07b922135ba1c9c9e",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-07b922135ba1c9c9e",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 50,
+                    "second": 30,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "non-secured-efs",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1cbcbea-2ce1-4794-90b1-fe58da4ce954",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "non-secured-efs"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+}

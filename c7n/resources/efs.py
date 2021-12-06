@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
@@ -227,3 +229,68 @@ class LifecyclePolicy(Filter):
             except client.exceptions.FileSystemNotFound:
                 continue
         return resources
+
+
+@ElasticFileSystem.filter_registry.register('check-secure-transport')
+class CheckSecureTransport(Filter):
+    """Find EFS that does not enforce secure transport
+
+    :Example:
+
+    .. code-block:: yaml
+
+     - name: efs-securetransport-check-policy
+       resource: efs
+       filters:
+         - check-secure-transport
+
+    To configure an EFS to enforce secure transport, set up the appropriate
+    Effect and Condition for its policy document. For example:
+
+    .. code-block:: json
+
+        {
+            "Sid": "efs-statement-b3f6b59b-d938-4001-9154-508f67707073",
+            "Effect": "Deny",
+            "Principal": { "AWS": "*" },
+            "Action": "*",
+            "Condition": {
+                "Bool": { "aws:SecureTransport": "false" }
+            }
+        }
+    """
+
+    schema = type_schema('check-secure-transport')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
+
+    def securetransport_check_policy(self, client, resource):
+        try:
+            resp = client.describe_file_system_policy(FileSystemId=resource['FileSystemId'])
+            if 'Policy' in resp:
+                policies = resp['Policy']
+        except Exception as e:
+            if e.response['Error']['Code'] == 'PolicyNotFound':
+                return True
+
+        statements = json.loads(policies)['Statement']
+        if isinstance(statements, dict):
+            statements = [statements]
+
+        for s in statements:
+            try:
+                if ((s['Effect'] == 'Deny' and
+                         s['Condition']['Bool']['aws:SecureTransport'] == 'false') or
+                    (s['Effect'] == 'Allow' and
+                         s['Condition']['Bool']['aws:SecureTransport'] == 'true')):
+                    return False
+            except (KeyError, TypeError): pass
+
+        return True
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('efs')
+        results = [r for r in resources if self.securetransport_check_policy(c, r)]
+        self.log.info(
+            "%d of %d EFS policies don't enforce secure transport",
+            len(results), len(resources))
+        return results
