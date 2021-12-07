@@ -5,21 +5,21 @@
         "FileSystems": [
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "quickCreated-b182bbc9-fecd-4503-9e3a-24bdb2733abb",
-                "FileSystemId": "fs-0d3f38476c955d214",
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0d3f38476c955d214",
+                "CreationToken": "some-token",
+                "FileSystemId": "fs-06f6ce85b4976bd7f",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-06f6ce85b4976bd7f",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2021,
                     "month": 12,
                     "day": 6,
-                    "hour": 13,
-                    "minute": 51,
-                    "second": 7,
+                    "hour": 15,
+                    "minute": 52,
+                    "second": 15,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
-                "Name": "secured-efs",
+                "Name": "efs-with-secure-transport",
                 "NumberOfMountTargets": 0,
                 "SizeInBytes": {
                     "Value": 6144,
@@ -33,31 +33,27 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "secured-efs"
-                    },
-                    {
-                        "Key": "aws:elasticfilesystem:default-backup",
-                        "Value": "enabled"
+                        "Value": "efs-with-secure-transport"
                     }
                 ]
             },
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "quickCreated-a1b107d5-bb3a-476c-bc9e-a4b3f00c8fdc",
-                "FileSystemId": "fs-07b922135ba1c9c9e",
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-07b922135ba1c9c9e",
+                "CreationToken": "some-token-2",
+                "FileSystemId": "fs-005ab9082da5b0a27",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-005ab9082da5b0a27",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2021,
                     "month": 12,
                     "day": 6,
-                    "hour": 13,
-                    "minute": 50,
-                    "second": 30,
+                    "hour": 15,
+                    "minute": 52,
+                    "second": 15,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
-                "Name": "non-secured-efs",
+                "Name": "efs-without-secure-transport",
                 "NumberOfMountTargets": 0,
                 "SizeInBytes": {
                     "Value": 6144,
@@ -71,11 +67,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "non-secured-efs"
-                    },
-                    {
-                        "Key": "aws:elasticfilesystem:default-backup",
-                        "Value": "enabled"
+                        "Value": "efs-without-secure-transport"
                     }
                 ]
             }

@@ -278,12 +278,13 @@ class CheckSecureTransport(Filter):
 
         for s in statements:
             try:
-                if ((s['Effect'] == 'Deny' and
-                         s['Condition']['Bool']['aws:SecureTransport'] == 'false') or
-                    (s['Effect'] == 'Allow' and
-                         s['Condition']['Bool']['aws:SecureTransport'] == 'true')):
+                effect = s['Effect']
+                secureTransportValue = s['Condition']['Bool']['aws:SecureTransport']
+                if ((effect == 'Deny' and secureTransportValue == 'false') or
+                        (effect == 'Allow' and secureTransportValue == 'true')):
                     return False
-            except (KeyError, TypeError): pass
+            except (KeyError, TypeError):
+                pass
 
         return True
 

@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "FileSystemId": "fs-0d3f38476c955d214",
-        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-c8abc7d0-22e5-4e0c-841f-76f97a96e1f2\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-b3f6b59b-d938-4001-9154-508f67707073\",\n    \"Effect\" : \"Deny\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"*\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0d3f38476c955d214\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"aws:SecureTransport\" : \"false\"\n      }\n    }\n  } ]\n}"
+        "FileSystemId": "fs-06f6ce85b4976bd7f",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"EnforceSecureTransport\",\n  \"Statement\" : [ {\n    \"Sid\" : \"ExampleSatement01\",\n    \"Effect\" : \"Deny\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"*\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-06f6ce85b4976bd7f\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"aws:SecureTransport\" : \"false\"\n      }\n    }\n  } ]\n}"
     }
 }
