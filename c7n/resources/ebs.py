@@ -542,6 +542,50 @@ class CopySnapshot(BaseAction):
                 "Cross region copy complete %s", ",".join(copy_ids))
 
 
+@Snapshot.action_registry.register('set-tier')
+class SetStorageTier(BaseAction):
+    """Set the storage tier of an ebs snapshot.
+
+    This can be used to archive or restore snapshots
+
+    https://aws.amazon.com/ebs/snapshots/faqs/#Snapshots_Archive
+    """
+
+    schema = type_schema(
+        'set-tier',
+        temporary_days={'type': 'integer'},
+        tier={'enum': ['archive', 'standard']}
+    )
+
+    def process(self, resources):
+        tier = self.data.get('tier', 'archive')
+        days = self.data.get('temporary_days')
+        if tier == 'archive':
+            resources = self.filter_resources(resources, 'StorageTier', ['standard'])
+            resources = self.filter_resources(resources, 'State', ['completed'])
+        elif tier == 'standard':
+            resources = self.filter_resources(resources, 'StorageTier', ['archive'])
+            resources = self.filter_resources(resources, 'State', ['recoverable'])
+
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        op = tier == 'archive' and client.modify_snapshot_tier or client.restore_snapshot_tier
+        if tier == 'archive':
+            params = {'StorageTier': 'archive'} or {}
+        elif days:
+            params['PermanentRestore'] = False
+            params['TemporaryRestoreDays'] = days
+        else:
+            params['PermamentRestore'] = True
+
+        for r in resources:
+            try:
+                op(SnapshotId=r['SnapshotId'], **params)
+            except ClientError as e:
+                if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
+                    continue
+
+
 @Snapshot.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):
     """Action to set permissions for creating volumes from a snapshot
