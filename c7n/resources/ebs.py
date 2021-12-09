@@ -557,6 +557,8 @@ class SetStorageTier(BaseAction):
         tier={'enum': ['archive', 'standard']}
     )
 
+    permissions = ('ec2:ModifySnapshotTier', 'ec2:RestoreSnapshotTier')
+
     def process(self, resources):
         tier = self.data.get('tier', 'archive')
         days = self.data.get('temporary_days')
