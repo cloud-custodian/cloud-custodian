@@ -961,13 +961,7 @@ class ConfigRuleManagedMode(ServerlessExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning AWS Config Managed Rule %s", self.policy.name)
-            try:
-                manager = ConfigManagedRuleManager(self.policy.session_factory)
-            except ClientError:
-                # For cli usage by normal users, don't assume the role just use
-                # it for the lambda
-                manager = ConfigManagedRuleManager(
-                    lambda assume=False: self.policy.session_factory(assume))
+            manager = ConfigManagedRuleManager(self.policy.session_factory)
             return manager.publish(
                 PolicyConfigManagedRule(self.policy))
 
