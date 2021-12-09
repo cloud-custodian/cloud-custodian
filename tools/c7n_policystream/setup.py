@@ -8,16 +8,16 @@ modules = \
 install_requires = \
 ['argcomplete (>=1.12.3,<2.0.0)',
  'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.19.12,<2.0.0)',
+ 'boto3 (>=1.20.15,<2.0.0)',
  'boto3>=1.12.0,<2.0.0',
- 'botocore (>=1.22.12,<2.0.0)',
- 'c7n (>=0.9.14,<0.10.0)',
+ 'botocore (>=1.23.15,<2.0.0)',
+ 'c7n (>=0.9.15,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
- 'importlib-metadata (>=4.8.1,<5.0.0)',
+ 'importlib-metadata (>=4.8.2,<5.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
  'jsonschema (>=3.2.0,<4.0.0)',
- 'pygit2>=1.5,<1.6',
+ 'pygit2>=1.7,<1.8',
  'pyrsistent (>=0.18.0,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=5.4.1,<6.0.0)',
@@ -26,7 +26,7 @@ install_requires = \
  's3transfer (>=0.5.0,<0.6.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.9,<0.9.0)',
- 'typing-extensions (>=3.10.0.2,<4.0.0.0)',
+ 'typing-extensions (>=4.0.0,<5.0.0)',
  'urllib3 (>=1.26.7,<2.0.0)',
  'zipp (>=3.6.0,<4.0.0)']
 
@@ -35,7 +35,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-policystream',
-    'version': '0.4.13',
+    'version': '0.4.14',
     'description': 'Cloud Custodian - Git Commits as Logical Policy Changes',
     'license': 'Apache-2.0',
     'classifiers': [

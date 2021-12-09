@@ -1,7 +1,7 @@
 click==8.0.3; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" and platform_system == "Windows" or python_version >= "3.6" and python_version < "4.0" and python_full_version >= "3.5.0" and platform_system == "Windows"
 commonmark==0.9.1; python_version >= "3.6" and python_version < "4.0"
-importlib-metadata==4.8.1; python_version < "3.8" and python_version >= "3.6"
+importlib-metadata==4.8.2; python_version < "3.8" and python_version >= "3.6"
 lark-parser==0.10.1; python_full_version >= "3.6.0"
 pprintpp==0.4.0; python_version >= "3.6" and python_version < "4.0"
 pygments==2.10.0; python_version >= "3.6" and python_version < "4.0"
