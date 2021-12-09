@@ -1751,3 +1751,174 @@ class ConfigRule(AWSEventBase):
             pass
         self.remove_permissions(func, remove_permission=not func_deleted)
         return True
+
+
+class ConfigManagedRuleManager:
+    """Deploy a policy as an AWS Config Managed Rule.
+    """
+
+    def __init__(self, session_factory):
+        self.session_factory = session_factory
+        self.client = self.session_factory().client('config')
+
+    def __repr__(self):
+        return "<ConfigRuleAwsManager>"
+
+    def get_rule_params(self, rule):
+        params = dict(
+            ConfigRuleName=rule.name,
+            Description=rule.description,
+            Source={
+                'Owner': 'AWS',
+                'SourceIdentifier': rule.managed_rule_id,
+            },
+            InputParameters=rule.rule_parameters
+        )
+
+        # A config rule scope can include one or more resource types,
+        # a combination of a tag key and value, or a combination of
+        # one resource type and one resource ID
+        params.update({'Scope': {'ComplianceResourceTypes': rule.resource_types}})
+        if rule.resource_tag:
+            params.update({'Scope': {
+                'TagKey': rule.resource_tag['key'],
+                'TagValue': rule.resource_tag['value']}
+            })
+        elif rule.resource_id:
+            params.update({'Scope': {'ComplianceResourceId': rule.resource_id}})
+
+        return dict(ConfigRule=params)
+
+    def get(self, rule_name):
+        params = {'ConfigRuleNames': [rule_name]}
+        return resource_exists(
+            self.client.describe_config_rules, NotFound='NoSuchConfigRuleException', **params)
+
+    def get_remediation_params(self, rule):
+        try:
+            params = rule.remediation_parameters
+            assume_role = params['AutomationAssumeRole']['StaticValue']['Values'][0]
+            account_id = rule.policy.resource_manager.config.account_id
+            role_arn = assume_role.replace('{account_id', account_id)
+            params['AutomationAssumeRole']['StaticValue']['Values'][0] = role_arn
+        except KeyError:
+            pass
+
+        params = dict(
+            ConfigRuleName=rule.name,
+            TargetType=rule.remediation_target_type,
+            TargetId=rule.remediation_target_id,
+            Parameters=rule.remediation_parameters,
+            Automatic=rule.remediation_automatic,
+            MaximumAutomaticAttempts=rule.remediation_maximum_automatic_attempts,
+            RetryAttemptSeconds=rule.remediation_retry_attempt_seconds,
+        )
+
+        if rule.remediation_execution_controls:
+            params['ExecutionControls'] = rule.remediation_execution_controls
+
+        return params
+
+    def _create_or_update(self, rule):
+        existing = self.get(rule.name)
+        params = self.get_rule_params(rule)
+
+        if existing:
+            # check for the first config rule info since we are
+            # calling describe on specific rulename
+            log.info('Config rule {r} already exists. Updating it ...'.format(r=rule.name))
+        else:
+            log.info('Publishing custodian policy config rule  %s', rule.name)
+
+        log.info('config rule params : {}'.format(params))
+        self.client.put_config_rule(**params)
+
+        changed = True
+
+        if rule.remediation_target_id:
+            remediation_params = self.get_remediation_params(rule)
+            log.info('remediatiion params: {}'.format(remediation_params))
+            out = self.client.put_remediation_configurations(
+                RemediationConfigurations=[remediation_params]
+            )
+            log.info('remediation configuration output: {}'.format(out))
+
+        return changed
+
+    def publish(self, rule):
+        self._create_or_update(rule)
+        updated_rule = self.get(rule.name)
+        rule_info = updated_rule['ConfigRules'][0]
+        rule.arn = rule_info['ConfigRuleArn']
+
+        return rule_info
+
+
+class PolicyConfigManagedRule:
+    """Wraps a custodian policy to turn it into an AWS Config Managed Rule.
+    """
+
+    def __init__(self, policy):
+        self.policy = policy
+
+    @property
+    def name(self):
+        prefix = self.policy.data['mode'].get('rule_prefix', 'custodian-')
+        return "%s%s" % (prefix, self.policy.name)
+
+    @property
+    def description(self):
+        return self.policy.data.get(
+            'description', 'cloud-custodian AWS Config Managed Rule policy')
+
+    @property
+    def tags(self):
+        return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def resource_types(self):
+        return self.policy.data['mode'].get('resource_types', [])
+
+    @property
+    def managed_rule_id(self):
+        return self.policy.data['mode'].get('rule_id', '')
+
+    @property
+    def resource_tag(self):
+        return self.policy.data['mode'].get('resource_tag', {})
+
+    @property
+    def resource_id(self):
+        return self.policy.data['mode'].get('resource_id', '')
+
+    @property
+    def rule_parameters(self):
+        return self.policy.data['mode'].get('rule_parameters', '')
+
+    @property
+    def remediation_target_type(self):
+        return self.policy.data['mode'].get('remediation', {}).get('target_type', 'SSM_DOCUMENT')
+
+    @property
+    def remediation_target_id(self):
+        return self.policy.data['mode'].get('remediation', {}).get('target_id', '')
+
+    @property
+    def remediation_parameters(self):
+        return self.policy.data['mode'].get('remediation', {}).get('parameters', {})
+
+    @property
+    def remediation_automatic(self):
+        return self.policy.data['mode'].get('remediation', {}).get('automatic', True)
+
+    @property
+    def remediation_maximum_automatic_attempts(self):
+        return self.policy.data['mode'].get('remediation', {}).get('maximum_automatic_attempts', 5)
+
+    @property
+    def remediation_retry_attempt_seconds(self):
+        return self.policy.data['mode'].get('remediation', {}).get('retry_attempt_seconds', 120)
+
+    @property
+    def remediation_execution_controls(self):
+        return self.policy.data['mode'].get('remediation', {}).get('execution_controls', {})

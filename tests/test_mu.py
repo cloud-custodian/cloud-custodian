@@ -29,7 +29,9 @@ from c7n.mu import (
     SNSSubscription,
     SQSSubscription,
     CloudWatchEventSource,
-    CloudWatchLogSubscription
+    CloudWatchLogSubscription,
+    PolicyConfigManagedRule,
+    ConfigManagedRuleManager,
 )
 
 from .common import (
@@ -1303,3 +1305,43 @@ class DiffTags(unittest.TestCase):
     def test_update(self):
         assert LambdaManager.diff_tags(
             {"Foo": "Bar"}, {"Foo": "Baz"}) == ({"Foo": "Baz"}, [])
+
+
+class ConfigManagedRuleManagerTest(BaseTest):
+
+    def test_config_managed_rule_provision(self):
+        session_factory = self.replay_flight_data("test_config_managed_rule")
+        p = self.load_policy({
+            'name': 'xyz', 'resource': 'config-rule',
+            'mode': {
+                'type': 'config-rule-managed',
+                'rule_prefix': 'test-',
+                'rule_id': 'S3_BUCKET_PUBLIC_WRITE_PROHIBITED',
+                'resource_types': ['AWS::S3::Bucket'],
+                'rule_parameters': '{}',
+                'remediation': {
+                    'target_id': 'AWS-DisableS3BucketPublicReadWrite',
+                    'maximum_automatic_attempts': 4,
+                    'parameters': {
+                        'AutomationAssumeRole': {
+                            'StaticValue': {
+                                'Values': ['arn:aws:iam::{account_id}:role/myrole']
+                            }
+                        },
+                        'S3BucketName': {
+                            'ResourceValue': {
+                                'Value': 'RESOURCE_ID'
+                            }
+                        }
+                    }
+                },
+            }
+        }, session_factory=session_factory)
+
+        rule = PolicyConfigManagedRule(p)
+        mgr = ConfigManagedRuleManager(session_factory)
+        result = mgr.publish(rule)
+        self.assertEqual(result['ConfigRuleName'], 'test-xyz')
+        self.assertEqual(result['ConfigRuleState'], 'ACTIVE')
+        self.assertEqual(result['Source']['Owner'], 'AWS')
+        self.assertEqual(result['Source']['SourceIdentifier'], 'S3_BUCKET_PUBLIC_WRITE_PROHIBITED')

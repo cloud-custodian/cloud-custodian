@@ -14,6 +14,7 @@ import jmespath
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
+from c7n.mu import ConfigManagedRuleManager, PolicyConfigManagedRule
 from c7n.filters import FilterRegistry, And, Or, Not
 from c7n.manager import iter_filters
 from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
@@ -894,7 +895,93 @@ class ConfigRuleMode(LambdaMode):
         return resources
 
 
+@execution.register('config-rule-managed')
+class ConfigRuleManagedMode(ServerlessExecutionMode):
+    """ Provision AWS Config Managed Rules.
+        http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
+    """
+
+    cfg_event = None
+    schema = utils.type_schema('config-rule-managed',
+        rule_id={'type': 'string'},
+        rule_prefix={'type': 'string'},
+        resource_types={'type': 'array', 'items':
+                        {'pattern': '^AWS::*', 'type': 'string'}},
+        resource_tag={
+            'type': 'object',
+            'properties': {
+                'key': {'type': 'string'},
+                'value': {'type': 'string'},
+            },
+            'required': ['key', 'value'],
+        },
+        resource_id={'type': 'string'},
+        rule_parameters={'type': 'string'},
+        remediation={
+            'type': 'object',
+            'properties': {
+                'target_type': {'type': 'string'},
+                'target_id': {'type': 'string'},
+                'automatic': {'type': 'boolean'},
+                'parameters': {'type': 'object'},
+                'maximum_automatic_attempts': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 25,
+                },
+                'retry_attempt_seconds': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 2678000,
+                },
+                'execution_controls': {'type': 'object'},
+            },
+        },
+        tags={'type': 'object'},
+        required=['rule_id'],
+    )
+
+    def __init__(self, policy):
+        self.policy = policy
+
+    def validate(self):
+        rule_id = self.policy.data['mode'].get('rule_id')
+        if not rule_id:
+            raise PolicyValidationError("Missing rule_id")
+
+        if (self.policy.data['mode'].get('resource_id') and
+                self.policy.data['mode'].get('resource_tag')):
+            raise PolicyValidationError(
+                "Cannot have both resource_id and resource_tag")
+
+        if (self.policy.data['mode'].get('resource_id') and
+                len(self.policy.data['mode'].get('resource_types', [])) > 1):
+            raise PolicyValidationError(
+                "Can only have 1 resource_types if resource_id is specified")
+
+    def provision(self):
+        with self.policy.ctx:
+            self.policy.log.info(
+                "Provisioning AWS Config Managed Rule %s", self.policy.name)
+            try:
+                manager = ConfigManagedRuleManager(self.policy.session_factory)
+            except ClientError:
+                # For cli usage by normal users, don't assume the role just use
+                # it for the lambda
+                manager = ConfigManagedRuleManager(
+                    lambda assume=False: self.policy.session_factory(assume))
+            return manager.publish(
+                PolicyConfigManagedRule(self.policy))
+
+    def resolve_resources(self, event):
+        source = self.policy.resource_manager.get_source('config')
+        return [source.load_resource(self.cfg_event['configurationItem'])]
+
+    def run(self, event):
+        self.policy.log.info('running config managed rule')
+        return []
+
+
 def get_session_factory(provider_name, options):
+
     try:
         return clouds[provider_name]().get_session_factory(options)
     except KeyError:

@@ -1563,3 +1563,40 @@ class GuardModeTest(BaseTest):
                 }
             ],
         )
+
+
+class ConfigRuleManagedModeTest(BaseTest):
+
+    def test_validation(self):
+        # missing rule_id
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'xyz', 'resource': 'config-rule',
+             'mode': {'type': 'config-rule-managed'}})
+
+        # cannot have both resource_id and resource_tag
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy, {
+                'name': 'xyz', 'resource': 'config-rule',
+                'mode': {
+                    'type': 'config-rule-managed',
+                    'rule_id': 'myrule',
+                    'resource_id': 'resource_id',
+                    'resource_tag': {'key': 'key', 'value': 'value'},
+                }
+            })
+
+        # cannot have resource_id and more than one resource_types
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy, {
+                'name': 'xyz', 'resource': 'config-rule',
+                'mode': {
+                    'type': 'config-rule-managed',
+                    'rule_id': 'myrule',
+                    'resource_id': 'resource_id',
+                    'resource_types': ['AWS::svc:res1', 'AWS::svc:res2']
+                }
+            })
