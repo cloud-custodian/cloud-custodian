@@ -5,9 +5,11 @@ AWS Config
 
 Custodian has deep integration with config, a custodian policy:
 
-- Can be deployed as config-rule for any resource type supported by config.
+- Can be deployed as an AWS Config custom rule (config-rule mode) for any resource type supported by config.
 
-- Can use config as resource database instead of querying service
+- Can be deployed as an AWS Config managed rule (config-managed-rule mode).
+
+- Can use AWS Config as resource database instead of querying service
   describe apis. Custodian supports server side querying resources
   with Config's SQL expression language.
 
@@ -107,3 +109,59 @@ timeline or resource attributes.
          schedule: Three_Hours
        filters:
          - tag:App: Dev
+
+Config Managed Rule
+++++++++++++++++
+
+AWS Config provides AWS managed rules, which are predefined, customizable
+rules that AWS Config uses to evaluate whether your AWS resources comply
+with common best practices. Additionally, these managed rules can be
+associated with predefined remediation SSM actions so that violated resources
+can be remediated.
+
+For a list of managed rules, refer to: https://docs.aws.amazon.com/config/latest/developerguide/managed-rules-by-aws-config.html
+
+Using config-managed-rule policy mode, you can tell AWS Config to activate a
+particular managed rule. You can also configure various properties to configure
+the rule and the remediation process.
+
+Example of such policy
+
+.. code-block:: yaml
+
+  policies:
+    - name: config-managed-s3-bucket-public-write-remediate-event
+      description: |
+        This policy detects if S3 bucket allows public write by the bucket policy or ACL and remediates.
+      comment: |
+        This policy detects if S3 bucket policy or ACL allows public write access.
+        When the bucket is evaluated as 'NON_COMPLIANT', the action 'AWS-DisableS3BucketPublicReadWrite' is triggered and remediates.
+      resource: config-rule
+
+      mode:
+        type: config-managed-rule
+        rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+        rule_prefix: 'custodian-'
+        resource_types:
+          - 'AWS::S3::Bucket'
+        rule_parameters: '{}'
+        remediation:
+          target_id: AWS-DisableS3BucketPublicReadWrite
+          automatic: true
+          maximum_automatic_attempts: 4
+          parameters:
+            AutomationAssumeRole:
+              StaticValue:
+                Values:
+                  - 'arn:aws:iam::{account_id}:role/my-role'
+            S3BucketName:
+              ResourceValue:
+                Value: RESOURCE_ID
+
+The properties of the config-managed-rule mode roughly corresponds to the
+AWS Config rule and remediation API properties, refer to the correspoding
+API doc for more information:
+
+- https://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
+
+- https://docs.aws.amazon.com/config/latest/APIReference/API_PutRemediationConfigurations.html

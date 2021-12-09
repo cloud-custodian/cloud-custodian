@@ -1314,7 +1314,7 @@ class ConfigManagedRuleManagerTest(BaseTest):
         p = self.load_policy({
             'name': 'xyz', 'resource': 'config-rule',
             'mode': {
-                'type': 'config-rule-managed',
+                'type': 'config-managed-rule',
                 'rule_prefix': 'test-',
                 'rule_id': 'S3_BUCKET_PUBLIC_WRITE_PROHIBITED',
                 'resource_types': ['AWS::S3::Bucket'],

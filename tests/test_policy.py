@@ -1573,7 +1573,7 @@ class ConfigRuleManagedModeTest(BaseTest):
             PolicyValidationError,
             self.load_policy,
             {'name': 'xyz', 'resource': 'config-rule',
-             'mode': {'type': 'config-rule-managed'}})
+             'mode': {'type': 'config-managed-rule'}})
 
         # cannot have both resource_id and resource_tag
         self.assertRaises(
@@ -1581,7 +1581,7 @@ class ConfigRuleManagedModeTest(BaseTest):
             self.load_policy, {
                 'name': 'xyz', 'resource': 'config-rule',
                 'mode': {
-                    'type': 'config-rule-managed',
+                    'type': 'config-managed-rule',
                     'rule_id': 'myrule',
                     'resource_id': 'resource_id',
                     'resource_tag': {'key': 'key', 'value': 'value'},
@@ -1594,7 +1594,7 @@ class ConfigRuleManagedModeTest(BaseTest):
             self.load_policy, {
                 'name': 'xyz', 'resource': 'config-rule',
                 'mode': {
-                    'type': 'config-rule-managed',
+                    'type': 'config-managed-rule',
                     'rule_id': 'myrule',
                     'resource_id': 'resource_id',
                     'resource_types': ['AWS::svc:res1', 'AWS::svc:res2']

@@ -895,14 +895,14 @@ class ConfigRuleMode(LambdaMode):
         return resources
 
 
-@execution.register('config-rule-managed')
+@execution.register('config-managed-rule')
 class ConfigRuleManagedMode(ServerlessExecutionMode):
     """ Provision AWS Config Managed Rules.
         http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
     """
 
     cfg_event = None
-    schema = utils.type_schema('config-rule-managed',
+    schema = utils.type_schema('config-managed-rule',
         rule_id={'type': 'string'},
         rule_prefix={'type': 'string'},
         resource_types={'type': 'array', 'items':
