@@ -13,7 +13,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema, local_session
+from c7n.utils import generate_arn, type_schema
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -839,7 +839,7 @@ class DomainNameRemediateTls(BaseAction):
     permissions = ('apigateway:PATCH',)
 
     def process(self, resources, event=None):
-        client = local_session(
+        client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         retryable = ('TooManyRequestsException', 'ConflictException')
         retry = utils.get_retry(retryable, max_attempts=8)
