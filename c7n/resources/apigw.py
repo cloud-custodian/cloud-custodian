@@ -8,12 +8,12 @@ from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter
+from c7n.filters import FilterRegistry, Filter, ValueFilter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema
+from c7n.utils import generate_arn, type_schema, local_session
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -793,3 +793,69 @@ class UpdateRestMethod(BaseAction):
                     resourceId=m['resourceId'],
                     httpMethod=m['httpMethod'],
                     patchOperations=ops)
+
+
+@resources.register('apigw-domain-name')
+class CustomDomainName(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        enum_spec = ('get_domain_names', 'items', None)
+        arn = False
+        id = name = 'domainName'
+        service = 'apigateway'
+        universal_taggable = True
+        cfn_type = 'AWS::ApiGateway::DomainName'
+        date = 'createdDate'
+
+    @classmethod
+    def get_permissions(cls):
+        return ('apigateway:GET',)
+
+    @classmethod
+    def has_arn(self):
+        return False
+
+
+@CustomDomainName.filter_registry.register('check-tls')
+class DomainNameCheckTls(Filter):
+    """ Filter API Gateway custom domains and return those with security policy != TLS 1.2
+    """
+    permissions = ("apigateway:GET",)
+    schema = utils.type_schema('check-tls', )
+
+    def process(self, resources, event=None):
+        notenable_domains = []
+
+        for r in resources:
+            if r['securityPolicy'] != 'TLS_1_2':
+                notenable_domains.append(r)
+        return notenable_domains
+
+
+@CustomDomainName.action_registry.register('remediate-tls')
+class DomainNameRemediateTls(BaseAction):
+
+    schema = type_schema('remediate-tls')
+    permissions = ('apigateway:PATCH',)
+
+    def process(self, resources, event=None):
+        client = local_session(
+            self.manager.session_factory).client('apigateway')
+        retryable = ('TooManyRequestsException', 'ConflictException')
+        retry = utils.get_retry(retryable, max_attempts=8)
+
+        for r in resources:
+            try:
+                retry(client.update_domain_name,
+                      domainName=r['domainName'],
+                      patchOperations=[
+                          {
+                              'op': 'replace',
+                              'path': '/securityPolicy',
+                              'value': 'TLS_1_2'
+                          },
+                      ]
+                      )
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    continue

@@ -489,3 +489,37 @@ class TestRestClientCertificate(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+class TestCustomDomainName(BaseTest):
+    def test_filter_check_tls(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [{"type": "check-tls"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["domainName"], "bad.example.com")
+
+    def test_action_remediate_tls(self):
+        factory = self.record_flight_data("test_apigw_domain_name_action_remediate_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [{"type": "check-tls"}],
+                "actions": ["remediate-tls"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["domainName"], "bad.example.com")
+
+        client = factory().client("apigateway")
+        result = client.get_domain_name(domainName="bad.example.com")
+        self.assertEqual(result['securityPolicy'], 'TLS_1_2')
