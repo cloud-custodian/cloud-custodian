@@ -490,6 +490,7 @@ class TestRestClientCertificate(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
 
+
 class TestCustomDomainName(BaseTest):
     def test_filter_check_tls(self):
         factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
