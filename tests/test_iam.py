@@ -2157,6 +2157,46 @@ class DeleteRoleAction(BaseTest):
             }
         )
 
+    def test_set_policy_arn_construction(self):
+        factory = self.replay_flight_data("test_set_policy_arn_construction")
+
+        # Use set-policy with an explicit ARN
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "actions": [{
+                    "type": "set-policy",
+                    "state": "attached",
+                    "arn": "arn:aws:iam::{account_id}:policy/DeleteMe"
+                }],
+            },
+            session_factory=factory
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        # Use a policy name
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "filters": [{"type": "has-specific-managed-policy", "value": "DeleteMe"}],
+                "actions": [{"type": "set-policy", "state": "detached", "arn": "DeleteMe"}],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_force_delete_role(self):
         factory = self.replay_flight_data("test_force_delete_role")
         policy = self.load_policy(
