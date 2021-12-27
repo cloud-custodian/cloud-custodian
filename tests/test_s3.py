@@ -3738,7 +3738,7 @@ class TestBucketOwnership:
         bucket_name = s3_ownership['aws_s3_bucket.no_ownership_controls.bucket']
         p = test.load_policy(
             {
-                "name": "s3-",
+                "name": "s3-ownership-empty",
                 "resource": "s3",
                 "filters": [
                     {"type": "value",
@@ -3766,7 +3766,7 @@ class TestBucketOwnership:
                         for r in ('owner_preferred', 'owner_enforced')}
         p = test.load_policy(
             {
-                "name": "s3-",
+                "name": "s3-ownership-defined",
                 "resource": "s3",
                 "filters": [
                     {"type": "value",
