@@ -8,7 +8,7 @@ from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, Filter, ValueFilter, MetricsFilter
+from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
@@ -816,26 +816,15 @@ class CustomDomainName(query.QueryResourceManager):
         return False
 
 
-@CustomDomainName.filter_registry.register('check-tls')
-class DomainNameCheckTls(Filter):
-    """ Filter API Gateway custom domains and return those with security policy != TLS 1.2
-    """
-    permissions = ("apigateway:GET",)
-    schema = utils.type_schema('check-tls', )
-
-    def process(self, resources, event=None):
-        notenable_domains = []
-
-        for r in resources:
-            if r['securityPolicy'] != 'TLS_1_2':
-                notenable_domains.append(r)
-        return notenable_domains
-
-
-@CustomDomainName.action_registry.register('remediate-tls')
+@CustomDomainName.action_registry.register('update-security')
 class DomainNameRemediateTls(BaseAction):
 
-    schema = type_schema('remediate-tls')
+    schema = type_schema(
+        'update-security',
+        securityPolicy={'type': 'string', 'enum': [
+            'TLS_1_0', 'TLS_1_2']},
+        required=['securityPolicy'])
+
     permissions = ('apigateway:PATCH',)
 
     def process(self, resources, event=None):
@@ -852,7 +841,7 @@ class DomainNameRemediateTls(BaseAction):
                           {
                               'op': 'replace',
                               'path': '/securityPolicy',
-                              'value': 'TLS_1_2'
+                              'value': self.data.get('securityPolicy')
                           },
                       ]
                       )

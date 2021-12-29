@@ -498,7 +498,17 @@ class TestCustomDomainName(BaseTest):
             {
                 "name": "apigw-domain-name-check-tls",
                 "resource": "apigw-domain-name",
-                "filters": [{"type": "check-tls"}],
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ]
             },
             session_factory=factory,
         )
@@ -512,8 +522,23 @@ class TestCustomDomainName(BaseTest):
             {
                 "name": "apigw-domain-name-check-tls",
                 "resource": "apigw-domain-name",
-                "filters": [{"type": "check-tls"}],
-                "actions": ["remediate-tls"],
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "update-security",
+                        "securityPolicy": "TLS_1_2"
+                    }
+                ],
             },
             session_factory=factory,
         )
