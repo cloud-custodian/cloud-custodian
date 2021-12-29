@@ -268,9 +268,8 @@ class CheckSecureTransport(Filter):
             resp = client.describe_file_system_policy(FileSystemId=resource['FileSystemId'])
             if 'Policy' in resp:
                 policies = resp['Policy']
-        except Exception as e:
-            if e.response['Error']['Code'] == 'PolicyNotFound':
-                return True
+        except client.exceptions.PolicyNotFound:
+            return True
 
         statements = json.loads(policies)['Statement']
         if isinstance(statements, dict):
