@@ -3507,15 +3507,14 @@ class BucketOwnershipControls(BucketFilterBase, ValueFilter):
         return super(BucketOwnershipControls, self).process(buckets, event)
 
     def process_bucket(self, b):
+        if self.annotation_key in b:
+            return
         client = bucket_client(local_session(self.manager.session_factory), b)
-        if self.annotation_key not in b:
-            try:
-                controls = client.get_bucket_ownership_controls(Bucket=b['Name'])
-                controls.pop('ResponseMetadata', None)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'OwnershipControlsNotFoundError':
-                    raise
-                controls = {}
-            b[self.annotation_key] = controls.get('OwnershipControls')
-        else:
-            controls = b[self.annotation_key]
+        try:
+            controls = client.get_bucket_ownership_controls(Bucket=b['Name'])
+            controls.pop('ResponseMetadata', None)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OwnershipControlsNotFoundError':
+                raise
+            controls = {}
+        b[self.annotation_key] = controls.get('OwnershipControls')
