@@ -5,8 +5,9 @@ Advanced Usage
 
 * :ref:`run-multiple-regions`
 * :ref:`report-multiple-regions`
-* :ref:`report-custom-fields`
+* :ref:`scheduling-policy-execution`
 * :ref:`policy_resource_limits`
+* :ref:`report-custom-fields`
 
 .. _run-multiple-regions:
 
