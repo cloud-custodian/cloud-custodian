@@ -245,6 +245,17 @@ def chunks(iterable, size=50):
         yield batch
 
 
+def lowerResource(obj):
+    """some sources from apis return TitleCased where as describe calls
+    return lowerCased.
+    """
+    for k in list(obj):
+        if k[0].isupper():
+            v = obj.pop(k)
+            obj[k[0].lower() + k[1:]] = v
+    return obj
+
+
 def camelResource(obj, implicitDate=False, implicitTitle=True):
     """Some sources from apis return lowerCased where as describe calls
 
