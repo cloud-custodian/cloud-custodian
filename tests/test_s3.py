@@ -3724,3 +3724,62 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     actual_names = sorted([r.get('Name') for r in resources])
 
     assert actual_names == expected_names
+
+
+@terraform('s3_ownership', scope='class')
+class TestBucketOwnership:
+    def test_s3_ownership_empty(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
+        test.patch(
+            s3, "S3_AUGMENT_TABLE", []
+        )
+        session_factory = test.replay_flight_data("test_s3_ownership_empty")
+        bucket_name = s3_ownership['aws_s3_bucket.no_ownership_controls.bucket']
+        p = test.load_policy(
+            {
+                "name": "s3-ownership-empty",
+                "resource": "s3",
+                "filters": [
+                    {"type": "value",
+                     "op": "glob",
+                     "key": "Name",
+                     "value": "c7ntest*"},
+                    {"type": "ownership",
+                     "value": "empty"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]["Name"] == bucket_name
+
+    def test_s3_ownership_defined(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
+        test.patch(
+            s3, "S3_AUGMENT_TABLE", []
+        )
+        session_factory = test.replay_flight_data("test_s3_ownership_defined")
+        bucket_names = {s3_ownership[f'aws_s3_bucket.{r}.bucket']
+                        for r in ('owner_preferred', 'owner_enforced')}
+        p = test.load_policy(
+            {
+                "name": "s3-ownership-defined",
+                "resource": "s3",
+                "filters": [
+                    {"type": "value",
+                     "op": "glob",
+                     "key": "Name",
+                     "value": "c7ntest*"},
+                    {"type": "ownership",
+                     "op": "in",
+                     "value": ["BucketOwnerPreferred", "BucketOwnerEnforced"]},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert len(resources) == 2
+        assert {r["Name"] for r in resources} == bucket_names
