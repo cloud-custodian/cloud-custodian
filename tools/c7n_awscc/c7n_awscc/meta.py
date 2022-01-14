@@ -7,8 +7,8 @@ from .manager import initialize_resource
 
 
 class ResourceFinder(MetaPathFinder):
-    """python importer for virtual resource modules from json data files.
-    """
+    """python importer for virtual resource modules from json data files."""
+
     @classmethod
     def attach(cls):
         found = False

@@ -7,9 +7,9 @@ from c7n.resources.aws import AWS
 
 
 def get_resource_map():
-    return json.loads(
-        (Path(__file__).parent / "data" / "index.json").read_text()
-    )["resources"]
+    return json.loads((Path(__file__).parent / "data" / "index.json").read_text())[
+        "resources"
+    ]
 
 
 @clouds.register("awscc")
