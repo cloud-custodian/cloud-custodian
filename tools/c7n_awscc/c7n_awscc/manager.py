@@ -10,7 +10,21 @@ from .provider import resources
 from c7n.query import TypeInfo, QueryResourceManager
 
 
-def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
+_IndexData = None
+
+
+def get_index():
+    global _IndexData
+
+    if _IndexData is not None:
+        return _IndexData
+
+    index_path = Path(__file__).parent / "data" / "index.json"
+    _IndexData = json.loads(index_path.read_text())
+    return _IndexData
+
+
+def initialize_resource(resource_name):
     """Load a resource class from its name"""
     rpath = Path(__file__).parent / "data" / f"aws_{resource_name}.json"
     if not rpath.exists():
@@ -73,8 +87,16 @@ def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
         ),
     )
 
+    process_supplementary_data(rtype)
     resources.register(rname, rtype)
+
     return {rtype.__name__: rtype}
+
+
+def process_supplementary_data(rtype):
+    idx = get_index()
+    augment = idx["augment"][rtype.resource_type.cfn_type]
+    rtype.resource_type.service = augment.get("service")
 
 
 def get_update_schema(schema):
