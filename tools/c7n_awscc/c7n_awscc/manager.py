@@ -36,6 +36,7 @@ def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
         rinfo["handlers"].get("read", {}).get("permissions", [])
         + rinfo["handlers"].get("list", {}).get("permissions", [])
     )
+
     rtype = type(
         class_name,
         (QueryResourceManager,),

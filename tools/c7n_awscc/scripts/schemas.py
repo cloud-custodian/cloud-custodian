@@ -20,7 +20,7 @@ def process_resource_list(control, rinfo):
 def extract_custodian(rdata, c7n_resource, raugment):
     # extract any custodian metadata if we have the same
     # resource in both providers.
-    raugment['c7n_type'] = "aws.%s" % c7n_resource.type
+    raugment["c7n_type"] = "aws.%s" % c7n_resource.type
 
 
 ServiceMap = {
@@ -56,7 +56,6 @@ ServiceMap = {
     "aws_timestream_scheduledquery": "timestream-query",
     "aws_timestream_table": "timestream-write",
 }
-
 
 
 @click.group()
@@ -96,7 +95,7 @@ def gen_index(index, schema_dir):
         rdata = json.loads(path.read_text())
 
         raugment = index_data["augment"].setdefault(rdata["typeName"], {})
-        if not service in all_services:
+        if service not in all_services:
             service = ServiceMap.get(service)
         raugment["service"] = service
 
@@ -109,24 +108,11 @@ def gen_index(index, schema_dir):
 
         class_name = "".join([s.title() for s in path.stem.split("_")[1:]])
         index_data["resources"]["awscc.%s" % rname] = "c7n_awscc.resources.%s.%s" % (
-            path.stem.split('_', 1)[-1],
-            class_name
+            path.stem.split("_", 1)[-1],
+            class_name,
         )
 
     index_path.write_text(json.dumps(index_data, indent=2))
-
-
-@cli.command()
-@click.option("-d", "--schema-dir", required=True, type=click.Path())
-def check_permissions(schema_dir):
-
-    sdir = Path(str(schema_dir))
-    control = boto3.client("cloudcontrol")
-
-    for p in sdir.rglob("*.json"):
-        rinfo = json.loads(p.read_text())
-        if not rinfo.get("handlers"):
-            print(f"type: {rinfo['typeName']} missing handler info")
 
 
 @cli.command()
@@ -145,8 +131,8 @@ def check_list(schema_dir):
         for f in as_completed(results):
             p, rinfo = results[f]
             exc = f.exception()
-            if f.exception():
-                print(f"type: {rinfo['typeName']} error {f.exception()}")
+            if exc:
+                print(f"type: {rinfo['typeName']} error {exc}")
                 p.unlink()
                 continue
 
