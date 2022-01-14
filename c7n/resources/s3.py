@@ -196,7 +196,7 @@ class ConfigS3(query.ConfigSource):
             for t in (r.get('transitions') or ()):
                 tr = {}
                 for k in ('date', 'days', 'storageClass'):
-                    if t[k]:
+                    if t.get(k):
                         tr["%s%s" % (k[0].upper(), k[1:])] = t[k]
                 transitions.append(tr)
             if transitions:
@@ -292,7 +292,7 @@ class ConfigS3(query.ConfigSource):
         resource['Replication'] = {'ReplicationConfiguration': d}
 
     def handle_BucketPolicy(self, resource, item_value):
-        resource['Policy'] = item_value['policyText']
+        resource['Policy'] = item_value.get('policyText')
 
     def handle_BucketTaggingConfiguration(self, resource, item_value):
         resource['Tags'] = [
@@ -303,9 +303,16 @@ class ConfigS3(query.ConfigSource):
         if item_value['status'] not in ('Enabled', 'Suspended'):
             return
         resource['Versioning'] = {'Status': item_value['status']}
-        if item_value['isMfaDeleteEnabled']:
-            resource['Versioning']['MFADelete'] = item_value[
-                'isMfaDeleteEnabled'].title()
+        # `isMfaDeleteEnabled` is an optional boolean property - the key may be absent,
+        # present with a null value, or present with a boolean value.
+        # Mirror the describe source by populating Versioning.MFADelete only in the
+        # boolean case.
+        mfa_delete = item_value.get('isMfaDeleteEnabled')
+        if mfa_delete is None:
+            return
+        resource['Versioning']['MFADelete'] = (
+            'Enabled' if mfa_delete else 'Disabled'
+        )
 
     def handle_BucketWebsiteConfiguration(self, resource, item_value):
         website = {}
