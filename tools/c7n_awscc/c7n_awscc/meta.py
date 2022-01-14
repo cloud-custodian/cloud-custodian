@@ -1,16 +1,32 @@
 from importlib.abc import MetaPathFinder, Loader
 from importlib.machinery import ModuleSpec
 import os
-
+import sys
 
 from .manager import initialize_resource
 
 
 class ResourceFinder(MetaPathFinder):
-    def find_spec(self, fullname, path, target=None):
+    """python importer for virtual resource modules from json data files.
+    """
+    @classmethod
+    def attach(cls):
+        found = False
+        for s in sys.meta_path:
+            if s == cls:
+                found = True
+                break
+
+        if not found:
+            sys.meta_path.append(cls)
+        else:
+            return False
+        return True
+
+    @staticmethod
+    def find_spec(fullname, path, target=None):
         if not fullname.startswith("c7n_awscc.resources."):
             return
-        print(f"{fullname} {path} {target}")
         module_attrs = initialize_resource(fullname.rsplit(".", 1)[-1])
         if module_attrs is None:
             return
@@ -26,10 +42,8 @@ class ResourceLoader(Loader):
         self.module_attrs = module_attrs
 
     def create_module(self, spec):
-        print("create %s" % spec)
         return None
 
     def exec_module(self, module):
-        print("exec %s" % module)
         for k, v in self.module_attrs.items():
             setattr(module, k, v)

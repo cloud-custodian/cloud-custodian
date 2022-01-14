@@ -15,10 +15,12 @@ classifiers=[
    "Topic :: System :: Distributed Computing"
 ]
 
+include = ["c7n_awscc/data/*json"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^8.0"
+jsonpatch = "^1.32"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}

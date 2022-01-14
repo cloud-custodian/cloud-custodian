@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 
 from c7n.filters import Filter  # noqa
+
 from .actions import Delete, Update
 from .query import CloudControl
+from .provider import resources
 
 from c7n.query import TypeInfo, QueryResourceManager
 
@@ -25,12 +27,15 @@ def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
         ),
     )
 
-    # rname = "-".join([s.lower() for s in rinfo["typeName"].split("::")[1:]])
+    rname = "_".join([s.lower() for s in rinfo["typeName"].split("::")[1:]])
     class_name = "".join(
         [s.lower().capitalize() for s in rinfo["typeName"].split("::")[1:]]
     )
     mod_name = f"c7n_awscc.resources.{resource_name}"
-
+    permissions = (
+        rinfo["handlers"].get("read", {}).get("permissions", [])
+        + rinfo["handlers"].get("list", {}).get("permissions", [])
+    )
     rtype = type(
         class_name,
         (QueryResourceManager,),
@@ -38,8 +43,7 @@ def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
             __module__=mod_name,
             source_mapping={"describe": CloudControl},
             resource_type=type_info,
-            permissions=tuple(rinfo["handlers"]["read"]["permissions"])
-            + tuple(rinfo["handlers"]["list"]["permissions"]),
+            perinmssions=permissions,
             schema=rinfo,
         ),
     )
@@ -69,6 +73,7 @@ def initialize_resource(resource_name: str) -> dict[str, QueryResourceManager]:
         ),
     )
 
+    resources.register(rname, rtype)
     return {rtype.__name__: rtype}
 
 
@@ -83,5 +88,5 @@ def get_update_schema(schema):
         "definitions": dict(schema["definitions"]),
         "properties": {u: schema["properties"][u] for u in updatable},
     }
-    update_schema["properties"]["type"] = {"enum": ["delete"]}
+    update_schema["properties"]["type"] = {"enum": ["update"]}
     return update_schema
