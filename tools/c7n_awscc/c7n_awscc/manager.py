@@ -57,7 +57,7 @@ def initialize_resource(resource_name):
             __module__=mod_name,
             source_mapping={"describe": CloudControl},
             resource_type=type_info,
-            perinmssions=permissions,
+            permissions=permissions,
             schema=rinfo,
         ),
     )
@@ -107,8 +107,10 @@ def get_update_schema(schema):
     updatable = prop_names - (create_only | read_only)
     update_schema = {
         "additionalProperties": False,
-        "definitions": dict(schema["definitions"]),
         "properties": {u: schema["properties"][u] for u in updatable},
     }
+    if "definitions" in schema:
+        update_schema["definitions"] = dict(schema["definitions"])
+
     update_schema["properties"]["type"] = {"enum": ["update"]}
     return update_schema

@@ -5,7 +5,7 @@ def test_init_resource_access_analyzer():
     data = initialize_resource("eks_cluster")
     assert "EksCluster" in data
     klass = data["EksCluster"]
-    assert klass.permissions == ("eks:DescribeCluster", "eks:ListClusters")
+    assert klass.permissions == ["eks:DescribeCluster", "eks:ListClusters"]
 
 
 def test_update_schema():
