@@ -269,6 +269,17 @@ class DeletePipeline(BaseAction):
                 continue
 
 
+class DescribeApplication(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r, arn in zip(resources, self.manager.get_arns(resources)):
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceArn=arn).get('Tags', [])
+        return resources
+
+
 @resources.register('codedeploy-app')
 class CodeDeployApplication(QueryResourceManager):
 
@@ -282,16 +293,13 @@ class CodeDeployApplication(QueryResourceManager):
         date = 'createTime'
         arn_type = "application"
         arn_separator = ":"
-        cfn_type = "AWS::CodeDeploy::Application"
+        config_type = cfn_type = "AWS::CodeDeploy::Application"
         universal_taggable = True
 
-    def augment(self, resources):
-        resources = super().augment(resources)
-        client = local_session(self.session_factory).client('codedeploy')
-        for r, arn in zip(resources, self.get_arns(resources)):
-            r['Tags'] = client.list_tags_for_resource(
-                ResourceArn=arn).get('Tags', [])
-        return resources
+    source_mapping = {
+        'describe': DescribeApplication,
+        'config': ConfigSource
+    }
 
     def get_arns(self, resources):
         return [self.generate_arn(r['applicationName']) for r in resources]
@@ -362,7 +370,7 @@ class CodeDeployDeploymentGroup(ChildResourceManager):
         id = 'deploymentGroupId'
         name = 'deploymentGroupName'
         arn_type = "deploymentgroup"
-        cfn_type = 'AWS::CodeDeploy::DeploymentGroup'
+        config_type = cfn_type = 'AWS::CodeDeploy::DeploymentGroup'
         arn_separator = ':'
         permission_prefix = 'codedeploy'
         universal_taggable = True

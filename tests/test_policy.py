@@ -16,6 +16,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
+from c7n.resources.kinesis import KinesisStream
 from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
@@ -247,6 +248,10 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q1 2022
+            'AwsNetworkFirewallRuleGroup',
+            'AwsNetworkFirewallFirewall',
+            'AwsNetworkFirewallFirewallPolicy',
             # q4 2021 - second wave
             'AwsXrayEncryptionConfig',
             'AwsOpenSearchServiceDomain',
@@ -310,6 +315,8 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            'AWS::Kinesis::StreamConsumer',
+            'AWS::CodeDeploy::DeploymentConfig',
             'AWS::OpenSearch::Domain',  # this is effectively an alias
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -1424,6 +1431,15 @@ class ConfigModeTest(BaseTest):
         cmock.put_evaluations.return_value = {}
         self.patch(
             ConfigPollRuleMode, '_get_client', lambda self: cmock)
+
+        config_type = KinesisStream.resource_type.config_type
+        KinesisStream.resource_type.config_type = None
+
+        def reset():
+            KinesisStream.resource_type.config_type = config_type
+
+        self.addCleanup(reset)
+
         p = self.load_policy({
             'name': 'kin-poll',
             'resource': 'aws.kinesis',
