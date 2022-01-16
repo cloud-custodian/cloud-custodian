@@ -15,7 +15,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 
 azure-mgmt-authorization = "^1.0.0"
 azure-mgmt-advisor = "^9.0.0"

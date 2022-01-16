@@ -19,10 +19,10 @@ c7n-mailer = 'c7n_mailer.cli:main'
 c7n-mailer-replay = 'c7n_mailer.replay:main'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 Jinja2 = "^3.0"
 boto3 = "^1.11.12"
-jsonschema = "^3.2.0"
+jsonschema = ">=3.2.0"
 python-dateutil = "^2.8.1"
 pyyaml="^5.3"
 sendgrid = "^6.1.1"

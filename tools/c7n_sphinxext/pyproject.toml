@@ -18,7 +18,7 @@ readme = "README.md"
 c7n-sphinxext = 'c7n_sphinxext.docgen:main'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 Sphinx = "^4.2.0"
 Pygments = "^2.10.0"
 sphinx-rtd-theme = "^1.0.0"
