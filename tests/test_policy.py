@@ -1431,14 +1431,8 @@ class ConfigModeTest(BaseTest):
         cmock.put_evaluations.return_value = {}
         self.patch(
             ConfigPollRuleMode, '_get_client', lambda self: cmock)
-
-        config_type = KinesisStream.resource_type.config_type
-        KinesisStream.resource_type.config_type = None
-
-        def reset():
-            KinesisStream.resource_type.config_type = config_type
-
-        self.addCleanup(reset)
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
 
         p = self.load_policy({
             'name': 'kin-poll',
@@ -1447,7 +1441,9 @@ class ConfigModeTest(BaseTest):
             'mode': {
                 'type': 'config-poll-rule',
                 'schedule': 'Three_Hours'}},
-            session_factory=factory)
+            session_factory=factory,
+            validate=False)
+
         event = event_data('poll-evaluation.json', 'config')
         results = p.push(event, None)
         self.assertEqual(results, ['dev2'])
