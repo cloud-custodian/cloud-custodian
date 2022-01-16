@@ -15,13 +15,12 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete>=1.11.1,<2.0.0',
+['argcomplete>=1.12.3',
  'boto3>=1.12.31,<2.0.0',
- 'docutils>=0.14,<0.18',
  'importlib-metadata>1.7.0',
- 'jsonschema>=3.2.0,<4.0.0',
- 'python-dateutil>=2.8.1,<3.0.0',
- 'pyyaml>=5.3,<6.0',
+ 'jsonschema>=3.0.0',
+ 'python-dateutil>=2.8.2,<3.0.0',
+ 'pyyaml>=5.4.0',
  'tabulate>=0.8.6,<0.9.0']
 
 entry_points = \
@@ -48,7 +47,7 @@ setup_kwargs = {
     'package_data': package_data,
     'install_requires': install_requires,
     'entry_points': entry_points,
-    'python_requires': '>=3.6,<4.0',
+    'python_requires': '>=3.7,<4.0',
 }
 
 
