@@ -69,7 +69,7 @@ colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and p
 cryptography==36.0.1; python_version >= "3.6"
 distlib==0.3.4
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5"
-importlib-metadata==4.10.0; python_version < "3.8" and python_version >= "3.7"
+importlib-metadata==4.10.1; python_version < "3.8" and python_version >= "3.7"
 isodate==0.6.1
 jmespath==0.10.0; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
 msal-extensions==0.3.1

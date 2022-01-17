@@ -27,7 +27,7 @@ pytz = "^2021.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"
-pytest-terraform = "^0.5.0"
+pytest-terraform = "^0.6.0"
 c7n = {path = "../..", develop = true}
 
 [build-system]

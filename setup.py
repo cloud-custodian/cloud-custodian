@@ -17,7 +17,7 @@ package_data = \
 install_requires = \
 ['argcomplete>=1.12.3',
  'boto3>=1.12.31,<2.0.0',
- 'importlib-metadata>1.7.0',
+ 'docutils>=0.14,<0.18',
  'jsonschema>=3.0.0',
  'python-dateutil>=2.8.2,<3.0.0',
  'pyyaml>=5.4.0',
