@@ -1,27 +1,19 @@
 from pathlib import Path
-import sys
 
 import pytest
+
 from c7n.testing import PyTestUtils, reset_session_cache
+from zpill import PillTest
 
 
-def init_c7n_fixture():
-    root = Path("__file__").parent.parent
-    c7n_tests = root / "tests"
-    sys.path.append(str(c7n_tests.absolute()))
-
-
-init_c7n_fixture()
-
-from zpill import PillTest  # noqa
-
-
-class CustodianAWSTesting(PyTestUtils, PillTest):
+class CloudControlTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture"""
+
+    placebo_dir = Path(__file__).absolute().parent / "data" / "placebo"
 
 
 @pytest.fixture(scope="function")
-def test(request):
-    test_utils = CustodianAWSTesting(request)
+def test_awscc(request):
+    test_utils = CloudControlTesting(request)
     test_utils.addCleanup(reset_session_cache)
     return test_utils
