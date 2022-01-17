@@ -18,7 +18,7 @@ classifiers=[
 include = ["c7n_awscc/data/*json"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 click = "^8.0"
 jsonpatch = "^1.32"
 
