@@ -80,7 +80,7 @@ def initialize_resource(resource_name):
             class_name + "Update",
             (Update,),
             {
-                "schema": get_update_schema(rtype.schema),
+                "schema": get_update_schema(rtype.schema, rname),
                 "permissions": rinfo["handlers"]["update"]["permissions"],
                 "__module__": mod_name,
             },
@@ -99,7 +99,7 @@ def process_supplementary_data(rtype):
     rtype.resource_type.service = augment.get("service")
 
 
-def get_update_schema(schema):
+def get_update_schema(schema, rname):
     prop_names = set(schema["properties"])
     create_only = {s.rsplit("/", 1)[-1] for s in schema.get("createOnlyProperties", ())}
     read_only = {s.rsplit("/", 1)[-1] for s in schema.get("readOnlyProperties", ())}
@@ -109,8 +109,22 @@ def get_update_schema(schema):
         "additionalProperties": False,
         "properties": {u: schema["properties"][u] for u in updatable},
     }
+    update_schema["properties"]["type"] = {"enum": ["update"]}
+
     if "definitions" in schema:
         update_schema["definitions"] = dict(schema["definitions"])
+        update_refs(update_schema, rname)
 
-    update_schema["properties"]["type"] = {"enum": ["update"]}
     return update_schema
+
+
+def update_refs(schema_node, rname):
+    for k, v in schema_node.items():
+        if k == "$ref" and v.startswith("#/definitions/"):
+            # mutating while iterating but there's only ref value ever
+            schema_node[k] = "#/definitions/resources/awscc.%s/actions/update/%s" % (
+                rname,
+                v[2:],
+            )
+        elif isinstance(v, dict):
+            update_refs(v, rname)
