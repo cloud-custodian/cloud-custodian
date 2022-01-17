@@ -1,4 +1,5 @@
 import json
+import logging
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
@@ -8,9 +9,13 @@ from c7n.query import RetryPageIterator
 from c7n.utils import local_session
 
 
+log = logging.getLogger("c7n_awscc.query")
+
+
 class CloudControl:
 
     resources_expr = jmespath.compile("ResourceDescriptions[].Properties")
+    ids_expr = jmespath.compile("ResourceDescriptions[].Identifier")
 
     def __init__(self, manager):
         self.manager = manager
@@ -40,12 +45,17 @@ class CloudControl:
     def resources(self, query):
         client = local_session(self.manager.session_factory).client("cloudcontrol")
         p = self._get_resource_paginator(client)
-        results = self.resources_expr.search(
-            p.paginate(TypeName=self.manager.resource_type.cfn_type).build_full_result()
-        )
-        # properties are serialized json, in json.. yo dawg :/
-        results = list(map(json.loads, results))
-        return results
+
+        augment = bool(self.get_rl_perm_delta())
+        results = p.paginate(
+            TypeName=self.manager.resource_type.cfn_type
+        ).build_full_result()
+        if not augment:
+            # properties are serialized json, in json.. yo dawg :/
+            results = list(map(json.loads, self.resources_expr.search(results)))
+            return results
+        else:
+            return self.get_resources(self.ids_expr.search(results))
 
     def get_resources(self, ids, cache=True):
         client = local_session(self.manager.session_factory).client("cloudcontrol")
@@ -59,6 +69,26 @@ class CloudControl:
             except ClientError:
                 continue
         return resources
+
+    def get_rl_perm_delta(self):
+        lperms = set(
+            self.manager.schema["handlers"]
+            .get("list", {"permissions": ()})
+            .get("permissions")
+        )
+        rperms = set(
+            self.manager.schema["handlers"]
+            .get("read", {"permissions": ()})
+            .get("permissions")
+        )
+
+        remainder = rperms.difference(lperms)
+        if not remainder or len(remainder) < 2:
+            return False
+        print(
+            f"cloud control {self.manager.type} forces augment {remainder} {lperms} {rperms}"
+        )
+        return remainder
 
     def augment(self, resources):
         # nothing useful to do, most types via this control
