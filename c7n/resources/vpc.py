@@ -1784,7 +1784,7 @@ class TransitGateway(query.QueryResourceManager):
         id_prefix = "tgw-"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
-        cfn_type = 'AWS::EC2::TransitGateway'
+        config_type = cfn_type = 'AWS::EC2::TransitGateway'
 
 
 class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
