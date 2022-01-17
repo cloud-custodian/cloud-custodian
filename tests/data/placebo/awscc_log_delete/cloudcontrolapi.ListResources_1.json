@@ -1,0 +1,149 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Logs::LogGroup",
+        "ResourceDescriptions": [
+            {
+                "Identifier": "/aws/apigateway/welcome",
+                "Properties": "{\"RetentionInDays\":30,\"LogGroupName\":\"/aws/apigateway/welcome\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/apigateway/welcome:*\",\"Tags\":[{\"Value\":\"Kapil\",\"Key\":\"Owner\"}]}"
+            },
+            {
+                "Identifier": "/aws/codebuild/custodian-build-python",
+                "Properties": "{\"LogGroupName\":\"/aws/codebuild/custodian-build-python\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/custodian-build-python:*\"}"
+            },
+            {
+                "Identifier": "/aws/ecs/containerinsights/apichanges/performance",
+                "Properties": "{\"RetentionInDays\":1,\"LogGroupName\":\"/aws/ecs/containerinsights/apichanges/performance\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/ecs/containerinsights/apichanges/performance:*\",\"Tags\":[{\"Value\":\"Dev\",\"Key\":\"Env\"}]}"
+            },
+            {
+                "Identifier": "/aws/lambda/RecipeSkillFunction",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/RecipeSkillFunction\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/RecipeSkillFunction:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/accountmgr-dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/accountmgr-dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/accountmgr-dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/burnify-dev-lease_gc",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/burnify-dev-lease_gc\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/burnify-dev-lease_gc:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/c7n-copy-cask-binary",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/c7n-copy-cask-binary\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/c7n-copy-cask-binary:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/c7nci-dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/c7nci-dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/c7nci-dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-dynamodb-policy",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-dynamodb-policy\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-dynamodb-policy:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-ec2-tag-compliance-v6",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-ec2-tag-compliance-v6\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ec2-tag-compliance-v6:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-fastai-stopper",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-fastai-stopper\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-fastai-stopper:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-root-login-detected",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-root-login-detected\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-root-login-detected:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-s3-encrypt",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-s3-encrypt\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-s3-encrypt:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-sqs-checker",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-sqs-checker\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-sqs-checker:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/custodian-subnet-detect",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/custodian-subnet-detect\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-subnet-detect:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/devtest",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/devtest\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/devtest:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/devx",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/devx\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/devx:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/devxt",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/devxt\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/devxt:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/gittersearch-dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/gittersearch-dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/gittersearch-dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/gittersearch-dev-fanned_fetch",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/gittersearch-dev-fanned_fetch\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/gittersearch-dev-fanned_fetch:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/gittersearch-dev-fetch",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/gittersearch-dev-fetch\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/gittersearch-dev-fetch:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/hubalytics-dev-MySQSQueueFunction-8H4V4RTOIJUZ",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/hubalytics-dev-MySQSQueueFunction-8H4V4RTOIJUZ\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/hubalytics-dev-MySQSQueueFunction-8H4V4RTOIJUZ:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/maid-periodic-ec2-checker",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/maid-periodic-ec2-checker\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/maid-periodic-ec2-checker:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/pydev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/pydev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pydev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/repobox-dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/repobox-dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/repobox-dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/repobox-dev-on_build",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/repobox-dev-on_build\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/repobox-dev-on_build:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/sphere11-dev",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/sphere11-dev\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/sphere11-dev:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/steward-app-ApiFunction-1WXI22JIWDPRQ",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/steward-app-ApiFunction-1WXI22JIWDPRQ\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/steward-app-ApiFunction-1WXI22JIWDPRQ:*\"}"
+            },
+            {
+                "Identifier": "/aws/lambda/test",
+                "Properties": "{\"LogGroupName\":\"/aws/lambda/test\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/test:*\"}"
+            },
+            {
+                "Identifier": "/fargate/task/sitebuild",
+                "Properties": "{\"LogGroupName\":\"/fargate/task/sitebuild\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/fargate/task/sitebuild:*\"}"
+            },
+            {
+                "Identifier": "/fargate/tasks/apichanges",
+                "Properties": "{\"RetentionInDays\":90,\"LogGroupName\":\"/fargate/tasks/apichanges\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/fargate/tasks/apichanges:*\",\"Tags\":[{\"Value\":\"AWSAPIChanges\",\"Key\":\"App\"}]}"
+            },
+            {
+                "Identifier": "/foo/bar",
+                "Properties": "{\"LogGroupName\":\"/foo/bar\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/foo/bar:*\"}"
+            },
+            {
+                "Identifier": "API-Gateway-Execution-Logs_e9geadujob/api",
+                "Properties": "{\"LogGroupName\":\"API-Gateway-Execution-Logs_e9geadujob/api\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_e9geadujob/api:*\"}"
+            },
+            {
+                "Identifier": "API-Gateway-Execution-Logs_tvw04x2qf6/latest",
+                "Properties": "{\"LogGroupName\":\"API-Gateway-Execution-Logs_tvw04x2qf6/latest\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:API-Gateway-Execution-Logs_tvw04x2qf6/latest:*\"}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

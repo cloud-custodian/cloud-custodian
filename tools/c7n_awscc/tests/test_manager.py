@@ -10,7 +10,7 @@ def test_init_resource_access_analyzer():
 
 def test_update_schema():
     klass = initialize_resource("eks_cluster")["EksCluster"]
-    update_schema = get_update_schema(klass.schema)
+    update_schema = get_update_schema(klass.schema, "eks_cluster")
     assert set(update_schema["properties"]) == {
         "Tags",
         "Version",

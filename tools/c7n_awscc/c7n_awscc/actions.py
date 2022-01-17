@@ -42,7 +42,7 @@ class Update(ControlAction):
             client.update_resource(
                 TypeName=self.manager.resource_type.cfn_type,
                 Identifier=self.get_identity(r),
-                PatchDocument=patch.to_string()
+                PatchDocument=patch.to_string(),
             )
 
     def get_patch(self, r):
