@@ -154,6 +154,14 @@ class PolicyLambdaProvision(Publish):
 
     def test_config_poll_rule_evaluation(self):
         session_factory = self.record_flight_data("test_config_poll_rule_provision")
+
+        # config added support for kinesis streams after that test was written
+        # disable that support so the original behavior check on config poll mode
+        # can be verified
+        from c7n.resources.kinesis import KinesisStream
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
+
         p = self.load_policy({
             'name': 'configx',
             'resource': 'aws.kinesis',

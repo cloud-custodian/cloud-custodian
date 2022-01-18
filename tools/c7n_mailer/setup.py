@@ -11,14 +11,14 @@ package_data = \
 
 install_requires = \
 ['Jinja2>=3.0,<4.0',
- 'boto3>=1.11.12,<2.0.0',
+ 'boto3>=1.11.12',
  'datadog>=0.34.0,<0.35.0',
  'jsonpatch>=1.25,<2.0',
  'jsonpointer>=2.0,<3.0',
- 'jsonschema>=3.2.0,<4.0.0',
+ 'jsonschema>=3.2.0',
  'ldap3>=2.6.1,<3.0.0',
  'python-dateutil>=2.8.1,<3.0.0',
- 'pyyaml>=5.3,<6.0',
+ 'pyyaml>=5.4.0',
  'redis>=3.4.1,<4.0.0',
  'sendgrid>=6.1.1,<7.0.0']
 
@@ -47,7 +47,7 @@ setup_kwargs = {
     'package_data': package_data,
     'install_requires': install_requires,
     'entry_points': entry_points,
-    'python_requires': '>=3.6,<4.0',
+    'python_requires': '>=3.7,<4.0',
 }
 
 
