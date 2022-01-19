@@ -96,7 +96,7 @@ def initialize_resource(resource_name):
 def process_supplementary_data(rtype):
     idx = get_index()
     augment = idx["augment"][rtype.resource_type.cfn_type]
-    rtype.resource_type.service = augment.get("service")
+    rtype.resource_type.service = augment.get("service") or ""
 
 
 def get_update_schema(schema, rname):
