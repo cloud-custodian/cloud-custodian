@@ -172,7 +172,8 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketLoggingConfiguration(self, resource, item_value):
         if ('destinationBucketName' not in item_value or
                 item_value['destinationBucketName'] is None):
-            return {}
+            resource[u'Logging'] = {}
+            return
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
@@ -301,6 +302,7 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketVersioningConfiguration(self, resource, item_value):
         # Config defaults versioning to 'Off' for a null value
         if item_value['status'] not in ('Enabled', 'Suspended'):
+            resource['Versioning'] = {}
             return
         resource['Versioning'] = {'Status': item_value['status']}
         # `isMfaDeleteEnabled` is an optional boolean property - the key may be absent,
