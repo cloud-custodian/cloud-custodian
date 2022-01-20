@@ -305,7 +305,6 @@ def _main(provider, output_dir, group_by):
     written = 0
     groups = {}
 
-
     for r in provider_class.resources.values():
         group = group_by(r)
         if not isinstance(group, list):
@@ -331,7 +330,6 @@ def _main(provider, output_dir, group_by):
                 provider_name=provider,
                 resource=r),
             diff_changes=not written)
-
 
     # Create files for all groups
     for key, group in sorted(groups.items()):
