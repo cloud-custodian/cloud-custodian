@@ -51,9 +51,11 @@ class SecurityHubFindingFilter(Filter):
                 'securityhub', region_name=self.data.get('region'))
         found = []
         params = dict(self.data.get('query', {}))
-
         for r_arn, resource in zip(self.manager.get_arns(resources), resources):
             params['ResourceId'] = [{"Value": r_arn, "Comparison": "EQUALS"}]
+            if resource.get("InstanceId"):
+                params['ResourceId'].append(
+                    {"Value": resource["InstanceId"], "Comparison": "EQUALS"})
             findings = client.get_findings(Filters=params).get("Findings")
             if len(findings) > 0:
                 resource[self.annotation_key] = findings
@@ -131,7 +133,7 @@ class SecurityHub(LambdaMode):
                 if r['Id'].startswith('AWS') and r['Type'] == 'AwsIamAccessKey':
                     rids.add('arn:aws:iam::%s:user/%s' % (
                         f['AwsAccountId'],
-                        r['Details']['AwsIamAccessKey']['UserName']))
+                        r['Details']['AwsIamAccessKey']['PrincipalName']))
                 elif not r['Id'].startswith('arn'):
                     log.warning("security hub unknown id:%s rtype:%s",
                                 r['Id'], r['Type'])

@@ -288,3 +288,33 @@ class TestECR(BaseTest):
 
     def test_ecr_set_lifecycle(self):
         pass
+
+    def test_ecr_image_filter_security_finding(self):
+        session_factory = self.replay_flight_data("test_ecr_image_filter_security_finding")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding",
+                        "query": {
+                            "RecordState": [
+                                {
+                                    "Value": "ACTIVE",
+                                    "Comparison": "EQUALS"
+                                }
+                            ],
+                            "Title": [
+                                {
+                                    "Value": "CVE-2021-44228",
+                                    "Comparison": "PREFIX"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
