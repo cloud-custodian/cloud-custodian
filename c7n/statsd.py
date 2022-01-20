@@ -10,7 +10,7 @@ https://github.com/statsd/statsd
 import logging
 import socket
 
-from .metrics import metrics_output
+from .metrics import metrics_output, Metrics
 
 log = logging.getLogger('c7n.statsd')
 
