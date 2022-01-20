@@ -131,9 +131,12 @@ class SecurityHub(LambdaMode):
                 # Security hub invented some new arn format for a few resources...
                 # detect that and normalize to something sane.
                 if r['Id'].startswith('AWS') and r['Type'] == 'AwsIamAccessKey':
+                    if 'PrincipalName' in r['Details']['AwsIamAccessKey']:
+                        label = r['Details']['AwsIamAccessKey']['PrincipalName']
+                    else:
+                        label = r['Details']['AwsIamAccessKey']['UserName']
                     rids.add('arn:aws:iam::%s:user/%s' % (
-                        f['AwsAccountId'],
-                        r['Details']['AwsIamAccessKey']['PrincipalName']))
+                        f['AwsAccountId'], label))
                 elif not r['Id'].startswith('arn'):
                     log.warning("security hub unknown id:%s rtype:%s",
                                 r['Id'], r['Type'])
