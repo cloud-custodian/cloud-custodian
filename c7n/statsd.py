@@ -10,7 +10,7 @@ https://github.com/statsd/statsd
 import logging
 import socket
 
-from .metrics import metrics_output, Metrics
+from .output import metrics_outputs, Metrics
 
 log = logging.getLogger('c7n.statsd')
 
@@ -22,7 +22,7 @@ TAG_SIGNALFX = "signalfx"
 TAG_INFLUXDB = "influxdb"
 
 
-@metrics_output.register('statsd')
+@metrics_outputs.register('statsd')
 class StatsdMetrics(Metrics):
     def __init__(self, ctx, config):
         self.ctx = ctx
@@ -30,7 +30,9 @@ class StatsdMetrics(Metrics):
 
     def get_client(self, config):
         host, port = config.netloc.split(':')
-        return StatsdClient(host, port, config.get('tag_format', TAG_DOGSTATSD))
+        return StatsdClient(
+            host, port, config.get('tag_format', TAG_DOGSTATSD)
+        ).connect()
 
     def get_dimensions(self, dimensions):
         if self.ctx.options.account_id:
@@ -53,7 +55,7 @@ class StatsdMetrics(Metrics):
 class StatsdClient:
     """statsd client"""
 
-    def __init__(self, host, port, tag_format):
+    def __init__(self, host, port, tag_format=TAG_DOGSTATSD):
         self.prefix = "c7n.policy."
         self.tags = {}
         self.sock = None
@@ -70,17 +72,17 @@ class StatsdClient:
 
     def increment(self, name, value, sampling_rate=1.0):
         # counter++
-        self._send("{self.prefix}{name}:{value}|c|@{sampling_rate}")
+        self._send(f"{self.prefix}{name}:{value}|c|@{sampling_rate}")
 
     def decrement(self, name, value, sampling_rate=1.0):
         # counter--
-        self._send("{self.prefix}{name}:-{value}|c|@{sampling_rate}")
+        self._send(f"{self.prefix}{name}:-{value}|c|@{sampling_rate}")
 
     def histogram(self, name, value):
-        self._send("{0}{1}:{2}|ms".format(self.prefix, name, value))
+        self._send(f"{self.prefix}{name}:{value}|ms")
 
     def set(self, name, value):
-        self._send("{0}{1}:{2}|s".format(self.prefix, name, value))
+        self._send(f"{self.prefix}{name}:{value}|s")
 
     # internals
     def format_tags(self, msg):
@@ -91,22 +93,22 @@ class StatsdClient:
         # https://github.com/prometheus/statsd_exporter#tagging-extensions
 
         if self.tag_format == TAG_DOGSTATSD:
-            msg += '|#%s' % (",".join(["%s:%s" % (k, v) for k, v in self.tags]))
+            msg += '|#%s' % (",".join(["%s:%s" % (k, v) for k, v in self.tags.items()]))
             return msg
         midx = msg.index(':')
         if self.tag_format == TAG_LIBRATO:
             msg = msg[:midx] + "#%s%s" % (
-                ",".join(["%s:%s" % (k, v) for k, v in self.tags]),
+                ",".join(["%s:%s" % (k, v) for k, v in self.tags.items()]),
                 msg[midx:],
             )
         elif self.tag_format == TAG_INFLUXDB:
             msg = msg[:midx] + ",%s%s" % (
-                ",".join(["%s:%s" % (k, v) for k, v in self.tags]),
+                ",".join(["%s:%s" % (k, v) for k, v in self.tags.items()]),
                 msg[midx:],
             )
         elif self.tag_format == TAG_SIGNALFX:
             msg = msg[:midx] + "[%s]%s" % (
-                ",".join(["%s:%s" % (k, v) for k, v in self.tags]),
+                ",".join(["%s:%s" % (k, v) for k, v in self.tags.items()]),
                 msg[midx:],
             )
         return msg
@@ -119,6 +121,7 @@ class StatsdClient:
         except Exception:
             log.warning("Couldnt connect to statsd host")
             self.sock = None
+        return self
 
     def close(self):
         if self.sock:
