@@ -15,7 +15,7 @@ def test_statsd_output():
 
     cfg = parse_url_config('statsd://localhost:3000?tag_format=librato')
 
-    with patch('socket.socket') as s:
+    with patch('socket.socket'):
         output = statsd.StatsdMetrics(ctx, cfg)
         assert output.get_dimensions({}) == {
             'Account': '112233',
@@ -100,10 +100,11 @@ def test_client_send():
     client = statsd.StatsdClient('localhost', '3000')
     client.sock = sock = MagicMock()
     client.gauge('resources', 10)
+    assert sock.send.call_args.args == (b'c7n.policy.resources:10|g',)
 
 
 def test_client_connect_close():
-    with patch('socket.socket') as s:
+    with patch('socket.socket'):
         client = statsd.StatsdClient('localhost', '3000')
         client.connect()
         client.close()
