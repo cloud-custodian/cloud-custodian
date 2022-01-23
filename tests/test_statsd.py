@@ -1,6 +1,33 @@
+from unittest.mock import MagicMock, patch
 import pytest
 
+from c7n.config import Config, Bag
+from c7n.utils import parse_url_config
 from c7n import statsd
+
+
+def test_statsd_output():
+
+    ctx = Bag(
+        policy=Bag({'name': 'abc', 'resource_type': 'aws.ec2'}),
+        options=Config.empty(**{'account_id': '112233', 'region': 'us-east-2'}),
+    )
+
+    cfg = parse_url_config('statsd://localhost:3000?tag_format=librato')
+
+    with patch('socket.socket') as s:
+        output = statsd.StatsdMetrics(ctx, cfg)
+        assert output.get_dimensions({}) == {
+            'Account': '112233',
+            'Region': 'us-east-2',
+            'Resource': 'aws.ec2',
+            'Policy': 'abc',
+        }
+
+        messages = []
+        output.statsd._send = messages.append
+        output.put_metric('ResourceCount', 100, 'Count')
+        assert messages.pop() == "c7n.policy.ResourceCount:100|g"
 
 
 def test_client():
@@ -60,3 +87,23 @@ def test_client_tag_format(tag_format, msg, output):
     client.tag_format = tag_format
     client.set_tags({'Env': 'Dev', 'Region': 'us-east-1'})
     assert client.format_tags(msg) == output
+
+
+def test_client_no_tags():
+    client = statsd.StatsdClient('localhost', '3000')
+    assert (
+        client.format_tags("c7n.policy.resources:10|g") == "c7n.policy.resources:10|g"
+    )
+
+
+def test_client_send():
+    client = statsd.StatsdClient('localhost', '3000')
+    client.sock = sock = MagicMock()
+    client.gauge('resources', 10)
+
+
+def test_client_connect_close():
+    with patch('socket.socket') as s:
+        client = statsd.StatsdClient('localhost', '3000')
+        client.connect()
+        client.close()

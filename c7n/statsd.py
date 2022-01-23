@@ -55,9 +55,9 @@ class StatsdMetrics(Metrics):
 class StatsdClient:
     """statsd client"""
 
-    def __init__(self, host, port, tag_format=TAG_DOGSTATSD):
-        self.prefix = "c7n.policy."
-        self.tags = {}
+    def __init__(self, host, port, tag_format=TAG_DOGSTATSD, prefix="c7n.policy."):
+        self.prefix = prefix
+        self.tags = None
         self.sock = None
         self.host = host
         self.port = port
@@ -113,11 +113,10 @@ class StatsdClient:
             )
         return msg
 
-    def connect(self, cfg):
-        host, port = cfg.statsd_host
+    def connect(self):
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.sock.connect((host, int(port)))
+            self.sock.connect((self.host, int(self.port)))
         except Exception:
             log.warning("Couldnt connect to statsd host")
             self.sock = None
