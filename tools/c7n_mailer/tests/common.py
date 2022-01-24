@@ -46,7 +46,6 @@ MAILER_CONFIG = {
     'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
                           os.path.abspath('/')],
 }
-
 MAILER_CONFIG_AZURE = {
     'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
     'from_address': 'you@youremail.com',
@@ -56,6 +55,18 @@ MAILER_CONFIG_AZURE = {
         os.path.abspath('/'),
         os.path.abspath(os.path.join(os.path.dirname(__file__), 'test-templates')),
     ],
+}
+
+MAILER_CONFIG_GCP = {
+    'smtp_port': 25,
+    'smtp_ssl': False,
+    'smtp_username': 'user',
+    'smtp_password': 'password',
+    'from_address': 'devops@initech.com',
+    'queue_url': 'projects/c7n-dev/subscriptions/getnotify',
+    'smtp_server': 'smtp.inittech.com',
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 RESOURCE_1 = {
@@ -289,6 +300,52 @@ SQS_MESSAGE_5 = {
     'resources': [RESOURCE_3]
 }
 
+GCP_MESSAGES = {
+    'receivedMessages': [{
+        'ackId': 'TgQhIT4wPkVTRFAGFixdRkhRNxkIaFEOT14jPzUgKEURCAgUBXx9cURLdV9bGgdRDRlyfGckOFgUBwtC'
+                 'UXZVWxENem1cVzhUCRB1eWF8algbAwVAVH53_pGKmvCVOR1tNcH7qrdASszD_492Zho9XxJLLD5-Ki1F'
+                 'QV5AEkwhGERJUytDCypYEQ',
+        'message': {
+            'data': 'eJzVUrtuwzAM3PUVhuY6GQNk6tStX1AUgULTrgqZFCQqgBHk36tHHm6nolsHDbrDHe9EnZXGE5Lof'
+                    'UfJuSelDQAnkoMdMqZhR/2AJ/0gfqABJ8tUQONcATw7C0sGzkqTmbFQglF6YrHj0jSRU4BKTeA3Ph'
+                    '1jOvbC3kLhR+sEQ8z0m1q5+MCfCBK31/HbKqjXw9VcXdR7jSo51N1AFl8NHgkEZ++MVHTA0SQnBc4'
+                    'pyoRbZEtT1zRdc6xSrrY6RQzPA8/G0gZ41nWwBEPRc5DW/za4FWzq0vHXZXIddbkX+m76D9usdv+X'
+                    '7WZ5vu1fjcAHDi+rX9JcymOV8wVn/efe',
+            'messageId': '549740902827570',
+            'publishTime': '2019-05-13T18:31:17.926Z'
+        }
+    }]
+}
+
+GCP_MESSAGE = '''{
+    "account": "c7n-dev",
+    "account_id": "c7n-dev",
+        "action": {
+        "subject": "testing notify action",
+        "template": "default",
+        "to": ["user@domain.com"],
+        "transport": {
+            "topic": "projects/c7n-dev/topics/c7n_notify",
+            "type": "pubsub"},
+        "type": "notify"},
+    "event": null,
+    "policy": {
+        "actions": [{
+            "subject": "testing notify action",
+            "template": "default",
+            "to": ["user@domain.com"],
+            "transport": {
+                "topic": "projects/c7n-dev/topics/c7n_notify",
+                "type": "pubsub"},
+            "type": "notify"}],
+        "filters": [{
+            "name": "projects/c7n-dev/topics/c7n_notify"}],
+        "name": "test-notify",
+        "resource": "gcp.pubsub-topic"},
+    "region": "all",
+    "resources": [{
+        "c7n:MatchedFilters": ["name"],
+        "name": "projects/c7n-dev/topics/c7n_notify"}]}'''
 
 ASQ_MESSAGE = '''{
    "account":"subscription",

@@ -9,9 +9,11 @@ import boto3
 import jsonschema
 import yaml
 from c7n_mailer import deploy, utils
-from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
-from c7n_mailer.azure_mailer import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+from c7n_mailer.azure_mailer import deploy as azure_deploy
+# from c7n_mailer.gcp_mailer import deploy as gcp_deploy
 from c7n_mailer.utils import get_provider, Providers
 
 AZURE_KV_SECRET_SCHEMA = {
@@ -23,6 +25,8 @@ AZURE_KV_SECRET_SCHEMA = {
     'required': ['type', 'secret'],
     'additionalProperties': False
 }
+
+# GCP_SECRET_SCHEMA = {}
 
 SECURED_STRING_SCHEMA = {
     'oneOf': [
@@ -116,9 +120,10 @@ CONFIG_SCHEMA = {
                 ]
             },
         },
-        'function_schedule': {'type': 'string'},
-        'function_skuCode': {'type': 'string'},
-        'function_sku': {'type': 'string'},
+        # GCP Cloud Function Config # TODO:
+        # 'function_schedule': {'type': 'string'},
+        # 'function_skuCode': {'type': 'string'},
+        # 'function_sku': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -251,6 +256,8 @@ def main():
 
         if provider == Providers.Azure:
             azure_deploy.provision(mailer_config)
+        # elif provider == Providers.GCP:  # TODO:
+        #     gcp_deploy.provision(mailer_config)
         elif provider == Providers.AWS:
             deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 
@@ -260,6 +267,8 @@ def main():
         # Select correct processor
         if provider == Providers.Azure:
             processor = MailerAzureQueueProcessor(mailer_config, logger)
+        elif provider == Providers.Google:
+            processor = MailerGcpQueueProcessor(mailer_config, logger)
         elif provider == Providers.AWS:
             aws_session = session_factory(mailer_config)
             processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)

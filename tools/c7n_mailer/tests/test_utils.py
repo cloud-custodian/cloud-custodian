@@ -336,7 +336,7 @@ class DecryptTests(unittest.TestCase):
     def test_azure_decrypt(self, azure_decrypt_mock):
         utils.decrypt({'queue_url': 'asq://', 'test': 'test'}, Mock(), Mock(), 'test')
         azure_decrypt_mock.assert_called_once()
-
+    # TODO: GCP
     def test_decrypt_none(self):
         self.assertEqual(utils.decrypt({'queue_url': 'aws'}, Mock(), Mock(), 'test'), None)
         self.assertEqual(utils.decrypt({'queue_url': 'asq://'}, Mock(), Mock(), 'test'), None)

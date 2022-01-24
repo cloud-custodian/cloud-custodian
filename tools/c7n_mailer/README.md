@@ -599,6 +599,54 @@ function_properties:
     type: SystemAssigned
 ```
 
+## Using on GCP
+
+Requires:
+
+- `c7n_gcp` package.  See [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
+- A working SMTP Account.
+- [GCP Pubsub Subscription](https://cloud.google.com/pubsub/docs/)
+
+The mailer supports GCP Pubsub transports and SMTP/Email delivery.
+Configuration for this scenario requires only minor changes from AWS deployments.
+
+The notify action in your policy will reflect transport type `projects` with the URL
+to a GCP Pub/Sub Topic.  For example:
+
+```yaml
+policies:
+  - name: gcp-notify
+    resource: gcp.compute
+    description: example policy
+    actions:
+      - type: notify
+        template: default
+        priority_header: '2'
+        subject: Hello from C7N Mailer
+        to:
+          - you@youremail.com
+        transport:
+          type: pubsub
+          topic: projects/myproject/topics/mytopic
+```
+
+In your mailer configuration, you'll need to provide your SMTP account information
+as well as your topic subscription path in the queue_url variable. Please note that the
+subscription you specify should be subscribed to the topic you assign in your policies'
+notify action for GCP resources.
+
+```yaml
+queue_url: projects/myproject/subscriptions/mysubscription
+from_address: you@youremail.com
+smtp_server: my.smtp.add.ress
+smtp_port: 25
+smtp_ssl: True
+smtp_username: smtpuser
+smtp_password: smtppassword  # TODO: Secure string
+```
+
+The mailer will transmit all messages found on the queue on each execution using SMTP/Email delivery.
+
 ## Writing an email template
 
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).
