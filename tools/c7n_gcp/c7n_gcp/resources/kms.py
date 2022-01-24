@@ -1,14 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import distutils
 import re
 
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo, \
     GcpLocation
 from c7n_gcp.actions import SetIamPolicy
 from c7n_gcp.filters import IamPolicyFilter
+from c7n.filters import Filter
 
 
 @resources.register('kms-keyring')
@@ -187,3 +189,53 @@ class KmsCryptoKeyVersion(ChildResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]
+
+
+@resources.register('kms-location')
+class KmsLocation(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudkms'
+        version = 'v1'
+        component = 'projects.locations'
+        enum_spec = ('list', 'locations[]', None)
+        scope = None
+        name = id = 'name'
+        default_report_fields = [
+            "name", "createTime"]
+        asset_type = "cloudkms.googleapis.com/Location"
+
+    def _fetch_resources(self, query):
+        super_fetch_resources = QueryResourceManager._fetch_resources
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+        return super_fetch_resources(self, {'name': 'projects/{}'.format(project)})
+
+
+@KmsLocation.filter_registry.register('kms-keyring')
+class KmsLocationKmsKeyringFilter(Filter):
+
+    schema = type_schema('kms-keyring', **{
+        'exist': {'anyOf': [{'type': 'boolean'}, {'type': 'string'}]}},)
+    permissions = ('cloudkms.keyRings.list',)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        client = session.client(
+            service_name='cloudkms', version='v1', component='projects.locations.keyRings')
+        accepted_resources = []
+        expecting_exist = self.data['exist']
+
+        for resource in resources:
+            kms_key_rings = client.execute_query('list', {'parent': resource['name']})
+            kms_key_rings_exist = (kms_key_rings.get('keyRings') is not None and
+                                   len(kms_key_rings.get('keyRings')) > 0)
+            if ((isinstance(expecting_exist, bool) and kms_key_rings_exist == expecting_exist) or
+                    (isinstance(expecting_exist, str)
+                     and kms_key_rings_exist == distutils.util.strtobool(expecting_exist))):
+                accepted_resources.append(resource)
+        return accepted_resources
