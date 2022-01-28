@@ -6,7 +6,9 @@ from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import (
+    ConfigSource, DescribeSource, QueryResourceManager, TypeInfo,
+    ChildResourceManager, ChildDescribeSource, ChildResourceQuery, sources)
 from c7n import tags
 from c7n.utils import local_session, type_schema
 
@@ -42,6 +44,57 @@ class ECR(QueryResourceManager):
     source_mapping = {
         'describe': DescribeECR,
         'config': ConfigSource
+    }
+
+
+class ECRImageQuery(ChildResourceQuery):
+
+    def get(self, resource_manager, identities):
+        m = self.resolve(resource_manager.resource_type)
+        params = {}
+        resources = self.filter(resource_manager, **params)
+        resources = [r for r in resources if "{}/{}".format(r[0], r[1][m.id]) in identities]
+
+        return resources
+
+
+@sources.register('describe-ecr-image')
+class RepositoryImageDescribeSource(ChildDescribeSource):
+
+    resource_query_factory = ECRImageQuery
+
+    def get_query(self):
+        query = super(RepositoryImageDescribeSource, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('ecr')
+        for repositoryName, image in resources:
+            repoArn = client.describe_repositories(
+                repositoryNames=[repositoryName])['repositories'][0]['repositoryArn']
+            imageArn = "{}/{}".format(repoArn, image["imageDigest"])
+            image["imageArn"] = imageArn
+            results.append(image)
+        return results
+
+
+@resources.register('ecr-image')
+class RepositoryImage(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ecr'
+        parent_spec = ('ecr', 'repositoryName', None)
+        enum_spec = ('describe_images', 'imageDetails', None)
+        id = 'imageDigest'
+        name = 'repositoryName'
+        arn = "imageArn"
+        arn_type = 'repository'
+
+    source_mapping = {
+        'describe-child': RepositoryImageDescribeSource,
+        'describe': RepositoryImageDescribeSource,
     }
 
 
