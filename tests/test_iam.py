@@ -71,6 +71,31 @@ class UserCredentialReportTest(BaseTest):
             ["Hazmat", "kapilt"],
         )
 
+    def test_credential_report_generate_in_progress(self):
+        session_factory = self.replay_flight_data("test_iam_user_unused_keys_report_in_progress")
+        p = self.load_policy(
+            {
+                "name": "user-access-unused-keys",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "credential",
+                        "key": "access_keys.last_used_date",
+                        "report_delay": 0.01,
+                        "value": "empty",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r["UserName"] for r in resources]),
+            ["Hazmat", "kapilt"],
+        )
+
     def test_credential_access_key_multifilter_delete(self):
         factory = self.replay_flight_data('test_iam_user_credential_multi_delete')
         p = self.load_policy({
