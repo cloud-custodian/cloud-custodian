@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.utils import type_schema
+from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
@@ -42,6 +42,34 @@ class SpannerInstance(QueryResourceManager):
                             'labels': all_labels
                         },
                         'field_mask': ', '.join(['labels'])}}
+
+
+@resources.register('spanner-instance-backup')
+class SpannerInstanceBackup(ChildResourceManager):
+    """GC resource: https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.backups"""
+    class resource_type(ChildTypeInfo):
+        service = 'spanner'
+        version = 'v1'
+        component = 'projects.instances.backups'
+        enum_spec = ('list', 'backups[]', None)
+        scope = 'parent'
+        name = id = 'backups'
+        parent_spec = {
+            'resource': 'spanner-instance',
+            'child_enum_params': {
+                ('instances', 'parent')},
+            'use_child_query': True,
+        }
+        default_report_fields = ['name', 'expireTime']
+        permissions = ('spanner.backups.list',)
+
+    def _get_child_enum_args(self, parent_instance):
+        return {
+            'parent': 'projects/{}/instances/{}'.format(
+                local_session(self.session_factory).get_default_project(),
+                parent_instance['displayName'],
+            )
+        }
 
 
 @SpannerInstance.action_registry.register('delete')

@@ -357,3 +357,21 @@ class SpannerDatabaseInstanceTest(BaseTest):
                               'members': ['user:dkhanas@gmail.com']}]
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
+
+
+class TestIamSpannerInstance(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('test-iam-spanner-instance',
+                                                  project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'iam-spanner-instance',
+             'resource': 'gcp.spanner-instance'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/instances/test-green')
+        self.assertEqual(resources[1]['name'], 'projects/cloud-custodian/instances/test-red')

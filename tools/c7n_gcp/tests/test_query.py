@@ -35,6 +35,7 @@ def test_gcp_resource_metadata_asset_type():
         'ml-model',
         'notebook',
         'sourcerepo',
+        'spanner-instance-backup',
         'sql-backup-run',
         'sql-ssl-cert',
         'sql-user',
