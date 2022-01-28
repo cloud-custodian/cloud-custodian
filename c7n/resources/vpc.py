@@ -1271,7 +1271,7 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource['Matched%s' % self.ip_permissions_key] = matched
+            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
             return True
 
 
