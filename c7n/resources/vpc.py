@@ -1080,6 +1080,32 @@ class SGPermission(Filter):
           value: 'default - DO NOT USE'
           op: equal
 
+    By default, this filter matches a security group rule if
+    _all_ of its keys match. Using `match-operator: or` causes a match
+    if _any_ key matches. This can help consolidate some simple
+    cases that would otherwise require multiple filters. To find
+    security groups that allow all inbound traffic over IPv4 or IPv6,
+    for example, we can use two filters inside an `or` block:
+
+    .. code-block:: yaml
+
+      - or:
+        - type: ingress
+          Cidr: "0.0.0.0/0"
+        - type: ingress
+          CidrV6: "::/0"
+
+    or combine them into a single filter:
+
+    .. code-block:: yaml
+
+      - type: ingress
+        match-operator: or
+          Cidr: "0.0.0.0/0"
+          CidrV6: "::/0"
+
+    Note that evaluating _combinations_ of factors (e.g. traffic over
+    port 22 from 0.0.0.0/0) still requires separate filters.
     """
 
     perm_attrs = {
