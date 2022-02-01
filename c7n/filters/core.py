@@ -211,13 +211,13 @@ class Filter(Element):
     def merge_annotation(self, r, annotation_key, values):
         block_op = self.get_block_operator()
         if block_op in ('and', 'not'):
-            r[self.matched_annotation_key] = intersect_list(
+            r[annotation_key] = intersect_list(
                 values,
-                r.get(self.matched_annotation_key))
+                r.get(annotation_key))
         elif block_op == 'or':
-            r[self.matched_annotation_key] = union_list(
+            r[annotation_key] = union_list(
                 values,
-                r.get(self.matched_annotation_key))
+                r.get(annotation_key))
 
 
 class BaseValueFilter(Filter):
