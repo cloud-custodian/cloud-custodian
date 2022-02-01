@@ -1416,6 +1416,29 @@ class IamManagedPolicyUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
+    def test_iam_role_has_specific_managed_policy_glob(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_role_no_specific_managed_policy"
+        )
+        self.patch(SpecificIamRoleManagedPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-role-with-specific-managed-policy-glob",
+                "resource": "iam-role",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "op": "glob",
+                        "value": "*Full*",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]["c7n:MatchedPolicies"]), 1)
+
 
 class IamInlinePolicyUsage(BaseTest):
 
