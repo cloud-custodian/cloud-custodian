@@ -474,3 +474,28 @@ class TestElastiCacheReplicationGroup(BaseTest):
         client = session_factory().client("elasticache")
         response = client.describe_replication_groups(ReplicationGroupId='c7n-delete')
         self.assertEqual(response.get('ReplicationGroups')[0].get('Status'), 'deleting')
+
+    def test_elasticache_replication_group_tag(self):
+        # the elasticache resource uses the universal_taggable wrapper for the AWS
+        # resource tagging API - this test ensures that API works for RGs
+        session_factory = self.replay_flight_data(
+            "test_elasticache_replication_group_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-ElastiCacheReplicationGroup",
+                "resource": "elasticache-group",
+                "filters": [{"tag:Tagging": "absent"}],
+                "actions": [{"type": "tag", "key": "Tagging", "value": "added"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        while(response.get('ReplicationGroups')[0].get('Status') == 'modifying'):
+            response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        arn = p.resource_manager.get_arns(resources)[0]
+        tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
+        self.assertEqual(tags[0]["Value"], "added")

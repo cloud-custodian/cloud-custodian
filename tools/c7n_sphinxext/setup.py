@@ -10,37 +10,41 @@ package_data = \
 {'': ['*'], 'c7n_sphinxext': ['_templates/*']}
 
 install_requires = \
-['Pygments>=2.6.1,<3.0.0',
- 'Sphinx>=3.0,<3.1',
- 'argcomplete (>=1.12.3,<2.0.0)',
- 'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.17.102,<2.0.0)',
- 'botocore (>=1.20.102,<2.0.0)',
- 'c7n (>=0.9.13,<0.10.0)',
- 'click>=7.1.2,<8.0.0',
- 'importlib-metadata (>=4.6.0,<5.0.0)',
+['Pygments>=2.10.0,<3.0.0',
+ 'Sphinx>=4.2.0,<5.0.0',
+ 'argcomplete (>=2.0.0,<3.0.0)',
+ 'attrs (>=21.4.0,<22.0.0)',
+ 'boto3 (>=1.20.37,<2.0.0)',
+ 'botocore (>=1.23.37,<2.0.0)',
+ 'c7n (>=0.9.15,<0.10.0)',
+ 'click>=8.0,<9.0',
+ 'docutils (>=0.17.1,<0.18.0)',
+ 'docutils>=0.14,<0.18',
+ 'importlib-metadata (>=4.10.1,<5.0.0)',
+ 'importlib-resources (>=5.4.0,<6.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
- 'jsonschema (>=3.2.0,<4.0.0)',
- 'pyrsistent (>=0.18.0,<0.19.0)',
- 'python-dateutil (>=2.8.1,<3.0.0)',
- 'pyyaml (>=5.4.1,<6.0.0)',
+ 'jsonschema (>=4.4.0,<5.0.0)',
+ 'myst-parser>=0.15.2,<0.16.0',
+ 'pyrsistent (>=0.18.1,<0.19.0)',
+ 'python-dateutil (>=2.8.2,<3.0.0)',
+ 'pyyaml (>=6.0,<7.0)',
  'recommonmark>=0.6.0,<0.7.0',
- 's3transfer (>=0.4.2,<0.5.0)',
+ 's3transfer (>=0.5.0,<0.6.0)',
  'six (>=1.16.0,<2.0.0)',
+ 'sphinx-rtd-theme>=1.0.0,<2.0.0',
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
- 'sphinx_rtd_theme>=0.4.3,<0.5.0',
  'tabulate (>=0.8.9,<0.9.0)',
- 'typing-extensions (>=3.10.0.0,<4.0.0.0)',
+ 'typing-extensions (>=3.10.0.2,<4.0.0.0)',
  'typing-extensions>=3.7.4,<4.0.0',
- 'urllib3 (>=1.26.6,<2.0.0)',
- 'zipp (>=3.4.1,<4.0.0)']
+ 'urllib3 (>=1.26.8,<2.0.0)',
+ 'zipp (>=3.7.0,<4.0.0)']
 
 entry_points = \
 {'console_scripts': ['c7n-sphinxext = c7n_sphinxext.docgen:main']}
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.12',
+    'version': '1.1.14',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'license': 'Apache-2.0',
     'classifiers': [
@@ -59,7 +63,7 @@ setup_kwargs = {
     'package_data': package_data,
     'install_requires': install_requires,
     'entry_points': entry_points,
-    'python_requires': '>=3.6,<4.0',
+    'python_requires': '>=3.7,<4.0',
 }
 
 

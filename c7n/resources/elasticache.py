@@ -460,7 +460,10 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
         arn_type = 'replicationgroup'
         id = name = dimension = 'ReplicationGroupId'
         cfn_type = 'AWS::ElastiCache::ReplicationGroup'
+        arn_separator = ":"
+        universal_taggable = object()
 
+    augment = universal_augment
     permissions = ('elasticache:DescribeReplicationGroups',)
 
 

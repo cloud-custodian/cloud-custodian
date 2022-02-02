@@ -61,3 +61,27 @@ class BucketTest(BaseTest):
         self.assertEqual(bucket['storageClass'], "REGIONAL")
         self.assertEqual(bucket['location'], "US-EAST1")
         self.assertJmes('iamConfiguration.uniformBucketLevelAccess.enabled', bucket, True)
+
+    def test_bucket_iam_policy_filter(self):
+        factory = self.replay_flight_data('bucket-iam-policy')
+        p = self.load_policy(
+            {'name': 'bucket',
+             'resource': 'gcp.bucket',
+             'filters': [{
+                 'type': 'iam-policy',
+                 'doc': {'key': 'bindings[*].members[]',
+                 'op': 'intersect',
+                 'value': ['allUsers', 'allAuthenticatedUsers']}
+             }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        for resource in resources:
+            self.assertTrue('c7n:iamPolicy' in resource)
+            bindings = resource['c7n:iamPolicy']['bindings']
+            members = set()
+            for binding in bindings:
+                for member in binding['members']:
+                    members.add(member)
+            self.assertTrue('allUsers' in members or 'allAuthenticatedUsers' in members)

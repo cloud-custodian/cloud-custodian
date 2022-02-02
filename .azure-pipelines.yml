@@ -5,31 +5,6 @@ variables:
 - group: CustodianCoreCI
 
 jobs:
-- job: 'CustodianCask'
-  displayName: 'Tool Tests - Cask'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  steps:
-  - checkout: self
-    fetchDepth: 1
-  - task: GoTool@0
-    inputs:
-      version: '1.12.6'
-  - script: make test
-    workingDirectory: tools/cask/
-
-- job: 'CustodianOmniSSM'
-  displayName: 'Tool Tests - OmniSSM'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  steps:
-  - checkout: self
-    fetchDepth: 1
-  - task: GoTool@0
-    inputs:
-      version: '1.12.6'
-  - script: make test
-    workingDirectory: tools/omnissm/
 
 - job: 'CustodianDockerBuild'
   displayName: 'Docker Build'

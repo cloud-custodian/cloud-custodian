@@ -20,12 +20,34 @@ def cli():
     some simple tooling to sync poetry files to setup/pip
     """
     # If there is a global installation of poetry, prefer that.
-    poetry_python_lib = os.path.expanduser('~/.poetry/lib')
-    sys.path.insert(0, os.path.realpath(poetry_python_lib))
-    # poetry env vendored deps
-    sys.path.insert(0,
-        os.path.join(poetry_python_lib, 'poetry', '_vendor', 'py{}.{}'.format(
-            sys.version_info.major, sys.version_info.minor)))
+    poetry_python_lib = Path(os.path.expanduser('~/.poetry/lib'))
+    if poetry_python_lib.exists():
+        sys.path.insert(0, os.path.realpath(poetry_python_lib))
+        # poetry env vendored deps
+        sys.path.insert(
+            0,
+            os.path.join(
+                poetry_python_lib,
+                'poetry',
+                '_vendor',
+                'py{}.{}'.format(sys.version_info.major, sys.version_info.minor),
+            ),
+        )
+
+    # If there is a global installation of poetry, prefer that.
+    cur_poetry_python_lib = Path(os.path.expanduser('~/.local/share/pypoetry/venv/lib'))
+    if cur_poetry_python_lib.exists():
+        sys.path.insert(
+            0, str(list(cur_poetry_python_lib.glob('*'))[0] / "site-packages")
+        )
+
+    osx_poetry_python_lib = Path(
+        os.path.expanduser('~/Library/Application Support/pypoetry/venv/lib')
+    )
+    if osx_poetry_python_lib.exists():
+        sys.path.insert(
+            0, str(list(osx_poetry_python_lib.glob('*'))[0] / "site-packages")
+        )
 
 
 # Override the poetry base template as all our readmes files
@@ -78,8 +100,7 @@ def gen_version_file(package_dir, version_file):
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
 def gen_setup(package_dir):
-    """Generate a setup suitable for dev compatibility with pip.
-    """
+    """Generate a setup suitable for dev compatibility with pip."""
     from poetry.core.masonry.builders import sdist
     from poetry.factory import Factory
 
@@ -114,9 +135,10 @@ def gen_setup(package_dir):
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-o', '--output', default='setup.py')
-def gen_frozensetup(package_dir, output):
-    """Generate a frozen setup suitable for distribution.
-    """
+@click.option('-x', '--exclude', multiple=True)
+@click.option('-r', '--remove', multiple=True)
+def gen_frozensetup(package_dir, output, exclude, remove):
+    """Generate a frozen setup suitable for distribution."""
     from poetry.core.masonry.builders import sdist
     from poetry.factory import Factory
 
@@ -126,10 +148,9 @@ def gen_frozensetup(package_dir, output):
     sdist.SETUP = SETUP_TEMPLATE
 
     class FrozenBuilder(sdist.SdistBuilder):
-
         @classmethod
         def convert_dependencies(cls, package, dependencies):
-            reqs, default = locked_deps(package, poetry)
+            reqs, default = locked_deps(package, poetry, exclude, remove)
             resolve_source_deps(poetry, package, reqs, frozen=True)
             return reqs, default
 
@@ -175,10 +196,17 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
             seen.add(cdep)
 
 
-def locked_deps(package, poetry):
+def locked_deps(package, poetry, exclude=(), remove=()):
     reqs = []
     packages = poetry.locker.locked_repository(False).packages
+
+    project_deps = {r.name: r for r in poetry.package.requires}
     for p in packages:
+        if p.name in exclude:
+            reqs.append(project_deps[p.name].to_pep_508())
+            continue
+        if p.name in remove:
+            continue
         dep = p.to_dependency()
         line = "{}=={}".format(p.name, p.version)
         requirement = dep.to_pep_508()

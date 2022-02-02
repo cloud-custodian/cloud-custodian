@@ -27,25 +27,25 @@ To get Python 3.8, first add the deadsnakes package repository:
 
 .. code-block:: bash
 
-    $ sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo add-apt-repository ppa:deadsnakes/ppa
 
 Next, install python3.8 and the development headers for it:
 
 .. code-block:: bash
 
-    $ sudo apt-get install python3.8 python3.8-dev
+    sudo apt-get install python3.8 python3.8-dev
 
 Then, install ``pip``:
 
 .. code-block::
 
-    $ sudo apt-get install python3-pip
+    sudo apt-get install python3-pip
 
 When this is complete you should be able to check that you have pip properly installed:
 
 .. code-block::
 
-    $ python3.8 -m pip --version
+    python3.8 -m pip --version
     pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.8)
 
 (your exact version numbers will likely differ)
@@ -56,7 +56,7 @@ On macOS with Homebrew
 
 .. code-block:: bash
 
-    $ brew install python3
+    brew install python3
 
 Installing ``python3`` will get you the latest version of Python 3 supported by Homebrew, currently Python 3.7.
 
@@ -68,7 +68,7 @@ Once your Python installation is squared away, you will need to install ``tox``:
 
 .. code-block:: bash
 
-    $ python3.7 -m pip install -U pip tox
+    python3.7 -m pip install -U pip tox
 
 (note that we also updated ``pip`` in order to get the latest version)
 
@@ -80,8 +80,8 @@ First, clone the repository:
 
 .. code-block:: bash
 
-    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-    $ cd cloud-custodian
+    git clone https://github.com/cloud-custodian/cloud-custodian.git
+    cd cloud-custodian
 
 .. note::
     If you have the intention to contribute to Cloud Custodian, it's better to make
@@ -91,28 +91,28 @@ First, clone the repository:
 
     .. code-block:: bash
 
-        $ git clone https://github.com/<your github account>/cloud-custodian.git
+        git clone https://github.com/<your github account>/cloud-custodian.git
 
     To keep track of the changes to the original cloud-custodian repository, add a
     remote upstream repository in your fork:
 
     .. code-block:: bash
 
-        $ git remote add upstream https://github.com/cloud-custodian/cloud-custodian.git
+        git remote add upstream https://github.com/cloud-custodian/cloud-custodian.git
 
     Then, to get the upstream changes and merge them into your fork:
 
     .. code-block:: bash
 
-        $ git fetch upstream
-        $ git merge upstream/master
+        git fetch upstream
+        git merge upstream/master
 
 
 Now that the repository is set up, build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:
 
 .. code-block:: bash
 
-    $ tox
+    tox
 
 Tox creates a sandboxed "virtual environment" ("venv") for each Python version, 3.6, 3.7, 3.8
 These are stored in the ``.tox/`` directory.
@@ -124,14 +124,14 @@ You can run the test suite in a single environment with the ``-e`` flag:
 
 .. code-block:: bash
 
-    $ tox -e py38
+    tox -e py38
 
 To access the executables installed in one or the other virtual environment,
 source the venv into your current shell, e.g.:
 
 .. code-block:: bash
 
-    $ source .tox/py37/bin/activate
+    source .tox/py37/bin/activate
 
 You should then have, e.g., the ``custodian`` command available:
 
@@ -160,7 +160,7 @@ module. It can be done right inside the cloned Cloud Custodian repository:
 
 .. code-block:: bash
 
-    $ python3 -m venv .
+    python3 -m venv .
 
 The above command assumes the current directory is the Cloud Custodian checkout.
 
@@ -172,20 +172,20 @@ For osx and linux, poetry recommends running this for installing:
 
 .. code-block:: bash
 
-    $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
 For windows powershell use this command:
 
 .. code-block:: bash
 
-    $ (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
+    (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
 
 
 Once poetry is installed, you can set up Cloud Custodian using the included Makefile:
 
 .. code-block:: bash
 
-    $ source bin/activate
+    source bin/activate
     (cloud-custodian) $ make install-poetry
 
 .. note::
@@ -205,7 +205,7 @@ using the shell:
 
 .. code-block:: bash
 
-    $ source test.env
+    source test.env
 
 In general, it's best to use ``tox`` to run the full test suite, and use ``pytest``
 to run specific tests that you are working on.

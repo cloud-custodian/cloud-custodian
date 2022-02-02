@@ -80,7 +80,7 @@ So for a test named ``test_file_example`` the terraform files for that test will
 Here's an example terraform file for the upcoming example.
 It is placed in ``tests/terraform/file_example/main.tf``.
 
-  .. code-block:: terraform
+  ::
 
     resource "local_file" "bar" {
        content = "bar!"
@@ -259,7 +259,7 @@ to inspect cloud entities after each test run.
 In this example we create a new SQS and a policy to delete it then assert it is
 deleted. To avoid terraform erroring on teardown `TEARDOWN_IGNORE` is used.
 
-  .. code-block:: terraform
+  ::
 
     provider "aws" {}
 

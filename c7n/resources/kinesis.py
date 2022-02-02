@@ -32,7 +32,7 @@ class KinesisStream(QueryResourceManager):
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
-        cfn_type = 'AWS::Kinesis::Stream'
+        config_type = cfn_type = 'AWS::Kinesis::Stream'
 
     source_mapping = {
         'describe': DescribeStream,

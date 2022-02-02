@@ -13,6 +13,7 @@ class ArtifactDomain(QueryResourceManager):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
         detail_spec = ('describe_domain', 'domain', 'name', 'domain')
+        cfn_type = 'AWS::CodeArtifact::Repository'
         id = name = 'name'
         arn = 'arn'
 

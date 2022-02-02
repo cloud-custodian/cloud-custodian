@@ -6,10 +6,18 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
+)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 from .aws import shape_validate
+
+
+class EFSDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('efs')
@@ -27,9 +35,12 @@ class ElasticFileSystem(QueryResourceManager):
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
-        cfn_type = 'AWS::EFS::FileSystem'
+        config_type = cfn_type = 'AWS::EFS::FileSystem'
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': EFSDescribe,
+        'config': ConfigSource
+    }
 
 
 @resources.register('efs-mount-target')

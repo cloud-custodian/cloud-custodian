@@ -49,8 +49,10 @@
                 "status": "Enabled"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]"
-              ]
+               "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]",
+               "[resourceId('Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies', parameters('servers_cctestsqlserver_name'), 'cctestdb', 'default')]",
+               "[resourceId('Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies', parameters('servers_cctestsqlserver_name'), 'cctestdb', 'default')]"
+            ]
             },
             {
                "name": "default",

@@ -8,7 +8,7 @@ install:
 
 install-poetry:
 	poetry install
-	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
+	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install && cd ../..; done
 
 pkg-rebase:
 	rm -f poetry.lock
@@ -38,11 +38,11 @@ pkg-update:
 
 pkg-show-update:
 	poetry show -o
-	for pkg in $(PKG_SET); do cd $$pkg && poetry show -o && cd ../..; done
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
 
 pkg-freeze-setup:
 	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg; done
+	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg -x sendgrid -r starkbank-ecdsa; done
 
 pkg-gen-setup:
 	python3 tools/dev/poetrypkg.py gen-setup -p .
@@ -80,6 +80,13 @@ pkg-publish-wheel:
 test-poetry:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
 
+test-poetry-cov:
+	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov c7n --cov tools/c7n_azure/c7n_azure \
+            --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
+            --cov tools/c7n_mailer/c7n_mailer \
+            tests tools {posargs}
+
 test:
 	./bin/tox -e py38
 
@@ -106,6 +113,7 @@ lint:
 	flake8 c7n tests tools
 
 clean:
+	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:

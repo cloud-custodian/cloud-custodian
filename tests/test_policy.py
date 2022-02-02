@@ -16,6 +16,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
+from c7n.resources.kinesis import KinesisStream
 from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
@@ -87,10 +88,10 @@ class PolicyMetaLint(BaseTest):
         assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
 
     def test_resource_type_repr(self):
-        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ecr'})
+        policy = self.load_policy({'name': 'airflow', 'resource': 'aws.airflow'})
         # check the repr absent a config type but with a cfn type
         assert policy.resource_manager.resource_type.config_type is None
-        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::ECR::Repository>'
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::MWAA::Environment>'
 
     def test_schema_plugin_name_mismatch(self):
         # todo iterate over all clouds not just aws resources
@@ -188,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -199,6 +200,17 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_filter_spec(self):
+        missing_fspec = []
+        for k, v in manager.resources.items():
+            if v.resource_type.filter_name is None:
+                continue
+            if not v.resource_type.filter_type:
+                missing_fspec.append(k)
+        if missing_fspec:
+            self.fail('aws resources missing filter specs: %s' % (
+                ', '.join(missing_fspec)))
 
     def test_ec2_id_prefix(self):
         missing_prefix = []
@@ -236,6 +248,25 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q1 2022
+            'AwsNetworkFirewallRuleGroup',
+            'AwsNetworkFirewallFirewall',
+            'AwsNetworkFirewallFirewallPolicy',
+            # q4 2021 - second wave
+            'AwsXrayEncryptionConfig',
+            'AwsOpenSearchServiceDomain',
+            'AwsEc2VpcEndpointService',
+            'AwsWafRateBasedRule',
+            'AwsWafRegionalRateBasedRule',
+            'AwsEcrRepository',
+            'AwsEksCluster',
+            # q4 2021
+            'AwsEcrContainerImage',
+            'AwsEc2VpnConnection',
+            'AwsAutoScalingLaunchConfiguration',
+            # q3 2021
+            'AwsEcsService',
+            'AwsRdsEventSubscription',
             # q2 2021
             'AwsEcsTaskDefinition',
             'AwsEcsCluster',
@@ -282,16 +313,21 @@ class PolicyMetaLint(BaseTest):
 
         # for several of these we express support as filter or action instead
         # of a resource.
+
         whitelist = {
+            'AWS::Kinesis::StreamConsumer',
+            'AWS::CodeDeploy::DeploymentConfig',
+            'AWS::OpenSearch::Domain',  # this is effectively an alias
+            'AWS::Backup::BackupSelection',
+            'AWS::Backup::RecoveryPoint',
             'AWS::Config::ConformancePackCompliance',
             'AWS::NetworkFirewall::FirewallPolicy',
-            'AWS::NetworkFirewall::Firewall',
             'AWS::NetworkFirewall::RuleGroup',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
-            'AWS::ECS::TaskDefinition',
+            'AWS::EFS::AccessPoint',
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
             'AWS::S3::AccountPublicAccessBlock',
@@ -343,7 +379,6 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-            'AWS::EKS::Cluster',
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall'
@@ -367,7 +402,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -432,7 +467,8 @@ class PolicyMetaLint(BaseTest):
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
-            'support-case', 'transit-attachment', 'config-recorder'}
+            'support-case', 'transit-attachment', 'config-recorder',
+            'apigw-domain-name'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -1395,6 +1431,9 @@ class ConfigModeTest(BaseTest):
         cmock.put_evaluations.return_value = {}
         self.patch(
             ConfigPollRuleMode, '_get_client', lambda self: cmock)
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
+
         p = self.load_policy({
             'name': 'kin-poll',
             'resource': 'aws.kinesis',
@@ -1402,7 +1441,9 @@ class ConfigModeTest(BaseTest):
             'mode': {
                 'type': 'config-poll-rule',
                 'schedule': 'Three_Hours'}},
-            session_factory=factory)
+            session_factory=factory,
+            validate=False)
+
         event = event_data('poll-evaluation.json', 'config')
         results = p.push(event, None)
         self.assertEqual(results, ['dev2'])

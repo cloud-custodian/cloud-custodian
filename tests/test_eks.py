@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+import pytest
 from .common import BaseTest
 
 from pytest_terraform import terraform
 
 
+@pytest.mark.skiplive
 @terraform('eks_nodegroup_delete')
 def test_eks_nodegroup_delete(test, eks_nodegroup_delete):
     aws_region = 'eu-central-1'

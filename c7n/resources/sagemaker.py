@@ -9,6 +9,7 @@ from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.offhours import OffHour, OnHour
 
 
 @resources.register('sagemaker-notebook')
@@ -43,6 +44,8 @@ class NotebookInstance(QueryResourceManager):
 
 
 NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
+NotebookInstance.filter_registry.register('offhour', OffHour)
+NotebookInstance.filter_registry.register('onhour', OnHour)
 
 
 @resources.register('sagemaker-job')
@@ -99,7 +102,8 @@ class SagemakerTransformJob(QueryResourceManager):
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
-        filter_name = 'TransformJobArn'
+        filter_name = 'NameContains'
+        filter_type = 'scalar'
         permission_augment = ('sagemaker:DescribeTransformJob', 'sagemaker:ListTags')
 
     def __init__(self, ctx, data):

@@ -1,8 +1,8 @@
 # c7n-org: Multi Account Custodian Execution
 
-[//]: # (         !!! IMPORTANT !!!                    )
-[//]: # (This file is moved during document generation.)
-[//]: # (Only edit the original document at ./tools/c7n_org/README.md)
+% [comment]: # (         !!! IMPORTANT !!!                    )
+% [comment]: # (This file is moved during document generation.)
+% [comment]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
 Azure subscriptions, or GCP projects in parallel.

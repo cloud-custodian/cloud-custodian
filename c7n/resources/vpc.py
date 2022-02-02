@@ -1080,6 +1080,32 @@ class SGPermission(Filter):
           value: 'default - DO NOT USE'
           op: equal
 
+    By default, this filter matches a security group rule if
+    _all_ of its keys match. Using `match-operator: or` causes a match
+    if _any_ key matches. This can help consolidate some simple
+    cases that would otherwise require multiple filters. To find
+    security groups that allow all inbound traffic over IPv4 or IPv6,
+    for example, we can use two filters inside an `or` block:
+
+    .. code-block:: yaml
+
+      - or:
+        - type: ingress
+          Cidr: "0.0.0.0/0"
+        - type: ingress
+          CidrV6: "::/0"
+
+    or combine them into a single filter:
+
+    .. code-block:: yaml
+
+      - type: ingress
+        match-operator: or
+          Cidr: "0.0.0.0/0"
+          CidrV6: "::/0"
+
+    Note that evaluating _combinations_ of factors (e.g. traffic over
+    port 22 from 0.0.0.0/0) still requires separate filters.
     """
 
     perm_attrs = {
@@ -1211,7 +1237,7 @@ class SGPermission(Filter):
         if not sg_perm:
             return False
 
-        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p.get('UserId', '') == owner_id]
         sg_resources = self.manager.get_resources(sg_group_ids)
         vf = ValueFilter(sg_refs, self.manager)
         vf.annotate = False
@@ -1271,7 +1297,7 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource['Matched%s' % self.ip_permissions_key] = matched
+            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
             return True
 
 
@@ -1784,7 +1810,7 @@ class TransitGateway(query.QueryResourceManager):
         id_prefix = "tgw-"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
-        cfn_type = 'AWS::EC2::TransitGateway'
+        config_type = cfn_type = 'AWS::EC2::TransitGateway'
 
 
 class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
@@ -2300,6 +2326,7 @@ class KeyPair(query.QueryResourceManager):
         id = 'KeyPairId'
         id_prefix = 'key-'
         filter_name = 'KeyNames'
+        filter_type = 'list'
 
 
 @KeyPair.filter_registry.register('unused')
@@ -2517,3 +2544,60 @@ class CreateFlowLogs(BaseAction):
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+
+class PrefixListDescribe(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        query = {'Filters': [
+            {'Name': 'prefix-list-id',
+             'Values': ids}]}
+        return self.query.filter(self.manager, **query)
+
+
+@resources.register('prefix-list')
+class PrefixList(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'prefix-list'
+        enum_spec = ('describe_managed_prefix_lists', 'PrefixLists', None)
+        name = 'PrefixListName'
+        id = 'PrefixListId'
+        id_prefix = 'pl-'
+        universal_taggable = object()
+
+    source_mapping = {'describe': PrefixListDescribe}
+
+
+@PrefixList.filter_registry.register('entry')
+class Entry(Filter):
+
+    schema = type_schema(
+        'entry', rinherit=ValueFilter.schema)
+    permissions = ('ec2:GetManagedPrefixListEntries',)
+
+    annotation_key = 'c7n:prefix-entries'
+    match_annotation_key = 'c7n:matched-entries'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            if self.annotation_key in r:
+                continue
+            r[self.annotation_key] = client.get_managed_prefix_list_entries(
+                PrefixListId=r['PrefixListId']).get('Entries', ())
+
+        vf = ValueFilter(self.data)
+        vf.annotate = False
+
+        results = []
+        for r in resources:
+            matched = []
+            for e in r[self.annotation_key]:
+                if vf(e):
+                    matched.append(e)
+            if matched:
+                results.append(r)
+                r[self.match_annotation_key] = matched
+        return results

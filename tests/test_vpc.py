@@ -2196,7 +2196,6 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
     def test_security_group_reference_egress_filter(self):
@@ -2219,7 +2218,6 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
     def test_egress_ipv6(self):
@@ -2231,7 +2229,7 @@ class SecurityGroupTest(BaseTest):
                     "value": "::/0"}}]
         })
 
-        resources = [{
+        resource = {
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -2268,9 +2266,28 @@ class SecurityGroupTest(BaseTest):
             "VpcId": "vpc-f8c6d983",
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
-        }]
+        }
         manager = p.load_resource_manager()
-        self.assertEqual(len(manager.filter_resources(resources)), 1)
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 1)
+
+        # IPv4 and IPv6 matches should both be included in the list
+        # of matched permissions
+        p = self.load_policy({
+            "name": "ipv4-v6-test",
+            "resource": "security-group",
+            "filters": [{"or": [
+                {"type": "egress", "CidrV6": {
+                 "value": "::/0"}},
+                {"type": "egress", "Cidr": {
+                 "value": "0.0.0.0/0"}},
+            ]}]
+        })
+        manager = p.load_resource_manager()
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 2)
 
     def test_permission_expansion(self):
         factory = self.replay_flight_data("test_security_group_perm_expand")
@@ -3139,3 +3156,33 @@ class TestUnusedKeys(BaseTest):
                     ]
                 }
             )
+
+
+class TestPrefixList(BaseTest):
+
+    def test_prefix_list_query(self):
+        factory = self.replay_flight_data("test_prefix_list_query")
+        p = self.load_policy(
+            {'name': 'prefix-get', 'resource': 'aws.prefix-list'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            ["pl-02d12d37020480a5f", "pl-0c79279cd77a6e7c2"])
+        assert len(resources) == 2
+
+    def test_prefix_entry(self):
+        factory = self.replay_flight_data("test_prefix_list_entry")
+        p = self.load_policy(
+            {'name': 'prefix-get',
+             'resource': 'aws.prefix-list',
+             'filters': [
+                 {'PrefixListName': 'All VPC CIDR'},
+                 {'type': 'entry',
+                  'key': 'Cidr',
+                  'value': '172.31.2.10/32',
+                  'value_type': 'cidr',
+                  'op': 'contains'}
+             ]},
+            session_factory=factory)
+        resources = p.run()
+        assert 'c7n:matched-entries' in resources[0]
+        assert 'c7n:prefix-entries' in resources[0]
