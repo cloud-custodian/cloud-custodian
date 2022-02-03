@@ -2357,6 +2357,43 @@ def resolve_credential_keys(m_keys, keys):
 #################
 
 
+@Group.filter_registry.register('has-specific-managed-policy')
+class SpecificIamGroupManagedPolicy(Filter):
+    """Filter IAM groups that have a specific policy attached
+
+    For example, if the user wants to check all groups with 'admin-policy':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-groups-have-admin
+            resource: iam-group
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedGroupPolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_group_policies(
+            GroupName=resource['GroupName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            results = []
+            for r in resources:
+                r["ManagedPolicies"] = self._managed_policies(c, r)
+                if self.data.get('value') in r["ManagedPolicies"]:
+                    results.append(r)
+            return results
+        return []
+
+
 @Group.filter_registry.register('has-users')
 class IamGroupUsers(Filter):
     """Filter IAM groups that have users attached based on True/False value:

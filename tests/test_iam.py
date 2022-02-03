@@ -1327,6 +1327,23 @@ class IamGroupTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["GroupId"], "AGPAI6NICSNT546VPVZGS")
 
+    def test_iam_group_with_managed_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_with_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-groups-have-ses-send-policy",
+                "resource": "aws.iam-group",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "AmazonSESFullAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
