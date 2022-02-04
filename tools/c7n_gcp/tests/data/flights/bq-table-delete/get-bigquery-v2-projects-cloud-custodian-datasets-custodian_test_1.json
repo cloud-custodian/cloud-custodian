@@ -25,24 +25,7 @@
       "datasetId": "custodian_test",
       "projectId": "cloud-custodian"
     },
-    "access": [
-      {
-        "role": "WRITER",
-        "specialGroup": "projectWriters"
-      },
-      {
-        "role": "OWNER",
-        "specialGroup": "projectOwners"
-      },
-      {
-        "role": "OWNER",
-        "userByEmail": "kyle.johnson@testing.com"
-      },
-      {
-        "role": "READER",
-        "specialGroup": "projectReaders"
-      }
-    ],
+    "access": [],
     "creationTime": "1643816775829",
     "lastModifiedTime": "1643816775829",
     "location": "us-central1",
