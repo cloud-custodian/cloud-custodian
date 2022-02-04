@@ -90,15 +90,15 @@ class BigQueryTableTest(BaseTest):
 
     def test_table_delete(self):
         project_id = 'premise-governance-rd'
-        factory = self.record_flight_data('bq-table-delete', project_id=project_id)
+        factory = self.replay_flight_data('bq-table-delete', project_id=project_id)
         p = self.load_policy(
             {
                 'name': 'bq-table-delete',
                 'resource': 'gcp.bq-table',
                 'filters': [{
                     'type': 'value',
-                    'key': 'tag:resource_owner',
-                    'value': 'data-platform',
+                    'key': 'tag:delete_me',
+                    'value': 'yes',
                     'op': 'equal'
                 }],
                 'actions': [
