@@ -2229,7 +2229,7 @@ class SecurityGroupTest(BaseTest):
                     "value": "::/0"}}]
         })
 
-        resources = [{
+        resource = {
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -2266,9 +2266,28 @@ class SecurityGroupTest(BaseTest):
             "VpcId": "vpc-f8c6d983",
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
-        }]
+        }
         manager = p.load_resource_manager()
-        self.assertEqual(len(manager.filter_resources(resources)), 1)
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 1)
+
+        # IPv4 and IPv6 matches should both be included in the list
+        # of matched permissions
+        p = self.load_policy({
+            "name": "ipv4-v6-test",
+            "resource": "security-group",
+            "filters": [{"or": [
+                {"type": "egress", "CidrV6": {
+                 "value": "::/0"}},
+                {"type": "egress", "Cidr": {
+                 "value": "0.0.0.0/0"}},
+            ]}]
+        })
+        manager = p.load_resource_manager()
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 2)
 
     def test_permission_expansion(self):
         factory = self.replay_flight_data("test_security_group_perm_expand")
