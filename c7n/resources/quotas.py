@@ -154,7 +154,6 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
-        metric_scale = 1.0
 
         result = []
 
@@ -165,10 +164,12 @@ class UsageFilter(MetricsFilter):
             stat = metric.get('MetricStatisticRecommendation', 'Maximum')
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
+
+            metric_scale = 1
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
-                if period_unit == "seconds" and period < 60:
+                if period_unit == "seconds" and period < 60 and stat == "Sum":
                     metric_scale = 60 / period
                     period = 60
             else:
@@ -189,6 +190,8 @@ class UsageFilter(MetricsFilter):
                     # about maximum... Also note that is probably what we should do
                     # for all statistic types, but if the service quota API will return
                     # different preferred statistics, atm we will try to match that
+                    op = self.metric_map['Maximum']
+                elif stat == 'Sum':
                     op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
