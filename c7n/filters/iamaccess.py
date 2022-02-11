@@ -26,7 +26,6 @@ References
 import fnmatch
 import logging
 import json
-import copy
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
@@ -124,12 +123,11 @@ class PolicyChecker:
             return True
         # Skip service principals
         if 'Service' in s['Principal']:
-            os = copy.deepcopy(s)
-            os['Principal'].pop('Service')
-            if not os['Principal']:
+            s['Principal'].pop('Service')
+            if not s['Principal']:
                 return False
 
-        assert len(s['Principal']) > 0, "At least one principal is needed %s" % s
+        assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         if isinstance(s['Principal'], str):
             p = s['Principal']
