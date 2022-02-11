@@ -154,6 +154,7 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
+        metric_scale = 1.0
 
         result = []
 
@@ -167,6 +168,9 @@ class UsageFilter(MetricsFilter):
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
+                if period_unit == "seconds" and period < 60:
+                    metric_scale = 60 / period
+                    period = 60
             else:
                 period = int(timedelta(1).total_seconds())
             res = client.get_metric_statistics(
@@ -189,15 +193,16 @@ class UsageFilter(MetricsFilter):
                 else:
                     op = self.metric_map[stat]
                 m = op([x[stat] for x in res['Datapoints']])
-                if m > (limit / 100) * r['Value']:
+                if m > (limit / 100) * r['Value'] * metric_scale:
                     r[self.annotation_key] = {
-                        'metric': m,
-                        'period': period,
+                        'metric': m / metric_scale,
+                        'period': period / metric_scale,
                         'start_time': start_time,
                         'end_time': end_time,
                         'statistic': stat,
                         'limit': limit / 100 * r['Value'],
                         'quota': r['Value'],
+                        'metric_scale': metric_scale,
                     }
                     result.append(r)
         return result
