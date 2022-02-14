@@ -219,9 +219,9 @@ def validate(options):
                 with open(config_file) as fh:
                     # our loader is safe loader derived.
 
-                    data = yaml.safe_load(
+                    data = yaml.load(  # nosec nosemgrep
                         fh.read(), Loader=DuplicateKeyCheckLoader
-                    )  # nosec nosemgrep
+                    )
         else:
             log.error("The config file must end in .json, .yml or .yaml.")
             raise ValueError("The config file must end in .json, .yml or .yaml.")
