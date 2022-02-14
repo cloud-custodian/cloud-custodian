@@ -21,7 +21,7 @@ from c7n.policy import load as policy_load
 from c7n.provider import clouds
 from c7n.resources import PROVIDER_NAMES, load_available, load_providers, load_resources
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import SafeLoader, load_file, local_session, yaml_dump
+from c7n.utils import NoSuchS3Bucket, NoSuchS3Key, SafeLoader, load_file, local_session, yaml_dump
 
 log = logging.getLogger('custodian.commands')
 
@@ -50,6 +50,10 @@ def policy_command(f):
                 collection = policy_load(options, fp, validate=validate, vars=vars)
             except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
+                errors += 1
+                continue
+            except (NoSuchS3Bucket, NoSuchS3Key) as e:
+                log.error(str(e))
                 errors += 1
                 continue
             except yaml.YAMLError as e:
