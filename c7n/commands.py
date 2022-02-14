@@ -21,7 +21,7 @@ from c7n.policy import load as policy_load
 from c7n.provider import clouds
 from c7n.resources import PROVIDER_NAMES, load_available, load_providers, load_resources
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import SafeLoader, load_file, local_session, yaml_dump
+from c7n.utils import NoSuchS3Bucket, NoSuchS3Key, SafeLoader, load_file, local_session, yaml_dump
 
 log = logging.getLogger('custodian.commands')
 
@@ -44,12 +44,16 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = ""
+        options.region = None
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
             except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
+                errors += 1
+                continue
+            except (NoSuchS3Bucket, NoSuchS3Key) as e:
+                log.error(str(e))
                 errors += 1
                 continue
             except yaml.YAMLError as e:
@@ -205,11 +209,7 @@ def validate(options):
 
         if fmt in ('yml', 'yaml', 'json'):
             if config_file.startswith('s3://'):
-                # should we be grabbing external id here?
-                policy_config = Config.empty(
-                    **{"profile": os.environ.get('AWS_DEFAULT_PROFILE', 'us-east-1')}
-                )
-                session_factory = get_session_factory('aws', policy_config)
+                session_factory = get_session_factory('aws', options)
                 data = load_file(
                     config_file, format=fmt, session_factory=session_factory
                 )
@@ -219,9 +219,9 @@ def validate(options):
                 with open(config_file) as fh:
                     # our loader is safe loader derived.
 
-                    data = yaml.load(
+                    data = yaml.load(  # nosec nosemgrep
                         fh.read(), Loader=DuplicateKeyCheckLoader
-                    )  # nosec nosemgrep
+                    )
         else:
             log.error("The config file must end in .json, .yml or .yaml.")
             raise ValueError("The config file must end in .json, .yml or .yaml.")

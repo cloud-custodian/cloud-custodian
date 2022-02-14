@@ -6,7 +6,6 @@ import sys
 from argparse import ArgumentTypeError
 from datetime import datetime, timedelta
 
-import pytest
 from c7n import cli, commands, version
 from c7n.resolver import ValuesFrom
 from c7n.resources import aws
@@ -98,11 +97,6 @@ class VersionTest(CliTest):
         self.assertIn('python-dateutil==', output)
 
 
-@pytest.fixture
-def set_aws(monkeypatch):
-    monkeypatch.setenv("AWS_DEFAULT_PROFILE", "myalt")
-
-
 class ValidateTest(CliTest):
     def test_invalidate_structure_exit(self):
         invalid_policies = {"policies": [{"name": "foo"}]}
@@ -159,7 +153,6 @@ class ValidateTest(CliTest):
         # duplicate policy names
         self.run_and_expect_failure(["custodian", "validate", yaml_file, yaml_file], 1)
 
-    @pytest.mark.usefixtures("set_aws")
     def test_validate_with_policies_in_s3(self):
 
         session_factory = self.replay_flight_data("validate_with_s3")
@@ -572,7 +565,6 @@ class RunTest(CliTest):
             ]
         )
 
-    @pytest.mark.usefixtures("set_aws")
     def test_ec2_with_policy_in_s3(self):
 
         session_factory = self.replay_flight_data(
