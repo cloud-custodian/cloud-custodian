@@ -12,7 +12,8 @@ from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
 from c7n.config import Config
-from c7n.resolver import ValuesFrom, URIResolver
+from c7n.resolver import ValuesFrom
+from c7n.utils import URIResolver
 
 
 class FakeCache:

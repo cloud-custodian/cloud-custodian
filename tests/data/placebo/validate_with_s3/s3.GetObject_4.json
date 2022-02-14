@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchKey",
+            "Message": "The specified key does not exist.",
+            "Key": "fake.yaml"
+        },
+        "ResponseMetadata": {}
+    }
+}

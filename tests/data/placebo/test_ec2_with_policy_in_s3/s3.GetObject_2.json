@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AcceptRanges": "bytes",
+        "LastModified": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 2,
+            "day": 14,
+            "hour": 3,
+            "minute": 38,
+            "second": 37,
+            "microsecond": 0
+        },
+        "ContentLength": 131,
+        "ETag": "\"7516c7bd4df5d768d340c67068b3c123\"",
+        "ContentType": "binary/octet-stream",
+        "Metadata": {},
+        "Body": {
+            "__class__": "StreamingBody",
+            "body": "LS0tCnBvbGljaWVzOgotIGZpbHRlcnM6CiAgLSBTdGF0ZS5OYW1lOiBydW5uaW5nCiAgLSBkYXlzOiAzMAogICAgdHlwZTogc3RhdGUtYWdlCiAgbmFtZTogZWMyLXN0YXRlLXRyYW5zaXRpb24tYWdlCiAgcmVzb3VyY2U6IGVjMgo="
+        }
+    }
+}

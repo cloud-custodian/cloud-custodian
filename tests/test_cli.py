@@ -3,15 +3,16 @@
 import json
 import os
 import sys
-
 from argparse import ArgumentTypeError
 from datetime import datetime, timedelta
 
-from c7n import cli, version, commands
+import pytest
+from c7n import cli, commands, version
 from c7n.resolver import ValuesFrom
 from c7n.resources import aws
+from c7n.resources.aws import AWS
 from c7n.schema import ElementSchema, generate
-from c7n.utils import yaml_dump, yaml_load
+from c7n.utils import NoSuchS3Bucket, NoSuchS3Key, yaml_dump, yaml_load
 
 from .common import BaseTest, TextTestIO
 
@@ -97,8 +98,12 @@ class VersionTest(CliTest):
         self.assertIn('python-dateutil==', output)
 
 
-class ValidateTest(CliTest):
+@pytest.fixture
+def set_aws(monkeypatch):
+    monkeypatch.setenv("AWS_DEFAULT_PROFILE", "myalt")
 
+
+class ValidateTest(CliTest):
     def test_invalidate_structure_exit(self):
         invalid_policies = {"policies": [{"name": "foo"}]}
         yaml_file = self.write_policy_file(invalid_policies)
@@ -153,6 +158,72 @@ class ValidateTest(CliTest):
 
         # duplicate policy names
         self.run_and_expect_failure(["custodian", "validate", yaml_file, yaml_file], 1)
+
+    @pytest.mark.usefixtures("set_aws")
+    def test_validate_with_policies_in_s3(self):
+
+        session_factory = self.replay_flight_data("validate_with_s3")
+
+        self.patch(
+            AWS,
+            "get_session_factory",
+            staticmethod(lambda x=None: session_factory),
+        )
+
+        # YAML validation
+        self.run_and_expect_exception(
+            ["custodian", "validate", "s3://custodian-source-s3/policy1.yaml"],
+            SystemExit,
+        )
+
+        self.run_and_expect_exception(
+            ["custodian", "validate", "s3://custodian-source-s3/policy1.yml"],
+            SystemExit,
+        )
+
+        # JSON validation
+        self.run_and_expect_failure(
+            ["custodian", "validate", "s3://custodian-source-s3/policy1.json"], 1
+        )
+
+        # nonexistent file given
+        self.run_and_expect_exception(
+            ["custodian", "validate", "s3://custodian-source-s3/fake.yaml"], NoSuchS3Key
+        )
+
+        # nonexistent bucket given
+        self.run_and_expect_exception(
+            ["custodian", "validate", "s3://not-a-custodian-source-s3/fake.yaml"],
+            NoSuchS3Bucket,
+        )
+
+        self.run_and_expect_success(
+            ["custodian", "validate", "s3://custodian-source-s3/policy2.yaml"]
+        )
+
+        self.run_and_expect_success(
+            ["custodian", "validate", "s3://custodian-source-s3/policy2.yml"]
+        )
+
+        self.run_and_expect_success(
+            ["custodian", "validate", "s3://custodian-source-s3/policy2.json"]
+        )
+
+        # legacy -c option
+        self.run_and_expect_success(
+            ["custodian", "validate", "-c", "s3://custodian-source-s3/policy2.yaml"]
+        )
+
+        # duplicate policy names
+        self.run_and_expect_failure(
+            [
+                "custodian",
+                "validate",
+                "s3://custodian-source-s3/policy2.yaml",
+                "s3://custodian-source-s3/policy2.yaml",
+            ],
+            1,
+        )
 
     def test_deprecated(self):
 
@@ -498,6 +569,57 @@ class RunTest(CliTest):
                 "-s",
                 temp_dir,
                 yaml_file,
+            ]
+        )
+
+    @pytest.mark.usefixtures("set_aws")
+    def test_ec2_with_policy_in_s3(self):
+
+        session_factory = self.replay_flight_data(
+            "test_ec2_with_policy_in_s3", region="us-east-1"
+        )
+
+        self.patch(
+            AWS,
+            "get_session_factory",
+            staticmethod(lambda x=None: session_factory),
+        )
+
+        temp_dir = self.get_temp_dir()
+
+        self.run_and_expect_success(
+            [
+                "custodian",
+                "run",
+                "--cache",
+                temp_dir + "/cache",
+                "-s",
+                temp_dir,
+                "s3://custodian-source-s3/policy3.yaml",
+            ]
+        )
+
+        self.run_and_expect_success(
+            [
+                "custodian",
+                "run",
+                "--cache",
+                temp_dir + "/cache",
+                "-s",
+                temp_dir,
+                "s3://custodian-source-s3/policy3.yml",
+            ]
+        )
+
+        self.run_and_expect_success(
+            [
+                "custodian",
+                "run",
+                "--cache",
+                temp_dir + "/cache",
+                "-s",
+                temp_dir,
+                "s3://custodian-source-s3/policy3.json",
             ]
         )
 

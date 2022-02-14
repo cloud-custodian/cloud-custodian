@@ -35,7 +35,7 @@ docutils = ">=0.14,<0.18"
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"
 coverage = "^5.0.3"
-placebo = "^0.9.0"
+placebo = "^0.10.0"
 pytest-xdist = "^2.0"
 pytest-cov = "^2.8.1"
 pytest-terraform = "^0.6.0"

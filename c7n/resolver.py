@@ -7,63 +7,10 @@ import json
 import os.path
 import logging
 import itertools
-from urllib.request import Request, urlopen
-from urllib.parse import parse_qsl, urlparse
-import zlib
-from contextlib import closing
 
-from c7n.utils import format_string_values
+from c7n.utils import format_string_values, URIResolver
 
 log = logging.getLogger('custodian.resolver')
-
-ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
-
-
-class URIResolver:
-
-    def __init__(self, session_factory, cache):
-        self.session_factory = session_factory
-        self.cache = cache
-
-    def resolve(self, uri):
-        if self.cache:
-            contents = self.cache.get(("uri-resolver", uri))
-            if contents is not None:
-                return contents
-
-        if uri.startswith('s3://'):
-            contents = self.get_s3_uri(uri)
-        else:
-            req = Request(uri, headers={"Accept-Encoding": "gzip"})
-            with closing(urlopen(req)) as response:  # nosec nosemgrep
-                contents = self.handle_response_encoding(response)
-
-        if self.cache:
-            self.cache.save(("uri-resolver", uri), contents)
-        return contents
-
-    def handle_response_encoding(self, response):
-        if response.info().get('Content-Encoding') != 'gzip':
-            return response.read().decode('utf-8')
-
-        data = zlib.decompress(response.read(),
-                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
-        return data
-
-    def get_s3_uri(self, uri):
-        parsed = urlparse(uri)
-        client = self.session_factory().client('s3')
-        params = dict(
-            Bucket=parsed.netloc,
-            Key=parsed.path[1:])
-        if parsed.query:
-            params.update(dict(parse_qsl(parsed.query)))
-        result = client.get_object(**params)
-        body = result['Body'].read()
-        if isinstance(body, str):
-            return body
-        else:
-            return body.decode('utf-8')
 
 
 class ValuesFrom:

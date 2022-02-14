@@ -1,28 +1,27 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from collections import Counter, defaultdict
-from datetime import timedelta, datetime
-from functools import wraps
-import json
 import itertools
+import json
 import logging
 import os
 import sys
+from collections import Counter, defaultdict
+from datetime import datetime, timedelta
+from functools import wraps
 
 import yaml
 from yaml.constructor import ConstructorError
 
 from c7n import deprecated
+from c7n.config import Bag, Config
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.loader import SourceLocator
+from c7n.policy import Policy, PolicyCollection, get_session_factory
+from c7n.policy import load as policy_load
 from c7n.provider import clouds
-from c7n.policy import Policy, PolicyCollection, load as policy_load
+from c7n.resources import PROVIDER_NAMES, load_available, load_providers, load_resources
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
-from c7n.config import Bag, Config
-from c7n.resources import (
-    load_resources, load_available, load_providers, PROVIDER_NAMES)
-
+from c7n.utils import SafeLoader, load_file, local_session, yaml_dump
 
 log = logging.getLogger('custodian.commands')
 
@@ -201,19 +200,31 @@ def validate(options):
     for config_file in options.configs:
 
         config_file = os.path.expanduser(config_file)
-        if not os.path.exists(config_file):
-            raise ValueError("Invalid path for config %r" % config_file)
-
         options.dryrun = True
         fmt = config_file.rsplit('.', 1)[-1]
 
-        with open(config_file) as fh:
-            if fmt in ('yml', 'yaml', 'json'):
-                # our loader is safe loader derived.
-                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
+        if fmt in ('yml', 'yaml', 'json'):
+            if config_file.startswith('s3://'):
+                # should we be grabbing external id here?
+                policy_config = Config.empty(
+                    **{"profile": os.environ.get('AWS_DEFAULT_PROFILE', 'us-east-1')}
+                )
+                session_factory = get_session_factory('aws', policy_config)
+                data = load_file(
+                    config_file, format=fmt, session_factory=session_factory
+                )
             else:
-                log.error("The config file must end in .json, .yml or .yaml.")
-                raise ValueError("The config file must end in .json, .yml or .yaml.")
+                if not os.path.exists(config_file):
+                    raise ValueError("Invalid path for config %r" % config_file)
+                with open(config_file) as fh:
+                    # our loader is safe loader derived.
+
+                    data = yaml.load(
+                        fh.read(), Loader=DuplicateKeyCheckLoader
+                    )  # nosec nosemgrep
+        else:
+            log.error("The config file must end in .json, .yml or .yaml.")
+            raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         try:
             structure.validate(data)

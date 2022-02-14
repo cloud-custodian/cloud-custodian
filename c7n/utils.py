@@ -1,11 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
-from datetime import datetime, timedelta
-from dateutil.tz import tzutc
-import json
-import itertools
 import ipaddress
+import itertools
+import json
 import logging
 import os
 import random
@@ -13,11 +11,14 @@ import re
 import sys
 import threading
 import time
-from urllib import parse as urlparse
-from urllib.request import getproxies, proxy_bypass
-
+import zlib
+from contextlib import closing
+from datetime import datetime, timedelta
+from urllib.parse import parse_qs, parse_qsl, urlparse
+from urllib.request import Request, getproxies, proxy_bypass, urlopen
 
 from dateutil.parser import ParserError, parse
+from dateutil.tz import tzutc
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -30,9 +31,11 @@ except ImportError:  # pragma: no cover
     SafeLoader = BaseSafeDumper = yaml = None
 else:
     try:
-        from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
+        from yaml import CSafeDumper as BaseSafeDumper
+        from yaml import CSafeLoader as SafeLoader
     except ImportError:  # pragma: no cover
-        from yaml import SafeLoader, SafeDumper as BaseSafeDumper
+        from yaml import SafeDumper as BaseSafeDumper
+        from yaml import SafeLoader
 
 
 class SafeDumper(BaseSafeDumper or object):
@@ -47,30 +50,101 @@ class VarsSubstitutionError(Exception):
     pass
 
 
-def load_file(path, format=None, vars=None):
+class NoSuchS3Key(Exception):
+    pass
+
+
+class NoSuchS3Bucket(Exception):
+    pass
+
+
+ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
+
+
+class URIResolver:
+
+    def __init__(self, session_factory, cache):
+        self.session_factory = session_factory
+        self.cache = cache
+
+    def resolve(self, uri):
+        if self.cache:
+            contents = self.cache.get(("uri-resolver", uri))
+            if contents is not None:
+                return contents
+
+        if uri.startswith('s3://'):
+            contents = self.get_s3_uri(uri)
+        else:
+            req = Request(uri, headers={"Accept-Encoding": "gzip"})
+            with closing(urlopen(req)) as response:  # nosec nosemgrep
+                contents = self.handle_response_encoding(response)
+
+        if self.cache:
+            self.cache.save(("uri-resolver", uri), contents)
+        return contents
+
+    def handle_response_encoding(self, response):
+        if response.info().get('Content-Encoding') != 'gzip':
+            return response.read().decode('utf-8')
+
+        data = zlib.decompress(response.read(),
+                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
+        return data
+
+    def get_s3_uri(self, uri):
+        parsed = urlparse(uri)
+        client = self.session_factory().client('s3')
+        params = dict(Bucket=parsed.netloc, Key=parsed.path[1:])
+        if parsed.query:
+            params.update(dict(parse_qsl(parsed.query)))
+        try:
+            result = client.get_object(**params)
+        except client.exceptions.NoSuchKey as e:
+            msg = f"Issue while getting {uri}. {str(e)}"
+            raise NoSuchS3Key(msg)
+        except client.exceptions.NoSuchBucket as e:
+            msg = f"Issue while getting {uri}. {str(e)}"
+            raise NoSuchS3Bucket(msg)
+
+        body = result['Body'].read()
+        if isinstance(body, str):
+            return body
+        else:
+            return body.decode('utf-8')
+
+
+def load_file(path, format=None, vars=None, session_factory=None):
     if format is None:
         format = 'yaml'
         _, ext = os.path.splitext(path)
         if ext[1:] == 'json':
             format = 'json'
 
-    with open(path) as fh:
-        contents = fh.read()
+    if path.startswith('s3://'):
+        resolver = URIResolver(session_factory, {})
+        contents = resolver.get_s3_uri(path)
+    else:
+        # should we do os.path.expanduser here?
+        if not os.path.exists(path):
+            raise IOError("Invalid path for config %r" % path)
+        with open(path) as fh:
+            contents = fh.read()
 
-        if vars:
-            try:
-                contents = contents.format(**vars)
-            except IndexError:
-                msg = 'Failed to substitute variable by positional argument.'
-                raise VarsSubstitutionError(msg)
-            except KeyError as e:
-                msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
-                raise VarsSubstitutionError(msg)
+    if vars:
+        try:
+            contents = contents.format(**vars)
+        except IndexError:
+            msg = 'Failed to substitute variable by positional argument.'
+            raise VarsSubstitutionError(msg)
+        except KeyError as e:
+            msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
+            raise VarsSubstitutionError(msg)
 
-        if format == 'yaml':
-            return yaml_load(contents)
-        elif format == 'json':
-            return loads(contents)
+    if format in ('yml', 'yaml'):
+        return yaml_load(contents)
+    elif format == 'json':
+        return loads(contents)
 
 
 def yaml_load(value):
@@ -592,10 +666,10 @@ def parse_url_config(url):
     if url and '://' not in url:
         url += "://"
     conf = config.Bag()
-    parsed = urlparse.urlparse(url)
+    parsed = urlparse(url)
     for k in ('scheme', 'netloc', 'path'):
         conf[k] = getattr(parsed, k)
-    for k, v in urlparse.parse_qs(parsed.query).items():
+    for k, v in parse_qs(parsed.query).items():
         conf[k] = v[0]
     conf['url'] = url
     return conf
@@ -603,7 +677,7 @@ def parse_url_config(url):
 
 def get_proxy_url(url):
     proxies = getproxies()
-    parsed = urlparse.urlparse(url)
+    parsed = urlparse(url)
 
     proxy_keys = [
         parsed.scheme + '://' + parsed.netloc,
