@@ -219,7 +219,7 @@ def validate(options):
                 with open(config_file) as fh:
                     # our loader is safe loader derived.
 
-                    data = yaml.load(
+                    data = yaml.safe_load(
                         fh.read(), Loader=DuplicateKeyCheckLoader
                     )  # nosec nosemgrep
         else:
