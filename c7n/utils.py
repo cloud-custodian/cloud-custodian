@@ -62,7 +62,6 @@ ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
 class URIResolver:
-
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
         self.cache = cache
@@ -88,8 +87,9 @@ class URIResolver:
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        data = zlib.decompress(response.read(),
-                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
+        data = zlib.decompress(response.read(), ZIP_OR_GZIP_HEADER_DETECT).decode(
+            'utf8'
+        )
         return data
 
     def get_s3_uri(self, uri):
@@ -101,11 +101,11 @@ class URIResolver:
         try:
             result = client.get_object(**params)
         except client.exceptions.NoSuchKey as e:
-            msg = f"Issue while getting {uri}. {str(e)}"
-            raise NoSuchS3Key(msg)
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Key(msg) from e
         except client.exceptions.NoSuchBucket as e:
-            msg = f"Issue while getting {uri}. {str(e)}"
-            raise NoSuchS3Bucket(msg)
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Bucket(msg) from e
 
         body = result['Body'].read()
         if isinstance(body, str):
