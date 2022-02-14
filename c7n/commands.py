@@ -44,7 +44,7 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = ""
+        options.region = None
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
@@ -205,11 +205,7 @@ def validate(options):
 
         if fmt in ('yml', 'yaml', 'json'):
             if config_file.startswith('s3://'):
-                # should we be grabbing external id here?
-                policy_config = Config.empty(
-                    **{"profile": os.environ.get('AWS_DEFAULT_PROFILE', 'us-east-1')}
-                )
-                session_factory = get_session_factory('aws', policy_config)
+                session_factory = get_session_factory('aws', options)
                 data = load_file(
                     config_file, format=fmt, session_factory=session_factory
                 )

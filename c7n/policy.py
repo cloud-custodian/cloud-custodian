@@ -28,14 +28,14 @@ log = logging.getLogger('c7n.policy')
 
 
 def load(options, path, format=None, validate=True, vars=None):
-    # should we do os.path.expanduser here?
-    if not os.path.exists(path):
-        raise IOError("Invalid path for config %r" % path)
-
-    from c7n.schema import validate, StructureParser
     session_factory = None
     if path.startswith('s3://'):
         session_factory = get_session_factory('aws', options)
+    # should we do os.path.expanduser here?
+    elif not os.path.exists(path):
+        raise IOError("Invalid path for config %r" % path)
+
+    from c7n.schema import validate, StructureParser
 
     data = utils.load_file(
         path, format=format, vars=vars, session_factory=session_factory
