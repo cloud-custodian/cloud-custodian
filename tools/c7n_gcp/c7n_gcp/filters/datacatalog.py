@@ -7,9 +7,8 @@ import json
 
 
 class DataCatalogSearchFilter(Filter):
-    """Filter resources via Data Catalog search
-
-    Filters resources by a catalog search of the provided query.
+    """Filter resources via Data Catalog's catalog search,
+    https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/catalog/search
 
     The filter retrieves high-level metadata about the retrieved data
     resources. This metadata is then used by resource-specific

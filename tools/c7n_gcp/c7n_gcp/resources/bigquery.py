@@ -121,7 +121,7 @@ class BigQueryTable(ChildResourceManager):
 @BigQueryTable.filter_registry.register('data-catalog')
 class BigQueryTableDataCatalogFilter(DataCatalogSearchFilter):
     """
-    Filter BigQuery Table resources via Data Catalog search by
+    Filter BigQuery Table resources via Data Catalog's catalog search by
     carrying out a Data Catalog search, parsing the returned metadata,
     and identifying all matching resources.
 
