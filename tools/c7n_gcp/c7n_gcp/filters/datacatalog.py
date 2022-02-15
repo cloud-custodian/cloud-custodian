@@ -43,7 +43,6 @@ class DataCatalogSearchFilter(Filter):
           resource: gcp.bq-table
           filters:
             - type: data-catalog
-              include_gcp_public_datasets: false
               include_org_ids:
                 - "112233445566"
               include_project_ids:
@@ -53,7 +52,7 @@ class DataCatalogSearchFilter(Filter):
     """
     schema = type_schema(
         'tag-template',
-        include_gcp_public_datasets={'type': 'string'},
+        include_gcp_public_datasets={'type': 'boolean'},
         include_org_ids={'type': 'array', 'items': {'type': 'string'}},
         include_project_ids={'type': 'array', 'items': {'type': 'string'}},
         restricted_locations={'type': 'array', 'items': {'type': 'string'}},

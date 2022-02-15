@@ -149,7 +149,6 @@ class BigQueryTableDataCatalogFilter(DataCatalogSearchFilter):
           resource: gcp.bq-table
           filters:
             - type: data-catalog
-              include_gcp_public_datasets: false
               include_org_ids:
                 - "112233445566"
               include_project_ids:
