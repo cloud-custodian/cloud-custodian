@@ -3167,3 +3167,45 @@ class TestPrefixList(BaseTest):
         resources = p.run()
         assert 'c7n:matched-entries' in resources[0]
         assert 'c7n:prefix-entries' in resources[0]
+
+
+class TrafficMirror(BaseTest):
+
+    def test_traffic_mirror_session_delete(self):
+        session_factory = self.replay_flight_data('test_traffic_mirror_session_delete')
+        p = self.load_policy({
+            'name': 'traffic-mirror-session-delete',
+            'resource': 'mirror-session',
+            "filters": [
+                {"tag:Owner": "absent"}
+            ],
+            "actions": [
+                {
+                    "type": "delete"
+                }
+            ],
+        },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TrafficMirrorSessionId"], "tms-084dc356a819e99ae")
+        client = session_factory(region="us-east-1").client("ec2")
+        if self.recording:
+            time.sleep(5)
+        self.assertEqual(
+            client.describe_traffic_mirror_sessions().get('TrafficMirrorSessions'), [])
+
+    def test_traffic_mirror_target(self):
+        session_factory = self.replay_flight_data('test_traffic_mirror_target')
+        p = self.load_policy({
+            'name': 'traffic-mirror-target',
+            'resource': 'mirror-target',
+            "filters": [
+                {"tag:Owner": "present"}
+            ],
+        },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TrafficMirrorTargetId"], "tmt-02cc3955d41358894")
+        self.assertEqual(resources[0]['Tags'], [{"Key": "Owner", "Value": "pratyush"}])
