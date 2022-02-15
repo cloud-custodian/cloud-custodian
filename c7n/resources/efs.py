@@ -263,15 +263,25 @@ class CheckSecureTransport(Filter):
     schema = type_schema('check-secure-transport')
     permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
 
-    def securetransport_check_policy(self, client, resource):
+    policy_annotation = 'c7n:Policy'
+
+    def get_policy(self, client, resource):
+        if self.policy_annotation in resource:
+            return resource[self.policy_annotation]
         try:
-            resp = client.describe_file_system_policy(FileSystemId=resource['FileSystemId'])
-            if 'Policy' in resp:
-                policies = resp['Policy']
+            result = client.describe_file_system_policy(
+                FileSystemId=resource['FileSystemId'])
         except client.exceptions.PolicyNotFound:
+            return None
+        resource[self.policy_annotation] = json.loads(result['Policy'])
+        return resource[self.policy_annotation]
+
+    def securetransport_check_policy(self, client, resource):
+        policy = self.get_policy(client, resource)
+        if not policy:
             return True
 
-        statements = json.loads(policies)['Statement']
+        statements = policy['Statement']
         if isinstance(statements, dict):
             statements = [statements]
 
