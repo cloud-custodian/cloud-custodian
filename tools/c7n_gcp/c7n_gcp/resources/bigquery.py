@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+import re
 
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
+from c7n_gcp.filters.datacatalog import DataCatalogSearchFilter
+from c7n.utils import type_schema
 
 
 @resources.register('bq-dataset')
@@ -113,3 +116,49 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+
+@BigQueryTable.filter_registry.register('data-catalog')
+class BigQueryTableDataCatalogFilter(DataCatalogSearchFilter):
+    """
+    Filter BigQuery Table resources via Data Catalog search by
+    carrying out a Data Catalog search, parsing the returned metadata,
+    and identifying all matching resources.
+
+    :example:
+
+    .. code-block :: yaml
+
+       policies:
+        - name: bq-tables-tag-template-resourceowner
+          resource: gcp.bq-table
+          filters:
+            - type: data-catalog
+              include_gcp_public_datasets: false
+              include_org_ids:
+                - 112233445566
+              include_project_ids:
+                - my-gcp-project
+              query: "tag=my-gcp-project.bq_table_ownership AND tag:resourceowner:test@gmail.com"
+
+    """
+    schema = type_schema('data-catalog', rinherit=DataCatalogSearchFilter.schema)
+    permissions = ('bigquery.tables.get',)
+
+    def get_resource_id(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/datasets/(.*?)/tables/(.*)')
+        project, dataset, table = path_param_re.match(resource['linkedResource']).groups()
+        id = f'{project}:{dataset}.{table}'
+        return id
+
+    def process(self, resources, event=None):
+        tables = super(BigQueryTableDataCatalogFilter, self).process(resources, None)
+        resources_dict = {r.get('id'): r for r in resources}
+        filtered_tables = []
+        for t in tables:
+            table_id = self.get_resource_id(t)
+            if resources_dict.get(table_id):
+                resource = super(BigQueryTableDataCatalogFilter, self).data_catalog_modify(
+                    resources_dict.get(table_id), t)
+                filtered_tables.append(resource)
+        return filtered_tables
