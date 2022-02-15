@@ -2664,6 +2664,8 @@ class TrafficMirrorSession(query.QueryResourceManager):
         enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
         name = id = 'TrafficMirrorSessionId'
         cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        arn_type = 'traffic-mirror-session'
+        universal_taggable = object()
 
 
 @TrafficMirrorSession.action_registry.register('delete')
@@ -2702,3 +2704,5 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
         name = id = 'TrafficMirrorTargetId'
         cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        arn_type = 'traffic-mirror-target'
+        universal_taggable = object()
