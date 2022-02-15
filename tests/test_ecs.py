@@ -561,3 +561,23 @@ class TestEcsContainerInstance(BaseTest):
             "status"
         ]
         self.assertEqual(state, "DRAINING")
+
+    def test_ecs_container_instance_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_container_instance_subnet")
+        p = self.load_policy(
+            {
+                "name": "ecs-container-instance-subnet",
+                "resource": "ecs-container-instance",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:NetworkLocation",
+                        "value": "Public"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('c7n:matched-subnets')[0], 'subnet-914763e7')

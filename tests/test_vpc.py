@@ -2229,7 +2229,7 @@ class SecurityGroupTest(BaseTest):
                     "value": "::/0"}}]
         })
 
-        resources = [{
+        resource = {
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -2266,9 +2266,28 @@ class SecurityGroupTest(BaseTest):
             "VpcId": "vpc-f8c6d983",
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
-        }]
+        }
         manager = p.load_resource_manager()
-        self.assertEqual(len(manager.filter_resources(resources)), 1)
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 1)
+
+        # IPv4 and IPv6 matches should both be included in the list
+        # of matched permissions
+        p = self.load_policy({
+            "name": "ipv4-v6-test",
+            "resource": "security-group",
+            "filters": [{"or": [
+                {"type": "egress", "CidrV6": {
+                 "value": "::/0"}},
+                {"type": "egress", "Cidr": {
+                 "value": "0.0.0.0/0"}},
+            ]}]
+        })
+        manager = p.load_resource_manager()
+        matched = manager.filter_resources([resource.copy()])
+        self.assertEqual(len(matched), 1)
+        self.assertEqual(len(matched[0]['MatchedIpPermissionsEgress']), 2)
 
     def test_permission_expansion(self):
         factory = self.replay_flight_data("test_security_group_perm_expand")
@@ -3167,3 +3186,35 @@ class TestPrefixList(BaseTest):
         resources = p.run()
         assert 'c7n:matched-entries' in resources[0]
         assert 'c7n:prefix-entries' in resources[0]
+
+
+class TestModifySubnet(BaseTest):
+
+    def test_subnet_modify_attributes(self):
+        session_factory = self.replay_flight_data(
+            "test_subnet_modify_attributes")
+        client = session_factory().client("ec2")
+        p = self.load_policy(
+            {
+                "name": "turn-on-public-ip-protection",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "MapPublicIpOnLaunch",
+                        "value": True,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "modify",
+                        "MapPublicIpOnLaunch": False,
+                    },
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        ModifiedSubnet = client.describe_subnets(
+            SubnetIds=[resources[0]['SubnetId']])
+        MapPublicIpOnLaunch = ModifiedSubnet["Subnets"][0]["MapPublicIpOnLaunch"]
+        self.assertEqual(MapPublicIpOnLaunch, False)

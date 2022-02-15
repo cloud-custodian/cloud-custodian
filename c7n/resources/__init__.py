@@ -37,7 +37,7 @@ def should_load_provider(name, provider_types):
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc')
 
 
 def load_available(resources=True):
@@ -68,6 +68,10 @@ def load_providers(provider_types):
         import c7n.resources.securityhub
         import c7n.resources.sfn
         import c7n.resources.ssm # NOQA
+
+    if should_load_provider('awscc', provider_types):
+        from c7n_awscc.entry import initialize_awscc
+        initialize_awscc()
 
     if should_load_provider('azure', provider_types):
         from c7n_azure.entry import initialize_azure
