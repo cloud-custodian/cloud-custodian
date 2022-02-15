@@ -2667,7 +2667,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
 
 
 @TrafficMirrorSession.action_registry.register('delete')
-class Delete(BaseAction):
+class DeleteTrafficMirrorSession(BaseAction):
     """Action to delete traffic mirror session(s)
 
     :example:
