@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+import time
 
 
 class BigQueryDataSetTest(BaseTest):
@@ -86,3 +87,27 @@ class BigQueryTableTest(BaseTest):
         event = event_data('bq-table-create.json')
         job = exec_mode.run(event, None)
         self.assertIn('tableReference', job[0].keys())
+
+    def test_table_delete(self):
+        project_id = 'premise-governance-rd'
+        factory = self.replay_flight_data('bq-table-delete', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'bq-table-delete',
+                'resource': 'gcp.bq-table',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'tag:delete_me',
+                    'value': 'yes',
+                    'op': 'equal'
+                }],
+                'actions': [
+                    'delete'
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(len(resources), 1)
