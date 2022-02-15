@@ -100,4 +100,4 @@ class DataCatalogSearchFilter(Filter):
         session = local_session(self.manager.session_factory)
         client = session.client('datacatalog', 'v1beta1', 'catalog')
         retrieved = client.execute_command('search', {'body': config}).get('results')
-        return retrieved
+        return retrieved if retrieved else []
