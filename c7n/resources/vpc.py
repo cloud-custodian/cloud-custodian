@@ -2654,3 +2654,51 @@ class SubnetModifyAtrributes(BaseAction):
                 client.modify_subnet_attribute,
                 SubnetId=r['SubnetId'], **params)
         return resources
+
+
+@resources.register('mirror-session')
+class TrafficMirrorSession(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
+        name = id = 'TrafficMirrorSessionId'
+        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+
+
+@TrafficMirrorSession.action_registry.register('delete')
+class Delete(BaseAction):
+    """Action to delete traffic mirror session(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: traffic-mirror-session-paclength
+                resource: mirror-session
+                filters:
+                  - type: value
+                    key: tag:Owner
+                    value: xyz
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteTrafficMirrorSession',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_traffic_mirror_session(TrafficMirrorSessionId=r['TrafficMirrorSessionId'])
+
+
+@resources.register('mirror-target')
+class TrafficMirrorTarget(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
+        name = id = 'TrafficMirrorTargetId'
+        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
