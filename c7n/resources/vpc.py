@@ -5,7 +5,6 @@ import operator
 import zlib
 import jmespath
 import re
-
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
@@ -2601,3 +2600,57 @@ class Entry(Filter):
                 results.append(r)
                 r[self.match_annotation_key] = matched
         return results
+
+
+@Subnet.action_registry.register('modify')
+class SubnetModifyAtrributes(BaseAction):
+    """Modify subnet attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: turn-on-public-ip-protection
+                resource: aws.subnet
+                filters:
+                  - type: value
+                    key: "MapPublicIpOnLaunch.enabled"
+                    value: false
+                actions:
+                  - type: modify
+                    MapPublicIpOnLaunch: false
+    """
+
+    schema = type_schema(
+        "modify",
+        AssignIpv6AddressOnCreation={'type': 'boolean'},
+        CustomerOwnedIpv4Pool={'type': 'string'},
+        DisableLniAtDeviceIndex={'type': 'boolean'},
+        EnableLniAtDeviceIndex={'type': 'integer'},
+        EnableResourceNameDnsAAAARecordOnLaunch={'type': 'boolean'},
+        EnableResourceNameDnsARecordOnLaunch={'type': 'boolean'},
+        EnableDns64={'type': 'boolean'},
+        MapPublicIpOnLaunch={'type': 'boolean'},
+        MapCustomerOwnedIpOnLaunch={'type': 'boolean'},
+        PrivateDnsHostnameTypeOnLaunch={
+            'type': 'string', 'enum': ['ip-name', 'resource-name']
+        }
+    )
+
+    permissions = ("ec2:ModifySubnetAttribute",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        params = dict(self.data)
+        params.pop('type')
+
+        for k in list(params):
+            if isinstance(params[k], bool):
+                params[k] = {'Value': params[k]}
+
+        for r in resources:
+            self.manager.retry(
+                client.modify_subnet_attribute,
+                SubnetId=r['SubnetId'], **params)
+        return resources

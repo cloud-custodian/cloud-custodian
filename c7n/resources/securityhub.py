@@ -135,10 +135,14 @@ class SecurityHub(LambdaMode):
                         label = r['Details']['AwsIamAccessKey']['PrincipalName']
                     else:
                         label = r['Details']['AwsIamAccessKey']['UserName']
-                    rids.add('arn:aws:iam::%s:user/%s' % (
+                    rids.add('arn:{}:iam::{}:user/{}'.format(get_partition(r['Region']),
                         f['AwsAccountId'], label))
                 elif not r['Id'].startswith('arn'):
-                    log.warning("security hub unknown id:%s rtype:%s",
+                    if r['Type'] == 'AwsEc2Instance':
+                        rids.add('arn:{}:ec2:{}:{}:instance/{}'.format(get_partition(r['Region']),
+                            r['Region'], f['AwsAccountId'], r['Id']))
+                    else:
+                        log.warning("security hub unknown id:%s rtype:%s",
                                 r['Id'], r['Type'])
                 else:
                     rids.add(r['Id'])

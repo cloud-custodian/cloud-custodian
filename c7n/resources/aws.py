@@ -588,7 +588,7 @@ class AWS(Provider):
         from c7n.policy import Policy, PolicyCollection
         policies = []
         service_region_map, resource_service_map = get_service_region_map(
-            options.regions, policy_collection.resource_types)
+            options.regions, policy_collection.resource_types, self.type)
         if 'all' in options.regions:
             enabled_regions = {
                 r['RegionName'] for r in
@@ -658,19 +658,19 @@ def fake_session():
     return session
 
 
-def get_service_region_map(regions, resource_types):
+def get_service_region_map(regions, resource_types, provider='aws'):
     # we're not interacting with the apis just using the sdk meta information.
 
     session = fake_session()
     normalized_types = []
     for r in resource_types:
-        if r.startswith('aws.'):
-            normalized_types.append(r[4:])
+        if r.startswith('%s.' % provider):
+            normalized_types.append(r[len(provider) + 1:])
         else:
             normalized_types.append(r)
 
     resource_service_map = {
-        r: clouds['aws'].resources.get(r).resource_type.service
+        r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
     # support for govcloud and china, we only utilize these regions if they
     # are explicitly passed in on the cli.

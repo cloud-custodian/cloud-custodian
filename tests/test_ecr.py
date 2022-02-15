@@ -318,3 +318,72 @@ class TestECR(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ecr_image_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_image_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ],
+                        "remove-statements": [
+                            "OldStatementToDelete"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_repo_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_repo_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy",
+                "resource": "aws.ecr",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "createdAt",
+                        "value_type": "date",
+                        "op": "lt",
+                        "value": "2021/12/15"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

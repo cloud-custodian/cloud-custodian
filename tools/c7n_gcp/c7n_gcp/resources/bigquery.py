@@ -3,8 +3,10 @@
 import jmespath
 import re
 
+from c7n.utils import type_schema
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.datacatalog import DataCatalogSearchFilter
 from c7n.utils import type_schema
 
@@ -28,7 +30,7 @@ class DataSet(QueryResourceManager):
             "creationTime", "lastModifiedTime"]
         asset_type = "bigquery.googleapis.com/Dataset"
         scc_type = "google.cloud.bigquery.Dataset"
-        metric_key = "resouece.labels.dataset_id"
+        metric_key = "resource.labels.dataset_id"
         permissions = ('bigquery.datasets.get',)
 
         @staticmethod
@@ -116,6 +118,20 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+
+@BigQueryTable.action_registry.register('delete')
+class DeleteBQTable(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.tables.get', 'bigquery.tables.delete')
+
+    def get_resource_params(self, model, r):
+        return {
+            'projectId': r['tableReference']['projectId'],
+            'datasetId': r['tableReference']['datasetId'],
+            'tableId': r['tableReference']['tableId']
+        }
 
 
 @BigQueryTable.filter_registry.register('data-catalog')
