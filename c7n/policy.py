@@ -21,6 +21,7 @@ from c7n.manager import iter_filters
 from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.provider import clouds, get_resource_class
 from c7n.registry import PluginRegistry
+from c7n.resolver import URIResolver
 from c7n.resources import load_resources
 from c7n.version import version
 
@@ -30,13 +31,12 @@ log = logging.getLogger('c7n.policy')
 def load(options, path, format=None, validate=True, vars=None):
     from c7n.schema import StructureParser, validate
 
-    session_factory = None
+    resolver = None
     if path.startswith('s3://'):
         session_factory = get_session_factory('aws', options)
+        resolver = URIResolver(session_factory, {})
 
-    data = utils.load_file(
-        path, format=format, vars=vars, session_factory=session_factory
-    )
+    data = utils.load_file(path, format=format, vars=vars, resolver=resolver)
 
     structure = StructureParser()
     structure.validate(data)

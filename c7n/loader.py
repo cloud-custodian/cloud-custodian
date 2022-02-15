@@ -12,6 +12,7 @@ import re
 
 from c7n.exceptions import PolicyValidationError
 from c7n.policy import PolicyCollection
+from c7n.resolver import URIResolver
 from c7n.resources import load_resources
 
 try:
@@ -92,9 +93,8 @@ class PolicyLoader:
     def load_file(self, file_path, format=None):
         if file_path.startswith('s3://'):
             session_factory = get_session_factory('aws', self.policy_config)
-            policy_data = load_file_util(
-                file_path, format=format, session_factory=session_factory
-            )
+            resolver = URIResolver(session_factory, {})
+            policy_data = load_file_util(file_path, format=format, resolver=resolver)
         else:
             # should we do os.path.expanduser here?
             if not os.path.exists(file_path):

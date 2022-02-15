@@ -2,15 +2,84 @@
 # SPDX-License-Identifier: Apache-2.0
 import csv
 import io
-import jmespath
-import json
-import os.path
-import logging
 import itertools
+import json
+import logging
+import os.path
+import zlib
+from contextlib import closing
+from urllib.parse import parse_qsl, urlparse
+from urllib.request import Request, urlopen
 
-from c7n.utils import format_string_values, URIResolver
+import jmespath
+
+from c7n.utils import format_string_values
 
 log = logging.getLogger('custodian.resolver')
+
+
+class NoSuchS3Key(Exception):
+    pass
+
+
+class NoSuchS3Bucket(Exception):
+    pass
+
+
+ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
+
+
+class URIResolver:
+    def __init__(self, session_factory, cache):
+        self.session_factory = session_factory
+        self.cache = cache
+
+    def resolve(self, uri):
+        if self.cache:
+            contents = self.cache.get(("uri-resolver", uri))
+            if contents is not None:
+                return contents
+
+        if uri.startswith('s3://'):
+            contents = self.get_s3_uri(uri)
+        else:
+            req = Request(uri, headers={"Accept-Encoding": "gzip"})
+            with closing(urlopen(req)) as response:  # nosec nosemgrep
+                contents = self.handle_response_encoding(response)
+
+        if self.cache:
+            self.cache.save(("uri-resolver", uri), contents)
+        return contents
+
+    def handle_response_encoding(self, response):
+        if response.info().get('Content-Encoding') != 'gzip':
+            return response.read().decode('utf-8')
+
+        data = zlib.decompress(response.read(), ZIP_OR_GZIP_HEADER_DETECT).decode(
+            'utf8'
+        )
+        return data
+
+    def get_s3_uri(self, uri):
+        parsed = urlparse(uri)
+        client = self.session_factory().client('s3')
+        params = dict(Bucket=parsed.netloc, Key=parsed.path[1:])
+        if parsed.query:
+            params.update(dict(parse_qsl(parsed.query)))
+        try:
+            result = client.get_object(**params)
+        except client.exceptions.NoSuchKey as e:
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Key(msg) from e
+        except client.exceptions.NoSuchBucket as e:
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Bucket(msg) from e
+
+        body = result['Body'].read()
+        if isinstance(body, str):
+            return body
+        else:
+            return body.decode('utf-8')
 
 
 class ValuesFrom:
@@ -46,6 +115,7 @@ class ValuesFrom:
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
+
     supported_formats = ('json', 'txt', 'csv', 'csv2dict')
 
     # intent is that callers embed this schema
@@ -56,16 +126,14 @@ class ValuesFrom:
         'properties': {
             'url': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
-            'expr': {'oneOf': [
-                {'type': 'integer'},
-                {'type': 'string'}]}
-        }
+            'expr': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
+        },
     }
 
     def __init__(self, data, manager):
         config_args = {
             'account_id': manager.config.account_id,
-            'region': manager.config.region
+            'region': manager.config.region,
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
@@ -82,8 +150,8 @@ class ValuesFrom:
 
         if format not in self.supported_formats:
             raise ValueError(
-                "Unsupported format %s for url %s",
-                format, self.data['url'])
+                "Unsupported format %s for url %s", format, self.data['url']
+            )
         contents = str(self.resolver.resolve(self.data['url']))
         return contents, format
 

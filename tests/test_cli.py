@@ -7,11 +7,11 @@ from argparse import ArgumentTypeError
 from datetime import datetime, timedelta
 
 from c7n import cli, commands, version
-from c7n.resolver import ValuesFrom
+from c7n.resolver import NoSuchS3Bucket, NoSuchS3Key, ValuesFrom
 from c7n.resources import aws
 from c7n.resources.aws import AWS
 from c7n.schema import ElementSchema, generate
-from c7n.utils import NoSuchS3Bucket, NoSuchS3Key, yaml_dump, yaml_load
+from c7n.utils import yaml_dump, yaml_load
 
 from .common import BaseTest, TextTestIO
 

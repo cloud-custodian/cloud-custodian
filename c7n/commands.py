@@ -19,9 +19,10 @@ from c7n.loader import SourceLocator
 from c7n.policy import Policy, PolicyCollection, get_session_factory
 from c7n.policy import load as policy_load
 from c7n.provider import clouds
+from c7n.resolver import NoSuchS3Bucket, NoSuchS3Key, URIResolver
 from c7n.resources import PROVIDER_NAMES, load_available, load_providers, load_resources
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import NoSuchS3Bucket, NoSuchS3Key, SafeLoader, load_file, local_session, yaml_dump
+from c7n.utils import SafeLoader, load_file, local_session, yaml_dump
 
 log = logging.getLogger('custodian.commands')
 
@@ -210,9 +211,8 @@ def validate(options):
         if fmt in ('yml', 'yaml', 'json'):
             if config_file.startswith('s3://'):
                 session_factory = get_session_factory('aws', options)
-                data = load_file(
-                    config_file, format=fmt, session_factory=session_factory
-                )
+                resolver = URIResolver(session_factory, {})
+                data = load_file(config_file, format=fmt, resolver=resolver)
             else:
                 if not os.path.exists(config_file):
                     raise ValueError("Invalid path for config %r" % config_file)
