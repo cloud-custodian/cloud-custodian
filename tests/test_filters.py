@@ -90,6 +90,9 @@ class TestFilter(unittest.TestCase):
 
         self.assertEqual(resource1, resource2)
 
+        filter_instance2.merge_annotation(resource2, 'c7n:a-different-key', [value1])
+        self.assertNotEqual(resource1, resource2)
+
 
 class TestOrFilter(unittest.TestCase):
 
