@@ -235,14 +235,15 @@ class DeleteApi(BaseAction):
     """
     permissions = ('apigateway:DELETE',)
     schema = type_schema('delete')
-    retry = get_retry(('TooManyRequestsException',))
 
     def process(self, resources):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
+        retry = get_retry(('TooManyRequestsException',))
+
         for r in resources:
             try:
-                self.retry(client.delete_rest_api, restApiId=r['id'])
+                retry(client.delete_rest_api, restApiId=r['id'])
             except client.exceptions.NotFoundException:
                 continue
 
