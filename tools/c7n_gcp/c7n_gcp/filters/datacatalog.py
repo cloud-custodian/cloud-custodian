@@ -45,9 +45,9 @@ class DataCatalogSearchFilter(Filter):
             - type: data-catalog
               include_gcp_public_datasets: false
               include_org_ids:
-                - 112233445566
+                - "112233445566"
               include_project_ids:
-                - my-gcp-project
+                - "my-gcp-project"
               query: "tag=my-gcp-project.bq_table_ownership AND tag:resourceowner:test@gmail.com"
 
     """

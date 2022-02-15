@@ -89,7 +89,7 @@ class BigQueryTableTest(BaseTest):
         self.assertIn('tableReference', job[0].keys())
 
     def test_table_delete(self):
-        project_id = 'premise-governance-rd'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('bq-table-delete', project_id=project_id)
         p = self.load_policy(
             {
@@ -126,7 +126,7 @@ class BigQueryTableTest(BaseTest):
                     'type': 'data-catalog',
                     'include_gcp_public_datasets': 'false',
                     'include_org_ids': [
-                        '659624054309'
+                        '112233445566'
                     ],
                     'include_project_ids': [
                         'cloud-custodian'
