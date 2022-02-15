@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "DeleteMe",
+                "PolicyArn": "arn:aws:iam::644160558196:policy/DeleteMe"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
