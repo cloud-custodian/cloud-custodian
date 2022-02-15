@@ -8,7 +8,6 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildRe
 from c7n_gcp.provider import resources
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.datacatalog import DataCatalogSearchFilter
-from c7n.utils import type_schema
 
 
 @resources.register('bq-dataset')

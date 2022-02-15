@@ -87,7 +87,7 @@ class BigQueryTableTest(BaseTest):
         event = event_data('bq-table-create.json')
         job = exec_mode.run(event, None)
         self.assertIn('tableReference', job[0].keys())
-        
+
     def test_table_delete(self):
         project_id = 'premise-governance-rd'
         factory = self.replay_flight_data('bq-table-delete', project_id=project_id)
