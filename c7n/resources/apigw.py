@@ -13,11 +13,12 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema
+from c7n.utils import generate_arn, type_schema, get_retry
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
 ANNOTATION_KEY_MATCHED_INTEGRATIONS = 'c7n:matched-method-integrations'
+
 
 
 @resources.register('rest-account')
@@ -235,13 +236,14 @@ class DeleteApi(BaseAction):
     """
     permissions = ('apigateway:DELETE',)
     schema = type_schema('delete')
+    retry = get_retry(('TooManyRequestsException',))
 
     def process(self, resources):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for r in resources:
             try:
-                client.delete_rest_api(restApiId=r['id'])
+                self.retry(client.delete_rest_api(restApiId=r['id']))
             except client.exceptions.NotFoundException:
                 continue
 
