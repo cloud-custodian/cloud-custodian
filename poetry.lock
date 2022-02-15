@@ -389,7 +389,7 @@ testing = ["coverage", "nose"]
 
 [[package]]
 name = "placebo"
-version = "0.9.0"
+version = "0.10.0"
 description = "Make boto3 calls that look real but have no effect"
 category = "dev"
 optional = false
@@ -857,7 +857,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "363e4bcaf1d1dc49670628674ebcd243c0f5a43da98629d9e148ade6d7d0fa3a"
+content-hash = "1082619b1f733f6325d37f72e5178ad1df0e12032f01917281579099d18b3775"
 
 [metadata.files]
 argcomplete = [
@@ -1178,7 +1178,7 @@ pkginfo = [
     {file = "pkginfo-1.8.2.tar.gz", hash = "sha256:542e0d0b6750e2e21c20179803e40ab50598d8066d51097a0e382cba9eb02bff"},
 ]
 placebo = [
-    {file = "placebo-0.9.0.tar.gz", hash = "sha256:03157f8527bbc2965b71b88f4a139ef8038618b346787f20d63e3c5da541b047"},
+    {file = "placebo-0.10.0.tar.gz", hash = "sha256:390db04f3f3486790b583dc18cb0bc116f195f196d4e58195adb4bb543ebe0bd"},
 ]
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},

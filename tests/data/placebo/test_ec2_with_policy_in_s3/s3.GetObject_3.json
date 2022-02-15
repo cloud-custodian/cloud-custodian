@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AcceptRanges": "bytes",
+        "LastModified": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 2,
+            "day": 14,
+            "hour": 3,
+            "minute": 38,
+            "second": 38,
+            "microsecond": 0
+        },
+        "ContentLength": 355,
+        "ETag": "\"b404039af88232af6bae77b167544a07\"",
+        "ContentType": "application/json",
+        "Metadata": {},
+        "Body": {
+            "__class__": "StreamingBody",
+            "body": "ewogICAgInBvbGljaWVzIjogWwogICAgICAgIHsKICAgICAgICAgICAgImZpbHRlcnMiOiBbCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgIlN0YXRlLk5hbWUiOiAicnVubmluZyIKICAgICAgICAgICAgICAgIH0sCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgImRheXMiOiAzMCwKICAgICAgICAgICAgICAgICAgICAidHlwZSI6ICJzdGF0ZS1hZ2UiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIF0sCiAgICAgICAgICAgICJuYW1lIjogImVjMi1zdGF0ZS10cmFuc2l0aW9uLWFnZSIsCiAgICAgICAgICAgICJyZXNvdXJjZSI6ICJlYzIiCiAgICAgICAgfQogICAgXQp9Cg=="
+        }
+    }
+}

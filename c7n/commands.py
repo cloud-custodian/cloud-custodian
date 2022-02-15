@@ -1,28 +1,28 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from collections import Counter, defaultdict
-from datetime import timedelta, datetime
-from functools import wraps
-import json
 import itertools
+import json
 import logging
 import os
 import sys
+from collections import Counter, defaultdict
+from datetime import datetime, timedelta
+from functools import wraps
 
 import yaml
 from yaml.constructor import ConstructorError
 
 from c7n import deprecated
+from c7n.config import Bag, Config
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.loader import SourceLocator
+from c7n.policy import Policy, PolicyCollection, get_session_factory
+from c7n.policy import load as policy_load
 from c7n.provider import clouds
-from c7n.policy import Policy, PolicyCollection, load as policy_load
+from c7n.resolver import NoSuchS3Bucket, NoSuchS3Key, URIResolver
+from c7n.resources import PROVIDER_NAMES, load_available, load_providers, load_resources
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
-from c7n.config import Bag, Config
-from c7n.resources import (
-    load_resources, load_available, load_providers, PROVIDER_NAMES)
-
+from c7n.utils import SafeLoader, load_file, local_session, yaml_dump
 
 log = logging.getLogger('custodian.commands')
 
@@ -45,12 +45,16 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = ""
+        options.region = None
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
             except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
+                errors += 1
+                continue
+            except (NoSuchS3Bucket, NoSuchS3Key) as e:
+                log.error(str(e))
                 errors += 1
                 continue
             except yaml.YAMLError as e:
@@ -201,19 +205,26 @@ def validate(options):
     for config_file in options.configs:
 
         config_file = os.path.expanduser(config_file)
-        if not os.path.exists(config_file):
-            raise ValueError("Invalid path for config %r" % config_file)
-
         options.dryrun = True
         fmt = config_file.rsplit('.', 1)[-1]
 
-        with open(config_file) as fh:
-            if fmt in ('yml', 'yaml', 'json'):
-                # our loader is safe loader derived.
-                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
+        if fmt in ('yml', 'yaml', 'json'):
+            if config_file.startswith('s3://'):
+                session_factory = get_session_factory('aws', options)
+                resolver = URIResolver(session_factory, {})
+                data = load_file(config_file, format=fmt, resolver=resolver)
             else:
-                log.error("The config file must end in .json, .yml or .yaml.")
-                raise ValueError("The config file must end in .json, .yml or .yaml.")
+                if not os.path.exists(config_file):
+                    raise ValueError("Invalid path for config %r" % config_file)
+                with open(config_file) as fh:
+                    # our loader is safe loader derived.
+
+                    data = yaml.load(  # nosec nosemgrep
+                        fh.read(), Loader=DuplicateKeyCheckLoader
+                    )
+        else:
+            log.error("The config file must end in .json, .yml or .yaml.")
+            raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         try:
             structure.validate(data)

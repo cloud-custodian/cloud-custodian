@@ -1,11 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
-from datetime import datetime, timedelta
-from dateutil.tz import tzutc
-import json
-import itertools
 import ipaddress
+import itertools
+import json
 import logging
 import os
 import random
@@ -13,11 +11,12 @@ import re
 import sys
 import threading
 import time
+from datetime import datetime, timedelta
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
-
 from dateutil.parser import ParserError, parse
+from dateutil.tz import tzutc
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -30,9 +29,11 @@ except ImportError:  # pragma: no cover
     SafeLoader = BaseSafeDumper = yaml = None
 else:
     try:
-        from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
+        from yaml import CSafeDumper as BaseSafeDumper
+        from yaml import CSafeLoader as SafeLoader
     except ImportError:  # pragma: no cover
-        from yaml import SafeLoader, SafeDumper as BaseSafeDumper
+        from yaml import SafeDumper as BaseSafeDumper
+        from yaml import SafeLoader
 
 
 class SafeDumper(BaseSafeDumper or object):
@@ -47,30 +48,36 @@ class VarsSubstitutionError(Exception):
     pass
 
 
-def load_file(path, format=None, vars=None):
+def load_file(path, format=None, vars=None, resolver=None):
     if format is None:
         format = 'yaml'
         _, ext = os.path.splitext(path)
         if ext[1:] == 'json':
             format = 'json'
 
-    with open(path) as fh:
-        contents = fh.read()
+    if path.startswith('s3://'):
+        contents = resolver.get_s3_uri(path)
+    else:
+        # should we do os.path.expanduser here?
+        if not os.path.exists(path):
+            raise IOError("Invalid path for config %r" % path)
+        with open(path) as fh:
+            contents = fh.read()
 
-        if vars:
-            try:
-                contents = contents.format(**vars)
-            except IndexError:
-                msg = 'Failed to substitute variable by positional argument.'
-                raise VarsSubstitutionError(msg)
-            except KeyError as e:
-                msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
-                raise VarsSubstitutionError(msg)
+    if vars:
+        try:
+            contents = contents.format(**vars)
+        except IndexError:
+            msg = 'Failed to substitute variable by positional argument.'
+            raise VarsSubstitutionError(msg)
+        except KeyError as e:
+            msg = 'Failed to substitute variables.  KeyError on {}'.format(str(e))
+            raise VarsSubstitutionError(msg)
 
-        if format == 'yaml':
-            return yaml_load(contents)
-        elif format == 'json':
-            return loads(contents)
+    if format in ('yml', 'yaml'):
+        return yaml_load(contents)
+    elif format == 'json':
+        return loads(contents)
 
 
 def yaml_load(value):

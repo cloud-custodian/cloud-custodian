@@ -1,38 +1,42 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from datetime import datetime
-import json
 import fnmatch
 import itertools
+import json
 import logging
 import os
 import time
+from datetime import datetime
 
-from dateutil import parser, tz as tzutil
 import jmespath
+from dateutil import parser
+from dateutil import tz as tzutil
 
-from c7n.cwe import CloudWatchEvents
+from c7n import deprecated, utils
 from c7n.ctx import ExecutionContext
-from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
-from c7n.filters import FilterRegistry, And, Or, Not
+from c7n.cwe import CloudWatchEvents
+from c7n.exceptions import ClientError, PolicyValidationError, ResourceLimitExceeded
+from c7n.filters import And, FilterRegistry, Not, Or
 from c7n.manager import iter_filters
 from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
-from c7n.resources import load_resources
-from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
-from c7n import deprecated, utils
+from c7n.registry import PluginRegistry
+from c7n.resolver import URIResolver
+from c7n.resources import load_resources
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
 
 
 def load(options, path, format=None, validate=True, vars=None):
-    # should we do os.path.expanduser here?
-    if not os.path.exists(path):
-        raise IOError("Invalid path for config %r" % path)
+    from c7n.schema import StructureParser, validate
 
-    from c7n.schema import validate, StructureParser
-    data = utils.load_file(path, format=format, vars=vars)
+    resolver = None
+    if path.startswith('s3://'):
+        session_factory = get_session_factory('aws', options)
+        resolver = URIResolver(session_factory, {})
+
+    data = utils.load_file(path, format=format, vars=vars, resolver=resolver)
 
     structure = StructureParser()
     structure.validate(data)

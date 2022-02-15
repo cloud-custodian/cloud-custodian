@@ -2,19 +2,29 @@
 # SPDX-License-Identifier: Apache-2.0
 import csv
 import io
-import jmespath
-import json
-import os.path
-import logging
 import itertools
-from urllib.request import Request, urlopen
-from urllib.parse import parse_qsl, urlparse
+import json
+import logging
+import os.path
 import zlib
 from contextlib import closing
+from urllib.parse import parse_qsl, urlparse
+from urllib.request import Request, urlopen
+
+import jmespath
 
 from c7n.utils import format_string_values
 
 log = logging.getLogger('custodian.resolver')
+
+
+class NoSuchS3Key(Exception):
+    pass
+
+
+class NoSuchS3Bucket(Exception):
+    pass
+
 
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
@@ -53,12 +63,18 @@ class URIResolver:
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
         client = self.session_factory().client('s3')
-        params = dict(
-            Bucket=parsed.netloc,
-            Key=parsed.path[1:])
+        params = dict(Bucket=parsed.netloc, Key=parsed.path[1:])
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
-        result = client.get_object(**params)
+        try:
+            result = client.get_object(**params)
+        except client.exceptions.NoSuchKey as e:
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Key(msg) from e
+        except client.exceptions.NoSuchBucket as e:
+            msg = f"Issue while getting {uri}."
+            raise NoSuchS3Bucket(msg) from e
+
         body = result['Body'].read()
         if isinstance(body, str):
             return body

@@ -2,21 +2,20 @@
 # SPDX-License-Identifier: Apache-2.0
 import csv
 import json
-import pickle
 import os
+import pickle
 import tempfile
-import vcr
 from urllib.request import urlopen
 
-from .common import BaseTest, ACCOUNT_ID, Bag
-from .test_s3 import destroyBucket
-
+import vcr
 from c7n.config import Config
-from c7n.resolver import ValuesFrom, URIResolver
+from c7n.resolver import URIResolver, ValuesFrom
+
+from .common import ACCOUNT_ID, Bag, BaseTest
+from .test_s3 import destroyBucket
 
 
 class FakeCache:
-
     def __init__(self):
         self.state = {}
         self.gets = 0

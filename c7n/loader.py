@@ -7,19 +7,22 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 import logging
-import re
 import os
+import re
 
 from c7n.exceptions import PolicyValidationError
 from c7n.policy import PolicyCollection
+from c7n.resolver import URIResolver
 from c7n.resources import load_resources
+
 try:
     from c7n import schema
 except ImportError:
     # serverless execution doesn't use jsonschema
     schema = None
+from c7n.policy import get_session_factory
 from c7n.structure import StructureParser
-from c7n.utils import load_file
+from c7n.utils import load_file as load_file_util
 
 
 class SchemaValidator:
@@ -88,10 +91,15 @@ class PolicyLoader:
         self.seen_types = set()
 
     def load_file(self, file_path, format=None):
-        # should we do os.path.expanduser here?
-        if not os.path.exists(file_path):
-            raise IOError("Invalid path for config %r" % file_path)
-        policy_data = load_file(file_path, format=format)
+        if file_path.startswith('s3://'):
+            session_factory = get_session_factory('aws', self.policy_config)
+            resolver = URIResolver(session_factory, {})
+            policy_data = load_file_util(file_path, format=format, resolver=resolver)
+        else:
+            # should we do os.path.expanduser here?
+            if not os.path.exists(file_path):
+                raise IOError("Invalid path for config %r" % file_path)
+            policy_data = load_file_util(file_path, format=format)
         return self.load_data(policy_data, file_path)
 
     def _handle_missing_resources(self, policy_data, missing):
