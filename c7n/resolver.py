@@ -25,6 +25,7 @@ class NoSuchS3Key(Exception):
 class NoSuchS3Bucket(Exception):
     pass
 
+
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
