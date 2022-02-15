@@ -17,8 +17,6 @@ from botocore.response import StreamingBody
 from c7n.testing import CustodianTestCore
 from placebo import pill
 
-from .constants import ACCOUNT_ID
-
 # Custodian Test Account. This is used only for testing.
 
 ACCOUNT_ID = "644160558196"
