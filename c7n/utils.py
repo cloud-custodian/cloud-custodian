@@ -377,7 +377,7 @@ def parse_s3(s3_path):
     if ridx is None:
         key_prefix = ""
     else:
-        key_prefix = s3_path[s3_path.find('/', 5) :]
+        key_prefix = s3_path[s3_path.find('/', 5):]
     return s3_path, bucket, key_prefix
 
 
