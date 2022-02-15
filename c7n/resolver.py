@@ -25,11 +25,11 @@ class NoSuchS3Key(Exception):
 class NoSuchS3Bucket(Exception):
     pass
 
-
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
 class URIResolver:
+
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
         self.cache = cache
@@ -55,9 +55,8 @@ class URIResolver:
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        data = zlib.decompress(response.read(), ZIP_OR_GZIP_HEADER_DETECT).decode(
-            'utf8'
-        )
+        data = zlib.decompress(response.read(),
+                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
         return data
 
     def get_s3_uri(self, uri):
@@ -115,7 +114,6 @@ class ValuesFrom:
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
-
     supported_formats = ('json', 'txt', 'csv', 'csv2dict')
 
     # intent is that callers embed this schema
@@ -126,14 +124,16 @@ class ValuesFrom:
         'properties': {
             'url': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
-            'expr': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
-        },
+            'expr': {'oneOf': [
+                {'type': 'integer'},
+                {'type': 'string'}]}
+        }
     }
 
     def __init__(self, data, manager):
         config_args = {
             'account_id': manager.config.account_id,
-            'region': manager.config.region,
+            'region': manager.config.region
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
@@ -150,8 +150,8 @@ class ValuesFrom:
 
         if format not in self.supported_formats:
             raise ValueError(
-                "Unsupported format %s for url %s", format, self.data['url']
-            )
+                "Unsupported format %s for url %s",
+                format, self.data['url'])
         contents = str(self.resolver.resolve(self.data['url']))
         return contents, format
 
