@@ -2666,6 +2666,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
         cfn_type = 'AWS::EC2::TrafficMirrorSession'
         arn_type = 'traffic-mirror-session'
         universal_taggable = object()
+        id_prefix = 'tms-'
 
 
 @TrafficMirrorSession.action_registry.register('delete')
@@ -2706,3 +2707,4 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         cfn_type = 'AWS::EC2::TrafficMirrorTarget'
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
+        id_prefix = 'tmt-'
