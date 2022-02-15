@@ -12,7 +12,7 @@ import sys
 import threading
 import time
 from datetime import datetime, timedelta
-from urllib.parse import parse_qs, urlparse
+from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
 from dateutil.parser import ParserError, parse
