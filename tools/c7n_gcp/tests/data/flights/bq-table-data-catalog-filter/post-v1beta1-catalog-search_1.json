@@ -1,0 +1,14 @@
+{
+  "headers": {},
+  "body": {
+    "results": [
+      {
+        "searchResultType": "ENTRY",
+        "searchResultSubtype": "entry.table",
+        "relativeResourceName": "projects/cloud-custodian/locations/us-central1/entryGroups/@bigquery/entries/cHJvamVjdHMvcHJlbWlzZS1nb3Zlcm5hbmNlLXJkL2RhdGFzZXRzL2N1c3RvZGlhbl90ZXN0L3RhYmxlcy90ZXN0LXRhYmxlLTI",
+        "linkedResource": "//bigquery.googleapis.com/projects/cloud-custodian/datasets/custodian_test/tables/test-table-2",
+        "modifyTime": "2022-02-09T18:53:35Z"
+      }
+    ]
+  }
+}

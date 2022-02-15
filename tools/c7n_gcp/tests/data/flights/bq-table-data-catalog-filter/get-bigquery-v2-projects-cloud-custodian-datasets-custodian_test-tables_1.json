@@ -1,0 +1,35 @@
+{
+  "headers": {},
+  "body": {
+    "kind": "bigquery#tableList",
+    "etag": "+uZesA1MYVY0llNoPGXuig==",
+    "tables": [
+      {
+        "kind": "bigquery#table",
+        "id": "cloud-custodian:custodian_test.test-table-2",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "datasetId": "custodian_test",
+          "tableId": "test-table-2"
+        },
+        "type": "TABLE",
+        "labels": {
+          "resource_owner": "data-platform"
+        },
+        "creationTime": "1643824568770"
+      },
+      {
+        "kind": "bigquery#table",
+        "id": "cloud-custodian:custodian_test.test-table-2_copy",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "datasetId": "custodian_test",
+          "tableId": "test-table-2_copy"
+        },
+        "type": "TABLE",
+        "creationTime": "1644263284154"
+      }
+    ],
+    "totalItems": 2
+  }
+}

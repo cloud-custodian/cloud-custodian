@@ -1,0 +1,18 @@
+{
+  "headers": {},
+  "body": {
+    "kind": "bigquery#dataset",
+    "etag": "sFwI7MAQGyv8POwjqQ3Biw==",
+    "id": "cloud-custodian:custodian_test",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/custodian_test",
+    "datasetReference": {
+      "datasetId": "custodian_test",
+      "projectId": "cloud-custodian"
+    },
+    "access": [],
+    "creationTime": "1643816775829",
+    "lastModifiedTime": "1643816775829",
+    "location": "us-central1",
+    "type": "DEFAULT"
+  }
+}

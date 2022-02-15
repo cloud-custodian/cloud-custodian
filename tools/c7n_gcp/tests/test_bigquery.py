@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+import time
 
 
 class BigQueryDataSetTest(BaseTest):
@@ -86,3 +87,33 @@ class BigQueryTableTest(BaseTest):
         event = event_data('bq-table-create.json')
         job = exec_mode.run(event, None)
         self.assertIn('tableReference', job[0].keys())
+
+    def test_table_data_datalog_filter(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('bq-table-data-catalog-filter', project_id=project_id)
+        q1 = 'tag=cloud-custodian.test_custodian_tag_template'
+        q2 = 'type=table'
+        q3 = 'tag:resourceowner:test123@gmail.com'
+        p = self.load_policy(
+            {
+                'name': 'bq-table-data-catalog-filter',
+                'resource': 'gcp.bq-table',
+                'filters': [{
+                    'type': 'data-catalog',
+                    'include_gcp_public_datasets': 'false',
+                    'include_org_ids': [
+                        '659624054309'
+                    ],
+                    'include_project_ids': [
+                        'cloud-custodian'
+                    ],
+                    'query': f'{q1} AND {q2} AND {q3}'
+                }],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(len(resources), 1)
+        self.assertIsNotNone(resources[0].get('c7n:data-catalog'))
