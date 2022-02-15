@@ -20,7 +20,6 @@ ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
 ANNOTATION_KEY_MATCHED_INTEGRATIONS = 'c7n:matched-method-integrations'
 
 
-
 @resources.register('rest-account')
 class RestAccount(ResourceManager):
     # note this is not using a regular resource manager or type info
