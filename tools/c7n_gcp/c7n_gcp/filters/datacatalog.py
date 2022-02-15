@@ -63,7 +63,8 @@ class DataCatalogSearchFilter(Filter):
     def validate(self):
         include_org_ids = self.data.get('include_org_ids')
         include_project_ids = self.data.get('include_project_ids')
-        include_gcp_public_datasets = self.data.get('include_gcp_public_datasets')
+        include_gcp_public_datasets = json.loads(
+            self.data.get('include_gcp_public_datasets', False))
         if not include_org_ids and not include_project_ids and not include_gcp_public_datasets:
             raise FilterValidationError(
                 """Invalid scope provided. Tag Template filter cannot have missing values for both
