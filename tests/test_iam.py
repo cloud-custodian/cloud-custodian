@@ -1939,6 +1939,16 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_iam_policies(self):
+        policies = load_data("iam/iam-policies.json")
+
+        checker = PolicyChecker({})
+        for p, expected in zip(
+            policies, [False, True]
+        ):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
     def test_principal_org_id(self):
         statements = [
             {'Actions': ['Deploy', 'UnshareApplication'],
