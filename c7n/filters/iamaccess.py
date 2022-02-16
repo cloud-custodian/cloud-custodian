@@ -124,9 +124,9 @@ class PolicyChecker:
             return True
         # Skip service principals
         if 'Service' in s['Principal']:
-            os = copy.deepcopy(s)
-            os['Principal'].pop('Service')
-            if not os['Principal']:
+            osd = copy.deepcopy(s)
+            osd['Principal'].pop('Service')
+            if not osd['Principal']:
                 return False
 
         assert len(s['Principal']) > 0, "At least one principal is needed %s" % s
