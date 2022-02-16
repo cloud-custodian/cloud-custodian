@@ -1091,6 +1091,10 @@ class SetPolicy(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
+        if policy_arn != "*" and not policy_arn.startswith('arn'):
+            policy_arn = 'arn:{}:iam::{}:policy/{}'.format(
+                get_partition(self.manager.config.region),
+                self.manager.account_id, policy_arn)
         state = self.data['state']
         for r in resources:
             if state == 'attached':
@@ -1582,9 +1586,15 @@ class CredentialReport(Filter):
         try:
             report = client.get_credential_report()
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ReportNotPresent':
+            if e.response['Error']['Code'] == 'ReportNotPresent':
+                report = None
+            elif e.response['Error']['Code'] == 'ReportInProgress':
+                # Someone else asked for the report before it was done. Wait
+                # for it again.
+                time.sleep(self.get_value_or_schema_default('report_delay'))
+                report = client.get_credential_report()
+            else:
                 raise
-            report = None
         if report:
             threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
                 seconds=self.get_value_or_schema_default(

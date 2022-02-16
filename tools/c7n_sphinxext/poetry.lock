@@ -194,7 +194,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 name = "importlib-resources"
 version = "5.4.0"
 description = "Read resources from Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -622,7 +622,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "906cec7b692a35eca4ecb738ea5d6d971de1cf47fb5157e9cb5d2060c7b265fc"
+content-hash = "66195e57ed6b6e0b817d976ea88b9071b8ac50f633faf329bb8db5e7b0d48c67"
 
 [metadata.files]
 alabaster = [

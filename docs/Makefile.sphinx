@@ -62,6 +62,7 @@ clean:
 	rm -f $(SRCDIR)/aws/resources/*
 	rm -f $(SRCDIR)/gcp/resources/*
 	rm -f $(SRCDIR)/azure/resources/*
+	rm -f $(SRCDIR)/awscc/resources/*
 
 html:
 #	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
@@ -85,10 +86,13 @@ html:
 
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/awscc/resources
+	c7n-sphinxext --provider awscc --output-dir $(SRCDIR)/awscc/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/gcp/resources
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
+
 	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 #

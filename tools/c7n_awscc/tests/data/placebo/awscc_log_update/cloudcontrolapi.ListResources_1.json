@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Logs::LogGroup",
+        "ResourceDescriptions": [
+            {
+                "Identifier": "/aws/codebuild/custodian-build-python",
+                "Properties": "{\"LogGroupName\":\"/aws/codebuild/custodian-build-python\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/custodian-build-python:*\"}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
