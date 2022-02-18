@@ -377,8 +377,8 @@ def get_provider(mailer_config):
         return Providers.Azure
     elif mailer_config.get('queue_url', '').startswith('projects'):
         return Providers.GCP
-
-    return Providers.AWS
+    else:
+        return Providers.AWS
 
 
 def kms_decrypt(config, logger, session, encrypted_field):

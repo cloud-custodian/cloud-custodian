@@ -5,8 +5,8 @@ import unittest
 from common import logger, MAILER_CONFIG_GCP, GCP_MESSAGE, GCP_MESSAGES
 from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
 from c7n_mailer.email_delivery import EmailDelivery
+from c7n_mailer.utils import get_provider
 from mock import patch
-import c7n_mailer.cli
 
 
 class GcpTest(unittest.TestCase):
@@ -21,12 +21,12 @@ class GcpTest(unittest.TestCase):
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         self.assertIsNone(processor.process_message(GCP_MESSAGES['receivedMessages'][0]))
 
-    def test_receive(self):
+    def test_receive(self):  # TODO: Set up GCP auth for test
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         messages = processor.receive_messages()
         self.assertEqual(messages, {})
 
-    def test_ack(self):
+    def test_ack(self):  # TODO: Set up GCP auth for test
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         self.assertEqual(processor.ack_messages('2019-05-13T18:31:17.926Z'), {})
 
@@ -37,7 +37,7 @@ class GcpTest(unittest.TestCase):
         processor.run()
 
     def test_is_gcp_cloud(self):
-        self.assertTrue(c7n_mailer.cli.is_gcp_cloud(MAILER_CONFIG_GCP))
+        self.assertEqual(get_provider(MAILER_CONFIG_GCP), 2)
 
     @patch('common.logger.info')
     @patch.object(MailerGcpQueueProcessor, 'receive_messages')

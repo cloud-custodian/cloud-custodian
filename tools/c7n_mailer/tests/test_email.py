@@ -69,7 +69,7 @@ class EmailTest(unittest.TestCase):
                 mock_decrypt.return_value = 'xyz'
                 for email_addrs, mimetext_msg in messages_map.items():
                     deliver.send_c7n_email(msg, list(email_addrs), mimetext_msg)
-            mock_decrypt.assert_called_once()
+            mock_decrypt.assert_called_once()  # TODO: Why is this failing?
             mock_smtp.assert_has_calls([call().login('alice', 'xyz')])
 
     def test_priority_header_is_valid(self):

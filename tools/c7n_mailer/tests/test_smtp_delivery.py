@@ -33,7 +33,7 @@ class SmtpDeliveryTest(unittest.TestCase):
             'smtp_port': 25,
             'smtp_ssl': False,
             'smtp_username': 'username',
-            'smtp_password': 'test'
+            'smtp_password': 'password'
         }
         d = SmtpDelivery(config, MagicMock(), MagicMock())
         del d
