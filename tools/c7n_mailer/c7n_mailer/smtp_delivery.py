@@ -13,7 +13,12 @@ class SmtpDelivery:
         smtp_port = int(config.get('smtp_port', 25))
         smtp_ssl = bool(config.get('smtp_ssl', True))
         smtp_username = config.get('smtp_username')
-        smtp_password = utils.decrypt(config, logger, session, 'smtp_password')
+        if config.get('smtp_password_in_kms'):
+            smtp_password = utils.decrypt(config, logger, session, 'smtp_password')
+        elif type(config.get('smtp_password')) == dict:
+            smtp_password = utils.decrypt(config, logger, session, 'smtp_password')
+        else:
+            smtp_password = config.get('smtp_password')
 
         smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
         if smtp_ssl:

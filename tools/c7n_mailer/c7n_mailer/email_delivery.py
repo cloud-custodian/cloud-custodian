@@ -18,7 +18,9 @@ class EmailDelivery:
         self.config = config
         self.logger = logger
         self.session = session
-        self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
+        self.provider = get_provider(self.config)
+        if self.provider == Providers.AWS:
+            self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
         self.provider = get_provider(self.config)
 
@@ -27,8 +29,9 @@ class EmailDelivery:
             if self.provider == Providers.AWS:
                 self.config['ldap_bind_password'] = kms_decrypt(self.config, self.logger,
                                                                 self.session, 'ldap_bind_password')
-            elif self.provider == Providers.GCP:
-                self.config['ldap_bind_password'] = decrypt(self.config, self.logger, self.session, 'ldap_bind_password')
+            else:
+                self.config['ldap_bind_password'] = decrypt(self.config, self.logger,
+                                                            self.session, 'ldap_bind_password')
             return LdapLookup(self.config, self.logger)
         return None
 

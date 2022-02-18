@@ -84,7 +84,7 @@ The standard way to do a DataDog integration is use the
 c7n integration with AWS CloudWatch and use the
 [DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/)
 to collect CloudWatch metrics. The mailer/messenger integration is only
-for the case you don't want or you can't use AWS CloudWatch.
+for the case you don't want or you can't use AWS CloudWatch, e.g. in Azure or GCP.
 
 Note this integration requires the additional dependency of datadog python bindings:
 ```
@@ -310,7 +310,7 @@ and here is a description of the options:
 |           | `debug`                     | boolean | debug on/off                                                                                                                                                                                       |
 |           | `ldap_bind_dn`              | string  | eg: ou=people,dc=example,dc=com                                                                                                                                                                    |
 |           | `ldap_bind_user`            | string  | eg: FOO\\BAR                                                                                                                                                                                       |
-|           | `ldap_bind_password`        | string  | ldap bind password                                                                                                                                                                                 |
+|           | `ldap_bind_password`        | secured string  | ldap bind password                                                                                                                                                                                 |
 |           | `ldap_bind_password_in_kms` | boolean | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`      | string  |                                                                                                                                                                                                    |
 |           | `ldap_email_key`            | string  | eg 'mail'                                                                                                                                                                                          |
@@ -407,6 +407,27 @@ You can store your secrets in Azure Key Vault secrets and reference them from th
 ```
 
 Note: `secrets.get` permission on the KeyVault for the Service Principal is required.
+
+#### GCP
+
+You can store your secrets as GCP Secret Manager secrets and reference them from the policy.
+
+```yaml
+  plaintext_secret: <raw_secret>
+  secured_string:
+    type: gcp.secretmanager
+    secret: projects/12345678912/secrets/your-secret
+```
+
+An example of an SMTP password set as a secured string:
+
+```yaml
+  smtp_password:
+    type: gcp.secretmanager
+    secret: projects/59808015552/secrets/smtp_pw
+```
+
+Note: If you do not specify a version, `/versions/latest` will be appended to your secret location.
 
 ## Configuring a policy to send email
 
@@ -604,10 +625,11 @@ function_properties:
 Requires:
 
 - `c7n_gcp` package.  See [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
+- `google-cloud-secret-manager` package, for pulling in secured string values.
 - A working SMTP Account.
 - [GCP Pubsub Subscription](https://cloud.google.com/pubsub/docs/)
 
-The mailer supports GCP Pubsub transports and SMTP/Email delivery.
+The mailer supports GCP Pubsub transports and SMTP/Email delivery, as well as Datadog and Splunk.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
 The notify action in your policy will reflect transport type `projects` with the URL
@@ -638,14 +660,23 @@ notify action for GCP resources.
 ```yaml
 queue_url: projects/myproject/subscriptions/mysubscription
 from_address: you@youremail.com
+# c7n-mailer currently requires a role be present, even if it's empty
+role: ""
+
 smtp_server: my.smtp.add.ress
 smtp_port: 25
-smtp_ssl: True
+smtp_ssl: true
 smtp_username: smtpuser
-smtp_password: smtppassword  # TODO: Secure string
+smtp_password:
+  type: gcp.secretmanager
+  secret: projects/12345678912/secrets/smtppassword
 ```
 
 The mailer will transmit all messages found on the queue on each execution using SMTP/Email delivery.
+
+### Deploying GCP Functions
+
+GCP Cloud Functions for c7n-mailer are currently not supported.
 
 ## Writing an email template
 

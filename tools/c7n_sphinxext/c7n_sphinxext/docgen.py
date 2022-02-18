@@ -62,6 +62,8 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'instance'})
         elif provider == 'azure':
             r = Bag({'type': 'vm'})
+        elif provider == 'awscc':
+            r = Bag({'type': 'logs_loggroup'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
@@ -312,6 +314,15 @@ def _main(provider, output_dir, group_by):
 
     # Create individual resources pages
     for r in provider_class.resources.values():
+        # FIXME / TODO: temporary work arounds for a few types that have recursion
+        # in jsonschema on these types.
+        if provider == 'awscc' and r.type in (
+                'wafv2_rulegroup',
+                'wafv2_webacl',
+                'amplifyuibuilder_theme',
+                'amplifyuibuilder_component',
+                'amplifybuilder_component'):
+            continue
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(

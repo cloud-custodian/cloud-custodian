@@ -376,7 +376,7 @@ def get_provider(mailer_config):
     if mailer_config.get('queue_url', '').startswith('asq://'):
         return Providers.Azure
     elif mailer_config.get('queue_url', '').startswith('projects'):
-        return Providers.Google
+        return Providers.GCP
 
     return Providers.AWS
 
@@ -412,7 +412,7 @@ def decrypt(config, logger, session, encrypted_field):
             return azure_decrypt(config, logger, session, encrypted_field)
         elif provider == Providers.GCP:
             from c7n_mailer.gcp_mailer.utils import gcp_decrypt
-            return gcp_decrypt(config, encrypted_field)
+            return gcp_decrypt(config, logger, encrypted_field)
         elif provider == Providers.AWS:
             return kms_decrypt(config, logger, session, encrypted_field)
         else:

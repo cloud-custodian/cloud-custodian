@@ -14,8 +14,7 @@ from c7n_mailer.email_delivery import EmailDelivery
 try:
     from c7n_gcp.client import Session
 except ImportError:
-    raise Exception("Using GCP Pub/Sub with c7n_mailer requires package c7n_gcp to be installed.") 
-    # TODO: Add test?
+    raise Exception("Using GCP Pub/Sub with c7n_mailer requires package c7n_gcp to be installed.")
 
 MAX_MESSAGES = 1000
 
@@ -51,36 +50,22 @@ class MailerGcpQueueProcessor(object):
         self.logger.info('No messages left in the gcp topic subscription, now exiting c7n_mailer.')
 
     # This function, when processing gcp pubsub messages, will deliver messages over email.
-    # Also added support for Datadog
-    # TODO: Add Splunk, possibly also Slack
+    # Also support for Datadog and Slack
     def process_message(self, encoded_gcp_pubsub_message):
         pubsub_message = self.unpack_to_dict(encoded_gcp_pubsub_message['message']['data'])
-        # TODO: Debug log?
-        # if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-        #     for e in pubsub_message.get('action', ()).get('to')):
-        #         self._deliver_slack_message(pubsub_message)
-
+        # Process email first
+        delivery = EmailDelivery(self.config, self.session, self.logger)
+        to_email_messages_map = delivery.get_to_addrs_email_messages_map(
+            pubsub_message)
+        for email_to_addrs, mimetext_msg in six.iteritems(to_email_messages_map):
+            delivery.send_c7n_email(pubsub_message, list(email_to_addrs), mimetext_msg)
+        # Process Datadog
         if any(e.startswith('datadog') for e in pubsub_message.get('action', ()).get('to')):
             self._deliver_datadog_message(pubsub_message)
-
-        else:
-            delivery = EmailDelivery(self.config, self.session, self.logger)
-            to_email_messages_map = delivery.get_to_addrs_email_messages_map(
-                pubsub_message)
-            for email_to_addrs, mimetext_msg in six.iteritems(to_email_messages_map):
-                delivery.send_c7n_email(pubsub_message, list(email_to_addrs), mimetext_msg)
-
-    # def _deliver_slack_message(self, pubsub_message):  # TODO: Allow for no email handler?
-    #     from c7n_mailer.slack_delivery import SlackDelivery
-    #     slack_delivery = SlackDelivery(self.config,
-    #                                    self.logger,
-    #                                    SendGridDelivery(self.config, self.session, self.logger))
-    #     slack_messages = slack_delivery.get_to_addrs_slack_messages_map(pubsub_message)
-    #     try:
-    #         self.logger.info('Sending message to Slack.')
-    #         slack_delivery.slack_handler(pubsub_message, slack_messages)
-    #     except Exception as error:
-    #         self.logger.exception(error)
+        # Process Slack
+        if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/') for e in
+        pubsub_message.get('action', ()).get('to')):
+            self._deliver_slack_message(pubsub_message, delivery)
 
     def _deliver_datadog_message(self, pubsub_message):
         from c7n_mailer.datadog_delivery import DataDogDelivery
@@ -92,6 +77,18 @@ class MailerGcpQueueProcessor(object):
             datadog_delivery.deliver_datadog_messages(datadog_message_packages, pubsub_message)
         except Exception as error:
             self.logger.exception(error)
+            pass
+
+    def _deliver_slack_message(self, pubsub_message, email_handler):
+        from c7n_mailer.slack_delivery import SlackDelivery
+        slack_delivery = SlackDelivery(self.config, self.logger, email_handler)
+        slack_messages = slack_delivery.get_to_addrs_slack_messages_map(pubsub_message)
+        try:
+            self.logger.info('Sending message to Slack.')
+            slack_delivery.slack_handler(pubsub_message, slack_messages)
+        except Exception as error:
+            self.logger.exception(error)
+            pass
 
     def receive_messages(self):
         """Receive messsage(s) from subscribed topic

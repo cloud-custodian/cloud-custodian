@@ -26,12 +26,21 @@ AZURE_KV_SECRET_SCHEMA = {
     'additionalProperties': False
 }
 
-# GCP_SECRET_SCHEMA = {}
+GCP_SECRET_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'enum': ['gcp.secretmanager']},
+        'secret': {'type': 'string'}
+    },
+    'required': ['type', 'secret'],
+    'additionalProperties': False
+}
 
 SECURED_STRING_SCHEMA = {
     'oneOf': [
         {'type': 'string'},
-        AZURE_KV_SECRET_SCHEMA
+        AZURE_KV_SECRET_SCHEMA,
+        GCP_SECRET_SCHEMA
     ]
 }
 
@@ -143,7 +152,7 @@ CONFIG_SCHEMA = {
         'ldap_manager_attribute': {'type': 'string'},
         'ldap_email_attribute': {'type': 'string'},
         'ldap_bind_password_in_kms': {'type': 'boolean'},
-        'ldap_bind_password': {'type': 'string'},
+        'ldap_bind_password': SECURED_STRING_SCHEMA,
         'cross_accounts': {'type': 'object'},
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
@@ -267,7 +276,7 @@ def main():
         # Select correct processor
         if provider == Providers.Azure:
             processor = MailerAzureQueueProcessor(mailer_config, logger)
-        elif provider == Providers.Google:
+        elif provider == Providers.GCP:
             processor = MailerGcpQueueProcessor(mailer_config, logger)
         elif provider == Providers.AWS:
             aws_session = session_factory(mailer_config)

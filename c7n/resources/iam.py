@@ -1091,6 +1091,10 @@ class SetPolicy(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
+        if policy_arn != "*" and not policy_arn.startswith('arn'):
+            policy_arn = 'arn:{}:iam::{}:policy/{}'.format(
+                get_partition(self.manager.config.region),
+                self.manager.account_id, policy_arn)
         state = self.data['state']
         for r in resources:
             if state == 'attached':
@@ -1582,9 +1586,15 @@ class CredentialReport(Filter):
         try:
             report = client.get_credential_report()
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ReportNotPresent':
+            if e.response['Error']['Code'] == 'ReportNotPresent':
+                report = None
+            elif e.response['Error']['Code'] == 'ReportInProgress':
+                # Someone else asked for the report before it was done. Wait
+                # for it again.
+                time.sleep(self.get_value_or_schema_default('report_delay'))
+                report = client.get_credential_report()
+            else:
                 raise
-            report = None
         if report:
             threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
                 seconds=self.get_value_or_schema_default(
@@ -2355,6 +2365,43 @@ def resolve_credential_keys(m_keys, keys):
 #################
 #   IAM Groups  #
 #################
+
+
+@Group.filter_registry.register('has-specific-managed-policy')
+class SpecificIamGroupManagedPolicy(Filter):
+    """Filter IAM groups that have a specific policy attached
+
+    For example, if the user wants to check all groups with 'admin-policy':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-groups-have-admin
+            resource: iam-group
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedGroupPolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_group_policies(
+            GroupName=resource['GroupName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            results = []
+            for r in resources:
+                r["ManagedPolicies"] = self._managed_policies(c, r)
+                if self.data.get('value') in r["ManagedPolicies"]:
+                    results.append(r)
+            return results
+        return []
 
 
 @Group.filter_registry.register('has-users')
