@@ -73,7 +73,8 @@ jobs:
             docs/source/aws/resources
             docs/source/gcp/resources
             docs/source/azure/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}
+            docs/source/awscc/resources
+          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}-1
 
       - name: Update PATH
         shell: bash
