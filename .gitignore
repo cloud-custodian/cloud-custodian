@@ -47,3 +47,5 @@ docs/source/*/resources
 docs/source/tools/assets/
 .tfcache
 .env
+.python-version
+
