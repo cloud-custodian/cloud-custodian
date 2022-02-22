@@ -12,6 +12,7 @@ import sys
 import toml
 from pathlib import Path
 
+
 def envbool(value):
     if not value:
         return False
@@ -21,6 +22,7 @@ def envbool(value):
     elif value == 'yes':
         return True
     return False
+
 
 POETRY_DEBUG = envbool(os.environ.get('POETRY_DEBUG'))
 
