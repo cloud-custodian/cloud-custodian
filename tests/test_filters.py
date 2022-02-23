@@ -187,7 +187,7 @@ class TestValueFilter(unittest.TestCase):
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
 
         vf.vtype = "cidr_range"
-        sentinel = {"10.0.0.0/16","192.168.0.0/16"}
+        sentinel = {"10.0.0.0/16", "192.168.0.0/16"}
         value = "10.10.10.0/24"
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((res[0], str(res[1])), (sentinel, value))
