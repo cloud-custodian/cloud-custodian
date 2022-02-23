@@ -3,8 +3,8 @@ atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" a
 attrs==21.4.0; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.5.0" and python_version >= "3.7" and python_version < "4.0"
 aws-xray-sdk==2.9.0
 bleach==4.1.0; python_version >= "3.6"
-boto3==1.21.4; python_version >= "3.6"
-botocore==1.24.4; python_version >= "3.6"
+boto3==1.21.5; python_version >= "3.6"
+botocore==1.24.5; python_version >= "3.6"
 certifi==2021.10.8; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 charset-normalizer==2.0.12; python_full_version >= "3.6.0" and python_version >= "3.6"
 click==8.0.4; python_version >= "3.6"
@@ -16,7 +16,7 @@ execnet==1.9.0; python_version >= "3.6" and python_full_version < "3.0.0" and py
 flake8==3.9.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 future==0.18.2; python_version >= "2.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
 idna==3.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
-importlib-metadata==4.11.1; python_version == "3.7" and (python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "3.8" or python_full_version >= "3.5.0" and python_version < "3.8" and python_version >= "3.7") and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6")
+importlib-metadata==4.11.1; python_version >= "3.7"
 importlib-resources==5.4.0; python_version < "3.9" and python_version >= "3.7"
 iniconfig==1.1.1; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.5.0" and python_version >= "3.6" and python_version < "4.0"
 jeepney==0.7.1; sys_platform == "linux" and python_version >= "3.7"
