@@ -8,8 +8,12 @@ from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
 
 
-class SecurityResourceManager(QueryResourceManager):
-    """Manager for Security Center resources
+class DefenderResourceManager(QueryResourceManager):
+    """Manager for Microsoft Defender resources
+
+    Note: The "Microsoft Defender for Cloud" name replaces and
+    consolidates products previously called Azure Security Center
+    and Azure Defender.
 
     The Azure Security SDK takes different arguments for its
     SecurityCenter client than other service SDKs use.
@@ -41,13 +45,13 @@ class SecurityResourceManager(QueryResourceManager):
 
 
 @resources.register("defender-pricing")
-class DefenderPricing(SecurityResourceManager, metaclass=QueryMeta):
-    """Active Azure Defender pricing details for supported resources.
+class DefenderPricing(DefenderResourceManager, metaclass=QueryMeta):
+    """Active Microsoft Defender pricing details for supported resources.
 
     :example:
 
     Check if the Key Vaults resource is operating under the Standard
-    pricing tier. This equates to Azure Defender being "On" in some
+    pricing tier. This equates to Microsoft Defender being "On" in some
     security assessments.
 
     .. code-block:: yaml
@@ -73,12 +77,12 @@ class DefenderPricing(SecurityResourceManager, metaclass=QueryMeta):
 
 
 @resources.register("defender-setting")
-class DefenderSetting(SecurityResourceManager, metaclass=QueryMeta):
-    """Top-level Azure Defender settings for a subscription.
+class DefenderSetting(DefenderResourceManager, metaclass=QueryMeta):
+    """Top-level Microsoft Defender settings for a subscription.
 
     :example:
 
-    Check that the MCAS integration with Azure Defender is enabled.
+    Check that the MCAS integration with Microsoft Defender is enabled.
 
     .. code-block:: yaml
 
@@ -104,12 +108,12 @@ class DefenderSetting(SecurityResourceManager, metaclass=QueryMeta):
 
 
 @resources.register("defender-autoprovisioning")
-class DefenderAutoProvisioningSetting(SecurityResourceManager, metaclass=QueryMeta):
-    """Auto-provisioning settings for Azure Defender agents.
+class DefenderAutoProvisioningSetting(DefenderResourceManager, metaclass=QueryMeta):
+    """Auto-provisioning settings for Microsoft Defender agents.
 
     :example:
 
-    Check that auto-provisioning is enabled for the Azure Defender monitoring agent.
+    Check that auto-provisioning is enabled for the Microsoft Defender monitoring agent.
 
     .. code-block:: yaml
 
