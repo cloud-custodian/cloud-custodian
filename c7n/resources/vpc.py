@@ -1042,6 +1042,19 @@ class SGPermission(Filter):
           CidrV6:
             value: "::/0"
 
+    `value_type: cidr_range` can can run extended cidr range check. In
+    this example we are blocking any smaller cidrs within allowed_cidrs.csv.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr_range
+          op: not-in
+          value_from:
+            url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
+            format: csv
+
     `SGReferences` can be used to filter out SG references in rules.
     In this example we want to block ingress rules that reference a SG
     that is tagged with `Access: Public`.
