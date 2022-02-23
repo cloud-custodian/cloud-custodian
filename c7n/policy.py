@@ -362,7 +362,8 @@ class LambdaMode(ServerlessExecutionMode):
             'kms_key_arn': {'type': 'string'},
             'tracing_config': {'type': 'object'},
             'security_groups': {'type': 'array'},
-            'subnets': {'type': 'array'}
+            'subnets': {'type': 'array'},
+            'architectures': {'type': 'array', 'items': {'enum': ['x86_64', 'arm64']}}
         }
     }
 
