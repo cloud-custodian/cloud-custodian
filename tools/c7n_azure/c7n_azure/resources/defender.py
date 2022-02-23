@@ -1,12 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
-import requests
 from azure.mgmt.security import SecurityCenter
 
 from c7n.utils import local_session
-from c7n_azure.constants import RESOURCE_GLOBAL_MGMT
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
 
@@ -15,26 +12,32 @@ class SecurityResourceManager(QueryResourceManager):
     """Manager for Security Center resources
 
     The Azure Security SDK takes different arguments for its
-    SecurityCenter client than other service SDKs use. Notably, it
-    takes an `asc_location` which comes from the `locations` API.
+    SecurityCenter client than other service SDKs use.
 
-    We can override client creation here to use a subscription's
-    home region, which should help simplify individual Defender
-    resource definitions.
+    We can override client creation here to help simplify individual
+    Defender resource definitions.
     """
 
     def get_client(self):
         session = local_session(self.session_factory)
-        credentials = session.get_credentials()
-        token = credentials.get_token(RESOURCE_GLOBAL_MGMT + '.default')
-        locations_path = f'/subscriptions/{session.subscription_id}/providers/Microsoft.Security/locations/'
-        api_version = session.resource_api_version(locations_path)
-        response = requests.get(
-            f'{RESOURCE_GLOBAL_MGMT}/{locations_path}?api-version={api_version}',
-            headers={'Authorization': f'Bearer {token.token}'})
-        home_region = jmespath.search('value[].properties.homeRegionName|[0]', response.json())
-        return SecurityCenter(credentials, session.subscription_id, home_region)
 
+        # The SecurityCenter client takes an "asc_location" parameter, and the
+        # documentation[^1] points out that this can come from the locations
+        # list (elsewhere there are references to using a subscription's
+        # "home region" for asc_location).
+        #
+        # However, from peeking at the Azure CLI's code it looks like they
+        # hardcode an arbitrary/common location[^2]. The initial pull request
+        # adding Defender to the CLI[^3] mentions that the intention is to
+        # remove asc_location from client creation and hide it from the user.
+        #
+        # Following the Azure CLI team's lead and hardcoding "centralus"
+        # here seems reasonable.
+        #
+        # [^1]: https://azuresdkdocs.blob.core.windows.net/$web/python/azure-mgmt-security/1.0.0/azure.mgmt.security.html#azure.mgmt.security.SecurityCenter  # noqa
+        # [^2]: https://github.com/Azure/azure-cli/blob/29767d75d850ddc1c24cc85bd46d861b61d77a47/src/azure-cli/azure/cli/command_modules/security/_client_factory.py#L11  # noqa
+        # [^3]: https://github.com/Azure/azure-cli/pull/7917#discussion_r238458818  # noqa
+        return SecurityCenter(session.get_credentials(), session.subscription_id, "centralus")
 
 @resources.register('defender-pricing')
 class DefenderPricing(SecurityResourceManager, metaclass=QueryMeta):
