@@ -51,7 +51,7 @@ ResourceMap = {
     "azure.search": "c7n_azure.resources.search.SearchService",
     "azure.defender-pricing": "c7n_azure.resources.defender.DefenderPricing",
     "azure.defender-setting": "c7n_azure.resources.defender.DefenderSetting",
-    "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",
+    "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",  # noqa
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",

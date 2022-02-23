@@ -39,7 +39,8 @@ class SecurityResourceManager(QueryResourceManager):
         # [^3]: https://github.com/Azure/azure-cli/pull/7917#discussion_r238458818  # noqa
         return SecurityCenter(session.get_credentials(), session.subscription_id, "centralus")
 
-@resources.register('defender-pricing')
+
+@resources.register("defender-pricing")
 class DefenderPricing(SecurityResourceManager, metaclass=QueryMeta):
     """Active Azure Defender pricing details for supported resources.
 
@@ -60,18 +61,18 @@ class DefenderPricing(SecurityResourceManager, metaclass=QueryMeta):
     """
 
     class resource_type(TypeInfo):
-        doc_groups = ['Security']
+        doc_groups = ["Security"]
 
-        id = 'id'
-        name = 'name'
-        enum_spec = ('pricings', 'list', None)
-        client = 'SecurityCenter'
+        id = "id"
+        name = "name"
+        enum_spec = ("pricings", "list", None)
+        client = "SecurityCenter"
         filter_name = None
-        service = 'security'
-        resource_type = 'Microsoft.Security/pricings'
+        service = "security"
+        resource_type = "Microsoft.Security/pricings"
 
 
-@resources.register('defender-setting')
+@resources.register("defender-setting")
 class DefenderSetting(SecurityResourceManager, metaclass=QueryMeta):
     """Top-level Azure Defender settings for a subscription.
 
@@ -91,18 +92,18 @@ class DefenderSetting(SecurityResourceManager, metaclass=QueryMeta):
     """
 
     class resource_type(TypeInfo):
-        doc_groups = ['Security']
+        doc_groups = ["Security"]
 
-        id = 'id'
-        name = 'name'
-        enum_spec = ('settings', 'list', None)
-        client = 'SecurityCenter'
+        id = "id"
+        name = "name"
+        enum_spec = ("settings", "list", None)
+        client = "SecurityCenter"
         filter_name = None
-        service = 'security'
-        resource_type = 'Microsoft.Security/settings'
+        service = "security"
+        resource_type = "Microsoft.Security/settings"
 
 
-@resources.register('defender-autoprovisioning')
+@resources.register("defender-autoprovisioning")
 class DefenderAutoProvisioningSetting(SecurityResourceManager, metaclass=QueryMeta):
     """Auto-provisioning settings for Azure Defender agents.
 
@@ -121,12 +122,12 @@ class DefenderAutoProvisioningSetting(SecurityResourceManager, metaclass=QueryMe
     """
 
     class resource_type(TypeInfo):
-        doc_groups = ['Security']
+        doc_groups = ["Security"]
 
-        id = 'id'
-        name = 'name'
-        enum_spec = ('auto_provisioning_settings', 'list', None)
-        client = 'SecurityCenter'
+        id = "id"
+        name = "name"
+        enum_spec = ("auto_provisioning_settings", "list", None)
+        client = "SecurityCenter"
         filter_name = None
-        service = 'security'
-        resource_type = 'Microsoft.Security/autoProvisioningSettings'
+        service = "security"
+        resource_type = "Microsoft.Security/autoProvisioningSettings"
