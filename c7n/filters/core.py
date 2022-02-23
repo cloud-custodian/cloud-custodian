@@ -584,8 +584,8 @@ class ValueFilter(BaseValueFilter):
         else:
             v = self.v
 
-        # ValueFrom match
-        if isinstance(v, set):
+        # cidr_range match
+        if isinstance(v, set) and all([v,r]):
             return self.process_value_type_cidr_range(v, r)
 
         # Value match
@@ -682,9 +682,9 @@ class ValueFilter(BaseValueFilter):
     # multiple sentinels.
     def process_value_type_cidr_range(self, sentinel, value):
         op = OPERATORS[self.op]
-        v = parse_cidr(value)
+        v = parse_cidr(value) or ''
         for snl in sentinel:
-            if not op(v, parse_cidr(snl)):
+            if not op(v, parse_cidr(snl) or ''):
                 return False
         return True
 
