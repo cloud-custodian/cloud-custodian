@@ -1871,19 +1871,19 @@ class EnableConfigManagedRule(BaseAction):
         remediation={
             'type': 'object',
             'properties': {
-                'target_type': {'type': 'string'},
-                'target_id': {'type': 'string'},
-                'automatic': {'type': 'boolean'},
-                'parameters': {'type': 'object'},
-                'maximum_automatic_attempts': {
+                'TargetType': {'type': 'string'},
+                'TargetId': {'type': 'string'},
+                'Automatic': {'type': 'boolean'},
+                'Parameters': {'type': 'object'},
+                'MaximumAutomaticAttempts': {
                     'type': 'integer',
                     'minimum': 1, 'maximum': 25,
                 },
-                'retry_attempt_seconds': {
+                'RetryAttemptSeconds': {
                     'type': 'integer',
                     'minimum': 1, 'maximum': 2678000,
                 },
-                'execution_controls': {'type': 'object'},
+                'ExecutionControls': {'type': 'object'},
             },
         },
         tags={'type': 'object'},
@@ -1896,7 +1896,7 @@ class EnableConfigManagedRule(BaseAction):
         params = self.get_rule_params(rule)
         client.put_config_rule(**params)
 
-        if rule.remediation_target_id:
+        if rule.remediation:
             remediation_params = self.get_remediation_params(rule)
             client.put_remediation_configurations(
                 RemediationConfigurations=[remediation_params]
@@ -1928,28 +1928,10 @@ class EnableConfigManagedRule(BaseAction):
         return dict(ConfigRule=params)
 
     def get_remediation_params(self, rule):
-        try:
-            params = rule.remediation_parameters
-            assume_role = params['AutomationAssumeRole']['StaticValue']['Values'][0]
-            role_arn = assume_role.replace('{account_id', self.manager.ctx.options.account_id)
-            params['AutomationAssumeRole']['StaticValue']['Values'][0] = role_arn
-        except KeyError:
-            pass
-
-        params = dict(
-            ConfigRuleName=rule.name,
-            TargetType=rule.remediation_target_type,
-            TargetId=rule.remediation_target_id,
-            Parameters=rule.remediation_parameters,
-            Automatic=rule.remediation_automatic,
-            MaximumAutomaticAttempts=rule.remediation_maximum_automatic_attempts,
-            RetryAttemptSeconds=rule.remediation_retry_attempt_seconds,
-        )
-
-        if rule.remediation_execution_controls:
-            params['ExecutionControls'] = rule.remediation_execution_controls
-
-        return params
+        rule.remediation['ConfigRuleName'] = rule.name
+        if 'TargetType' not in rule.remediation:
+            rule.remediation['TargetType'] = 'SSM_DOCUMENT'
+        return rule.remediation
 
     class ConfigManagedRule:
         """Wraps the action data into an AWS Config Managed Rule.
@@ -1993,29 +1975,5 @@ class EnableConfigManagedRule(BaseAction):
             return self.data.get('rule_parameters', '')
 
         @property
-        def remediation_target_type(self):
-            return self.data.get('remediation', {}).get('target_type', 'SSM_DOCUMENT')
-
-        @property
-        def remediation_target_id(self):
-            return self.data.get('remediation', {}).get('target_id', '')
-
-        @property
-        def remediation_parameters(self):
-            return self.data.get('remediation', {}).get('parameters', {})
-
-        @property
-        def remediation_automatic(self):
-            return self.data.get('remediation', {}).get('automatic', True)
-
-        @property
-        def remediation_maximum_automatic_attempts(self):
-            return self.data.get('remediation', {}).get('maximum_automatic_attempts', 5)
-
-        @property
-        def remediation_retry_attempt_seconds(self):
-            return self.data.get('remediation', {}).get('retry_attempt_seconds', 120)
-
-        @property
-        def remediation_execution_controls(self):
-            return self.data.get('remediation', {}).get('execution_controls', {})
+        def remediation(self):
+            return self.data.get('remediation', {})
