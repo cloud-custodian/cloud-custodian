@@ -584,6 +584,10 @@ class ValueFilter(BaseValueFilter):
         else:
             v = self.v
 
+        # ValueFrom match
+        if isinstance(v, set):
+            return self.process_value_type_cidr_range(v, r)
+
         # Value match
         if r is None and v == 'absent':
             return True
@@ -648,6 +652,8 @@ class ValueFilter(BaseValueFilter):
             if (isinstance(s, ipaddress._BaseAddress) and isinstance(v, ipaddress._BaseNetwork)):
                 return v, s
             return s, v
+        elif self.vtype == 'cidr_range':
+            return sentinel, value
         elif self.vtype == 'cidr_size':
             cidr = parse_cidr(value)
             if cidr:
@@ -671,6 +677,16 @@ class ValueFilter(BaseValueFilter):
             return s, v
 
         return sentinel, value
+
+    # value_type: cidr_range returns True if a value is within cidr range with
+    # multiple sentinels.
+    def process_value_type_cidr_range(self, sentinel, value):
+        op = OPERATORS[self.op]
+        v = parse_cidr(value)
+        for snl in sentinel:
+            if not op(v, parse_cidr(snl)):
+                return False
+        return True
 
 
 class AgeFilter(Filter):

@@ -185,6 +185,13 @@ class TestValueFilter(unittest.TestCase):
         value = "10.10.10.10"
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
+
+        vf.vtype = "cidr_range"
+        sentinel = {"10.0.0.0/16","192.168.0.0/16"}
+        value = "10.10.10.0/24"
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual((res[0], str(res[1])), (sentinel, value))
+
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
         res = vf.process_value_type(sentinel, value, resource)
@@ -207,6 +214,38 @@ class TestValueFilter(unittest.TestCase):
         sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 4))
+
+    def test_value_type_cidr_range(self):
+        vf = filters.factory({"type": "value", "value": "ingress"})
+        vf.op = 'not-in'
+        sentinel = {"10.0.0.0/8"}
+        value = "10.10.10.0/24"
+        res = vf.process_value_type_cidr_range(sentinel, value)
+        self.assertFalse(res)
+
+    def test_value_type_cidr_range2(self):
+        vf = filters.factory({"type": "value", "value": "ingress"})
+        vf.op = 'not-in'
+        sentinel = {"10.0.0.0/16"}
+        value = "10.10.10.0/24"
+        res = vf.process_value_type_cidr_range(sentinel, value)
+        self.assertTrue(res)
+
+    def test_value_type_cidr_range3(self):
+        vf = filters.factory({"type": "value", "value": "ingress"})
+        vf.op = 'in'
+        sentinel = {"10.0.0.0/8"}
+        value = "10.10.10.0/24"
+        res = vf.process_value_type_cidr_range(sentinel, value)
+        self.assertTrue(res)
+
+    def test_value_type_cidr_range4(self):
+        vf = filters.factory({"type": "value", "value": "ingress"})
+        vf.op = 'in'
+        sentinel = {"10.0.0.0/16"}
+        value = "10.10.10.0/24"
+        res = vf.process_value_type_cidr_range(sentinel, value)
+        self.assertFalse(res)
 
     def test_value_type_expr(self):
         resource = {'a': 1, 'b': 1}
