@@ -1042,7 +1042,7 @@ class SGPermission(Filter):
           CidrV6:
             value: "::/0"
 
-    `value_type: cidr_range` can can run extended cidr range check. In
+    `value_type: cidr_range` can filter if cidr is a subset of cidr range. In
     this example we are blocking any smaller cidrs within allowed_cidrs.csv.
 
     .. code-block:: yaml
