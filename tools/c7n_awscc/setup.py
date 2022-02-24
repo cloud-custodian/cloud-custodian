@@ -4,54 +4,45 @@
 from setuptools import setup
 
 packages = \
-['c7n_sphinxext']
+['c7n_awscc', 'c7n_awscc.resources']
 
 package_data = \
-{'': ['*'], 'c7n_sphinxext': ['_templates/*']}
+{'': ['*'], 'c7n_awscc': ['data/*']}
 
 install_requires = \
-['Pygments>=2.10.0,<3.0.0',
- 'Sphinx>=4.2.0,<5.0.0',
- 'argcomplete (>=2.0.0,<3.0.0)',
+['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=21.4.0,<22.0.0)',
  'boto3 (>=1.21.5,<2.0.0)',
  'botocore (>=1.24.5,<2.0.0)',
  'c7n (>=0.9.15,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
- 'docutils>=0.14,<0.18',
  'importlib-metadata (>=4.11.1,<5.0.0)',
  'importlib-resources (>=5.4.0,<6.0.0)',
  'jmespath (>=0.10.0,<0.11.0)',
+ 'jsonpatch>=1.32,<2.0',
  'jsonschema (>=4.4.0,<5.0.0)',
- 'myst-parser>=0.15.2,<0.16.0',
  'pyrsistent (>=0.18.1,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
- 'recommonmark>=0.6.0,<0.7.0',
  's3transfer (>=0.5.1,<0.6.0)',
  'six (>=1.16.0,<2.0.0)',
- 'sphinx-rtd-theme>=1.0.0,<2.0.0',
- 'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'tabulate (>=0.8.9,<0.9.0)',
  'typing-extensions (>=4.1.1,<5.0.0)',
  'urllib3 (>=1.26.8,<2.0.0)',
  'zipp (>=3.7.0,<4.0.0)']
 
-entry_points = \
-{'console_scripts': ['c7n-sphinxext = c7n_sphinxext.docgen:main']}
-
 setup_kwargs = {
-    'name': 'c7n-sphinxext',
-    'version': '1.1.14',
-    'description': 'Cloud Custodian - Sphinx Extensions',
+    'name': 'c7n-awscc',
+    'version': '0.1.0',
+    'description': 'Cloud Custodian - AWS Cloud Control Provider',
     'license': 'Apache-2.0',
     'classifiers': [
         'License :: OSI Approved :: Apache Software License',
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing'
     ],
-    'long_description': '# Sphinx Extensions\n\nCustom sphinx extensions for use with Cloud Custodian.\n\n',
+    'long_description': '\n# Custodian AWS Cloud Control Provider\n\n\n',
     'long_description_content_type': 'text/markdown',
     'author': 'Cloud Custodian Project',
     'author_email': None,
@@ -61,7 +52,6 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
-    'entry_points': entry_points,
     'python_requires': '>=3.7,<4.0',
 }
 
