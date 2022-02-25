@@ -585,7 +585,7 @@ class ValueFilter(BaseValueFilter):
             v = self.v
 
         # cidr_range match
-        if isinstance(v, (set, list)) and parse_cidr(v):
+        if isinstance(v, (set, list)) and parse_cidr(r):
             return self.process_value_type_cidr_range(v, r)
 
         # Value match

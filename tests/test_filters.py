@@ -223,7 +223,6 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type_cidr_range(sentinel, value)
         self.assertFalse(res)
 
-    def test_value_type_cidr_range2(self):
         vf = filters.factory({"type": "value", "value": "ingress"})
         vf.op = 'not-in'
         sentinel = {"10.0.0.0/16"}
@@ -231,7 +230,6 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type_cidr_range(sentinel, value)
         self.assertTrue(res)
 
-    def test_value_type_cidr_range3(self):
         vf = filters.factory({"type": "value", "value": "ingress"})
         vf.op = 'in'
         sentinel = {"10.0.0.0/8"}
@@ -239,7 +237,6 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type_cidr_range(sentinel, value)
         self.assertTrue(res)
 
-    def test_value_type_cidr_range4(self):
         vf = filters.factory({"type": "value", "value": "ingress"})
         vf.op = 'in'
         sentinel = {"10.0.0.0/16"}
@@ -277,6 +274,13 @@ class TestValueFilter(unittest.TestCase):
 
         self.assertTrue(vf.content_initialized)
         self.assertEqual(vf.v, None)
+        self.assertFalse(res)
+
+        # test cidr_range match
+        resource = {"ingress": "10.10.10.0/24"}
+        vf = filters.factory({"type": "value", "value": ["10.0.0.0/16"],
+                              "op": "in", "key": "ingress"})
+        res = vf.match(resource)
         self.assertFalse(res)
 
 
