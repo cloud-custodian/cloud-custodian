@@ -276,12 +276,12 @@ class TestValueFilter(unittest.TestCase):
         self.assertEqual(vf.v, None)
         self.assertFalse(res)
 
-        # # test cidr_range match
-        # resource = {"ingress": "10.10.10.0/24"}
-        # vf = filters.factory({"type": "value", "value": ["10.0.0.0/16"],
-        #                       "op": "in", "key": "ingress"})
-        # res = vf.match(resource)
-        # self.assertFalse(res)
+        # test cidr_range match
+        resource = {"ingress": "10.10.10.0/24"}
+        vf = filters.factory({"type": "value", "value": ["10.0.0.0/16"],
+                              "op": "in", "key": "ingress"})
+        res = vf.match(resource)
+        self.assertFalse(res)
 
 
 class TestAgeFilter(unittest.TestCase):
