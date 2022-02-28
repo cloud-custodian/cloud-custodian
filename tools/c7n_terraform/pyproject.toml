@@ -15,7 +15,6 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-rich = "^1.1.9"
 click = "^8.0"
 python-hcl2 = "^2.0"
 
