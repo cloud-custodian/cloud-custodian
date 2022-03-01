@@ -206,7 +206,7 @@ class SetSslListenerPolicy(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: elb-set-listener-policy
+              - name: elb-set-listener-custom-policy
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
@@ -225,7 +225,7 @@ class SetSslListenerPolicy(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: elb-set-listener-policy
+              - name: elb-set-listener-predefined-policy
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
