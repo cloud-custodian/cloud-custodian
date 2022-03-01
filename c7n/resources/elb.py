@@ -215,12 +215,28 @@ class SetSslListenerPolicy(BaseAction):
                       - Protocol-SSLv3
                       - Protocol-TLSv1.1
                       - DHE-RSA-AES256-SHA256
+
+
+    Alternatively, you can specify one of AWS recommended policy by
+    specifying an attribute where key=Reference-Security-Policy
+    and value=name of the predefined policy. For example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elb-set-listener-policy
+                resource: elb
+                actions:
+                  - type: set-ssl-listener-policy
+                    name: SSLNegotiation-Policy-01
+                    attributes:
+                      Reference-Security-Policy: ELBSecurityPolicy-TLS-1-2-2017-01
     """
 
     schema = type_schema(
         'set-ssl-listener-policy',
         name={'type': 'string'},
-        attributes={'type': 'array', 'items': {'type': 'string'}},
+        attributes={'anyOf': [{'type': 'object'}, {'type': 'array', 'items': {'type': 'string'}}]},
         required=['name', 'attributes'])
 
     permissions = (
@@ -258,8 +274,13 @@ class SetSslListenerPolicy(BaseAction):
             str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
-        policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
-            for attr in attrs]
+
+        if type(attrs) is dict:
+            policy_attributes = [{'AttributeName': name, 'AttributeValue': value}
+                for name, value in attrs.items()]
+        else:
+            policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
+                for attr in attrs]
 
         try:
             client.create_load_balancer_policy(
@@ -592,6 +613,7 @@ class SSLPolicyFilter(Filter):
                     elb["ProhibitedPolicies"] = list(
                         set(active_policies).difference(whitelist))
                     invalid_elbs.append(elb)
+
         return invalid_elbs
 
     def create_elb_active_policy_attribute_tuples(self, elbs):
