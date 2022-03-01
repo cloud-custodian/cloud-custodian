@@ -210,7 +210,7 @@ class SetSslListenerPolicy(BaseAction):
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
-                    name: SSLNegotiation-Policy-01
+                    name: SSLNegotiation-Custom-Policy-01
                     attributes:
                       - Protocol-SSLv3
                       - Protocol-TLSv1.1
@@ -229,7 +229,7 @@ class SetSslListenerPolicy(BaseAction):
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
-                    name: SSLNegotiation-Policy-01
+                    name: SSLNegotiation-Predefined-Policy-01
                     attributes:
                       Reference-Security-Policy: ELBSecurityPolicy-TLS-1-2-2017-01
     """
