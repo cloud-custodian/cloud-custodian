@@ -281,7 +281,9 @@ class SSLPolicyTest(BaseTest):
                     {
                         "type": "set-ssl-listener-policy",
                         "name": "testpolicy",
-                        "attributes": {"Reference-Security-Policy": "ELBSecurityPolicy-TLS-1-2-2017-01"},
+                        "attributes": {
+                            "Reference-Security-Policy": "ELBSecurityPolicy-TLS-1-2-2017-01"
+                        },
                     }
                 ],
             },
@@ -313,7 +315,17 @@ class SSLPolicyTest(BaseTest):
                 "testpolicy-1493768308000",
             ],
         )
-        self.assertEqual(active_ciphers, ['Protocol-TLSv1.2', 'Server-Defined-Cipher-Order', 'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-ECDSA-AES128-SHA256', 'ECDHE-RSA-AES128-SHA256', 'ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-AES256-SHA384', 'ECDHE-RSA-AES256-SHA384', 'AES128-GCM-SHA256', 'AES128-SHA256', 'AES256-GCM-SHA384', 'AES256-SHA256'])
+        self.assertEqual(
+            active_ciphers,
+            [
+                'Protocol-TLSv1.2', 'Server-Defined-Cipher-Order',
+                'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256',
+                'ECDHE-ECDSA-AES128-SHA256', 'ECDHE-RSA-AES128-SHA256',
+                'ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384',
+                'ECDHE-ECDSA-AES256-SHA384', 'ECDHE-RSA-AES256-SHA384', 'AES128-GCM-SHA256',
+                'AES128-SHA256', 'AES256-GCM-SHA384', 'AES256-SHA256'
+            ]
+        )
 
     def test_ssl_matching(self):
         session_factory = self.replay_flight_data("test_ssl_ciphers")
