@@ -697,6 +697,7 @@ class VolumeSnapshotTest(BaseTest):
         for s in snapshot_data['Snapshots']:
             self.assertEqual('Automated snapshot by c7n - ebs-test-snapshot', s['Description'])
 
+
 class VolumeDeleteTest(BaseTest):
 
     def test_volume_delete_force(self):
