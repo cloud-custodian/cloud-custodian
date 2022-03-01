@@ -695,7 +695,7 @@ class VolumeSnapshotTest(BaseTest):
             Filters=[{"Name": "volume-id", "Values": ["vol-0cc137cb158adbc32"]}]
         )
         for s in snapshot_data['Snapshots']:
-            self.assertEqual('Automated snapshot by c7n of vol-0cc137cb158adbc32', s['Description'])
+            self.assertEqual('Automated snapshot by c7n - ebs-test-snapshot', s['Description'])
 
 class VolumeDeleteTest(BaseTest):
 

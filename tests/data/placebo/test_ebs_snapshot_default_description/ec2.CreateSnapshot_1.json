@@ -1,20 +1,20 @@
 {
     "status_code": 200,
     "data": {
-        "Description": "Automated snapshot by c7n of vol-0cc137cb158adbc32",
+        "Description": "Automated snapshot by c7n - ebs-test-snapshot",
         "Encrypted": true,
         "OwnerId": "644160558196",
         "Progress": "",
-        "SnapshotId": "snap-034e3ccff9379ed58",
+        "SnapshotId": "snap-066f4e928dc2bd46e",
         "StartTime": {
             "__class__": "datetime",
             "year": 2022,
-            "month": 2,
-            "day": 28,
-            "hour": 18,
-            "minute": 56,
-            "second": 17,
-            "microsecond": 80000
+            "month": 3,
+            "day": 1,
+            "hour": 21,
+            "minute": 4,
+            "second": 42,
+            "microsecond": 522000
         },
         "State": "pending",
         "VolumeId": "vol-0cc137cb158adbc32",
@@ -23,6 +23,10 @@
             {
                 "Key": "custodian_snapshot",
                 "Value": ""
+            },
+            {
+                "Key": "del_status",
+                "Value": "Resource does not meet policy: delete@2022/03/31"
             }
         ],
         "ResponseMetadata": {}

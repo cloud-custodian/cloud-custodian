@@ -1355,7 +1355,7 @@ class CreateSnapshot(BaseAction):
     def process_volume(self, client, volume, tags):
         description = self.data.get('description')
         if not description:
-            description = "Automated snapshot by c7n of %s" % (volume)
+            description = "Automated snapshot by c7n - %s" % (self.manager.ctx.policy.name)
 
         try:
             client.create_snapshot(
