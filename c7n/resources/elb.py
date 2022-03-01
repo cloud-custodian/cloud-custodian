@@ -217,8 +217,9 @@ class SetSslListenerPolicy(BaseAction):
                       - DHE-RSA-AES256-SHA256
 
 
-    Alternatively, you can specify one of AWS recommended policy by
-    specifying an attribute where key=Reference-Security-Policy
+    Alternatively, you can specify one of AWS recommended policies
+    (https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html)
+    by specifying an attribute where key=Reference-Security-Policy
     and value=name of the predefined policy. For example:
 
     .. code-block:: yaml
