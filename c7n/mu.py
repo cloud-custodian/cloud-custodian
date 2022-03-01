@@ -486,7 +486,8 @@ class LambdaManager:
             if self._update_tags(existing, new_config.pop('Tags', {})):
                 changed = True
 
-            if self._update_architecture(func, existing, new_config.pop('Architectures', []), code_ref):
+            if self._update_architecture(func, existing,
+                    new_config.pop('Architectures', []), code_ref):
                 changed = True
 
             config_changed = self.delta_function(old_config, new_config)
