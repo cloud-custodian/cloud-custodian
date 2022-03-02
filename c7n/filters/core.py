@@ -655,7 +655,7 @@ class ValueFilter(BaseValueFilter):
             return value, sentinel
         elif self.vtype == 'cidr':
             if isinstance(sentinel, (list, set)):
-                s = [parse_cidr(c) for c in sentinel]
+                s = [parse_cidr(c) or '' for c in sentinel]
             else:
                 s = parse_cidr(sentinel)
             v = parse_cidr(value)
