@@ -80,7 +80,7 @@ class ServiceQuota(QueryResourceManager):
             return quotas.values()
 
         results = []
-        with self.executor_factory(max_workers=self.max_workers) as w:
+        with self.executor_factory(max_workers=min(self.max_workers, 2)) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(get_quotas, client, r)] = r
