@@ -686,16 +686,6 @@ class ValueFilter(BaseValueFilter):
 
         return sentinel, value
 
-    # value_type: cidr_range returns True if a value is within cidr range with
-    # multiple sentinels.
-    def process_value_type_cidr_range(self, sentinel, value):
-        op = OPERATORS[self.op]
-        v = parse_cidr(value) or ''
-        for snl in sentinel:
-            if not op(v, parse_cidr(snl) or ''):
-                return False
-        return True
-
 
 class AgeFilter(Filter):
     """Automatically filter resources older than a given date.
