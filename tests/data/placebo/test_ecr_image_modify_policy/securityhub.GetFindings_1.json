@@ -1,0 +1,2478 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/f1807d4755d6190774ded0396d159148",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.603Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.603Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249009Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2020-28196 - krb5",
+                "Description": "MIT Kerberos 5 (aka krb5) before 1.17.2 and 1.18.x before 1.18.3 allows unbounded recursion via an ASN.1-encoded Kerberos message because the lib/krb5/asn.1/asn1_encode.c support for BER indefinite lengths lacks a recursion limit.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "7.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/f1807d4755d6190774ded0396d159148",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-28196",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "krb5",
+                                "Version": "1.15.5",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-28196",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2020-11-06T08:15:00Z",
+                            "VendorUpdatedAt": "2021-07-20T23:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/KPH2V3WSQTELROZK3GFCPQDOFLKIZ6H5/",
+                            "https://www.oracle.com/security-alerts/cpuApr2021.html",
+                            "https://security.gentoo.org/glsa/202011-17",
+                            "https://www.debian.org/security/2020/dsa-4795",
+                            "https://lists.debian.org/debian-lts-announce/2020/11/msg00011.html",
+                            "https://www.oracle.com//security-alerts/cpujul2021.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/45KKOZQWIIIW5C45PJVGQ32AXBSYNBE7/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/73IGOG6CZAVMVNS4GGRMOLOZ7B6QVA7F/",
+                            "https://lists.apache.org/thread.html/r58af02e294bd07f487e2c64ffc0a29b837db5600e33b6e698b9d696b@%3Cissues.bookkeeper.apache.org%3E",
+                            "https://lists.apache.org/thread.html/rf4c02775860db415b4955778a131c2795223f61cb8c6a450893651e4@%3Cissues.bookkeeper.apache.org%3E"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/e7f52b2d6a663954df7942510e865677",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249014Z",
+                "Severity": {
+                    "Label": "LOW",
+                    "Normalized": 1
+                },
+                "Title": "CVE-2019-2894 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Security). Supported versions that are affected are Java SE: 7u231, 8u221, 11.0.4 and 13; Java SE Embedded: 8u221. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. Successful attacks of this vulnerability can result in unauthorized read access to a subset of Java SE, Java SE Embedded accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability can also be exploited by using APIs in the specified Component, e.g., through a web service which supplies data to the APIs. CVSS 3.0 Base Score 3.7 (Confidentiality impacts). CVSS Vector: (CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "3.7",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/e7f52b2d6a663954df7942510e865677",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-2894",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:P/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-2894",
+                            "VendorSeverity": "LOW",
+                            "VendorCreatedAt": "2019-10-16T18:15:00Z",
+                            "VendorUpdatedAt": "2020-09-08T13:00:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://www.debian.org/security/2019/dsa-4546",
+                            "https://seclists.org/bugtraq/2019/Oct/31",
+                            "https://lists.debian.org/debian-lts-announce/2019/12/msg00005.html",
+                            "https://seclists.org/bugtraq/2019/Oct/27",
+                            "https://usn.ubuntu.com/4223-1/",
+                            "https://kc.mcafee.com/corporate/index",
+                            "https://www.debian.org/security/2019/dsa-4548"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "LOW"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/e66ec1b4514906c45d83cd1056ea37e5",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249007Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2020-11080 - nghttp2",
+                "Description": "In nghttp2 before version 1.41.0, the overly large HTTP/2 SETTINGS frame payload causes denial of service. The proof of concept attack involves a malicious client constructing a SETTINGS frame with a length of 14,400 bytes (2400 individual settings entries) over and over again. The attack causes the CPU to spike at 100%. nghttp2 v1.41.0 fixes this vulnerability. There is a workaround to this vulnerability. Implement nghttp2_on_frame_recv_callback callback, and if received frame is SETTINGS frame and the number of settings entries are large (e.g., > 32), then drop the connection.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "7.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:4c71876dfa5f27506361f089fd2f10e9c9a3f84da5748c3164ac6d558256eef3",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/e66ec1b4514906c45d83cd1056ea37e5",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-11080",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "nghttp2",
+                                "Version": "1.35.1",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-11080",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2020-06-03T23:15:00Z",
+                            "VendorUpdatedAt": "2021-10-17T08:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.debian.org/debian-lts-announce/2021/10/msg00011.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/4OOYAMJVLLCLXDTHW3V5UXNULZBBK4O6/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AAC2AA36OTRHKSVM5OV7TTVB3CZIGEFL/",
+                            "https://www.oracle.com/security-alerts/cpuoct2020.html",
+                            "https://www.debian.org/security/2020/dsa-4696",
+                            "https://www.oracle.com/security-alerts/cpujul2020.html",
+                            "https://www.oracle.com//security-alerts/cpujul2021.html",
+                            "https://www.oracle.com/security-alerts/cpujan2021.html"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/dfd39f2110b7ad3c5503a4cb63a140ae",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.603Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.603Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249009Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2019-1387 - git",
+                "Description": "An issue was found in Git before v2.24.1, v2.23.1, v2.22.2, v2.21.1, v2.20.2, v2.19.3, v2.18.2, v2.17.3, v2.16.6, v2.15.4, and v2.14.6. Recursive clones are currently affected by a vulnerability that is caused by too-lax validation of submodule names, allowing very targeted attacks via remote code execution in recursive clones.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "8.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:4c71876dfa5f27506361f089fd2f10e9c9a3f84da5748c3164ac6d558256eef3",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/dfd39f2110b7ad3c5503a4cb63a140ae",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-1387",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "git",
+                                "Version": "2.20.1",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 6.8,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:P/I:P/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-1387",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2019-12-18T21:15:00Z",
+                            "VendorUpdatedAt": "2021-01-26T14:47:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2020:0124",
+                            "https://access.redhat.com/errata/RHSA-2020:0002",
+                            "https://public-inbox.org/git/xmqqr21cqcn9.fsf@gitster-ct.c.googlers.com/",
+                            "https://access.redhat.com/errata/RHSA-2019:4356",
+                            "https://access.redhat.com/errata/RHSA-2020:0228",
+                            "https://lists.debian.org/debian-lts-announce/2020/01/msg00019.html",
+                            "https://security.gentoo.org/glsa/202003-30",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/N6UGTEOXWIYSM5KDZL74QD2GK6YQNQCP/",
+                            "https://lore.kernel.org/git/xmqqr21cqcn9.fsf@gitster-ct.c.googlers.com/T/",
+                            "https://security.gentoo.org/glsa/202003-42"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/d30ae9e3225b42905b77cc0365377758",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249011Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2020-5260 - git",
+                "Description": "Affected versions of Git have a vulnerability whereby Git can be tricked into sending private credentials to a host controlled by an attacker. Git uses external \"credential helper\" programs to store and retrieve passwords or other credentials from secure storage provided by the operating system. Specially-crafted URLs that contain an encoded newline can inject unintended values into the credential helper protocol stream, causing the credential helper to retrieve the password for one server (e.g., good.example.com) for an HTTP request being made to another server (e.g., evil.example.com), resulting in credentials for the former being sent to the latter. There are no restrictions on the relationship between the two, meaning that an attacker can craft a URL that will present stored credentials for any host to a host of their choosing. The vulnerability can be triggered by feeding a malicious URL to git clone. However, the affected URLs look rather suspicious; the likely vector would be through system...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "7.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:4c71876dfa5f27506361f089fd2f10e9c9a3f84da5748c3164ac6d558256eef3",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/d30ae9e3225b42905b77cc0365377758",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-5260",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "git",
+                                "Version": "2.20.1",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:P/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 7.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-5260",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2020-04-14T23:15:00Z",
+                            "VendorUpdatedAt": "2021-03-19T18:21:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PN3FUOXKX3AXTULYV53ACABER2W2FSOU/",
+                            "https://lists.debian.org/debian-lts-announce/2020/04/msg00010.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/74Q7WVJ6FKLIN62VS2JD2XCNWK5TNKOW/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/7TVS5UG6JD3MYIGSBKMIOS6AF7CR5IPI/",
+                            "https://support.apple.com/kb/HT211141",
+                            "https://security.gentoo.org/glsa/202004-13",
+                            "https://www.debian.org/security/2020/dsa-4657",
+                            "https://lore.kernel.org/git/xmqqy2qy7xn8.fsf@gitster.c.googlers.com/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/XPCEOIFLLEF24L6GLVJVFZX4CREDEHDF/",
+                            "https://usn.ubuntu.com/4329-1/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/MOCTR2SEHCPSCOVUQJAGFPGKFMI2VE6V/"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/d20765695bb57749b2ecaa41313e8718",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249004Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2019-2989 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Networking). Supported versions that are affected are Java SE: 7u231, 8u221, 11.0.4 and 13; Java SE Embedded: 8u221. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. While the vulnerability is in Java SE, Java SE Embedded, attacks may significantly impact additional products. Successful attacks of this vulnerability can result in unauthorized creation, deletion or modification access to critical data or all Java SE, Java SE Embedded accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability can also be exploited by using APIs in the specified Component, e.g., t...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "6.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/d20765695bb57749b2ecaa41313e8718",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-2989",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:N/I:P/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-2989",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2019-10-16T18:15:00Z",
+                            "VendorUpdatedAt": "2020-09-08T13:00:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2019:3136",
+                            "https://access.redhat.com/errata/RHSA-2019:3158",
+                            "https://access.redhat.com/errata/RHSA-2019:3135",
+                            "https://access.redhat.com/errata/RHSA-2019:3157",
+                            "https://access.redhat.com/errata/RHSA-2019:3134",
+                            "https://seclists.org/bugtraq/2019/Oct/31",
+                            "https://access.redhat.com/errata/RHSA-2020:0046",
+                            "https://access.redhat.com/errata/RHSA-2019:4113",
+                            "https://lists.debian.org/debian-lts-announce/2019/12/msg00005.html",
+                            "https://access.redhat.com/errata/RHSA-2019:4115",
+                            "https://access.redhat.com/errata/RHSA-2019:4110",
+                            "https://seclists.org/bugtraq/2019/Oct/27",
+                            "https://access.redhat.com/errata/RHSA-2020:0006",
+                            "https://www.debian.org/security/2019/dsa-4546",
+                            "https://usn.ubuntu.com/4223-1/",
+                            "https://access.redhat.com/errata/RHSA-2019:4109",
+                            "https://kc.mcafee.com/corporate/index",
+                            "https://www.debian.org/security/2019/dsa-4548"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/b8d5984d3f53e0b3f910c7ff7509633f",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249015Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2019-16168 - sqlite",
+                "Description": "In SQLite through 3.29.0, whereLoopAddBtreeIndex in sqlite3.c can crash a browser or other application because of missing validation of a sqlite_stat1 sz field, aka a \"severe division by zero in the query planner.\"",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "6.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/b8d5984d3f53e0b3f910c7ff7509633f",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-16168",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "sqlite",
+                                "Version": "3.26.0",
+                                "Epoch": "0",
+                                "Release": "r3",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.5,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-16168",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2019-09-09T17:15:00Z",
+                            "VendorUpdatedAt": "2021-07-31T08:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://www.oracle.com/security-alerts/cpuapr2020.html",
+                            "https://usn.ubuntu.com/4205-1/",
+                            "https://security.gentoo.org/glsa/202003-16",
+                            "https://www.sqlite.org/src/info/e4598ecbdd18bd82945f6029013296690e719a62",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/XZARJHJJDBHI7CE5PZEBXS5HKK6HXKW2/",
+                            "https://www.oracle.com/security-alerts/cpujan2020.html",
+                            "https://kc.mcafee.com/corporate/index",
+                            "https://www.sqlite.org/src/timeline",
+                            "https://lists.debian.org/debian-lts-announce/2020/08/msg00037.html"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/a9f3d126b7c9f6dfb57b4b87287a04d4",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249004Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2020-28928 - musl",
+                "Description": "In musl libc through 1.2.1, wcsnrtombs mishandles particular combinations of destination buffer size and source character limit, as demonstrated by an invalid write access (buffer overflow).",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "5.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:e7c96db7181be991f19a9fb6975cdbbd73c65f4a2681348e63a141a2192a5f10",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/a9f3d126b7c9f6dfb57b4b87287a04d4",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-28928",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "musl",
+                                "Version": "1.1.20",
+                                "Epoch": "0",
+                                "Release": "r4",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 2.1,
+                                "BaseVector": "AV:L/AC:L/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 5.5,
+                                "BaseVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 5.5,
+                                "BaseVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-28928",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2020-11-24T18:15:00Z",
+                            "VendorUpdatedAt": "2021-12-02T21:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/LKQ3RVSMVZNZNO4D65W2CZZ4DMYFZN2Q/",
+                            "https://lists.apache.org/thread.html/r2134abfe847bea7795f0e53756d10a47e6643f35ab8169df8b8a9eb1@%3Cnotifications.apisix.apache.org%3E",
+                            "https://lists.debian.org/debian-lts-announce/2020/11/msg00050.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/UW27QVY7ERPTSGKS4KAWE5TU7EJWHKVQ/",
+                            "https://www.oracle.com//security-alerts/cpujul2021.html",
+                            "https://lists.apache.org/thread.html/r90b60cf49348e515257b4950900c1bd3ab95a960cf2469d919c7264e@%3Cnotifications.apisix.apache.org%3E",
+                            "https://lists.apache.org/thread.html/ra63e8dc5137d952afc55dbbfa63be83304ecf842d1eab1ff3ebb29e2@%3Cnotifications.apisix.apache.org%3E",
+                            "https://www.oracle.com/security-alerts/cpuoct2021.html",
+                            "https://musl.libc.org/releases.html"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/a7cc817ecb374642ba1fb08d45fa79eb",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.603Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.603Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249001Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2020-2601 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Security). Supported versions that are affected are Java SE: 7u241, 8u231, 11.0.5 and 13.0.1; Java SE Embedded: 8u231. Difficult to exploit vulnerability allows unauthenticated attacker with network access via Kerberos to compromise Java SE, Java SE Embedded. While the vulnerability is in Java SE, Java SE Embedded, attacks may significantly impact additional products. Successful attacks of this vulnerability can result in unauthorized access to critical data or complete access to all Java SE, Java SE Embedded accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability can also be exploited by using APIs in the specified Component, e.g., through a web service whi...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "6.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/a7cc817ecb374642ba1fb08d45fa79eb",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-2601",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:P/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 6.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-2601",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2020-01-15T17:15:00Z",
+                            "VendorUpdatedAt": "2021-03-04T20:49:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2020:0122",
+                            "https://access.redhat.com/errata/RHSA-2020:0232",
+                            "https://access.redhat.com/errata/RHSA-2020:0231",
+                            "https://access.redhat.com/errata/RHSA-2020:0157",
+                            "https://access.redhat.com/errata/RHSA-2020:0541",
+                            "https://access.redhat.com/errata/RHSA-2020:0196",
+                            "https://usn.ubuntu.com/4257-1/",
+                            "https://www.debian.org/security/2020/dsa-4621",
+                            "https://access.redhat.com/errata/RHSA-2020:0632",
+                            "https://access.redhat.com/errata/RHSA-2020:0202",
+                            "https://access.redhat.com/errata/RHSA-2020:0128",
+                            "https://seclists.org/bugtraq/2020/Jan/24",
+                            "https://www.debian.org/security/2020/dsa-4605",
+                            "https://lists.debian.org/debian-lts-announce/2020/02/msg00034.html",
+                            "https://www.oracle.com/security-alerts/cpujan2020.html",
+                            "https://security.gentoo.org/glsa/202101-19",
+                            "https://seclists.org/bugtraq/2020/Feb/22"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/9bba0df1d5b93051470d7b0194f8e92d",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.603Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.603Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249002Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2019-7317 - openjdk8",
+                "Description": "png_image_free in png.c in libpng 1.6.x before 1.6.37 has a use-after-free because png_image_free_function is called under png_safe_execute.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "5.3",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/9bba0df1d5b93051470d7b0194f8e92d",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-7317",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 2.6,
+                                "BaseVector": "AV:N/AC:H/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 5.3,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 5.3,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-7317",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2019-02-04T08:29:00Z",
+                            "VendorUpdatedAt": "2021-10-20T11:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2019:1310",
+                            "https://access.redhat.com/errata/RHSA-2019:2585",
+                            "https://www.oracle.com/security-alerts/cpuApr2021.html",
+                            "https://www.oracle.com/technetwork/security-advisory/cpujul2019-5072835.html",
+                            "https://usn.ubuntu.com/4083-1/",
+                            "https://security.gentoo.org/glsa/201908-02",
+                            "https://seclists.org/bugtraq/2019/Apr/30",
+                            "https://bugs.chromium.org/p/oss-fuzz/issues/detail",
+                            "https://usn.ubuntu.com/3997-1/",
+                            "https://www.debian.org/security/2019/dsa-4448",
+                            "https://lists.debian.org/debian-lts-announce/2019/05/msg00032.html",
+                            "https://access.redhat.com/errata/RHSA-2019:2737",
+                            "https://seclists.org/bugtraq/2019/May/59",
+                            "https://seclists.org/bugtraq/2019/May/56",
+                            "https://access.redhat.com/errata/RHSA-2019:1309",
+                            "https://www.oracle.com/security-alerts/cpuoct2021.html",
+                            "https://access.redhat.com/errata/RHSA-2019:1308",
+                            "https://access.redhat.com/errata/RHSA-2019:1265",
+                            "https://access.redhat.com/errata/RHSA-2019:2495",
+                            "https://usn.ubuntu.com/3962-1/",
+                            "https://access.redhat.com/errata/RHSA-2019:1269",
+                            "https://access.redhat.com/errata/RHSA-2019:1267",
+                            "https://usn.ubuntu.com/4080-1/",
+                            "https://www.debian.org/security/2019/dsa-4451",
+                            "https://usn.ubuntu.com/3991-1/",
+                            "https://access.redhat.com/errata/RHSA-2019:2494",
+                            "https://lists.debian.org/debian-lts-announce/2019/05/msg00038.html",
+                            "https://access.redhat.com/errata/RHSA-2019:2592",
+                            "https://access.redhat.com/errata/RHSA-2019:2590",
+                            "https://www.debian.org/security/2019/dsa-4435",
+                            "https://seclists.org/bugtraq/2019/Apr/36",
+                            "https://seclists.org/bugtraq/2019/May/67"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/994edc4fe15ae729afd711a868dba488",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249010Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2020-14583 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Libraries). Supported versions that are affected are Java SE: 7u261, 8u251, 11.0.7 and 14.0.1; Java SE Embedded: 8u251. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. Successful attacks require human interaction from a person other than the attacker and while the vulnerability is in Java SE, Java SE Embedded, attacks may significantly impact additional products. Successful attacks of this vulnerability can result in takeover of Java SE, Java SE Embedded. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets, that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability does not apply to Java deployments, typically in servers, that load and run onl...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "8.3",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/994edc4fe15ae729afd711a868dba488",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-14583",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5.1,
+                                "BaseVector": "AV:N/AC:H/Au:N/C:P/I:P/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.3,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.3,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-14583",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2020-07-15T18:15:00Z",
+                            "VendorUpdatedAt": "2020-11-10T16:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/DFZ36XIW5ENQAW6BB7WHRFFTTJX7KGMR/",
+                            "https://www.debian.org/security/2020/dsa-4734",
+                            "https://usn.ubuntu.com/4433-1/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/QQUMIAON2YEFRONMIUVHAKYCIOLICDBA/",
+                            "https://usn.ubuntu.com/4453-1/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/6CFJPOYF3CWYEPCDOAOCNFJTQIKKWPHW/",
+                            "https://www.oracle.com/security-alerts/cpujul2020.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/MEPHBZPNSLX43B26DWKB7OS6AROTS2BO/",
+                            "https://lists.debian.org/debian-lts-announce/2020/08/msg00021.html",
+                            "https://security.gentoo.org/glsa/202008-24"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/9799c7be91841f5c90f3022f35425128",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249016Z",
+                "Severity": {
+                    "Label": "CRITICAL",
+                    "Normalized": 90
+                },
+                "Title": "CVE-2019-14697 - musl",
+                "Description": "musl libc through 1.1.23 has an x87 floating-point stack adjustment imbalance, related to the math/i386/ directory. In some cases, use of this library could introduce out-of-bounds writes that are not present in an application's source code.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "9.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:e7c96db7181be991f19a9fb6975cdbbd73c65f4a2681348e63a141a2192a5f10",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/9799c7be91841f5c90f3022f35425128",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-14697",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "musl",
+                                "Version": "1.1.20",
+                                "Epoch": "0",
+                                "Release": "r4",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 7.5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 9.8,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 9.8,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-14697",
+                            "VendorSeverity": "CRITICAL",
+                            "VendorCreatedAt": "2019-08-06T16:15:00Z",
+                            "VendorUpdatedAt": "2020-03-14T19:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://security.gentoo.org/glsa/202003-13"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "CRITICAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/8d8058791c6d3fd549c8696db72bdd7b",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249019Z",
+                "Severity": {
+                    "Label": "LOW",
+                    "Normalized": 1
+                },
+                "Title": "CVE-2020-2590 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Security). Supported versions that are affected are Java SE: 7u241, 8u231, 11.0.5 and 13.0.1; Java SE Embedded: 8u231. Difficult to exploit vulnerability allows unauthenticated attacker with network access via Kerberos to compromise Java SE, Java SE Embedded. Successful attacks of this vulnerability can result in unauthorized update, insert or delete access to some of Java SE, Java SE Embedded accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability can also be exploited by using APIs in the specified Component, e.g., through a web service which supplies data to the APIs. CVSS 3.0 Base Score 3.7 (Integrity impacts). CVSS Vector: (CVSS:3.0/AV:N/AC:H/PR:N/UI:N/...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "3.7",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/8d8058791c6d3fd549c8696db72bdd7b",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-2590",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:N/I:P/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-2590",
+                            "VendorSeverity": "LOW",
+                            "VendorCreatedAt": "2020-01-15T17:15:00Z",
+                            "VendorUpdatedAt": "2021-02-26T19:38:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2020:0122",
+                            "https://access.redhat.com/errata/RHSA-2020:0232",
+                            "https://access.redhat.com/errata/RHSA-2020:0231",
+                            "https://access.redhat.com/errata/RHSA-2020:0157",
+                            "https://access.redhat.com/errata/RHSA-2020:0541",
+                            "https://access.redhat.com/errata/RHSA-2020:0196",
+                            "https://usn.ubuntu.com/4257-1/",
+                            "https://www.debian.org/security/2020/dsa-4621",
+                            "https://access.redhat.com/errata/RHSA-2020:0632",
+                            "https://access.redhat.com/errata/RHSA-2020:0202",
+                            "https://access.redhat.com/errata/RHSA-2020:0128",
+                            "https://seclists.org/bugtraq/2020/Jan/24",
+                            "https://www.debian.org/security/2020/dsa-4605",
+                            "https://lists.debian.org/debian-lts-announce/2020/02/msg00034.html",
+                            "https://www.oracle.com/security-alerts/cpujan2020.html",
+                            "https://security.gentoo.org/glsa/202101-19",
+                            "https://kc.mcafee.com/corporate/index",
+                            "https://seclists.org/bugtraq/2020/Feb/22"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "LOW"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/8c1de144c0df0ed3c9744adf01802bf8",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249005Z",
+                "Severity": {
+                    "Label": "HIGH",
+                    "Normalized": 70
+                },
+                "Title": "CVE-2019-1352 - git",
+                "Description": "A remote code execution vulnerability exists when Git for Visual Studio improperly sanitizes input, aka 'Git for Visual Studio Remote Code Execution Vulnerability'. This CVE ID is unique from CVE-2019-1349, CVE-2019-1350, CVE-2019-1354, CVE-2019-1387.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "8.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:4c71876dfa5f27506361f089fd2f10e9c9a3f84da5748c3164ac6d558256eef3",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/8c1de144c0df0ed3c9744adf01802bf8",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-1352",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "git",
+                                "Version": "2.20.1",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 9.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:C/I:C/A:C"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 8.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-1352",
+                            "VendorSeverity": "HIGH",
+                            "VendorCreatedAt": "2020-01-24T21:15:00Z",
+                            "VendorUpdatedAt": "2020-01-28T01:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://public-inbox.org/git/xmqqr21cqcn9.fsf@gitster-ct.c.googlers.com/",
+                            "https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-1352",
+                            "https://access.redhat.com/errata/RHSA-2020:0228",
+                            "https://security.gentoo.org/glsa/202003-30"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "HIGH"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/7fe2a76640cb906a6599c997be2bde63",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249003Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2018-14498 - libjpeg-turbo",
+                "Description": "get_8bit_row in rdbmp.c in libjpeg-turbo through 1.5.90 and MozJPEG through 3.3.1 allows attackers to cause a denial of service (heap-based buffer over-read and application crash) via a crafted 8-bit BMP in which one or more of the color indices is out of range for the number of palette entries.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "6.5",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/7fe2a76640cb906a6599c997be2bde63",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2018-14498",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "libjpeg-turbo",
+                                "Version": "1.5.3",
+                                "Epoch": "0",
+                                "Release": "r4",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 6.5,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 6.5,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2018-14498",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2019-03-07T23:29:00Z",
+                            "VendorUpdatedAt": "2020-07-31T21:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://lists.debian.org/debian-lts-announce/2019/03/msg00021.html",
+                            "https://usn.ubuntu.com/4190-1/",
+                            "https://lists.debian.org/debian-lts-announce/2020/07/msg00033.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/F7YP4QUEYGHI4Q7GIAVFVKWQ7DJMBYLU/",
+                            "https://access.redhat.com/errata/RHSA-2019:2052",
+                            "https://access.redhat.com/errata/RHSA-2019:3705"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/7e88c0ed6d3a95551eba85b71aef7bc2",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.604Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.604Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249011Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2020-14803 - openjdk8",
+                "Description": "Vulnerability in the Java SE product of Oracle Java SE (component: Libraries). Supported versions that are affected are Java SE: 11.0.8 and 15. Easily exploitable vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE. Successful attacks of this vulnerability can result in unauthorized read access to a subset of Java SE accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets, that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability does not apply to Java deployments, typically in servers, that load and run only trusted code (e.g., code installed by an administrator). CVSS 3.1 Base Score 5.3 (Confidentiality impacts). CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N).",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "5.3",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/7e88c0ed6d3a95551eba85b71aef7bc2",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-14803",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:P/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 5.3,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 5.3,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-14803",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2020-10-21T15:15:00Z",
+                            "VendorUpdatedAt": "2021-02-24T21:42:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://www.debian.org/security/2020/dsa-4779",
+                            "https://lists.debian.org/debian-lts-announce/2020/10/msg00031.html",
+                            "https://www.oracle.com/security-alerts/cpuoct2020.html",
+                            "https://security.gentoo.org/glsa/202101-19",
+                            "https://www.oracle.com/security-alerts/cpujan2021.html"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/69c2de2537c2497d63152eef28b45a33",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.603Z",
+                "LastObservedAt": "2021-12-23T19:12:46.476Z",
+                "CreatedAt": "2021-12-15T16:20:52.603Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249006Z",
+                "Severity": {
+                    "Label": "CRITICAL",
+                    "Normalized": 90
+                },
+                "Title": "CVE-2019-1353 - git",
+                "Description": "An issue was found in Git before v2.24.1, v2.23.1, v2.22.2, v2.21.1, v2.20.2, v2.19.3, v2.18.2, v2.17.3, v2.16.6, v2.15.4, and v2.14.6. When running Git in the Windows Subsystem for Linux (also known as \"WSL\") while accessing a working directory on a regular Windows drive, none of the NTFS protections were active.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "9.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:4c71876dfa5f27506361f089fd2f10e9c9a3f84da5748c3164ac6d558256eef3",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/69c2de2537c2497d63152eef28b45a33",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-1353",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "git",
+                                "Version": "2.20.1",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 7.5,
+                                "BaseVector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 9.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 9.8,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-1353",
+                            "VendorSeverity": "CRITICAL",
+                            "VendorCreatedAt": "2020-01-24T22:15:00Z",
+                            "VendorUpdatedAt": "2021-01-26T14:47:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://public-inbox.org/git/xmqqr21cqcn9.fsf@gitster-ct.c.googlers.com/",
+                            "https://security.gentoo.org/glsa/202003-30",
+                            "https://lore.kernel.org/git/xmqqr21cqcn9.fsf@gitster-ct.c.googlers.com/T/"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "CRITICAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/60a12e63ad81f6295d946b06524d92bf",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249013Z",
+                "Severity": {
+                    "Label": "MEDIUM",
+                    "Normalized": 40
+                },
+                "Title": "CVE-2019-2816 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded component of Oracle Java SE (subcomponent: Networking). Supported versions that are affected are Java SE: 7u221, 8u212, 11.0.3 and 12.0.1; Java SE Embedded: 8u211. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. Successful attacks of this vulnerability can result in unauthorized update, insert or delete access to some of Java SE, Java SE Embedded accessible data as well as unauthorized read access to a subset of Java SE, Java SE Embedded accessible data. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability can also be exploited by using APIs in the specified Component, e.g., through a web service which suppl...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "4.8",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/60a12e63ad81f6295d946b06524d92bf",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-2816",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 5.8,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:P/I:P/A:N"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 4.8,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+                            },
+                            {
+                                "Version": "3.0",
+                                "BaseScore": 4.8,
+                                "BaseVector": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-2816",
+                            "VendorSeverity": "MEDIUM",
+                            "VendorCreatedAt": "2019-07-23T23:15:00Z",
+                            "VendorUpdatedAt": "2020-09-08T13:00:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2019:2585",
+                            "https://access.redhat.com/errata/RHSA-2019:2495",
+                            "https://lists.debian.org/debian-lts-announce/2019/08/msg00020.html",
+                            "https://usn.ubuntu.com/4083-1/",
+                            "https://usn.ubuntu.com/4080-1/",
+                            "https://access.redhat.com/errata/RHSA-2019:2737",
+                            "https://kc.mcafee.com/corporate/index",
+                            "https://access.redhat.com/errata/RHSA-2019:2494",
+                            "https://access.redhat.com/errata/RHSA-2019:2592",
+                            "https://access.redhat.com/errata/RHSA-2019:2590"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "MEDIUM"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/5d09059e6dd1984aa2ac24d83d984c2b",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249020Z",
+                "Severity": {
+                    "Label": "LOW",
+                    "Normalized": 1
+                },
+                "Title": "CVE-2020-14781 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: JNDI). Supported versions that are affected are Java SE: 7u271, 8u261, 11.0.8 and 15; Java SE Embedded: 8u261. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. Successful attacks of this vulnerability can result in unauthorized read access to a subset of Java SE, Java SE Embedded accessible data. Note: Applies to client and server deployment of Java. This vulnerability can be exploited through sandboxed Java Web Start applications and sandboxed Java applets. It can also be exploited by supplying data to APIs in the specified Component without using sandboxed Java Web Start applications or sandboxed Java applets, such as through a web service. CVSS 3.1 Base Score 3.7 (Confidentiality impacts). CVSS Vector: (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N).",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "3.7",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/5d09059e6dd1984aa2ac24d83d984c2b",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2020-14781",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 4.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:P/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.7,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2020-14781",
+                            "VendorSeverity": "LOW",
+                            "VendorCreatedAt": "2020-10-21T15:15:00Z",
+                            "VendorUpdatedAt": "2021-02-24T21:13:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://www.debian.org/security/2020/dsa-4779",
+                            "https://lists.debian.org/debian-lts-announce/2020/10/msg00031.html",
+                            "https://www.oracle.com/security-alerts/cpuoct2020.html",
+                            "https://security.gentoo.org/glsa/202101-19"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "LOW"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            },
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/55d233a5eb21f742f2c5bb79b896e33b",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2021-12-15T16:20:52.678Z",
+                "LastObservedAt": "2021-12-23T19:12:46.522Z",
+                "CreatedAt": "2021-12-15T16:20:52.678Z",
+                "UpdatedAt": "2022-01-14T22:16:10.249018Z",
+                "Severity": {
+                    "Label": "LOW",
+                    "Normalized": 1
+                },
+                "Title": "CVE-2019-2945 - openjdk8",
+                "Description": "Vulnerability in the Java SE, Java SE Embedded product of Oracle Java SE (component: Networking). Supported versions that are affected are Java SE: 7u231, 8u221, 11.0.4 and 13; Java SE Embedded: 8u221. Difficult to exploit vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise Java SE, Java SE Embedded. Successful attacks require human interaction from a person other than the attacker. Successful attacks of this vulnerability can result in unauthorized ability to cause a partial denial of service (partial DOS) of Java SE, Java SE Embedded. Note: This vulnerability applies to Java deployments, typically in clients running sandboxed Java Web Start applications or sandboxed Java applets (in Java SE 8), that load and run untrusted code (e.g., code that comes from the internet) and rely on the Java sandbox for security. This vulnerability does not apply to Java deployments, typically in servers, that load and run only trusted code (e.g., code installed by...Truncated",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "CLOSED",
+                    "aws/inspector/inspectorScore": "3.1",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_9",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/55d233a5eb21f742f2c5bb79b896e33b",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/jenkins/sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "jenkins",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                                "ImageTags": [
+                                    "saasmon"
+                                ],
+                                "ImagePublishedAt": "2021-12-15T16:20:24Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ARCHIVED",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2019-2945",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "openjdk8",
+                                "Version": "8.212.04",
+                                "Epoch": "0",
+                                "Release": "r0",
+                                "Architecture": "X86_64"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 2.6,
+                                "BaseVector": "AV:N/AC:H/Au:N/C:N/I:N/A:P"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.1,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 3.1,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2019-2945",
+                            "VendorSeverity": "LOW",
+                            "VendorCreatedAt": "2019-10-16T18:15:00Z",
+                            "VendorUpdatedAt": "2020-09-08T13:00:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://access.redhat.com/errata/RHSA-2019:3136",
+                            "https://access.redhat.com/errata/RHSA-2019:3158",
+                            "https://access.redhat.com/errata/RHSA-2019:3135",
+                            "https://access.redhat.com/errata/RHSA-2019:3157",
+                            "https://access.redhat.com/errata/RHSA-2019:3134",
+                            "https://seclists.org/bugtraq/2019/Oct/31",
+                            "https://access.redhat.com/errata/RHSA-2020:0046",
+                            "https://access.redhat.com/errata/RHSA-2019:4113",
+                            "https://lists.debian.org/debian-lts-announce/2019/12/msg00005.html",
+                            "https://access.redhat.com/errata/RHSA-2019:4115",
+                            "https://access.redhat.com/errata/RHSA-2019:4110",
+                            "https://seclists.org/bugtraq/2019/Oct/27",
+                            "https://access.redhat.com/errata/RHSA-2020:0006",
+                            "https://www.debian.org/security/2019/dsa-4546",
+                            "https://usn.ubuntu.com/4223-1/",
+                            "https://access.redhat.com/errata/RHSA-2019:4109",
+                            "https://www.debian.org/security/2019/dsa-4548"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "LOW"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            }
+        ],
+        "NextToken": "U2FsdGVkX1/HguMhK2IJb5K+af5npSQ0YQbG7g63B3KAuLqYQUpOyUBEvki8rAXzBTU/ASXUxJyWTMSjeckzzR0eSDiKiFInnV2tO2WSDeQMYF18u9GkC2FHst6dfQNW4ud2j5yc3RV+uA8MGy/sDhALa90RK0SEuPE/p3G8kpS27yuRCno66OuaBuoyzB20r+V8yawJH8vHeyWN8O4TyElqP/tmu0QBwVyHNWpWUie5Zqxd3iAf8N0y3K64BWqJZa+ZjiIulPZoOA2nYtxNbYm1ShbXPUioFycWsS3sFTM9gd0bDOKRRgUqMyM8cYbxQkY0qti1pb0XmjWyAc4UeGhyREC78CRubs50LoFG8+0="
+    }
+}

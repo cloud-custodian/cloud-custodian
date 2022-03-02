@@ -31,6 +31,7 @@ ldap3 = "^2.6.1"
 redis = "^3.4.1"
 jsonpointer = "^2.0"
 jsonpatch = "^1.25"
+importlib-metadata = ">=4.11.1"
 
 [tool.poetry.dev-dependencies]
 fakeredis = "^1.2.0"
