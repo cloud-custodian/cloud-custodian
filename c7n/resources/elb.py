@@ -614,7 +614,6 @@ class SSLPolicyFilter(Filter):
                     elb["ProhibitedPolicies"] = list(
                         set(active_policies).difference(whitelist))
                     invalid_elbs.append(elb)
-
         return invalid_elbs
 
     def create_elb_active_policy_attribute_tuples(self, elbs):
