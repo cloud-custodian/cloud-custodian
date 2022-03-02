@@ -15,7 +15,6 @@ from c7n.filters import (
     ShieldMetrics)
 import c7n.filters.vpc as net_filters
 from datetime import datetime
-from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
@@ -272,7 +271,7 @@ class SetSslListenerPolicy(BaseAction):
         # to make it unique within the
         # set of policies for this load balancer.
         policy_name = self.data.get('name') + '-' + \
-            str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
+            str(int(datetime.utcnow().timestamp() * 1000))
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
 
