@@ -1026,6 +1026,20 @@ class SGPermission(Filter):
           op: in
           value: x.y.z
 
+    `value_type: cidr` can also filter if cidr is a subset of cidr
+    value range. In this example we are blocking any smaller cidrs within
+    allowed_cidrs.csv.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value_from:
+            url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
+            format: csv
+
     `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
     this example we are blocking global inbound connections to SSH or
     RDP.
