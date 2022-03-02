@@ -14,7 +14,7 @@ from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
 from c7n.testing import mock_datetime_now
-from c7n.utils import annotation
+from c7n.utils import annotation, parse_cidr
 from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import ValueRegex, parse_date as core_parse_date
 
@@ -186,11 +186,12 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
 
-        vf.vtype = "cidr_range"
+        vf.vtype = "cidr"
         sentinel = {"10.0.0.0/16", "192.168.0.0/16"}
         value = "10.10.10.0/24"
+        parsed_sentinel = [parse_cidr(s) for s in sentinel]
         res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual((res[0], str(res[1])), (sentinel, value))
+        self.assertEqual((res[0], str(res[1])), (parsed_sentinel, value))
 
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
@@ -214,35 +215,6 @@ class TestValueFilter(unittest.TestCase):
         sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 4))
-
-    def test_value_type_cidr_range(self):
-        vf = filters.factory({"type": "value", "value": "ingress"})
-        vf.op = 'not-in'
-        sentinel = {"10.0.0.0/8"}
-        value = "10.10.10.0/24"
-        res = vf.process_value_type_cidr_range(sentinel, value)
-        self.assertFalse(res)
-
-        vf = filters.factory({"type": "value", "value": "ingress"})
-        vf.op = 'not-in'
-        sentinel = {"10.0.0.0/16"}
-        value = "10.10.10.0/24"
-        res = vf.process_value_type_cidr_range(sentinel, value)
-        self.assertTrue(res)
-
-        vf = filters.factory({"type": "value", "value": "ingress"})
-        vf.op = 'in'
-        sentinel = {"10.0.0.0/8"}
-        value = "10.10.10.0/24"
-        res = vf.process_value_type_cidr_range(sentinel, value)
-        self.assertTrue(res)
-
-        vf = filters.factory({"type": "value", "value": "ingress"})
-        vf.op = 'in'
-        sentinel = {"10.0.0.0/16"}
-        value = "10.10.10.0/24"
-        res = vf.process_value_type_cidr_range(sentinel, value)
-        self.assertFalse(res)
 
     def test_value_type_expr(self):
         resource = {'a': 1, 'b': 1}
@@ -274,13 +246,6 @@ class TestValueFilter(unittest.TestCase):
 
         self.assertTrue(vf.content_initialized)
         self.assertEqual(vf.v, None)
-        self.assertFalse(res)
-
-        # test cidr_range match
-        resource = {"ingress": "10.10.10.0/24"}
-        vf = filters.factory({"type": "value", "value": ["10.0.0.0/16"],
-                              "op": "in", "key": "ingress"})
-        res = vf.match(resource)
         self.assertFalse(res)
 
 

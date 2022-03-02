@@ -584,10 +584,6 @@ class ValueFilter(BaseValueFilter):
         else:
             v = self.v
 
-        # cidr_range match
-        if isinstance(v, (set, list)) and parse_cidr(r):
-            return self.process_value_type_cidr_range(v, r)
-
         # Value match
         if r is None and v == 'absent':
             return True
@@ -599,6 +595,17 @@ class ValueFilter(BaseValueFilter):
             return True
         elif self.op:
             op = OPERATORS[self.op]
+            if isinstance(v, list) and self.op in ('in', 'not-in'):
+                for s in v:
+                    if self.op == 'in':
+                        if op(r, s):
+                            return True
+                        continue
+                    if not op(r, s):
+                        return False
+                if self.op == 'in':
+                    return False
+                return True
             try:
                 return op(r, v)
             except TypeError:
@@ -647,13 +654,14 @@ class ValueFilter(BaseValueFilter):
             # comparisons is intuitively wrong.
             return value, sentinel
         elif self.vtype == 'cidr':
-            s = parse_cidr(sentinel)
+            if isinstance(sentinel, (list, set)):
+                s = [parse_cidr(c) for c in sentinel]
+            else:
+                s = parse_cidr(sentinel)
             v = parse_cidr(value)
             if (isinstance(s, ipaddress._BaseAddress) and isinstance(v, ipaddress._BaseNetwork)):
                 return v, s
             return s, v
-        elif self.vtype == 'cidr_range':
-            return sentinel, value
         elif self.vtype == 'cidr_size':
             cidr = parse_cidr(value)
             if cidr:
