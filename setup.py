@@ -44,6 +44,9 @@ setup_kwargs = {
     'maintainer': None,
     'maintainer_email': None,
     'url': 'https://cloudcustodian.io',
+    'project_urls': {
+        'Source': 'https://github.com/cloud-custodian/cloud-custodian',
+    },
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
