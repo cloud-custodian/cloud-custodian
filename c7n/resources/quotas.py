@@ -159,7 +159,8 @@ class UsageFilter(MetricsFilter):
 
         for r in resources:
             metric = r.get('UsageMetric')
-            if not metric:
+            quota = r.get('Value')
+            if not metric or quota is None:
                 continue
             stat = metric.get('MetricStatisticRecommendation', 'Maximum')
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
@@ -196,15 +197,15 @@ class UsageFilter(MetricsFilter):
                 else:
                     op = self.metric_map[stat]
                 m = op([x[stat] for x in res['Datapoints']])
-                if m > (limit / 100) * r['Value'] * metric_scale:
+                if m > (limit / 100) * quota * metric_scale:
                     r[self.annotation_key] = {
                         'metric': m / metric_scale,
                         'period': period / metric_scale,
                         'start_time': start_time,
                         'end_time': end_time,
                         'statistic': stat,
-                        'limit': limit / 100 * r['Value'],
-                        'quota': r['Value'],
+                        'limit': limit / 100 * quota,
+                        'quota': quota,
                         'metric_scale': metric_scale,
                     }
                     result.append(r)
