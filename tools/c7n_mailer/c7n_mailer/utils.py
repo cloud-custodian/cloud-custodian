@@ -321,7 +321,7 @@ def resource_format(resource, resource_type):
             resource['QueueArn'])
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
-            resource['Name'],
+            resource.get('Name', ''),
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
