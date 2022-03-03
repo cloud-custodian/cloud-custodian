@@ -82,6 +82,7 @@ jmespath = "^0.10.0"
 azure-mgmt-servicefabric = "^1.0.0"
 azure-mgmt-trafficmanager = "^0.51.0"
 azure-mgmt-frontdoor = "^1.0.0"
+azure-mgmt-security = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency
