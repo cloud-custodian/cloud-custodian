@@ -271,6 +271,7 @@ class TestValueFilter(unittest.TestCase):
             "key": "ingress"})
         self.assertRaises(TypeError, vf.match(resource))
 
+
 class TestAgeFilter(unittest.TestCase):
 
     def test_age_filter(self):
