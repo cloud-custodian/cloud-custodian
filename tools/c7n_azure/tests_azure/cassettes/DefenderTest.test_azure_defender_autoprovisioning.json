@@ -1,0 +1,53 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/autoProvisioningSettings?api-version=2017-08-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 23 Feb 2022 05:32:38 GMT"
+                    ],
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "240"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/autoProvisioningSettings/default",
+                                "name": "default",
+                                "type": "Microsoft.Security/autoProvisioningSettings",
+                                "properties": {
+                                    "autoProvision": "On"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
