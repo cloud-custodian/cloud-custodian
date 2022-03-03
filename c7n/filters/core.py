@@ -593,19 +593,17 @@ class ValueFilter(BaseValueFilter):
             return True
         elif v == 'empty' and not r:
             return True
+        elif self.vtype == 'cidr' and isinstance(v, list):
+            op = OPERATORS[self.op]
+            try:
+                if self.op == 'in':
+                    return any(op(r, s) for s in v)
+                if self.op == 'not-in':
+                    return all(op(r, s) for s in v)
+            except TypeError:
+                return False
         elif self.op:
             op = OPERATORS[self.op]
-            if isinstance(v, list) and self.op in ('in', 'not-in'):
-                for s in v:
-                    if self.op == 'in':
-                        if op(r, s):
-                            return True
-                        continue
-                    if not op(r, s):
-                        return False
-                if self.op == 'in':
-                    return False
-                return True
             try:
                 return op(r, v)
             except TypeError:
