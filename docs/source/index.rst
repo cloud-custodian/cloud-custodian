@@ -75,6 +75,14 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
 
 .. toctree::
+   :maxdepth: 1
+   :caption: AWS Cloud Control
+
+   awscc/gettingstarted
+   awscc/resources/index
+
+
+.. toctree::
    :maxdepth: 2
    :caption: Tools
 
