@@ -1248,7 +1248,7 @@ class AccountDataEvents(BaseTest):
                                     }
                                 },
                                 "S3BucketName": {
-                                    "ResourceValue":{
+                                    "ResourceValue": {
                                         "Value": "RESOURCE_ID"
                                     }
                                 }

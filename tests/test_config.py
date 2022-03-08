@@ -165,4 +165,7 @@ class ConfigRuleTest(BaseTest):
         p.expand_variables(p.get_variables())
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ConfigRuleName'], 'custodian-config-managed-s3-bucket-public-write-remediate-event')
+        self.assertEqual(
+            resources[0]['ConfigRuleName'],
+            'custodian-config-managed-s3-bucket-public-write-remediate-event'
+        )
