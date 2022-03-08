@@ -211,7 +211,7 @@ class SSLPolicyTest(BaseTest):
                 "filters": [
                     {
                         "type": "ssl-policy",
-                        "whitelist": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "blacklist": ["Protocol-SSLv3", "Protocol-TLSv1"],
                     },
                     {
                         "type": "value",
@@ -224,7 +224,7 @@ class SSLPolicyTest(BaseTest):
                     {
                         "type": "set-ssl-listener-policy",
                         "name": "testpolicy",
-                        "attributes": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "attributes": ["Protocol-TLSv1.2", "AES128-SHA256"],
                     }
                 ],
             },
@@ -252,11 +252,10 @@ class SSLPolicyTest(BaseTest):
         self.assertEqual(
             curr_pol,
             [
-                "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333",
                 "testpolicy-1493768308000",
             ],
         )
-        self.assertEqual(active_ciphers, ["Protocol-TLSv1", "AES128-SHA256"])
+        self.assertEqual(active_ciphers, ["Protocol-TLSv1.2", "AES128-SHA256"])
 
     def test_set_ssl_listener_policy_predefined(self):
         session_factory = self.replay_flight_data("test_set_ssl_listener_predefined")
