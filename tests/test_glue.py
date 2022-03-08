@@ -289,6 +289,30 @@ class TestGlueJobs(BaseTest):
         jobs = client.get_jobs()["Jobs"]
         self.assertFalse(jobs)
 
+    def test_enable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_enable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-enable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "absent",
+                    }
+                ],
+                "actions": [{"type": "enable-metrics"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertIn("--enable-metrics", job["DefaultArguments"])
+
 
 class TestGlueCrawlers(BaseTest):
 

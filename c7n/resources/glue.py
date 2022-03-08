@@ -165,6 +165,38 @@ class DeleteJob(BaseAction):
                 continue
 
 
+@GlueJob.action_registry.register('enable-metrics')
+class UpdateGlueJob(BaseAction):
+    schema = type_schema('enable-metrics')
+    permissions = ('glue:UpdateJob',)
+
+    def cleanup_params(self, r):
+        del_keys = [
+            "Name", "CreatedOn", "LastModifiedOn",
+            "AllocatedCapacity", "Tags", "c7n:MatchedFilters"
+        ]
+        for key in del_keys:
+            del r[key]
+
+        # Can't specify MaxCapacity when updating/creating a job if
+        # job configuration includes WorkerType or NumberOfWorkers
+        if 'WorkerType' in r or 'NumberOfWorkers' in r:
+            del r['MaxCapacity']
+
+        return r
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                job_name = r["Name"]
+                r["DefaultArguments"]["--enable-metrics"] = ""
+                updated_resource = self.cleanup_params(r)
+                client.update_job(JobName=job_name, JobUpdate=updated_resource)
+            except Exception as e:
+                self.log.error('Error updating glue job: {}'.format(e))
+
+
 @resources.register('glue-crawler')
 class GlueCrawler(QueryResourceManager):
 
