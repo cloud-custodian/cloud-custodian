@@ -166,7 +166,23 @@ class DeleteJob(BaseAction):
 
 
 @GlueJob.action_registry.register('enable-metrics')
-class UpdateGlueJob(BaseAction):
+class GlueJobEnableMetrics(BaseAction):
+    """Enable CloudWatch metrics for a Glue job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gluejob-enable-metrics
+            resource: glue-job
+            filters:
+              - type: value
+                key: 'DefaultArguments."--enable-metrics"'
+                value: absent
+            actions:
+              - type: enable-metrics
+    """
     schema = type_schema('enable-metrics')
     permissions = ('glue:UpdateJob',)
 
