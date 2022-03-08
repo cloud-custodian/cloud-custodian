@@ -124,8 +124,57 @@ class DeleteRule(BaseAction):
             client.delete_config_rule(
                 ConfigRuleName=r['ConfigRuleName'])
 
+
 @ConfigRule.filter_registry.register('remediation')
 class RuleRemediation(Filter):
+    """Filter to look for config rules that match the given remediation configuration settings
+
+    This filter can be used in conjunction with account missing filter to look for
+    managed config rules with missing remediation and to enable it accordingly.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: config-managed-s3-bucket-public-write-remediate-event
+            description: |
+              This policy detects if S3 bucket allows public write by the bucket policy
+              or ACL and remediates.
+            comment: |
+              This policy detects if S3 bucket policy or ACL allows public write access.
+              When the bucket is evaluated as 'NON_COMPLIANT', the action
+              'AWS-DisableS3BucketPublicReadWrite' is triggered and remediates.
+            resource: account
+            filters:
+              - type: missing
+                policy:
+                  resource: config-rule
+                  filters:
+                    - type: remediation
+                      rule_name: &rule_name 'config-managed-s3-bucket-public-write-remediate-event'
+                      remediation: &remediation-config
+                        TargetId: AWS-DisableS3BucketPublicReadWrite
+                        Automatic: true
+                        MaximumAutomaticAttempts: 5
+                        RetryAttemptSeconds: 211
+                        Parameters:
+                          AutomationAssumeRole:
+                            StaticValue:
+                              Values:
+                                - 'arn:aws:iam::{account_id}:role/myrole'
+                          S3BucketName:
+                            ResourceValue:
+                              Value: RESOURCE_ID
+            actions:
+              - type: enable-config-managed-rule
+                rule_name: *rule_name
+                rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+                resource_types:
+                  - 'AWS::S3::Bucket'
+                rule_parameters: '{}'
+                remediation: *remediation-config
+    """
 
     schema = type_schema('remediation',
         rule_name={'type': 'string'},
@@ -173,7 +222,7 @@ class RuleRemediation(Filter):
 
         # check if matched rule has matched remediation configuration
         for r in resp.get('RemediationConfigurations', []):
-            r.pop('Arn', None) # don't include this for comparison
+            r.pop('Arn', None)  # don't include this for comparison
             if r == desired_remediation_config:
                 return results
 

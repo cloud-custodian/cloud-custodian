@@ -1217,3 +1217,58 @@ class AccountDataEvents(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_config_managed_rule(self):
+        session_factory = self.replay_flight_data("test_enable_config_managed_rule")
+        p = self.load_policy(
+            {
+                "name": "enable-config-managed-rule",
+                "resource": "account",
+                "actions": [
+                    {
+                        "type": "enable-config-managed-rule",
+                        "rule_name": "enable-config-managed-rule",
+                        "rule_prefix": "test-",
+                        "rule_id": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED",
+                        "resource_types": [
+                            "AWS::S3::Bucket"
+                        ],
+                        "rule_parameters": "{}",
+                        "remediation": {
+                            "TargetId": "AWS-DisableS3BucketPublicReadWrite",
+                            "Automatic": True,
+                            "MaximumAutomaticAttempts": 5,
+                            "RetryAttemptSeconds": 211,
+                            "Parameters": {
+                                "AutomationAssumeRole": {
+                                    "StaticValue": {
+                                        "Values": [
+                                           "arn:aws:iam::{account_id}:role/myrole"
+                                        ]
+                                    }
+                                },
+                                "S3BucketName": {
+                                    "ResourceValue":{
+                                        "Value": "RESOURCE_ID"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(session_factory).client('config')
+        resp = client.describe_config_rules(
+            ConfigRuleNames=['test-enable-config-managed-rule']
+        )
+        self.assertEqual(len(resp['ConfigRules']), 1)
+
+        resp = client.describe_remediation_configurations(
+            ConfigRuleNames=['test-enable-config-managed-rule']
+        )
+        self.assertEqual(len(resp['RemediationConfigurations']), 1)

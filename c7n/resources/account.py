@@ -1839,10 +1839,48 @@ class SecHubEnabled(Filter):
 class EnableConfigManagedRule(BaseAction):
     """Enables an AWS Config Managed Rule
 
-    :Example:
+    :example:
 
     .. code-block:: yaml
 
+        policies:
+          - name: config-managed-s3-bucket-public-write-remediate-event
+            description: |
+              This policy detects if S3 bucket allows public write by the bucket policy
+              or ACL and remediates.
+            comment: |
+              This policy detects if S3 bucket policy or ACL allows public write access.
+              When the bucket is evaluated as 'NON_COMPLIANT', the action
+              'AWS-DisableS3BucketPublicReadWrite' is triggered and remediates.
+            resource: account
+            filters:
+              - type: missing
+                policy:
+                  resource: config-rule
+                  filters:
+                    - type: remediation
+                      rule_name: &rule_name 'config-managed-s3-bucket-public-write-remediate-event'
+                      remediation: &remediation-config
+                        TargetId: AWS-DisableS3BucketPublicReadWrite
+                        Automatic: true
+                        MaximumAutomaticAttempts: 5
+                        RetryAttemptSeconds: 211
+                        Parameters:
+                          AutomationAssumeRole:
+                            StaticValue:
+                              Values:
+                                - 'arn:aws:iam::{account_id}:role/myrole'
+                          S3BucketName:
+                            ResourceValue:
+                              Value: RESOURCE_ID
+            actions:
+              - type: enable-config-managed-rule
+                rule_name: *rule_name
+                rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+                resource_types:
+                  - 'AWS::S3::Bucket'
+                rule_parameters: '{}'
+                remediation: *remediation-config
     """
 
     permissions = (
