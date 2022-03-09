@@ -66,6 +66,7 @@ class PolicyChecker(object):
       - whitelist_conditions: a list of conditions that are considered
             sufficient enough to whitelist the statement.
     """
+
     def __init__(self, checker_config):
         self.checker_config = checker_config
 
@@ -141,8 +142,6 @@ class PolicyChecker(object):
             s['Principal'].pop('Service')
             if not s['Principal']:
                 return False
-
-        assert len(s['Principal']) == 1, "Too many principals %s" % s
 
         if isinstance(s['Principal'], six.string_types):
             p = s['Principal']
