@@ -13,7 +13,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema
+from c7n.utils import generate_arn, type_schema, get_retry
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -239,9 +239,11 @@ class DeleteApi(BaseAction):
     def process(self, resources):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
+        retry = get_retry(('TooManyRequestsException',))
+
         for r in resources:
             try:
-                client.delete_rest_api(restApiId=r['id'])
+                retry(client.delete_rest_api, restApiId=r['id'])
             except client.exceptions.NotFoundException:
                 continue
 
@@ -793,3 +795,58 @@ class UpdateRestMethod(BaseAction):
                     resourceId=m['resourceId'],
                     httpMethod=m['httpMethod'],
                     patchOperations=ops)
+
+
+@resources.register('apigw-domain-name')
+class CustomDomainName(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        enum_spec = ('get_domain_names', 'items', None)
+        arn = False
+        id = name = 'domainName'
+        service = 'apigateway'
+        universal_taggable = True
+        cfn_type = 'AWS::ApiGateway::DomainName'
+        date = 'createdDate'
+
+    @classmethod
+    def get_permissions(cls):
+        return ('apigateway:GET',)
+
+    @classmethod
+    def has_arn(self):
+        return False
+
+
+@CustomDomainName.action_registry.register('update-security')
+class DomainNameRemediateTls(BaseAction):
+
+    schema = type_schema(
+        'update-security',
+        securityPolicy={'type': 'string', 'enum': [
+            'TLS_1_0', 'TLS_1_2']},
+        required=['securityPolicy'])
+
+    permissions = ('apigateway:PATCH',)
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        retryable = ('TooManyRequestsException', 'ConflictException')
+        retry = utils.get_retry(retryable, max_attempts=8)
+
+        for r in resources:
+            try:
+                retry(client.update_domain_name,
+                      domainName=r['domainName'],
+                      patchOperations=[
+                          {
+                              'op': 'replace',
+                              'path': '/securityPolicy',
+                              'value': self.data.get('securityPolicy')
+                          },
+                      ]
+                      )
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    continue

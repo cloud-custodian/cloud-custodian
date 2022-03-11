@@ -11,6 +11,7 @@ import time  # NOQA needed for some recordings
 
 from unittest import TestCase
 
+from contextlib import suppress
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 from pytest_terraform import terraform
@@ -117,14 +118,8 @@ def destroyVersionedBucket(client, bucket):
 
 
 def destroyBucketIfPresent(client, bucket):
-    try:
+    with suppress(client.exceptions.NoSuchBucket):
         destroyVersionedBucket(client, bucket)
-    except Exception as exc:
-        response = getattr(
-            exc, "response", {"ResponseMetadata": {"HTTPStatusCode": None}}
-        )
-        if response["ResponseMetadata"]["HTTPStatusCode"] != 404:
-            raise
 
 
 def generateBucketContents(s3, bucket, contents=None):
@@ -776,6 +771,44 @@ class S3ConfigSource(ConfigTest):
 
     maxDiff = None
 
+    def test_normalize_initial_state(self):
+        """Check for describe/config parity after bucket creation, before changing properties"""
+
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        augments = list(s3.S3_AUGMENT_TABLE)
+        augments.remove((
+            "get_bucket_location", "Location", {}, None, 's3:GetBucketLocation'))
+        self.patch(s3, "S3_AUGMENT_TABLE", augments)
+
+        bname = "custodian-test-s3confignormalize"
+        session_factory = self.replay_flight_data("test_s3_normalize_initstate", region="us-east-1")
+        session = session_factory()
+
+        queue_url = self.initialize_config_subscriber(session)
+        client = session.client("s3")
+        if self.recording:
+            destroyBucketIfPresent(client, bname)
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        p = self.load_policy(
+            {"name": "s3-inv", "resource": "s3", "filters": [{"Name": bname}]},
+            session_factory=session_factory,
+        )
+
+        manager = p.load_resource_manager()
+        resource_a = manager.get_resources([bname])[0]
+        results = self.wait_for_config(session, queue_url, bname)
+        resource_b = s3.ConfigS3(manager).load_resource(results[0])
+        self.maxDiff = None
+        self.assertEqual(s3.get_region(resource_b), 'us-east-1')
+        for k in ("Logging", "Policy", "Versioning", "Name", "Website"):
+            self.assertEqual(resource_a[k], resource_b[k])
+
+        self.assertEqual(
+            {t["Key"]: t["Value"] for t in resource_a.get("Tags")},
+            {t["Key"]: t["Value"] for t in resource_b.get("Tags")},
+        )
+
     @functional
     def test_normalize(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -1186,13 +1219,13 @@ class S3ConfigSource(ConfigTest):
                 ),
                 u"Lifecycle": None,
                 u"Location": {},
-                u"Logging": None,
+                u"Logging": {},
                 u"Name": u"c7n-fire-logs",
                 u"Notification": {},
                 u"Policy": None,
                 u"Replication": None,
                 u"Tags": [],
-                u"Versioning": None,
+                u"Versioning": {},
                 u"Website": None,
             },
         )
@@ -3724,3 +3757,62 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     actual_names = sorted([r.get('Name') for r in resources])
 
     assert actual_names == expected_names
+
+
+@terraform('s3_ownership', scope='class')
+class TestBucketOwnership:
+    def test_s3_ownership_empty(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
+        test.patch(
+            s3, "S3_AUGMENT_TABLE", []
+        )
+        session_factory = test.replay_flight_data("test_s3_ownership_empty")
+        bucket_name = s3_ownership['aws_s3_bucket.no_ownership_controls.bucket']
+        p = test.load_policy(
+            {
+                "name": "s3-ownership-empty",
+                "resource": "s3",
+                "filters": [
+                    {"type": "value",
+                     "op": "glob",
+                     "key": "Name",
+                     "value": "c7ntest*"},
+                    {"type": "ownership",
+                     "value": "empty"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]["Name"] == bucket_name
+
+    def test_s3_ownership_defined(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
+        test.patch(
+            s3, "S3_AUGMENT_TABLE", []
+        )
+        session_factory = test.replay_flight_data("test_s3_ownership_defined")
+        bucket_names = {s3_ownership[f'aws_s3_bucket.{r}.bucket']
+                        for r in ('owner_preferred', 'owner_enforced')}
+        p = test.load_policy(
+            {
+                "name": "s3-ownership-defined",
+                "resource": "s3",
+                "filters": [
+                    {"type": "value",
+                     "op": "glob",
+                     "key": "Name",
+                     "value": "c7ntest*"},
+                    {"type": "ownership",
+                     "op": "in",
+                     "value": ["BucketOwnerPreferred", "BucketOwnerEnforced"]},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert len(resources) == 2
+        assert {r["Name"] for r in resources} == bucket_names

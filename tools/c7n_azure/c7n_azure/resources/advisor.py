@@ -17,7 +17,7 @@ class AdvisorRecommendation(ArmResourceManager):
 
         policies:
         - name: list-advisor-security-recommendations
-          resource: azure.advisor-recommendiation
+          resource: azure.advisor-recommendation
           filters:
             - type: value
               key: properties.category

@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/alpine",
+                "registryId": "644160558196",
+                "repositoryName": "alpine",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/alpine",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 16,
+                    "hour": 14,
+                    "minute": 10,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

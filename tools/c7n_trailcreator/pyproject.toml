@@ -19,7 +19,7 @@ classifiers=[
 c7n-trailcreator = 'c7n_trailcreator.trailcreator:cli'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 click = "^8.0"
 
 [tool.poetry.dev-dependencies]
