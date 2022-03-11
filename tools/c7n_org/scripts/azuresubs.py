@@ -19,14 +19,14 @@ NAME_TEMPLATE = "{name}"
     default=('Enabled',),
     help="File to store the generated config (default stdout)")
 @click.option(
-    '-e', '--ea',
-    default=False,
-    help="Include only subscriptions that have an Enterprise Aggreement quotaID property")
+    '-q', '--quota_id',
+    default="",
+    help="Include a quota-id filter for limiting output to a spectic quotaID property, e.g., EnterpriseAgreement")
 @click.option(
     '--name',
     default=NAME_TEMPLATE,
     help="Name template for subscriptions in the config, defaults to %s" % NAME_TEMPLATE)
-def main(output, state, ea, name):
+def main(output, state, quota_id, name):
     """
     Generate a c7n-org subscriptions config file
     """
@@ -37,10 +37,12 @@ def main(output, state, ea, name):
     for sub in subs:
         if state and sub['state'] not in state:
             continue
-        if ea:
+        
+        if quota_id:
             sub_policies = sub['subscriptionPolicies']
-            if 'EnterpriseAgreement' not in sub_policies['quotaId']:
+            if quota_id not in sub_policies['quotaId']:
               continue 
+
         sub_info = {
             'subscription_id': sub['subscriptionId'],
             'name': sub['displayName']
