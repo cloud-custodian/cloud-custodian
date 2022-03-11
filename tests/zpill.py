@@ -16,11 +16,10 @@ from botocore.response import StreamingBody
 from placebo import pill
 
 from c7n.testing import CustodianTestCore
-from .constants import ACCOUNT_ID
 
 # Custodian Test Account. This is used only for testing.
-# Access is available for community project maintainers.
 
+ACCOUNT_ID = "644160558196"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH

@@ -71,6 +71,31 @@ class UserCredentialReportTest(BaseTest):
             ["Hazmat", "kapilt"],
         )
 
+    def test_credential_report_generate_in_progress(self):
+        session_factory = self.replay_flight_data("test_iam_user_unused_keys_report_in_progress")
+        p = self.load_policy(
+            {
+                "name": "user-access-unused-keys",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "credential",
+                        "key": "access_keys.last_used_date",
+                        "report_delay": 0.01,
+                        "value": "empty",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r["UserName"] for r in resources]),
+            ["Hazmat", "kapilt"],
+        )
+
     def test_credential_access_key_multifilter_delete(self):
         factory = self.replay_flight_data('test_iam_user_credential_multi_delete')
         p = self.load_policy({
@@ -1327,6 +1352,23 @@ class IamGroupTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["GroupId"], "AGPAI6NICSNT546VPVZGS")
 
+    def test_iam_group_with_managed_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_with_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-groups-have-ses-send-policy",
+                "resource": "aws.iam-group",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "AmazonSESFullAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
@@ -2156,6 +2198,46 @@ class DeleteRoleAction(BaseTest):
                 "actions": [{"type": "set-policy", "state": "attached", "arn": "*"}],
             }
         )
+
+    def test_set_policy_arn_construction(self):
+        factory = self.replay_flight_data("test_set_policy_arn_construction")
+
+        # Use set-policy with an explicit ARN
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "actions": [{
+                    "type": "set-policy",
+                    "state": "attached",
+                    "arn": "arn:aws:iam::{account_id}:policy/DeleteMe"
+                }],
+            },
+            session_factory=factory
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        # Use a policy name
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "filters": [{"type": "has-specific-managed-policy", "value": "DeleteMe"}],
+                "actions": [{"type": "set-policy", "state": "detached", "arn": "DeleteMe"}],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_force_delete_role(self):
         factory = self.replay_flight_data("test_force_delete_role")

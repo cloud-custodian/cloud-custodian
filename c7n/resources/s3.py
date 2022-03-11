@@ -172,7 +172,8 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketLoggingConfiguration(self, resource, item_value):
         if ('destinationBucketName' not in item_value or
                 item_value['destinationBucketName'] is None):
-            return {}
+            resource[u'Logging'] = {}
+            return
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
@@ -196,7 +197,7 @@ class ConfigS3(query.ConfigSource):
             for t in (r.get('transitions') or ()):
                 tr = {}
                 for k in ('date', 'days', 'storageClass'):
-                    if t[k]:
+                    if t.get(k):
                         tr["%s%s" % (k[0].upper(), k[1:])] = t[k]
                 transitions.append(tr)
             if transitions:
@@ -292,7 +293,7 @@ class ConfigS3(query.ConfigSource):
         resource['Replication'] = {'ReplicationConfiguration': d}
 
     def handle_BucketPolicy(self, resource, item_value):
-        resource['Policy'] = item_value['policyText']
+        resource['Policy'] = item_value.get('policyText')
 
     def handle_BucketTaggingConfiguration(self, resource, item_value):
         resource['Tags'] = [
@@ -301,11 +302,19 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketVersioningConfiguration(self, resource, item_value):
         # Config defaults versioning to 'Off' for a null value
         if item_value['status'] not in ('Enabled', 'Suspended'):
+            resource['Versioning'] = {}
             return
         resource['Versioning'] = {'Status': item_value['status']}
-        if item_value['isMfaDeleteEnabled']:
-            resource['Versioning']['MFADelete'] = item_value[
-                'isMfaDeleteEnabled'].title()
+        # `isMfaDeleteEnabled` is an optional boolean property - the key may be absent,
+        # present with a null value, or present with a boolean value.
+        # Mirror the describe source by populating Versioning.MFADelete only in the
+        # boolean case.
+        mfa_delete = item_value.get('isMfaDeleteEnabled')
+        if mfa_delete is None:
+            return
+        resource['Versioning']['MFADelete'] = (
+            'Enabled' if mfa_delete else 'Disabled'
+        )
 
     def handle_BucketWebsiteConfiguration(self, resource, item_value):
         website = {}
@@ -3423,3 +3432,98 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
         )
+
+
+OWNERSHIP_CONTROLS = ['BucketOwnerEnforced', 'BucketOwnerPreferred', 'ObjectWriter']
+VALUE_FILTER_MAGIC_VALUES = ['absent', 'present', 'not-null', 'empty']
+
+
+@filters.register('ownership')
+class BucketOwnershipControls(BucketFilterBase, ValueFilter):
+    """Filter for object ownership controls
+
+    Reference: https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
+
+    :example
+
+    Find buckets with ACLs disabled
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-acls-disabled
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    value: BucketOwnerEnforced
+
+    :example
+
+    Find buckets with object ownership preferred or enforced
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-ownership-preferred
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    op: in
+                    value:
+                      - BucketOwnerEnforced
+                      - BucketOwnerPreferred
+
+    :example
+
+    Find buckets with no object ownership controls
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-no-ownership-controls
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    value: empty
+    """
+    schema = type_schema('ownership', rinherit=ValueFilter.schema, value={'oneOf': [
+        {'type': 'string', 'enum': OWNERSHIP_CONTROLS + VALUE_FILTER_MAGIC_VALUES},
+        {'type': 'array', 'items': {
+            'type': 'string', 'enum': OWNERSHIP_CONTROLS + VALUE_FILTER_MAGIC_VALUES}}]})
+    permissions = ('s3:GetBucketOwnershipControls',)
+    annotation_key = 'c7n:ownership'
+
+    def __init__(self, data, manager=None):
+        super(BucketOwnershipControls, self).__init__(data, manager)
+
+        # Ownership controls appear as an array of rules. There can only be one
+        # ObjectOwnership rule defined for a bucket, so we can automatically
+        # match against that if it exists.
+        self.data['key'] = f'("{self.annotation_key}".Rules[].ObjectOwnership)[0]'
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(),
+                                   b['Name'])
+                    continue
+        return super(BucketOwnershipControls, self).process(buckets, event)
+
+    def process_bucket(self, b):
+        if self.annotation_key in b:
+            return
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        try:
+            controls = client.get_bucket_ownership_controls(Bucket=b['Name'])
+            controls.pop('ResponseMetadata', None)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OwnershipControlsNotFoundError':
+                raise
+            controls = {}
+        b[self.annotation_key] = controls.get('OwnershipControls')
