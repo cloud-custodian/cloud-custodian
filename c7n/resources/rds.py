@@ -1860,7 +1860,7 @@ class ConsecutiveSnapshots(Filter):
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
         expectedDates = []
-        for i in range(retention - 1):
+        for i in range(retention):
             days = i + 1
             expectedDates.append((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
 

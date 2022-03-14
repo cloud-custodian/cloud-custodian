@@ -5,9 +5,9 @@
             "HTTPStatusCode": 200,
             "RequestId": "9ec20898-2cce-11e6-9e53-995121fda0e7"
         },
-        "DBSnapshots": [
+        "DBClusterSnapshots": [
             {
-                "Engine": "postgres",
+                "Engine": "aurora-mysql",
                 "SnapshotCreateTime": {
                     "hour": 19,
                     "__class__": "datetime",
@@ -18,16 +18,15 @@
                     "day": 13,
                     "minute": 4
                 },
-                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZones": ["us-east-1b"],
                 "PercentProgress": 100,
                 "MasterUsername": "dbadmin",
-                "Encrypted": true,
-                "LicenseModel": "postgresql-license",
-                "StorageType": "gp2",
+                "StorageEncrypted": true,
+                "LicenseModel": "aurora-mysql-license",
                 "Status": "available",
                 "VpcId": "vpc-f3581498",
-                "DBSnapshotIdentifier": "abc-restore-final-snapshot-1",
-                "InstanceCreateTime": {
+                "DBClusterSnapshotIdentifier": "abc-restore-final-snapshot-1",
+                "ClusterCreateTime": {
                     "hour": 3,
                     "__class__": "datetime",
                     "month": 3,
@@ -37,12 +36,10 @@
                     "day": 8,
                     "minute": 33
                 },
-                "OptionGroupName": "default:postgres-9-4",
-                "AllocatedStorage": 100,
                 "EngineVersion": "9.4.5",
                 "SnapshotType": "manual",
                 "Port": 5432,
-                "DBInstanceIdentifier": "abc-restore",
+                "DBClusterIdentifier": "abc-restore",
                 "TagList": [
                     {
                         "Value": "other",
@@ -55,7 +52,7 @@
                 ]
             },
             {
-                "Engine": "postgres",
+                "Engine": "aurora-mysql",
                 "SnapshotCreateTime": {
                     "hour": 19,
                     "__class__": "datetime",
@@ -66,16 +63,15 @@
                     "day": 12,
                     "minute": 4
                 },
-                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZones": ["us-east-1b"],
                 "PercentProgress": 100,
                 "MasterUsername": "dbadmin",
-                "Encrypted": true,
-                "LicenseModel": "postgresql-license",
-                "StorageType": "gp2",
+                "StorageEncrypted": true,
+                "LicenseModel": "aurora-mysql-license",
                 "Status": "available",
                 "VpcId": "vpc-f3581498",
-                "DBSnapshotIdentifier": "abc-restore-final-snapshot-2",
-                "InstanceCreateTime": {
+                "DBClusterSnapshotIdentifier": "abc-restore-final-snapshot-2",
+                "ClusterCreateTime": {
                     "hour": 3,
                     "__class__": "datetime",
                     "month": 3,
@@ -85,12 +81,10 @@
                     "day": 8,
                     "minute": 33
                 },
-                "OptionGroupName": "default:postgres-9-4",
-                "AllocatedStorage": 100,
                 "EngineVersion": "9.4.5",
                 "SnapshotType": "manual",
                 "Port": 5432,
-                "DBInstanceIdentifier": "abc-restore",
+                "DBClusterIdentifier": "abc-restore",
                 "TagList": [
                     {
                         "Value": "other",
@@ -103,7 +97,7 @@
                 ]
             },
             {
-                "Engine": "postgres",
+                "Engine": "aurora-mysql",
                 "SnapshotCreateTime": {
                     "hour": 19,
                     "__class__": "datetime",
@@ -114,16 +108,15 @@
                     "day": 11,
                     "minute": 4
                 },
-                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZones": ["us-east-1b"],
                 "PercentProgress": 100,
                 "MasterUsername": "dbadmin",
-                "Encrypted": true,
+                "StorageEncrypted": true,
                 "LicenseModel": "postgresql-license",
-                "StorageType": "gp2",
                 "Status": "available",
                 "VpcId": "vpc-f3581498",
-                "DBSnapshotIdentifier": "abc-restore-final-snapshot-3",
-                "InstanceCreateTime": {
+                "DBClusterSnapshotIdentifier": "abc-restore-final-snapshot-3",
+                "ClusterCreateTime": {
                     "hour": 3,
                     "__class__": "datetime",
                     "month": 3,
@@ -133,12 +126,10 @@
                     "day": 8,
                     "minute": 33
                 },
-                "OptionGroupName": "default:postgres-9-4",
-                "AllocatedStorage": 100,
                 "EngineVersion": "9.4.5",
                 "SnapshotType": "manual",
                 "Port": 5432,
-                "DBInstanceIdentifier": "abc-restore",
+                "DBClusterIdentifier": "abc-restore",
                 "TagList": [
                     {
                         "Value": "other",
