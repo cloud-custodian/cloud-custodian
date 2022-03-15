@@ -1836,19 +1836,19 @@ class ConsecutiveSnapshots(Filter):
                 filters:
                   - type: consecutive-snapshots
                     days: 7
-                    exclude_engine: ["postgres"]
+                    exclude_engines: ["postgres"]
     """
     schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
-     exclude_engine={'type': 'array', 'items': {'type': 'string'}}, required=['days'])
+     exclude_engines={'type': 'array', 'items': {'type': 'string'}}, required=['days'])
     permissions = ('rds:DescribeDBSnapshots', 'rds:DescribeDBInstances')
 
     def enhance_resources(self, resources):
-        exclude_engine = self.data.get('exclude_engine', [])
+        exclude_engines = self.data.get('exclude_engine', [])
         client = local_session(self.manager.session_factory).client('rds')
         results = []
 
         for resource in resources:
-            if resource['Engine'] not in exclude_engine:
+            if resource['Engine'] not in exclude_engines:
                 response = client.describe_db_snapshots(
                     DBInstanceIdentifier=resource['DBInstanceIdentifier'])
                 resource.update({'DBSnapshots': response['DBSnapshots']})
@@ -1859,10 +1859,9 @@ class ConsecutiveSnapshots(Filter):
         results = []
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
-        expectedDates = []
-        for i in range(retention):
-            days = i + 1
-            expectedDates.append((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
 
         for resource in self.enhance_resources(resources):
             if not resource.get('DBSnapshots'):
@@ -1871,6 +1870,6 @@ class ConsecutiveSnapshots(Filter):
             for snapshot in resource['DBSnapshots']:
                 if snapshot['Status'] == 'available':
                     snapshot_dates.append(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
-            if set(expectedDates).issubset(snapshot_dates):
+            if set(expected_dates).issubset(snapshot_dates):
                 results.append(resource)
         return results
