@@ -21,7 +21,7 @@ NAME_TEMPLATE = "{name}"
 @click.option(
     '-q', '--quota_id',
     default="",
-    help="Include a quota-id filter for limiting output to a spectic quotaID property, e.g., EnterpriseAgreement")
+    help="Filter based on spectic quotaID property e.g., EnterpriseAgreement")
 @click.option(
     '--name',
     default=NAME_TEMPLATE,
@@ -37,12 +37,10 @@ def main(output, state, quota_id, name):
     for sub in subs:
         if state and sub['state'] not in state:
             continue
-        
         if quota_id:
             sub_policies = sub['subscriptionPolicies']
             if quota_id not in sub_policies['quotaId']:
-              continue 
-
+              continue
         sub_info = {
             'subscription_id': sub['subscriptionId'],
             'name': sub['displayName']

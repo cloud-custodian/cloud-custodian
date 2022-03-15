@@ -1,0 +1,154 @@
+subscriptions:
+- name: FNF-Development-01
+  subscription_id: 03f39f76-065e-46fd-a116-ba6085c71481
+- name: SoftPro Internal Infrastructure Prod (Corp)
+  subscription_id: ffc50e11-2385-4e77-af4a-c5f739bbd5f2
+- name: Steve Murnin - Integrated Technology Solutions Group
+  subscription_id: 2724b4db-c2a4-44ef-a152-382a623daea0
+- name: Commercial Services Systems (SmartView)
+  subscription_id: 5ec87b20-ff32-4efe-b212-1be590be2951
+- name: FNTGDIV6-TX
+  subscription_id: 83f6cf74-97fb-4895-954f-5b9dba9f5fad
+- name: Dev Env
+  subscription_id: 62029dc2-6307-44a7-8605-fd18460d59a6
+- name: SoftPro Agency Hosted Services Prod (Lite)
+  subscription_id: 01b9ee2a-2273-467d-a1c8-14507b05aba8
+- name: Div6-OK
+  subscription_id: b2d955fe-0d0b-4caa-852b-d3d7f7cd4250
+- name: FNF-ServiceProvider-SoftPro-Prod-01
+  subscription_id: a986479d-89d5-451b-ad32-cf56690564e3
+- name: FNF-PRODUCTION-NEXTACE
+  subscription_id: 29f50f59-74bc-446a-939e-6e8ee092bf91
+- name: FNTG-FLServices
+  subscription_id: 9d9bf706-953a-420b-a785-205041a5b56b
+- name: FNZ-CORE-Infrastructure100
+  subscription_id: 480f8b14-8d3b-4bba-8dde-038fc792e248
+- name: DataArchival
+  subscription_id: cbcf39b4-6596-4542-9fd4-7a250a564a33
+- name: SoftPro Cloud Services Core Prod (360-HST-SPH)
+  subscription_id: 2ae09c4e-83bf-49bb-aaf3-8e5040e48580
+- name: FNTG-MidSouth
+  subscription_id: 4eb250c7-8550-4a88-8dad-1c0c4de6606c
+- name: FRS-FICS
+  subscription_id: ab817846-0ba9-4c04-9048-a90572c4b577
+- name: FNF-INFRASTRUCTURE-KEYVAULT
+  subscription_id: e2717621-8754-4f41-94d9-c81ca1f3e122
+- name: FNF-Nonprod-01
+  subscription_id: 1a1ea867-a0f7-451d-b5b3-f3a276746beb
+- name: FNZ-PRODUCTION-NorthEastIT (Sandy Carroll)
+  subscription_id: 6cee3bd7-89f8-4223-96f8-7f673fd4d091
+- name: FNF-Prod-02
+  subscription_id: 516b231f-189c-49e9-b2bb-2de160b58d12
+- name: FNF-Prod-01
+  subscription_id: c48f5cd5-8dd0-4eaa-b46e-a351002cdabd
+- name: PacNW
+  subscription_id: 1dacd8b6-99f2-4999-abba-98b0dfb61292
+- name: FNF-WVD-PROD-01
+  subscription_id: 23f8ad78-24e0-4424-a601-3b973060240e
+- name: FLAgencySolutions-Prod
+  subscription_id: 994ca627-dbe6-4a2b-83d6-ad6a77246319
+- name: SL-EXOS-ALL
+  subscription_id: 97aeb7a6-ff38-40b1-9fc8-a4111cf894c2
+- name: SoftPro Dev-Test (Sandbox)
+  subscription_id: 2a0ea6e6-eeb0-41e8-8192-4ce665bcb204
+- name: SL-EXOS-Performance-01
+  subscription_id: 00d5d0e4-64fb-4d41-b953-241c4d2d8f99
+- name: ENT-DS-Prod-01
+  subscription_id: 061a48d6-bce7-4644-8429-6a0ef2c8abaf
+- name: SL-EXOS-Development-03
+  subscription_id: 09e605d9-0461-4b8f-894f-70d10d543a62
+- name: FNF-ServiceProvider-Sandbox-01
+  subscription_id: 0b07e710-f02f-4205-9436-3ed028e2e199
+- name: SL-DataGovernance-01
+  subscription_id: 0e6d9ec9-3f9f-4354-9d2e-15faed542546
+- name: FNF_India-NonProd-01
+  subscription_id: 16bb8419-52b4-408a-81e6-6ee20344cbfc
+- name: FNF-FNTG-Sandbox-01
+  subscription_id: 1a6f03a3-9342-4482-acd5-3b35a32d8779
+- name: FNF-CTX-DEV-01
+  subscription_id: 1a9a389d-ceb8-44e6-b026-359b1a9a2658
+- name: FNF-GNET-Sandbox-01
+  subscription_id: 1b473c55-3917-476c-a631-5b4a4d194086
+- name: FFW EA Azure Subscription
+  subscription_id: 220f9ca3-d7a1-4dee-a2e3-d4509466fe14
+- name: FNF_Canada-Prod-01
+  subscription_id: 22f32cd1-0d60-44a9-92a3-f8fd6dff3e13
+- name: SL-EXOS-Sandbox-02
+  subscription_id: 26d9dc6e-5a90-4ca2-a360-722e4b310e4c
+- name: FNF-Finance-Prod-01
+  subscription_id: 28c077fe-6031-47c3-9410-a168c335fd8c
+- name: FNF-SecurityOperationsCenter-01
+  subscription_id: 481eda38-a0d1-4765-b9db-8cf5b1987c38
+- name: SL-EXOS-Development-01
+  subscription_id: 4d2365a8-0ea4-4e92-b0f5-550a559d7b34
+- name: PI-Prod-01
+  subscription_id: 51c52771-718d-4110-a0b1-6c8c7ca72983
+- name: SL-EXOS-UAT-04
+  subscription_id: 520112a3-fb53-4b7c-a771-72d56533a037
+- name: SL-EXOS-UAT-05
+  subscription_id: 532d85d7-1eca-4ab0-9a20-8caf777544e4
+- name: SL-Arrakis-Development-01
+  subscription_id: 5b390429-ef23-4f40-8d7b-9d3e89c44513
+- name: SL-EXOS-Development-02
+  subscription_id: 63b7d481-6d18-4a56-bbec-0d3411477a0c
+- name: FNF_Canada-Dev-01
+  subscription_id: 67085875-7771-4984-a381-7484aaacefe1
+- name: SL-EXOS-QA-02
+  subscription_id: 6b6dcbef-6db7-405d-9ab8-98649a296b1f
+- name: PI-NonProd-01
+  subscription_id: 7ef1e3b2-e72d-4229-a592-d8b4c9628100
+- name: SL-EXOS-DataMigration-01
+  subscription_id: 85007903-ccaa-41f0-9a74-1be006bb429f
+- name: SL-EXOS-Sandbox-01
+  subscription_id: 8d1a8329-ea90-46a3-b900-8676c42ed761
+- name: SL-EXOS-UAT-02
+  subscription_id: 8f2e2199-66ed-4b86-b236-6148a8425229
+- name: wrong-name-sl-exos-uat3-cancel
+  subscription_id: 90988d96-bbd0-46d8-9bf3-cde480a3a559
+- name: Microsoft Azure Enterprise
+  subscription_id: 923d9560-5a67-4a3c-8002-0f6224aca76d
+- name: FNF_India-Prod-01
+  subscription_id: 97d3f30c-0178-4cbc-87f4-5ff484fad9d3
+- name: SL-EXOS-ReleaseMGMT-01
+  subscription_id: a2ca26b7-774e-4207-801a-c45151ff310d
+- name: ENT-BU Apps-Prod-01
+  subscription_id: a55c5b65-92ec-4ce5-bcc9-48e018f3c37d
+- name: FNF-ENT-01
+  subscription_id: a8848682-e805-4487-827f-a4888431a5ad
+- name: SL-EXOS-Production-01
+  subscription_id: ac348851-c1e6-463a-a202-5041c8912fb8
+- name: SL-EXOS-Archival-01
+  subscription_id: ae71418a-ccf8-4445-9dcc-ab602fe53523
+- name: FNF-Finance-NonProd-01
+  subscription_id: b54fb082-70b4-4b72-a2b8-0b82ba6c9d45
+- name: FNF_Canada-NonProd-01
+  subscription_id: c4d5a648-360c-4892-bc0b-6fd7becec93b
+- name: Microsoft Azure Enterprise
+  subscription_id: c80086d2-12af-4e81-b60b-313096436b1a
+- name: Microsoft Azure Enterprise
+  subscription_id: d26be4eb-39e0-4de9-882e-d1303f09c5dc
+- name: SL-EXOS-Stage-01
+  subscription_id: d57c9855-b4d0-4397-b3de-0fb34d24651e
+- name: FNF_India-Dev-01
+  subscription_id: d77bea34-ccbb-4ac5-9d40-833b0d4ba141
+- name: SL-EXOS-UAT-03
+  subscription_id: d80e8c55-1c42-4228-ae2b-97468b42d541
+- name: SL-EXOS-Development-04
+  subscription_id: dfc0fccd-ee8d-4296-90aa-1e8394347dbe
+- name: Microsoft Azure Enterprise
+  subscription_id: e044d887-0a50-425b-a557-7203908009cb
+- name: LNC-NonProd-01
+  subscription_id: e7ea2e08-f94c-4075-8282-87a0f7dc50a2
+- name: FNF-DirectoryServices-Sandbox-01
+  subscription_id: eae86d70-8d72-4e89-82c8-2b859da50620
+- name: PI-Development-01
+  subscription_id: eb57f75f-19f1-48f2-85d1-dd9d5d6c150d
+- name: LNC-Development-01
+  subscription_id: ef4146ff-bf06-458d-88d2-c32b9829663c
+- name: SL-InfoSec
+  subscription_id: f1743aea-3bf1-4feb-9b59-8059836a5999
+- name: SL-EXOS-QA-01
+  subscription_id: f6b521f0-fb0c-41f1-a236-b3ce273d26eb
+- name: LNC-Prod-01
+  subscription_id: f9ef7c98-5af9-4912-a48a-2880ac1e8176
+
