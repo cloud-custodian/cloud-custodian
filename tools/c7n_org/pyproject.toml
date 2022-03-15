@@ -18,7 +18,7 @@ classifiers=[
 c7n-org = 'c7n_org.cli:cli'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 click = "^8.0"
 
 [tool.poetry.dev-dependencies]

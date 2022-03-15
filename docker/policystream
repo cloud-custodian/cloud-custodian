@@ -1,7 +1,8 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
-FROM ubuntu:20.04 as build-env
+FROM ubuntu:21.10 as build-env
 
+ENV DEBIAN_FRONTEND=noninteractive
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
@@ -37,7 +38,7 @@ RUN . /usr/local/bin/activate && \
 RUN mkdir /output
 
 # Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
+RUN apt-get -y install wget cmake libssl-dev libffi-dev git
 RUN mkdir build && \
     wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \
     cd build && \
@@ -57,16 +58,17 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 #  - as a sanity check to distributing known good assets / we test here
 RUN . /usr/local/bin/activate && pytest -p "no:terraform" tools/c7n_policystream
 
-FROM ubuntu:20.04
+FROM ubuntu:21.10
 
 LABEL name="policystream" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
 COPY --from=build-env /output /output
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get --yes update \
+RUN apt-get --yes update \
         && apt-get --yes install python3 python3-venv --no-install-recommends \
         && rm -Rf /var/cache/apt \
         && rm -Rf /var/lib/apt/lists/* \

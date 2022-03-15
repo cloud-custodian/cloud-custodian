@@ -222,3 +222,17 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")
+
+    def test_filter_securetransport_check(self):
+        factory = self.replay_flight_data("test_efs_filter_check_secure_transport")
+        p = self.load_policy(
+            {
+                "name": "efs-check-securetransport",
+                "resource": "efs",
+                "filters": [{"type": "check-secure-transport"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")

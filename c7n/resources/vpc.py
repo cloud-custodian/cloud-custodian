@@ -5,7 +5,6 @@ import operator
 import zlib
 import jmespath
 import re
-
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
@@ -1080,6 +1079,32 @@ class SGPermission(Filter):
           value: 'default - DO NOT USE'
           op: equal
 
+    By default, this filter matches a security group rule if
+    _all_ of its keys match. Using `match-operator: or` causes a match
+    if _any_ key matches. This can help consolidate some simple
+    cases that would otherwise require multiple filters. To find
+    security groups that allow all inbound traffic over IPv4 or IPv6,
+    for example, we can use two filters inside an `or` block:
+
+    .. code-block:: yaml
+
+      - or:
+        - type: ingress
+          Cidr: "0.0.0.0/0"
+        - type: ingress
+          CidrV6: "::/0"
+
+    or combine them into a single filter:
+
+    .. code-block:: yaml
+
+      - type: ingress
+        match-operator: or
+          Cidr: "0.0.0.0/0"
+          CidrV6: "::/0"
+
+    Note that evaluating _combinations_ of factors (e.g. traffic over
+    port 22 from 0.0.0.0/0) still requires separate filters.
     """
 
     perm_attrs = {
@@ -1271,7 +1296,7 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource['Matched%s' % self.ip_permissions_key] = matched
+            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
             return True
 
 
@@ -1784,7 +1809,7 @@ class TransitGateway(query.QueryResourceManager):
         id_prefix = "tgw-"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
-        cfn_type = 'AWS::EC2::TransitGateway'
+        config_type = cfn_type = 'AWS::EC2::TransitGateway'
 
 
 class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
@@ -2575,3 +2600,111 @@ class Entry(Filter):
                 results.append(r)
                 r[self.match_annotation_key] = matched
         return results
+
+
+@Subnet.action_registry.register('modify')
+class SubnetModifyAtrributes(BaseAction):
+    """Modify subnet attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: turn-on-public-ip-protection
+                resource: aws.subnet
+                filters:
+                  - type: value
+                    key: "MapPublicIpOnLaunch.enabled"
+                    value: false
+                actions:
+                  - type: modify
+                    MapPublicIpOnLaunch: false
+    """
+
+    schema = type_schema(
+        "modify",
+        AssignIpv6AddressOnCreation={'type': 'boolean'},
+        CustomerOwnedIpv4Pool={'type': 'string'},
+        DisableLniAtDeviceIndex={'type': 'boolean'},
+        EnableLniAtDeviceIndex={'type': 'integer'},
+        EnableResourceNameDnsAAAARecordOnLaunch={'type': 'boolean'},
+        EnableResourceNameDnsARecordOnLaunch={'type': 'boolean'},
+        EnableDns64={'type': 'boolean'},
+        MapPublicIpOnLaunch={'type': 'boolean'},
+        MapCustomerOwnedIpOnLaunch={'type': 'boolean'},
+        PrivateDnsHostnameTypeOnLaunch={
+            'type': 'string', 'enum': ['ip-name', 'resource-name']
+        }
+    )
+
+    permissions = ("ec2:ModifySubnetAttribute",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        params = dict(self.data)
+        params.pop('type')
+
+        for k in list(params):
+            if isinstance(params[k], bool):
+                params[k] = {'Value': params[k]}
+
+        for r in resources:
+            self.manager.retry(
+                client.modify_subnet_attribute,
+                SubnetId=r['SubnetId'], **params)
+        return resources
+
+
+@resources.register('mirror-session')
+class TrafficMirrorSession(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
+        name = id = 'TrafficMirrorSessionId'
+        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        arn_type = 'traffic-mirror-session'
+        universal_taggable = object()
+        id_prefix = 'tms-'
+
+
+@TrafficMirrorSession.action_registry.register('delete')
+class DeleteTrafficMirrorSession(BaseAction):
+    """Action to delete traffic mirror session(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: traffic-mirror-session-paclength
+                resource: mirror-session
+                filters:
+                  - type: value
+                    key: tag:Owner
+                    value: xyz
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteTrafficMirrorSession',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_traffic_mirror_session(TrafficMirrorSessionId=r['TrafficMirrorSessionId'])
+
+
+@resources.register('mirror-target')
+class TrafficMirrorTarget(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
+        name = id = 'TrafficMirrorTargetId'
+        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        arn_type = 'traffic-mirror-target'
+        universal_taggable = object()
+        id_prefix = 'tmt-'
