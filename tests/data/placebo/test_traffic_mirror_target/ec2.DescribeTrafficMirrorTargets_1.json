@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrafficMirrorTargets": [
+            {
+                "TrafficMirrorTargetId": "tmt-02cc3955d41358894",
+                "NetworkInterfaceId": "eni-06dd77d6d23aa41e5",
+                "Type": "network-interface",
+                "OwnerId": "644160558196",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "pratyush"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
