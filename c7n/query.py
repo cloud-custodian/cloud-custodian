@@ -441,6 +441,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     retry = staticmethod(
         get_retry((
+            'TooManyRequestsException',
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
