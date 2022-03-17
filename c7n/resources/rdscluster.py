@@ -617,39 +617,33 @@ class ConsecutiveSnapshots(Filter):
                 filters:
                   - type: consecutive-snapshots
                     days: 7
-                    exclude_engine: ["postgres"]
     """
     schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
-     exclude_engine={'type': 'array', 'items': {'type': 'string'}}, required=['days'])
+        required=['days'])
     permissions = ('rds:DescribeDBClusterSnapshots', 'rds:DescribeDBClusters')
 
-    def enhance_resources(self, resources):
-        exclude_engine = self.data.get('exclude_engine', [])
+    def augment(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
-        results = []
 
         for resource in resources:
-            if resource['Engine'] not in exclude_engine:
-                response = client.describe_db_cluster_snapshots(
-                    DBClusterIdentifier=resource['DBClusterIdentifier'])
-                resource.update({'DBClusterSnapshots': response['DBClusterSnapshots']})
-                results.append(resource)
-        return results
+            response = client.describe_db_cluster_snapshots(
+                DBClusterIdentifier=resource['DBClusterIdentifier'])
+            resource.update({'c7n:DBClusterSnapshots': response['DBClusterSnapshots']})
 
     def process(self, resources, event=None):
         results = []
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
         expectedDates = []
-        for i in range(retention):
-            days = i + 1
+        for days in range(1, retention + 1):
             expectedDates.append((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
 
-        for resource in self.enhance_resources(resources):
-            if not resource.get('DBClusterSnapshots'):
+        self.augment(resources)
+        for resource in resources:
+            if not resource.get('c7n:DBClusterSnapshots'):
                 continue
             snapshot_dates = []
-            for snapshot in resource['DBClusterSnapshots']:
+            for snapshot in resource['c7n:DBClusterSnapshots']:
                 if snapshot['Status'] == 'available':
                     snapshot_dates.append(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
             if set(expectedDates).issubset(snapshot_dates):
