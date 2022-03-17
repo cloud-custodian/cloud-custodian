@@ -166,12 +166,12 @@ class SlackDelivery:
         if key.startswith('https://hooks.slack.com/'):
             response = requests.post(
                 url=key,
-                data=message_payload,
-                headers={'Content-Type': 'application/json'})
+                data=message_payload.encode('utf-8'),
+                headers={'Content-Type': 'application/json;charset=utf-8'})
         else:
             response = requests.post(
                 url='https://slack.com/api/chat.postMessage',
-                data=message_payload,
+                data=message_payload.encode('utf-8'),
                 headers={'Content-Type': 'application/json;charset=utf-8',
                          'Authorization': 'Bearer %s' % self.config.get('slack_token')})
 
