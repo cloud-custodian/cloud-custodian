@@ -43,7 +43,7 @@ class ServiceQuota(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'service-quotas'
         permission_prefix = 'servicequotas'
-        enum_spec = ('list_services', 'Services', None)
+        enum_spec = ('list_services', 'Services', {'MaxResults': 100})
         id = 'QuotaCode'
         arn = 'QuotaArn'
         name = 'QuotaName'
