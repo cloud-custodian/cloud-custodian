@@ -80,7 +80,7 @@ class ServiceQuota(QueryResourceManager):
             return quotas.values()
 
         results = []
-        # NOTE TooManyRequestsException errors are reported in us-east-1 often 
+        # NOTE TooManyRequestsException errors are reported in us-east-1 often
         # when calling the ListServiceQuotas operation
         # set the max_workers to 1 instead of self.max_workers to slow down the rate
         with self.executor_factory(max_workers=1) as w:
