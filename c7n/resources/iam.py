@@ -435,6 +435,7 @@ class InstanceProfile(QueryResourceManager):
         service = 'iam'
         arn_type = 'instance-profile'
         enum_spec = ('list_instance_profiles', 'InstanceProfiles', None)
+        detail_spec = ('get_instance_profile', 'InstanceProfileName', 'InstanceProfileName', 'InstanceProfile')
         name = id = 'InstanceProfileName'
         date = 'CreateDate'
         # Denotes this resource type exists across regions
