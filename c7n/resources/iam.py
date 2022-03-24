@@ -442,6 +442,9 @@ class InstanceProfile(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @resources.register('iam-certificate')
