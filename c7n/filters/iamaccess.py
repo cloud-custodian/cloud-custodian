@@ -26,7 +26,6 @@ References
 import fnmatch
 import logging
 import json
-import copy
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
