@@ -415,3 +415,14 @@ class OtherTests(unittest.TestCase):
         session_mock.get_session_for_resource.return_value = session_mock
 
         self.assertEqual(utils.kms_decrypt(config, Mock(), session_mock, 'test'), config['test'])
+        
+    def test_kms_decrypt_base64_decode_error_logging(self):
+        
+        logger = logging.getLogger('c7n_mailer.utils.email')
+        
+        config = {'test': {'secret': 'mysecretpassword'}}
+        session_mock = Mock()
+        
+        with self.assertLogs() as lc:
+            utils.kms_decrypt(config, logger, session_mock, 'test')
+        self.assertIn('If plaintext was your intention, you can ignore this error.', lc.output[0])
