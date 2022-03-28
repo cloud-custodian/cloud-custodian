@@ -29,5 +29,45 @@
 	}
       }
     ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-AWS-Federated",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole",
+          "sts:AssumeRoleWithSAML"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com",
+          "AWS": [ "111111111111" ],
+          "Federated": [
+            "arn:aws:iam::234567890123:saml-provider/my-provider",
+            "cognito-identity.amazonaws.com"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-Federated",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole",
+          "sts:AssumeRoleWithSAML"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com",
+          "Federated": [
+            "cognito-identity.amazonaws.com"
+          ]
+        }
+      }
+    ]
   }
 ]

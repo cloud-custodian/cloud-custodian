@@ -1942,9 +1942,14 @@ class CrossAccountChecker(TestCase):
     def test_iam_policies(self):
         policies = load_data("iam/iam-policies.json")
 
-        checker = PolicyChecker({})
+        checker = PolicyChecker({
+            "allowed_accounts": [
+                "111111111111",
+                "cognito-identity.amazonaws.com",
+            ]
+        })
         for p, expected in zip(
-            policies, [False, True]
+            policies, [False, True, True, False]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
