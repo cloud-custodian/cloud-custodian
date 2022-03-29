@@ -867,6 +867,19 @@ class RDSTest(BaseTest):
         db_info = client.describe_db_instances(DBInstanceIdentifier="database-4")
         self.assertTrue(db_info["DBInstances"][0]["PerformanceInsightsEnabled"])
 
+    def test_rds_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rds_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-count-filter",
+                "resource": "rds",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSSnapshotTest(BaseTest):
 

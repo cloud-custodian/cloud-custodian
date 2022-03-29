@@ -3,9 +3,10 @@
 import logging
 
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -599,3 +600,52 @@ class RDSClusterSnapshotDelete(BaseAction):
             except (client.exceptions.DBSnapshotNotFoundFault,
                     client.exceptions.InvalidDBSnapshotStateFault):
                 continue
+
+
+@RDSCluster.filter_registry.register('consecutive-snapshots')
+class ConsecutiveSnapshots(Filter):
+    """Returns RDS clusters where number of consective daily snapshots is equal to/or greater
+     than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rdscluster-daily-snapshot-count
+                resource: rds-cluster
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('rds:DescribeDBClusterSnapshots', 'rds:DescribeDBClusters')
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        for resource in resources:
+            response = client.describe_db_cluster_snapshots(
+                DBClusterIdentifier=resource['DBClusterIdentifier'])
+            resource.update({'c7n:DBClusterSnapshots': response['DBClusterSnapshots']})
+
+    def process(self, resources, event=None):
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expectedDates = []
+        for days in range(1, retention + 1):
+            expectedDates.append((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        self.augment(resources)
+        for resource in resources:
+            if not resource.get('c7n:DBClusterSnapshots'):
+                continue
+            snapshot_dates = []
+            for snapshot in resource['c7n:DBClusterSnapshots']:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.append(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if set(expectedDates).issubset(snapshot_dates):
+                results.append(resource)
+        return results

@@ -424,6 +424,19 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
 
+    def test_rdscluster_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rdscluster_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster-snapshot-count-filter",
+                "resource": "rds-cluster",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSClusterSnapshotTest(BaseTest):
 
