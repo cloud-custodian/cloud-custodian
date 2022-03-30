@@ -31,7 +31,6 @@ Find rds instances that are not encrypted
            op: ne
 
 """
-from __future__ import annotations
 import functools
 import itertools
 import logging
@@ -1855,7 +1854,7 @@ class ConsecutiveSnapshots(Filter):
         for snapshot in db_snapshots:
             if snapshot['DBInstanceIdentifier'] not in inst_map:
                 inst_map[snapshot['DBInstanceIdentifier']] = []
-            inst_map[snapshot['DBInstanceIdentifier']].append(snapshot)
+            inst_map.setdefault(snapshot['DBInstanceIdentifier']).append(snapshot)
         for r in resources:
             r[self.annotation] = inst_map.get(r['DBInstanceIdentifier'], [])
 
@@ -1873,10 +1872,10 @@ class ConsecutiveSnapshots(Filter):
             self.process_resource_set(client, resource_set)
 
         for r in resources:
-            snapshot_dates = []
+            snapshot_dates = set()
             for snapshot in r[self.annotation]:
                 if snapshot['Status'] == 'available':
-                    snapshot_dates.append(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
-            if set(expected_dates).issubset(snapshot_dates):
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results

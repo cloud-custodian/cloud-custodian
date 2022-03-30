@@ -628,7 +628,7 @@ class ConsecutiveSnapshots(Filter):
         rds_clusters = [r['DBClusterIdentifier'] for r in resources]
         paginator = client.get_paginator('describe_db_cluster_snapshots')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        cluster_snapshots = paginator.paginate(Filters=[{'Name': 'db-instance-id',
+        cluster_snapshots = paginator.paginate(Filters=[{'Name': 'db-cluster-id',
           'Values': rds_clusters}]).build_full_result().get('DBClusterSnapshots', [])
 
         cluster_map = {}
@@ -653,10 +653,10 @@ class ConsecutiveSnapshots(Filter):
             self.process_resource_set(client, resource_set)
 
         for r in resources:
-            snapshot_dates = []
+            snapshot_dates = set()
             for snapshot in r[self.annotation]:
                 if snapshot['Status'] == 'available':
-                    snapshot_dates.append(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
-            if set(expected_dates).issubset(snapshot_dates):
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results
