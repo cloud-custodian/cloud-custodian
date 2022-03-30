@@ -633,9 +633,7 @@ class ConsecutiveSnapshots(Filter):
 
         cluster_map = {}
         for snapshot in cluster_snapshots:
-            if snapshot['DBClusterIdentifier'] not in cluster_map:
-                cluster_map[snapshot['DBClusterIdentifier']] = []
-            cluster_map[snapshot['DBClusterIdentifier']].append(snapshot)
+            cluster_map.setdefault(snapshot['DBClusterIdentifier'], []).append(snapshot)
         for r in resources:
             r[self.annotation] = cluster_map.get(r['DBClusterIdentifier'], [])
 

@@ -1852,9 +1852,7 @@ class ConsecutiveSnapshots(Filter):
 
         inst_map = {}
         for snapshot in db_snapshots:
-            if snapshot['DBInstanceIdentifier'] not in inst_map:
-                inst_map[snapshot['DBInstanceIdentifier']] = []
-            inst_map.setdefault(snapshot['DBInstanceIdentifier']).append(snapshot)
+            inst_map.setdefault(snapshot['DBInstanceIdentifier'], []).append(snapshot)
         for r in resources:
             r[self.annotation] = inst_map.get(r['DBInstanceIdentifier'], [])
 
