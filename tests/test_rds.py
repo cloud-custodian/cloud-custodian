@@ -878,7 +878,7 @@ class RDSTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
 
 class RDSSnapshotTest(BaseTest):
