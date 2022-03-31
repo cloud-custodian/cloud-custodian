@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
-from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -10,14 +9,18 @@ import time
 import uuid
 from collections import OrderedDict
 
-from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest, event_data
-
+import c7n.resources.rds
+from botocore.exceptions import ClientError
+from c7n import tags
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rds
-from c7n import tags
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+from dateutil import tz as tzutil
+
+from .common import BaseTest, event_data
 
 logger = logging.getLogger(name="c7n.tests")
 
@@ -877,8 +880,9 @@ class RDSTest(BaseTest):
             },
             session_factory=factory,
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class RDSSnapshotTest(BaseTest):
