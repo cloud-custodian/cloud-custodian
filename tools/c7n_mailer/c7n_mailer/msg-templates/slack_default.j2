@@ -1,3 +1,63 @@
+{# You can set any mandatory tags here, and they will be formatted/outputted in the message #}
+{% set requiredTags = ['Application','Owner'] %}
+{% set expireDays = 90 %}
+
+{# The macros below format some resource attributes for better presentation #}
+{%- macro getTag(resource, tagKey) -%}
+  {%- if resource.get('Tags') -%}
+    {%- for t in resource.get('Tags') -%}
+      {%-  if t.get('Key') == tagKey -%}
+        {{ t.get('Value') }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endmacro -%}
+
+{% macro columnData(resources, columnNames) -%}
+  {%- for resource in resources %}
+    {%- for columnName in columnNames -%}
+    {% set inner_loop = loop %}
+      {%- if columnName in requiredTags -%}
+        {%- set value = getTag(resource,columnName) -%}
+      {%- elif columnName == 'tag.Name' -%}
+        {%- set value = getTag(resource,'Name') -%}
+      {%- elif columnName == 'InstanceCount' -%}
+        {%- set value = resource['Instances'] | length -%}
+      {%- elif columnName == 'AccessKeys:RemainDays' -%}
+        {%- set combinedkeys = dict() -%}
+        {%- for accesskeydet in resource['c7n:AccessKeys'] -%}
+          {%- set accesskeyid = accesskeydet['AccessKeyId'] -%}
+          {%- set remaindays = ( expireDays - (accesskeydet['CreateDate'] | get_date_age)) -%}
+          {%- set _dummy = combinedkeys.update({ accesskeyid:remaindays }) -%}
+        {%- endfor -%}
+        {%- set value = combinedkeys -%}
+      {%- elif columnName == 'RoleLastUsed' -%}
+        {%- if resource['RoleLastUsed'].get('LastUsedDate') -%}
+          {%- set value = resource['RoleLastUsed'].get('LastUsedDate')  + ' (Last used ' ~ (resource['RoleLastUsed'].get('LastUsedDate')  | get_date_age)  + ' days ago)' -%}
+        {%- else -%}
+          {%- set value = "Never used -" + ' (Created ' ~ (resource['CreateDate'] | get_date_age)  + ' days ago)' -%}
+        {%- endif -%}
+      {%- elif columnName == 'PublicIp' -%}
+        {%- set value = resource['NetworkInterfaces'][0].get('Association')['PublicIp'] -%}
+      {%- elif columnName == 'PublicIpAddress' -%}
+        {%- set value = resource['PublicIp'] -%}
+      {%- else -%}
+        {% set value = resource[columnName] %}
+      {%- endif -%}
+      {%- if  inner_loop.index == 1 -%}
+        {{"\n"}}*- {{ columnName }}*: {{ value }}
+      {%- else %}
+    {{"\n     "}}*{{ columnName }}*: {{ value }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{% endmacro %}
+
+{# Main #}
+{%- macro createTable(columnNames, resources) -%}
+  {{ columnData(resources, columnNames) }}
+{%- endmacro -%}
+
 {
    "attachments":[
       {
@@ -7,9 +67,138 @@
          "fields":[
             {
                "title":"Resources",
-               "value":"{%- for resource in resources -%}
-                        {{ format_resource(resource, policy['resource']) | replace('\\"', '"') | replace('"', '\\"') }}\n
-                        {%- endfor -%}"
+               "value":"{% if policy['resource'] == "ami" %}
+				{% set columnNames = ['Name','ImageId','CreationDate'] %}
+				{{ createTable(columnNames, resources) }}				
+		  				
+		        {% elif policy['resource'] == "app-elb" %}
+		          	{% set columnNames = ['LoadBalancerName','CreatedTime','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}					  				
+		        							
+		        {% elif policy['resource'] == "asg" %}
+		        	{% if resources[0]['Invalid'] is defined %}
+		          		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Invalid'] %}
+		          	{% else %}
+		          		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Application','Owner'] %}
+		          	{% endif %}
+		        	{{ createTable(columnNames, resources) }}			  				
+		        	    	
+		        {% elif policy['resource'] == "cache-cluster" %}
+		          	{% set columnNames = ['CacheClusterId','CacheClusterCreateTime','CacheClusterStatus','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}			  				  										  				
+
+		        {% elif policy['resource'] == "cache-snapshot" %}
+		        	{% set columnNames = ['SnapshotName','CacheClusterId','SnapshotSource','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}			  	
+
+		        {% elif policy['resource'] == "cfn" %}
+		        	{% set columnNames = ['StackName'] %}
+		        	{{ createTable(columnNames, resources) }}			     	
+		        	
+		        {% elif policy['resource'] == "cloudsearch" %}
+		        	{% set columnNames = ['DomainName'] %}
+		        	{{ createTable(columnNames, resources) }}		    								    	
+		        	
+		        {% elif policy['resource'] == "ebs" %}
+		        	{% set columnNames = ['VolumeId','CreateTime','State','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}		 
+		        	
+		        {% elif policy['resource'] == "ebs-snapshot" %}
+		        	{% set columnNames = ['SnapshotId','StartTime','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}			     		
+		        	
+		        {% elif policy['resource'] == "ec2" %}
+		        	{% if resources[0]['MatchedFilters'] == ['PublicIpAddress'] %}
+		        		{% set columnNames = ['tag.Name','PublicIp','InstanceId'] %}
+		        	{% else %}
+		        		{% set columnNames = ['tag.Name','PrivateIpAddress','InstanceId','ImageId','Application','Owner'] %}
+		        	{% endif %}
+		        	{{ createTable(columnNames, resources) }}					   
+		        	
+		        {% elif policy['resource'] == "efs" %}
+		        	{% set columnNames = ['CreationToken','CreationTime','FileSystemId','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}		
+		        	  				
+		        {% elif policy['resource'] == "elasticsearch" %}
+		        	{% set columnNames = ['DomainName','Endpoint'] %}
+		        	{{ createTable(columnNames, resources) }}		
+		        	  				
+		        {% elif policy['resource'] == "elb" %}
+	    	        {% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','Application','Owner'] %}	    		
+		        	{{ createTable(columnNames, resources) }}			  
+
+		        {% elif policy['resource'] == "emr" %}
+		        	{% set columnNames = ['Id','EmrState'] %}
+		        	{{ createTable(columnNames, resources) }}					
+
+  	       		{% elif policy['resource'] == "iam-user" %}
+    		        	{% set columnNames = ['UserName','AccessKeys:RemainDays','Application','CreateDate','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}					
+
+  	       		{% elif policy['resource'] == "iam-role" %}
+    		        	{% set columnNames = ['RoleName','RoleLastUsed','Application','CreateDate','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}					
+
+		        {% elif policy['resource'] == "kinesis" %}
+		        	{% set columnNames = ['StreamName'] %}
+		        	{{ createTable(columnNames, resources) }}						
+
+		        {% elif policy['resource'] == "launch-config" %}
+		            {% set columnNames = ['LaunchConfigurationName'] %}
+		        	{{ createTable(columnNames, resources) }}		
+
+		        {% elif policy['resource'] == "log-group" %}
+		        	{% set columnNames = ['logGroupName'] %}
+		        	{{ createTable(columnNames, resources) }}			  				  				  	
+		        	
+		        {% elif policy['resource'] == "rds" %}
+		        	{% if resources[0]['PubliclyAccessible'] == true or resources[0]['StorageEncrypted'] == false %}
+		        		{% set columnNames = ['DBInstanceIdentifier','PubliclyAccessible','StorageEncrypted','DBSubnetGroup'] %}
+		        	{% else %}
+		        		{% set columnNames = ['DBInstanceIdentifier','Application','Owner'] %}
+		        	{% endif %}				
+		        	{{ createTable(columnNames, resources) }}	
+		        				
+		        {% elif policy['resource'] == "rds-snapshot" %}
+		        	{% set columnNames = ['DBSnapshotIdentifier','SnapshotCreateTime','DBInstanceIdentifier','SnapshotType','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }}				
+
+		        {% elif policy['resource'] == "redshift" %}
+		        	{% if resources[0]['PubliclyAccessible'] == true or resources[0]['Encrypted'] == false %}
+		        		{% set columnNames = ['ClusterIdentifier','NodeCount','PubliclyAccessible','Encrypted'] %}
+		        	{% else %}
+		        		{% set columnNames = ['ClusterIdentifier','NodeCount','Application','Owner'] %}
+		        	{% endif %}
+		        	{{ createTable(columnNames, resources) }}
+		        		  				
+		        {% elif policy['resource'] == "redshift-snapshot" %}
+		        	{% set columnNames = ['SnapshotIdentifier','DBName','Application','Owner'] %}
+		        	{{ createTable(columnNames, resources) }} 					  				
+		        			
+		        {% elif policy['resource'] == "s3" %}
+		        	{% if resources[0]['GlobalPermissions'] is defined %}
+		        	 	{% set columnNames = ['Name','GlobalPermissions'] %}
+		        	{% else %}
+		        		{% set columnNames = ['Name','Application','Owner'] %}
+		        	{% endif %}
+		        	{{ createTable(columnNames, resources) }} 										  								
+
+		        {% elif policy['resource'] == "security-group" %}
+		        	{% set columnNames = ['GroupName','tag.Name','GroupId','VpcId'] %}
+		        	{{ createTable(columnNames, resources) }}
+		        {% elif policy['resource'] == "iam-role" %}
+                                {% set columnNames = ['RoleName','CreateDate','Arn'] %}
+                                {{ createTable(columnNames, resources) }}
+		        	
+		        {% elif policy['resource'] == "simpledb" %}
+		        	{% set columnNames = ['DomainName'] %}
+		        	{{ createTable(columnNames, resources) }}	
+	                {% else %}
+	                  	{% set columnNames = resources[0].keys() %}
+	                  	{{ createTable(columnNames, resources) }}
+	                {% endif %}"
+	
+
             },
             {
                "title":"Account",

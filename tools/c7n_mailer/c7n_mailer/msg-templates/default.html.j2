@@ -30,6 +30,7 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 
 {# You can set any mandatory tags here, and they will be formatted/outputted in the message #}
 {% set requiredTags = ['Application','Owner'] %}
+{% set expireDays = 90 %}
 
 {# The macros below format some resource attributes for better presentation #}
 {% macro getTag(resource, tagKey) -%}
@@ -40,12 +41,6 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 			{% endif %}
 		{% endfor %}
 	{% endif %}
-{%- endmacro %}
-
-{% macro extractList(resource, column) -%}
-		{% for p in resource.get(column) %}
-			{{ p }},
-		{% endfor %}
 {%- endmacro %}
 	
 {% macro columnHeading(columnNames, tableWidth) -%}
@@ -68,6 +63,21 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 				<td>{{ getTag(resource,'Name') }}</td>
 			{% elif columnName == 'InstanceCount' %}
 				<td align="center">{{ resource['Instances'] | length }}</td>		
+                        {% elif columnName == 'AccessKeys:RemainDays' %}
+                          {% set combinedkeys = dict() %}
+                          {% for accesskeydet in resource['c7n:AccessKeys'] %}
+                            {% set accesskeyid = accesskeydet['AccessKeyId'] %}
+                            {% set remaindays = ( expireDays - (accesskeydet['CreateDate'] | get_date_age)) %}
+                            {% set _dummy = combinedkeys.update({ accesskeyid:remaindays }) %}
+                          {% endfor %}
+                          <td>{{ combinedkeys }}</td>
+                        {% elif columnName == 'RoleLastUsed' %}
+                          {% if resource['RoleLastUsed'].get('LastUsedDate') %}
+                            {% set last_used_status = resource['RoleLastUsed'].get('LastUsedDate')  + ' (Last used ' ~ (resource['RoleLastUsed'].get('LastUsedDate')  | get_date_age)  + ' days ago)' %}
+                          {% else %}
+                            {% set last_used_status = "Never used -" + ' (Created ' ~ (resource['CreateDate'] | get_date_age)  + ' days ago)' %}
+                          {% endif %}
+                          <td>{{ last_used_status }}</td>
 			{% elif columnName == 'VolumeConsumedReadWriteOps' %}
 				<td>{{ resource['c7n.metrics']['AWS/EBS.VolumeConsumedReadWriteOps.Maximum'][0]['Maximum'] }}</td>
 			{% elif columnName == 'PublicIp' %}
@@ -184,7 +194,7 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 			{{ createTable(columnNames, resources, '80') }}					   
 			
 		{% elif policy['resource'] == "efs" %}
-			{% set columnNames = ['CreationToken','CreationTime','FileSystemId','OwnerId'] %}
+			{% set columnNames = ['CreationToken','CreationTime','FileSystemId','Owner'] %}
 			{{ createTable(columnNames, resources, '50') }}		
 			  				
 		{% elif policy['resource'] == "elasticsearch" %}
@@ -198,6 +208,14 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 		{% elif policy['resource'] == "emr" %}
 			{% set columnNames = ['Id','EmrState'] %}
 			{{ createTable(columnNames, resources, '50') }}					
+
+  	       {% elif policy['resource'] == "iam-user" %}
+    			{% set columnNames = ['UserName','AccessKeys:RemainDays','Application','CreateDate','Owner'] %}
+			{{ createTable(columnNames, resources, '80') }}					
+
+  	       {% elif policy['resource'] == "iam-role" %}
+    			{% set columnNames = ['RoleName','RoleLastUsed','Application','CreateDate','Owner'] %}
+			{{ createTable(columnNames, resources, '80') }}					
 
 		{% elif policy['resource'] == "kinesis" %}
 			{% set columnNames = ['StreamName'] %}
