@@ -13,12 +13,32 @@ import toml
 from pathlib import Path
 
 
+def envbool(value):
+    if not value:
+        return False
+    value = value.lower()
+    if value == 'true':
+        return True
+    elif value == 'yes':
+        return True
+    return False
+
+
+POETRY_DEBUG = envbool(os.environ.get('POETRY_DEBUG'))
+
+
 @click.group()
 def cli():
     """Custodian Python Packaging Utility
 
     some simple tooling to sync poetry files to setup/pip
     """
+
+    # if we're using poetry from git, have a flag to prevent the user installed
+    # one from getting precedence.
+    if POETRY_DEBUG:
+        return
+
     # If there is a global installation of poetry, prefer that.
     poetry_python_lib = Path(os.path.expanduser('~/.poetry/lib'))
     if poetry_python_lib.exists():
@@ -198,18 +218,23 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
 
 def locked_deps(package, poetry, exclude=(), remove=()):
     reqs = []
-    packages = poetry.locker.locked_repository(False).packages
+    deps = poetry.locker.get_project_dependency_packages(
+        project_requires=package.all_requires,
+        dev=False, extras=[])
 
     project_deps = {r.name: r for r in poetry.package.requires}
-    for p in packages:
-        if p.name in exclude:
+    for dep_pkg in deps:
+        p = dep_pkg.package
+        d = dep_pkg.dependency
+
+        if p.name in exclude and p.name in project_deps:
             reqs.append(project_deps[p.name].to_pep_508())
             continue
         if p.name in remove:
             continue
-        dep = p.to_dependency()
+
         line = "{}=={}".format(p.name, p.version)
-        requirement = dep.to_pep_508()
+        requirement = d.to_pep_508(with_extras=False)
         if ';' in requirement:
             line += "; {}".format(requirement.split(";")[1].strip())
         reqs.append(line)

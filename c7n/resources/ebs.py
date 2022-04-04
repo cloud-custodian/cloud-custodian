@@ -1332,7 +1332,8 @@ class CreateSnapshot(BaseAction):
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
-           'tags': {'type': 'object'}})
+           'tags': {'type': 'object'},
+           'description': {'type': 'string'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1352,8 +1353,16 @@ class CreateSnapshot(BaseAction):
             retry(self.process_volume, client=client, volume=vol_id, tags=tags)
 
     def process_volume(self, client, volume, tags):
+        description = self.data.get('description')
+        if not description:
+            description = "Automated snapshot by c7n - %s" % (self.manager.ctx.policy.name)
+
         try:
-            client.create_snapshot(VolumeId=volume, TagSpecifications=tags)
+            client.create_snapshot(
+                VolumeId=volume,
+                Description=description,
+                TagSpecifications=tags
+            )
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
                 return
