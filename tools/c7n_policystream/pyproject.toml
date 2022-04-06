@@ -23,7 +23,7 @@ python = "^3.7"
 click = "^8.0"
 requests = "^2.22.0"
 pyyaml = ">=5.4.0"
-pygit2 = "~1.7"
+pygit2 = "~1.9"
 boto3 = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
