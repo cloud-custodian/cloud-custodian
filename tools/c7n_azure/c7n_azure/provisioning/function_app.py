@@ -49,6 +49,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         # consumption app plan
         if params['is_consumption_plan']:
             functionapp_def.kind = 'functionapp,linux'
+            site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
         # dedicated app plan
         else:
             functionapp_def.kind = 'functionapp,linux,container'

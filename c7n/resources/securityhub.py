@@ -15,7 +15,7 @@ from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
-    local_session, type_schema,
+    local_session, type_schema, get_retry,
     chunks, dumps, filter_empty, get_partition
 )
 from c7n.version import version
@@ -56,7 +56,8 @@ class SecurityHubFindingFilter(Filter):
             if resource.get("InstanceId"):
                 params['ResourceId'].append(
                     {"Value": resource["InstanceId"], "Comparison": "EQUALS"})
-            findings = client.get_findings(Filters=params).get("Findings")
+            retry = get_retry(('TooManyRequestsException'))
+            findings = retry(client.get_findings, Filters=params).get("Findings")
             if len(findings) > 0:
                 resource[self.annotation_key] = findings
                 found.append(resource)

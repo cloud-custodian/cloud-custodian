@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
-from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -10,14 +9,18 @@ import time
 import uuid
 from collections import OrderedDict
 
-from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest, event_data
-
+import c7n.resources.rds
+from botocore.exceptions import ClientError
+from c7n import tags
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rds
-from c7n import tags
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+from dateutil import tz as tzutil
+
+from .common import BaseTest, event_data
 
 logger = logging.getLogger(name="c7n.tests")
 
@@ -866,6 +869,20 @@ class RDSTest(BaseTest):
         client = session_factory().client("rds")
         db_info = client.describe_db_instances(DBInstanceIdentifier="database-4")
         self.assertTrue(db_info["DBInstances"][0]["PerformanceInsightsEnabled"])
+
+    def test_rds_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rds_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-count-filter",
+                "resource": "rds",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class RDSSnapshotTest(BaseTest):

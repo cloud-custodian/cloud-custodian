@@ -4,28 +4,38 @@
         "LoadBalancerDescriptions": [
             {
                 "LoadBalancerName": "test-elb",
-                "DNSName": "test-elb-505592940.us-east-1.elb.amazonaws.com",
-                "CanonicalHostedZoneName": "test-elb-505592940.us-east-1.elb.amazonaws.com",
+                "DNSName": "test-elb-798013825.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneName": "test-elb-798013825.us-east-1.elb.amazonaws.com",
                 "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K",
                 "ListenerDescriptions": [
                     {
                         "Listener": {
                             "Protocol": "HTTPS",
                             "LoadBalancerPort": 443,
-                            "InstanceProtocol": "HTTPS",
-                            "InstancePort": 443,
+                            "InstanceProtocol": "HTTP",
+                            "InstancePort": 80,
                             "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/80d45f1f-e9b3-4e46-8118-8504079d27b3"
                         },
                         "PolicyNames": [
-                            "AWSConsole-SSLNegotiationPolicy-test-elb-1646765145761"
+                            "testpolicy-1493768308000"
                         ]
+                    },
+                    {
+                        "Listener": {
+                            "Protocol": "HTTP",
+                            "LoadBalancerPort": 80,
+                            "InstanceProtocol": "HTTP",
+                            "InstancePort": 80
+                        },
+                        "PolicyNames": []
                     }
                 ],
                 "Policies": {
                     "AppCookieStickinessPolicies": [],
                     "LBCookieStickinessPolicies": [],
                     "OtherPolicies": [
-                        "AWSConsole-SSLNegotiationPolicy-test-elb-1646765145761",
+                        "testpolicy-1493768308000",
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1646121490434",
                         "ELBSecurityPolicy-2016-08"
                     ]
                 },
@@ -43,7 +53,7 @@
                 "VPCId": "vpc-052db4896ba2ce07e",
                 "Instances": [],
                 "HealthCheck": {
-                    "Target": "HTTPS:443/index.html",
+                    "Target": "HTTP:80/index.html",
                     "Interval": 30,
                     "Timeout": 5,
                     "UnhealthyThreshold": 2,
@@ -60,11 +70,11 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 3,
-                    "day": 8,
-                    "hour": 18,
-                    "minute": 45,
-                    "second": 44,
-                    "microsecond": 350000
+                    "day": 1,
+                    "hour": 7,
+                    "minute": 58,
+                    "second": 8,
+                    "microsecond": 990000
                 },
                 "Scheme": "internet-facing"
             }
