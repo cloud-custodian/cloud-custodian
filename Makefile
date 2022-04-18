@@ -33,8 +33,9 @@ pkg-rebase:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add requirements.txt && cd ../..; done
 
 pkg-update:
+	# Update subproject lock files first, then update the root project
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update --lock && cd ../..; done
 	poetry update
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update && cd ../..; done
 
 pkg-show-update:
 	poetry show -o
