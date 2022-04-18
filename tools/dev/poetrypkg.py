@@ -143,8 +143,13 @@ def gen_setup(package_dir):
             resolve_source_deps(poetry, package, reqs)
             return reqs, default
 
-    builder = SourceDevBuilder(poetry, None, None)
-    setup_content = builder.build_setup()
+    # Use Poetry's default logic when building a setup.py for the top-level project,
+    # since its dev-dependencies are subprojects. 
+    #
+    # For other projects, resolve editable dev dependencies and bake them into
+    # the generated setup.py
+    builder = sdist.SdistBuilder if poetry.package.name == 'c7n' else SourceDevBuilder
+    setup_content = builder(poetry, None, None).build_setup()
 
     with open(os.path.join(package_dir, 'setup.py'), 'wb') as fh:
         fh.write(b'# Automatically generated from poetry/pyproject.toml\n')
