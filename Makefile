@@ -1,4 +1,5 @@
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
+POETRYPKG := poetry run python $(CURDIR)/tools/dev/poetrypkg.py
 PKG_REPO = testpypi
 PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc
 
@@ -40,12 +41,12 @@ pkg-show-update:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
 
 pkg-freeze-setup:
-	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg; done
+	$(POETRYPKG) gen-frozensetup -p .
+	for pkg in $(PKG_SET); do $(POETRYPKG) gen-frozensetup -p $$pkg; done
 
 pkg-gen-setup:
-	python3 tools/dev/poetrypkg.py gen-setup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-setup -p $$pkg; done
+	$(POETRYPKG) gen-setup -p .
+	for pkg in $(PKG_SET); do $(POETRYPKG) gen-setup -p $$pkg; done
 
 pkg-gen-requirements:
 # we have todo without hashes due to https://github.com/pypa/pip/issues/4995
@@ -58,7 +59,7 @@ pkg-increment:
 	for pkg in $(PKG_SET); do cd $$pkg && poetry version patch && cd ../..; done
 # generate setup
 	@$(MAKE) pkg-gen-setup
-	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+	$(POETRYPKG) gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
 # azure pin uses ancient wheel version, upgrade first
