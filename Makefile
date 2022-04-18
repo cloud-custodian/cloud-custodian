@@ -61,21 +61,24 @@ pkg-increment:
 	@$(MAKE) pkg-gen-setup
 	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
-pkg-publish-wheel:
+pkg-build-wheel:
 # azure pin uses ancient wheel version, upgrade first
-	pip install -U wheel
+	poetry run pip install -U wheel
 # clean up any artifacts first
 	rm -f dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 # generate sdist
-	python setup.py bdist_wheel
-	for pkg in $(PKG_SET); do cd $$pkg && python setup.py bdist_wheel && cd ../..; done
-# check wheel
-	twine check dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine check dist/* && cd ../..; done
+	poetry run python setup.py bdist_wheel
+	for pkg in $(PKG_SET); do cd $$pkg && poetry run python setup.py bdist_wheel && cd ../..; done
+# check wheels
+	poetry run twine check dist/*
+	for pkg in $(PKG_SET); do poetry run twine check $$pkg/dist/*; done
+
+pkg-publish-wheel:
+	@$(MAKE) -f $(SELF_MAKE) pkg-build-wheel
 # upload to test pypi
-	twine upload -r $(PKG_REPO) dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
+	poetry run twine upload -r $(PKG_REPO) dist/*
+	for pkg in $(PKG_SET); do twine upload -r $(PKG_REPO) $$pkg/dist/*; done
 
 test-poetry:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
