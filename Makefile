@@ -50,7 +50,7 @@ pkg-gen-setup:
 
 pkg-gen-requirements:
 # we have todo without hashes due to https://github.com/pypa/pip/issues/4995
-	poetry export --dev --without-hashes -f requirements.txt > requirements.txt
+	poetry export --without-hashes -f requirements.txt > requirements.txt
 	for pkg in $(PKG_SET); do cd $$pkg && poetry export --without-hashes -f requirements.txt > requirements.txt && cd ../..; done
 
 pkg-increment:
