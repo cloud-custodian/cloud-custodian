@@ -8,7 +8,6 @@ install:
 
 install-poetry:
 	poetry install
-	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install && cd ../..; done
 
 pkg-rebase:
 	rm -f poetry.lock
