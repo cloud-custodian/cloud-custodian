@@ -207,6 +207,8 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
         dep = source_deps.pop()
         if dep not in dep_map:
             dep = dep.replace('_', '-')
+        if dep not in dep_map:
+            dep = dep.lower()
         version = dep_map[dep]['version']
         reqs.append(Dependency(dep, '{}{}'.format(prefix, version)).to_pep_508())
         for cdep, cversion in dep_map[dep].get('dependencies', {}).items():

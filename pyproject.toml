@@ -32,6 +32,7 @@ tabulate = "^0.8.6"
 importlib-metadata = ">=4.11.1"
 docutils = ">=0.14,<0.18"
 
+
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"
 coverage = "^5.0.3"
@@ -51,5 +52,23 @@ twine = "^3.1.1"
 pytest-sugar = "^0.9.2"
 click = "^8.0"
 
+# Subprojects
+c7n_awscc = { path = "tools/c7n_awscc", develop = true }
+c7n_azure = { path = "tools/c7n_azure", develop = true }
+c7n_gcp = { path = "tools/c7n_gcp", develop = true }
+c7n_kube = { path = "tools/c7n_kube", develop = true }
+c7n_logexporter = { path = "tools/c7n_logexporter", develop = true }
+c7n_mailer = { path = "tools/c7n_mailer", develop = true }
+c7n_openstack = { path = "tools/c7n_openstack", develop = true }
+c7n_org = { path = "tools/c7n_org", develop = true }
+c7n_policystream = { path = "tools/c7n_policystream", develop = true }
+c7n_sphinxext = { path = "tools/c7n_sphinxext", develop = true }
+c7n_terraform = { path = "tools/c7n_terraform", develop = true }
+c7n_trailcreator = { path = "tools/c7n_trailcreator", develop = true }
+
 [tool.black]
 skip-string-normalization = true
+
+[build-system]
+requires = ["poetry-core>=1.0.8"]
+build-backend = "poetry.core.masonry.api"
