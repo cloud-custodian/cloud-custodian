@@ -37,6 +37,10 @@ pkg-update:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update --lock && cd ../..; done
 	poetry update
 
+pkg-lock:
+	# poetry lock --no-update
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry lock --no-update && cd ../..; done
+
 pkg-show-update:
 	poetry show -o
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
@@ -114,14 +118,14 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	flake8 c7n tests tools
+	poetry run flake8 c7n tests tools
 
 clean:
 	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:
-	bandit -i -s B101,B311 \
+	poetry run bandit -i -s B101,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_terraform/c7n_terraform \
@@ -134,7 +138,7 @@ analyzer-bandit:
 
 
 analyzer-semgrep:
-	semgrep --error --verbose --config p/security-audit \
+	poetry run semgrep --error --verbose --config p/security-audit \
 	 tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_terraform/c7n_terraform \
