@@ -902,6 +902,8 @@ class RDSSetPublicAvailability(BaseAction):
 
     def set_accessibility(self, r):
         client = local_session(self.manager.session_factory).client('rds')
+        waiter = client.get_waiter('db_instance_available')
+        waiter.wait(DBInstanceIdentifier=r['DBInstanceIdentifier'])
         client.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
             PubliclyAccessible=self.data.get('state', False))
