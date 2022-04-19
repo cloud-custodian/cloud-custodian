@@ -144,7 +144,7 @@ def gen_setup(package_dir):
             return reqs, default
 
     # Use Poetry's default logic when building a setup.py for the top-level project,
-    # since its dev-dependencies are subprojects. 
+    # since its dev-dependencies are subprojects.
     #
     # For other projects, resolve editable dev dependencies and bake them into
     # the generated setup.py
