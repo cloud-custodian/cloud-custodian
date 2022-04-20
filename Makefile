@@ -38,7 +38,7 @@ pkg-update:
 	poetry update
 
 pkg-lock:
-	# poetry lock --no-update
+	poetry lock --no-update
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry lock --no-update && cd ../..; done
 
 pkg-show-update:
