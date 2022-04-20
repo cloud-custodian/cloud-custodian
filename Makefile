@@ -118,14 +118,14 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	poetry run flake8 c7n tests tools
+	flake8 c7n tests tools
 
 clean:
 	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:
-	poetry run bandit -i -s B101,B311 \
+	bandit -i -s B101,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_terraform/c7n_terraform \
@@ -138,7 +138,7 @@ analyzer-bandit:
 
 
 analyzer-semgrep:
-	poetry run semgrep --error --verbose --config p/security-audit \
+	semgrep --error --verbose --config p/security-audit \
 	 tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_terraform/c7n_terraform \
