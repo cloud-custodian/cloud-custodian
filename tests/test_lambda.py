@@ -317,7 +317,7 @@ class LambdaTest(BaseTest):
                     {
                         "type": "set-concurrency",
                         "expr": True,
-                        "value": '"c7n.metrics"."AWS/Lambda.Invocations.Sum"[0].Sum',
+                        "value": '"c7n.metrics"."AWS/Lambda.Invocations.Sum.14"[0].Sum',
                     }
                 ],
             },
