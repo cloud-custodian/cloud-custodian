@@ -1,6 +1,6 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
-FROM ubuntu:20.04 as build-env
+FROM ubuntu:22.04 as build-env
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
@@ -15,11 +15,12 @@ ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && pip install -q wheel &&       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+
 ADD tools /tools
 
-# Install requested providers
+# Install c7n and requested providers
 ARG providers="azure gcp kube openstack"
-RUN mkdir -p /src/tools && . /usr/local/bin/activate &&     for pkg in $providers; do         pip install "/tools/c7n_$pkg";         cp -R "/tools/c7n_$pkg" "/src/tools/c7n_$pkg";         rm -R "/src/tools/c7n_$pkg/tests"; done
+RUN mkdir -p /src/tools && . /usr/local/bin/activate &&     pip install /src &&     for pkg in $providers; do         cp -R "/tools/c7n_$pkg" "/src/tools/c7n_$pkg";         pip install "/tools/c7n_$pkg";         rm -R "/src/tools/c7n_$pkg/tests"; done
 
 RUN mkdir /output
 
@@ -27,7 +28,7 @@ RUN mkdir /output
 ADD tools/c7n_mailer /src/tools/c7n_mailer
 RUN . /usr/local/bin/activate && pip install tools/c7n_mailer
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL name="mailer" \
       repository="http://github.com/cloud-custodian/cloud-custodian"

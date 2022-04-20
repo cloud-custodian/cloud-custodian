@@ -44,14 +44,16 @@ ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+
 ADD tools /tools
 
-# Install requested providers
+# Install c7n and requested providers
 ARG providers="azure gcp kube openstack"
 RUN mkdir -p /src/tools && . /usr/local/bin/activate && \
+    pip install /src && \
     for pkg in $providers; do \
-        pip install "/tools/c7n_$pkg"; \
         cp -R "/tools/c7n_$pkg" "/src/tools/c7n_$pkg"; \
+        pip install "/tools/c7n_$pkg"; \
         rm -R "/src/tools/c7n_$pkg/tests"; done
 
 RUN mkdir /output
@@ -137,13 +139,14 @@ RUN . /usr/local/bin/activate && pip install tools/c7n_policystream
 # Verify the install
 #  - policystream is not in ci due to libgit2 compilation needed
 #  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
+RUN . /usr/local/bin/activate && \
+    pip install "pytest~=6.0" && pytest -p "no:terraform" tools/c7n_policystream
 """
 
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:20.04", base_target_image="ubuntu:20.04")
+    defaults = dict(base_build_image="ubuntu:22.04", base_target_image="ubuntu:22.04")
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata
