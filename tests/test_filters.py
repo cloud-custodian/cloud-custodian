@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import calendar
+from collections import namedtuple
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
@@ -14,7 +15,7 @@ from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
 from c7n.testing import mock_datetime_now
-from c7n.utils import annotation, parse_cidr
+from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import ValueRegex, parse_date as core_parse_date
 
@@ -186,13 +187,6 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
 
-        vf.vtype = "cidr"
-        sentinel = {"10.0.0.0/16", "192.168.0.0/16"}
-        value = "10.10.10.0/24"
-        parsed_sentinel = [parse_cidr(s) for s in sentinel]
-        res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual((res[0], str(res[1])), (parsed_sentinel, value))
-
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
         res = vf.process_value_type(sentinel, value, resource)
@@ -248,26 +242,38 @@ class TestValueFilter(unittest.TestCase):
         self.assertEqual(vf.v, None)
         self.assertFalse(res)
 
+    def test_value_type_cidr(self):
         # test cidr range match
         resource = {"ingress": "10.10.10.0/24"}
-        vf = filters.factory({
-            "type": "value",
-            "value": ["10.0.0.0/16"],
-            "op": "in",
-            "value_type": "cidr",
-            "key": "ingress"})
-        res = vf.match(resource)
-        self.assertFalse(res)
+        TestCidrValue = namedtuple("TestCidrValue", ["value", "contains_resource"])
 
-        resource = {"ingress": "10.10.10.0/24"}
-        vf = filters.factory({
-            "type": "value",
-            "value": ["10.0.0.0/16"],
-            "op": "not-in",
-            "value_type": "cidr",
-            "key": "ingress"})
-        res = vf.match(resource)
-        self.assertTrue(res)
+        test_networks = [
+            TestCidrValue("10.10.0.0/16", True),
+            TestCidrValue(["10.10.0.0/16"], True),
+            TestCidrValue(["172.17.0.0/24", "10.10.0.0/16"], True),
+            TestCidrValue("10.0.0.0/16", False),
+            TestCidrValue(["10.0.0.0/16"], False),
+            TestCidrValue(["172.17.0.0/24", "10.0.0.0/16"], False)
+        ]
+
+        for net in test_networks:
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, net.contains_resource)
+
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "not-in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, not net.contains_resource)
 
         resource = {"ingress": "xyz"}
         vf = filters.factory({
@@ -277,6 +283,7 @@ class TestValueFilter(unittest.TestCase):
             "value_type": "cidr",
             "key": "ingress"})
         self.assertRaises(TypeError, vf.match(resource))
+
 
 class TestAgeFilter(unittest.TestCase):
 
