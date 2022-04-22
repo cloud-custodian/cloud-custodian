@@ -847,7 +847,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.8')
+        return self.policy.data['mode'].get('runtime', 'python3.9')
 
     @property
     def memory_size(self):

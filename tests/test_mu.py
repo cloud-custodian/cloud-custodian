@@ -902,7 +902,7 @@ class PolicyLambdaProvision(Publish):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.8",
+                "Runtime": "python3.9",
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},
