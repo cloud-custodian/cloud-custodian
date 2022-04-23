@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest, arm_template
 from c7n.exceptions import PolicyValidationError
 
@@ -86,6 +75,53 @@ class DiagnosticSettingsFilterTest(BaseTest):
 
         resources_logs_not_enabled = p2.run()
         self.assertEqual(len(resources_logs_not_enabled), 0)
+
+    @arm_template('diagnostic-settings.json')
+    def test_filter_diagnostic_settings_absent(self):
+        """Verifies absent operation works with a diagnostic setting
+        on an azure resource.
+        """
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.publicip',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': "name",
+                    'value': 'cctestdiagnostic_loadbalancer_public_ip'
+                },
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[?category == 'DDoSProtectionNotifications'][].enabled",
+                    'value': 'absent'
+                }
+            ]
+        })
+
+        resources_logs_enabled = p.run()
+        self.assertEqual(len(resources_logs_enabled), 1)
+
+    @arm_template('diagnostic-settings.json')
+    def test_filter_diagnostic_settings_present(self):
+        """Verifies present operation works with a diagnostic setting
+        on an azure resource.
+        """
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.loadbalancer',
+            'filters': [
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled",
+                    'value': 'present'
+                }
+            ]
+        })
+
+        resources_logs_enabled = p.run()
+        self.assertEqual(len(resources_logs_enabled), 1)
 
     @arm_template('vm.json')
     def test_filter_diagnostic_settings_not_enabled(self):

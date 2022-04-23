@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import boto3
 import copy
@@ -140,6 +129,24 @@ class EmailTest(unittest.TestCase):
         items = list(email_addrs_to_email_message_map.items())
         self.assertEqual(items[0][0], to_emails)
         self.assertEqual(items[0][1]['to'], ', '.join(to_emails))
+
+    def test_email_to_email_message_map_additional_headers(self):
+        conf = dict(MAILER_CONFIG)
+        conf['additional_email_headers'] = {
+            'X-Foo': 'X-Foo-Value',
+            'X-Bar': '1234'
+        }
+        email_delivery = MockEmailDelivery(
+            conf, self.aws_session, logger
+        )
+        SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
+        SQS_MESSAGE['policy']['actions'][1].pop('email_ldap_username_manager', None)
+        email_addrs_to_email_message_map = email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
+        )
+        for _, mimetext_msg in email_addrs_to_email_message_map.items():
+            self.assertEqual(mimetext_msg['X-Foo'], 'X-Foo-Value')
+            self.assertEqual(mimetext_msg['X-Bar'], '1234')
 
     def test_smtp_called_once(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)

@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest
 import time
@@ -412,6 +401,14 @@ class TestFSx(BaseTest):
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
         self.assertTrue(len(fs), 1)
         self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_arn_in_event(self):
+        session_factory = self.replay_flight_data('test_fsx_resource')
+        p = self.load_policy({'name': 'test-fsx', 'resource': 'fsx'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(
+            ["arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896"])
+        self.assertEqual(len(resources), 1)
 
 
 class TestFSxBackup(BaseTest):

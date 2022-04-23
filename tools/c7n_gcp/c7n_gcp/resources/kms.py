@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
@@ -18,6 +7,8 @@ from c7n.utils import local_session
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo, \
     GcpLocation
+from c7n_gcp.actions import SetIamPolicy
+from c7n_gcp.filters import IamPolicyFilter
 
 
 @resources.register('kms-keyring')
@@ -99,6 +90,7 @@ class KmsCryptoKey(ChildResourceManager):
             'use_child_query': True
         }
         asset_type = "cloudkms.googleapis.com/CryptoKey"
+        scc_type = "google.cloud.kms.CryptoKey"
 
         @staticmethod
         def get(client, resource_info):
@@ -108,6 +100,19 @@ class KmsCryptoKey(ChildResourceManager):
                         resource_info['key_ring_id'],
                         resource_info['crypto_key_id'])
             return client.execute_command('get', {'name': name})
+
+
+@KmsCryptoKey.filter_registry.register('iam-policy')
+class KmsCryptokeyIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process KMS Cryptokey resources correctly.
+    """
+    permissions = ('cloudkms.cryptoKeys.get', 'cloudkms.cryptoKeys.list',
+    'cloudkms.cryptoKeys.update', 'resourcemanager.projects.get')
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        return verb_arguments
 
 
 @resources.register('kms-cryptokey-version')

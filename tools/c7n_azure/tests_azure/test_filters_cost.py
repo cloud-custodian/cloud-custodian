@@ -1,16 +1,5 @@
-# Copyright 2015-2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import namedtuple
 
 from .azure_common import BaseTest
@@ -54,12 +43,12 @@ class CostFilterTest(BaseTest):
         resources = [self._get_resource('vm1', 2000),
                      self._get_resource('vm2', 20),
                      self._get_resource('vm3', 3000)]
-        f = self._get_filter({'timeframe': 'TheLastWeek', 'op': 'gt', 'value': 1000}, resources)
+        f = self._get_filter({'timeframe': 'TheLastMonth', 'op': 'gt', 'value': 1000}, resources)
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'TheLastWeek', False)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 'TheLastMonth', False)
         self.assertEqual(len(result), 2)
 
     def test_rg(self):
@@ -70,20 +59,20 @@ class CostFilterTest(BaseTest):
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 1, True)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 1, True)
         self.assertEqual(len(result), 1)
 
     def test_child_resources(self):
         resources = [self._get_resource('vm1', 0),
                      self._get_resource('vm1/child1', 300),
                      self._get_resource('vm1/child2', 3000)]
-        f = self._get_filter({'timeframe': 'TheLastWeek', 'op': 'eq', 'value': 3300}, resources)
+        f = self._get_filter({'timeframe': 'WeekToDate', 'op': 'eq', 'value': 3300}, resources)
 
         result = f.process(resources, None)
 
-        usage_by_scope = f.manager.get_client.return_value.query.usage_by_scope
-        self._verify_expected_call(usage_by_scope, 'TheLastWeek', False)
+        usage = f.manager.get_client.return_value.query.usage
+        self._verify_expected_call(usage, 'WeekToDate', False)
         self.assertEqual(len(result), 1)
 
     def _verify_expected_call(self, mock, timeframe, resource_group):
@@ -120,7 +109,7 @@ class CostFilterTest(BaseTest):
         manager = Mock()
         manager.get_session.return_value.get_subscription_id.return_value = \
             self.session.get_subscription_id()
-        manager.get_client.return_value.query.usage_by_scope.return_value = \
+        manager.get_client.return_value.query.usage.return_value = \
             self._get_costs(resources)
         if 'Microsoft.Compute/virtualMachines' in resources[0]['id']:
             manager.resource_type.resource_type = 'Microsoft.Compute/virtualMachines'
@@ -150,4 +139,4 @@ class CostFilterTest(BaseTest):
             'rows': rows
         }
         cost = namedtuple("Cost", cost.keys())(*cost.values())
-        return [cost]
+        return cost

@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, WhiteListFilter,
                                            KeyVaultFirewallRulesFilter,
@@ -18,7 +7,7 @@ from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, Whi
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 from netaddr import IPSet
 from parameterized import parameterized
 import pytest
@@ -149,8 +138,8 @@ class KeyVaultTest(BaseTest):
 
         mock_response = Mock(spec=Response)
         mock_response.status_code = 403
-        mock_response.text = 'forbidden'
-        get_principal_dictionary.side_effect = CloudError(mock_response)
+        mock_response.reason = 'forbidden'
+        get_principal_dictionary.side_effect = HttpResponseError(response=mock_response)
 
         p = self.load_policy({
             'name': 'test-key-vault',
@@ -169,7 +158,7 @@ class KeyVaultTest(BaseTest):
             ]
         })
 
-        with self.assertRaises(CloudError) as e:
+        with self.assertRaises(HttpResponseError) as e:
             p.run()
 
         self.assertEqual(403, e.exception.status_code)

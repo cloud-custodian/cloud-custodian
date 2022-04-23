@@ -1,18 +1,10 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
+import time
 
 from gcp_common import BaseTest, event_data
+from googleapiclient.errors import HttpError
 
 
 class ProjectRoleTest(BaseTest):
@@ -33,7 +25,7 @@ class ProjectRoleTest(BaseTest):
         roles = exec_mode.run(event, None)
 
         self.assertEqual(len(roles), 1)
-        self.assertEqual(roles[0]['name'], 'projects/mythic-tribute-232915/roles/CustomRole1')
+        self.assertEqual(roles[0]['name'], 'projects/cloud-custodian/roles/CustomRole1')
 
 
 class ServiceAccountTest(BaseTest):
@@ -45,10 +37,111 @@ class ServiceAccountTest(BaseTest):
             'resource': 'gcp.service-account'},
             session_factory=factory)
         resource = p.resource_manager.get_resource(
-            {'project_id': 'custodian-1291',
-             'email_id': 'devtest@custodian-1291.iam.gserviceaccount.com',
+            {'project_id': 'cloud-custodian',
+             'email_id': 'devtest@cloud-custodian.iam.gserviceaccount.com',
              'unique_id': '110936229421407410679'})
         self.assertEqual(resource['displayName'], 'devtest')
+
+    def test_disable(self):
+        factory = self.replay_flight_data('iam-service-account-disable')
+        p = self.load_policy({
+            'name': 'sa-disable',
+            'resource': 'gcp.service-account',
+            'actions': ['disable']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'name': resources[0]["name"]})
+        self.assertTrue(result['disabled'])
+
+    def test_enable(self):
+        factory = self.replay_flight_data('iam-service-account-enable')
+        p = self.load_policy({
+            'name': 'sa-enable',
+            'resource': 'gcp.service-account',
+            'actions': ['enable']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query('get', {'name': resources[0]["name"]})
+        self.assertIsNone(result.get('disabled'))
+
+    def test_delete(self):
+        factory = self.replay_flight_data('iam-service-account-delete')
+        p = self.load_policy({
+            'name': 'sa-delete',
+            'resource': 'gcp.service-account',
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        try:
+            client.execute_query('get', {'name': resources[0]["name"]})
+            self.fail('found deleted service account')
+        except HttpError as e:
+            self.assertTrue("Account deleted" in str(e))
+
+
+class ServiceAccountKeyTest(BaseTest):
+
+    def test_service_account_key_query(self):
+        project_id = "cloud-custodian"
+
+        session_factory = self.replay_flight_data(
+            'iam-service-account-key-query', project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'iam-service-account-key-query',
+                'resource': 'gcp.service-account-key'
+            },
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["keyType"], "SYSTEM_MANAGED")
+        self.assertEqual(resources[1]["keyType"], "USER_MANAGED")
+
+    def test_get_service_account_key(self):
+        factory = self.replay_flight_data('iam-service-account-key')
+        p = self.load_policy({
+            'name': 'sa-key-get',
+            'resource': 'gcp.service-account-key'},
+            session_factory=factory)
+        resource = p.resource_manager.get_resource(
+            {'resourceName': '//iam.googleapis.com/projects/cloud-custodian/'
+            'serviceAccounts/111111111111111/keys/2222'})
+        self.assertEqual(resource['keyType'], 'USER_MANAGED')
+        self.assertEqual(resource["c7n:service-account"]["email"],
+        "test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com")
+
+    def test_delete_service_account_key(self):
+        factory = self.replay_flight_data('iam-delete-service-account-key')
+        p = self.load_policy({
+            'name': 'sa-key-delete',
+            'resource': 'gcp.service-account-key',
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        try:
+            result = client.execute_query(
+                'get', {'name': resources[0]["name"]})
+            self.fail('found deleted service account key: %s' % result)
+        except HttpError as e:
+            self.assertTrue("does not exist" in str(e))
 
 
 class IAMRoleTest(BaseTest):

@@ -1,32 +1,20 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1505583804", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1505583804", 
-            "QueueArn": "arn:aws:sqs:us-east-1:123456789012:test-sqs-remove-matched-1"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "763f0e08-cccc-50a1-b217-5c3fa8306180", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "763f0e08-cccc-50a1-b217-5c3fa8306180", 
-                "content-length": "1677", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:43:24 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:c09b0bc7-7270-4b71-2427-a044030a51f2",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1599099527",
+            "LastModifiedTimestamp": "1599099527",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
+        "ResponseMetadata": {}
     }
 }

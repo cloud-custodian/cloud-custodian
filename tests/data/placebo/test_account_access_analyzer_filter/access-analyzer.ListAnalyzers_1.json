@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "analyzers": [
+            {
+                "arn": "arn:aws:access-analyzer:us-east-1:0123456789012:analyzer/ConsoleAnalyzer-d534345f-499c-43bd-bbcc-dd637ab352d2",
+                "name": "ConsoleAnalyzer-d534345f-499c-43bd-bbcc-dd637ab352d2",
+                "status": "ACTIVE",
+                "tags": {},
+                "type": "ACCOUNT"
+            }
+        ]
+    }
+}

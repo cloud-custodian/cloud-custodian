@@ -1,0 +1,27 @@
+{
+  "body": {
+    "kind": "compute#sslCertificate", 
+    "creationTimestamp": "2019-04-30T05:22:52.503-07:00", 
+    "id": "8232650683038662899", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/comelfo-com-google-certificate", 
+    "name": "comelfo-com-google-certificate"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "308", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 15:38:06 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 15:38:06 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/comelfo-com-google-certificate?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"vKuX2_r2U-aZcW0tIcvws994268=/djehg-hN0QuAglN2YEdenVPgjJg=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

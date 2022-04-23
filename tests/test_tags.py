@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
@@ -87,6 +76,31 @@ class UniversalTagTest(BaseTest):
             {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "PermissionDenied"}}}
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
+
+    def test_mark_for_op_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'actions': [{'type': 'mark-for-op', 'op': 'stop'}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                mark-for-op: optional fields deprecated (one of 'hours' or 'days' must be specified)
+            """)
+
+    def test_unmark_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'filters': [{'tag:foo': 'exists'}],
+            'actions': [{'type': 'unmark', 'tags': ['foo']}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                remove-tag: alias 'unmark' has been deprecated
+            """)
 
 
 class CoalesceCopyUserTags(BaseTest):

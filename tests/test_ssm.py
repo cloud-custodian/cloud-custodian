@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import time
 
@@ -280,3 +269,234 @@ class TestSSM(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "mi-1111aa111aa11a111")
+
+    def test_get_ssm_documents(self):
+        session_factory = self.replay_flight_data("test_get_ssm_documents")
+        p = self.load_policy(
+            {
+                "name": "retrieve-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "yyyyyyyyyyyy")
+
+    def test_ssm_document_remove_sharing(self):
+        session_factory = self.replay_flight_data("test_ssm_document_remove_sharing")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "remove-sharing-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-sharing",
+                        "remove": "matched"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        permissions = client.describe_document_permission(
+            Name='Test-Document-1',
+            PermissionType='Share'
+        )
+        self.assertEqual(len(permissions.get('AccountIds')), 1)
+        self.assertEqual(permissions.get('AccountIds'), ['xxxxxxxxxxxx'])
+
+    def test_ssm_document_add_sharing(self):
+        session_factory = self.replay_flight_data("test_ssm_document_add_sharing")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "add-sharing-ssm-documents",
+                "resource": "ssm-document",
+                "actions": [
+                    {
+                        "type": "set-sharing",
+                        "add": ['yyyyyyyyyyyy']
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        permissions = client.describe_document_permission(
+            Name='Test-Document-1',
+            PermissionType='Share'
+        )
+        self.assertEqual(len(permissions.get('AccountIds')), 2)
+        self.assertEqual(permissions.get('AccountIds'), ['xxxxxxxxxxxx', 'yyyyyyyyyyyy'])
+
+    def test_ssm_document_delete(self):
+        session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "delete-ssm-documents",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        p.run()
+        try:
+            client.get_document(
+                Name='Test-Document-1',
+            )
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocument)
+
+    def test_ssm_document_delete_error(self):
+        session_factory = self.replay_flight_data("test_ssm_document_delete")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "delete-ssm-documents-error",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["xxxxxxxxxxxx"]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        try:
+            p.run()
+        except Exception as e:
+            self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
+
+    def test_get_data_sync_resources(self):
+        session_factory = self.replay_flight_data("test_get_data_sync_resources")
+        p = self.load_policy(
+            {
+                "name": "ssm-get-data-sync-resources",
+                "resource": "ssm-data-sync"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_data_sync_kms_key_filter(self):
+        session_factory = self.replay_flight_data("test_data_sync_kms_filter")
+        p = self.load_policy(
+            {
+                "name": "ssm-get-data-sync-resources",
+                "resource": "ssm-data-sync",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "data-sync-kms-key",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resource = p.run()
+        self.assertEqual(len(resource), 1)
+        self.assertEqual(resource[0]["S3Destination"]["BucketName"], "data-sync-destination-bucket")
+
+    def test_data_sync_value_filter(self):
+        session_factory = self.replay_flight_data("test_data_sync_value_filter")
+        p = self.load_policy(
+            {
+                "name": "ssm-data-sync-value-filter",
+                "resource": "ssm-data-sync",
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'S3Destination.BucketName',
+                        'value': ['c7n-ssm'],
+                        'op': 'in'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["S3Destination"]["BucketName"], "c7n-ssm")
+
+    def test_data_sync_delete(self):
+        session_factory = self.replay_flight_data("test_data_sync_delete")
+        p = self.load_policy(
+            {
+                "name": "ssm-delete-data-sync-resources",
+                "resource": "ssm-data-sync",
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'S3Destination.BucketName',
+                        'value': ['data-sync-destination-bucket'],
+                        'op': 'in'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        p.run()
+        client = session_factory().client('ssm', region_name='us-east-1')
+        data_syncs = client.list_resource_data_sync(SyncType='SyncToDestination')
+        self.assertEqual(len(data_syncs.get('ResourceDataSyncItems')), 1)
+
+    def test_data_sync_delete_error(self):
+        session_factory = self.replay_flight_data("test_data_sync_delete_error")
+        p = self.load_policy(
+            {
+                "name": "ssm-delete-data-sync-resources",
+                "resource": "ssm-data-sync",
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        data_syncs = p.run()
+        self.assertEqual(len(data_syncs), 3)

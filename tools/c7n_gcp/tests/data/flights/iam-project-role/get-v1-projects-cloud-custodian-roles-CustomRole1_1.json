@@ -1,0 +1,27 @@
+{
+  "body": {
+    "description": "Created on: 2019-06-03", 
+    "includedPermissions": [
+      "accessapproval.requests.get"
+    ], 
+    "name": "projects/cloud-custodian/roles/CustomRole1", 
+    "etag": "BwWKaXIHoic=", 
+    "title": "Custom Role test1"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "232", 
+    "x-xss-protection": "0", 
+    "content-location": "https://iam.googleapis.com/v1/projects/cloud-custodian/roles/CustomRole1?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 03 Jun 2019 13:10:18 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

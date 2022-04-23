@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS Account as a custodian resource.
 """
 import json
@@ -28,7 +17,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
@@ -104,6 +93,49 @@ class AccountCredentialReport(CredentialReport):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
+
+
+@filters.register('check-macie')
+class MacieEnabled(ValueFilter):
+    """Check status of macie v2 in the account.
+
+    Gets the macie session info for the account, and
+    the macie master account for the current account if
+    configured.
+    """
+
+    schema = type_schema('check-macie', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:macie'
+    annotate = False
+    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+
+    def process(self, resources, event=None):
+
+        if self.annotation_key not in resources[0]:
+            self.get_macie_info(resources[0])
+
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+
+    def get_macie_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('macie2')
+
+        try:
+            info = client.get_macie_session()
+            info.pop('ResponseMetadata')
+        except client.exceptions.AccessDeniedException:
+            info = {}
+
+        try:
+            minfo = client.get_master_account().get('master')
+        except (client.exceptions.AccessDeniedException,
+                client.exceptions.ResourceNotFoundException):
+            info['master'] = {}
+        else:
+            info['master'] = minfo
+        account[self.annotation_key] = info
 
 
 @filters.register('check-cloudtrail')
@@ -375,6 +407,45 @@ class IAMSummary(ValueFilter):
         if self.match(resources[0]['c7n:iam_summary']):
             return resources
         return []
+
+
+@filters.register('access-analyzer')
+class AccessAnalyzer(ValueFilter):
+    """Check for access analyzers in an account
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: account-access-analyzer
+          resource: account
+          filters:
+            - type: access-analyzer
+              key: 'status'
+              value: ACTIVE
+              op: eq
+    """
+
+    schema = type_schema('access-analyzer', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('access-analyzer:ListAnalyzers',)
+    annotation_key = 'c7n:matched-analyzers'
+
+    def process(self, resources, event=None):
+        account = resources[0]
+        if not account.get(self.annotation_key):
+            client = local_session(self.manager.session_factory).client('accessanalyzer')
+            analyzers = self.manager.retry(client.list_analyzers)['analyzers']
+        else:
+            analyzers = account.get(self.annotation_key)
+
+        matched_analyzers = []
+        for analyzer in analyzers:
+            if self.match(analyzer):
+                matched_analyzers.append(analyzer)
+        account[self.annotation_key] = matched_analyzers
+        return matched_analyzers and resources or []
 
 
 @filters.register('password-policy')
@@ -653,9 +724,9 @@ class ServiceLimit(Filter):
         return True
 
     def process(self, resources, event=None):
+        support_region = get_support_region(self.manager)
         client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
-
+            'support', region_name=support_region)
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
@@ -784,8 +855,9 @@ class RequestLimitIncrease(BaseAction):
     }
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        client = session.client('support', region_name='us-east-1')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         account_id = self.manager.config.account_id
         service_map = {}
         region_map = {}

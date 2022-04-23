@@ -1,0 +1,310 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2019-06-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 21 Apr 2021 17:39:34 GMT"
+                    ],
+                    "content-length": [
+                        "492"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlservertqtfgpqzllch4.database.windows.net",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4",
+                                "name": "cctestsqlservertqtfgpqzllch4",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 21 Apr 2021 17:39:35 GMT"
+                    ],
+                    "content-length": [
+                        "2734"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 10
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 268435456000,
+                                    "status": "Online",
+                                    "databaseId": "7af22fe1-cb5a-49f9-bdf0-638e0e9cbc9f",
+                                    "creationDate": "2021-04-21T15:14:57.6Z",
+                                    "currentServiceObjectiveName": "S0",
+                                    "requestedServiceObjectiveName": "S0",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2021-04-21T15:25:17Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "Standard",
+                                        "tier": "Standard",
+                                        "capacity": 10
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cclongtermretentiondb",
+                                "name": "cclongtermretentiondb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 10
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 2147483648,
+                                    "status": "Online",
+                                    "databaseId": "99338c6f-5608-4257-9861-0cdfa07417f0",
+                                    "creationDate": "2021-04-21T15:14:57.457Z",
+                                    "currentServiceObjectiveName": "S0",
+                                    "requestedServiceObjectiveName": "S0",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2021-04-21T15:25:07Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "Standard",
+                                        "tier": "Standard",
+                                        "capacity": 10
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cctestdb",
+                                "name": "cctestdb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 32212254720,
+                                    "status": "Online",
+                                    "databaseId": "f66fbb30-0835-4b16-b20c-537cfba87945",
+                                    "creationDate": "2021-04-21T15:13:00.593Z",
+                                    "currentServiceObjectiveName": "System0",
+                                    "requestedServiceObjectiveName": "System0",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "System",
+                                        "tier": "System",
+                                        "capacity": 0
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/master",
+                                "name": "master",
+                                "type": "Microsoft.Sql/servers/databases"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cclongtermretentiondb/transparentDataEncryption/current?api-version=2014-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 21 Apr 2021 17:39:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "dataserviceversion": [
+                        "3.0;"
+                    ],
+                    "content-length": [
+                        "358"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "current",
+                        "location": "East US 2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cclongtermretentiondb/transparentDataEncryption/current",
+                        "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+                        "properties": {
+                            "status": "Enabled"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cctestdb/transparentDataEncryption/current?api-version=2014-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 21 Apr 2021 17:39:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "dataserviceversion": [
+                        "3.0;"
+                    ],
+                    "content-length": [
+                        "345"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "current",
+                        "location": "East US 2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/cctestdb/transparentDataEncryption/current",
+                        "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+                        "properties": {
+                            "status": "Enabled"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/master/transparentDataEncryption/current?api-version=2014-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 21 Apr 2021 17:39:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "dataserviceversion": [
+                        "3.0;"
+                    ],
+                    "content-length": [
+                        "344"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "current",
+                        "location": "East US 2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlservertqtfgpqzllch4/databases/master/transparentDataEncryption/current",
+                        "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+                        "properties": {
+                            "status": "Disabled"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

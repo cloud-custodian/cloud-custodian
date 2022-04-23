@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2017 The Forseti Security Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,6 +65,13 @@ RETRYABLE_EXCEPTIONS = (
     ssl.SSLError,
     URLError,  # include "no network connection"
 )
+
+
+def get_default_project():
+    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+              'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
+        if k in os.environ:
+            return os.environ[k]
 
 
 class PaginationNotSupported(Exception):
@@ -166,7 +175,8 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            credentials, _ = google.auth.default()
+            credentials, _ = google.auth.default(quota_project_id=project_id or
+            get_default_project())
         self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
         if use_rate_limiter:
             self._rate_limiter = RateLimiter(max_calls=quota_max_calls,
@@ -188,10 +198,10 @@ class Session:
     def get_default_project(self):
         if self.project_id:
             return self.project_id
-        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
-                  'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
-            if k in os.environ:
-                return os.environ[k]
+        default_project = get_default_project()
+        if default_project:
+            return default_project
+
         raise ValueError("No GCP Project ID set - set CLOUDSDK_CORE_PROJECT")
 
     def get_default_region(self):

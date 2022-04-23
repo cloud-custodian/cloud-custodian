@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 import json
@@ -25,6 +14,7 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import PostFinding
 
 
@@ -44,7 +34,7 @@ class DescribeQueue(DescribeSource):
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
+                    self.manager.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
             return queue
@@ -54,13 +44,21 @@ class DescribeQueue(DescribeSource):
                 self.manager, list(filter(None, w.map(_augment, resources))))
 
 
+class QueueConfigSource(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['QueueUrl'] = item['resourceId']
+        return resource
+
+
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sqs'
         arn_type = ""
-        enum_spec = ('list_queues', 'QueueUrls', None)
+        enum_spec = ('list_queues', 'QueueUrls', {'MaxResults': 1000})
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
@@ -79,7 +77,7 @@ class SQS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeQueue,
-        'config': ConfigSource
+        'config': QueueConfigSource
     }
 
     def get_permissions(self):
@@ -94,7 +92,8 @@ class SQS(QueryResourceManager):
                 ids_normalized.append(i)
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
-        return super(SQS, self).get_resources(ids_normalized, cache)
+        resources = super(SQS, self).get_resources(ids_normalized, cache)
+        return [r for r in resources if Arn.parse(r['QueueArn']).resource in ids_normalized]
 
 
 @SQS.filter_registry.register('metrics')
@@ -125,29 +124,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
 @SQS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-    The KmsMasterId returned for SQS sometimes has the alias name directly in the value.
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sqs-kms-key-filters
-                  resource: aws.sqs
-                  filters:
-                    - or:
-                      - type: value
-                        key: KmsMasterKeyId
-                        value: "^(alias/aws/)"
-                        op: regex
-                      - type: kms-key
-                        key: c7n:AliasName
-                        value: "^(alias/aws/)"
-                        op: regex
-    """
     RelatedIdsExpression = 'KmsMasterKeyId'
 
 

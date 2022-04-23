@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -25,6 +14,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('glue-connection')
@@ -32,7 +22,7 @@ class GlueConnection(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'glue'
-        enum_spec = ('get_connections', 'ConnectionList', None)
+        enum_spec = ('get_connections', 'ConnectionList', {'HidePassword': True})
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
@@ -173,6 +163,62 @@ class DeleteJob(BaseAction):
                 client.delete_job(JobName=r['Name'])
             except client.exceptions.EntityNotFoundException:
                 continue
+
+
+@GlueJob.action_registry.register('toggle-metrics')
+class GlueJobToggleMetrics(BaseAction):
+    """Enable or disable CloudWatch metrics for a Glue job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gluejob-enable-metrics
+            resource: glue-job
+            filters:
+              - type: value
+                key: 'DefaultArguments."--enable-metrics"'
+                value: absent
+            actions:
+              - type: toggle-metrics
+                enabled: true
+    """
+    schema = type_schema(
+        'toggle-metrics',
+        enabled={'type': 'boolean'},
+        required=['enabled'],
+    )
+    permissions = ('glue:UpdateJob',)
+
+    def prepare_params(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        update_keys = client.meta._service_model.shape_for('JobUpdate').members
+        want_keys = set(r).intersection(update_keys) - {'AllocatedCapacity'}
+        params = {k: r[k] for k in want_keys}
+
+        # Can't specify MaxCapacity when updating/creating a job if
+        # job configuration includes WorkerType or NumberOfWorkers
+        if 'WorkerType' in params or 'NumberOfWorkers' in params:
+            del params['MaxCapacity']
+
+        if self.data.get('enabled'):
+            params["DefaultArguments"]["--enable-metrics"] = ""
+        else:
+            del params["DefaultArguments"]["--enable-metrics"]
+
+        return params
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+
+        for r in resources:
+            try:
+                job_name = r["Name"]
+                updated_resource = self.prepare_params(r)
+                client.update_job(JobName=job_name, JobUpdate=updated_resource)
+            except Exception as e:
+                self.log.error('Error updating glue job: {}'.format(e))
 
 
 @resources.register('glue-crawler')
@@ -411,6 +457,31 @@ class GlueSecurityConfiguration(QueryResourceManager):
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
         cfn_type = 'AWS::Glue::SecurityConfiguration'
+
+
+@GlueSecurityConfiguration.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            's3', 'cloudwatch', 'job-bookmarks', 'all']},
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            's3': 'EncryptionConfiguration.S3Encryption[].KmsKeyArn',
+            'cloudwatch': 'EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn',
+            'job-bookmarks': 'EncryptionConfiguration.JobBookmarksEncryption.KmsKeyArn',
+            'all': 'EncryptionConfiguration.*[][].KmsKeyArn'
+        }
+        key_type = self.data.get('key_type', 'all')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')

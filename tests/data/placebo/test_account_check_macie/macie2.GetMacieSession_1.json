@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 12,
+            "day": 3,
+            "hour": 16,
+            "minute": 22,
+            "second": 14,
+            "microsecond": 821000
+        },
+        "findingPublishingFrequency": "FIFTEEN_MINUTES",
+        "serviceRole": "arn:aws:iam::644160558196:role/aws-service-role/macie.amazonaws.com/AWSServiceRoleForAmazonMacie",
+        "status": "ENABLED",
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 12,
+            "day": 3,
+            "hour": 16,
+            "minute": 22,
+            "second": 14,
+            "microsecond": 821000
+        }
+    }
+}

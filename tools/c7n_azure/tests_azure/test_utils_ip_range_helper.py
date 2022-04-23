@@ -1,16 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import pytest
+
 from .azure_common import BaseTest, cassette_name
 from c7n_azure.utils import IpRangeHelper
 from netaddr import IPRange, IPSet
@@ -63,6 +54,8 @@ class IpRangeHelperTest(BaseTest):
         expected = IPSet(IPRange('1.2.2.127', '1.2.2.127'))
         self.assertEqual(expected, actual)
 
+    # Service Tag IP lists are dynamic and will always be changing in live tests
+    @pytest.mark.skiplive
     @cassette_name('servicetags')
     def test_parse_alias(self):
         data = {'whatever': ['ServiceTags.ApiManagement.WestUS']}
@@ -70,6 +63,8 @@ class IpRangeHelperTest(BaseTest):
         expected = IPSet(['13.64.39.16/32', '40.112.242.148/31', '40.112.243.240/28'])
         self.assertEqual(expected, actual)
 
+    # Service Tag IP lists are dynamic and will always be changing in live tests
+    @pytest.mark.skiplive
     @cassette_name('servicetags')
     def test_parse_alias_and_blocks(self):
         data = {'whatever': ['ServiceTags.ApiManagement.WestUS', '1.2.2.127', '1.2.2.128/25']}

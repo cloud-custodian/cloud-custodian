@@ -1,17 +1,9 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
+from c7n_azure.session import Session
+from c7n.utils import local_session
+from mock import patch
 
 
 class ResourceGroupTest(BaseTest):
@@ -21,7 +13,7 @@ class ResourceGroupTest(BaseTest):
     def test_resource_group_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                'name': 'test-resource-group',
+                'name': 'test-azure-resource-group',
                 'resource': 'azure.resourcegroup',
                 'filters': [
                     {'type': 'empty-group'}
@@ -46,3 +38,26 @@ class ResourceGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
+
+    @arm_template('emptyrg.json')
+    def test_delete_resource_group(self):
+        with patch(self._get_mgmt_client_string() + '.begin_delete') \
+                as begin_delete_mock:
+            p = self.load_policy({
+                'name': 'test-azure-resource-group',
+                'resource': 'azure.resourcegroup',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'test_emptyrg'}],
+                'actions': [
+                    {'type': 'delete'}]})
+            p.run()
+
+            begin_delete_mock.assert_called()
+
+    def _get_mgmt_client_string(self):
+        client = local_session(Session) \
+            .client('azure.mgmt.resource.ResourceManagementClient').resource_groups
+        return client.__module__ + '.' + client.__class__.__name__

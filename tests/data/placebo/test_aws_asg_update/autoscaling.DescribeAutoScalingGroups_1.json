@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "tf-asg-20210406161729306300000003",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:644160558196:autoScalingGroup:f92d4ea4-ba11-42ab-8c34-696ed8047010:autoScalingGroupName/tf-asg-20210406161729306300000003",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-007e80764a20763ae",
+                    "LaunchTemplateName": "foobar20210406161728176600000001",
+                    "Version": "$Latest"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-west-2a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-0843feb694ac159c7",
+                        "InstanceType": "t3.micro",
+                        "AvailabilityZone": "us-west-2a",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-007e80764a20763ae",
+                            "LaunchTemplateName": "foobar20210406161728176600000001",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 6,
+                    "hour": 16,
+                    "minute": 17,
+                    "second": 30,
+                    "microsecond": 696000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "tf-asg-20210406161729306300000003",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "App",
+                        "Value": "Testing",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "tf-asg-20210406161729306300000003",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Creator",
+                        "Value": "tstansell",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "tf-asg-20210406161729306300000003",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "c7n_status",
+                        "Value": "AutoScaleGroup does not meet org policy: suspend@2021/04/06 1717 UTC",
+                        "PropagateAtLaunch": false
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

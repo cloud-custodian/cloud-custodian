@@ -1,27 +1,16 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import re
+
+from c7n_azure.session import Session
+from c7n_azure.utils import ResourceIdParser, StringUtils
+from c7n.utils import local_session
 
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
-from c7n_azure.session import Session
-from c7n_azure.utils import ResourceIdParser, StringUtils
-
-from c7n.utils import local_session
 
 
 class FunctionAppUtilities:
@@ -40,7 +29,7 @@ class FunctionAppUtilities:
         rg_name = ResourceIdParser.get_resource_group(id)
         name = ResourceIdParser.get_resource_name(id)
         client = local_session(Session).client('azure.mgmt.storage.StorageManagementClient')
-        obj = client.storage_accounts.list_keys(rg_name, name)
+        obj = client.storage_accounts.list_keys(rg_name, name, expand=None)
 
         connection_string = 'DefaultEndpointsProtocol={};AccountName={};AccountKey={}'.format(
             'https',
@@ -113,7 +102,7 @@ class FunctionAppUtilities:
 
         cls.log.info('Publishing Function application')
 
-        publish_creds = web_client.web_apps.list_publishing_credentials(
+        publish_creds = web_client.web_apps.begin_list_publishing_credentials(
             function_params.function_app['resource_group_name'],
             function_params.function_app['name']).result()
 

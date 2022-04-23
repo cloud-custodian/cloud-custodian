@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import time
 import json
@@ -81,6 +70,19 @@ class TestGlueConnections(BaseTest):
         client = session_factory().client("glue")
         connections = client.get_connections()["ConnectionList"]
         self.assertFalse(connections)
+
+    def test_connection_password_hidden(self):
+        session_factory = self.replay_flight_data("test_connection_password_hidden")
+        p = self.load_policy(
+            {
+                "name": "glue-connection",
+                "resource": "glue-connection",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('PASSWORD' in resources[0].get('ConnectionProperties'), False)
 
 
 class TestGlueDevEndpoints(BaseTest):
@@ -287,6 +289,54 @@ class TestGlueJobs(BaseTest):
         jobs = client.get_jobs()["Jobs"]
         self.assertFalse(jobs)
 
+    def test_enable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_enable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-enable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "absent",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertIn("--enable-metrics", job["DefaultArguments"])
+
+    def test_disable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_disable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-disable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "present",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": False}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertNotIn("--enable-metrics", job["DefaultArguments"])
+
 
 class TestGlueCrawlers(BaseTest):
 
@@ -446,6 +496,30 @@ class TestGlueSecurityConfiguration(BaseTest):
         security_configrations = client.get_security_configurations()
         self.assertFalse("test" in [t.get("Name")
             for t in security_configrations.get("SecurityConfigurations", [])])
+
+    def test_kms_alias(self):
+        factory = self.replay_flight_data("test_glue_security_configuration_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-configuration-s3-kms-alias",
+                "resource": "glue-security-configuration",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/)",
+                        "op": "regex",
+                        "key-type": "cloudwatch"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['EncryptionConfiguration']['CloudWatchEncryption']['KmsKeyArn'],
+            'arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8')
 
 
 class TestGlueTriggers(BaseTest):

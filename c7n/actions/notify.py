@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 
 import base64
@@ -175,9 +164,11 @@ class Notify(BaseNotify):
     def process(self, resources, event=None):
         alias = utils.get_account_alias_from_sts(
             utils.local_session(self.manager.session_factory))
+        partition = utils.get_partition(self.manager.config.region)
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
+            'partition': partition,
             'account': alias,
             'version': version,
             'region': self.manager.config.region,
@@ -259,11 +250,12 @@ class Notify(BaseNotify):
             for k, v in user_attributes.items():
                 if k != 'mtype':
                     attrs[k] = {'DataType': 'String', 'StringValue': v}
-        client.publish(
+        result = client.publish(
             TopicArn=topic_arn,
             Message=self.pack(message),
             MessageAttributes=attrs
         )
+        return result['MessageId']
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue'].format(**message)

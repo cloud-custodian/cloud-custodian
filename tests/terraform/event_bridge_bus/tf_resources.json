@@ -1,0 +1,26 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_event_bus": {
+            "messenger": {
+                "arn": "arn:aws:events:us-east-1:644160558196:event-bus/chat-messages",
+                "id": "chat-messages",
+                "name": "chat-messages",
+                "tags": {
+                    "Env": "Sandbox"
+                }
+            }
+        },
+        "aws_cloudwatch_event_permission": {
+            "DevAccountAccess": {
+                "action": "events:PutEvents",
+                "condition": [],
+                "event_bus_name": "chat-messages",
+                "id": "chat-messages/DevAccountAccess",
+                "principal": "644160558196",
+                "statement_id": "DevAccountAccess"
+            }
+        }
+    }
+}

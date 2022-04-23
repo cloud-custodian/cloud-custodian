@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Cloud Custodian Lambda Provisioning Support
 
@@ -49,7 +38,9 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
 
-LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
+LambdaRetry = get_retry(('InsufficientPermissionsException',
+                         'InvalidParameterValueException',), max_attempts=5)
+LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
 
@@ -414,7 +405,7 @@ class LambdaManager:
 
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
-            e.remove(func)
+            e.remove(func, func_deleted=True)
         log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
@@ -467,6 +458,7 @@ class LambdaManager:
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
         existing = self.get(func.name, qualifier)
+        function_updated_waiter = self.client.get_waiter('function_updated')
 
         if s3_uri:
             # TODO: support versioned buckets
@@ -483,6 +475,7 @@ class LambdaManager:
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
                 result = self.client.update_function_code(**params)
+                function_updated_waiter.wait(FunctionName=func.name)
                 changed = True
 
             # TODO/Consider also set publish above to false, and publish
@@ -620,6 +613,10 @@ class AbstractLambdaFunction:
         """Name for the lambda function"""
 
     @abc.abstractproperty
+    def event_name(self):
+        """Name for event sources"""
+
+    @abc.abstractproperty
     def runtime(self):
         """ """
 
@@ -688,6 +685,7 @@ class AbstractLambdaFunction:
         """Return the lambda distribution archive object."""
 
     def get_config(self):
+
         conf = {
             'FunctionName': self.name,
             'MemorySize': self.memory_size,
@@ -740,6 +738,8 @@ class LambdaFunction(AbstractLambdaFunction):
     @property
     def name(self):
         return self.func_data['name']
+
+    event_name = name
 
     @property
     def description(self):
@@ -835,6 +835,8 @@ class PolicyLambda(AbstractLambdaFunction):
         prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
         return "%s%s" % (prefix, self.policy.name)
 
+    event_name = name
+
     @property
     def description(self):
         return self.policy.data.get(
@@ -846,7 +848,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.8')
+        return self.policy.data['mode'].get('runtime', 'python3.9')
 
     @property
     def memory_size(self):
@@ -945,7 +947,52 @@ def zinfo(fname):
     return info
 
 
-class CloudWatchEventSource:
+class AWSEventBase:
+    """for AWS Event Sources that want to utilize lazy client initialization.
+
+    Primarily utilized by sources that support static rendering to
+    IAAC templates (tools/ops/policylambda.py) to do so in an account
+    agnostic fashion.
+    """
+    client_service = None
+
+    def __init__(self, data, session_factory):
+        self.session_factory = session_factory
+        self._session = None
+        self._client = None
+        self.data = data
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
+
+    @property
+    def client(self):
+        if not self._client:
+            self._client = self.session.client(self.client_service)
+        return self._client
+
+    def remove_permissions(self, func, remove_permission):
+        # typically the entire function will be deleted so we dont
+        # need to bother with removing the permission explicitly
+        if not remove_permission:
+            return True
+
+        client = self.session.client("lambda")
+        try:
+            LambdaConflictRetry(
+                client.remove_permission,
+                FunctionName=func.name,
+                StatementId=func.event_name,
+            )
+            return True
+        except client.ResourceNotFoundException:
+            pass
+
+
+class CloudWatchEventSource(AWSEventBase):
     """Subscribe a lambda to cloud watch events.
 
     Cloud watch events supports a number of different event
@@ -981,23 +1028,7 @@ class CloudWatchEventSource:
         'terminate-success': 'EC2 Instance Terminate Successful',
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
 
-    def __init__(self, data, session_factory):
-        self.session_factory = session_factory
-        self._session = None
-        self._client = None
-        self.data = data
-
-    @property
-    def session(self):
-        if not self._session:
-            self._session = self.session_factory()
-        return self._session
-
-    @property
-    def client(self):
-        if not self._client:
-            self._client = self.session.client('events')
-        return self._client
+    client_service = 'events'
 
     def get(self, rule_name):
         return resource_exists(self.client.describe_rule, Name=rule_name)
@@ -1070,12 +1101,15 @@ class CloudWatchEventSource:
             payload['detail-type'] = events
         elif event_type == 'phd':
             payload['source'] = ['aws.health']
+            payload.setdefault('detail', {})
             if self.data.get('events'):
-                payload['detail'] = {
+                payload['detail'].update({
                     'eventTypeCode': list(self.data['events'])
-                }
+                })
             if self.data.get('categories', []):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
+            if not payload['detail']:
+                payload.pop('detail')
         elif event_type == 'hub-finding':
             payload['source'] = ['aws.securityhub']
             payload['detail-type'] = ['Security Hub Findings - Imported']
@@ -1097,7 +1131,7 @@ class CloudWatchEventSource:
 
     def add(self, func):
         params = dict(
-            Name=func.name, Description=func.description, State='ENABLED')
+            Name=func.event_name, Description=func.description, State='ENABLED')
 
         pattern = self.render_event_pattern()
         if pattern:
@@ -1106,10 +1140,10 @@ class CloudWatchEventSource:
         if schedule:
             params['ScheduleExpression'] = schedule
 
-        rule = self.get(func.name)
+        rule = self.get(func.event_name)
 
         if rule and self.delta(rule, params):
-            log.debug("Updating cwe rule for %s" % func.name)
+            log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
@@ -1121,7 +1155,7 @@ class CloudWatchEventSource:
         try:
             client.add_permission(
                 FunctionName=func.name,
-                StatementId=func.name,
+                StatementId=func.event_name,
                 SourceArn=response['RuleArn'],
                 Action='lambda:InvokeFunction',
                 Principal='events.amazonaws.com')
@@ -1131,7 +1165,7 @@ class CloudWatchEventSource:
 
         # Add Targets
         found = False
-        response = RuleRetry(self.client.list_targets_by_rule, Rule=func.name)
+        response = RuleRetry(self.client.list_targets_by_rule, Rule=func.event_name)
         # CloudWatchE seems to be quite picky about function arns (no aliases/versions)
         func_arn = func.arn
 
@@ -1148,7 +1182,7 @@ class CloudWatchEventSource:
             self, func_arn))
 
         self.client.put_targets(
-            Rule=func.name, Targets=[{"Id": func.name, "Arn": func_arn}])
+            Rule=func.event_name, Targets=[{"Id": func.event_name, "Arn": func_arn}])
 
         return True
 
@@ -1157,31 +1191,33 @@ class CloudWatchEventSource:
 
     def pause(self, func):
         try:
-            self.client.disable_rule(Name=func.name)
-        except Exception:
+            self.client.disable_rule(Name=func.event_name)
+        except ClientError:
             pass
 
     def resume(self, func):
         try:
-            self.client.enable_rule(Name=func.name)
-        except Exception:
+            self.client.enable_rule(Name=func.event_name)
+        except ClientError:
             pass
 
-    def remove(self, func):
-        if self.get(func.name):
-            log.info("Removing cwe targets and rule %s", func.name)
+    def remove(self, func, func_deleted=True):
+        if self.get(func.event_name):
+            log.info("Removing cwe targets and rule %s", func.event_name)
             try:
                 targets = self.client.list_targets_by_rule(
-                    Rule=func.name)['Targets']
+                    Rule=func.event_name)['Targets']
                 if targets:
                     self.client.remove_targets(
-                        Rule=func.name,
+                        Rule=func.event_name,
                         Ids=[t['Id'] for t in targets])
             except ClientError as e:
                 log.warning(
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
-            self.client.delete_rule(Name=func.name)
+            self.client.delete_rule(Name=func.event_name)
+            self.remove_permissions(func, remove_permission=not func_deleted)
+            return True
 
 
 class SecurityHubAction:
@@ -1224,7 +1260,7 @@ class SecurityHubAction:
     def add(self, func):
         self.cwe.add(func)
         client = local_session(self.session_factory).client('securityhub')
-        action = self.get(func.name).get('action')
+        action = self.get(func.event_name).get('action')
         arn = self._get_arn()
         params = {'Name': (
             self.policy.data.get('title') or (
@@ -1250,8 +1286,8 @@ class SecurityHubAction:
         self.cwe.update(func)
         self.add(func)
 
-    def remove(self, func):
-        self.cwe.remove(func)
+    def remove(self, func, func_deleted=True):
+        self.cwe.remove(func, func_deleted)
         client = local_session(self.session_factory).client('securityhub')
         client.delete_action_target(ActionTargetArn=self._get_arn())
 
@@ -1325,25 +1361,28 @@ class BucketLambdaNotification:
 
         return True
 
-    def remove(self, func):
+    def remove(self, func, func_deleted=True):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         if not found:
             return
 
         lambda_client = self.session.client('lambda')
-        try:
-            response = lambda_client.remove_permission(
-                FunctionName=func['FunctionName'],
-                StatementId=self.bucket['Name'])
-            log.debug("Removed lambda permission result: %s" % response)
-        except lambda_client.exceptions.ResourceNotFoundException:
-            pass
+        if not func_deleted:
+            try:
+                response = lambda_client.remove_permission(
+                    FunctionName=func.name,
+                    StatementId=self.bucket['Name'])
+                log.debug("Removed lambda permission result: %s" % response)
+            except lambda_client.exceptions.ResourceNotFoundException:
+                pass
 
         notifies['LambdaFunctionConfigurations'].remove(found)
+        notifies.pop("ResponseMetadata")
         s3.put_bucket_notification_configuration(
             Bucket=self.bucket['Name'],
             NotificationConfiguration=notifies)
+        return True
 
 
 class CloudWatchLogSubscription:
@@ -1380,28 +1419,34 @@ class CloudWatchLogSubscription:
             # Consistent put semantics / ie no op if extant
             self.client.put_subscription_filter(
                 logGroupName=group['logGroupName'],
-                filterName=func.name,
+                filterName=func.event_name,
                 filterPattern=self.filter_pattern,
                 destinationArn=func.alias or func.arn)
 
-    def remove(self, func):
+    def remove(self, func, func_deleted=True):
         lambda_client = self.session.client('lambda')
+        found = False
         for group in self.log_groups:
-            try:
-                response = lambda_client.remove_permission(
-                    FunctionName=func.name,
-                    StatementId=group['logGroupName'][1:].replace('/', '-'))
-                log.debug("Removed lambda permission result: %s" % response)
-            except lambda_client.exceptions.ResourceNotFoundException:
-                pass
-
+            # if the function isn't deleted we need to do some cleanup
+            if not func_deleted:
+                try:
+                    response = lambda_client.remove_permission(
+                        FunctionName=func.name,
+                        StatementId=group['logGroupName'][1:].replace('/', '-'))
+                    log.debug("Removed lambda permission result: %s" % response)
+                    found = True
+                except lambda_client.exceptions.ResourceNotFoundException:
+                    pass
             try:
                 response = self.client.delete_subscription_filter(
-                    logGroupName=group['logGroupName'], filterName=func.name)
+                    logGroupName=group['logGroupName'],
+                    filterName=func.event_name)
                 log.debug("Removed subscription filter from: %s",
                           group['logGroupName'])
+                found = True
             except lambda_client.exceptions.ResourceNotFoundException:
                 pass
+        return found
 
 
 class SQSSubscription:
@@ -1449,17 +1494,20 @@ class SQSSubscription:
                     BatchSize=self.batch_size)
             return modified
 
-    def remove(self, func):
+    def remove(self, func, func_deleted=True):
         client = local_session(self.session_factory).client('lambda')
         event_mappings = {
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
                 FunctionName=func.name).get('EventSourceMappings', ())}
 
+        found = None
         for queue_arn in self.queue_arns:
             if queue_arn not in event_mappings:
                 continue
             client.delete_event_source_mapping(
                 UUID=event_mappings[queue_arn]['UUID'])
+            found = True
+        return found
 
 
 class SNSSubscription:
@@ -1491,7 +1539,7 @@ class SNSSubscription:
             try:
                 lambda_client.add_permission(
                     FunctionName=func.name,
-                    StatementId='sns-topic-' + topic_name,
+                    StatementId=statement_id,
                     SourceArn=arn,
                     Action='lambda:InvokeFunction',
                     Principal='sns.amazonaws.com')
@@ -1506,7 +1554,7 @@ class SNSSubscription:
             sns_client.subscribe(
                 TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
-    def remove(self, func):
+    def remove(self, func, func_deleted=True):
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         sns_client = session.client('sns')
@@ -1514,14 +1562,16 @@ class SNSSubscription:
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
 
-            try:
-                response = lambda_client.remove_permission(
-                    FunctionName=func.name,
-                    StatementId=statement_id)
-                log.debug("Removed lambda permission result: %s" % response)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
+            # if the function isn't deleted we need to do some cleanup
+            if not func_deleted:
+                try:
+                    response = lambda_client.remove_permission(
+                        FunctionName=func.name,
+                        StatementId=statement_id)
+                    log.debug("Removed lambda permission result: %s" % response)
+                except ClientError as e:
+                    if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                        raise
 
             paginator = sns_client.get_paginator('list_subscriptions_by_topic')
 
@@ -1588,16 +1638,10 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
-class ConfigRule:
+class ConfigRule(AWSEventBase):
     """Use a lambda as a custom config rule.
-
     """
-
-    def __init__(self, data, session_factory):
-        self.data = data
-        self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('config')
+    client_service = 'config'
 
     def __repr__(self):
         return "<ConfigRule>"
@@ -1605,7 +1649,7 @@ class ConfigRule:
     def get_rule_params(self, func):
         # config does not support versions/aliases on lambda funcs
         func_arn = func.arn
-        if func_arn.count(':') > 6:
+        if isinstance(func_arn, str) and func_arn.count(':') > 6:
             func_arn, version = func_arn.rsplit(':', 1)
 
         params = dict(
@@ -1667,7 +1711,7 @@ class ConfigRule:
         if ('MaximumExecutionFrequency' in params and
                 rule['MaximumExecutionFrequency'] != params['MaximumExecutionFrequency']):
             return True
-        if rule.get('Description', '') != rule.get('Description', ''):
+        if rule.get('Description', '') != params.get('Description', ''):
             return True
         return False
 
@@ -1696,7 +1740,7 @@ class ConfigRule:
         log.debug("Adding config rule for %s" % func.name)
         return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
-    def remove(self, func):
+    def remove(self, func, func_deleted=True):
         rule = self.get(func.name)
         if not rule:
             return
@@ -1706,3 +1750,5 @@ class ConfigRule:
                 ConfigRuleName=func.name)
         except self.client.exceptions.NoSuchConfigRuleException:
             pass
+        self.remove_permissions(func, remove_permission=not func_deleted)
+        return True

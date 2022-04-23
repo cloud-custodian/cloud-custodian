@@ -1,19 +1,19 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import pytest
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import collections
+from netaddr import IPSet
+from mock import Mock
 from ..azure_common import BaseTest, arm_template
+from c7n_azure.resources.postgresql_server import PostgresqlServerFirewallRulesFilter
+
+IpRange = collections.namedtuple('IpRange', 'start_ip_address end_ip_address')
+
+PORTAL_IPS = ['104.42.195.92',
+              '40.76.54.131',
+              '52.176.6.30',
+              '52.169.50.45',
+              '52.187.184.26']
+AZURE_CLOUD_IPS = ['0.0.0.0']
 
 
 class PostgresqlServerTest(BaseTest):
@@ -26,9 +26,6 @@ class PostgresqlServerTest(BaseTest):
         self.assertTrue(p)
 
     @arm_template('postgresql.json')
-    # Due to the COVID-19 Azure hardened quota limits for internal subscriptions and
-    # postgresql can't be provisioned.
-    @pytest.mark.skiplive
     def test_find_server_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-postgresql-server',
@@ -45,3 +42,33 @@ class PostgresqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class PostgresqlServerFirewallFilterTest(BaseTest):
+
+    resource = {'name': 'test', 'resourceGroup': 'test'}
+
+    def test_query_empty_rules(self):
+        rules = []
+        expected = IPSet()
+        self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
+
+    def test_query_regular_rules(self):
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8')]
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
+
+    def test_query_regular_rules_with_magic(self):
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+                 IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
+
+    def _get_filter(self, rules, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        filter = PostgresqlServerFirewallRulesFilter(data, Mock())
+        filter.client = Mock()
+        filter.client.firewall_rules.list_by_server.return_value = rules
+        return filter

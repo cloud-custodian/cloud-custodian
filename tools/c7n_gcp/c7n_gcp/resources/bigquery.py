@@ -1,20 +1,11 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
 
+from c7n.utils import type_schema
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('bq-dataset')
@@ -35,6 +26,8 @@ class DataSet(QueryResourceManager):
             id, name, "description",
             "creationTime", "lastModifiedTime"]
         asset_type = "bigquery.googleapis.com/Dataset"
+        scc_type = "google.cloud.bigquery.Dataset"
+        metric_key = "resource.labels.dataset_id"
         permissions = ('bigquery.datasets.get',)
 
         @staticmethod
@@ -122,3 +115,17 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+
+@BigQueryTable.action_registry.register('delete')
+class DeleteBQTable(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.tables.get', 'bigquery.tables.delete')
+
+    def get_resource_params(self, model, r):
+        return {
+            'projectId': r['tableReference']['projectId'],
+            'datasetId': r['tableReference']['datasetId'],
+            'tableId': r['tableReference']['tableId']
+        }

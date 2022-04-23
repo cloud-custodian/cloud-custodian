@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import os
 import time
@@ -72,7 +61,9 @@ class FunctionPackageTest(BaseTest):
             content = json.loads(zf.read('test-azure-public-ip/auth.json'))
             self.assertEqual(content, {
                 'client_id': 'dog',
-                'subscription_id': None, 'use_msi': True})
+                'subscription_id': None,
+                'use_msi': True,
+                'tenant_id': self.session.get_tenant_id()})
 
     def test_auth_file_user_assigned_identity(self):
         p = self.load_policy({
@@ -91,7 +82,10 @@ class FunctionPackageTest(BaseTest):
         packer.pkg.close()
         with zipfile.ZipFile(packer.pkg.path) as zf:
             content = json.loads(zf.read('test-azure-public-ip/auth.json'))
-            self.assertEqual(content, {'subscription_id': None, 'use_msi': True})
+            self.assertEqual(content, {
+                'subscription_id': None,
+                'use_msi': True,
+                'tenant_id': self.session.get_tenant_id()})
 
     def test_add_function_config_events(self):
         p = self.load_policy({

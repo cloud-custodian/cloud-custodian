@@ -1,20 +1,20 @@
-module github.com/capitalone/cloud-custodian/tools/cask
+module github.com/cloud-custodian/cloud-custodian/tools/cask
+
+go 1.14
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Microsoft/go-winio v0.4.12 // indirect
-	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
-	github.com/docker/distribution v2.7.1+incompatible // indirect
-	github.com/docker/docker v0.0.0-20170601211448-f5ec1e2936dc
-	github.com/docker/go-connections v0.4.0
-	github.com/docker/go-units v0.4.0 // indirect
-	github.com/mattn/go-isatty v0.0.9
-	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
-	github.com/stretchr/testify v1.3.0 // indirect
-	github.com/thoas/go-funk v0.4.0
-	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443 // indirect
-	golang.org/x/net v0.0.0-20190619014844-b5b0513f8c1b // indirect
+	github.com/Microsoft/go-winio v0.5.1 // indirect
+	github.com/containerd/containerd v1.5.10 // indirect
+	github.com/docker/distribution v2.8.0+incompatible // indirect
+	github.com/docker/docker v20.10.12+incompatible
+	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/mattn/go-isatty v0.0.14
+	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/thoas/go-funk v0.9.1
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	google.golang.org/genproto v0.0.0-20220211171837-173942840c17 // indirect
 
 )
 

@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 from .common import BaseTest
@@ -131,6 +120,38 @@ class TestRestApi(BaseTest):
         with self.assertRaises(ClientError) as e:
             client.delete_rest_api(restApiId='am0c2fyskg')
         self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+    def test_rest_api_metrics(self):
+        factory = self.replay_flight_data("test_rest_api_delete")
+        p = self.load_policy(
+            {
+                "name": "unused-rest-api",
+                "resource": "rest-api",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "Count",
+                        "days": 4,
+                        "period": 86400,
+                        "value": 1000,
+                        "op": "less-than",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        test_filter = p.resource_manager.filters[0]
+        resource_payload = {
+            "id": "am0c2fyskg",
+            "name": "c7n-test-2"
+        }
+        test_filter.process(resource_payload)
+        self.assertEqual(
+            test_filter.get_dimensions(resource_payload),
+            [
+                {"Name": "ApiName", "Value": "c7n-test-2"}
+            ],
+        )
 
 
 class TestRestResource(BaseTest):
@@ -401,3 +422,131 @@ class TestRestStage(BaseTest):
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
+
+
+class TestRestClientCertificate(BaseTest):
+
+    def test_rest_client_certificate_resource(self):
+        session_factory = self.replay_flight_data('test_rest_client_certificate_resource',
+            region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'list-rest-client-certificates',
+                'resource': 'rest-client-certificate',
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['description'], 'Test certificate')
+
+    def test_rest_stage_client_certificate_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_client_certificate_filter', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+    def test_rest_stage_certificate_filter_config_source(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_stage_certificate_filter_config_source', region='us-east-2')
+        p = self.load_policy(
+            {
+                'name': 'rest-stages-with-expired-certificate',
+                'resource': 'rest-stage',
+                'source': 'config',
+                'filters': [
+                    {
+                        'type': 'client-certificate',
+                        'key': 'expirationDate',
+                        'value_type': 'expiration',
+                        'value': 0,
+                        'op': 'lte',
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('expirationDate', resources[0]['c7n:matched-client-certificate'])
+
+
+class TestCustomDomainName(BaseTest):
+    def test_filter_check_tls(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["domainName"], "bad.example.com")
+
+    def test_action_remediate_tls(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_action_remediate_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "update-security",
+                        "securityPolicy": "TLS_1_2"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["domainName"], "bad.example.com")
+
+        # verify resource is remediated
+        client = factory().client("apigateway")
+        result = client.get_domain_name(domainName="bad.example.com")
+        self.assertEqual(result['securityPolicy'], 'TLS_1_2')

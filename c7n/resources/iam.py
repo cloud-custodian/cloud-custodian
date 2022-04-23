@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from collections import OrderedDict
 import csv
 import datetime
@@ -21,13 +10,16 @@ from datetime import timedelta
 import itertools
 import time
 
+# Used to parse saml provider metadata configuration.
+from xml.etree import ElementTree  # nosec nosemgrep
+
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse as parse_date
 
 from botocore.exceptions import ClientError
 
-
+from c7n import deprecated
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
@@ -36,7 +28,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
     get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
@@ -118,6 +110,10 @@ class Role(QueryResourceManager):
         'describe': DescribeRole,
         'config': ConfigSource
     }
+
+
+Role.action_registry.register('mark-for-op', TagDelayedAction)
+Role.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @Role.action_registry.register('post-finding')
@@ -222,6 +218,19 @@ class RoleSetBoundary(SetBoundary):
 
 class DescribeUser(DescribeSource):
 
+    def augment(self, resources):
+        # iam has a race condition, where listing will potentially return a
+        # new user prior it to its availability to get user
+        client = local_session(self.manager.session_factory).client('iam')
+        results = []
+        for r in resources:
+            ru = self.manager.retry(
+                client.get_user, UserName=r['UserName'],
+                ignore_err_codes=client.exceptions.NoSuchEntityException)
+            if ru:
+                results.append(ru['User'])
+        return list(filter(None, results))
+
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.manager.session_factory).client('iam')
         results = []
@@ -287,6 +296,10 @@ class UserRemoveTag(RemoveTag):
 
 User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+Role.action_registry.register('mark-for-op', TagDelayedAction)
+Role.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @User.action_registry.register('set-groups')
@@ -377,6 +390,9 @@ class DescribePolicy(DescribeSource):
                     continue
         return results
 
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
@@ -384,7 +400,7 @@ class Policy(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', None)
+        enum_spec = ('list_policies', 'Policies', {'Scope': 'Local'})
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
@@ -392,6 +408,7 @@ class Policy(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        universal_taggable = object()
 
     source_mapping = {
         'describe': DescribePolicy,
@@ -418,8 +435,7 @@ class InstanceProfile(QueryResourceManager):
         service = 'iam'
         arn_type = 'instance-profile'
         enum_spec = ('list_instance_profiles', 'InstanceProfiles', None)
-        id = 'InstanceProfileId'
-        name = 'InstanceProfileId'
+        name = id = 'InstanceProfileName'
         date = 'CreateDate'
         # Denotes this resource type exists across regions
         global_resource = True
@@ -435,11 +451,49 @@ class ServerCertificate(QueryResourceManager):
         enum_spec = ('list_server_certificates',
                      'ServerCertificateMetadataList',
                      None)
-        id = 'ServerCertificateId'
+        name = id = 'ServerCertificateName'
         name = 'ServerCertificateName'
         date = 'Expiration'
         # Denotes this resource type exists across regions
         global_resource = True
+
+
+@ServerCertificate.action_registry.register('delete')
+class CertificateDelete(BaseAction):
+    """Delete an IAM Certificate
+
+    For example, if you want to automatically delete an unused IAM certificate.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-certificate-delete-expired
+          resource: iam-certificate
+          filters:
+            - type: value
+              key: Expiration
+              value_type: expiration
+              op: greater-than
+              value: 0
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteServerCertificate',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for cert in resources:
+            self.manager.retry(
+                client.delete_server_certificate,
+                ServerCertificateName=cert['ServerCertificateName'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
 
 
 @User.filter_registry.register('usage')
@@ -579,12 +633,27 @@ class CheckPermissions(Filter):
 
         policies:
           - name: super-users
-            resource: iam-user
+            resource: aws.iam-user
             filters:
               - type: check-permissions
                 match: allowed
                 actions:
                  - iam:CreateUser
+
+    :example:
+
+    Find users with access to all services and actions
+
+    .. code-block:: yaml
+
+        policies:
+          - name: admin-users
+            resource: aws.iam-user
+            filters:
+              - type: check-permissions
+                match: allowed
+                actions:
+                  - '*:*'
 
     By default permission boundaries are checked.
     """
@@ -603,6 +672,21 @@ class CheckPermissions(Filter):
     policy_annotation = 'c7n:policy'
     eval_annotation = 'c7n:perm-matches'
 
+    def validate(self):
+        # This filter relies on IAM policy simulator APIs. From the docs concerning action names:
+        #
+        # "Each operation must include the service identifier, such as iam:CreateUser. This
+        # operation does not support using wildcards (*) in an action name."
+        #
+        # We can catch invalid actions during policy validation, rather than waiting to hit
+        # runtime exceptions.
+        for action in self.data['actions']:
+            if ':' not in action[1:-1]:
+                raise PolicyValidationError(
+                    "invalid check-permissions action: '%s' must be in the form <service>:<action>"
+                    % (action,))
+        return self
+
     def get_permissions(self):
         if self.manager.type == 'iam-policy':
             return ('iam:SimulateCustomPolicy', 'iam:GetPolicyVersion')
@@ -617,9 +701,19 @@ class CheckPermissions(Filter):
         actions = self.data['actions']
         matcher = self.get_eval_matcher()
         operator = self.data.get('match-operator', 'and') == 'and' and all or any
-
         arn_resources = list(zip(self.get_iam_arns(resources), resources))
-        self.initialize_boundaries(client, arn_resources)
+
+        # To ignore permission boundaries, override with an allow-all policy
+        self.simulation_boundary_override = '''
+            {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Action": "*",
+                    "Resource": "*"
+                }]
+            }
+        ''' if not self.data.get('boundaries', True) else None
         results = []
         eval_cache = {}
         for arn, r in arn_resources:
@@ -642,49 +736,6 @@ class CheckPermissions(Filter):
                 results.append(r)
         return results
 
-    def initialize_boundaries(self, client, iam_resources):
-        """For IAM boundaries we need to retrieve boundary policy content.
-        """
-        # boundaries aren't attached to these.
-        if (self.manager.type in ('iam-policy', 'iam-group') or
-                self.data.get('boundary', True) is False):
-            return
-
-        # if boundary attributes aren't directly on the resource, fetch
-        # the iam role for the resource to get the boundary.
-        if self.manager.type not in ('iam-role', 'iam-user'):
-            iam_arns = {iam_arn for iam_arn, r in iam_resources if iam_arn is not None}
-            roles = self.manager.get_resource_manager(
-                'iam-role').get_resources(list(iam_arns), augment=False)
-            boundary_iam_map = {
-                r['Arn']: r.get('PermissionsBoundary', {}).get('PermissionsBoundaryArn')
-                for r in roles}
-            boundary_map = {}
-            for iam_arn, r in iam_resources:
-                boundary_map[self.manager.get_arns((r,))[0]] = boundary_iam_map.get(iam_arn)
-        else:
-            boundary_map = {
-                resource_arn: r.get('PermissionsBoundary', {}).get('PermissionsBoundaryArn')
-                for resource_arn, r in iam_resources}
-
-        # fetch boundary policies text
-        boundary_arns = set(boundary_map.values())
-        if None in boundary_arns:
-            boundary_arns.remove(None)
-        policies = self.manager.get_resource_manager(
-            'iam-policy').get_resources(list(boundary_arns))
-        boundaries = {}
-        for p in policies:
-            boundaries[p['Arn']] = json.dumps(client.get_policy_version(
-                PolicyArn=p['Arn'],
-                VersionId=p['DefaultVersionId'])['PolicyVersion']['Document'])
-
-        for resource_arn, boundary_arn in list(boundary_map.items()):
-            if boundary_arn is None:
-                continue
-            boundary_map[resource_arn] = boundaries[boundary_arn]
-        self.boundaries = boundary_map
-
     def get_iam_arns(self, resources):
         return self.manager.get_arns(resources)
 
@@ -701,15 +752,24 @@ class CheckPermissions(Filter):
                 ActionNames=actions).get('EvaluationResults', ())
             return evaluations
 
-        params = dict(PolicySourceArn=arn, ActionNames=actions)
-        if self.boundaries:
-            boundary_policy = self.boundaries.get(
-                self.manager.get_arns([r])[0])
-            if boundary_policy:
-                params['PermissionsBoundaryPolicyInputList'] = [boundary_policy]
+        params = dict(
+            PolicySourceArn=arn,
+            ActionNames=actions,
+            ignore_err_codes=('NoSuchEntity',))
 
-        evaluations = self.manager.retry(
-            client.simulate_principal_policy, **params).get('EvaluationResults', ())
+        # simulate_principal_policy() respects permission boundaries by default. To opt out of
+        # considering boundaries for this filter, we can provide an allow-all policy
+        # as the boundary.
+        #
+        # Note: Attempting to use an empty list for the boundary seems like a reasonable
+        # impulse too, but that seems to cause the simulator to fall back to its default
+        # of using existing boundaries.
+        if self.simulation_boundary_override:
+            params['PermissionsBoundaryPolicyInputList'] = [self.simulation_boundary_override]
+
+        evaluations = (self.manager.retry(
+            client.simulate_principal_policy,
+            **params) or {}).get('EvaluationResults', ())
         return evaluations
 
     def get_eval_matcher(self):
@@ -859,6 +919,9 @@ class UnusedIamRole(IamRoleUsage):
               - type: used
                 state: false
     """
+    deprecations = (
+        deprecated.filter("use the 'used' filter with 'state' attribute"),
+    )
 
     schema = type_schema('unused')
 
@@ -1028,6 +1091,10 @@ class SetPolicy(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
+        if policy_arn != "*" and not policy_arn.startswith('arn'):
+            policy_arn = 'arn:{}:iam::{}:policy/{}'.format(
+                get_partition(self.manager.config.region),
+                self.manager.account_id, policy_arn)
         state = self.data['state']
         for r in resources:
             if state == 'attached':
@@ -1058,6 +1125,17 @@ class SetPolicy(BaseAction):
 class RoleDelete(BaseAction):
     """Delete an IAM Role.
 
+    To delete IAM Role you must first delete the policies
+    that are associated with the role. Also, you need to remove
+    the role from all instance profiles that the role is in.
+
+    https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html
+
+    For this case option 'force' is used. If you set it as 'true',
+    policies that are associated with the role would be detached
+    (inline policies would be removed) and all instance profiles
+    the role is in would be removed as well as the role.
+
     For example, if you want to automatically delete an unused IAM role.
 
     :example:
@@ -1076,7 +1154,37 @@ class RoleDelete(BaseAction):
 
     """
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('iam:DeleteRole',)
+    permissions = ('iam:DeleteRole', 'iam:DeleteInstanceProfile',)
+
+    def detach_inline_policies(self, client, r):
+        policies = (self.manager.retry(
+            client.list_role_policies, RoleName=r['RoleName'],
+            ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
+        for p in policies:
+            self.manager.retry(
+                client.delete_role_policy,
+                RoleName=r['RoleName'], PolicyName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+
+    def delete_instance_profiles(self, client, r):
+        # An instance profile can contain only one IAM role,
+        # although a role can be included in multiple instance profiles
+        profile_names = []
+        profiles = self.manager.retry(
+            client.list_instance_profiles_for_role,
+            RoleName=r['RoleName'],
+            ignore_err_codes=('NoSuchEntityException',))
+        if profiles:
+            profile_names = [p.get('InstanceProfileName') for p in profiles['InstanceProfiles']]
+        for p in profile_names:
+            self.manager.retry(
+                client.remove_role_from_instance_profile,
+                RoleName=r['RoleName'], InstanceProfileName=p,
+                ignore_err_codes=('NoSuchEntityException',))
+            self.manager.retry(
+                client.delete_instance_profile,
+                InstanceProfileName=p,
+                ignore_err_codes=('NoSuchEntityException',))
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1085,17 +1193,21 @@ class RoleDelete(BaseAction):
             policy_setter = self.manager.action_registry['set-policy'](
                 {'state': 'detached', 'arn': '*'}, self.manager)
             policy_setter.process(resources)
+
         for r in resources:
+            if self.data.get('force', False):
+                self.detach_inline_policies(client, r)
+                self.delete_instance_profiles(client, r)
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
-                    "Role:%s cannot be deleted, set force to detach policy and delete"
-                    % r['Arn'])
+                    ("Role:%s cannot be deleted, set force "
+                     "to detach policy, instance profile and delete, error: %s") % (
+                         r['Arn'], str(e)))
                 error = e
-            except client.exceptions.NoSuchEntityException:
-                continue
-            except client.exceptions.UnmodifiableEntityException:
+            except (client.exceptions.NoSuchEntityException,
+                    client.exceptions.UnmodifiableEntityException):
                 continue
         if error:
             raise error
@@ -1322,7 +1434,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if (r['Arn'] not in profiles or r['InstanceProfileName'] not in profiles):
+            if (r['Arn'] not in profiles and r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (
@@ -1474,9 +1586,15 @@ class CredentialReport(Filter):
         try:
             report = client.get_credential_report()
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ReportNotPresent':
+            if e.response['Error']['Code'] == 'ReportNotPresent':
+                report = None
+            elif e.response['Error']['Code'] == 'ReportInProgress':
+                # Someone else asked for the report before it was done. Wait
+                # for it again.
+                time.sleep(self.get_value_or_schema_default('report_delay'))
+                report = client.get_credential_report()
+            else:
                 raise
-            report = None
         if report:
             threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
                 seconds=self.get_value_or_schema_default(
@@ -1732,6 +1850,61 @@ class UserAccessKey(ValueFilter):
                 k['c7n:match-type'] = 'access'
             self.merge_annotation(r, self.matched_annotation_key, k_matched)
             if k_matched:
+                matched.append(r)
+        return matched
+
+
+@User.filter_registry.register('ssh-key')
+class UserSSHKeyFilter(ValueFilter):
+    """Filter IAM users based on uploaded SSH public keys
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-old-ssh-keys
+            resource: iam-user
+            filters:
+              - type: ssh-key
+                key: Status
+                value: Active
+              - type: ssh-key
+                key: UploadDate
+                value_type: age
+                value: 90
+    """
+
+    schema = type_schema(
+        'ssh-key',
+        rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('iam:ListSSHPublicKeys',)
+    annotation_key = 'c7n:SSHKeys'
+    matched_annotation_key = 'c7n:matched-ssh-keys'
+    annotate = False
+
+    def get_user_ssh_keys(self, client, user_set):
+        for u in user_set:
+            u[self.annotation_key] = self.manager.retry(
+                client.list_ssh_public_keys,
+                UserName=u['UserName'])['SSHPublicKeys']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
+            self.log.debug(
+                "Querying %d users' SSH keys" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_user_ssh_keys, client),
+                chunks(augment_set, 50)))
+
+        matched = []
+        for r in resources:
+            matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_keys)
+            if matched_keys:
                 matched.append(r)
         return matched
 
@@ -2105,7 +2278,10 @@ class UserRemoveAccessKey(BaseAction):
                 m_keys = resolve_credential_keys(
                     r.get(CredentialReport.matched_annotation_key),
                     keys)
-                assert m_keys, "shouldn't have gotten this far without keys"
+                # It is possible for a _user_ to match multiple credential filters
+                # without having any single key match them all.
+                if not m_keys:
+                    continue
                 keys = m_keys
 
             for k in keys:
@@ -2121,6 +2297,53 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
+
+
+@User.action_registry.register('delete-ssh-keys')
+class UserDeleteSSHKey(BaseAction):
+    """Delete or disable a user's SSH keys.
+
+    For example to delete keys after 90 days:
+
+    :example:
+
+        .. code-block:: yaml
+
+         - name: iam-user-delete-ssh-keys
+           resource: iam-user
+           actions:
+             - type: delete-ssh-keys
+    """
+
+    schema = type_schema(
+        'delete-ssh-keys',
+        matched={'type': 'boolean'},
+        disable={'type': 'boolean'})
+    annotation_key = 'c7n:SSHKeys'
+    permissions = ('iam:ListSSHPublicKeys', 'iam:UpdateSSHPublicKey',
+                   'iam:DeleteSSHPublicKey')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = client.list_ssh_public_keys(
+                    UserName=r['UserName'])['SSHPublicKeys']
+
+            keys = (r.get(UserSSHKeyFilter.matched_annotation_key, [])
+                    if self.data.get('matched') else r[self.annotation_key])
+
+            for k in keys:
+                if self.data.get('disable'):
+                    client.update_ssh_public_key(
+                        UserName=r['UserName'],
+                        SSHPublicKeyId=k['SSHPublicKeyId'],
+                        Status='Inactive')
+                else:
+                    client.delete_ssh_public_key(
+                        UserName=r['UserName'],
+                        SSHPublicKeyId=k['SSHPublicKeyId'])
 
 
 def resolve_credential_keys(m_keys, keys):
@@ -2142,6 +2365,43 @@ def resolve_credential_keys(m_keys, keys):
 #################
 #   IAM Groups  #
 #################
+
+
+@Group.filter_registry.register('has-specific-managed-policy')
+class SpecificIamGroupManagedPolicy(Filter):
+    """Filter IAM groups that have a specific policy attached
+
+    For example, if the user wants to check all groups with 'admin-policy':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-groups-have-admin
+            resource: iam-group
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedGroupPolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_group_policies(
+            GroupName=resource['GroupName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            results = []
+            for r in resources:
+                r["ManagedPolicies"] = self._managed_policies(c, r)
+                if self.data.get('value') in r["ManagedPolicies"]:
+                    results.append(r)
+            return results
+        return []
 
 
 @Group.filter_registry.register('has-users')
@@ -2208,3 +2468,174 @@ class IamGroupInlinePolicy(Filter):
             if len(r['c7n:InlinePolicies']) == 0 and not value:
                 res.append(r)
         return res
+
+
+@Group.action_registry.register('delete-inline-policies')
+class GroupInlinePolicyDelete(BaseAction):
+    """Delete inline policies embedded in an IAM group.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-group-policies
+          resource: aws.iam-group
+          filters:
+            - type: value
+              key: GroupName
+              value: test
+          actions:
+            - type: delete-inline-policies
+    """
+    schema = type_schema('delete-inline-policies')
+    permissions = ('iam:ListGroupPolicies', 'iam:DeleteGroupPolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        if 'c7n:InlinePolicies' not in r:
+            r['c7n:InlinePolicies'] = client.list_group_policies(
+                GroupName=r['GroupName'])['PolicyNames']
+        for policy in r.get('c7n:InlinePolicies', []):
+            try:
+                self.manager.retry(client.delete_group_policy,
+                    GroupName=r['GroupName'], PolicyName=policy)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@Group.action_registry.register('delete')
+class UserGroupDelete(BaseAction):
+    """Delete an IAM User Group.
+
+    For example, if you want to delete a group named 'test'.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-user-group
+          resource: aws.iam-group
+          filters:
+            - type: value
+              key: GroupName
+              value: test
+          actions:
+            - type: delete
+              force: True
+    """
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('iam:DeleteGroup', 'iam:RemoveUserFromGroup')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.process_group(client, r)
+
+    def process_group(self, client, r):
+        error = None
+        force = self.data.get('force', False)
+        if force:
+            users = client.get_group(GroupName=r['GroupName']).get('Users', [])
+            for user in users:
+                client.remove_user_from_group(
+                    UserName=user['UserName'], GroupName=r['GroupName'])
+
+        try:
+            client.delete_group(GroupName=r['GroupName'])
+        except client.exceptions.DeleteConflictException as e:
+            self.log.warning(
+                ("Group:%s cannot be deleted, "
+                 "set force to remove all users from group")
+                % r['Arn'])
+            error = e
+        except (client.exceptions.NoSuchEntityException,
+                client.exceptions.UnmodifiableEntityException):
+            pass
+        if error:
+            raise error
+
+
+class SamlProviderDescribe(DescribeSource):
+
+    def augment(self, resources):
+        super().augment(resources)
+        for r in resources:
+            md = r.get('SAMLMetadataDocument')
+            if not md:
+                continue
+            root = sso_metadata(md)
+            r['IDPSSODescriptor'] = root['IDPSSODescriptor']
+        return resources
+
+    def get_permissions(self):
+        return ('iam:GetSAMLProvider', 'iam:ListSAMLProviders')
+
+
+def sso_metadata(md):
+    root = ElementTree.fromstringlist(md)
+    d = {}
+    _sso_recurse(root, d)
+    return d
+
+
+def _sso_recurse(node, d):
+    d.update(node.attrib)
+    for c in node:
+        k = c.tag.split('}', 1)[-1]
+        cd = {}
+        if k in d:
+            if not isinstance(d[k], list):
+                d[k] = [d[k]]
+            d[k].append(cd)
+        else:
+            d[k] = cd
+        _sso_recurse(c, cd)
+    if node.text and node.text.strip():
+        d['Value'] = node.text.strip()
+
+
+@resources.register('iam-saml-provider')
+class SamlProvider(QueryResourceManager):
+    """SAML SSO Provider
+
+    we parse and expose attributes of the SAML Metadata XML Document
+    as resources attribute for use with custodian's standard value filter.
+    """
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_saml_providers', 'SAMLProviderList', None)
+        detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'saml-provider'
+        global_resource = True
+
+    source_mapping = {'describe': SamlProviderDescribe}
+
+
+class OpenIdDescribe(DescribeSource):
+
+    def get_permissions(self):
+        return ('iam:GetOpenIDConnectProvider', 'iam:ListOpenIDConnectProviders')
+
+
+@resources.register('iam-oidc-provider')
+class OpenIdProvider(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+
+        service = 'iam'
+        name = id = 'Arn'
+        enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
+        detail_spec = ('get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None)
+        arn = 'Arn'
+        arn_type = 'oidc-provider'
+        global_resource = True
+
+    source_mapping = {'describe': OpenIdDescribe}

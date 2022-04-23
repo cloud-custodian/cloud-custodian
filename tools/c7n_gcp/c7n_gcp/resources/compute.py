@@ -1,27 +1,17 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import re
 
 from datetime import datetime
 
-from c7n.utils import type_schema
+from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+from c7n.filters.core import ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -38,6 +28,8 @@ class Instance(QueryResourceManager):
         labels = True
         default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
         asset_type = "compute.googleapis.com/Instance"
+        scc_type = "google.compute.Instance"
+        metric_key = 'metric.labels.instance_name'
 
         @staticmethod
         def get(client, resource_info):
@@ -73,6 +65,57 @@ class InstanceOnHour(OnHour):
 
     def get_tag_value(self, instance):
         return instance.get('labels', {}).get(self.tag_key, False)
+
+
+@Instance.filter_registry.register('effective-firewall')
+class EffectiveFirewall(ValueFilter):
+    """Filters instances by their effective firewall rules.
+    See `getEffectiveFirewalls
+    <https://cloud.google.com/compute/docs/reference/rest/v1/instances/getEffectiveFirewalls>`_
+    for valid fields.
+
+    :example:
+
+    Filter all instances that have a firewall rule that allows public
+    acess
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-publicly-accessable-instances
+             resource: gcp.instance
+             filters:
+             - type: effective-firewall
+               key: firewalls[*].sourceRanges[]
+               op: contains
+               value: "0.0.0.0/0"
+    """
+
+    schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
+    permissions = ('compute.instances.getEffectiveFirewalls',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+
+    def process_resource(self, client, resource):
+        params = self.get_resource_params(resource)
+        effective_firewalls = []
+        for interface in resource["networkInterfaces"]:
+            effective_firewalls.append(client.execute_command(
+                'getEffectiveFirewalls', {"networkInterface": interface["name"], **params}))
+        return super(EffectiveFirewall, self).process(effective_firewalls, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        model = self.manager.get_model()
+        session = local_session(self.manager.session_factory)
+        client = self.get_client(session, model)
+        return [r for r in resources if self.process_resource(client, r)]
 
 
 class InstanceAction(MethodAction):
@@ -154,6 +197,52 @@ class DetachDisks(MethodAction):
             self.invoke_api(client, op_name, params)
 
 
+@Instance.action_registry.register('create-machine-image')
+class CreateMachineImage(MethodAction):
+    """
+    `Creates <https://cloud.google.com/compute/docs/reference/rest/beta/machineImages/insert>`_
+     Machine Image from instance.
+
+    The `name_format` specifies name of image in python `format string <https://pyformat.info/>`
+
+    Inside format string there are defined variables:
+      - `now`: current time
+      - `instance`: whole instance resource
+
+    Default name format is `{instance[name]}`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-create-machine-image
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: name
+                value: instance-create-to-make-image
+            actions:
+              - type: create-machine-image
+                name_format: "{instance[name]:.50}-{now:%Y-%m-%d}"
+
+    """
+    schema = type_schema('create-machine-image', name_format={'type': 'string'})
+    method_spec = {'op': 'insert'}
+    permissions = ('compute.machineImages.create',)
+
+    def get_resource_params(self, model, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, _, _ = path_param_re.match(resource['selfLink']).groups()
+        name_format = self.data.get('name_format', '{instance[name]}')
+        name = name_format.format(instance=resource, now=datetime.now())
+
+        return {'project': project, 'sourceInstance': resource['selfLink'], 'body': {'name': name}}
+
+    def get_client(self, session, model):
+        return session.client(model.service, "beta", "machineImages")
+
+
 @resources.register('image')
 class Image(QueryResourceManager):
 
@@ -206,7 +295,7 @@ class Disk(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
-                        'resourceId': resource_info['disk_id']})
+                        'disk': resource_info['disk_id']})
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -305,7 +394,7 @@ class Snapshot(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'snapshot_id': resource_info['snapshot_id']})
+                        'snapshot': resource_info['snapshot_id']})
 
 
 @Snapshot.action_registry.register('delete')
@@ -387,6 +476,7 @@ class Autoscaler(QueryResourceManager):
         default_report_fields = [
             "name", "description", "status", "target", "recommendedSize"]
         asset_type = "compute.googleapis.com/Autoscaler"
+        metric_key = "resource.labels.autoscaler_name"
 
         @staticmethod
         def get(client, resource_info):

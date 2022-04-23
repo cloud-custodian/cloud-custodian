@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import base64
 from datetime import datetime, timedelta
 import functools
@@ -21,9 +10,13 @@ import yaml
 
 import jinja2
 import jmespath
-from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
+
+try:
+    from botocore.exceptions import ClientError
+except ImportError:  # pragma: no cover
+    pass  # Azure provider
 
 
 class Providers:
@@ -32,7 +25,7 @@ class Providers:
 
 
 def get_jinja_env(template_folders):
-    env = jinja2.Environment(trim_blocks=True, autoescape=False)
+    env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
     env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
@@ -75,6 +68,7 @@ def get_rendered_jinja(
         resources=resources,
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -107,6 +101,7 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -194,6 +189,12 @@ def resource_format(resource, resource_type):
             "%s-%s" % (
                 resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
+            resource['AllocatedStorage'])
+    elif resource_type == 'rds-cluster':
+        return "%s %s %s" % (
+            resource['DBClusterIdentifier'],
+            "%s-%s" % (
+                resource['Engine'], resource['EngineVersion']),
             resource['AllocatedStorage'])
     elif resource_type == 'asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
@@ -320,7 +321,7 @@ def resource_format(resource, resource_type):
             resource['QueueArn'])
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
-            resource['Name'],
+            resource.get('Name', ''),
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
@@ -353,6 +354,19 @@ def resource_format(resource, resource_type):
         return "Name: %s  RunTime: %s  \n" % (
             resource['FunctionName'],
             resource['Runtime'])
+    elif resource_type == 'service-quota':
+        try:
+            return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+                resource['c7n:UsageMetric']['quota'],
+                resource['c7n:UsageMetric']['metric']
+            )
+        except KeyError:
+            return "ServiceName: %s QuotaName: %s\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+            )
     else:
         return "%s" % format_struct(resource)
 
