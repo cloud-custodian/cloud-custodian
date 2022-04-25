@@ -1035,9 +1035,25 @@ class CopyRelatedResourceTag(Tag):
 
     def process(self, resources):
         related_resources = []
-        for rrid, r in zip(jmespath.search('[].[%s]' % self.data['key'], resources),
-                           resources):
-            related_resources.append((rrid[0], r))
+        if self.data['key'].startswith('tag:'):
+            tag_key = self.data['key'].split(':', 1)[-1]
+            found = False
+            for r in resources:
+                if not r.get('Tags'):
+                    related_resources.append((None, r))
+                    continue
+                for tag in r['Tags']:
+                    if tag['Key'] == tag_key:
+                        related_resources.append((tag['Value'], r))
+                        found = True
+                        break
+                if found is False:
+                    related_resources.append((None, r))
+        else:
+            for rrid, r in zip(jmespath.search('[].[%s]' % self.data['key'], resources),
+                               resources):
+                related_resources.append((rrid[0], r))
+
         related_ids = {r[0] for r in related_resources}
         missing = False
         if None in related_ids:
