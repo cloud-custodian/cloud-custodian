@@ -196,6 +196,28 @@ class AppELBTest(BaseTest):
         listeners = client.describe_listeners(LoadBalancerArn=arn)["Listeners"]
         self.assertEqual(listeners[0]["Port"], 80)
 
+    def test_appelb_has_target_group_http_filter(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_has_target_group_http")
+        p = self.load_policy(
+            {
+                "name": "appelb-has-target-group-http-filter",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener",
+                        "key": "Protocol",
+                        "value": ["HTTP"],
+                        "op": "in",
+                    },
+                    "nonssl-forward"
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_appelb_target_group_filter(self):
         self.patch(AppELB, "executor_factory", MainThreadExecutor)
         session_factory = self.replay_flight_data("test_appelb_instance_count_non_zero")

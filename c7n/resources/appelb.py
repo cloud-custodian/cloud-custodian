@@ -918,6 +918,36 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
         return [alb for alb in albs if _healthcheck_protocol_mismatch(alb)]
 
 
+@AppELB.filter_registry.register('nonssl-forward')
+class AppELBNonsslForwardFilter(Filter, AppELBTargetGroupFilterBase):
+    """Filter AppELBs using forwarding rule with target groups using unsecure or non-ssl protocol
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appelb-tg-http-protocol
+                resource: app-elb
+                filters:
+                  - nonssl-forward
+    """
+
+    schema = type_schema('nonssl-forward')
+    permissions = ("elasticloadbalancing:DescribeTargetGroups",)
+
+    def process(self, albs, event=None):
+        def _non_ssl_forward(alb):
+            for target_group in self.target_group_map[alb['LoadBalancerArn']]:
+                if (target_group['Protocol'] == 'HTTP'):
+                    return True
+
+            return False
+
+        self.initialize(albs)
+        return [alb for alb in albs if _non_ssl_forward(alb)]
+
+
 @AppELB.filter_registry.register('target-group')
 class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """Filter ALB based on matching target group value"""
