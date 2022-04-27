@@ -364,3 +364,40 @@ class ModifyClientProperties(BaseAction):
                     ResourceId=directory['DirectoryId'], **self.data['attributes'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@WorkspaceDirectory.action_registry.register('deregister')
+class DeregisterWorkspaceDirectory(BaseAction):
+    """
+    Deregisters a workspace
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: deregister-workspace
+          resource: aws.workspaces-directory
+          filters:
+            - "tag:Deregister": present
+          actions:
+            - deregister
+    """
+
+    schema = type_schema('deregister')
+    permissions = ('workspaces:DeregisterWorkspaceDirectory',)
+
+    def process(self, directories):
+
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for d in directories:
+            try:
+                client.deregister_workspace_directory(DirectoryId=d['DirectoryId'])
+            except client.exceptions.InvalidResourceStateException as e:
+                self.log.error(f"Error deregistering workspace: {d['DirectoryId']} error: {e}")
+                continue
+            except client.exceptions.ResourceAssociatedException as e:
+                self.log.error(f"Error deregistering workspace: {d['DirectoryId']} error: {e}")
+                continue
+            except client.exceptions.ResourceNotFoundException:
+                continue
