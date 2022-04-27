@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
+import time
 from dateutil import parser
 
 from .common import BaseTest
@@ -200,6 +201,31 @@ class WorkspacesTest(BaseTest):
         client = session_factory().client('workspaces')
         call = client.describe_workspace_images(ImageIds=[imageId])
         self.assertTrue(call['Images'])
+
+    def test_workspaces_directory_deregister(self):
+        factory = self.replay_flight_data("test_workspaces_directory_deregister")
+        p = self.load_policy(
+            {
+                "name": "workspace-deregister",
+                "resource": "workspaces-directory",
+                'filters': [{
+                    'tag:Deregister': 'present'
+                }],
+                'actions': [{
+                    'type': 'deregister'
+                }]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        directoryId = resources[0].get('DirectoryId')
+        client = factory().client('workspaces')
+        if self.recording:
+            time.sleep(5)
+        call = client.describe_workspace_directories(DirectoryIds=[directoryId])
+        self.assertEqual(call['Directories'], [])
 
     def test_workspaces_directory_subnet_sg(self):
         factory = self.replay_flight_data("test_workspaces_directory_subnet_sg")
