@@ -1460,6 +1460,45 @@ class ConfigModeTest(BaseTest):
                'ComplianceType': 'COMPLIANT',
                'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
 
+    related_resource_policy = {
+        "name": "vpc-flow-logs",
+        "resource": "aws.vpc",
+        "filters": [
+            {
+                "type": "flow-logs",
+                "destination-type": "s3",
+                "enabled": True,
+                "status": "active",
+            }
+        ]
+    }
+
+    def test_config_poll_supported_resource_warning(self):
+        with self.assertRaisesRegex(
+            PolicyValidationError,
+            r'fully supported by config'
+        ):
+            self.load_policy({
+                **self.related_resource_policy,
+                "mode": {
+                    "type": "config-poll-rule",
+                    "role": "arn:aws:iam::{account_id}:role/MyRole",
+                    "schedule": "TwentyFour_Hours"
+                }
+            })
+
+    def test_config_poll_ignore_support_check(self):
+        p = self.load_policy({
+            **self.related_resource_policy,
+            "mode": {
+                "type": "config-poll-rule",
+                "role": "arn:aws:iam::{account_id}:role/MyRole",
+                "schedule": "TwentyFour_Hours",
+                "ignore-support-check": True
+            }
+        })
+        p.validate()
+
 
 class GuardModeTest(BaseTest):
 

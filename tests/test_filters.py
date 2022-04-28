@@ -1055,12 +1055,12 @@ class TestMetricsFilter(BaseTest):
 
         self.assertEqual(len(resources), 2)
         self.assertEqual(all(
-            isinstance(res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"], list)
+            isinstance(res["c7n.metrics"]["AWS/ELB.RequestCount.Sum.14"], list)
             for res in resources
         ), True)
         self.assertIn(
             "Fill value for missing data",
-            (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"][0].get("c7n:detail")
+            (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum.14"][0].get("c7n:detail")
                 for res in resources)
         )
 
@@ -1092,7 +1092,7 @@ class TestMetricsFilter(BaseTest):
         # Set a fixed end time for the metrics filter with a non-zero minute component.
         with mock_datetime_now(parse_date("2020-12-03T04:45:00+00:00"), base_filters.metrics):
             resources = p.run()
-            datapoints = resources[0]["c7n.metrics"]["AWS/SQS.NumberOfMessagesSent.Sum"]
+            datapoints = resources[0]["c7n.metrics"]["AWS/SQS.NumberOfMessagesSent.Sum.90"]
 
         self.assertEqual(metrics_filter.start.strftime("%H:%M"), "04:00")
         self.assertEqual(len(resources), 1)

@@ -467,7 +467,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LoadBalancerName'], 'nicnoc')
         self.assertTrue(
-            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum' in resources[
+            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
 
 

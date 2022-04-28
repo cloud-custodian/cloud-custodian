@@ -7,6 +7,10 @@
                 "PolicyTypeName": "SSLNegotiationPolicyType",
                 "PolicyAttributeDescriptions": [
                     {
+                        "AttributeName": "Reference-Security-Policy",
+                        "AttributeValue": "ELBSecurityPolicy-TLS-1-2-2017-01"
+                    },
+                    {
                         "AttributeName": "Protocol-TLSv1",
                         "AttributeValue": "false"
                     },
@@ -24,23 +28,23 @@
                     },
                     {
                         "AttributeName": "Server-Defined-Cipher-Order",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-ECDSA-AES128-GCM-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-RSA-AES128-GCM-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-ECDSA-AES128-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-RSA-AES128-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-ECDSA-AES128-SHA",
@@ -56,19 +60,19 @@
                     },
                     {
                         "AttributeName": "ECDHE-ECDSA-AES256-GCM-SHA384",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-RSA-AES256-GCM-SHA384",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-ECDSA-AES256-SHA384",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-RSA-AES256-SHA384",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "ECDHE-RSA-AES256-SHA",
@@ -80,7 +84,7 @@
                     },
                     {
                         "AttributeName": "AES128-GCM-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "AES128-SHA256",
@@ -92,11 +96,11 @@
                     },
                     {
                         "AttributeName": "AES256-GCM-SHA384",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "AES256-SHA256",
-                        "AttributeValue": "false"
+                        "AttributeValue": "true"
                     },
                     {
                         "AttributeName": "AES256-SHA",

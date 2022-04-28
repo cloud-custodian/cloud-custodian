@@ -17,7 +17,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
@@ -724,9 +724,9 @@ class ServiceLimit(Filter):
         return True
 
     def process(self, resources, event=None):
+        support_region = get_support_region(self.manager)
         client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
-
+            'support', region_name=support_region)
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
@@ -855,8 +855,9 @@ class RequestLimitIncrease(BaseAction):
     }
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        client = session.client('support', region_name='us-east-1')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         account_id = self.manager.config.account_id
         service_map = {}
         region_map = {}
