@@ -281,6 +281,99 @@ class ElasticSearch(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
 
+    def test_elasticsearch_cross_cluster_search_connections(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_inbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_outbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
     def test_elasticsearch_cross_account(self):
         session_factory = self.replay_flight_data("test_elasticsearch_cross_account")
         p = self.load_policy(

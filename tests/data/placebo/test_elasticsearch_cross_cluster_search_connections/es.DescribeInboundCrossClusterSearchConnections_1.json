@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CrossClusterSearchConnections": [
+            {
+                "SourceDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-outbound",
+                    "Region": "us-east-1"
+                },
+                "DestinationDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-inbound",
+                    "Region": "us-east-1"
+                },
+                "CrossClusterSearchConnectionId": "ccs-1e26f833-5404-49d1-a261-577fb7abce9b",
+                "ConnectionStatus": {
+                    "StatusCode": "APPROVED"
+                }
+            },
+            {
+                "SourceDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-outbound",
+                    "Region": "us-east-1"
+                },
+                "DestinationDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-inbound",
+                    "Region": "us-east-1"
+                },
+                "CrossClusterSearchConnectionId": "ccs-876865f6-e37c-4533-8e7b-ce982ceecaed",
+                "ConnectionStatus": {
+                    "StatusCode": "DELETED"
+                }
+            },
+            {
+                "SourceDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-outbound",
+                    "Region": "us-east-1"
+                },
+                "DestinationDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-inbound",
+                    "Region": "us-east-1"
+                },
+                "CrossClusterSearchConnectionId": "ccs-a07adeb7-89fa-4377-bb98-f93db6417ae5",
+                "ConnectionStatus": {
+                    "StatusCode": "DELETED"
+                }
+            },
+            {
+                "SourceDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-outbound",
+                    "Region": "us-east-1"
+                },
+                "DestinationDomainInfo": {
+                    "OwnerId": "644160558196",
+                    "DomainName": "default-inbound",
+                    "Region": "us-east-1"
+                },
+                "CrossClusterSearchConnectionId": "ccs-f0b99d04-575c-4c9c-bc42-938e9e7d8d8a",
+                "ConnectionStatus": {
+                    "StatusCode": "DELETED"
+                }
+            }
+        ]
+    }
+}
