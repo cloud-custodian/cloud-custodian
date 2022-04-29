@@ -32,6 +32,7 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    get_support_region
 )
 from c7n.resources.ami import AMI
 
@@ -807,7 +808,9 @@ class FaultTolerantSnapshots(Filter):
 
     def pull_check_results(self):
         result = set()
-        client = local_session(self.manager.session_factory).client('support')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']

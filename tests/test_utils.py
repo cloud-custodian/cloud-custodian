@@ -510,6 +510,39 @@ class UtilTest(BaseTest):
             {'k': '{limit}',
              'b': '21'})
 
+    def test_get_support_region(self):
+        # AWS Partition
+        mock_manager = mock.MagicMock()
+        mock_manager.config.region = "us-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "us-west-2"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "eu-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        # GovCloud Partition
+        mock_manager.config.region = "us-gov-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        mock_manager.config.region = "us-gov-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        # AWS CN Partition
+        mock_manager.config.region = "cn-northwest-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+        mock_manager.config.region = "cn-north-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
 
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters

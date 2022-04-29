@@ -732,11 +732,39 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
 
     The primary benefit this mode offers is to support additional resources
     beyond what config supports natively, as it can post evaluations for
-    any resource which has a cloudformation type. If a resource is natively
-    supported by config its highly recommended to use a `config-rule`
-    mode instead.
+    any resource which has a cloudformation type.
 
-    This mode effectively receives no data from config, instead its
+    If a resource is natively supported by config it's highly recommended
+    to use a `config-rule` mode instead. Deployment will fail unless
+    the policy explicitly opts out of that check with `ignore-support-check`.
+    This can be useful in cases when a policy resource has native Config
+    support, but filters based on related resource attributes.
+
+    :example:
+
+    VPCs have native Config support, but flow logs are a separate resource.
+    This policy forces `config-poll-rule` mode to bypass the Config support
+    check and evaluate VPC compliance on a schedule.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vpc-flow-logs
+            resource: vpc
+            mode:
+              type: config-poll-rule
+              role: arn:aws:iam::{account_id}:role/MyRole
+              ignore-support-check: True
+            filters:
+              - not:
+                - type: flow-logs
+                  destination-type: "s3"
+                  enabled: True
+                  status: active
+                  traffic-type: all
+                  destination: "arn:aws:s3:::mys3flowlogbucket"
+
+    This mode effectively receives no data from config, instead it's
     periodically executed by config and polls and evaluates all
     resources. It is equivalent to a periodic policy, except it also
     pushes resource evaluations to config.
@@ -749,6 +777,7 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             "Six_Hours",
             "Twelve_Hours",
             "TwentyFour_Hours"]},
+        **{'ignore-support-check': {'type': 'boolean'}},
         rinherit=LambdaMode.schema)
 
     def validate(self):
@@ -757,7 +786,10 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             raise PolicyValidationError(
                 "policy:%s config-poll-rule schedule required" % (
                     self.policy.name))
-        if self.policy.resource_manager.resource_type.config_type:
+        if (
+            self.policy.resource_manager.resource_type.config_type
+            and not self.policy.data['mode'].get('ignore-support-check')
+        ):
             raise PolicyValidationError(
                 "resource:%s fully supported by config and should use mode: config-rule" % (
                     self.policy.resource_type))
