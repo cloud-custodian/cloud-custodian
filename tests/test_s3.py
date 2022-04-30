@@ -3819,6 +3819,7 @@ class TestBucketOwnership:
 
     def test_s3_access_analyzer_filter_with_no_results(self, test):
         factory = test.replay_flight_data("test_s3_iam_analyzers")
+        test.patch(s3, "S3_AUGMENT_TABLE", [])
         p = test.load_policy({
             'name': 'check-s3',
             'resource': 'aws.s3',
