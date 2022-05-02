@@ -248,6 +248,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2022
+            'AwsRdsDbSecurityGroup',
             # q1 2022
             'AwsNetworkFirewallRuleGroup',
             'AwsNetworkFirewallFirewall',
@@ -315,50 +317,56 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            'AWS::Kinesis::StreamConsumer',
-            'AWS::CodeDeploy::DeploymentConfig',
-            'AWS::OpenSearch::Domain',  # this is effectively an alias
+            'AWS::ApiGatewayV2::Api',
+            'AWS::ApiGatewayV2::Stage',
+            'AWS::AutoScaling::ScalingPolicy',
+            'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
+            'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
+            'AWS::Config::ResourceCompliance',
+            'AWS::EC2::EgressOnlyInternetGateway',
+            'AWS::EC2::FlowLog',
+            'AWS::EC2::LaunchTemplate',
+            'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::VPCEndpointService',
+            'AWS::ECR::PublicRepository',
+            'AWS::EFS::AccessPoint',
+            'AWS::EMR::SecurityConfiguration',
+            'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::GuardDuty::Detector',
+            'AWS::Kinesis::StreamConsumer',
             'AWS::NetworkFirewall::FirewallPolicy',
             'AWS::NetworkFirewall::RuleGroup',
-            'AWS::EC2::RegisteredHAInstance',
-            'AWS::EC2::EgressOnlyInternetGateway',
-            'AWS::EC2::VPCEndpointService',
-            'AWS::EC2::FlowLog',
-            'AWS::EFS::AccessPoint',
+            'AWS::OpenSearch::Domain',  # this is effectively an alias
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
-            'AWS::S3::AccountPublicAccessBlock',
             'AWS::Redshift::ClusterParameterGroup',
             'AWS::Redshift::ClusterSecurityGroup',
             'AWS::Redshift::EventSubscription',
+            'AWS::S3::AccountPublicAccessBlock',
+            'AWS::SSM::AssociationCompliance',
+            'AWS::SSM::FileData',
             'AWS::SSM::ManagedInstanceInventory',
-            'AWS::AutoScaling::ScalingPolicy',
-            'AWS::AutoScaling::ScheduledAction',
+            'AWS::SSM::PatchCompliance',
+            'AWS::SageMaker::CodeRepository',
+            'AWS::ServiceCatalog::CloudFormationProduct',
+            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
+            'AWS::ShieldRegional::Protection',
             'AWS::WAF::RateBasedRule',
             'AWS::WAF::Rule',
             'AWS::WAF::RuleGroup',
             'AWS::WAFRegional::RateBasedRule',
             'AWS::WAFRegional::Rule',
             'AWS::WAFRegional::RuleGroup',
-            'AWS::ElasticBeanstalk::ApplicationVersion',
-            'AWS::WAFv2::WebACL',
-            'AWS::WAFv2::RuleGroup',
             'AWS::WAFv2::IPSet',
-            'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::ManagedRuleSet',
-            'AWS::XRay::EncryptionConfig',
-            'AWS::SSM::AssociationCompliance',
-            'AWS::SSM::PatchCompliance',
-            'AWS::ShieldRegional::Protection',
-            'AWS::Config::ResourceCompliance',
-            'AWS::ApiGatewayV2::Stage',
-            'AWS::ApiGatewayV2::Api',
-            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
-            'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::SSM::FileData'}
+            'AWS::WAFv2::RegexPatternSet',
+            'AWS::WAFv2::RuleGroup',
+            'AWS::WAFv2::WebACL',
+            'AWS::XRay::EncryptionConfig'
+        }
 
         resource_map = {}
         for k, v in manager.resources.items():
