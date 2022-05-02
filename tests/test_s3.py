@@ -16,7 +16,7 @@ from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 from pytest_terraform import terraform
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
@@ -3816,3 +3816,19 @@ class TestBucketOwnership:
         resources = p.run()
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
+
+    def test_s3_access_analyzer_filter_with_no_results(self, test):
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
+        test.patch(s3, "S3_AUGMENT_TABLE", [])
+        p = test.load_policy({
+            'name': 'check-s3',
+            'resource': 'aws.s3',
+            'filters': [
+                {
+                    'type': 'iam-analyzer',
+                    'key': 'isPublic',
+                    'value': True,
+                },
+            ]
+        }, session_factory=factory)
+        test.assertRaises(PolicyExecutionError, p.run)
