@@ -374,6 +374,42 @@ class ElasticSearch(BaseTest):
         self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
         ['SourceDomainInfo']['OwnerId'], '644160558196')
 
+    def test_elasticsearch_cross_cluster_search_connections_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'DestinationDomainInfo.DomainName',
+                            'value': 'test',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections(
+            Filters=[
+                {
+                    'Name': 'destination-domain-info.domain-name',
+                    'Values': [
+                        'test',
+                    ]
+                },
+            ],)
+        print(search_outbound_connections)
+        self.assertEqual(len(search_outbound_connections["CrossClusterSearchConnections"]), 0)
+
     def test_elasticsearch_cross_account(self):
         session_factory = self.replay_flight_data("test_elasticsearch_cross_account")
         p = self.load_policy(
