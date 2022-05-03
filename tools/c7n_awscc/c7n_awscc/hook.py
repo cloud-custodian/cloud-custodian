@@ -2,16 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 import base64
 import contextlib
+from datetime import datetime
 import json
 import logging
 import uuid
 import os
 
+from botocore.exceptions import ClientError
 import boto3
 
 from c7n import handler
 from c7n.credentials import assumed_session
-from c7n.logs import CloudWatchLogHandler
+from c7n.log import CloudWatchLogHandler
 
 log = logging.getLogger("c7n_awscc.hook")
 
@@ -62,7 +64,7 @@ def log_group(provider, event):
 
     try:
         handler = CloudWatchLogHandler(
-            lambda: provider, log_group=log_group, log_stream=log_stream
+            lambda: provider, log_group=group_name, log_stream=stream_name
         )
         logging.getLogger("custodian").addHandler(handler)
         logging.getLogger("c7n_awscc").addHandler(handler)
@@ -116,7 +118,7 @@ class MetricOutput:
     def get(cls, provider, event):
         return cls(
             provider,
-            "%s/%s"
+            "%s/%s/%s"
             % (
                 cls.namespace_root,
                 event["awsAccountId"],
