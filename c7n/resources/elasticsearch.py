@@ -157,30 +157,12 @@ class ElasticSearchCrossClusterFilter(Filter):
                     value: '123456789'
     """
     schema = type_schema(type_name="cross-cluster",
-        inbound={
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'key': {'type': 'string'},
-                'value_type': {'$ref': '#/definitions/filters_common/value_types'},
-                'default': {'type': 'object'},
-                'value_regex': {'type': 'string'},
-                'value_from': {'$ref': '#/definitions/filters_common/value_from'},
-                'value': {'$ref': '#/definitions/filters_common/value'},
-                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
-            }},
-        outbound={
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'key': {'type': 'string'},
-                'value_type': {'$ref': '#/definitions/filters_common/value_types'},
-                'default': {'type': 'object'},
-                'value_regex': {'type': 'string'},
-                'value_from': {'$ref': '#/definitions/filters_common/value_from'},
-                'value': {'$ref': '#/definitions/filters_common/value'},
-                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
-            }})
+                         inbound=type_schema(type_name='inbound',
+                                             required=('key', 'value'),
+                                             rinherit=ValueFilter.schema),
+                         outbound=type_schema(type_name='outbound',
+                                              required=('key', 'value'),
+                                              rinherit=ValueFilter.schema),)
     schema_alias = False
     annotation_key = "c7n:SearchConnections"
     matched_key = "c7n:MatchedConnections"

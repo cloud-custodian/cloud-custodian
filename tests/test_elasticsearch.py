@@ -407,7 +407,6 @@ class ElasticSearch(BaseTest):
                     ]
                 },
             ],)
-        print(search_outbound_connections)
         self.assertEqual(len(search_outbound_connections["CrossClusterSearchConnections"]), 0)
 
     def test_elasticsearch_cross_account(self):
