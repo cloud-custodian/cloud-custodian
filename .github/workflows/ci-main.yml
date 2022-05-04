@@ -109,6 +109,14 @@ jobs:
         run: |
           make sphinx
 
+      - name: Deploy Docs
+        if: ${{ github.event_name == 'push' }}
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: docs/build/html
+          target-folder: docs
+
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
