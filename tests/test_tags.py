@@ -415,3 +415,42 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+    def test_copy_related_tag_resourcegroupstaggingapi(self):
+        session_factory = self.replay_flight_data("test_copy_related_tag_resourcegroupstaggingapi")
+        ec2_client = session_factory().client("ec2")
+        policy = {
+            "name": "copy-tags-from-tags",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "tag:test-tag",
+                    "value": "absent"
+                },
+            ],
+            "actions": [
+                {
+                    "type": "copy-related-tag",
+                    "resource": "resourcegroupstaggingapi",
+                    "key": "tag:Foo",
+                    "tags": "*"
+                }
+            ]
+        }
+        policy = self.load_policy(policy, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        tags = ec2_client.describe_tags(
+            Filters=[
+                {
+                    "Name": "resource-id",
+                    "Values": [resources[0]['InstanceId']]
+                }
+            ]
+        )
+        found = False
+        for t in tags["Tags"]:
+            if t['Key'] == 'test-tag':
+                found = True
+        self.assertTrue(found)
