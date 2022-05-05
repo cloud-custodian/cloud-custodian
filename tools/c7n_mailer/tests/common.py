@@ -44,7 +44,7 @@ MAILER_CONFIG = {
     'role': 'arn:aws:iam::xxxx:role/cloudcustodian-mailer',
     'ldap_uid_tags': ['CreatorName', 'Owner'],
     'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
-                          os.path.abspath('/')],
+                          os.path.abspath('/'), ''],
 }
 
 MAILER_CONFIG_AZURE = {
