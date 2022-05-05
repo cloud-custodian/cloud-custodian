@@ -998,6 +998,25 @@ class CopyRelatedResourceTag(Tag):
                       skip_missing: True
                       key: VolumeId
                       tags: '*'
+
+    In the event that the resource type is not supported in Cloud Custodian but
+    is supported in the resources groups tagging api, use the resourcegroupstaggingapi
+    resource type to reference the resource. The value should be an ARN for the
+    related resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: copy-tags-from-unsupported-resource
+                  resource: ebs-snapshot
+                  actions:
+                    - type: copy-related-tag
+                      resource: resourcegroupstaggingapi
+                      key: tag:a-resource-tag
+                      tags: '*'
+
     """
 
     schema = utils.type_schema(
