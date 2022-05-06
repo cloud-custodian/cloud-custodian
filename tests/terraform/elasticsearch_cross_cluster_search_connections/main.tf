@@ -70,6 +70,58 @@ resource "aws_elasticsearch_domain" "outbound_connection" {
   }
 }
 
-# and then run these command from CLI to create cross cluster connection
-# aws es create-outbound-cross-cluster-search-connection --source-domain-info OwnerId="[AccountID]",DomainName="default-outbound",Region="us-east-1" --destination-domain-info OwnerId="[AccountID]",DomainName="default-inbound",Region="us-east-1" --connection-alias "test2"
-# aws es accept-inbound-cross-cluster-search-connection --cross-cluster-search-connection-id "[CrossClusterSearchConnectionId]"
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
+
+data "template_file" "create_connection_output"{
+  template = "${path.module}/create_connection_output.json"
+}
+
+# Create connection command
+# Comment this resource out after first apply
+resource "null_resource" "es_create_outbound_connection" {
+  provisioner "local-exec" {
+    command = "aws es create-outbound-cross-cluster-search-connection --source-domain-info OwnerId='${data.aws_caller_identity.current.account_id}',DomainName='${aws_elasticsearch_domain.outbound_connection.domain_name}',Region='${data.aws_region.current.name}' --destination-domain-info OwnerId='${data.aws_caller_identity.current.account_id}',DomainName='${aws_elasticsearch_domain.inbound_connection.domain_name}',Region='${data.aws_region.current.name}' --connection-alias 'test' >> ${data.template_file.create_connection_output.rendered}"
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  depends_on = [
+    aws_elasticsearch_domain.inbound_connection,
+    aws_elasticsearch_domain.outbound_connection,
+    data.aws_caller_identity.current,
+    data.aws_region.current
+  ]
+}
+
+data "local_file" "create_connection_output"{
+  filename = "${data.template_file.create_connection_output.rendered}"
+}
+
+# Accept connection command
+# Comment this resource out after first apply
+resource "null_resource" "es_accept_connection"{
+  provisioner "local-exec" {
+    command = "aws es accept-inbound-cross-cluster-search-connection --cross-cluster-search-connection-id '${jsondecode(data.local_file.create_connection_output.content).CrossClusterSearchConnectionId}'"
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  depends_on = [
+    data.template_file.create_connection_output,
+    data.local_file.create_connection_output,
+  ]
+}
+
+# Delete Connection comand
+# Uncomment this command and run apply before running destroy becasue connection needs to be deleted before deleting domains
+# resource "null_resource" "es_delete_connection"{
+#   provisioner "local-exec" {
+#     command = "aws es delete-inbound-cross-cluster-search-connection --cross-cluster-search-connection-id '${jsondecode(data.local_file.create_connection_output.content).CrossClusterSearchConnectionId}'"
+#     interpreter = ["/bin/bash", "-c"]
+#   }
+
+#   depends_on = [
+#     data.template_file.create_connection_output,
+#     data.local_file.create_connection_output,
+#   ]
+# }
