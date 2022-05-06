@@ -78,6 +78,12 @@ data "template_file" "create_connection_output"{
   template = "${path.module}/create_connection_output.json"
 }
 
+data "local_file" "create_connection_output"{
+  filename = "${data.template_file.create_connection_output.rendered}"
+  # Comment out depends on after first apply create_connection_output.json when file is created
+  depends_on = [null_resource.es_create_outbound_connection]
+}
+
 # Create connection command
 # Comment this resource out after first apply
 resource "null_resource" "es_create_outbound_connection" {
@@ -94,10 +100,6 @@ resource "null_resource" "es_create_outbound_connection" {
   ]
 }
 
-data "local_file" "create_connection_output"{
-  filename = "${data.template_file.create_connection_output.rendered}"
-}
-
 # Accept connection command
 # Comment this resource out after first apply
 resource "null_resource" "es_accept_connection"{
@@ -106,22 +108,16 @@ resource "null_resource" "es_accept_connection"{
     interpreter = ["/bin/bash", "-c"]
   }
 
-  depends_on = [
-    data.template_file.create_connection_output,
-    data.local_file.create_connection_output,
-  ]
+  depends_on = [data.local_file.create_connection_output]
 }
 
 # Delete Connection comand
-# Uncomment this command and run apply before running destroy becasue connection needs to be deleted before deleting domains
+# Uncomment this command and run apply before running destroy because connection needs to be deleted before deleting domains
 # resource "null_resource" "es_delete_connection"{
 #   provisioner "local-exec" {
 #     command = "aws es delete-inbound-cross-cluster-search-connection --cross-cluster-search-connection-id '${jsondecode(data.local_file.create_connection_output.content).CrossClusterSearchConnectionId}'"
 #     interpreter = ["/bin/bash", "-c"]
 #   }
 
-#   depends_on = [
-#     data.template_file.create_connection_output,
-#     data.local_file.create_connection_output,
-#   ]
+#   depends_on = [data.local_file.create_connection_output]
 # }
