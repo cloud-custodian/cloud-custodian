@@ -1,11 +1,28 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
 import json
+
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+import pytest
+from pytest_terraform import terraform
+
+from .common import BaseTest
 
 
+@pytest.fixture(scope='class')
+@terraform('elasticsearch_cross_cluster_search_connections', scope='class')
+def terraform_cross_cluster(elasticsearch_cross_cluster_search_connections, request):
+    """Wrap a pytest-terraform fixture for use with unittest
+
+    Due to the way pytest-terraform creates fixtures, it doesn't play well with unittest
+    directly. One workaround for that is to not use unittest and pytest-terraform
+    together. Another option is wrapping the fixture and using it to set a class attribute.
+    """
+    request.cls.terraform_cross_cluster = elasticsearch_cross_cluster_search_connections
+
+
+@pytest.mark.usefixtures('terraform_cross_cluster')
 class ElasticSearch(BaseTest):
 
     def test_get_resources(self):
@@ -341,6 +358,10 @@ class ElasticSearch(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.inbound_connection.domain_name']
+        )
         es = session_factory().client('es')
         search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
         self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
@@ -369,6 +390,10 @@ class ElasticSearch(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.outbound_connection.domain_name']
+        )
         es = session_factory().client('es')
         search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
         self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]

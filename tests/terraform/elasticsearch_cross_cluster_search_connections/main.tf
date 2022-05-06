@@ -1,4 +1,4 @@
-resource "aws_elasticsearch_domain" "inbound-connection" {
+resource "aws_elasticsearch_domain" "inbound_connection" {
   domain_name           = "${terraform.workspace}-inbound"
   elasticsearch_version = "7.10"
 
@@ -34,7 +34,7 @@ resource "aws_elasticsearch_domain" "inbound-connection" {
   }
 }
 
-resource "aws_elasticsearch_domain" "outbound-connection" {
+resource "aws_elasticsearch_domain" "outbound_connection" {
   domain_name           = "${terraform.workspace}-outbound"
   elasticsearch_version = "7.10"
 
