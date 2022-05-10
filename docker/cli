@@ -20,7 +20,14 @@ ADD tools /tools
 
 # Install c7n and requested providers
 ARG providers="azure gcp kube openstack"
-RUN mkdir -p /src/tools && . /usr/local/bin/activate &&     pip install /src &&     for pkg in $providers; do         cp -R "/tools/c7n_$pkg" "/src/tools/c7n_$pkg";         pip install "/tools/c7n_$pkg";         rm -R "/src/tools/c7n_$pkg/tests"; done
+RUN mkdir -p /src/tools \
+    && . /usr/local/bin/activate \
+    && pip install /src \
+    && for pkg in $providers; do \
+        cp -R "/tools/c7n_$pkg" "/src/tools/c7n_$pkg"; \
+        pip install "/tools/c7n_$pkg"; \
+        rm -R "/src/tools/c7n_$pkg/tests"; \
+    done
 
 RUN mkdir /output
 
