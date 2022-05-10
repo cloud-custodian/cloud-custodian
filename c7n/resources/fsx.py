@@ -1,12 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from __future__ import annotations
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import (
+    QueryResourceManager, TypeInfo, DescribeSource, RetryPageIterator)
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema, local_session, chunks
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
+from datetime import datetime, timedelta
 
 
 class DescribeFSx(DescribeSource):
@@ -329,3 +333,77 @@ class KmsFilter(KmsRelatedFilter):
 class KmsFilterFsxBackup(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+
+@FSx.filter_registry.register('consecutive-backups')
+class ConsecutiveBackups(Filter):
+    """Returns consecutive daily Fsx backups, which are equal to/or greater than n days.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: fsx-daily-backup-count
+                resource: fsx
+                filters:
+                  - type: consecutive-backups
+                    days: 5
+                actions:
+                  - notify
+    """
+    schema = type_schema('consecutive-backups', days={'type': 'number',
+                                                      'minimum': 1},
+                         required=['days'])
+    permissions = ('fsx:DescribeBackups', 'fsx:DescribeVolumes',)
+    annotation = 'c7n:FsxBackups'
+
+    def process_resource_set(self, client, resources):
+        ontap_fid = [r['FileSystemId'] for r in resources if r['FileSystemType'] == 'ONTAP']
+        nonontap_fid = [r['FileSystemId'] for r in resources if r['FileSystemType'] != 'ONTAP']
+        vpaginator = client.get_paginator('describe_volumes')
+        bpaginator = client.get_paginator('describe_backups')
+
+        vpaginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ontap_volumes = vpaginator.paginate(Filters=[
+            {
+                'Name': 'file-system-id',
+                'Values':
+                    ontap_fid,
+            }]).build_full_result().get('Volumes', [])
+        ontap_vid = [v['VolumeId'] for v in ontap_volumes]
+
+        bpaginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ontap_backups = bpaginator.paginate(Filters=[
+            {'Name': 'volume-id', 'Values': ontap_vid, },
+        ]).build_full_result().get('Backups', [])
+        nonontap_backups = bpaginator.paginate(Filters=[
+            {'Name': 'file-system-id', 'Values': nonontap_fid, },
+        ]).build_full_result().get('Backups', [])
+
+        inst_map = {}
+        for ontap in ontap_backups:
+            inst_map.setdefault(ontap['Volume']['FileSystemId'], []).append(ontap)
+        for nonontap in nonontap_backups:
+            inst_map.setdefault(nonontap['FileSystem']['FileSystemId'], []).append(nonontap)
+        for r in resources:
+            r[self.annotation] = inst_map.get(r['FileSystemId'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('fsx')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        for r in resources:
+            backup_dates = set()
+            for backup in r[self.annotation]:
+                if backup['Lifecycle'] == 'AVAILABLE':
+                    backup_dates.add(backup['CreationTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(backup_dates):
+                results.append(r)
+        return results

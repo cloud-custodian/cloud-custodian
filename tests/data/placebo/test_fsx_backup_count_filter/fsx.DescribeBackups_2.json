@@ -1,0 +1,312 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-081c91ffb32a2c364",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 31,
+                    "microsecond": 794000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-081c91ffb32a2c364",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-0320da4b9297db1f5",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 21,
+                    "microsecond": 976000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0320da4b9297db1f5",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-0255b114e9b4d0471",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 33,
+                    "microsecond": 550000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0255b114e9b4d0471",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-058b0d4a93323f641",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 12,
+                    "microsecond": 988000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-058b0d4a93323f641",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-02fcd6ae59f58c2cf",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 12,
+                    "microsecond": 863000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-02fcd6ae59f58c2cf",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-08342a2734312dadb",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 44,
+                    "microsecond": 38000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-08342a2734312dadb",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-0de2b4a2b64bad9dc",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 35,
+                    "microsecond": 662000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0de2b4a2b64bad9dc",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            },
+            {
+                "BackupId": "backup-0f02cae8618128da6",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 9,
+                    "hour": 17,
+                    "minute": 38,
+                    "second": 25,
+                    "microsecond": 563000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0f02cae8618128da6",
+                "Tags": [],
+                "OwnerId": "644160558196",
+                "ResourceType": "VOLUME",
+                "Volume": {
+                    "FileSystemId": "fs-04e28b1857bb98245",
+                    "Lifecycle": "ACTIVE",
+                    "Name": "fsx_root",
+                    "OntapConfiguration": {
+                        "JunctionPath": "/",
+                        "SizeInMegabytes": 1024,
+                        "StorageEfficiencyEnabled": false,
+                        "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                        "TieringPolicy": {
+                            "Name": "NONE"
+                        }
+                    },
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fsvol-0657f3d24496ab9dd",
+                    "VolumeId": "fsvol-0657f3d24496ab9dd",
+                    "VolumeType": "ONTAP"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

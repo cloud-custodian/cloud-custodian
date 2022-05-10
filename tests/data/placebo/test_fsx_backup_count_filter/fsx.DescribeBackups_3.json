@@ -1,0 +1,368 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-0aee1d4198efc53f5",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 13,
+                    "microsecond": 520000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0aee1d4198efc53f5",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-055149add8424dad4",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 13,
+                    "microsecond": 720000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-055149add8424dad4",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0aef6778272feb2f0",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 26,
+                    "microsecond": 33000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0aef6778272feb2f0",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0c1b5ae8b27b2ee01",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 29,
+                    "microsecond": 871000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0c1b5ae8b27b2ee01",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0ac8403763e250e92",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 31,
+                    "microsecond": 729000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0ac8403763e250e92",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0a1376ad3b63dafb5",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 7,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 28,
+                    "microsecond": 530000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0a1376ad3b63dafb5",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0850d77bd43653694",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 20,
+                    "microsecond": 916000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0850d77bd43653694",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0febce33fefd70b9c",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 9,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 15,
+                    "microsecond": 946000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0febce33fefd70b9c",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0248ba818ebd2ebaa",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 10,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 24,
+                    "microsecond": 343000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0248ba818ebd2ebaa",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0743f13f94de2b106",
+                    "FileSystemType": "LUSTRE",
+                    "StorageCapacity": 1200,
+                    "StorageType": "SSD",
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0743f13f94de2b106",
+                    "LustreConfiguration": {
+                        "WeeklyMaintenanceStartTime": "2:12:00",
+                        "DeploymentType": "PERSISTENT_2",
+                        "PerUnitStorageThroughput": 125,
+                        "DailyAutomaticBackupStartTime": "08:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "DataCompressionType": "NONE",
+                        "LogConfiguration": {
+                            "Level": "WARN_ERROR",
+                            "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0743f13f94de2b106"
+                        }
+                    },
+                    "FileSystemTypeVersion": "2.12"
+                },
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

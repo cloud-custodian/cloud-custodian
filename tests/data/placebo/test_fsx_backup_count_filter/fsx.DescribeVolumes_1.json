@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 11,
+                    "minute": 10,
+                    "second": 49,
+                    "microsecond": 173000
+                },
+                "FileSystemId": "fs-04e28b1857bb98245",
+                "Lifecycle": "CREATED",
+                "Name": "vol1",
+                "OntapConfiguration": {
+                    "FlexCacheEndpointType": "NONE",
+                    "JunctionPath": "/vol1",
+                    "SecurityStyle": "UNIX",
+                    "SizeInMegabytes": 1048576,
+                    "StorageEfficiencyEnabled": false,
+                    "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                    "StorageVirtualMachineRoot": false,
+                    "TieringPolicy": {
+                        "CoolingPeriod": 31,
+                        "Name": "AUTO"
+                    },
+                    "UUID": "606e3d88-9ea7-11ec-8e1e-bd7d1ce2884a",
+                    "OntapVolumeType": "RW"
+                },
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fs-04e28b1857bb98245/fsvol-0c13ac71beb39ad27",
+                "VolumeId": "fsvol-0c13ac71beb39ad27",
+                "VolumeType": "ONTAP"
+            },
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 11,
+                    "minute": 45,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "FileSystemId": "fs-04e28b1857bb98245",
+                "Lifecycle": "CREATED",
+                "Name": "fsx_root",
+                "OntapConfiguration": {
+                    "FlexCacheEndpointType": "NONE",
+                    "JunctionPath": "/",
+                    "SecurityStyle": "UNIX",
+                    "SizeInMegabytes": 1024,
+                    "StorageEfficiencyEnabled": false,
+                    "StorageVirtualMachineId": "svm-07cfbdd2c28b0b285",
+                    "StorageVirtualMachineRoot": true,
+                    "TieringPolicy": {
+                        "Name": "NONE"
+                    },
+                    "UUID": "25385468-9ea7-11ec-9c58-d7d965afdd8e",
+                    "OntapVolumeType": "RW"
+                },
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:volume/fs-04e28b1857bb98245/fsvol-0657f3d24496ab9dd",
+                "VolumeId": "fsvol-0657f3d24496ab9dd",
+                "VolumeType": "ONTAP"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

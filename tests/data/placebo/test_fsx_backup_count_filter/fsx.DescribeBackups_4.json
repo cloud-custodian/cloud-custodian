@@ -1,0 +1,341 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-0c5c226b302f17a2c",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 33,
+                    "microsecond": 256000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0c5c226b302f17a2c",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0492ff18d65925b41",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 44,
+                    "microsecond": 879000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0492ff18d65925b41",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-07f713d35e14214bc",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 20,
+                    "microsecond": 713000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-07f713d35e14214bc",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0dc3ab8180123babc",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 34,
+                    "microsecond": 32000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0dc3ab8180123babc",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-092342cc53f3925ee",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 2,
+                    "microsecond": 699000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-092342cc53f3925ee",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0483d547d5360b699",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 33,
+                    "microsecond": 564000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0483d547d5360b699",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-089c6432b999e8919",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 7,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 51,
+                    "microsecond": 678000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-089c6432b999e8919",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0db7ccd1cc347b27d",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 42,
+                    "microsecond": 245000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0db7ccd1cc347b27d",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            },
+            {
+                "BackupId": "backup-0cc3d4c030fad527f",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 37,
+                    "second": 26,
+                    "microsecond": 858000
+                },
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/a10ed3ae-7429-4d97-b3af-2f38772a6497",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:backup/backup-0cc3d4c030fad527f",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0b71d060807bbabcc",
+                    "FileSystemType": "OPENZFS",
+                    "StorageCapacity": 64,
+                    "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b71d060807bbabcc",
+                    "OpenZFSConfiguration": {
+                        "AutomaticBackupRetentionDays": 7,
+                        "DailyAutomaticBackupStartTime": "11:00",
+                        "DeploymentType": "SINGLE_AZ_1",
+                        "ThroughputCapacity": 64,
+                        "WeeklyMaintenanceStartTime": "5:08:30",
+                        "DiskIopsConfiguration": {
+                            "Mode": "AUTOMATIC",
+                            "Iops": 192
+                        }
+                    }
+                },
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

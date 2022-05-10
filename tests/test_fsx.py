@@ -410,6 +410,20 @@ class TestFSx(BaseTest):
             ["arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896"])
         self.assertEqual(len(resources), 1)
 
+    def test_fsx_backup_count_filter(self):
+        factory = self.replay_flight_data("test_fsx_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx-backup-count-filter",
+                "resource": "fsx",
+                "filters": [{"type": "consecutive-backups", "days": 2}],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
 
 class TestFSxBackup(BaseTest):
     def test_fsx_backup_delete(self):
