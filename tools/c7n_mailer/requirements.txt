@@ -1,6 +1,6 @@
 attrs==21.4.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
-boto3==1.21.42; python_version >= "3.6"
-botocore==1.24.42; python_version >= "3.6"
+boto3==1.22.12; python_version >= "3.6"
+botocore==1.25.12; python_version >= "3.6"
 certifi==2021.10.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 charset-normalizer==2.0.12; python_full_version >= "3.6.0" and python_version >= "3"
 datadog==0.34.1
@@ -8,11 +8,11 @@ decorator==5.1.1; python_version >= "3.5"
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5"
 importlib-metadata==4.11.3; python_version >= "3.7"
 importlib-resources==5.7.1; python_version < "3.9" and python_version >= "3.7"
-jinja2==3.1.1; python_version >= "3.7"
+jinja2==3.1.2; python_version >= "3.7"
 jmespath==1.0.0; python_version >= "3.7"
 jsonpatch==1.32; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 jsonpointer==2.3; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
-jsonschema==4.4.0; python_version >= "3.7"
+jsonschema==4.5.1; python_version >= "3.7"
 ldap3==2.9.1
 markupsafe==2.1.1; python_version >= "3.7"
 pyasn1==0.4.8

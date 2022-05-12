@@ -1,7 +1,7 @@
 cachetools==5.0.0; python_version >= "3.7" and python_version < "4.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0")
 certifi==2021.10.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 charset-normalizer==2.0.12; python_full_version >= "3.6.0" and python_version >= "3"
-google-auth==2.6.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
+google-auth==2.6.6; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5"
 kubernetes==10.0.1
 oauthlib==3.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
