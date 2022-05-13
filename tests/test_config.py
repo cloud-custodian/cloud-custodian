@@ -113,7 +113,8 @@ class ConfigRuleTest(BaseTest):
                 "name": "rule",
                 "resource": "config-rule",
                 "filters": [
-                    {"type": "value", "key": "ConfigRuleName", "value": "^custodian-db-", "op": "regex"},
+                    {"type": "value", "key": "ConfigRuleName",
+                     "value": "^custodian-db-", "op": "regex"},
                     {"tag:Environment": "sandbox"}
                 ],
                 "actions": ["delete"],
