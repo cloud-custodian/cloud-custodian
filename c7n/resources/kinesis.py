@@ -70,8 +70,13 @@ class Encrypt(Action):
 @KinesisStream.action_registry.register('delete')
 class Delete(Action):
 
-    schema = type_schema('delete')
-    permissions = ("kinesis:DeleteStream",)
+    schema = type_schema('delete', force={'type': 'boolean'})
+
+    def get_permissions(self):
+        permissions = ("kinesis:DeleteStream",)
+        if self.data.get('force'):
+            permissions += ('kinesis:DeregisterStreamConsumer',)
+        return permissions
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
@@ -84,7 +89,8 @@ class Delete(Action):
             if not r['StreamStatus'] == 'ACTIVE':
                 continue
             client.delete_stream(
-                StreamName=r['StreamName'])
+                StreamName=r['StreamName'],
+                EnforceConsumerDeletion=self.data.get('force', False))
 
 
 @KinesisStream.filter_registry.register('kms-key')
