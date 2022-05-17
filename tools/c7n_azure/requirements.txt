@@ -72,7 +72,7 @@ distlib==0.3.4
 idna==3.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 importlib-metadata==4.11.3; python_version < "3.8" and python_version >= "3.7"
 isodate==0.6.1; python_version >= "3.6"
-jmespath==0.10.0; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
+jmespath==1.0.0; python_version >= "3.7"
 msal-extensions==1.0.0; python_version >= "3.6"
 msal==1.17.0; python_version >= "3.6"
 msrest==0.6.21; python_version >= "3.6"

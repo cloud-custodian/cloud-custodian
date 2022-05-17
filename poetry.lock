@@ -920,14 +920,14 @@ dev = ["pip-tools (==6.5.1)", "pytest (==7.1.1)", "flake8 (==4.0.1)", "tox (==3.
 
 [[package]]
 name = "boto3"
-version = "1.22.12"
+version = "1.23.1"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.25.12,<1.26.0"
+botocore = ">=1.26.1,<1.27.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -936,7 +936,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.25.12"
+version = "1.26.1"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -1037,7 +1037,7 @@ azure-storage-queue = "^12.1.5"
 click = "^8.0"
 cryptography = ">=3.4.6"
 distlib = "^0.3.0"
-jmespath = "^0.10.0"
+jmespath = "^1.0"
 netaddr = "^0.7.19"
 PyJWT = "^1.7.1"
 requests = "^2.22.0"
@@ -1246,7 +1246,7 @@ python-versions = "*"
 
 [[package]]
 name = "cachetools"
-version = "5.0.0"
+version = "5.1.0"
 description = "Extensible memoizing collections and decorators"
 category = "dev"
 optional = false
@@ -1404,15 +1404,15 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "fakeredis"
-version = "1.7.4"
+version = "1.7.5"
 description = "Fake implementation of redis API for testing purposes."
 category = "dev"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 
 [package.dependencies]
 packaging = "*"
-redis = "<=4.2.2"
+redis = "<=4.3.1"
 six = ">=1.12"
 sortedcontainers = "*"
 
@@ -1626,7 +1626,7 @@ requests = ["requests (>=2.18.0,<3.0.0dev)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.56.0"
+version = "1.56.1"
 description = "Common protobufs used in Google APIs"
 category = "dev"
 optional = false
@@ -1634,7 +1634,7 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 grpcio = {version = ">=1.0.0", optional = true, markers = "extra == \"grpc\""}
-protobuf = ">=3.12.0"
+protobuf = ">=3.15.0"
 
 [package.extras]
 grpc = ["grpcio (>=1.0.0)"]
@@ -1792,11 +1792,11 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jmespath"
-version = "0.10.0"
+version = "1.0.0"
 description = "JSON Matching Expressions"
 category = "main"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = ">=3.7"
 
 [[package]]
 name = "jsonpatch"
@@ -3405,12 +3405,12 @@ bleach = [
     {file = "bleach-5.0.0.tar.gz", hash = "sha256:c6d6cc054bdc9c83b48b8083e236e5f00f238428666d2ce2e083eaa5fd568565"},
 ]
 boto3 = [
-    {file = "boto3-1.22.12-py3-none-any.whl", hash = "sha256:9830d7f8748c164a3f0929d8a0c5bb313cc62d7cf69ce55617108bed451a8520"},
-    {file = "boto3-1.22.12.tar.gz", hash = "sha256:4b3a49abf7a5f7cdd82714a3ae356a9a8ce12a668e014c5fc68454aa1e2fc0cb"},
+    {file = "boto3-1.23.1-py3-none-any.whl", hash = "sha256:4e3ef99d211266175a97b35d78103c31e3d01af31fd02bf599185421e5873fc0"},
+    {file = "boto3-1.23.1.tar.gz", hash = "sha256:3b50b49c5c0d3f19406cfbcefa32467c199cd6537d80f6fd04f18588670bdeeb"},
 ]
 botocore = [
-    {file = "botocore-1.25.12-py3-none-any.whl", hash = "sha256:53e19890124be45e47ec4f7ffdaf587343d375dbd7c7a501e55aeff80680fec0"},
-    {file = "botocore-1.25.12.tar.gz", hash = "sha256:e2fc586fdc0b54c08fc509e906e87fb358b9f5607b12f526f995ee74a4a4bcd3"},
+    {file = "botocore-1.26.1-py3-none-any.whl", hash = "sha256:598304f20df607944c6db3870e005f2775230ec4558c8280d870f861a8003632"},
+    {file = "botocore-1.26.1.tar.gz", hash = "sha256:a805cbd8e79b64da0f719869b6b4c698cf5db7991b1aa412b086b25fb2892795"},
 ]
 c7n-awscc = []
 c7n-azure = []
@@ -3429,8 +3429,8 @@ cached-property = [
     {file = "cached_property-1.5.2-py2.py3-none-any.whl", hash = "sha256:df4f613cf7ad9a588cc381aaf4a512d26265ecebd5eb9e1ba12f1319eb85a6a0"},
 ]
 cachetools = [
-    {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
-    {file = "cachetools-5.0.0.tar.gz", hash = "sha256:486471dfa8799eb7ec503a8059e263db000cdda20075ce5e48903087f79d5fd6"},
+    {file = "cachetools-5.1.0-py3-none-any.whl", hash = "sha256:4ebbd38701cdfd3603d1f751d851ed248ab4570929f2d8a7ce69e30c420b141c"},
+    {file = "cachetools-5.1.0.tar.gz", hash = "sha256:8b3b8fa53f564762e5b221e9896798951e7f915513abf2ba072ce0f07f3f5a98"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
@@ -3607,8 +3607,8 @@ execnet = [
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
 fakeredis = [
-    {file = "fakeredis-1.7.4-py3-none-any.whl", hash = "sha256:cc033ebf9af9f42bba6aa538a3e1a9f1732686b8b7e9ef50c7a44955bbc2aff8"},
-    {file = "fakeredis-1.7.4.tar.gz", hash = "sha256:69697ffeeb09939073605eeac97f524bccabae04265757a575c7fc923087aa65"},
+    {file = "fakeredis-1.7.5-py3-none-any.whl", hash = "sha256:c4ca2be686e7e7637756ccc7dcad8472a5e4866b065431107d7a4b7a250d4e6f"},
+    {file = "fakeredis-1.7.5.tar.gz", hash = "sha256:49375c630981dd4045d9a92e2709fcd4476c91f927e0228493eefa625e705133"},
 ]
 flake8 = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},
@@ -3707,8 +3707,8 @@ google-resumable-media = [
     {file = "google_resumable_media-2.3.2-py2.py3-none-any.whl", hash = "sha256:3c13f84813861ac8f5b6371254bdd437076bf1f3bac527a9f3fd123a70166f52"},
 ]
 googleapis-common-protos = [
-    {file = "googleapis-common-protos-1.56.0.tar.gz", hash = "sha256:4007500795bcfc269d279f0f7d253ae18d6dc1ff5d5a73613ffe452038b1ec5f"},
-    {file = "googleapis_common_protos-1.56.0-py2.py3-none-any.whl", hash = "sha256:60220c89b8bd5272159bed4929ecdc1243ae1f73437883a499a44a1cbc084086"},
+    {file = "googleapis-common-protos-1.56.1.tar.gz", hash = "sha256:6b5ee59dc646eb61a8eb65ee1db186d3df6687c8804830024f32573298bca19b"},
+    {file = "googleapis_common_protos-1.56.1-py2.py3-none-any.whl", hash = "sha256:ddcd955b5bb6589368f659fa475373faa1ed7d09cde5ba25e88513d87007e174"},
 ]
 grpc-google-iam-v1 = [
     {file = "grpc-google-iam-v1-0.12.4.tar.gz", hash = "sha256:3f0ac2c940b9a855d7ce7e31fde28bddb0d9ac362d32d07c67148306931a0e30"},
@@ -3815,8 +3815,8 @@ jinja2 = [
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
 ]
 jmespath = [
-    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
-    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
+    {file = "jmespath-1.0.0-py3-none-any.whl", hash = "sha256:e8dcd576ed616f14ec02eed0005c85973b5890083313860136657e24784e4c04"},
+    {file = "jmespath-1.0.0.tar.gz", hash = "sha256:a490e280edd1f57d6de88636992d05b71e97d69a26a19f058ecf7d304474bf5e"},
 ]
 jsonpatch = [
     {file = "jsonpatch-1.32-py2.py3-none-any.whl", hash = "sha256:26ac385719ac9f54df8a2f0827bb8253aa3ea8ab7b3368457bcdb8c14595a397"},

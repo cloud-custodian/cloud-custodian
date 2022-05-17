@@ -1,11 +1,11 @@
 argcomplete==2.0.0; python_version >= "3.6"
 attrs==21.4.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
-boto3==1.22.12; python_version >= "3.6"
-botocore==1.25.12; python_version >= "3.6"
+boto3==1.23.1; python_version >= "3.6"
+botocore==1.26.1; python_version >= "3.6"
 docutils==0.17.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 importlib-metadata==4.11.3; python_version >= "3.7"
 importlib-resources==5.7.1; python_version < "3.9" and python_version >= "3.7"
-jmespath==0.10.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6"
+jmespath==1.0.0; python_version >= "3.7"
 jsonschema==4.5.1; python_version >= "3.7"
 pyrsistent==0.18.1; python_version >= "3.7"
 python-dateutil==2.8.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")

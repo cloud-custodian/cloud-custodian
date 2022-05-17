@@ -856,14 +856,14 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.22.12"
+version = "1.23.1"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.25.12,<1.26.0"
+botocore = ">=1.26.1,<1.27.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -872,7 +872,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.25.12"
+version = "1.26.1"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
@@ -1047,11 +1047,11 @@ six = "*"
 
 [[package]]
 name = "jmespath"
-version = "0.10.0"
+version = "1.0.0"
 description = "JSON Matching Expressions"
 category = "main"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = ">=3.7"
 
 [[package]]
 name = "jsonschema"
@@ -1438,7 +1438,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6a7277502d7e2455603e5cb72d9b2fd31c7f8a10d0496e85a9310c562aa80e5f"
+content-hash = "b815fcb8f55c73abee02edfdbb848ead2472a5f1659827d7229b6775216c2337"
 
 [metadata.files]
 adal = [
@@ -1721,12 +1721,12 @@ azure-storage-queue = [
     {file = "backports.zoneinfo-0.2.1.tar.gz", hash = "sha256:fadbfe37f74051d024037f223b8e001611eac868b5c5b06144ef4d8b799862f2"},
 ]
 boto3 = [
-    {file = "boto3-1.22.12-py3-none-any.whl", hash = "sha256:9830d7f8748c164a3f0929d8a0c5bb313cc62d7cf69ce55617108bed451a8520"},
-    {file = "boto3-1.22.12.tar.gz", hash = "sha256:4b3a49abf7a5f7cdd82714a3ae356a9a8ce12a668e014c5fc68454aa1e2fc0cb"},
+    {file = "boto3-1.23.1-py3-none-any.whl", hash = "sha256:4e3ef99d211266175a97b35d78103c31e3d01af31fd02bf599185421e5873fc0"},
+    {file = "boto3-1.23.1.tar.gz", hash = "sha256:3b50b49c5c0d3f19406cfbcefa32467c199cd6537d80f6fd04f18588670bdeeb"},
 ]
 botocore = [
-    {file = "botocore-1.25.12-py3-none-any.whl", hash = "sha256:53e19890124be45e47ec4f7ffdaf587343d375dbd7c7a501e55aeff80680fec0"},
-    {file = "botocore-1.25.12.tar.gz", hash = "sha256:e2fc586fdc0b54c08fc509e906e87fb358b9f5607b12f526f995ee74a4a4bcd3"},
+    {file = "botocore-1.26.1-py3-none-any.whl", hash = "sha256:598304f20df607944c6db3870e005f2775230ec4558c8280d870f861a8003632"},
+    {file = "botocore-1.26.1.tar.gz", hash = "sha256:a805cbd8e79b64da0f719869b6b4c698cf5db7991b1aa412b086b25fb2892795"},
 ]
 c7n = []
 certifi = [
@@ -1846,8 +1846,8 @@ isodate = [
     {file = "isodate-0.6.1.tar.gz", hash = "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"},
 ]
 jmespath = [
-    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
-    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
+    {file = "jmespath-1.0.0-py3-none-any.whl", hash = "sha256:e8dcd576ed616f14ec02eed0005c85973b5890083313860136657e24784e4c04"},
+    {file = "jmespath-1.0.0.tar.gz", hash = "sha256:a490e280edd1f57d6de88636992d05b71e97d69a26a19f058ecf7d304474bf5e"},
 ]
 jsonschema = [
     {file = "jsonschema-4.5.1-py3-none-any.whl", hash = "sha256:71b5e39324422543546572954ce71c67728922c104902cb7ce252e522235b33f"},
