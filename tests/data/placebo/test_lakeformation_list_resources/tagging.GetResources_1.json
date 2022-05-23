@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:s3:::test-logs-644160558196-d90b78f1",
+                "Tags": [
+                    {
+                        "Key": "LakeFormationManaged",
+                        "Value": "true"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

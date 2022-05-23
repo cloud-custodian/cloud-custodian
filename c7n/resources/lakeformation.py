@@ -1,8 +1,9 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import universal_augment
 
 
-@resources.register('lakeformation')
+@resources.register('lakeformation-resource')
 class LakeFormation(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -11,5 +12,6 @@ class LakeFormation(QueryResourceManager):
         arn = id = 'ResourceArn'
         name = 'name'
         cfn_type = "AWS::LakeFormation::Resource"
-        arn_type = 'Resource'
         universal_taggable = object()
+
+    augment = universal_augment
