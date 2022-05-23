@@ -8,9 +8,8 @@ class LakeFormationTest(BaseTest):
         p = self.load_policy({
             'name': 'list_lakeformation_resources',
             'resource': 'lakeformation-resource',
-            "filters": [{"RoleArn": "present"},
-                        {"tag:LakeFormationManaged": "present"}]},
+            "filters": [{"RoleArn": "present"}], },
             session_factory=factory)
         resources = p.run()
         print(resources)
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
