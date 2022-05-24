@@ -9,6 +9,9 @@ class DescribeRegionalWaf(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
+class DescribeWafV2(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 @resources.register('waf')
 class WAF(QueryResourceManager):
@@ -46,5 +49,28 @@ class RegionalWAF(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRegionalWaf,
+        'config': ConfigSource
+    }
+
+
+@resources.register('wafv2')
+class WAFV2(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "wafv2"
+        enum_spec = ("list_web_acls", "WebACLs", None)
+        detail_spec = ("get_web_acl", "Id", "Id", "WebACL")
+        name = "Name"
+        id = "Id"
+        dimension = "WebACL"
+        cfn_type = config_type = "AWS::WAFV2::WebACL"
+        arn_type = "webacl"
+        # override defaults to casing issues
+        permissions_enum = ('wafv2:ListWebACLs',)
+        permissions_augment = ('wafv2:GetWebACL',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeWafV2,
         'config': ConfigSource
     }
