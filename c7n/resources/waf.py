@@ -9,9 +9,11 @@ class DescribeRegionalWaf(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
+
 class DescribeWafV2(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
 
 @resources.register('waf')
 class WAF(QueryResourceManager):

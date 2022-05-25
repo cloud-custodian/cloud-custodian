@@ -447,6 +447,7 @@ class TestRestStage(BaseTest):
         )
         self.assertEqual(len(resources), 1)
 
+
 class TestRestClientCertificate(BaseTest):
 
     def test_rest_client_certificate_resource(self):

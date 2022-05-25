@@ -164,12 +164,14 @@ class IsWafV2Enabled(Filter):
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
             if state:
-                if target_acl_id is None and r_web_acl_id and r_web_acl_id in waf_name_id_map.values():
+                if target_acl_id is None and r_web_acl_id \
+                        and r_web_acl_id in waf_name_id_map.values():
                     results.append(r)
                 elif target_acl_id and r_web_acl_id == target_acl_id:
                     results.append(r)
             else:
-                if target_acl_id is None and (not r_web_acl_id or r_web_acl_id and r_web_acl_id not in waf_name_id_map.values()):
+                if target_acl_id is None and (not r_web_acl_id or r_web_acl_id and
+                                              r_web_acl_id not in waf_name_id_map.values()):
                     results.append(r)
                 elif target_acl_id and r_web_acl_id != target_acl_id:
                     results.append(r)

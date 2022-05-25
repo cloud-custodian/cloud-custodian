@@ -504,6 +504,7 @@ class CloudFront(BaseTest):
             resp['StreamingDistributionConfig']['Logging']['Enabled'], True
         )
 
+
 class CloudFrontWafV2(BaseTest):
 
     def test_wafv2(self):
