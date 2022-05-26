@@ -32,3 +32,21 @@ class Delete(Action):
             if r['Created'] is not True or r['Deleted'] is True:
                 continue
             client.delete_domain(DomainName=r['DomainName'])
+
+
+@CloudSearch.action_registry.register('enable-https')
+class EnableHttps(Action):
+
+    schema = type_schema('enable-https')
+    permissions = ('cloudsearch:UpdateDomainEndpointOptions',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudsearch')
+        for r in resources:
+            client.update_domain_endpoint_options(
+                DomainName=r['DomainName'],
+                DomainEndpointOptions = {
+                    'EnforceHTTPS': True,
+                }
+            )

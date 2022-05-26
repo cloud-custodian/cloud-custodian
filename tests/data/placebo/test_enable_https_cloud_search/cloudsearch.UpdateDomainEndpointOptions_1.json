@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainEndpointOptions": {
+            "Options": {
+                "EnforceHTTPS": true,
+                "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+            },
+            "Status": {
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 1,
+                    "hour": 14,
+                    "minute": 25,
+                    "second": 42,
+                    "microsecond": 528000
+                },
+                "UpdateDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 3,
+                    "second": 15,
+                    "microsecond": 677000
+                },
+                "UpdateVersion": 19,
+                "State": "Active",
+                "PendingDeletion": false
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "db8e7493-xxx-44c2-aa69-c970e78a2320",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "db8e7493-xxxx-44c2-aa69-c970e78a2320",
+                "content-type": "text/xml",
+                "content-length": "796",
+                "date": "Wed, 01 Dec 2021 16:08:40 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
