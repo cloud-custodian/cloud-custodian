@@ -1098,6 +1098,10 @@ class TestMetricsFilter(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(datapoints), 1)
 
+        # Using a period that is not a clean multiple of hours can inadvertently
+        # fetch data points with shorter retention.
+        self.assertEqual(metrics_filter.period % 3600, 0)
+
 
 class TestReduceFilter(BaseFilterTest):
 
