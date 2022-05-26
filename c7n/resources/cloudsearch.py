@@ -36,6 +36,17 @@ class Delete(Action):
 
 @CloudSearch.action_registry.register('enable-https')
 class EnableHttps(Action):
+    """Enable HTTPs to cloudsearch
+
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: enable-https
+                resource: cloudsearch
+                actions:
+                  - type: enable-https
+
+    """
 
     schema = type_schema('enable-https')
     permissions = ('cloudsearch:UpdateDomainEndpointOptions',)
