@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Custodian on AWS
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/categories/aws
+    about: Ask a question or request support for using c7n on Amazon Web Services
+  - name: Custodian on Azure
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/categories/azure
+    about: Ask a question or request support for using c7n on Microsoft Azure
+  - name: Custodian on GCP
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/categories/gcp
+    about: Ask a question or request support for using c7n on Google Cloup Platform
+  - name: General Questions
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/categories/general
+    about: Ask a general questions about Custodian
