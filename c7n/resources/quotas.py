@@ -118,7 +118,7 @@ class UsageFilter(MetricsFilter):
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'})
+    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
@@ -157,6 +157,7 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
+        min_period = max(self.data.get('min_period', 300), 300)
 
         result = []
 
@@ -173,9 +174,9 @@ class UsageFilter(MetricsFilter):
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
-                if period_unit == "seconds" and period < 60 and stat == "Sum":
-                    metric_scale = 60 / period
-                    period = 60
+                if period_unit == "seconds" and period < min_period and stat == "Sum":
+                    metric_scale = min_period / period
+                    period = min_period
             else:
                 period = int(timedelta(1).total_seconds())
             res = client.get_metric_statistics(
@@ -199,10 +200,11 @@ class UsageFilter(MetricsFilter):
                     op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
-                m = op([x[stat] for x in res['Datapoints']])
-                if m > (limit / 100) * quota * metric_scale:
+                m = op([x[stat] for x in res['Datapoints']]) / metric_scale
+                self.log.info(f'{r.get("QuotaName")} usage: {m}/{quota}')
+                if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
-                        'metric': m / metric_scale,
+                        'metric': m,
                         'period': period / metric_scale,
                         'start_time': start_time,
                         'end_time': end_time,
