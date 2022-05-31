@@ -157,7 +157,7 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
-        min_period = max(self.data.get('min_period', 300), 300)
+        min_period = max(self.data.get('min_period', 300), 60)
 
         result = []
 
@@ -169,6 +169,11 @@ class UsageFilter(MetricsFilter):
             stat = metric.get('MetricStatisticRecommendation', 'Maximum')
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
+
+            period_value = {"PeriodValue": 1, "PeriodUnit": "SECOND"}
+            # NOTE Hot fix for "QuotaName": "Concurrently executing Automations"
+            if r.get("QuotaCode") == "L-09101E66" and "Period" not in r:
+                r["Period"] = period_value
 
             metric_scale = 1
             if 'Period' in r:
@@ -201,7 +206,7 @@ class UsageFilter(MetricsFilter):
                 else:
                     op = self.metric_map[stat]
                 m = op([x[stat] for x in res['Datapoints']]) / metric_scale
-                self.log.info(f'{r.get("QuotaName")} usage: {m}/{quota}')
+                self.log.info(f'{r.get("ServiceName")} {r.get("QuotaName")} usage: {m}/{quota}')
                 if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
                         'metric': m,
