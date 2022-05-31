@@ -65,7 +65,7 @@ class WAFV2(QueryResourceManager):
         name = "Name"
         id = "Id"
         dimension = "WebACL"
-        cfn_type = config_type = "AWS::WAFV2::WebACL"
+        cfn_type = config_type = "AWS::WAFv2::WebACL"
         arn_type = "webacl"
         # override defaults to casing issues
         permissions_enum = ('wafv2:ListWebACLs',)

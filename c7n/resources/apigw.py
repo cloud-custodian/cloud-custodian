@@ -494,7 +494,7 @@ class WafV2Enabled(Filter):
             'web-acl': {'type': 'string'},
             'state': {'type': 'boolean'}})
 
-    permissions = ('wafv2:ListWebACLs')
+    permissions = ('wafv2:ListWebACLs',)
 
     def process(self, resources, event=None):
         target_acl = self.data.get('web-acl')
