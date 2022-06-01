@@ -8,7 +8,6 @@ from c7n.utils import local_session, type_schema
 
 @resources.register('cloudsearch')
 class CloudSearch(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = "cloudsearch"
         enum_spec = ("describe_domains", "DomainStatusList", None)
@@ -21,7 +20,6 @@ class CloudSearch(QueryResourceManager):
 
 @CloudSearch.action_registry.register('delete')
 class Delete(Action):
-
     schema = type_schema('delete')
     permissions = ('cloudsearch:DeleteDomain',)
 
@@ -45,6 +43,8 @@ class EnableHttps(Action):
                 resource: cloudsearch
                 actions:
                   - type: enable-https
+                    tls-security-policy: Policy-Min-TLS-1-0-2019-07
+
 
     """
 
@@ -57,7 +57,8 @@ class EnableHttps(Action):
         for r in resources:
             client.update_domain_endpoint_options(
                 DomainName=r['DomainName'],
-                DomainEndpointOptions = {
+                DomainEndpointOptions={
                     'EnforceHTTPS': True,
+                    'TLSSecurityPolicy': self.data.get('tls-security-policy', 'Policy-Min-TLS-1-0-2019-07')
                 }
             )

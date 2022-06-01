@@ -1,6 +1,6 @@
 {
   "version": "0",
-  "id": "c49f0d45-84b9-4e68-a930-03a7f8d62b50",
+  "id": "xxxxx-84b9-4e68-a930-03a7f8d62b50",
   "detail-type": "AWS API Call via CloudTrail",
   "source": "aws.rds",
   "account": "687174582794",
@@ -11,17 +11,17 @@
     "eventVersion": "1.08",
     "userIdentity": {
       "type": "AssumedRole",
-      "principalId": "AROAILJD4VDVFFUUQB4VM:itx-046_2dff6113-d10e-4dea-91bf-70a953d01bda_cred_session",
-      "arn": "arn:aws:sts::285452473038:assumed-role/itx-ITxAdministrator-1OT8CHKE29AQJ/itx-046_2dff6113-d10e-4dea-91bf-70a953d01bda_cred_session",
-      "accountId": "285452473038",
-      "accessKeyId": "ASIAUE5SLCLHAE7CWRWM",
+      "principalId": "AROAILJD4VDVFFUUQB4VM:xxxxx-4dea-91bf-70a953d01bda_cred_session",
+      "arn": "arn:aws:sts::123456789:assumed-role/XXXX1OT8CHKE29AQJ/XXXX-d10e-4dea-91bf-70a953d01bda_cred_session",
+      "accountId": "123456789",
+      "accessKeyId": "XXXXXXX",
       "sessionContext": {
         "sessionIssuer": {
           "type": "Role",
-          "principalId": "AROAILJD4VDVFFUUQB4VM",
-          "arn": "arn:aws:iam::285452473038:role/itx/role-1OT8CHKE29AQJ",
-          "accountId": "285452473038",
-          "userName": "itx-ITxAdministrator-1OT8CHKE29AQJ"
+          "principalId": "XXXXXX",
+          "arn": "arn:aws:iam::123456789:role/role-xxxx",
+          "accountId": "123456789",
+          "userName": "xxxx"
         },
         "webIdFederationData": {},
         "attributes": {
@@ -41,13 +41,13 @@
     },
     "responseElements": {
       "domainStatus": {
-        "aRN": "arn:aws:cloudsearch:us-east-1:285452473038:domain/demo-search",
+        "aRN": "arn:aws:cloudsearch:us-east-1:123456789:domain/demo-search",
         "searchInstanceCount": 0,
         "docService": {},
         "requiresIndexDocuments": false,
         "deleted": false,
         "searchService": {},
-        "domainId": "285452473038/demo-search",
+        "domainId": "123456789/demo-search",
         "processing": false,
         "created": true,
         "searchPartitionCount": 0,
@@ -59,7 +59,7 @@
     "readOnly": false,
     "eventType": "AwsApiCall",
     "managementEvent": true,
-    "recipientAccountId": "285452473038",
+    "recipientAccountId": "123456789",
     "eventCategory": "Management"
   }
 }

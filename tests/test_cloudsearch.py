@@ -60,6 +60,7 @@ class CloudSearch(BaseTest):
                 "actions": [
                     {
                         "type": "enable-https",
+                        "tls-security-policy": "Policy-Min-TLS-1-2-2019-07"
                     }
                 ]
             },
