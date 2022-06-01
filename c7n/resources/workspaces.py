@@ -5,7 +5,7 @@ import itertools
 import jmespath
 
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, Filter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -265,6 +265,45 @@ class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
 class WorkSpacesDirectorySg(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+@WorkspaceDirectory.filter_registry.register('connection-aliases')
+class WorkspacesDirectoryConnectionAliases(Filter):
+    """Filter workspace directories based on connection aliases
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: workspace-connection-alias
+           resource: aws.workspaces-directory
+           filters:
+            - type: connection-aliases
+              state: True
+
+    """
+
+    permissions = ('workspaces:DescribeConnectionAliases',)
+
+    schema = type_schema('connection-aliases',
+        **{'state': {'type': 'boolean'}})
+
+    def process(self, directories, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        results = []
+
+        for directory in directories:
+
+            connection_aliases = client.describe_connection_aliases(
+                ResourceId=directory['DirectoryId'])
+            connection_aliases_list = connection_aliases['ConnectionAliases']
+
+            if ((connection_aliases_list and self.data.get('state'))
+                    or (not connection_aliases_list and not self.data.get('state'))):
+                results.append(directory)
+
+        return results
 
 
 @WorkspaceDirectory.filter_registry.register('client-properties')
