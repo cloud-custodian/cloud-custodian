@@ -4,7 +4,6 @@
 Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
-import pytz
 
 import jmespath
 
@@ -112,7 +111,7 @@ class GCPMetricsFilter(Filter):
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
-        self.end = datetime.now(pytz.timezone('UTC'))
+        self.end = datetime.utcnow()
         self.start = self.end - duration
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
