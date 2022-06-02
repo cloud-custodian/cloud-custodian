@@ -501,8 +501,7 @@ class WafV2Enabled(Filter):
         state = self.data.get('state', False)
 
         results = []
-        query = {'Scope': 'REGIONAL'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         waf_name_arn_map = {w['Name']: w['ARN'] for w in wafs}
         target_acl_id = waf_name_arn_map.get(target_acl, target_acl)
         for r in resources:
@@ -549,8 +548,7 @@ class SetWafv2(BaseAction):
         return self
 
     def process(self, resources):
-        query = {'Scope': 'REGIONAL'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         name_id_map = {w['Name']: w['ARN'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = name_id_map.get(target_acl, target_acl)

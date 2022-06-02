@@ -259,8 +259,7 @@ class WafV2Enabled(Filter):
         name_arn_map = {}
         resource_map = {}
 
-        query = {'Scope': 'REGIONAL'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
 
         for w in wafs:
             if 'c7n:AssociatedResources' not in w:
@@ -375,8 +374,7 @@ class SetWafV2(BaseAction):
         return self
 
     def process(self, resources):
-        query = {'Scope': 'REGIONAL'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         name_id_map = {w['Name']: w['ARN'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = name_id_map.get(target_acl, target_acl)

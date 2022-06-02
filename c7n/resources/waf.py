@@ -14,6 +14,16 @@ class DescribeWafV2(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
+    # set REGIONAL for Scope as default
+    def get_query_params(self, query):
+        q = super(DescribeWafV2, self).get_query_params(query)
+        if q:
+            if 'Scope' not in q:
+                q['Scope'] = 'REGIONAL'
+        else:
+            q = {'Scope': 'REGIONAL'}
+        return q
+
 
 @resources.register('waf')
 class WAF(QueryResourceManager):
