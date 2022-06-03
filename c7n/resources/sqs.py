@@ -6,6 +6,7 @@ import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters.core import Filter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.utils import local_session
@@ -371,3 +372,31 @@ class SetRetentionPeriod(BaseAction):
                 QueueUrl=q['QueueUrl'],
                 Attributes={
                     'MessageRetentionPeriod': period})
+
+
+@SQS.filter_registry.register('deadletter')
+class DeadLetterFilter(Filter):
+    """
+    Filter for sqs queues that are dead letter queues
+    """
+
+    schema = type_schema('deadletter')
+    permissions = ()
+
+    def process(self, resources, event=None):
+        queue_arn_map = {r['QueueArn']: r for r in resources}
+        has_redrive = []
+        for r in resources:
+            if r.get("RedrivePolicy"):
+                has_redrive.append(r['QueueArn'])
+        result = []
+        # dead letter queues must exist in the same region and account as the
+        # original queue so it should be safe to look for them in our existing
+        # resources
+        for r in resources:
+            if r['QueueArn'] in has_redrive:
+                queue = queue_arn_map[r['QueueArn']]
+                target = json.loads(queue['RedrivePolicy']).get('deadLetterTargetArn')
+                if queue_arn_map.get(target):
+                    result.append(queue_arn_map[target])
+        return result
