@@ -6,14 +6,15 @@ from dateutil.tz import tzutc
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
-
 import json
 import logging
 import pytest
 import time
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from c7n.resources.aws import shape_validate, Arn
+from c7n.resources.sqs import DeadLetterFilter
 
 
 def test_sqs_config_translate(test):
@@ -694,3 +695,19 @@ class QueueTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n:AccessAnalysis', resources[0])
+
+    def test_sqs_deadletter_filter(self):
+        manager = MagicMock()
+        dl_filter = DeadLetterFilter(manager)
+        resources = [
+            {
+                "QueueArn": "foo",
+                "RedrivePolicy": "{\"deadLetterTargetArn\": \"foo-dlq\"}"
+            },
+            {
+                "QueueArn": "foo-dlq"
+            }
+        ]
+        result = dl_filter.process(resources)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['QueueArn'], "foo-dlq")
