@@ -62,6 +62,7 @@ class TestQuotas(BaseTest):
             "filters": [
                 {"UsageMetric": "present"},
                 {"type": "usage-metric",
+                 "min_period": 60,
                  "limit": 20}
             ]},
             session_factory=session_factory)
