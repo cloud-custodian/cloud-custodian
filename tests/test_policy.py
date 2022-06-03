@@ -1149,6 +1149,16 @@ class TestPolicy(BaseTest):
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
     def test_policy_variable_interpolation(self):
+        self.change_environment(
+            C7N_VAR_email='me@example.com',
+            C7N_VAR_='invalid, so we have to ignore it',
+            C7N_VAR_account='the value should be rewritten by runtime variable (account)',
+            ignored_env_variable='ignored since no env prefix',
+            C7N_VAR_CaSe_SeNsItIvE='case-sensitive')
+
+        case_sensitive_name = 'CaSe_SeNsItIvE'
+        if os.name == 'nt':
+            case_sensitive_name = case_sensitive_name.lower()
 
         p = self.load_policy({
             'name': 'compute',
@@ -1159,12 +1169,16 @@ class TestPolicy(BaseTest):
                 'role': 'FooBar'},
             'actions': [
                 {'type': 'notify',
-                 'to': ['me@example.com'],
+                 'to': ['{email}'],
                  'transport': {
                      'type': 'sns',
                      'topic': 'arn:::::',
                  },
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
+                {'type': 'tag',
+                 'tags': {
+                     'ignored_env_variable': '{ignored_env_variable}',
+                     'case_sensitive_variable': '{{{}}}'.format(case_sensitive_name)}},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
         p.expand_variables(p.get_variables())
@@ -1173,6 +1187,11 @@ class TestPolicy(BaseTest):
             "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
         self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam::{account_id}:role/BarFoo')
+        self.assertEqual(
+            p.data['actions'][1]['tags']['ignored_env_variable'], '{ignored_env_variable}')
+        self.assertEqual(
+            p.data['actions'][1]['tags']['case_sensitive_variable'], 'case-sensitive')
+        self.assertEqual(p.data['actions'][0]['to'][0], 'me@example.com')
 
     def test_now_interpolation(self):
         """Test interpolation of the {now} placeholder
