@@ -7,6 +7,7 @@ Advanced Usage
 * :ref:`report-multiple-regions`
 * :ref:`report-custom-fields`
 * :ref:`policy_resource_limits`
+* :ref:`environment_variable_policy_interpolation`
 
 .. _run-multiple-regions:
 
@@ -229,3 +230,37 @@ To remove the default fields and only add the desired ones, the ``--no-default-f
 flag can be specified and then specific fields can be added in, e.g.::
 
   custodian report -s out --no-default-fields --field Image=ImageId policy.yml
+
+
+.. _environment_variable_policy_interpolation:
+
+Using environment variables in a policy
+---------------------------------------
+
+Cloud Custodian searches the environment for environment variables named ``C7N_VAR_`` followed by the name of a declared variable.
+
+This can be useful when running Cloud Custodian in automation. For example, at a bash prompt on a Unix system::
+
+  $ export C7N_VAR_email="example@example.com"
+  $ custodian run -s out policy.yml
+
+``policy.yml`` contains Cloud Custodian policy definiton with declared variable ``{email}``:
+
+.. code-block:: yaml
+
+  policies:
+  - name: notify
+    resource: azure.resourcegroup
+    actions:
+    - type: notify
+      template: default
+      subject: Hello World
+      to:
+      - {email}
+      transport:
+        type: asq
+        queue: https://storagename.queue.core.windows.net/queuename
+
+On operating systems where environment variable names are case-sensitive,
+Cloud Custodian matches the variable name exactly as given in configuration,
+and so the required environment variable name will usually have a mix of upper and lower case letters as in the above example.
