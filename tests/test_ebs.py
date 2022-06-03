@@ -770,6 +770,8 @@ class EncryptExtantVolumesTest(BaseTest):
                     self.assertNotIn(
                         "maid-instance-device", [i["Key"] for i in v["Tags"]]
                     )
+                if (v["Attachments"][0]["InstanceId"] == r["Attachments"][0]["InstanceId"]):
+                    self.assertEqual(v["Tags"], r["Tags"])
 
 
 class TestKmsAlias(BaseTest):
