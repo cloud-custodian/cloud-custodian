@@ -119,7 +119,9 @@ class UserCredentialReportTest(BaseTest):
                 {'type': 'remove-keys',
                  'matched': True}]},
             session_factory=factory)
-        resources = p.run()
+
+        with mock_datetime_now(parser.parse("2020-01-01"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
         client = factory().client('iam')
