@@ -705,6 +705,10 @@ class QueueTests(BaseTest):
                 "RedrivePolicy": "{\"deadLetterTargetArn\": \"foo-dlq\"}"
             },
             {
+                "QueueArn": "bar",
+                "RedrivePolicy": "{\"deadLetterTargetArn\": \"foo-dlq\"}"
+            },
+            {
                 "QueueArn": "foo-dlq"
             }
         ]

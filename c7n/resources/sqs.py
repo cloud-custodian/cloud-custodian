@@ -398,5 +398,7 @@ class DeadLetterFilter(Filter):
                 queue = queue_arn_map[r['QueueArn']]
                 target = json.loads(queue['RedrivePolicy']).get('deadLetterTargetArn')
                 if queue_arn_map.get(target):
-                    result.append(queue_arn_map[target])
-        return result
+                    result.append(target)
+        # in case there are multiple queues pointing at the same dead letter queue
+        # we need to only return the unique queues
+        return [queue_arn_map[r] for r in list(set(result))]
