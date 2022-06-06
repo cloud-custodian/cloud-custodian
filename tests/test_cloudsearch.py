@@ -39,7 +39,6 @@ class CloudSearch(BaseTest):
         ]
         self.assertEqual(state["Deleted"], True)
 
-
     def test_enable_https_cloud_search(self):
         """ CloudSearchEnableHttpsTest: tes_enable_https_cloud_search: enable https """
         session_factory = self.replay_flight_data("test_enable_https_cloud_search")
@@ -62,7 +61,8 @@ class CloudSearch(BaseTest):
                         "type": "enable-https",
                         "tls-security-policy": "Policy-Min-TLS-1-2-2019-07"
                     }
-                ]
+                ],
+                "filters": ["domain-options"]
             },
             session_factory=session_factory
         )
