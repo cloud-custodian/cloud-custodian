@@ -20,3 +20,4 @@ from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase
+from .revisions import JsonDiff
