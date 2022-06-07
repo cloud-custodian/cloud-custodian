@@ -65,6 +65,7 @@ class Group(QueryResourceManager):
         id = name = 'GroupName'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Group"
+        config_id = 'GroupId'
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
@@ -102,6 +103,7 @@ class Role(QueryResourceManager):
         id = name = 'RoleName'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Role"
+        config_id = 'RoleId'
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
@@ -254,6 +256,7 @@ class User(QueryResourceManager):
         id = name = 'UserName'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::User"
+        config_id = 'UserId'
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
@@ -405,6 +408,7 @@ class Policy(QueryResourceManager):
         name = 'PolicyName'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Policy"
+        config_id = 'PolicyId'
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'

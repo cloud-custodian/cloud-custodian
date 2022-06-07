@@ -94,9 +94,13 @@ class Diff(Filter):
         return results
 
     def get_revisions(self, config, resource):
+        # For some resource types (notably IAM resources), the AWS Config resourceId
+        # field doesn't match the `id` parameter of the Custodian resource. In those
+        # cases, a Custodian resource can define the `config_id` parameter.
+        config_id = getattr(self.model, 'config_id', self.model.id)
         params = dict(
             resourceType=self.model.config_type,
-            resourceId=resource[self.model.id])
+            resourceId=resource[config_id])
         params.update(self.get_selector_params(resource))
         try:
             revisions = config.get_resource_config_history(
@@ -107,7 +111,7 @@ class Diff(Filter):
             if e.response['Error']['Code'] != ErrNotFound:
                 self.log.debug(
                     "config - resource %s:%s not found" % (
-                        self.model.config_type, resource[self.model.id]))
+                        self.model.config_type, resource[config_id]))
                 revisions = []
             raise
         return revisions
