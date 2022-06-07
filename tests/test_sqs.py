@@ -11,10 +11,8 @@ import logging
 import pytest
 import time
 from pathlib import Path
-from unittest.mock import MagicMock
 
 from c7n.resources.aws import shape_validate, Arn
-from c7n.resources.sqs import DeadLetterFilter
 
 
 def test_sqs_config_translate(test):
@@ -697,21 +695,24 @@ class QueueTests(BaseTest):
         self.assertIn('c7n:AccessAnalysis', resources[0])
 
     def test_sqs_deadletter_filter(self):
-        manager = MagicMock()
-        dl_filter = DeadLetterFilter(manager)
-        resources = [
+        factory = self.replay_flight_data("test_sqs_deadletter_filter")
+        p = self.load_policy(
             {
-                "QueueArn": "foo",
-                "RedrivePolicy": "{\"deadLetterTargetArn\": \"foo-dlq\"}"
+                "name": "sqs-deadletter",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "QueueArn",
+                        "value": "arn:aws:sqs:us-east-1:644160558196:bar",
+                        "op": "ne"
+                    },
+                    {
+                        "type": "deadletter"
+                    },
+                ]
             },
-            {
-                "QueueArn": "bar",
-                "RedrivePolicy": "{\"deadLetterTargetArn\": \"foo-dlq\"}"
-            },
-            {
-                "QueueArn": "foo-dlq"
-            }
-        ]
-        result = dl_filter.process(resources)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]['QueueArn'], "foo-dlq")
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
