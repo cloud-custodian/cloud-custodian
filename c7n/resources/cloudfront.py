@@ -140,6 +140,44 @@ class IsWafEnabled(Filter):
         return results
 
 
+@Distribution.filter_registry.register('wafv2-enabled')
+class IsWafV2Enabled(Filter):
+    # useful primarily to use the same name across accounts, else webaclid
+    # attribute works as well
+
+    schema = type_schema(
+        'wafv2-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('wafv2:ListWebACLs',)
+
+    def process(self, resources, event=None):
+        query = {'Scope': 'CLOUDFRONT'}
+        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
+        state = self.data.get('state', False)
+        target_acl = self.data.get('web-acl')
+        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+
+        results = []
+        for r in resources:
+            r_web_acl_id = r.get('WebACLId')
+            if state:
+                if target_acl_id is None and r_web_acl_id \
+                        and r_web_acl_id in waf_name_id_map.values():
+                    results.append(r)
+                elif target_acl_id and r_web_acl_id == target_acl_id:
+                    results.append(r)
+            else:
+                if target_acl_id is None and (not r_web_acl_id or r_web_acl_id and
+                                              r_web_acl_id not in waf_name_id_map.values()):
+                    results.append(r)
+                elif target_acl_id and r_web_acl_id != target_acl_id:
+                    results.append(r)
+        return results
+
+
 class BaseDistributionConfig(ValueFilter):
     schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
     schema_alias = False
@@ -343,6 +381,42 @@ class SetWaf(BaseAction):
 
         client = local_session(self.manager.session_factory).client(
             'cloudfront')
+        force = self.data.get('force', False)
+
+        for r in resources:
+            if r.get('WebACLId') and not force:
+                continue
+            if r.get('WebACLId') == target_acl_id:
+                continue
+            result = client.get_distribution_config(Id=r['Id'])
+            config = result['DistributionConfig']
+            config['WebACLId'] = target_acl_id
+            self.retry(
+                client.update_distribution,
+                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+
+
+@Distribution.action_registry.register('set-wafv2')
+class SetWafv2(BaseAction):
+    permissions = ('cloudfront:UpdateDistribution', 'wafv2:ListWebACLs')
+    schema = type_schema(
+        'set-wafv2', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry(('Throttling',)))
+
+    def process(self, resources):
+        query = {'Scope': 'CLOUDFRONT'}
+        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+        if target_acl_id not in waf_name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)
 
         for r in resources:

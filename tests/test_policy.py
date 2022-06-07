@@ -389,7 +389,8 @@ class PolicyMetaLint(BaseTest):
         invalid_ignore = {
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
-            'AWS::NetworkFirewall::Firewall'
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::WAFv2::WebACL'
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
