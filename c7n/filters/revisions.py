@@ -5,13 +5,16 @@ Custodian support for diffing and patching across multiple versions
 of a resource.
 """
 
+import json
+
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
+from functools import partial
 
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, DateTimeEncoder
 
 try:
     import jsonpatch
@@ -158,7 +161,8 @@ class JsonDiff(Diff):
     def diff(self, source, target):
         source, target = (
             self.sanitize_revision(source), self.sanitize_revision(target))
-        patch = jsonpatch.JsonPatch.from_diff(source, target)
+        dumper = partial(json.dumps, cls=DateTimeEncoder)
+        patch = jsonpatch.JsonPatch.from_diff(source, target, dumps=dumper)
         return list(patch)
 
     def sanitize_revision(self, rev):
