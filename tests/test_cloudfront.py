@@ -503,3 +503,30 @@ class CloudFront(BaseTest):
         self.assertEqual(
             resp['StreamingDistributionConfig']['Logging']['Enabled'], True
         )
+
+
+class CloudFrontWafV2(BaseTest):
+
+    def test_wafv2(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(p.run(), [])

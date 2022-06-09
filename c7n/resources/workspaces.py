@@ -10,8 +10,8 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
-from c7n.exceptions import PolicyValidationError
-from c7n.utils import local_session, type_schema, chunks
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.utils import get_retry, local_session, type_schema, chunks
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
@@ -364,3 +364,43 @@ class ModifyClientProperties(BaseAction):
                     ResourceId=directory['DirectoryId'], **self.data['attributes'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@WorkspaceDirectory.action_registry.register('deregister')
+class DeregisterWorkspaceDirectory(BaseAction):
+    """
+    Deregisters a workspace
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: deregister-workspace
+          resource: aws.workspaces-directory
+          filters:
+            - "tag:Deregister": present
+          actions:
+            - deregister
+    """
+
+    schema = type_schema('deregister')
+    permissions = ('workspaces:DeregisterWorkspaceDirectory',)
+
+    def process(self, directories):
+        exceptions = []
+        retry = get_retry(('InvalidResourceStateException',))
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for d in directories:
+            try:
+                retry(client.deregister_workspace_directory, DirectoryId=d['DirectoryId'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+            except client.exceptions.OperationNotSupportedException as e:
+                self.log.error(f"Error deregistering workspace: {d['DirectoryId']} error: {e}")
+                exceptions.append(d['DirectoryId'])
+
+        if exceptions:
+            raise PolicyExecutionError(
+                'The following directories must be removed from WorkSpaces'
+                'and cannot be deregistered: %s ' % ''.join(map(str, exceptions))
+            )
