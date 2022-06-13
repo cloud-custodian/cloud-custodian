@@ -23,6 +23,7 @@ def main():
 
     # manually add the ones missing
     missing = (
+        'AWS::::Account',
         'AWS::Serverless::Application',)
     for m in missing:
         if m not in type_names:
