@@ -20,18 +20,19 @@ class ExperimentTemplate(QueryResourceManager):
         arn_type = 'experiment-template'
 
     def augment(self, resources):
+        resources = super().augment(resources)
         # tag normalize for value filter
         for r in resources:
             if 'tags' not in r:
                 continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('tags')]
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('tags', {}).items()]
         return resources
 
     def get_arns(self, resources):
-        partition = get_partition(self.manager.region)
+        partition = get_partition(self.region)
         return [
             "arn:%s:fis:%s:%s:experiment-template/%s"
-            % (partition, self.manager.region, self.manager.account_id, r['id'])
+            % (partition, self.region, self.account_id, r['id'])
             for r in resources
         ]
 
