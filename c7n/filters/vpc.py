@@ -101,11 +101,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
 
     def get_route_tables(self, subnets):
         rmanager = self.manager.get_resource_manager('aws.route-table')
-        rtables = rmanager.resources(
-            query={'association.subnet-id': sorted([
-                s['SubnetId'] for s in subnets])})
         route_tables = {}
-        for r in rtables:
+        for r in rmanager.resources():
             for a in r['Associations']:
                 if a['Main']:
                     route_tables[r['VpcId']] = r
