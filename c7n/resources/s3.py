@@ -3113,12 +3113,13 @@ class Lifecycle(BucketActionBase):
         config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
-                if rule['ID'] == existing_rule['ID']:
-                    if rule['Status'] == 'absent':
-                        config[index] = None
-                    else:
-                        config[index] = rule
-                    break
+                if existing_rule:
+                    if rule['ID'] == existing_rule['ID']:
+                        if rule['Status'] == 'absent':
+                            config[index] = None
+                        else:
+                            config[index] = rule
+                        break
             else:
                 if rule['Status'] != 'absent':
                     config.append(rule)
