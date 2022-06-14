@@ -79,6 +79,7 @@ ResourceMap = {
     "aws.event-rule-target": "c7n.resources.cw.EventRuleTarget",
     "aws.firewall": "c7n.resources.firewall.NetworkFirewall",
     "aws.firehose": "c7n.resources.kinesis.DeliveryStream",
+    "aws.fis-template": "c7n.resources.fis.ExperimentTemplate",
     "aws.fsx": "c7n.resources.fsx.FSx",
     "aws.fsx-backup": "c7n.resources.fsx.FSxBackup",
     "aws.gamelift-build": "c7n.resources.gamelift.GameLiftBuild",
