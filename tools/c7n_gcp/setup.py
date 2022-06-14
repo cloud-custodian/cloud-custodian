@@ -27,7 +27,7 @@ install_requires = \
  'jsonschema (>=4.4.0,<5.0.0)',
  'pyrsistent (>=0.18.1,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
- 'pytz',
+ 'pytz>=2021.1,<2022.0',
  'pyyaml (>=6.0,<7.0)',
  'ratelimiter>=1.2.0,<2.0.0',
  'retrying>=1.3.3,<2.0.0',
