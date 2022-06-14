@@ -163,7 +163,7 @@ class RemoveTag(tags.RemoveTag):
     def process_resource_set(self, client, resource_set, tag_keys):
         client.remove_tags(
             LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
-            Tags=[{'Key': k for k in tag_keys}])
+            Tags=[{'Key': k} for k in tag_keys])
 
 
 @actions.register('delete')
