@@ -10,6 +10,22 @@ from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
 
+def test_eni_public_subnet(test):
+    factory = test.replay_flight_data('test_eni_public_subnet')
+    p = test.load_policy({
+        'name': 'public-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'public': True}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['NetworkInterfaceId'] == 'eni-0d47bf614f6182182'
+
+
 @terraform('aws_code_build_vpc')
 def test_codebuild_unused(test, aws_code_build_vpc):
     factory = test.replay_flight_data("test_security_group_codebuild_unused")

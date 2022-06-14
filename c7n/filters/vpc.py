@@ -93,7 +93,7 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
                 return False
         return super().match(related)
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         related = self.get_related(resources)
         if self.check_public in [True, False]:
             self.route_tables = self.get_route_tables(related)
