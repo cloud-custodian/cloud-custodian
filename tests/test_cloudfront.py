@@ -419,6 +419,62 @@ class CloudFront(BaseTest):
 
         self.assertEqual(east_resources, west_resources)
 
+    def test_cloudfront_update_deep_attribute(self):
+        factory = self.replay_flight_data("test_distribution_update_deep_attribute", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-update-tls",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "DomainName": "dal78uzs60406.cloudfront.net",
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.MinimumProtocolVersion",
+                        "op": "in",
+                        "value": ["TLSv1.1_2016", "TLSv1_2016", "TLSv1", "SSLv3"],
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.CertificateSource",
+                        "op": "in",
+                        "value": ["acm", "iam"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-attributes",
+                        "attributes": {
+                            "ViewerCertificate": {
+                                "MinimumProtocolVersion": "TLSv1.2_2018",
+                            }
+                        },
+                    },
+                ],
+            },
+            config=dict(region='us-east-2'),
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_distribution_config(Id=dist_id)
+
+        # Check attribute updated by policy action
+        self.assertEqual(
+            resp['DistributionConfig']['ViewerCertificate']['MinimumProtocolVersion'], 'TLSv1.2_2018'
+        )
+
+        # Check deep attribute from original configuration
+        self.assertEqual(
+            resp['DistributionConfig']['ViewerCertificate']['CertificateSource'], 'acm'
+        )
+
     def test_cloudfront_update_distribution(self):
         factory = self.replay_flight_data("test_distribution_update_distribution")
         p = self.load_policy(
