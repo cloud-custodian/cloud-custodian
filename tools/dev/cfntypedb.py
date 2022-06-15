@@ -21,8 +21,12 @@ def main():
     results = paginator.paginate(Visibility='PUBLIC').build_full_result()
     type_names = jmespath.search('TypeSummaries[].TypeName', results)
 
+    # filter out non aws ones
+    type_names = [t for t in type_names if t.startswith('AWS:')]
+
     # manually add the ones missing
     missing = (
+        'AWS::::Account',
         'AWS::Serverless::Application',)
     for m in missing:
         if m not in type_names:
