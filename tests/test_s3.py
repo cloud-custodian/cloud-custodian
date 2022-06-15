@@ -3740,6 +3740,10 @@ class S3LifecycleTest(BaseTest):
                                 "ID": "id2",
                                 "Status": "absent",
                             },
+                            {
+                                "ID": "id1",
+                                "Status": "absent",
+                            },
                         ]
                     }
                 ],
