@@ -12,6 +12,8 @@ import pytest
 import time
 from pathlib import Path
 
+from c7n.executor import MainThreadExecutor
+from c7n.resources.sqs import SQS
 from c7n.resources.aws import shape_validate, Arn
 
 
@@ -696,7 +698,8 @@ class QueueTests(BaseTest):
 
     def test_sqs_deadletter_filter(self):
         factory = self.replay_flight_data("test_sqs_deadletter_filter")
-        p = self.load_policy(
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        policy = self.load_policy(
             {
                 "name": "sqs-deadletter",
                 "resource": "aws.sqs",
@@ -714,5 +717,5 @@ class QueueTests(BaseTest):
             },
             session_factory=factory
         )
-        resources = p.run()
+        resources = policy.run()
         self.assertEqual(len(resources), 2)
