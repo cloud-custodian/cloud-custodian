@@ -570,6 +570,7 @@ class PolicyMetaLint(BaseTest):
                     "instance-age",
                     "ephemeral",
                     "instance-uptime",
+                    "dead-letter",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
