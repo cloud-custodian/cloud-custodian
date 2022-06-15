@@ -1054,11 +1054,12 @@ class CopyRelatedResourceTag(Tag):
 
     def process(self, resources):
         related_resources = []
-        search_path = "[].[%s]" % self.data['key']
         if self.data['key'].startswith('tag:'):
             tag_key = self.data['key'].split(':', 1)[-1]
 
             search_path = "[].[Tags[?Key=='%s'].Value | [0]]" % tag_key
+        else:
+            search_path = "[].[%s]" % self.data['key']
 
         for rrid, r in zip(jmespath.search(search_path, resources),
                            resources):
