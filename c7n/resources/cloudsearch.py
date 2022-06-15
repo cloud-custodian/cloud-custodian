@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.filters import Filter
+from c7n.filters import ValueFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
@@ -34,9 +34,10 @@ class Delete(Action):
 
 
 @CloudSearch.filter_registry.register('domain-options')
-class DomainOptionsFilter(Filter):
+class DomainOptionsFilter(ValueFilter):
     """
-    Filter for cloud search domains that are domain options not enabled
+    Filter for cloud search domains by their domain options.
+
     :example:
 
     .. code-block:: yaml
@@ -45,21 +46,23 @@ class DomainOptionsFilter(Filter):
               - name: enable-https
                 resource: cloudsearch
                 filters:
-                  - domain-options
+                  - type: domain-options
+                    key: Options.EnforceHTTPS
+                    value: false
+
     """
 
-    schema = type_schema('domain-options')
+    schema = type_schema('domain-options', rinherit=ValueFilter.schema)
     permissions = ('cloudsearch:DescribeDomainEndpointOptions',)
 
     def process(self, resources, event=None):
         results = []
-
         client = local_session(self.manager.session_factory).client('cloudsearch')
         for r in resources:
-            response = client.describe_domain_endpoint_options(
+            options = client.describe_domain_endpoint_options(
                 DomainName=r['DomainName']
-            )
-            if not response['DomainEndpointOptions']['Options']['EnforceHTTPS']:
+            ).get('DomainEndpointOptions')
+            if self.match(options):
                 results.append(r)
         return results
 
@@ -73,14 +76,19 @@ class EnableHttps(Action):
             policies:
               - name: enable-https
                 resource: cloudsearch
+                filters:
+                  - type: domain-options
+                    key: Options.EnforceHTTPS
+                    value: false
                 actions:
                   - type: enable-https
                     tls-security-policy: Policy-Min-TLS-1-0-2019-07
-
-
     """
 
-    schema = type_schema('enable-https')
+    schema = type_schema(
+        'enable-https',
+        **{"tls-policy": {'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}}
+    )
     permissions = ('cloudsearch:UpdateDomainEndpointOptions',)
 
     def process(self, resources):
@@ -91,7 +99,7 @@ class EnableHttps(Action):
                 DomainName=r['DomainName'],
                 DomainEndpointOptions={
                     'EnforceHTTPS': True,
-                    'TLSSecurityPolicy': self.data.get('tls-security-policy', 'Policy-Min-TLS-1-0-2019-07')
+                    'TLSSecurityPolicy': self.data.get(
+                        'tls-policy', 'Policy-Min-TLS-1-2-2019-07')
                 }
             )
-

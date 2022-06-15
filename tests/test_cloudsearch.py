@@ -68,7 +68,6 @@ class CloudSearch(BaseTest):
         )
         event = event_data("event-cloudsearch.json", "config")
         resources = p.push(event, {})
-        print(resources)
         client = session_factory().client('cloudsearch')
         for resource in resources:
             self.assert_cloudsearch_https(client, resource)
@@ -84,4 +83,4 @@ class CloudSearch(BaseTest):
         response = client.describe_domain_endpoint_options(
             DomainName=domain_name)
         https_status = response['DomainEndpointOptions']['Options']['EnforceHTTPS']
-        self.assertEqual(https_status, True, f'cloud search https is enabled')
+        self.assertEqual(https_status, True, 'cloud search https is enabled')
