@@ -1103,7 +1103,7 @@ class SetPolicy(BaseAction):
         except client.exceptions.NoSuchEntityException:
             return
 
-    def list_attached_policies(client, resource):
+    def list_attached_policies(self, client, resource):
         attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
         policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
         return policy_arns
