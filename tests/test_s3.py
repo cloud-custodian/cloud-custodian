@@ -3625,7 +3625,7 @@ class S3LifecycleTest(BaseTest):
         session_factory = self.replay_flight_data("test_s3_lifecycle")
         session = session_factory()
         client = session.client("s3")
-        bname = "custodian-lifecycle-test"
+        bname = "c7n-lifecycle-test-again3"
 
         # Make a bucket
         client.create_bucket(Bucket=bname)
@@ -3636,7 +3636,7 @@ class S3LifecycleTest(BaseTest):
         def get_policy(**kwargs):
             rule = {
                 "Status": "Enabled",
-                "Prefix": "foo/",
+                "Filter": {"Prefix": "foo/"},
                 "Transitions": [{"Days": 60, "StorageClass": "GLACIER"}],
             }
             rule.update(**kwargs)
@@ -3670,7 +3670,7 @@ class S3LifecycleTest(BaseTest):
         # Now add another lifecycle rule to ensure it doesn't clobber the first one
         #
         lifecycle_id2 = "test-lifecycle-two"
-        policy = get_policy(ID=lifecycle_id2, Prefix="bar/")
+        policy = get_policy(ID=lifecycle_id2, Filter={"Prefix": "bar/"})
         run_policy(policy)
 
         # Verify the lifecycle
@@ -3684,7 +3684,7 @@ class S3LifecycleTest(BaseTest):
         #
         # Next, overwrite one of the lifecycles and make sure it changed
         #
-        policy = get_policy(ID=lifecycle_id2, Prefix="baz/")
+        policy = get_policy(ID=lifecycle_id2, Filter={"Prefix": "baz/"})
         run_policy(policy)
 
         # Verify the lifecycle
@@ -3697,7 +3697,7 @@ class S3LifecycleTest(BaseTest):
 
         for rule in lifecycle["Rules"]:
             if rule["ID"] == lifecycle_id2:
-                self.assertEqual(rule["Prefix"], "baz/")
+                self.assertEqual(rule["Filter"]["Prefix"], "baz/")
 
         #
         # Test deleting a lifecycle
