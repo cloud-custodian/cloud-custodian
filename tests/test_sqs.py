@@ -708,7 +708,7 @@ class QueueTests(BaseTest):
                         "op": "ne"
                     },
                     {
-                        "type": "deadletter"
+                        "type": "dead-letter"
                     },
                 ]
             },

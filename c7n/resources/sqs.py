@@ -374,7 +374,7 @@ class SetRetentionPeriod(BaseAction):
                     'MessageRetentionPeriod': period})
 
 
-@SQS.filter_registry.register('deadletter')
+@SQS.filter_registry.register('dead-letter')
 class DeadLetterFilter(Filter):
     """
     Filter for sqs queues that are dead letter queues
@@ -387,10 +387,10 @@ class DeadLetterFilter(Filter):
          - name: find-dead-letter-queues
            resource: aws.sqs
            filters:
-             - type: deadletter
+             - type: dead-letter
     """
 
-    schema = type_schema('deadletter')
+    schema = type_schema('dead-letter')
     permissions = ()
 
     def process(self, resources, event=None):
