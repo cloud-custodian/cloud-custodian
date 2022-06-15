@@ -1160,7 +1160,8 @@ class SetGroupPolicy(SetPolicy):
 
     """
 
-    permissions = ("iam:AttachGroupPolicy", "iam:DetachGroupPolicy", "iam:ListAttachedGroupPolicies",)
+    permissions = (
+        "iam:AttachGroupPolicy", "iam:DetachGroupPolicy", "iam:ListAttachedGroupPolicies",)
 
     def attach_policy(self, client, resource, policy_arn):
         client.attach_group_policy(
