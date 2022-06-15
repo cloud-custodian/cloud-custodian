@@ -4,7 +4,7 @@
         "Error": {
             "Code": "NoSuchLifecycleConfiguration",
             "Message": "The lifecycle configuration does not exist",
-            "BucketName": "c7n-lifecycle-test-again3"
+            "BucketName": "c7n-test-1"
         },
         "ResponseMetadata": {}
     }
