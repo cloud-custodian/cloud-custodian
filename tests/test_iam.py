@@ -1371,6 +1371,55 @@ class IamGroupTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_iam_group_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::532725030595:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
