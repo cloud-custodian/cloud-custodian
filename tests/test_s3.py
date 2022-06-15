@@ -3722,7 +3722,7 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertSetEqual(
             {x["ID"] for x in lifecycle["Rules"]},
-            {'id1', 'id2'},)
+            {'id2'},)
         p = self.load_policy(
             {
                 "name": "s3-remove-lc-rule-id",
@@ -3737,7 +3737,7 @@ class S3LifecycleTest(BaseTest):
                         "type": "configure-lifecycle",
                         "rules": [
                             {
-                                "ID": "id1",
+                                "ID": "id2",
                                 "Status": "absent",
                             },
                         ]
@@ -3748,11 +3748,8 @@ class S3LifecycleTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        lc = client.get_bucket_lifecycle_configuration(Bucket=bname)
-        self.assertSetEqual(
-            {x["ID"] for x in lc["Rules"]},
-            {'id2'},)
-
+        with self.assertRaises(Exception):
+            client.get_bucket_lifecycle_configuration(Bucket=bname)
 
 @terraform('aws_s3_encryption_audit')
 def test_s3_encryption_audit(test, aws_s3_encryption_audit):

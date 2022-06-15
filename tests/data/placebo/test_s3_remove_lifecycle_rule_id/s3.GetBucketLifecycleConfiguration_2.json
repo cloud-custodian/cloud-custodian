@@ -4,31 +4,6 @@
         "ResponseMetadata": {},
         "Rules": [
             {
-                "ID": "id1",
-                "Filter": {
-                    "Tag": {
-                        "Key": "dataSetRegistered",
-                        "Value": "2022-12-03"
-                    }
-                },
-                "Status": "Enabled",
-                "Transitions": [
-                    {
-                        "Date": {
-                            "__class__": "datetime",
-                            "year": 2022,
-                            "month": 12,
-                            "day": 10,
-                            "hour": 0,
-                            "minute": 0,
-                            "second": 0,
-                            "microsecond": 0
-                        },
-                        "StorageClass": "GLACIER"
-                    }
-                ]
-            },
-            {
                 "Expiration": {
                     "Date": {
                         "__class__": "datetime",
