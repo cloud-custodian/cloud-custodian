@@ -3709,6 +3709,50 @@ class S3LifecycleTest(BaseTest):
         self.assertEqual(len(lifecycle["Rules"]), 1)
         self.assertEqual(lifecycle["Rules"][0]["ID"], lifecycle_id2)
 
+    def test_s3_remove_lifecycle_rule_id(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_lifecycle_configuration", "Lifecycle", None, None)],)
+        bname = 'c7n-test-1'
+        session_factory = self.replay_flight_data("test_s3_remove_lifecycle_rule_id")
+        session = session_factory()
+        client = session.client("s3")
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertSetEqual(
+            {x["ID"] for x in lifecycle["Rules"]},
+            {'id1', 'id2'},)
+        p = self.load_policy(
+            {
+                "name": "s3-remove-lc-rule-id",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "Name": bname
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "configure-lifecycle",
+                        "rules": [
+                            {
+                                "ID": "id1",
+                                "Status": "absent",
+                            },
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        lc = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertSetEqual(
+            {x["ID"] for x in lc["Rules"]},
+            {'id2'},)
+
 
 @terraform('aws_s3_encryption_audit')
 def test_s3_encryption_audit(test, aws_s3_encryption_audit):
