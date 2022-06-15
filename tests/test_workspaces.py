@@ -209,7 +209,8 @@ class WorkspacesTest(BaseTest):
                 "resource": "workspaces-directory",
                 "filters": [{
                     'type': 'connection-aliases',
-                    'state': False
+                    'key': 'ConnectionAliases',
+                    'value': 'empty',
                 }]
             },
             session_factory=session_factory
@@ -225,7 +226,9 @@ class WorkspacesTest(BaseTest):
                 "resource": "workspaces-directory",
                 "filters": [{
                     'type': 'connection-aliases',
-                    'state': True
+                    'key': 'ConnectionAliases',
+                    'value': 'empty',
+                    'op': 'ne'
                 }]
             },
             session_factory=session_factory

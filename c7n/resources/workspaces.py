@@ -5,7 +5,7 @@ import itertools
 import jmespath
 
 from c7n.actions import BaseAction
-from c7n.filters import ValueFilter, Filter
+from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -268,7 +268,7 @@ class WorkSpacesDirectorySg(net_filters.SubnetFilter):
 
 
 @WorkspaceDirectory.filter_registry.register('connection-aliases')
-class WorkspacesDirectoryConnectionAliases(Filter):
+class WorkspacesDirectoryConnectionAliases(ValueFilter):
     """Filter workspace directories based on connection aliases
 
     :example:
@@ -286,21 +286,20 @@ class WorkspacesDirectoryConnectionAliases(Filter):
 
     permissions = ('workspaces:DescribeConnectionAliases',)
 
-    schema = type_schema('connection-aliases',
-        **{'state': {'type': 'boolean'}})
+    schema = type_schema('connection-aliases', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ConnectionAliases'
 
     def process(self, directories, event=None):
         client = local_session(self.manager.session_factory).client('workspaces')
         results = []
 
         for directory in directories:
+            if self.annotation_key not in directory:
+                connection_aliases = client.describe_connection_aliases(
+                    ResourceId=directory['DirectoryId'])
+                directory[self.annotation_key] = connection_aliases
 
-            connection_aliases = client.describe_connection_aliases(
-                ResourceId=directory['DirectoryId'])
-            connection_aliases_list = connection_aliases['ConnectionAliases']
-
-            if ((connection_aliases_list and self.data.get('state'))
-                    or (not connection_aliases_list and not self.data.get('state'))):
+            if self.match(directory[self.annotation_key]):
                 results.append(directory)
 
         return results
