@@ -48,6 +48,7 @@ class Account(ResourceManager):
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(QueryResourceManager.retry)
+    source_type = 'describe'
 
     class resource_type(TypeInfo):
         id = 'account_id'
@@ -56,6 +57,8 @@ class Account(ResourceManager):
         global_resource = True
         # fake this for doc gen
         service = "account"
+        # for posting config rule evaluations
+        cfn_type = 'AWS::::Account'
 
     @classmethod
     def get_permissions(cls):

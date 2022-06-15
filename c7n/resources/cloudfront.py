@@ -7,7 +7,7 @@ from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, merge_dict, type_schema, get_retry
 from c7n.filters import ValueFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
@@ -707,7 +707,10 @@ class DistributionUpdateAction(BaseUpdateAction):
                 Id=distribution[self.manager.get_model().id])
             default_config = self.validation_config
             config = {**default_config, **res['DistributionConfig']}
-            updatedConfig = {**config, **self.data['attributes']}
+
+            # Recursively merge config to allow piecemeal updates of
+            # nested structures
+            updatedConfig = merge_dict(config, self.data['attributes'])
             if config == updatedConfig:
                 return
             res = client.update_distribution(
