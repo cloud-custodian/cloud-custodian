@@ -420,7 +420,9 @@ class CloudFront(BaseTest):
         self.assertEqual(east_resources, west_resources)
 
     def test_cloudfront_update_deep_attribute(self):
-        factory = self.replay_flight_data("test_distribution_update_deep_attribute", region="us-east-2")
+        factory = self.replay_flight_data(
+            "test_distribution_update_deep_attribute",
+            region="us-east-2")
         p = self.load_policy(
             {
                 "name": "cloudfront-update-tls",
@@ -467,12 +469,14 @@ class CloudFront(BaseTest):
 
         # Check attribute updated by policy action
         self.assertEqual(
-            resp['DistributionConfig']['ViewerCertificate']['MinimumProtocolVersion'], 'TLSv1.2_2018'
+            resp['DistributionConfig']['ViewerCertificate']['MinimumProtocolVersion'],
+            'TLSv1.2_2018'
         )
 
         # Check deep attribute from original configuration
         self.assertEqual(
-            resp['DistributionConfig']['ViewerCertificate']['CertificateSource'], 'acm'
+            resp['DistributionConfig']['ViewerCertificate']['CertificateSource'],
+            'acm'
         )
 
     def test_cloudfront_update_distribution(self):
