@@ -1734,8 +1734,6 @@ class RouteTable(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::RouteTable"
 
 
-
-
 class RouteFilter(Filter):
 
     schema_attr = {
@@ -1763,7 +1761,7 @@ class RouteFilter(Filter):
             'type': {'enum': ['ingress']},
             'match-operator': {'enum': ['or', 'and']},
         },
-        'required': ['type']}
+        'required': ['type']
     }
     schema['properties'].update(schema_attr)
     schema_alias = True
