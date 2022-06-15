@@ -3751,6 +3751,7 @@ class S3LifecycleTest(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_lifecycle_configuration(Bucket=bname)
 
+
 @terraform('aws_s3_encryption_audit')
 def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     test.patch(s3.S3, "executor_factory", MainThreadExecutor)
