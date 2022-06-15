@@ -43,7 +43,7 @@ class DomainOptionsFilter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: enable-https
+              - name: cloudsearch-detect-https
                 resource: cloudsearch
                 filters:
                   - type: domain-options
