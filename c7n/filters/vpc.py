@@ -48,8 +48,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
               value: Database
 
     It also supports finding resources on public or private subnets
-    via route table introspection to determine if its associated to an
-    internet gateway.
+    via route table introspection to determine if the subnet is
+    associated to an internet gateway.
 
     :example:
 
@@ -60,16 +60,17 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
            resource: aws.ec2
            filters:
              - type: subnet
-               public: True
+               igw: True
                key: SubnetId
                value: present
+
     """
 
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']},
-           'public': {'enum': [True, False]},
+           'igw': {'enum': [True, False]},
            })
 
     schema_alias = True
@@ -78,24 +79,24 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
 
     def get_permissions(self):
         perms = super().get_permissions()
-        if self.data.get('public') in (True, False):
+        if self.data.get('igw') in (True, False):
             perms += self.manager.get_resource_manager(
                 'aws.route-table').get_permissions()
         return perms
 
     def validate(self):
         super().validate()
-        self.check_public = self.data.get('public')
+        self.check_igw = self.data.get('igw')
 
     def match(self, related):
-        if self.check_public in [True, False]:
-            if not self.match_route(related):
+        if self.check_igw in [True, False]:
+            if not self.match_igw(related):
                 return False
         return super().match(related)
 
     def process(self, resources, event=None):
         related = self.get_related(resources)
-        if self.check_public in [True, False]:
+        if self.check_igw in [True, False]:
             self.route_tables = self.get_route_tables(related)
         return [r for r in resources if self.process_resource(r, related)]
 
@@ -110,7 +111,7 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
                     route_tables[a['SubnetId']] = r
         return route_tables
 
-    def match_route(self, subnet):
+    def match_igw(self, subnet):
         rtable = self.route_tables.get(
             subnet['SubnetId'],
             self.route_tables.get(subnet['VpcId']))
@@ -122,9 +123,9 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
             if route.get('GatewayId') and route['GatewayId'].startswith('igw-'):
                 found_igw = True
                 break
-        if self.check_public and found_igw:
+        if self.check_igw and found_igw:
             return True
-        elif not self.check_public and not found_igw:
+        elif not self.check_igw and not found_igw:
             return True
         return False
 
