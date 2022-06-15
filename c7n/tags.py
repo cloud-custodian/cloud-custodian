@@ -878,7 +878,7 @@ class UniversalTag(Tag):
     def get_client(self):
         # For global resources, manage tags from us-east-1
         region = (getattr(self.manager.resource_type, 'global_resource', None)
-            and 'us-east-1' or self.region)
+            and 'us-east-1' or self.manager.region)
         return utils.local_session(self.manager.session_factory).client(
             'resourcegroupstaggingapi', region_name=region)
 
@@ -894,7 +894,7 @@ class UniversalUntag(RemoveTag):
     def get_client(self):
         # For global resources, manage tags from us-east-1
         region = (getattr(self.manager.resource_type, 'global_resource', None)
-            and 'us-east-1' or self.region)
+            and 'us-east-1' or self.manager.region)
         return utils.local_session(self.manager.session_factory).client(
             'resourcegroupstaggingapi', region_name=region)
 
@@ -968,7 +968,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     def get_client(self):
         # For global resources, manage tags from us-east-1
         region = (getattr(self.manager.resource_type, 'global_resource', None)
-            and 'us-east-1' or self.region)
+            and 'us-east-1' or self.manager.region)
         return utils.local_session(self.manager.session_factory).client(
             'resourcegroupstaggingapi', region_name=region)
 
