@@ -1877,3 +1877,56 @@ class ConsecutiveSnapshots(Filter):
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results
+
+
+@filters.register('engine')
+class EngineFilter(ValueFilter):
+    """
+    Filter a rds resource based on its Engine Metadata
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-deprecated-versions
+              resource: aws.rds
+              filters:
+                - type: engine
+                  key: Status
+                  value: deprecated
+    """
+
+    schema = type_schema('engine', rinherit=ValueFilter.schema)
+
+    permissions = ("rds:DescribeDBEngineVersions", )
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        engines = set()
+        engine_versions = set()
+        for r in resources:
+            engines.add(r['Engine'])
+            engine_versions.add(r['EngineVersion'])
+
+        paginator = client.get_paginator('describe_db_engine_versions')
+        response = paginator.paginate(
+            Filters=[
+                {'Name': 'engine', 'Values': list(engines)},
+                {'Name': 'engine-version', 'Values': list(engine_versions)}
+            ],
+            IncludeAll=True,
+        )
+        all_versions = {}
+        matched = []
+        for page in response:
+            for e in page['DBEngineVersions']:
+                all_versions.setdefault(e['Engine'], {})
+                all_versions[e['Engine']][e['EngineVersion']] = e
+        for r in resources:
+            v = all_versions[r['Engine']][r['EngineVersion']]
+            if self.match(v):
+                r['c7n:Engine'] = v
+                matched.append(r)
+        return matched

@@ -1197,6 +1197,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
+        unencrypted_volume_tags = v['Tags']
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1236,7 +1237,7 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-crypt-remediation', 'Value': instance_id},
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+                 'Value': v['Attachments'][0]['Device']}] + unencrypted_volume_tags)
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])

@@ -69,9 +69,35 @@ class Encrypt(Action):
 
 @KinesisStream.action_registry.register('delete')
 class Delete(Action):
+    """ Delete a set of kinesis streams.
 
-    schema = type_schema('delete')
-    permissions = ("kinesis:DeleteStream",)
+    Additionally, if we're configured with 'force', we will remove
+    all existing consumers before deleting the stream itself. For
+    'force' to work, we would require the
+    `kinesis:DeregisterStreamConsumer` permission as well.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: kinesis-stream-deletion
+            resource: kinesis
+            filters:
+              - type: marked-for-op
+                op: delete
+            actions:
+              - type: delete
+                force: true
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+
+    def get_permissions(self):
+        permissions = ("kinesis:DeleteStream",)
+        if self.data.get('force'):
+            permissions += ('kinesis:DeregisterStreamConsumer',)
+        return permissions
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
@@ -84,7 +110,8 @@ class Delete(Action):
             if not r['StreamStatus'] == 'ACTIVE':
                 continue
             client.delete_stream(
-                StreamName=r['StreamName'])
+                StreamName=r['StreamName'],
+                EnforceConsumerDeletion=self.data.get('force', False))
 
 
 @KinesisStream.filter_registry.register('kms-key')

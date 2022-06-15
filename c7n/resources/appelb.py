@@ -238,6 +238,64 @@ class WafEnabled(Filter):
         return [r for r in resources if state_map[r[arn_key]] == state]
 
 
+@AppELB.filter_registry.register('wafv2-enabled')
+class WafV2Enabled(Filter):
+
+    schema = type_schema(
+        'wafv2-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('wafv2:ListResourcesForWebACL', 'wafv2:ListWebACLs')
+
+    # TODO verify name uniqueness within region/account
+    # TODO consider associated resource fetch in augment
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('wafv2')
+
+        target_acl = self.data.get('web-acl')
+        state = self.data.get('state', False)
+
+        name_arn_map = {}
+        resource_map = {}
+
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+
+        for w in wafs:
+            if 'c7n:AssociatedResources' not in w:
+                arns = client.list_resources_for_web_acl(
+                    WebACLArn=w['ARN']).get('ResourceArns', [])
+                w['c7n:AssociatedResources'] = arns
+            name_arn_map[w['Name']] = w['ARN']
+            for r in w['c7n:AssociatedResources']:
+                resource_map[r] = w['ARN']
+
+        target_acl_id = name_arn_map.get(target_acl, target_acl)
+        arn_key = self.manager.resource_type.id
+        state_map = {}
+        for r in resources:
+            arn = r[arn_key]
+            if arn in resource_map:
+                # NLB doesn't support WAF. So, skip NLB resources
+                if r['Type'] == 'network':
+                    continue
+                r['c7n_webacl'] = resource_map[arn]
+                if not target_acl:
+                    state_map[arn] = True
+                    continue
+                r_acl = resource_map[arn]
+                if r_acl == target_acl_id:
+                    state_map[arn] = True
+                    continue
+                state_map[arn] = False
+            else:
+                # NLB doesn't support WAF. So, skip NLB resources
+                if r['Type'] == 'network':
+                    continue
+                state_map[arn] = False
+        return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
+
+
 @AppELB.action_registry.register('set-waf')
 class SetWaf(BaseAction):
     """Enable/Disable waf protection on applicable resource.
@@ -288,6 +346,58 @@ class SetWaf(BaseAction):
             else:
                 client.disassociate_web_acl(
                     WebACLId=target_acl_id, ResourceArn=r[arn_key])
+
+
+@AppELB.action_registry.register('set-wafv2')
+class SetWafV2(BaseAction):
+    """Enable/Disable wafv2 protection on applicable resource.
+
+    """
+    permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
+
+    schema = type_schema(
+        'set-wafv2', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafV2Enabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-wafv2 should be used in conjunction with wafv2-enabled filter on %s" % (
+                    self.manager.data,))
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
+
+        if state and target_acl_id not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = local_session(
+            self.manager.session_factory).client('wafv2')
+
+        arn_key = self.manager.resource_type.id
+
+        # TODO implement force to reassociate.
+        # TODO investigate limits on waf association.
+        for r in resources:
+            print(r)
+            if state:
+                client.associate_web_acl(
+                    WebACLArn=target_acl_id, ResourceArn=r[arn_key])
+            else:
+                client.disassociate_web_acl(
+                    WebACLArn=target_acl_id, ResourceArn=r[arn_key])
 
 
 @AppELB.action_registry.register('set-s3-logging')
