@@ -1156,7 +1156,7 @@ class SetGroupPolicy(SetPolicy):
               arn: "*"
             - type: set-policy
               state: attached
-              arn: arn:aws:iam::123456789012:policy/my-iam-policy
+              arn: arn:aws:iam::{account_id}:policy/my-iam-policy
 
     """
 
