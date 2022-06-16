@@ -155,7 +155,7 @@ class IsWafV2Enabled(Filter):
     def process(self, resources, event=None):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
         state = self.data.get('state', False)
         target_acl = self.data.get('web-acl')
         target_acl_id = waf_name_id_map.get(target_acl, target_acl)
