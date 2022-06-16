@@ -59,10 +59,14 @@ class CloudSearch(BaseTest):
                 "actions": [
                     {
                         "type": "enable-https",
-                        "tls-security-policy": "Policy-Min-TLS-1-2-2019-07"
+                        "tls-policy": "Policy-Min-TLS-1-2-2019-07"
                     }
                 ],
-                "filters": ["domain-options"]
+                "filters": [{
+                    "type": "domain-options",
+                    "key": "Options.EnforceHTTPS",
+                    "value": False,
+                }]
             },
             session_factory=session_factory
         )
