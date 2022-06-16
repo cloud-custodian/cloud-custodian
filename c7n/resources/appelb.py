@@ -391,7 +391,6 @@ class SetWafV2(BaseAction):
         # TODO implement force to reassociate.
         # TODO investigate limits on waf association.
         for r in resources:
-            print(r)
             if state:
                 client.associate_web_acl(
                     WebACLArn=target_acl_id, ResourceArn=r[arn_key])

@@ -1,7 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
+
 from .common import BaseTest
+from c7n.resources.aws import shape_validate
 from c7n.utils import local_session
 from unittest.mock import MagicMock
 
@@ -563,6 +565,48 @@ class CloudFront(BaseTest):
         self.assertEqual(
             resp['StreamingDistributionConfig']['Logging']['Enabled'], True
         )
+
+    def test_cloudfront_post_finding(self):
+        factory = self.replay_flight_data(
+            "test_distribution_post_finding",
+            region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-post-finding",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "DomainName": "dal78uzs60406.cloudfront.net",
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.MinimumProtocolVersion",
+                        "op": "in",
+                        "value": ["TLSv1.1_2016", "TLSv1_2016", "TLSv1", "SSLv3"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "compliance_status": "FAILED",
+                        "description": "Deprecated TLS version support",
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    },
+                ],
+            },
+            config={'region': 'us-east-2'},
+            session_factory=factory,
+        )
+
+        resources = p.resource_manager.resources()
+        self.assertEqual(len(resources), 1)
+        formatted_resource = p.resource_manager.actions[0].format_resource(resources[0])
+        shape_validate(
+            formatted_resource['Details']['AwsCloudFrontDistribution'],
+            'AwsCloudFrontDistributionDetails',
+            'securityhub')
 
 
 class CloudFrontWafV2(BaseTest):
