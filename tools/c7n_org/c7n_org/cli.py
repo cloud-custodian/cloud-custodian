@@ -198,9 +198,16 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
 def resolve_regions(regions, account):
     if 'all' in regions:
-        session = get_session(account, 'c7n-org', "us-east-1")
-        client = session.client('ec2')
-        return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        try:
+            session = get_session(account, 'c7n-org', 'us-east-1')
+            client = session.client('ec2')
+            return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning('access denied listing available regions for account:%s',
+                             account['name'])
+                return []
+            raise
     if not regions:
         return ('us-east-1', 'us-west-2')
 
