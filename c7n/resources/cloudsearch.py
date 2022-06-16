@@ -82,7 +82,7 @@ class EnableHttps(Action):
                     value: false
                 actions:
                   - type: enable-https
-                    tls-security-policy: Policy-Min-TLS-1-0-2019-07
+                    tls-policy: Policy-Min-TLS-1-0-2019-07
     """
 
     schema = type_schema(
