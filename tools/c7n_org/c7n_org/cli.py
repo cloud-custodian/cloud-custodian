@@ -205,7 +205,7 @@ def resolve_regions(regions, account):
         except ClientError as e:
             if e.response['Error']['Code'] == 'AccessDenied':
                 log.warning('access denied listing available regions for account:%s',
-                             account['name'])
+                    account['name'])
                 return []
             raise
     if not regions:
