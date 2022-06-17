@@ -87,7 +87,7 @@ class HasStatementFilter(Filter):
 
             policies:
               - name: sns-topic-has-statement
-                resource: s3
+                resource: sns
                 filters:
                   - type: has-statement
                     statement_ids:
@@ -96,7 +96,7 @@ class HasStatementFilter(Filter):
 
             policies:
               - name: sns-block-non-ssl
-                resource: s3
+                resource: sns
                 filters:
                   - type: has-statement
                     statements:
