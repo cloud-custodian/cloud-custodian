@@ -724,6 +724,7 @@ class TestSNS(BaseTest):
 
         # resources = policy.run()
         # self.assertEqual(len(resources), 2)
+        
         session_factory = self.replay_flight_data(
             "test_sns_has_statement"
         )
