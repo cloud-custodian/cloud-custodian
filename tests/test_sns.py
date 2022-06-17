@@ -711,6 +711,45 @@ class TestSNS(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'false')
 
+    def test_sns_has_statement(self):
+        # session_factory = self.record_flight_data('test_sns_has_statement')
+        # policy = {
+        #     'name': 'list-sns-topics',
+        #     'resource': 'sns',
+        # }
+        # policy = self.load_policy(
+        #     policy,
+        #     session_factory=session_factory, config={'region': 'us-west-1'}
+        # )
+
+        # resources = policy.run()
+        # self.assertEqual(len(resources), 2)
+
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "SNS:Publish",
+                                "Principal": "*"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestSubscription(BaseTest):
 
