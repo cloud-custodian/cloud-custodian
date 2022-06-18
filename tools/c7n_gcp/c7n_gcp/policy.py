@@ -17,6 +17,7 @@ class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
         'gcp',
+        required=['service-account'],
         **{'execution-options': {'$ref': '#/definitions/basic_dict'},
            'timeout': {'type': 'string'},
            'memory-size': {'type': 'integer'},

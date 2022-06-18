@@ -645,7 +645,10 @@ class PeriodicEvent(EventSource):
                 'uri': 'https://{}-{}.cloudfunctions.net/{}'.format(
                     self.region,
                     self.session.get_default_project(),
-                    func.name)
+                    func.name),
+                'oidcToken': {
+                    'serviceAccountEmail': self.data.get('service-account')
+                }
             }
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
