@@ -80,7 +80,7 @@ class PeriodicMode(FunctionMode, PullMode):
             tzinfo = tz.gettz(mode['tz'])
             if tzinfo is None:
                 raise error
-        if mode.get('target-type', 'http'):
+        if mode.get('target-type', 'http') == 'http':
             if mode.get('service-account') is None:
                 raise PolicyValidationError(
                     'policy:%s gcp-periodic requires service-account for http target'
