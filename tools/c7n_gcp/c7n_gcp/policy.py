@@ -17,7 +17,6 @@ class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
         'gcp',
-        required=['service-account'],
         **{'execution-options': {'$ref': '#/definitions/basic_dict'},
            'timeout': {'type': 'string'},
            'memory-size': {'type': 'integer'},
@@ -81,6 +80,12 @@ class PeriodicMode(FunctionMode, PullMode):
             tzinfo = tz.gettz(mode['tz'])
             if tzinfo is None:
                 raise error
+        if self.data.get('target-type', 'http'):
+            if self.data.get('service-account') is None:
+                raise PolicyValidationError(
+                    'policy:%s gcp-periodic requires service-account for http target'
+                    % self.policy.name
+                )
 
     def _get_function(self):
         events = [mu.PeriodicEvent(
