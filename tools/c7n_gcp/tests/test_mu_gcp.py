@@ -99,6 +99,7 @@ class FunctionTest(BaseTest):
             'resource': 'gcp.instance',
             'mode': {
                 'type': 'gcp-periodic',
+                'service-account': 'foo',
                 'schedule': 'every 2 hours'}},
             output_dir='gs://somebucket/some-prefix',
             log_group='gcp',
@@ -117,6 +118,7 @@ class FunctionTest(BaseTest):
             {'name': 'instance-off',
              'resource': 'gcp.instance',
              'mode': {'type': 'gcp-periodic',
+                      'service-account': 'foo',
                       'schedule': 'every 2 hours',
                       'tz': 'zulugold'}})
 
@@ -135,7 +137,10 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'gcp-find-instances',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
         p.run()
 
@@ -152,7 +157,10 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'instance-off',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
 
         p.provision()
