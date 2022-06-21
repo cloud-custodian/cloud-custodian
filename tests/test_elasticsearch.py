@@ -1,11 +1,28 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
 import json
+
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+import pytest
+from pytest_terraform import terraform
+
+from .common import BaseTest
 
 
+@pytest.fixture(scope='class')
+@terraform('elasticsearch_cross_cluster_search_connections', scope='class')
+def terraform_cross_cluster(elasticsearch_cross_cluster_search_connections, request):
+    """Wrap a pytest-terraform fixture for use with unittest
+
+    Due to the way pytest-terraform creates fixtures, it doesn't play well with unittest
+    directly. One workaround for that is to not use unittest and pytest-terraform
+    together. Another option is wrapping the fixture and using it to set a class attribute.
+    """
+    request.cls.terraform_cross_cluster = elasticsearch_cross_cluster_search_connections
+
+
+@pytest.mark.usefixtures('terraform_cross_cluster')
 class ElasticSearch(BaseTest):
 
     def test_get_resources(self):
@@ -280,6 +297,142 @@ class ElasticSearch(BaseTest):
         self.assertTrue(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
+    def test_elasticsearch_cross_cluster_search_connections(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_inbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.inbound_connection.domain_name']
+        )
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_outbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.outbound_connection.domain_name']
+        )
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'DestinationDomainInfo.DomainName',
+                            'value': 'test',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections(
+            Filters=[
+                {
+                    'Name': 'destination-domain-info.domain-name',
+                    'Values': [
+                        'test',
+                    ]
+                },
+            ],)
+        self.assertEqual(len(search_outbound_connections["CrossClusterSearchConnections"]), 0)
 
     def test_elasticsearch_cross_account(self):
         session_factory = self.replay_flight_data("test_elasticsearch_cross_account")

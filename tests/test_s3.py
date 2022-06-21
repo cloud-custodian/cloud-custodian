@@ -16,7 +16,7 @@ from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 from pytest_terraform import terraform
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
@@ -3625,7 +3625,7 @@ class S3LifecycleTest(BaseTest):
         session_factory = self.replay_flight_data("test_s3_lifecycle")
         session = session_factory()
         client = session.client("s3")
-        bname = "custodian-lifecycle-test"
+        bname = "c7n-lifecycle-test-again3"
 
         # Make a bucket
         client.create_bucket(Bucket=bname)
@@ -3636,7 +3636,7 @@ class S3LifecycleTest(BaseTest):
         def get_policy(**kwargs):
             rule = {
                 "Status": "Enabled",
-                "Prefix": "foo/",
+                "Filter": {"Prefix": "foo/"},
                 "Transitions": [{"Days": 60, "StorageClass": "GLACIER"}],
             }
             rule.update(**kwargs)
@@ -3670,7 +3670,7 @@ class S3LifecycleTest(BaseTest):
         # Now add another lifecycle rule to ensure it doesn't clobber the first one
         #
         lifecycle_id2 = "test-lifecycle-two"
-        policy = get_policy(ID=lifecycle_id2, Prefix="bar/")
+        policy = get_policy(ID=lifecycle_id2, Filter={"Prefix": "bar/"})
         run_policy(policy)
 
         # Verify the lifecycle
@@ -3684,7 +3684,7 @@ class S3LifecycleTest(BaseTest):
         #
         # Next, overwrite one of the lifecycles and make sure it changed
         #
-        policy = get_policy(ID=lifecycle_id2, Prefix="baz/")
+        policy = get_policy(ID=lifecycle_id2, Filter={"Prefix": "baz/"})
         run_policy(policy)
 
         # Verify the lifecycle
@@ -3697,7 +3697,7 @@ class S3LifecycleTest(BaseTest):
 
         for rule in lifecycle["Rules"]:
             if rule["ID"] == lifecycle_id2:
-                self.assertEqual(rule["Prefix"], "baz/")
+                self.assertEqual(rule["Filter"]["Prefix"], "baz/")
 
         #
         # Test deleting a lifecycle
@@ -3708,6 +3708,52 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(len(lifecycle["Rules"]), 1)
         self.assertEqual(lifecycle["Rules"][0]["ID"], lifecycle_id2)
+
+    def test_s3_remove_lifecycle_rule_id(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_lifecycle_configuration", "Lifecycle", None, None)],)
+        bname = 'c7n-test-1'
+        session_factory = self.replay_flight_data("test_s3_remove_lifecycle_rule_id")
+        session = session_factory()
+        client = session.client("s3")
+        lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
+        self.assertSetEqual(
+            {x["ID"] for x in lifecycle["Rules"]},
+            {'id2'},)
+        p = self.load_policy(
+            {
+                "name": "s3-remove-lc-rule-id",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "Name": bname
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "configure-lifecycle",
+                        "rules": [
+                            {
+                                "ID": "id2",
+                                "Status": "absent",
+                            },
+                            {
+                                "ID": "id1",
+                                "Status": "absent",
+                            },
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(Exception):
+            client.get_bucket_lifecycle_configuration(Bucket=bname)
 
 
 @terraform('aws_s3_encryption_audit')
@@ -3816,3 +3862,19 @@ class TestBucketOwnership:
         resources = p.run()
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
+
+    def test_s3_access_analyzer_filter_with_no_results(self, test):
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
+        test.patch(s3, "S3_AUGMENT_TABLE", [])
+        p = test.load_policy({
+            'name': 'check-s3',
+            'resource': 'aws.s3',
+            'filters': [
+                {
+                    'type': 'iam-analyzer',
+                    'key': 'isPublic',
+                    'value': True,
+                },
+            ]
+        }, session_factory=factory)
+        test.assertRaises(PolicyExecutionError, p.run)
