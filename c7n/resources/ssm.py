@@ -795,9 +795,8 @@ class SSMDataSync(QueryResourceManager):
 
         enum_spec = ('list_resource_data_sync', 'ResourceDataSyncItems', None)
         service = 'ssm'
-        arn_type = 'datasync'
-        id = 'DataSync'
-        name = 'Title'
+        arn_type = 'resource-data-sync'
+        id = name = 'SyncName'
 
     permissions = ('ssm:ListResourceDataSync',)
 
