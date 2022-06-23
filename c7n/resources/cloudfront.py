@@ -155,7 +155,7 @@ class IsWafV2Enabled(Filter):
     def process(self, resources, event=None):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
         state = self.data.get('state', False)
         target_acl = self.data.get('web-acl')
         target_acl_id = waf_name_id_map.get(target_acl, target_acl)
@@ -343,17 +343,30 @@ class DistributionPostFinding(PostFinding):
 
     def format_resource(self, r):
         envelope, payload = self.format_envelope(r)
-        origins = r['DistributionConfig']['Origins']
+        origins = r['Origins']
 
         payload.update(self.filter_empty({
             'DomainName': r['DomainName'],
             'WebACLId': r.get('WebACLId'),
-            'LastModifiedTime': r['LastModifiedTime'],
+            'LastModifiedTime': r['LastModifiedTime'].isoformat(),
             'Status': r['Status'],
-            'Logging': self.filter_empty(r['DistributionConfig'].get('Logging', {})),
-            'Origins': [
-                dict(Id=o['Id'], OriginPath=o['OriginPath'], DomainName=o['DomainName'])
-                for o in origins]
+            'Logging': self.filter_empty(r.get('Logging', {})),
+            'Origins': {
+                'Items': [
+                    {
+                        # Extract a subset of origin item keys,
+                        # only if they're non-empty.
+                        #
+                        # The full item can be large and noisy, and
+                        # empty string values (notably for OriginPath)
+                        # will fail validation.
+                        k: o[k]
+                        for k in self.filter_empty(o)
+                        if k in ('Id', 'OriginPath', 'DomainName')
+                    }
+                    for o in origins['Items']
+                ]
+            }
         }))
 
         return envelope
@@ -410,7 +423,7 @@ class SetWafv2(BaseAction):
     def process(self, resources):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = waf_name_id_map.get(target_acl, target_acl)
         if target_acl_id not in waf_name_id_map.values():
