@@ -79,30 +79,32 @@ class SNSPostFinding(PostFinding):
 
 @SNS.filter_registry.register('has-statement')
 class HasStatementFilter(Filter):
-    """Find SNS topics with set of access policy statements.
+    """Find SNS topics with set of matching access policy statements.
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: sns-topic-has-statement
+              - name: sns-check-statement-id
                 resource: sns
                 filters:
                   - type: has-statement
                     statement_ids:
-                      - AllowSSLRequestsOnly
-
+                      - BlockNonSSL
 
             policies:
-              - name: sns-block-non-ssl
+              - name: sns-check-block-non-ssl
                 resource: sns
                 filters:
                   - type: has-statement
                     statements:
                       - Effect: Deny
-                        Action: 'SNS:*'
+                        Action: 'SNS:Publish'
                         Principal: '*'
+                        Condition:
+                            Bool:
+                                "aws:SecureTransport": "false"
     """
     schema = type_schema(
         'has-statement',
@@ -141,7 +143,13 @@ class HasStatementFilter(Filter):
         if p is None:
             return None
         p = json.loads(p)
+
+        required = list(self.data.get('statement_ids', []))
         statements = p.get('Statement', [])
+        for s in list(statements):
+            if s.get('Sid') in required:
+                required.remove(s['Sid'])
+
         required_statements = list(self.data.get('statements', []))
         for required_statement in required_statements:
             for statement in statements:
@@ -153,7 +161,8 @@ class HasStatementFilter(Filter):
                     required_statements.remove(required_statement)
                     break
 
-        if (self.data.get('statements', []) and not required_statements):
+        if (self.data.get('statement_ids', []) and not required) or \
+           (self.data.get('statements', []) and not required_statements):
             return t
         return None
 
