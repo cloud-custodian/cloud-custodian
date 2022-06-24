@@ -727,7 +727,8 @@ class TestSNS(BaseTest):
                                 "Effect": "Deny",
                                 "Action": "SNS:Publish",
                                 "Principal": "*",
-                                "Condition": { "Bool": {"aws:SecureTransport": "false"} }
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}}
                             }
                         ]
                     }
@@ -737,7 +738,8 @@ class TestSNS(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["TopicArn"], "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
 
     def test_sns_has_statement_id(self):
         session_factory = self.replay_flight_data(
@@ -758,7 +760,8 @@ class TestSNS(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["TopicArn"], "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
 
 
 class TestSubscription(BaseTest):
