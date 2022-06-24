@@ -496,7 +496,7 @@ class WafEnabled(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: waf-enabled
+              - name: filter-apigw-waf-regional
                 resource: rest-stage
                 filters:
                   - type: waf-enabled
@@ -562,7 +562,7 @@ class SetWaf(BaseAction):
                     state: true
                     web-acl: test
 
-              - name: disassociate-wafv2-associate-waf-regional
+              - name: disassociate-wafv2-associate-waf-regional-apigw
                 resource: rest-stage
                 filters:
                   - type: wafv2-enabled
@@ -573,7 +573,7 @@ class SetWaf(BaseAction):
                     web-acl: test
 
     """
-    permissions = ('waf:AssociateWebACL', 'waf:ListWebACLs')
+    permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
 
     schema = type_schema(
         'set-waf', required=['web-acl'], **{
@@ -623,7 +623,7 @@ class WafV2Enabled(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: wafv2-enabled
+              - name: filter-wafv2-apigw
                 resource: rest-stage
                 filters:
                   - type: wafv2-enabled
@@ -684,7 +684,7 @@ class SetWafv2(BaseAction):
                     state: true
                     web-acl: testv2
 
-              - name: disassociate-waf-regional-associate-wafv2
+              - name: disassociate-waf-regional-associate-wafv2-apigw
                 resource: rest-stage
                 filters:
                   - type: waf-enabled

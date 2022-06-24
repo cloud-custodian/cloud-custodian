@@ -187,7 +187,7 @@ class WafEnabled(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: waf-enabled
+              - name: filter-elb-waf-regional
                 resource: app-elb
                 filters:
                   - type: waf-enabled
@@ -260,7 +260,7 @@ class WafV2Enabled(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: wafv2-enabled
+              - name: filter-wafv2-elb
                 resource: app-elb
                 filters:
                   - type: wafv2-enabled
@@ -343,7 +343,7 @@ class SetWaf(BaseAction):
                     state: true
                     web-acl: test
 
-              - name: disassociate-wafv2-associate-waf-regional
+              - name: disassociate-wafv2-associate-waf-regional-elb
                 resource: app-elb
                 filters:
                   - type: wafv2-enabled
@@ -421,7 +421,7 @@ class SetWafV2(BaseAction):
                     state: true
                     web-acl: testv2
 
-              - name: disassociate-waf-regional-associate-wafv2
+              - name: disassociate-waf-regional-associate-wafv2-elb
                 resource: app-elb
                 filters:
                   - type: waf-enabled

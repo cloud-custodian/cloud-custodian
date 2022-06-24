@@ -417,8 +417,8 @@ class SetWaf(BaseAction):
                     force: true
                     web-acl: test
 
-              - name: disassociate-waf-associate-wafv2
-                resource: app-elb
+              - name: disassociate-waf-associate-wafv2-cf
+                resource: distribution
                 filters:
                   - type: waf-enabled
                     state: true
@@ -485,8 +485,8 @@ class SetWafv2(BaseAction):
                     force: true
                     web-acl: testv2
 
-              - name: disassociate-wafv2-associate-waf-regional
-                resource: app-elb
+              - name: disassociate-wafv2-associate-waf-cf
+                resource: distribution
                 filters:
                   - type: wafv2-enabled
                     state: true
