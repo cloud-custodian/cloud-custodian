@@ -96,6 +96,34 @@ class TagInterpolationTest(BaseTest):
             DryRun=False,
         )
 
+    @freeze_time("2022-06-27 12:34:56")
+    def test_rds_tag_interpolation(self):
+        (_, tag_resources) = self.__tag_interpolation_helper(
+            'rds', [{'DBInstanceIdentifier': 'xxx', 'DBInstanceArn': 'arn:xxx'}]
+        )
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:xxx'],
+            Tags={
+                'tag_account_id': self.account_id,
+                'tag_now': '2022-06-27 12:34:56',
+                'tag_region': 'us-east-1',
+            },
+        )
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_kms_key_tag_interpolation(self):
+        (_, tag_resources) = self.__tag_interpolation_helper(
+            'kms-key', [{'KeyId': 'xxx', 'Arn': 'arn:xxx'}]
+        )
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:xxx'],
+            Tags={
+                'tag_account_id': self.account_id,
+                'tag_now': '2022-06-27 12:34:56',
+                'tag_region': 'us-east-1',
+            },
+        )
+
 
 class UniversalTagTest(BaseTest):
 
