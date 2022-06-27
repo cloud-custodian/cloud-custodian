@@ -504,6 +504,27 @@ class IsSSLFilter(Filter):
         return [b for b in balancers if is_ssl(b)]
 
 
+@filters.register('is-not-ssl')
+class ISNotSSLFilter(Filter):
+    """Filters ELB that are not using a SSL policy
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elb-not-using-ssl
+                resource: elb
+                filters:
+                  - type: is-not-ssl
+    """
+
+    schema = type_schema('is-not-ssl')
+
+    def process(self, balancers, event=None):
+        return [b for b in balancers if not is_ssl(b)]
+
+
 @filters.register('ssl-policy')
 class SSLPolicyFilter(Filter):
     """Filter ELBs on the properties of SSLNegotation policies.
