@@ -189,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -570,6 +570,7 @@ class PolicyMetaLint(BaseTest):
                     "instance-age",
                     "ephemeral",
                     "instance-uptime",
+                    "dead-letter",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)

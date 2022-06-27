@@ -1085,12 +1085,32 @@ class SetPolicy(BaseAction):
         arn={'type': 'string'},
         required=['state', 'arn'])
 
-    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy', "iam:ListAttachedRolePolicies",)
 
     def validate(self):
         if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
             raise PolicyValidationError(
                 '* operator is not supported for state: attached on %s' % (self.manager.data))
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_role_policy(
+            RoleName=resource['RoleName'],
+            PolicyArn=policy_arn
+        )
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_role_policy(
+                RoleName=resource['RoleName'],
+                PolicyArn=policy_arn
+            )
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
+        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        return policy_arns
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1102,16 +1122,9 @@ class SetPolicy(BaseAction):
         state = self.data['state']
         for r in resources:
             if state == 'attached':
-                client.attach_role_policy(
-                    RoleName=r['RoleName'],
-                    PolicyArn=policy_arn)
+                self.attach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn != "*":
-                try:
-                    client.detach_role_policy(
-                        RoleName=r['RoleName'],
-                        PolicyArn=policy_arn)
-                except client.exceptions.NoSuchEntityException:
-                    continue
+                self.detach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn == "*":
                 try:
                     self.detach_all_policies(client, r)
@@ -1119,10 +1132,58 @@ class SetPolicy(BaseAction):
                     continue
 
     def detach_all_policies(self, client, resource):
-        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
-        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        policy_arns = self.list_attached_policies(client, resource)
         for parn in policy_arns:
-            client.detach_role_policy(RoleName=resource['RoleName'], PolicyArn=parn)
+            self.detach_policy(client, resource, parn)
+
+
+@Group.action_registry.register("set-policy")
+class SetGroupPolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on a group.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-group-policy
+          resource: iam-group
+          actions:
+            - type: set-policy
+              state: detached
+              arn: "*"
+            - type: set-policy
+              state: attached
+              arn: arn:aws:iam::{account_id}:policy/my-iam-policy
+
+    """
+
+    permissions = (
+        "iam:AttachGroupPolicy", "iam:DetachGroupPolicy", "iam:ListAttachedGroupPolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_group_policy(
+            GroupName=resource["GroupName"], PolicyArn=policy_arn)
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_group_policy(
+                GroupName=resource["GroupName"], PolicyArn=policy_arn)
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_group_policies(
+            GroupName=resource["GroupName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
 
 
 @Role.action_registry.register('delete')
