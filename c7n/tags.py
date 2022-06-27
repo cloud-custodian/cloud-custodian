@@ -425,13 +425,20 @@ class Tag(Action):
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 
-    def interpolate_values(self, tags):
+    def interpolate_single_value(self, tag):
+        """Interpolate in a single tag value.
+        """
         params = {
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
+        return tag.format(**params)
+
+    def interpolate_values(self, tags):
+        """Interpolate in a list of tags - 'old' ec2 format
+        """
         for t in tags:
-            t['Value'] = t['Value'].format(**params)
+            t['Value'] = self.interpolate_single_value(t['Value'])
 
     def get_client(self):
         return utils.local_session(self.manager.session_factory).client(
