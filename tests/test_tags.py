@@ -4,6 +4,7 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
+from freezegun import freeze_time
 from mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
@@ -46,6 +47,54 @@ def test_tag_action_filter_call(test, tag_action_filter_call):
     ec2 = session_factory().resource('ec2')
     instance = ec2.Instance(stopped_ec2_instance_id)
     test.assertEqual(instance.state['Name'], 'stopping')
+
+
+class TagInterpolationTest(BaseTest):
+    def __tag_interpolation_helper(self, resource_name, resources):
+
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+
+        create_tags = mock_factory().client(resource_name).create_tags
+
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+
+        policy = self.load_policy(
+            {
+                "name": "test-tag-interpolation",
+                "resource": resource_name,
+                "actions": [
+                    {
+                        "type": "tag",
+                        "tags": {
+                            "tag_account_id": "{account_id}",
+                            "tag_now": "{now}",
+                            "tag_region": "{region}",
+                        },
+                    }
+                ],
+            },
+            session_factory=mock_factory,
+        )
+        policy.resource_manager.actions[0].process(resources)
+
+        return (create_tags, tag_resources)
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_ec2_tag_interpolation(self):
+        (create_tags, _) = self.__tag_interpolation_helper(
+            'ec2', [{'InstanceId': 'i-12345'}]
+        )
+        create_tags.assert_called_once_with(
+            Resources=['i-12345'],
+            Tags=[
+                {'Key': 'tag_account_id', 'Value': self.account_id},
+                {'Key': 'tag_now', 'Value': '2022-06-27 12:34:56'},
+                {'Key': 'tag_region', 'Value': 'us-east-1'},
+            ],
+            DryRun=False,
+        )
 
 
 class UniversalTagTest(BaseTest):
