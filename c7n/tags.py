@@ -871,6 +871,8 @@ class UniversalTag(Tag):
         if msg:
             tags[tag] = msg
 
+        self.interpolate_values(tags)
+
         batch_size = self.data.get('batch_size', self.batch_size)
         client = self.get_client()
 
@@ -882,6 +884,12 @@ class UniversalTag(Tag):
         arns = self.manager.get_arns(resource_set)
         return universal_retry(
             client.tag_resources, ResourceARNList=arns, Tags=tags)
+
+    def interpolate_values(self, tags):
+        """Interpolate in a list of tags - 'new' resourcegroupstaggingapi format
+        """
+        for key in list(tags.keys()):
+            tags[key] = self.interpolate_single_value(tags[key])
 
     def get_client(self):
         # For global resources, manage tags from us-east-1
