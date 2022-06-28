@@ -80,6 +80,7 @@ class GcpTest(unittest.TestCase):
     def test_run_empty_receive(self, mock_receive):
         mock_receive.return_value = self._pull_messages(0)
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+
         processor.run()
 
     def test_is_gcp_cloud(self):
