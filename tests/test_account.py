@@ -52,6 +52,21 @@ class AccountTests(BaseTest):
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
         }
 
+    def test_macie_disabled(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_disabled')
+        p = self.load_policy({
+            'name': 'macie-check-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'not': [
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_missing(self):
         session_factory = self.replay_flight_data(
             'test_account_missing_resource_ec2')
