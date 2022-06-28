@@ -121,6 +121,8 @@ class MacieEnabled(ValueFilter):
         if super().process([resources[0][self.annotation_key]]):
             return resources
 
+        return []
+
     def get_macie_info(self, account):
         client = local_session(
             self.manager.session_factory).client('macie2')
