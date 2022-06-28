@@ -43,7 +43,11 @@ MAILER_CONFIG = {
     "cache_engine": "sqlite",
     "role": "arn:aws:iam::xxxx:role/cloudcustodian-mailer",
     "ldap_uid_tags": ["CreatorName", "Owner"],
-    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/")],
+    "templates_folders": [
+        os.path.abspath(os.path.dirname(__file__)),
+        os.path.abspath("/"),
+        ""
+    ],
 }
 MAILER_CONFIG_AZURE = {
     "queue_url": "asq://storageaccount.queue.core.windows.net/queuename",
@@ -53,6 +57,7 @@ MAILER_CONFIG_AZURE = {
         os.path.abspath(os.path.dirname(__file__)),
         os.path.abspath("/"),
         os.path.abspath(os.path.join(os.path.dirname(__file__), "test-templates")),
+        ""
     ],
 }
 
@@ -64,7 +69,11 @@ MAILER_CONFIG_GCP = {
     "from_address": "devops@initech.com",
     "queue_url": "projects/c7n-dev/subscriptions/getnotify",
     "smtp_server": "smtp.inittech.com",
-    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/")],
+    "templates_folders": [
+        os.path.abspath(os.path.dirname(__file__)),
+        os.path.abspath("/"),
+        ""
+    ],
 }
 
 RESOURCE_1 = {
