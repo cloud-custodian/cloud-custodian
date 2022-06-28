@@ -23,28 +23,62 @@ class GcpTest(unittest.TestCase):
         self.compressed_message = GCP_MESSAGE
         self.loaded_message = json.loads(GCP_MESSAGE)
 
+    def _pull_messages(self, count=0):
+        template = {
+            "message": {
+                "data": "",
+                "attributes": {},
+                "messageId": "",
+                "orderingKey": "",
+                "publishTime": "a time"
+            },
+            "ackId": "",
+            "deliveryAttempt": ""
+        }
+        result = []
+        for i in range(count):
+            result.append(template)
+        return {"receivedMessages": result}
+
     @patch.object(EmailDelivery, "send_c7n_email")
     def test_process_message(self, mock_email):
         mock_email.return_value = True
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         self.assertTrue(processor.process_message(GCP_MESSAGES["receivedMessages"][0]))
+        mock_email.assert_called()
 
-    @patch.object(MailerGcpQueueProcessor, "receive_messages")
-    def test_receive(self, mock_receive):
-        mock_receive.return_value = {}
+    def test_receive_message(self):
+        patched_client = MagicMock()
+        patched_client.execute_command.return_value = self._pull_messages(1)
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+        processor.client = patched_client
         messages = processor.receive_messages()
-        self.assertEqual(messages, {})
+        self.assertEqual(len(messages['receivedMessages']), 1)
+        patched_client.execute_command.assert_called_with(
+            "pull",
+            {
+                "subscription": "projects/c7n-dev/subscriptions/getnotify",
+                "body": {"returnImmediately": True, "max_messages": 1000}
+            }
+        )
 
-    @patch.object(MailerGcpQueueProcessor, "ack_messages")
-    def test_ack(self, mock_ack):
-        mock_ack.return_value = {}
+    def test_ack_message(self):
+        patched_client = MagicMock()
+        patched_client.execute_command.return_value = {}
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
-        self.assertEqual(processor.ack_messages("2019-05-13T18:31:17.926Z"), {})
+        processor.client = patched_client
+        processor.ack_messages("2019-05-13T18:31:17.926Z")
+        patched_client.execute_command.assert_called_with(
+            "seek",
+            {
+                "subscription": "projects/c7n-dev/subscriptions/getnotify",
+                "body": {"time": "2019-05-13T18:31:17.926Z"}
+            }
+        )
 
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
-    def test_run(self, mock_receive):
-        mock_receive.return_value = []
+    def test_run_empty_receive(self, mock_receive):
+        mock_receive.return_value = self._pull_messages(0)
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         processor.run()
 
@@ -54,7 +88,7 @@ class GcpTest(unittest.TestCase):
     @patch("common.logger.info")
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
     def test_processor_run_logging(self, mock_receive, mock_log):
-        mock_receive.return_value = []
+        mock_receive.return_value = self._pull_messages(0)
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         processor.run()
         mock_log.assert_called_with(
@@ -86,3 +120,16 @@ class GcpTest(unittest.TestCase):
         mock_datadog.assert_has_calls(
             [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]
         )
+
+    @patch.object(MailerGcpQueueProcessor, "ack_messages")
+    @patch.object(MailerGcpQueueProcessor, "process_message")
+    @patch.object(MailerGcpQueueProcessor, "receive_messages")
+    def test_gcp_queue_processor_run(self, mock_receive, mock_process_message, mock_ack_messages):
+        mock_receive.side_effect = [
+            self._pull_messages(1),
+            self._pull_messages(0),
+        ]
+        processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+        processor.run()
+        mock_process_message.assert_called()
+        mock_ack_messages.assert_called()

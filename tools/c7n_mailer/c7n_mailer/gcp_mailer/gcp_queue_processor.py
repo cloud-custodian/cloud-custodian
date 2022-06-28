@@ -34,7 +34,7 @@ class MailerGcpQueueProcessor(object):
         # Get first set of messages to process
         messages = self.receive_messages()
 
-        while len(messages) > 0:
+        while len(messages['receivedMessages']) > 0:
             # Discard_date is the timestamp of the last published message in the messages list
             # and will be the date we need to seek to when we ack_messages
             discard_date = messages["receivedMessages"][-1]["message"]["publishTime"]
