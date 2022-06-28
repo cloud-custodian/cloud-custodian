@@ -27,6 +27,12 @@ steps above don't apply to your environment, you can still install a current
 release of Python manually. `This guide
 <https://realpython.com/installing-python/>`_ may be a useful reference.
 
+NOTE: Some Enterprise/Long Term Support Linux distributions may support Python
+longer than the upstream support period. If you are in this situation it might
+be prudent to contact your vendor to see if there are other supported ways to
+use a more recent version. In some cases using the Docker container might be
+an appropriate solution.
+
 NOTE: Ensure you install the correct follow-on package depending on the cloud
 you are deploying to, otherwise you won't have the right modules for that
 specific cloud.
