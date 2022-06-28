@@ -783,3 +783,23 @@ def get_human_size(size, precision=2):
         size = size / 1024.0
 
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def get_support_region(manager):
+    # support is a unique service in that it doesnt support regional endpoints
+    # thus, we need to construct the client based off the regions found here:
+    # https://docs.aws.amazon.com/general/latest/gr/awssupport.html
+    #
+    # aws-cn uses cn-north-1 for both the Beijing and Ningxia regions
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Beijing.html
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Ningxia.html
+
+    partition = get_partition(manager.config.region)
+    support_region = None
+    if partition == "aws":
+        support_region = "us-east-1"
+    elif partition == "aws-us-gov":
+        support_region = "us-gov-west-1"
+    elif partition == "aws-cn":
+        support_region = "cn-north-1"
+    return support_region

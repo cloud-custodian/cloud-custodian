@@ -119,7 +119,9 @@ class UserCredentialReportTest(BaseTest):
                 {'type': 'remove-keys',
                  'matched': True}]},
             session_factory=factory)
-        resources = p.run()
+
+        with mock_datetime_now(parser.parse("2020-01-01"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
         client = factory().client('iam')
@@ -1369,6 +1371,55 @@ class IamGroupTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_iam_group_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
@@ -1935,6 +1986,21 @@ class CrossAccountChecker(TestCase):
         checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
         for p, expected in zip(
             policies, [False, True, True, False, False, False, False, False]
+        ):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_iam_policies(self):
+        policies = load_data("iam/iam-policies.json")
+
+        checker = PolicyChecker({
+            "allowed_accounts": [
+                "111111111111",
+                "cognito-identity.amazonaws.com",
+            ]
+        })
+        for p, expected in zip(
+            policies, [False, True, True, False]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

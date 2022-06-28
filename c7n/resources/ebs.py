@@ -32,6 +32,7 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    get_support_region
 )
 from c7n.resources.ami import AMI
 
@@ -807,7 +808,9 @@ class FaultTolerantSnapshots(Filter):
 
     def pull_check_results(self):
         result = set()
-        client = local_session(self.manager.session_factory).client('support')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
@@ -1194,6 +1197,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
+        unencrypted_volume_tags = v['Tags']
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1233,7 +1237,7 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-crypt-remediation', 'Value': instance_id},
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+                 'Value': v['Attachments'][0]['Device']}] + unencrypted_volume_tags)
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])

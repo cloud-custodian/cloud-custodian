@@ -38,7 +38,8 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
 
-LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
+LambdaRetry = get_retry(('InsufficientPermissionsException',
+                         'InvalidParameterValueException',), max_attempts=5)
 LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
@@ -847,7 +848,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.8')
+        return self.policy.data['mode'].get('runtime', 'python3.9')
 
     @property
     def memory_size(self):

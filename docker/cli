@@ -29,7 +29,7 @@ ADD tools/c7n_openstack /src/tools/c7n_openstack
 RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
-ARG providers="azure gcp kube openstack"
+ARG providers="gcp kube openstack azure"
 RUN . /usr/local/bin/activate && \
     for pkg in $providers; do cd tools/c7n_$pkg && \
     $HOME/.poetry/bin/poetry install && cd ../../; done

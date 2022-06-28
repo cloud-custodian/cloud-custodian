@@ -119,28 +119,24 @@ class PolicyChecker:
     def handle_principal(self, s):
         if 'NotPrincipal' in s:
             return True
-        if 'Principal' not in s:
-            return True
-        # Skip service principals
-        if 'Service' in s['Principal']:
-            s['Principal'].pop('Service')
-            if not s['Principal']:
-                return False
 
-        assert len(s['Principal']) == 1, "Too many principals %s" % s
-
-        if isinstance(s['Principal'], str):
-            p = s['Principal']
-        elif 'AWS' in s['Principal']:
-            p = s['Principal']['AWS']
-        elif 'Federated' in s['Principal']:
-            p = s['Principal']['Federated']
-        else:
+        principals = s.get('Principal')
+        if not principals:
             return True
+        if not isinstance(principals, dict):
+            principals = {'AWS': principals}
+
+        # Ignore service principals, merge the rest into a single set
+        non_service_principals = set()
+        for principal_type in set(principals) - {'Service'}:
+            p = principals[principal_type]
+            non_service_principals.update({p} if isinstance(p, str) else p)
+
+        if not non_service_principals:
+            return False
 
         principal_ok = True
-        p = isinstance(p, str) and (p,) or p
-        for pid in p:
+        for pid in non_service_principals:
             if pid == '*':
                 principal_ok = False
             elif self.everyone_only:
