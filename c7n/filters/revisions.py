@@ -84,7 +84,7 @@ class Diff(Filter):
         results = []
         for r in resources:
             revisions = self.get_revisions(config, r)
-            r['c7n:previous-revision'] = rev = self.select_revision(revisions)
+            r['c7n:previous-revision'] = rev = self.select_revision(revisions[1:])
             if not rev:
                 continue
             delta = self.diff(rev['resource'], r)

@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 28,
+                    "hour": 22,
+                    "minute": 45,
+                    "second": 11,
+                    "microsecond": 535000
+                },
+                "configurationItemStatus": "OK",
+                "configurationStateId": "1656470711535",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:iam::644160558196:role/c7n-json-diff-test",
+                "resourceType": "AWS::IAM::Role",
+                "resourceId": "AROAY5Y4D45RLATRHIRGV",
+                "resourceName": "c7n-json-diff-test",
+                "awsRegion": "global",
+                "availabilityZone": "Not Applicable",
+                "resourceCreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 6,
+                    "hour": 9,
+                    "minute": 42,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "tags": {},
+                "relatedEvents": [],
+                "relationships": [],
+                "configuration": "{\"path\":\"/\",\"roleName\":\"c7n-json-diff-test\",\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"instanceProfileList\":[{\"path\":\"/\",\"instanceProfileName\":\"c7n-json-diff-test\",\"instanceProfileId\":\"AIPAY5Y4D45RLLFUSCRL2\",\"arn\":\"arn:aws:iam::644160558196:instance-profile/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:45.000Z\",\"roles\":[{\"path\":\"/\",\"roleName\":\"c7n-json-diff-test\",\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"description\":null,\"maxSessionDuration\":null,\"permissionsBoundary\":null,\"tags\":[],\"roleLastUsed\":null}],\"tags\":[]}],\"rolePolicyList\":[],\"attachedManagedPolicies\":[{\"policyName\":\"AdministratorAccess\",\"policyArn\":\"arn:aws:iam::aws:policy/AdministratorAccess\"},{\"policyName\":\"AmazonSSMManagedInstanceCore\",\"policyArn\":\"arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore\"},{\"policyName\":\"PowerUserAccess\",\"policyArn\":\"arn:aws:iam::aws:policy/PowerUserAccess\"}],\"permissionsBoundary\":null,\"tags\":[],\"roleLastUsed\":null}",
+                "supplementaryConfiguration": {}
+            },
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 6,
+                    "hour": 9,
+                    "minute": 45,
+                    "second": 29,
+                    "microsecond": 133000
+                },
+                "configurationItemStatus": "OK",
+                "configurationStateId": "1654523129133",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:iam::644160558196:role/c7n-json-diff-test",
+                "resourceType": "AWS::IAM::Role",
+                "resourceId": "AROAY5Y4D45RLATRHIRGV",
+                "resourceName": "c7n-json-diff-test",
+                "awsRegion": "global",
+                "availabilityZone": "Not Applicable",
+                "resourceCreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 6,
+                    "hour": 9,
+                    "minute": 42,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "tags": {},
+                "relatedEvents": [],
+                "relationships": [],
+                "configuration": "{\"path\":\"/\",\"roleName\":\"c7n-json-diff-test\",\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"instanceProfileList\":[{\"path\":\"/\",\"instanceProfileName\":\"c7n-json-diff-test\",\"instanceProfileId\":\"AIPAY5Y4D45RLLFUSCRL2\",\"arn\":\"arn:aws:iam::644160558196:instance-profile/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:45.000Z\",\"roles\":[{\"path\":\"/\",\"roleName\":\"c7n-json-diff-test\",\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"description\":null,\"maxSessionDuration\":null,\"permissionsBoundary\":null,\"tags\":[],\"roleLastUsed\":null}],\"tags\":[]}],\"rolePolicyList\":[],\"attachedManagedPolicies\":[{\"policyName\":\"AmazonSSMManagedInstanceCore\",\"policyArn\":\"arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore\"},{\"policyName\":\"PowerUserAccess\",\"policyArn\":\"arn:aws:iam::aws:policy/PowerUserAccess\"}],\"permissionsBoundary\":null,\"tags\":[],\"roleLastUsed\":null}",
+                "supplementaryConfiguration": {}
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbLTg2LC0yMiwtOTEsOCw5LDEyMywtOTEsMTAwLC04NiwtOTgsMTEzLC0xNSwxMiw5OSwtNzcsLTEwMCwtMTA0LDExMCw5MCwtODUsLTg5LDY4LC05OCw5NSwzNCwtMTgsNTAsLTEyNSw1LDUwLDEwMCwtMzQsLTgwLDExNSwtOTEsLTkwLC03LC0xMDAsMTMsLTU4LDgsOTksLTEwMSw0MiwtNDgsLTgsLTExMywxMTMsNTgsLTIyLC05OCwtMTE5LC05MCw0NCwxMDYsLTM4LDMyLC0yNyw2LC03OSwtOTIsLTcwLC01MCwxMTksMzUsOSwzOCwtMTAyLC00OCw2NiwtNTQsLTM5LDEsMzAsMTE3LDUxLDUyLDUyLC01NSw3NCwtODgsLTc3LC02NiwtMTAzLDcxLC04NywtNiwtMzQsMjksLTksLTYwLC05OSwtNzAsLTU1LDExOCwtNzQsLTExMSwtMSwtNzEsLTMwLC0xMjIsMjQsLTIxLDU2LC0xMjIsLTg1LDEwOCwtNzUsLTU4LC0xMiw3NSwtMjYsNzcsLTksLTcxLDEyMiw4MCwtMTI1LDMzLDQzLC01NiwxMjUsNjksMTEzLC04MywtMTA5LDMyLDI2LDExOCw1OSwtNjYsLTI5LC0xNywwLDExOSwxMDYsLTY0LC0yNyw3NSw2NCwxMjUsNzYsLTgwLDExNywtNzIsLTQ3LDgzLC0zNCwtMjIsLTkyLDYxLC02NiwtOTgsODYsMzEsNzEsLTEwNywtMTIsLTY1LDEyNCwxMjYsLTU5LDgzLDUsLTEwNywtMTE2XSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6Wy02MSw5NCw4NywxNiwtMzksLTM0LDc1LC00NCwxLDEyNCwtMTI0LDIzLDU2LDEyLDEwMSwxOF19fQ==",
+        "ResponseMetadata": {}
+    }
+}

@@ -669,6 +669,28 @@ class IamRoleTest(BaseTest):
         assert client.get_role(RoleName='accountmgr-dev')[
             'Role'].get('PermissionsBoundary', {}) == {}
 
+    def test_iam_role_diff(self):
+        session_factory = self.record_flight_data("test_iam_role_diff")
+        p = self.load_policy(
+            {
+                "name": "aws-iam-role-diff",
+                "resource": "aws.iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'c7n-json-diff-test'"}],
+                "filters": [{"type": "json-diff"}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # TODO: `r['c7n:diff']` should show that a managed policy was added, but I'm
+        # seeing some wonkiness which seems related to some combination of:
+        #
+        # - select_revision setting the current resource config as the previous
+        #   version (sorting and dropping the current rev should help)
+        # - Treating order as meaningful for list attributes (sorting should help)
+        # - Detecting effects of transform_revision as deltas
+
 
 class IamUserTest(BaseTest):
 
