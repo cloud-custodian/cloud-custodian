@@ -26,12 +26,9 @@ class EmailDelivery:
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
-            self.config['ldap_bind_password'] = decrypt(
-                self.config,
-                self.logger,
-                self.session,
-                'ldap_bind_password'
-            )
+            credential = decrypt(
+                self.config, self.logger, self.session, 'ldap_bind_password')
+            self.config['ldap_bind_password'] = credential
             return LdapLookup(self.config, self.logger)
         return None
 

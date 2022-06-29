@@ -4,6 +4,8 @@
 
 import unittest
 
+import smtplib
+
 from c7n_mailer.smtp_delivery import SmtpDelivery
 from mock import patch, call, MagicMock
 
@@ -102,3 +104,18 @@ class SmtpDeliveryTest(unittest.TestCase):
                 call().quit(),
             ]
         )
+
+    @patch("smtplib.SMTP")
+    def test_smtp_disconnected_del(self, mock_smtp):
+        # if the smtp server is already disconnected we shouldnt raise an exception when
+        # deleting the connection
+        config = {
+            "smtp_server": "server",
+            "smtp_port": 25,
+            "smtp_ssl": False,
+            "smtp_username": None,
+            "smtp_password": None,
+        }
+        d = SmtpDelivery(config, MagicMock(), MagicMock())
+        d._smtp_connection.quit.side_effect = smtplib.SMTPServerDisconnected
+        del d

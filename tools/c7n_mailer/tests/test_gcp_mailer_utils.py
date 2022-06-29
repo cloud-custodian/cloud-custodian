@@ -3,7 +3,7 @@
 
 import unittest
 
-from c7n_mailer.gcp_mailer.utils import gcp_decrypt
+from c7n_mailer.gcp_mailer.utils import gcp_decrypt, CACHE
 from mock import MagicMock
 
 
@@ -25,3 +25,15 @@ class GcpUtilsTest(unittest.TestCase):
             ),
             "secret value")
         mock_client.access_secret_version.assert_called_with(name="foo/versions/latest")
+        self.assertTrue("foo/versions/latest" in CACHE)
+        # the value should be cached and we should only see one access secret version call
+        value = gcp_decrypt(
+            {"test": {"secret": "foo"}},
+            MagicMock(),
+            "test",
+            mock_client
+        )
+        mock_client.access_secret_version.assert_called_once()
+
+        # of course, the value of the secret should not have changed
+        self.assertEqual(value, "secret value")
