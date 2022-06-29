@@ -454,15 +454,3 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
-
-
-def priority_header_is_valid(priority_header, logger):
-    try:
-        priority_header_int = int(priority_header)
-    except ValueError:
-        return False
-    if priority_header_int and 0 < int(priority_header_int) < 6:
-        return True
-    else:
-        logger.warning('mailer priority_header is not a valid string from 1 to 5')
-        return False
