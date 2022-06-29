@@ -860,6 +860,7 @@ class TypeInfo(metaclass=TypeMeta):
     dimension = None
     cfn_type = None
     config_type = None
+    config_id = None
     universal_taggable = False
     global_resource = False
     metrics_namespace = None

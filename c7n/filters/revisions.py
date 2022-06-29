@@ -97,7 +97,7 @@ class Diff(Filter):
         # For some resource types (notably IAM resources), the AWS Config resourceId
         # field doesn't match the `id` parameter of the Custodian resource. In those
         # cases, a Custodian resource can define the `config_id` parameter.
-        config_id = getattr(self.model, 'config_id', self.model.id)
+        config_id = self.model.config_id or self.model.id
         params = dict(
             resourceType=self.model.config_type,
             resourceId=resource[config_id])
