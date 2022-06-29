@@ -44,7 +44,12 @@ class GcpTest(unittest.TestCase):
     def test_process_message(self, mock_email):
         mock_email.return_value = True
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
-        self.assertTrue(processor.process_message(GCP_MESSAGES["receivedMessages"][0]))
+        self.assertTrue(
+            processor.process_message(
+                GCP_MESSAGES["receivedMessages"][0],
+                GCP_MESSAGES['receivedMessages'][0]['message']['publishTime']
+            )
+        )
         mock_email.assert_called()
 
     def test_receive_message(self):
@@ -116,7 +121,7 @@ class GcpTest(unittest.TestCase):
 
         pubsub_message = {"message": {"data": datadog_compressed_message.content}}
         gcp_processor = MailerGcpQueueProcessor(datadog_mailer_config, logger)
-        gcp_processor.process_message(pubsub_message)
+        gcp_processor.process_message(pubsub_message, "a timestamp")
 
         mock_datadog.assert_has_calls(
             [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]

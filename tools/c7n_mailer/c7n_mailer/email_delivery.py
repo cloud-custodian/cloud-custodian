@@ -3,13 +3,12 @@
 from itertools import chain
 
 from c7n_mailer.smtp_delivery import SmtpDelivery
-from c7n_mailer.utils_email import is_email, get_mimetext_message
 import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 
 from .ldap_lookup import LdapLookup
 from .utils import (
     decrypt, get_resource_tag_targets, get_provider,
-    get_aws_username_from_event, Providers)
+    get_aws_username_from_event, Providers, get_mimetext_message, is_email)
 
 
 class EmailDelivery:

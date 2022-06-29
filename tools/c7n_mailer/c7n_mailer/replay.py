@@ -21,8 +21,7 @@ import boto3
 import jsonschema
 from c7n_mailer.cli import CONFIG_SCHEMA
 from c7n_mailer.email_delivery import EmailDelivery
-from c7n_mailer.utils import setup_defaults
-from c7n_mailer.utils_email import get_mimetext_message
+from c7n_mailer.utils import setup_defaults, get_mimetext_message
 
 logger = logging.getLogger(__name__)
 

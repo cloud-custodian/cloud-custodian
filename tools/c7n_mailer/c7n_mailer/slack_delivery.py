@@ -4,8 +4,7 @@ import time
 
 import requests
 from c7n_mailer.ldap_lookup import Redis
-from c7n_mailer.utils import get_rendered_jinja
-from c7n_mailer.utils_email import is_email
+from c7n_mailer.utils import get_rendered_jinja, is_email
 
 
 class SlackDelivery:
