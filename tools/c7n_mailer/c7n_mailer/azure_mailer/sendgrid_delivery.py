@@ -6,7 +6,8 @@ import sendgrid
 from python_http_client import exceptions
 from sendgrid.helpers.mail import Content, Email, Header, Mail, To
 
-from c7n_mailer.utils import decrypt, get_mimetext_message, is_email
+from c7n_mailer.utils import decrypt
+from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
 class SendGridDelivery:

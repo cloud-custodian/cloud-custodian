@@ -19,7 +19,7 @@ from common import (
 )
 from mock import patch, call, MagicMock
 
-from c7n_mailer.utils import is_email, priority_header_is_valid, get_mimetext_message
+from c7n_mailer.utils_email import is_email, priority_header_is_valid, get_mimetext_message
 
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
