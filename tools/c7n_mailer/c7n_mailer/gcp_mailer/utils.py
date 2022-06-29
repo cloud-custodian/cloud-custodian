@@ -4,9 +4,11 @@
 from google.cloud import secretmanager
 
 
-def gcp_decrypt(config, logger, encrypted_field, client=secretmanager.SecretManagerServiceClient()):
+def gcp_decrypt(config, logger, encrypted_field, client=None):
+    if client is None:
+        client = secretmanager.SecretManagerServiceClient()
     data = config[encrypted_field]
-    if type(data) is dict:
+    if isinstance(data, dict):
         logger.debug(f'Accessing {data["secret"]}')
         if "versions" not in data["secret"]:
             secret = f"{data['secret']}/versions/latest"
