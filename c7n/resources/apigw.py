@@ -278,7 +278,8 @@ class RestStage(query.ChildResourceManager):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_stages', 'item', None)
-        name = id = 'stageName'
+        name = 'stageName'
+        id = 'deploymentId'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"
@@ -303,7 +304,7 @@ class RestStage(query.ChildResourceManager):
         arns = []
         for r in resources:
             arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
-             '/stages/' + r[self.get_model().id]))
+             '/stages/' + r[self.get_model().name]))
         return arns
 
 
