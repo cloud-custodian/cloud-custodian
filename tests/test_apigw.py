@@ -423,6 +423,30 @@ class TestRestStage(BaseTest):
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
 
+    def test_wafv2(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(len(resources), 1)
+
 
 class TestRestClientCertificate(BaseTest):
 

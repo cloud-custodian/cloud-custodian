@@ -189,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -389,7 +389,8 @@ class PolicyMetaLint(BaseTest):
         invalid_ignore = {
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
-            'AWS::NetworkFirewall::Firewall'
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::WAFv2::WebACL'
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -569,6 +570,7 @@ class PolicyMetaLint(BaseTest):
                     "instance-age",
                     "ephemeral",
                     "instance-uptime",
+                    "dead-letter",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
