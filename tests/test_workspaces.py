@@ -239,7 +239,7 @@ class WorkspacesTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-def test_workspaces_directory_deregister(self):
+    def test_workspaces_directory_deregister(self):
         factory = self.replay_flight_data("test_workspaces_directory_deregister")
         p = self.load_policy(
             {
