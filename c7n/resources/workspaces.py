@@ -280,7 +280,8 @@ class WorkspacesDirectoryConnectionAliases(ValueFilter):
            resource: aws.workspaces-directory
            filters:
             - type: connection-aliases
-              state: True
+              key: 'ConnectionAliases',
+              value: 'empty',
 
     """
 
