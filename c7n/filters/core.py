@@ -239,6 +239,9 @@ class BaseValueFilter(Filter):
             # GCP schema: 'labels': {'key': 'value'}
             elif 'labels' in i:
                 r = i.get('labels', {}).get(tk, None)
+            elif 'settings' in i:
+                if 'userLabels' in i["settings"]:
+                    r = i["settings"].get('userLabels', {}).get(tk, None)
             # GCP has a secondary form of labels called tags
             # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
