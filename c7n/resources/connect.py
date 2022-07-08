@@ -20,6 +20,21 @@ class Connect(QueryResourceManager):
 class ConnectInstanceAttributeFilter(ValueFilter):
     """
     Filter Connect resources based on instance attributes
+
+        :example:
+
+    .. code-block:: yaml
+
+            policies:
+
+              - name: connect-instance-attribute
+                resource: connect
+                filters:
+                  - type: instance-attribute
+                    key: Attribute.Value
+                    value: true
+                    attribute_type: CONTACT_LENS
+
     """
 
     schema = type_schema('instance-attribute', rinherit=ValueFilter.schema,
