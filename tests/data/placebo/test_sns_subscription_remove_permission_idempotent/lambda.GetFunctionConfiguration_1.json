@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+	"ResponseMetadata": {
+	    "RequestId": "5ff0dcad-f273-4bd4-9388-19a52c50fb10",
+	    "HTTPStatusCode": 200,
+	    "HTTPHeaders": {
+		"date": "Tue, 09 Nov 2021 10:01:16 GMT",
+		"content-type": "application/json",
+		"content-length": "1009",
+		"connection": "keep-alive",
+		"x-amzn-requestid": "5ff0dcad-f273-4bd4-9388-19a52c50fb10"
+	    },
+	    "RetryAttempts": 0
+	},
+	"FunctionName": "custodian-ec2-run-check",
+	"FunctionArn": "arn:aws:lambda:us-east-1:490065885863:function:custodian-ec2-run-check",
+	"Runtime": "python3.9",
+	"Role": "arn:aws:iam::490065885863:role/assetdb-functional",
+	"Handler": "custodian_policy.run",
+	"CodeSize": 508556,
+	"Description": "aws:states:opt-in test3",
+	"Timeout": 900,
+	"MemorySize": 512,
+	"LastModified": "2021-11-09T09:58:31.337+0000",
+	"CodeSha256": "l6PKfcRj3aTEy84ko8+sXgwGQa1jImiO7ywr5WQKyLI=",
+	"Version": "$LATEST",
+	"VpcConfig": {
+	    "SubnetIds": [],
+	    "SecurityGroupIds": [],
+	    "VpcId": ""
+	},
+	"TracingConfig": {
+	    "Mode": "PassThrough"
+	},
+	"RevisionId": "73d4d394-3acb-4f5e-b7d0-0e53e431d79b",
+	"State": "Active",
+	"LastUpdateStatus": "Successful",
+	"PackageType": "Zip",
+	"Architectures": [
+	    "x86_64"
+	]
+    }
+}

@@ -535,8 +535,12 @@ class S3Output(BlobOutput):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
         # can't use a local session as we dont want an unassumed session cached.
+        s3_client = self.ctx.session_factory(assume=False).client('s3')
+        region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+        # if region is None, we use us-east-1
+        region = region or "us-east-1"
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(region=region, assume=False).client('s3'))
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
