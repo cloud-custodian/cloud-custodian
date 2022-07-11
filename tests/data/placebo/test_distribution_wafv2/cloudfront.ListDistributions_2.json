@@ -32,7 +32,7 @@
                         "Quantity": 1
                     }, 
                     "DomainName": "d3naej5h8q7gej.cloudfront.net", 
-                    "WebACLId": "1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf", 
+                    "WebACLId": "arn:aws:wafv2:us-east-1:1234567890:regional/webacl/test/791f9fc9-16bb-4d32-8f6a-b55e9b6f11c8", 
                     "PriceClass": "PriceClass_All", 
                     "Enabled": true, 
                     "DefaultCacheBehavior": {
@@ -188,7 +188,7 @@
                         "Quantity": 1
                     }, 
                     "DomainName": "d34vi31c0msjue.cloudfront.net", 
-                    "WebACLId": "1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf", 
+                    "WebACLId": "arn:aws:wafv2:us-east-1:1234567890:regional/webacl/test/791f9fc9-16bb-4d32-8f6a-b55e9b6f11c8", 
                     "PriceClass": "PriceClass_All", 
                     "Enabled": true, 
                     "DefaultCacheBehavior": {

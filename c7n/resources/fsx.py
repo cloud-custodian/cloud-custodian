@@ -7,6 +7,7 @@ from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import local_session, type_schema
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.vpc import SubnetFilter
 
 
 class DescribeFSx(DescribeSource):
@@ -329,3 +330,9 @@ class KmsFilter(KmsRelatedFilter):
 class KmsFilterFsxBackup(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+
+@FSx.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = 'SubnetIds[]'
