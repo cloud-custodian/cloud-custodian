@@ -4,7 +4,7 @@ from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 
 
-@resources.register('connect')
+@resources.register('connect-instance')
 class Connect(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -13,7 +13,6 @@ class Connect(QueryResourceManager):
         arn_type = 'connect'
         name = id = 'InstanceId'
         universal_taggable = object()
-        cfn_type = 'AWS::Connect'
 
 
 @Connect.filter_registry.register('instance-attribute')
