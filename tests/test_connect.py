@@ -8,7 +8,7 @@ class ConnectTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "connect-query-test",
-                "resource": "connect"
+                "resource": "connect-instance"
             }, session_factory=session_factory
         )
         resources = p.run()
@@ -19,7 +19,7 @@ class ConnectTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "connect-instance-attribute-test",
-                "resource": "connect",
+                "resource": "connect-instance",
                 "filters": [{
                     'type': 'instance-attribute',
                     'key': 'Attribute.Value',
