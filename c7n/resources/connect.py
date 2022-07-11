@@ -27,7 +27,7 @@ class ConnectInstanceAttributeFilter(ValueFilter):
             policies:
 
               - name: connect-instance-attribute
-                resource: connect
+                resource: connect-instance
                 filters:
                   - type: instance-attribute
                     key: Attribute.Value
