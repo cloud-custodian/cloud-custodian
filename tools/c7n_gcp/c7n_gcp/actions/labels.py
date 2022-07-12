@@ -45,8 +45,6 @@ class BaseLabelAction(MethodAction):
         return model.get_label_params(resource, all_labels)
 
     def _get_current_labels(self, resource):
-        if resource["kind"] == "sql#instance":
-            return resource["settings"].get('userLabels', {})
         return resource.get('labels', {})
 
     @classmethod
