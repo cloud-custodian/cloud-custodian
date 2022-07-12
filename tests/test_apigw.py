@@ -473,6 +473,8 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_waf_no_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
         p = self.load_policy(
             {
                 "name": "waf-apigw",
@@ -483,17 +485,7 @@ class TestRestStage(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
-
-        p = self.load_policy(
-            {
-                "name": "waf-apigw",
-                "resource": "rest-stage",
-                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": True}],
-            },
-            session_factory=factory,
-        )
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
 
     def test_wafregional_to_wafv2(self):
         factory = self.replay_flight_data("test_rest_stage_waf")
@@ -509,6 +501,8 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_wafregional_to_wafv2_with_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
         p = self.load_policy(
             {
                 "name": "waf-apigw",
@@ -518,18 +512,9 @@ class TestRestStage(BaseTest):
             },
             session_factory=factory,
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 3)
 
-        p = self.load_policy(
-            {
-                "name": "waf-apigw",
-                "resource": "rest-stage",
-                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": True}],
-            },
-            session_factory=factory,
-        )
-        self.assertEqual(len(resources), 3)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_wafv2_to_wafregional(self):
         factory = self.replay_flight_data("test_rest_stage_waf")
@@ -545,6 +530,8 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
+    def test_wafv2_to_wafregional_with_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
         p = self.load_policy(
             {
                 "name": "waf-apigw",
@@ -555,16 +542,6 @@ class TestRestStage(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
-
-        p = self.load_policy(
-            {
-                "name": "waf-apigw",
-                "resource": "rest-stage",
-                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": True}],
-            },
-            session_factory=factory,
-        )
         self.assertEqual(len(resources), 3)
 
 

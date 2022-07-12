@@ -303,23 +303,21 @@ class WafV2Enabled(Filter):
         for r in resources:
             arn = r[arn_key]
             if arn in resource_map:
-                # NLB doesn't support WAF. So, skip NLB resources
-                if r['Type'] == 'network':
-                    continue
-                r['c7n_webacl'] = resource_map[arn]
-                if not target_acl:
-                    state_map[arn] = True
-                    continue
-                r_acl = resource_map[arn]
-                if r_acl == target_acl_id:
-                    state_map[arn] = True
-                    continue
-                state_map[arn] = False
+                # NLB & GLB doesn't support WAF. So, skip such resources
+                if r['Type'] == 'application':
+                    r['c7n_webacl'] = resource_map[arn]
+                    if not target_acl:
+                        state_map[arn] = True
+                        continue
+                    r_acl = resource_map[arn]
+                    if r_acl == target_acl_id:
+                        state_map[arn] = True
+                        continue
+                    state_map[arn] = False
             else:
-                # NLB doesn't support WAF. So, skip NLB resources
-                if r['Type'] == 'network':
-                    continue
-                state_map[arn] = False
+                # NLB & GLB doesn't support WAF. So, skip such resources
+                if r['Type'] == 'application':
+                    state_map[arn] = False
         return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
 
 

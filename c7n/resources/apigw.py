@@ -516,29 +516,22 @@ class WafEnabled(Filter):
         state = self.data.get('state', False)
 
         results = []
-        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
-
-        client = utils.local_session(self.manager.session_factory).client('waf-regional')
-        waf_name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
-        waf_name_arn_map = {}
-        for web_acl_id in wafs:
-            response = client.get_web_acl(WebACLId=web_acl_id['WebACLId'])
-            if response:
-                waf_name_arn_map[response['WebACL']['Name']] = response['WebACL']['WebACLArn']
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        waf_name_arn_map = {w['Name']: w['WebACLArn'] for w in wafs}
+        target_acl_arn = waf_name_arn_map.get(target_acl, target_acl)
         for r in resources:
             r_web_acl_arn = r.get('webAclArn')
             if state:
-                if target_acl_id is None and r_web_acl_arn and \
+                if target_acl_arn is None and r_web_acl_arn and \
                         r_web_acl_arn in waf_name_arn_map.values():
                     results.append(r)
-                elif target_acl_id and r_web_acl_arn == target_acl_id:
+                elif target_acl_arn and r_web_acl_arn == target_acl_arn:
                     results.append(r)
             else:
-                if target_acl_id is None and (not r_web_acl_arn or
+                if target_acl_arn is None and (not r_web_acl_arn or
                      r_web_acl_arn and r_web_acl_arn not in waf_name_arn_map.values()):
                     results.append(r)
-                elif target_acl_id and r_web_acl_arn != target_acl_id:
+                elif target_acl_arn and r_web_acl_arn != target_acl_arn:
                     results.append(r)
         return results
 
