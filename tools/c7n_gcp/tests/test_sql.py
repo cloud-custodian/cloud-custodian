@@ -19,8 +19,10 @@ class SqlInstanceTest(BaseTest):
             {'k': 'v'}) == {
                 'project': 'abc-123',
                 'instance': 'rds-123',
-                'settings': {
-                    'userLabels': {'k': 'v'}
+                'body': {
+                    'settings': {
+                        'userLabels': {'k': 'v'}
+                    }
                 }
         }
 
