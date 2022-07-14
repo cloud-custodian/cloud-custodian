@@ -728,7 +728,8 @@ class TestSNS(BaseTest):
                                 "Action": "SNS:Publish",
                                 "Principal": "*",
                                 "Condition":
-                                    {"Bool": {"aws:SecureTransport": "false"}}
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{topic_arn}"
                             }
                         ]
                     }

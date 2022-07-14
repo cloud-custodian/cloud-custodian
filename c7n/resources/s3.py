@@ -813,7 +813,7 @@ class BucketFinding(PostFinding):
 
 
 @S3.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter, BucketFilterBase):
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
     def get_std_format_args(self, bucket):
         return {
             'account_id': self.manager.config.account_id,

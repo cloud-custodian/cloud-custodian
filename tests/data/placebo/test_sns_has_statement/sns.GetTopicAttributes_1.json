@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"Statement_1\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Resource\":\"arn:aws:sns:us-west-2:644160558196:sns-test-has-statement\",\"Condition\":{\"StringEquals\":{\"aws:SourceOwner\":\"644160558196\"},\"Bool\":{\"aws:SecureTransport\":\"true\"}}},{\"Sid\":\"BlockNonSSL\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-west-2:644160558196:sgunn-test-1\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"Statement_1\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Resource\":\"arn:aws:sns:us-west-1:644160558196:sns-test-has-statement\",\"Condition\":{\"StringEquals\":{\"aws:SourceOwner\":\"644160558196\"},\"Bool\":{\"aws:SecureTransport\":\"true\"}}},{\"Sid\":\"BlockNonSSL\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:sns-test-has-statement\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
             "LambdaSuccessFeedbackSampleRate": "0",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",
