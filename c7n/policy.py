@@ -22,6 +22,7 @@ from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
 from c7n import deprecated, utils
 from c7n.version import version
+from c7n.query import RetryPageIterator
 
 log = logging.getLogger('c7n.policy')
 
@@ -802,6 +803,35 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
                 'policy:%s resource:%s does not have a cloudformation type'
                 ' and is there-fore not supported by config-poll-rule'))
 
+    @staticmethod
+    def get_obsolete_evaluations(client, cfg_rule_name, ordering_ts, evaluations):
+        """Get list of evaluations that are no longer applicable due to resources being deleted
+        """
+        latest_resource_ids = set()
+        for latest_eval in evaluations:
+            latest_resource_ids.add(latest_eval['ComplianceResourceId'])
+
+        obsolete_evaluations = []
+        paginator = client.get_paginator('get_compliance_details_by_config_rule')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        old_evals = paginator.paginate(
+            ConfigRuleName=cfg_rule_name,
+            ComplianceTypes=['COMPLIANT', 'NON_COMPLIANT'],
+            PaginationConfig={'PageSize': 100}).build_full_result().get('EvaluationResults', [])
+
+        for old_eval in old_evals:
+            eval_res_qual = old_eval['EvaluationResultIdentifier']['EvaluationResultQualifier']
+            old_resource_id = eval_res_qual['ResourceId']
+            if old_resource_id not in latest_resource_ids:
+                obsolete_evaluation = {
+                    'ComplianceResourceType': eval_res_qual['ResourceType'],
+                    'ComplianceResourceId': old_resource_id,
+                    'Annotation': 'The rule does not apply.',
+                    'ComplianceType': 'NOT_APPLICABLE',
+                    'OrderingTimestamp': ordering_ts}
+                obsolete_evaluations.append(obsolete_evaluation)
+        return obsolete_evaluations
+
     def _get_client(self):
         return utils.local_session(
             self.policy.session_factory).client('config')
@@ -819,6 +849,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
         resource_id = self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
+        cfg_rule_name = event['configRuleName']
+        ordering_ts = cfg_event['notificationCreationTime']
 
         matched_resources = set()
         for r in PullMode.run(self):
@@ -829,27 +861,30 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             if r[resource_id] not in matched_resources:
                 unmatched_resources.add(r[resource_id])
 
-        evaluations = [dict(
+        non_compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='NON_COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is not compliant with policy:%s.' % (
                 self.policy.name))
             for r in matched_resources]
-        if evaluations and token:
-            self.put_evaluations(client, token, evaluations)
-
-        evaluations = [dict(
+        compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is compliant with policy:%s.' % (
                 self.policy.name))
             for r in unmatched_resources]
+        evaluations = non_compliant_evals + compliant_evals
+        obsolete_evaluations = self.get_obsolete_evaluations(
+            client, cfg_rule_name, ordering_ts, evaluations)
+        evaluations = evaluations + obsolete_evaluations
+
         if evaluations and token:
             self.put_evaluations(client, token, evaluations)
+
         return list(matched_resources)
 
 

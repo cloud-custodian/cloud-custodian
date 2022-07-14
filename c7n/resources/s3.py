@@ -3036,6 +3036,8 @@ class Lifecycle(BucketActionBase):
         config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
+                if not existing_rule:
+                    continue
                 if rule['ID'] == existing_rule['ID']:
                     if rule['Status'] == 'absent':
                         config[index] = None

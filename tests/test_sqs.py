@@ -6,13 +6,14 @@ from dateutil.tz import tzutc
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
-
 import json
 import logging
 import pytest
 import time
 from pathlib import Path
 
+from c7n.executor import MainThreadExecutor
+from c7n.resources.sqs import SQS
 from c7n.resources.aws import shape_validate, Arn
 
 
@@ -725,3 +726,27 @@ class QueueTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["QueueArn"],
         "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement")
+
+    def test_sqs_deadletter_filter(self):
+        factory = self.replay_flight_data("test_sqs_deadletter_filter")
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        policy = self.load_policy(
+            {
+                "name": "sqs-deadletter",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "QueueArn",
+                        "value": "arn:aws:sqs:us-east-1:644160558196:bar",
+                        "op": "ne"
+                    },
+                    {
+                        "type": "dead-letter"
+                    },
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
