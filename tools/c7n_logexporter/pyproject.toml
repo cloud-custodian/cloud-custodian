@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_logexporter"
-version = "0.4.11"
+version = "0.4.16"
 description = "Cloud Custodian - Cloud Watch Log S3 exporter"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
@@ -18,8 +18,8 @@ classifiers = [
 c7n-log-exporter = 'c7n_logexporter.exporter:cli'
 
 [tool.poetry.dependencies]
-python = "^3.6"
-click = "^7.0"
+python = "^3.7"
+click = "^8.0"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}

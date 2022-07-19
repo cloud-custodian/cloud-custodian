@@ -113,7 +113,7 @@ class ResourceRecordSet(ChildResourceManager):
     class resource_type(TypeInfo):
         service = 'route53'
         arn_type = 'rrset'
-        parent_spec = ('hostedzone', 'HostedZoneId', None)
+        parent_spec = ('hostedzone', 'HostedZoneId', True)
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         cfn_type = 'AWS::Route53::RecordSet'

@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ServiceFabric/managedClusters?api-version=2020-01-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 21 Jun 2021 17:58:39 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1209"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_service-fabric/providers/Microsoft.ServiceFabric/managedClusters/ccfabricc129bfa71a47",
+                                "type": "Microsoft.ServiceFabric/managedclusters",
+                                "location": "southcentralus",
+                                "name": "ccfabricc129bfa71a47",
+                                "tags": {},
+                                "sku": {
+                                    "name": "Basic"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "clusterId": "51c5e2f8-e7e5-4ef1-a99a-ca433561411a",
+                                    "clusterUpgradeMode": "Automatic",
+                                    "clusterUpgradeCadence": "Wave0",
+                                    "adminUserName": "ccfabricc129bfa71a47",
+                                    "dnsName": "ccfabricc129bfa71a47",
+                                    "fqdn": "ccfabricc129bfa71a47.southcentralus.cloudapp.azure.com",
+                                    "clusterCertificateThumbprint": "C003D012F3A80AC9B5A59725369BEA74C41AC5D4",
+                                    "clientConnectionPort": 19000,
+                                    "httpGatewayConnectionPort": 19080,
+                                    "loadBalancingRules": [
+                                        {
+                                            "frontendPort": 8080,
+                                            "backendPort": 8080,
+                                            "protocol": "tcp",
+                                            "probeProtocol": "tcp"
+                                        }
+                                    ],
+                                    "clients": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -50,7 +50,7 @@ class S3OutputTest(TestUtils):
             output_url = "s3://cloud-custodian/policies"
         output = klass(
             ExecutionContext(
-                lambda assume=False: mock.MagicMock(),
+                lambda assume=False, region="us-east-1": mock.MagicMock(),
                 Bag(name="xyz", provider_name="ostack"),
                 Config.empty(output_dir=output_url, account_id='112233445566')),
             {'url': output_url, 'test': True})

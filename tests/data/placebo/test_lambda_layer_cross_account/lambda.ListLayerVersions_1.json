@@ -1,23 +1,19 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "3a9a8bda-02af-11e9-846d-ff6320024c8c",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Tue, 18 Dec 2018 10:25:23 GMT",
-                "content-type": "application/json",
-                "content-length": "231",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "3a9a8bda-02af-11e9-846d-ff6320024c8c"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "LayerVersions": [
             {
-                "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:test:2",
-                "Version": 2,
-                "CreatedDate": "2018-12-18T10:20:13.948+0000"
+                "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:c7n-botocore1-20-33-boto31-17-33:1",
+                "Version": 1,
+                "Description": "Lambda Layer for c7n",
+                "CreatedDate": "2021-03-26T01:15:59.627+0000",
+                "CompatibleRuntimes": [
+                    "python2.7",
+                    "python3.6",
+                    "python3.7",
+                    "python3.8"
+                ]
             }
         ]
     }

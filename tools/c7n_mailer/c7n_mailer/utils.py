@@ -68,6 +68,7 @@ def get_rendered_jinja(
         resources=resources,
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -100,6 +101,7 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -319,7 +321,7 @@ def resource_format(resource, resource_type):
             resource['QueueArn'])
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
-            resource['Name'],
+            resource.get('Name', ''),
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
@@ -352,6 +354,19 @@ def resource_format(resource, resource_type):
         return "Name: %s  RunTime: %s  \n" % (
             resource['FunctionName'],
             resource['Runtime'])
+    elif resource_type == 'service-quota':
+        try:
+            return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+                resource['c7n:UsageMetric']['quota'],
+                resource['c7n:UsageMetric']['metric']
+            )
+        except KeyError:
+            return "ServiceName: %s QuotaName: %s\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+            )
     else:
         return "%s" % format_struct(resource)
 

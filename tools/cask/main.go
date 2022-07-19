@@ -159,6 +159,7 @@ func create(ctx context.Context, image string, dockerClient *client.Client) stri
 			NetworkMode: "host",
 		},
 		nil,
+		nil,
 		"")
 	if err != nil {
 		log.Fatal(err)

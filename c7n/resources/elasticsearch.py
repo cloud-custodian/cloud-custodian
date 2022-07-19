@@ -4,9 +4,9 @@ import jmespath
 import json
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
-from c7n.filters import MetricsFilter, CrossAccountAccessFilter
+from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, type_schema
@@ -131,6 +131,82 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
                         result.get('DomainConfig').get('AccessPolicies').get('Options')
                     )
         return super().process(resources)
+
+
+@ElasticSearchDomain.filter_registry.register('cross-cluster')
+class ElasticSearchCrossClusterFilter(Filter):
+    """
+    Filter to return all elasticsearch domains with inbound cross-cluster with the given info
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: check-elasticsearch-cross-cluster
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-cluster
+                inbound:
+                    key: SourceDomainInfo.OwnerId
+                    op: eq
+                    value: '123456789'
+                outbound:
+                    key: SourceDomainInfo.OwnerId
+                    op: eq
+                    value: '123456789'
+    """
+    schema = type_schema(type_name="cross-cluster",
+                         inbound=type_schema(type_name='inbound',
+                                             required=('key', 'value'),
+                                             rinherit=ValueFilter.schema),
+                         outbound=type_schema(type_name='outbound',
+                                              required=('key', 'value'),
+                                              rinherit=ValueFilter.schema),)
+    schema_alias = False
+    annotation_key = "c7n:SearchConnections"
+    matched_key = "c7n:MatchedConnections"
+    annotate = False
+    permissions = ('es:ESCrossClusterGet',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = {}
+                try:
+                    if "inbound" in self.data:
+                        inbound = self.manager.retry(
+                            client.describe_inbound_cross_cluster_search_connections,
+                            Filters=[{'Name': 'destination-domain-info.domain-name',
+                                    'Values': [r['DomainName']]}])
+                        inbound.pop('ResponseMetadata')
+                        r[self.annotation_key]["inbound"] = inbound
+                    if "outbound" in self.data:
+                        outbound = self.manager.retry(
+                            client.describe_outbound_cross_cluster_search_connections,
+                            Filters=[{'Name': 'source-domain-info.domain-name',
+                                    'Values': [r['DomainName']]}])
+                        outbound.pop('ResponseMetadata')
+                        r[self.annotation_key]["outbound"] = outbound
+                except client.exceptions.ResourceNotFoundExecption:
+                    continue
+            matchFound = False
+            r[self.matched_key] = {}
+            for direction in r[self.annotation_key]:
+                matcher = self.data.get(direction)
+                valueFilter = ValueFilter(matcher)
+                valueFilter.annotate = False
+                matched = []
+                for conn in r[self.annotation_key][direction]['CrossClusterSearchConnections']:
+                    if valueFilter(conn):
+                        matched.append(conn)
+                        matchFound = True
+                r[self.matched_key][direction] = matched
+            if matchFound:
+                results.append(r)
+        return results
 
 
 @ElasticSearchDomain.action_registry.register('remove-statements')

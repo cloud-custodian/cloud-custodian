@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
-Generic EC2 Resource Tag / Filters and actions
+Generic Resource Tag / Filters and Actions wrapper
 
 These work for the whole family of resources associated
 to ec2 (subnets, vpc, security-groups, volumes, instances,
-snapshots).
+snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
 from collections import Counter
@@ -23,7 +23,7 @@ from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
-from c7n import utils
+from c7n import deprecated, utils
 
 DEFAULT_TAG = "maid_status"
 
@@ -226,7 +226,7 @@ class TagTrim(Action):
 class TagActionFilter(Filter):
     """Filter resources for tag specified future action
 
-    Filters resources by a 'custodian_status' tag which specifies a future
+    Filters resources by a 'maid_status' tag which specifies a future
     date for an action.
 
     The filter parses the tag values looking for an 'op@date'
@@ -251,7 +251,7 @@ class TagActionFilter(Filter):
           resource: ec2
           filters:
             - type: marked-for-op
-              # The default tag used is custodian_status
+              # The default tag used is maid_status
               # but that is configurable
               tag: custodian_status
               op: stop
@@ -366,6 +366,10 @@ class Tag(Action):
     batch_size = 25
     concurrency = 2
 
+    deprecations = (
+        deprecated.alias('mark'),
+    )
+
     schema = utils.type_schema(
         'tag', aliases=('mark',),
         tags={'type': 'object'},
@@ -436,6 +440,11 @@ class Tag(Action):
 class RemoveTag(Action):
     """Remove tags from ec2 resources.
     """
+
+    deprecations = (
+        deprecated.alias('unmark'),
+        deprecated.alias('untag'),
+    )
 
     batch_size = 100
     concurrency = 2
@@ -588,6 +597,9 @@ class TagDelayedAction(Action):
             - type: mark-for-op
               op: stop
     """
+    deprecations = (
+        deprecated.optional_fields(('hours', 'days')),
+    )
 
     schema = utils.type_schema(
         'mark-for-op',
@@ -864,8 +876,11 @@ class UniversalTag(Tag):
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
 
 class UniversalUntag(RemoveTag):
@@ -877,8 +892,11 @@ class UniversalUntag(RemoveTag):
     permissions = ('tag:UntagResources',)
 
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
     def process_resource_set(self, client, resource_set, tag_keys):
         arns = self.manager.get_arns(resource_set)
@@ -948,8 +966,11 @@ class UniversalTagDelayedAction(TagDelayedAction):
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
 
 class CopyRelatedResourceTag(Tag):
@@ -1173,13 +1194,13 @@ def coalesce_copy_user_tags(resource, copy_tags, user_tags):
 
     if isinstance(copy_tags, list):
         if '*' in copy_tags:
-            copy_keys = {t['Key'] for t in r_tags}
+            copy_keys = {t['Key'] for t in r_tags if not t['Key'].startswith('aws:')}
         else:
             copy_keys = set(copy_tags)
 
     if isinstance(copy_tags, bool):
         if copy_tags is True:
-            copy_keys = {t['Key'] for t in r_tags}
+            copy_keys = {t['Key'] for t in r_tags if not t['Key'].startswith('aws:')}
         else:
             copy_keys = set()
 

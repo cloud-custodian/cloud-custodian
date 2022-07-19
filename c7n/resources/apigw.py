@@ -8,12 +8,13 @@ from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter, Filter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema
+from c7n.utils import generate_arn, type_schema, get_retry
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -160,6 +161,14 @@ class RestApi(query.QueryResourceManager):
         return self._generate_arn
 
 
+@RestApi.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'ApiName',
+                 'Value': resource['name']}]
+
+
 @RestApi.filter_registry.register('cross-account')
 class RestApiCrossAccount(CrossAccountAccessFilter):
 
@@ -231,9 +240,11 @@ class DeleteApi(BaseAction):
     def process(self, resources):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
+        retry = get_retry(('TooManyRequestsException',))
+
         for r in resources:
             try:
-                client.delete_rest_api(restApiId=r['id'])
+                retry(client.delete_rest_api, restApiId=r['id'])
             except client.exceptions.NotFoundException:
                 continue
 
@@ -474,6 +485,88 @@ class StageClientCertificateFilter(RelatedResourceFilter):
             resource[self.annotation_key] = {
                 self.data['key']: jmespath.search(self.data['key'], related[rid])
             }
+
+
+@RestStage.filter_registry.register('wafv2-enabled')
+class WafV2Enabled(Filter):
+    schema = type_schema(
+        'wafv2-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('wafv2:ListWebACLs',)
+
+    def process(self, resources, event=None):
+        target_acl = self.data.get('web-acl')
+        state = self.data.get('state', False)
+
+        results = []
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        waf_name_arn_map = {w['Name']: w['ARN'] for w in wafs}
+        target_acl_id = waf_name_arn_map.get(target_acl, target_acl)
+        for r in resources:
+            r_web_acl_arn = r.get('webAclArn')
+            if state:
+                if target_acl_id is None and r_web_acl_arn and \
+                        r_web_acl_arn in waf_name_arn_map.values():
+                    results.append(r)
+                elif target_acl_id and r_web_acl_arn == target_acl_id:
+                    results.append(r)
+            else:
+                if target_acl_id is None and (
+                        not r_web_acl_arn or r_web_acl_arn and r_web_acl_arn
+                        not in waf_name_arn_map.values()):
+                    results.append(r)
+                elif target_acl_id and r_web_acl_arn != target_acl_id:
+                    results.append(r)
+        return results
+
+
+@RestStage.action_registry.register('set-wafv2')
+class SetWafv2(BaseAction):
+    """Enable/Disable wafv2 protection on applicable resource.
+
+    """
+    permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
+
+    schema = type_schema(
+        'set-wafv2', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafV2Enabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-wafv2 should be used in conjunction with wafv2-enabled filter on %s" % (
+                    self.manager.data,))
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
+
+        if state and target_acl_id not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl_id))
+
+        client = utils.local_session(self.manager.session_factory).client('wafv2')
+
+        for r in resources:
+            r_arn = self.manager.get_arns([r])[0]
+            if state:
+                client.associate_web_acl(
+                    WebACLArn=target_acl_id, ResourceArn=r_arn)
+            else:
+                client.disassociate_web_acl(
+                    WebACLArn=target_acl_id, ResourceArn=r_arn)
 
 
 @RestResource.filter_registry.register('rest-integration')
@@ -785,3 +878,58 @@ class UpdateRestMethod(BaseAction):
                     resourceId=m['resourceId'],
                     httpMethod=m['httpMethod'],
                     patchOperations=ops)
+
+
+@resources.register('apigw-domain-name')
+class CustomDomainName(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        enum_spec = ('get_domain_names', 'items', None)
+        arn = False
+        id = name = 'domainName'
+        service = 'apigateway'
+        universal_taggable = True
+        cfn_type = 'AWS::ApiGateway::DomainName'
+        date = 'createdDate'
+
+    @classmethod
+    def get_permissions(cls):
+        return ('apigateway:GET',)
+
+    @classmethod
+    def has_arn(self):
+        return False
+
+
+@CustomDomainName.action_registry.register('update-security')
+class DomainNameRemediateTls(BaseAction):
+
+    schema = type_schema(
+        'update-security',
+        securityPolicy={'type': 'string', 'enum': [
+            'TLS_1_0', 'TLS_1_2']},
+        required=['securityPolicy'])
+
+    permissions = ('apigateway:PATCH',)
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        retryable = ('TooManyRequestsException', 'ConflictException')
+        retry = utils.get_retry(retryable, max_attempts=8)
+
+        for r in resources:
+            try:
+                retry(client.update_domain_name,
+                      domainName=r['domainName'],
+                      patchOperations=[
+                          {
+                              'op': 'replace',
+                              'path': '/securityPolicy',
+                              'value': self.data.get('securityPolicy')
+                          },
+                      ]
+                      )
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    continue

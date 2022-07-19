@@ -164,9 +164,11 @@ class Notify(BaseNotify):
     def process(self, resources, event=None):
         alias = utils.get_account_alias_from_sts(
             utils.local_session(self.manager.session_factory))
+        partition = utils.get_partition(self.manager.config.region)
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
+            'partition': partition,
             'account': alias,
             'version': version,
             'region': self.manager.config.region,
@@ -248,11 +250,12 @@ class Notify(BaseNotify):
             for k, v in user_attributes.items():
                 if k != 'mtype':
                     attrs[k] = {'DataType': 'String', 'StringValue': v}
-        client.publish(
+        result = client.publish(
             TopicArn=topic_arn,
             Message=self.pack(message),
             MessageAttributes=attrs
         )
+        return result['MessageId']
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue'].format(**message)

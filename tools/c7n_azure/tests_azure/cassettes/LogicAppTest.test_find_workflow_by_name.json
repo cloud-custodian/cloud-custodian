@@ -1,0 +1,143 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Logic/workflows?api-version=2019-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 21 Jun 2021 17:55:06 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "19999"
+                    ],
+                    "content-length": [
+                        "1499"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "createdTime": "2021-06-10T13:51:36.1015399Z",
+                                    "changedTime": "2021-06-10T13:51:36.0865226Z",
+                                    "state": "Enabled",
+                                    "version": "08585782737894352777",
+                                    "accessEndpoint": "https://prod-16.centralus.logic.azure.com:443/workflows/13ed91368d274eab97afc83c7b54228b",
+                                    "definition": {
+                                        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                                        "contentVersion": "1.0.0.0",
+                                        "parameters": {},
+                                        "triggers": {
+                                            "manual": {
+                                                "type": "Request",
+                                                "kind": "Http",
+                                                "inputs": {
+                                                    "schema": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "actions": {},
+                                        "outputs": {}
+                                    },
+                                    "parameters": {},
+                                    "endpointsConfiguration": {
+                                        "workflow": {
+                                            "outgoingIpAddresses": [
+                                                {
+                                                    "address": "13.67.236.125"
+                                                },
+                                                {
+                                                    "address": "104.208.25.27"
+                                                },
+                                                {
+                                                    "address": "40.122.170.198"
+                                                },
+                                                {
+                                                    "address": "40.113.218.230"
+                                                },
+                                                {
+                                                    "address": "23.100.86.139"
+                                                },
+                                                {
+                                                    "address": "23.100.87.24"
+                                                },
+                                                {
+                                                    "address": "23.100.87.56"
+                                                },
+                                                {
+                                                    "address": "23.100.82.16"
+                                                }
+                                            ],
+                                            "accessEndpointIpAddresses": [
+                                                {
+                                                    "address": "13.67.236.76"
+                                                },
+                                                {
+                                                    "address": "40.77.111.254"
+                                                },
+                                                {
+                                                    "address": "40.77.31.87"
+                                                },
+                                                {
+                                                    "address": "104.43.243.39"
+                                                }
+                                            ]
+                                        },
+                                        "connector": {
+                                            "outgoingIpAddresses": [
+                                                {
+                                                    "address": "13.89.171.80/28"
+                                                },
+                                                {
+                                                    "address": "40.122.49.51"
+                                                },
+                                                {
+                                                    "address": "52.173.245.164"
+                                                },
+                                                {
+                                                    "address": "52.173.241.27"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_logic-app/providers/Microsoft.Logic/workflows/cclogicappc129bfa71a47",
+                                "name": "cclogicappc129bfa71a47",
+                                "type": "Microsoft.Logic/workflows",
+                                "location": "centralus"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

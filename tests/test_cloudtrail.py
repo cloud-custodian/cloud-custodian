@@ -29,20 +29,27 @@ class CloudTrail(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:TrailStatus' in resources[0])
 
-    def test_org_trail_status(self):
-        factory = self.replay_flight_data('test_cloudtrail_org_trail_status_skip')
-        output = self.capture_logging('custodian')
+    def test_event_selectors(self):
+        factory = self.replay_flight_data('test_cloudtrail_event_selectors')
         p = self.load_policy({
             'name': 'resource',
             'resource': 'cloudtrail',
-            'filters': [{'type': 'status', 'key': 'IsLogging', 'value': True}]},
+            'filters': [{
+                'type': 'event-selectors',
+                'key': 'EventSelectors[].IncludeManagementEvents',
+                'op': 'contains',
+                'value': True
+            }]},
             session_factory=factory)
         resources = p.run()
-        self.assertIn(
-            ("found 1 org cloud trail from different"
-             " account that cant be processed"),
-            output.getvalue())
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 4)
+
+        for resource in resources:
+            self.assertTrue('c7n:TrailEventSelectors' in resource)
+            selectors = resource['c7n:TrailEventSelectors']['EventSelectors']
+            self.assertEqual(len(selectors), 1)
+            self.assertTrue('IncludeManagementEvents' in selectors[0])
+            self.assertTrue(selectors[0]['IncludeManagementEvents'])
 
     def test_trail_update(self):
         factory = self.replay_flight_data('test_cloudtrail_update')

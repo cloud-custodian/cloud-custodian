@@ -140,8 +140,9 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
                 f['destinationArn'] == subscription['destination-arn'] and
                 f['distribution'] == distribution):
             return
-    client.delete_subscription_filter(
-        logGroupName=group_name, filterName=sub_name)
+        else:
+            client.delete_subscription_filter(
+                logGroupName=group_name, filterName=sub_name)
     client.put_subscription_filter(
         logGroupName=group_name,
         destinationArn=subscription['destination-arn'],
@@ -209,7 +210,7 @@ def subscribe(config, accounts, region, merge, debug):
                 g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
                 allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
-                for l in allLogGroups:
+                for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
                         client, l['logGroupName'], subscription, distribution)
             else:
@@ -764,19 +765,20 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
 
     client = session.client('logs')
 
-    paginator = client.get_paginator('describe_log_groups')
-    for p in paginator.paginate():
-        found = False
-        for _group in p['logGroups']:
-            if _group['logGroupName'] == group:
-                group = _group
-                found = True
+    if isinstance(group, str):
+        paginator = client.get_paginator('describe_log_groups')
+        for p in paginator.paginate():
+            found = False
+            for _group in p['logGroups']:
+                if _group['logGroupName'] == group:
+                    group = _group
+                    found = True
+                    break
+            if found:
                 break
-        if found:
-            break
 
-    if not found:
-        raise ValueError("Log group %s not found." % group)
+        if not found:
+            raise ValueError("Log group %s not found." % group)
 
     if prefix:
         prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))

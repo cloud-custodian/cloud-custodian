@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_trailcreator"
-version = "0.2.11"
+version = "0.2.16"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
@@ -19,8 +19,8 @@ classifiers=[
 c7n-trailcreator = 'c7n_trailcreator.trailcreator:cli'
 
 [tool.poetry.dependencies]
-python = "^3.6"
-click = "^7.0"
+python = "^3.7"
+click = "^8.0"
 
 [tool.poetry.dev-dependencies]
 c7n_org = {path = "../c7n_org", develop = true}

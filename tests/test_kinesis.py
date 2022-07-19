@@ -29,7 +29,7 @@ class Kinesis(BaseTest):
                 "name": "kstream",
                 "resource": "kinesis",
                 "filters": [{"StreamName": "sock-drawer"}],
-                "actions": ["delete"],
+                "actions": [{"type": "delete", "force": True}],
             },
             session_factory=factory,
         )

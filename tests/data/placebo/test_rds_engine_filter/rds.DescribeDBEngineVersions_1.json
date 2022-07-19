@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBEngineVersions": [
+            {
+                "Engine": "postgres",
+                "EngineVersion": "13.4",
+                "DBParameterGroupFamily": "postgres13",
+                "DBEngineDescription": "PostgreSQL",
+                "DBEngineVersionDescription": "PostgreSQL 13.4-R1",
+                "ValidUpgradeTarget": [
+                    {
+                        "Engine": "postgres",
+                        "EngineVersion": "13.5",
+                        "Description": "PostgreSQL 13.5-R1",
+                        "AutoUpgrade": false,
+                        "IsMajorVersionUpgrade": false
+                    },
+                    {
+                        "Engine": "postgres",
+                        "EngineVersion": "13.6",
+                        "Description": "PostgreSQL 13.6-R1",
+                        "AutoUpgrade": false,
+                        "IsMajorVersionUpgrade": false
+                    },
+                    {
+                        "Engine": "postgres",
+                        "EngineVersion": "14.1",
+                        "Description": "PostgreSQL 14.1-R1",
+                        "AutoUpgrade": false,
+                        "IsMajorVersionUpgrade": true
+                    },
+                    {
+                        "Engine": "postgres",
+                        "EngineVersion": "14.2",
+                        "Description": "PostgreSQL 14.2-R1",
+                        "AutoUpgrade": false,
+                        "IsMajorVersionUpgrade": true
+                    }
+                ],
+                "ExportableLogTypes": [
+                    "postgresql",
+                    "upgrade"
+                ],
+                "SupportsLogExportsToCloudwatchLogs": true,
+                "SupportsReadReplica": true,
+                "SupportedFeatureNames": [
+                    "Lambda",
+                    "s3Export",
+                    "s3Import"
+                ],
+                "Status": "available",
+                "SupportsParallelQuery": false,
+                "SupportsGlobalDatabases": false,
+                "MajorEngineVersion": "13",
+                "SupportsBabelfish": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

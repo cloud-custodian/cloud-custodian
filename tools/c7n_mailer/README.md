@@ -1,8 +1,8 @@
 # c7n-mailer: Custodian Mailer
 
-[//]: # (         !!! IMPORTANT !!!                    )
-[//]: # (This file is moved during document generation.)
-[//]: # (Only edit the original document at ./tools/c7n_mailer/README.md)
+% [comment]: # (         !!! IMPORTANT !!!                    )
+% [comment]: # (This file is moved during document generation.)
+% [comment]: # (Only edit the original document at ./tools/c7n_mailer/README.md)
 
 A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
@@ -271,7 +271,7 @@ and here is a description of the options:
 |           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                                                                                                                                                                |
 |           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
 
-#### Standard Lambda Function Config
+### Standard Lambda Function Config
 
 | Required? | Key                  | Type             |
 |:---------:|:---------------------|:-----------------|
@@ -284,7 +284,7 @@ and here is a description of the options:
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
 
-#### Standard Azure Functions Config
+### Standard Azure Functions Config
 
 | Required? | Key                   | Type   | Notes                                                                                  |
 |:---------:|:----------------------|:-------|:---------------------------------------------------------------------------------------|
@@ -301,7 +301,7 @@ and here is a description of the options:
 
 
 
-#### Mailer Infrastructure Config
+### Mailer Infrastructure Config
 
 | Required? | Key                         | Type    | Notes                                                                                                                                                                                              |
 |:---------:|:----------------------------|:--------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -323,7 +323,7 @@ and here is a description of the options:
 |           | `redis_port`                | integer | redis port, default: 6369                                                                                                                                                                          |
 |           | `ses_region`                | string  | AWS region that handles SES API calls                                                                                                                                                              |
 
-#### SMTP Config
+### SMTP Config
 
 | Required? | Key             | Type             | Notes                                                                                                                                                                               |
 |:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -344,20 +344,20 @@ If `smtp_server` is unset, `c7n_mailer` will use AWS SES or Azure SendGrid.
 
 These fields are not necessary if c7n_mailer is run in a instance/lambda/etc with the DataDog agent.
 
-#### Slack Config
+### Slack Config
 
 | Required? | Key           | Type   | Notes           |
 |:---------:|:--------------|:-------|:----------------|
 |           | `slack_token` | string | Slack API token |
 
-#### SendGrid Config
+### SendGrid Config
 
 | Required? | Key                | Type           | Notes              |
 |:---------:|:-------------------|:---------------|:-------------------|
 |           | `sendgrid_api_key` | secured string | SendGrid API token |
 
 
-#### Splunk HEC Config
+### Splunk HEC Config
 
 The following configuration items are *all* optional. The ones marked "Required for Splunk" are only required if you're sending notifications to ``splunkhec://`` destinations.
 
@@ -371,7 +371,7 @@ The following configuration items are *all* optional. The ones marked "Required 
 |                      | `splunk_hec_max_length` | integer          | Maximum data length that Splunk HEC accepts; an error will be logged for any message sent over this length                         |
 |                      | `splunk_hec_sourcetype` | string       | Configure sourcetype of the payload sent to Splunk HEC. (default is '_json')                         |
 
-#### SDK Config
+### SDK Config
 
 | Required? | Key           | Type   | Notes |
 |:---------:|:--------------|:-------|:------|
@@ -380,30 +380,30 @@ The following configuration items are *all* optional. The ones marked "Required 
 |           | `profile`     | string |       |
 
 
-#### Secured String
+### Secured String
 
 In order to ensure sensitive data is not stored plaintext in a policy, `c7n-mailer` supports secured
 strings. You can treat it as a regular `string` or use `secured string` features.
 
-##### AWS
+#### AWS
 
 You can use KMS to encrypt your secrets and use encrypted secret in mailer policy.
 Custodian tries to decrypt the string using KMS, if it fails c7n treats it as a plaintext secret.
 
 ```yaml
-    plaintext_secret: <raw_secret>
-    secured_string: <encrypted_secret>
+ plaintext_secret: <raw_secret>
+ secured_string: <encrypted_secret>
 ```
 
-##### Azure
+#### Azure
 
 You can store your secrets in Azure Key Vault secrets and reference them from the policy.
 
 ```yaml
-    plaintext_secret: <raw_secret>
-    secured_string:
-        type: azure.keyvault
-        secret: https://your-vault.vault.azure.net/secrets/your-secret
+  plaintext_secret: <raw_secret>
+  secured_string:
+    type: azure.keyvault
+    secret: https://your-vault.vault.azure.net/secrets/your-secret
 ```
 
 Note: `secrets.get` permission on the KeyVault for the Service Principal is required.
@@ -547,7 +547,7 @@ to:
 This will find the email address associated with the resource's `OwnerEmail` tag, and send an email to the specified address.
 If no tag is found, or the associated email address is invalid, no email will be sent.
 
-#### Deploying Azure Functions
+### Deploying Azure Functions
 
 The `--update-lambda` CLI option will also deploy Azure Functions if you have an Azure
 mailer configuration.
@@ -565,7 +565,7 @@ function_properties:
     name: 'testmailer1'
 ```
 
-#### Configuring Function Identity
+### Configuring Function Identity
 
 You can configure the service principal used for api calls made by the
 mailer azure function by specifying an identity configuration under
@@ -677,7 +677,7 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.
 
-#### Testing Templates for Azure
+### Testing Templates for Azure
 
 The ``c7n-mailer-replay`` entrypoint can be used to test templates for Azure with either of the arguments:
 * ``-T`` | ``--template-print``

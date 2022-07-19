@@ -20,6 +20,21 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(resources[0]['status'], 'RUNNING')
         self.assertEqual(resources[0]['name'], 'standard-cluster-1')
 
+    def test_gke_cluster_tags(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data("gke-cluster-query-resourceLabels", project_id)
+        p = self.load_policy(
+            {
+                'name': 'all-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{"tag:foo": "bar"}]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(resources[0]['name'], 'cluster-1')
+        self.assertEqual(resources[0]['resourceLabels']['foo'], 'bar')
+
     def test_cluster_get(self):
         project_id = "cloud-custodian"
         name = "standard-cluster-1"

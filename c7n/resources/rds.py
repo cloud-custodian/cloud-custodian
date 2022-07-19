@@ -37,6 +37,7 @@ import logging
 import operator
 import jmespath
 import re
+from datetime import datetime, timedelta
 from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
@@ -52,8 +53,9 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
-from c7n import tags
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, RetryPageIterator)
+from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
@@ -633,6 +635,9 @@ class CopySnapshotTags(BaseAction):
                   - type: set-snapshot-copy-tags
                     enable: True
     """
+    deprecations = (
+        deprecated.action("use modify-db instead with `CopyTagsToSnapshot`"),
+    )
 
     schema = type_schema(
         'set-snapshot-copy-tags',
@@ -983,6 +988,7 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        filter_type = "scalar"
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBSnapshots',)
 
@@ -1815,3 +1821,112 @@ class ReservedRDS(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+
+@filters.register('consecutive-snapshots')
+class ConsecutiveSnapshots(Filter):
+    """Returns instances where number of consective daily snapshots is equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-daily-snapshot-count
+                resource: rds
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('rds:DescribeDBSnapshots', 'rds:DescribeDBInstances')
+    annotation = 'c7n:DBSnapshots'
+
+    def process_resource_set(self, client, resources):
+        rds_instances = [r['DBInstanceIdentifier'] for r in resources]
+        paginator = client.get_paginator('describe_db_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        db_snapshots = paginator.paginate(Filters=[{'Name': 'db-instance-id',
+          'Values': rds_instances}]).build_full_result().get('DBSnapshots', [])
+
+        inst_map = {}
+        for snapshot in db_snapshots:
+            inst_map.setdefault(snapshot['DBInstanceIdentifier'], []).append(snapshot)
+        for r in resources:
+            r[self.annotation] = inst_map.get(r['DBInstanceIdentifier'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results
+
+
+@filters.register('engine')
+class EngineFilter(ValueFilter):
+    """
+    Filter a rds resource based on its Engine Metadata
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-deprecated-versions
+              resource: aws.rds
+              filters:
+                - type: engine
+                  key: Status
+                  value: deprecated
+    """
+
+    schema = type_schema('engine', rinherit=ValueFilter.schema)
+
+    permissions = ("rds:DescribeDBEngineVersions", )
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        engines = set()
+        engine_versions = set()
+        for r in resources:
+            engines.add(r['Engine'])
+            engine_versions.add(r['EngineVersion'])
+
+        paginator = client.get_paginator('describe_db_engine_versions')
+        response = paginator.paginate(
+            Filters=[
+                {'Name': 'engine', 'Values': list(engines)},
+                {'Name': 'engine-version', 'Values': list(engine_versions)}
+            ],
+            IncludeAll=True,
+        )
+        all_versions = {}
+        matched = []
+        for page in response:
+            for e in page['DBEngineVersions']:
+                all_versions.setdefault(e['Engine'], {})
+                all_versions[e['Engine']][e['EngineVersion']] = e
+        for r in resources:
+            v = all_versions[r['Engine']][r['EngineVersion']]
+            if self.match(v):
+                r['c7n:Engine'] = v
+                matched.append(r)
+        return matched

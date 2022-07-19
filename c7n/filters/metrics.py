@@ -97,6 +97,7 @@ class MetricsFilter(Filter):
 
     # ditto for spot fleet
     DEFAULT_NAMESPACE = {
+        'apigateway': 'AWS/ApiGateway',
         'cloudfront': 'AWS/CloudFront',
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
@@ -123,7 +124,7 @@ class MetricsFilter(Filter):
     }
 
     def process(self, resources, event=None):
-        days = self.data.get('days', 14)
+        self.days = days = self.data.get('days', 14)
         duration = timedelta(days)
 
         self.metric = self.data['name']
@@ -191,7 +192,7 @@ class MetricsFilter(Filter):
             # policies, still the lack of full qualification on the key
             # means multiple filters within a policy using the same metric
             # across different periods or dimensions would be problematic.
-            key = "%s.%s.%s" % (self.namespace, self.metric, self.statistics)
+            key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
             if key not in collected_metrics:
                 collected_metrics[key] = client.get_metric_statistics(
                     Namespace=self.namespace,

@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:iam::644160558196:policy/MyAdminPolicy",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "testing"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:iam::644160558196:policy/S3OpsAccess",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

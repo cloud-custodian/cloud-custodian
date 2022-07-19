@@ -33,7 +33,7 @@ c7n-mailer tool.
 			  - RunInstances
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -71,7 +71,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -109,7 +109,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -144,7 +144,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -179,7 +179,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -216,7 +216,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -259,7 +259,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -295,7 +295,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -334,7 +334,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -371,7 +371,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -409,7 +409,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -445,7 +445,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -482,7 +482,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1
@@ -519,7 +519,7 @@ c7n-mailer tool.
 			  region and delete it and notify the customer
 		  filters:
 			- type: event
-			  key: "region"
+			  key: "detail.awsRegion"
 			  op: not-in
 			  value:
 				  - us-east-1

@@ -26,6 +26,9 @@ email = "policyauthor@example.com"
 name = "WatchFolk"
 """
 
+if os.name == 'nt':
+    pytest.skip('policystream not supported on windows', allow_module_level=True)
+
 
 class GitRepo:
 
@@ -34,7 +37,7 @@ class GitRepo:
         self.git_config = git_config or DEFAULT_CONFIG
 
     def init(self):
-        subprocess.check_output(['git', 'init'], cwd=self.repo_path)
+        subprocess.check_output(['git', 'init', '--initial-branch', 'main'], cwd=self.repo_path)
         with open(os.path.join(self.repo_path, '.git', 'config'), 'w') as fh:
             fh.write(self.git_config)
 
@@ -107,12 +110,12 @@ class StreamTest(TestUtils):
         git.commit('switch')
         return git
 
-    def test_cli_diff_master(self):
+    def test_cli_diff_main(self):
         git = self.setup_basic_repo()
         runner = CliRunner()
         result = runner.invoke(
             policystream.cli,
-            ['diff', '-r', git.repo_path])
+            ['diff', '-r', git.repo_path, '--source', 'HEAD^', '--target', 'main'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
             yaml.safe_load(result.stdout),
@@ -132,7 +135,7 @@ class StreamTest(TestUtils):
         runner = CliRunner()
         result = runner.invoke(
             policystream.cli,
-            ['diff', '-r', git.repo_path])
+            ['diff', '-r', git.repo_path, '--source', 'main'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
             yaml.safe_load(result.stdout),
@@ -280,3 +283,18 @@ class StreamTest(TestUtils):
              ('add', 'lambda-check', 'switch'),
              ('add', 'ec2-check', 'new file'),
              ('moved', 'lambda-check', 'move policy')])
+
+
+@pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
+def test_path_matcher():
+    for p, result in (
+            ('foo/bar.yml', True),
+            ('foo/bar.json', False),
+            ('zoo/rabbit.yaml', True),
+    ):
+        assert policystream.policy_path_matcher(p) is result
+
+    for p, patterns, result in (
+            ('foo/bar.yml', ('dir/*.yaml',), False),
+            ('foo/bar.json', ('foo/*.json',), True)):
+        assert policystream.policy_path_matcher(p, patterns) is result

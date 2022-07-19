@@ -2,8 +2,9 @@
 
 ## Leads
 
-- Kapil Thangavelu @kapilt (@kapilt)
+- Kapil Thangavelu (@kapilt)
   project lead (bdfl)
+- Darren Dao (@darrendao)
 
 ## Aws Provider Maintainers
 
