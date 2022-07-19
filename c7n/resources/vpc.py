@@ -134,7 +134,7 @@ class FlowLogFilter(Filter):
                 for fl in flogs:
                     dest_type_match = (destination_type is None) or op(
                         fl['LogDestinationType'], destination_type)
-                    if not 'LogDestination' in fl:
+                    if 'LogDestination' not in fl:
                         fl['LogDestination'] = ''
                     dest_match = (destination is None) or op(
                         fl['LogDestination'], destination)
