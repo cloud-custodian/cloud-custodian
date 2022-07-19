@@ -10,9 +10,9 @@ class Connect(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'connect'
         enum_spec = ('list_instances', 'InstanceSummaryList', None)
-        arn_type = 'connect'
-        name = id = 'InstanceId'
-        universal_taggable = object()
+        arn_type = 'instance'
+        name = "InstanceAlias"
+        id = "Id"
 
 
 @Connect.filter_registry.register('instance-attribute')
