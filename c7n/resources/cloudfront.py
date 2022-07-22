@@ -106,9 +106,20 @@ class DistributionMetrics(MetricsFilter):
 
 @Distribution.filter_registry.register('waf-enabled')
 class IsWafEnabled(Filter):
-    # useful primarily to use the same name across accounts, else webaclid
-    # attribute works as well
+    """Filter CloudFront distribution by waf-regional web-acl
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-waf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
     schema = type_schema(
         'waf-enabled', **{
             'web-acl': {'type': 'string'},
@@ -131,7 +142,8 @@ class IsWafEnabled(Filter):
         for r in resources:
             if state and target_acl_id is None and r.get('WebACLId'):
                 results.append(r)
-            elif not state and target_acl_id is None and not r.get('WebACLId'):
+            elif not state and target_acl_id is None and (not r.get('WebACLId') or
+                    r.get('WebACLId') not in waf_name_id_map.values()):
                 results.append(r)
             elif state and target_acl_id and r['WebACLId'] == target_acl_id:
                 results.append(r)
@@ -142,8 +154,20 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('wafv2-enabled')
 class IsWafV2Enabled(Filter):
-    # useful primarily to use the same name across accounts, else webaclid
-    # attribute works as well
+    """Filter CloudFront distribution by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-wafv2
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+    """
 
     schema = type_schema(
         'wafv2-enabled', **{
@@ -374,6 +398,37 @@ class DistributionPostFinding(PostFinding):
 
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
+    """Enable waf protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+              - name: disassociate-waf-associate-wafv2-cf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+    """
     permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
     schema = type_schema(
         'set-waf', required=['web-acl'], **{
@@ -411,6 +466,37 @@ class SetWaf(BaseAction):
 
 @Distribution.action_registry.register('set-wafv2')
 class SetWafv2(BaseAction):
+    """Enable wafv2 protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+              - name: disassociate-wafv2-associate-waf-cf
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+    """
     permissions = ('cloudfront:UpdateDistribution', 'wafv2:ListWebACLs')
     schema = type_schema(
         'set-wafv2', required=['web-acl'], **{
