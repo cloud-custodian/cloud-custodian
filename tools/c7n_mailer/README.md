@@ -264,12 +264,14 @@ configuration you specify in a YAML file.  Here is [the
 schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform,
 and here is a description of the options:
 
-| Required? | Key             | Type             | Notes                                                                                                                                                                               |
-|:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
-|           | `from_address`  | string           | default from address                                                                                                                                                                |
-|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                                                                                                                                                                |
-|           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
+| Required? | Key             | Type             | Notes                                                             |
+|:---------:|:----------------|:-----------------|:------------------------------------------------------------------|
+| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                               | 
+|           | `from_address`  | string           | default from address                                              |
+|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                          |
+|           | `contact_tags`  | array of strings | tags that we should look at for address information               |
+|           | `email_base_url`| string           | Base URL to construct a valid email address from a resource owner |
+
 
 ### Standard Lambda Function Config
 
@@ -289,9 +291,9 @@ and here is a description of the options:
 | Required? | Key                   | Type   | Notes                                                                                  |
 |:---------:|:----------------------|:-------|:---------------------------------------------------------------------------------------|
 |           | `function_properties` | object | Contains `appInsights`, `storageAccount` and `servicePlan` objects                     |
-|           | `appInsights`         | object | Contains `name`, `location` and `resourceGroupName` properties                       |
-|           | `storageAccount`      | object | Contains `name`, `location` and `resourceGroupName` properties                       |
-|           | `servicePlan`         | object | Contains `name`, `location`, `resourceGroupName`, `skuTier` and `skuName` properties |
+|           | `appInsights`         | object | Contains `name`, `location` and `resourceGroupName` properties                         |
+|           | `storageAccount`      | object | Contains `name`, `location` and `resourceGroupName` properties                         |
+|           | `servicePlan`         | object | Contains `name`, `location`, `resourceGroupName`, `skuTier` and `skuName` properties   |
 |           | `name`                | string |                                                                                        |
 |           | `location`            | string | Default: `west us 2`                                                                   |
 |           | `resourceGroupName`   | string | Default `cloud-custodian`                                                              |

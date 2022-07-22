@@ -82,12 +82,11 @@ def get_rendered_jinja(
 # and this function would go through the resource and look for any tag keys
 # that match Owners or SupportTeam, and return those values as targets
 def get_resource_tag_targets(resource, target_tag_keys):
-    if 'Tags' not in resource:
+    if 'Tags' not in resource and 'labels' not in resource:
         return []
-    if isinstance(resource['Tags'], dict):
-        tags = resource['Tags']
-    else:
-        tags = {tag['Key']: tag['Value'] for tag in resource['Tags']}
+    tags = resource.get('Tags') or resource.get('labels')
+    if isinstance(tags, list):
+        tags = {tag['Key']: tag['Value'] for tag in tags}
     targets = []
     for target_tag_key in target_tag_keys:
         if target_tag_key in tags:

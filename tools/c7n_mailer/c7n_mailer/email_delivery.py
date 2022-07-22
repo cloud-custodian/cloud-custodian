@@ -35,9 +35,18 @@ class EmailDelivery:
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
+            if target in ('resource-owner', 'event-owner'):
+                continue
             for email in target.split(':'):
                 if is_email(target):
                     emails.append(target)
+                # gcp doesn't support the '@' character in their label values so we
+                # allow users to specify an email_base_url to append to the end of their
+                # owner contact tags
+                if not is_email(target) and self.config.get('email_base_url'):
+                    target = "%s@%s" % (target, self.config['email_base_url'])
+                    if is_email(target):
+                        emails.append(target)
         return emails
 
     def get_event_owner_email(self, targets, event):  # TODO: GCP-friendly

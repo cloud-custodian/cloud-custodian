@@ -133,6 +133,7 @@ CONFIG_SCHEMA = {
         # 'function_schedule': {'type': 'string'},
         # 'function_skuCode': {'type': 'string'},
         # 'function_sku': {'type': 'string'},
+        'email_base_url': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
