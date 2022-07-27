@@ -11,7 +11,8 @@ def test_stream_config_source(test):
     item = event_data('kinesis-stream.json', 'config')
     source = p.resource_manager.get_source('config')
     resource = source.load_resource(item)
-    assert resource['StreamName'] == 'test'
+    assert resource['StreamName'] == 'stream-encrypted'
+    assert resource['KeyId'] == 'alias/aws/kinesis'
 
 
 class Kinesis(BaseTest):

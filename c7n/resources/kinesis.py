@@ -25,6 +25,10 @@ class ConfigStream(ConfigSource):
                 'Arn': 'StreamARN',
                 'Name': 'StreamName'}.items():
             resource[dk] = resource.pop(ck, None)
+        if 'StreamEncryption' in resource:
+            encrypt = resource.pop('StreamEncryption')
+            resource['EncryptionType'] = encrypt['EncryptionType']
+            resource['KeyId'] = encrypt['KeyId']
         return resource
 
 
