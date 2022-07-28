@@ -371,7 +371,7 @@ class DistributionPostFinding(PostFinding):
 
         payload.update(self.filter_empty({
             'DomainName': r['DomainName'],
-            'WebACLId': r.get('WebACLId'),
+            "WebAclId": r.get('WebACLId'),
             'LastModifiedTime': r['LastModifiedTime'].isoformat(),
             'Status': r['Status'],
             'Logging': self.filter_empty(r.get('Logging', {})),
