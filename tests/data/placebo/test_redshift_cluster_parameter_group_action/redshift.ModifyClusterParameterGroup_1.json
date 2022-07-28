@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ParameterGroupName": "test123",
+        "ParameterGroupStatus": "Your parameter group has been updated. If you changed only dynamic parameters, associated clusters are being modified now. If you changed static parameters, all updates, including dynamic parameters, will be applied when you reboot the associated clusters.",
+        "ResponseMetadata": {}
+    }
+}
