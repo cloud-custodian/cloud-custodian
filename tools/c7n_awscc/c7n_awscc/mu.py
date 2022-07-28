@@ -24,7 +24,7 @@ policies:
         action: FAIL | WARN
         enabled: true
         log-role: arn
-        exec-role: arn   
+        exec-role: arn
 """
 
 
