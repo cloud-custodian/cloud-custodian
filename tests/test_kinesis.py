@@ -1,6 +1,18 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
+from .common import BaseTest, event_data
+
+
+def test_stream_config_source(test):
+    p = test.load_policy({
+        'name': 'stream-config',
+        'resource': 'aws.kinesis',
+        'mode': {'type': 'config-rule'}})
+    item = event_data('kinesis-stream.json', 'config')
+    source = p.resource_manager.get_source('config')
+    resource = source.load_resource(item)
+    assert resource['StreamName'] == 'stream-encrypted'
+    assert resource['KeyId'] == 'alias/aws/kinesis'
 
 
 class Kinesis(BaseTest):
