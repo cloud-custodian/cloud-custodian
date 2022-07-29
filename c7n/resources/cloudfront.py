@@ -21,6 +21,21 @@ class DescribeDistribution(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
+    def get_resources(self, ids, cache=True):
+        results = []
+        distribution_ids = []
+        for id in ids:
+            # if we get cloudfront distribution arn, we pick distribution id
+            if 'arn:aws:cloudfront' in id:
+                _, ident = id.rsplit(':', 1)
+                parts = ident.split('/', 2)
+                distribution_ids.append(parts[1])
+            else:
+                distribution_ids.append(id)
+        if distribution_ids:
+            results = super(DescribeDistribution, self).get_resources(distribution_ids, cache)
+        return results
+
 
 @resources.register('distribution')
 class Distribution(QueryResourceManager):
@@ -38,6 +53,7 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
+        supports_trailevents = True
 
     source_mapping = {
         'describe': DescribeDistribution,

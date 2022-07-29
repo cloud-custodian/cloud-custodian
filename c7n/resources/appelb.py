@@ -80,6 +80,7 @@ class AppELB(QueryResourceManager):
         arn = "LoadBalancerArn"
         # The suffix varies by type of loadbalancer (app vs net)
         arn_type = 'loadbalancer/app'
+        supports_trailevents = True
 
     retry = staticmethod(get_retry(('Throttling',)))
     source_mapping = {
