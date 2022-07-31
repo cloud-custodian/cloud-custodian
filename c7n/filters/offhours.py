@@ -308,6 +308,9 @@ class Time(Filter):
         'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b']
+    TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
 
     z_names = list(zoneinfo.get_zonefile_instance().zones)
     non_title_case_zones = (
@@ -456,9 +459,19 @@ class Time(Filter):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8').decode('utf8')
+        value = self.decode_tag_restrictions(value)
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')
+        return value
+
+    @classmethod
+    def decode_tag_restrictions(cls, value: str):
+        if any(c in value for c in cls.TAG_RESTRICTIONS):
+            return value
+
+        for i, c in enumerate(cls.TAG_RESTRICTIONS_ESCAPE):
+            value = value.replace(c, cls.TAG_RESTRICTIONS[i])
         return value
 
     @classmethod
