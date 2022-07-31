@@ -1,12 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
-
+import itertools
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -657,4 +657,80 @@ class ConsecutiveSnapshots(Filter):
                     snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
+        return results
+#1588
+@RDSCluster.filter_registry.register('db-cluster-parameter')
+class ParameterFilter(ValueFilter):
+    """
+    Applies value type filter on set db cluster parameter values.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-pg
+                resource: rds
+                filters:
+                  - type: db-cluster-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
+
+    @staticmethod
+    def recast(val, datatype):
+        """ Re-cast the value based upon an AWS supplied datatype
+            and treat nulls sensibly.
+        """
+        ret_val = val
+        if datatype == 'string':
+            ret_val = str(val)
+        elif datatype == 'boolean':
+            # AWS returns 1s and 0s for boolean for most of the cases
+            if val.isdigit():
+                ret_val = bool(int(val))
+            # AWS returns 'TRUE,FALSE' for Oracle engine
+            elif val == 'TRUE':
+                ret_val = True
+            elif val == 'FALSE':
+                ret_val = False
+        elif datatype == 'integer':
+            if val.isdigit():
+                ret_val = int(val)
+        elif datatype == 'float':
+            ret_val = float(val) if val else 0.0
+        return ret_val
+
+    def process(self, resources, event=None):
+        results = []
+        paramcache = {}
+
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+        param_groups = {db['DBClusterParameterGroup']for db in resources}
+        for pg in param_groups:
+            cache_key = {
+                'region': self.manager.config.region,
+                'account_id': self.manager.config.account_id,
+                'rds-pg': pg}
+            pg_values = self.manager._cache.get(cache_key)
+            if pg_values is not None:
+                paramcache[pg] = pg_values
+                continue
+            param_list = list(itertools.chain(*[p['Parameters']
+                for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+            paramcache[pg] = {
+                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
+                for p in param_list if 'ParameterValue' in p}
+            self.manager._cache.save(cache_key, paramcache[pg])
+        for resource in resources:
+                pg_values = paramcache[resource['DBClusterParameterGroup']]
+                if self.match(pg_values):
+                    resource.setdefault('c7n:MatchedDBParameter', []).append(
+                        self.data.get('key'))
+                    results.append(resource)
+                    break
         return results
