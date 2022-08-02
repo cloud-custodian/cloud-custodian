@@ -1,4 +1,4 @@
-# Automatically generated from poetry/pyproject.toml
+# Automatically generated from pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
 from setuptools import setup
@@ -15,14 +15,33 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete>=1.12.3',
- 'boto3>=1.12.31,<2.0.0',
- 'docutils>=0.14,<0.18',
- 'importlib-metadata>=4.11.1',
- 'jsonschema>=3.0.0',
- 'python-dateutil>=2.8.2,<3.0.0',
- 'pyyaml>=5.4.0',
- 'tabulate>=0.8.6,<0.9.0']
+['argcomplete==2.0.0; python_version >= "3.6"',
+ 'attrs==22.1.0; python_version >= "3.7"',
+ 'boto3==1.24.44; python_version >= "3.7"',
+ 'botocore==1.27.44; python_version >= "3.7"',
+ 'docutils==0.17.1; (python_version >= "2.7" and python_full_version < '
+ '"3.0.0") or (python_full_version >= "3.5.0")',
+ 'importlib-metadata==4.12.0; python_version >= "3.7"',
+ 'importlib-resources==5.9.0; python_version < "3.9" and python_version >= '
+ '"3.7"',
+ 'jmespath==1.0.1; python_version >= "3.7"',
+ 'jsonschema==4.9.0; python_version >= "3.7"',
+ 'pkgutil-resolve-name==1.3.10; python_version < "3.9" and python_version >= '
+ '"3.7"',
+ 'pyrsistent==0.18.1; python_version >= "3.7"',
+ 'python-dateutil==2.8.2; (python_version >= "2.7" and python_full_version < '
+ '"3.0.0") or (python_full_version >= "3.3.0")',
+ 'pyyaml==6.0; python_version >= "3.6"',
+ 's3transfer==0.6.0; python_version >= "3.7"',
+ 'six==1.16.0; python_version >= "3.7" and python_full_version < "3.0.0" or '
+ 'python_full_version >= "3.3.0" and python_version >= "3.7"',
+ 'tabulate==0.8.10; (python_version >= "2.7" and python_full_version < '
+ '"3.0.0") or (python_full_version >= "3.5.0")',
+ 'typing-extensions==4.3.0; python_version == "3.7"',
+ 'urllib3==1.26.11; python_version >= "3.7" and python_full_version < "3.0.0" '
+ 'or python_full_version >= "3.6.0" and python_version < "4" and '
+ 'python_version >= "3.7"',
+ 'zipp==3.8.1; python_version == "3.7"']
 
 entry_points = \
 {'console_scripts': ['custodian = c7n.cli:main']}

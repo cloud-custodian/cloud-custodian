@@ -271,7 +271,7 @@ class Model(QueryResourceManager):
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::Model'
+        cfn_type = config_type = 'AWS::SageMaker::Model'
 
     permissions = ('sagemaker:ListTags',)
 
