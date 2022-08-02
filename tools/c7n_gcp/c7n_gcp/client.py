@@ -68,7 +68,7 @@ RETRYABLE_EXCEPTIONS = (
 
 
 def get_default_project():
-    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+    for k in ('GCP_PROJECT', 'GOOGLE_PROJECT', 'GCLOUD_PROJECT',
               'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
         if k in os.environ:
             return os.environ[k]
