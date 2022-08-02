@@ -28,21 +28,25 @@ def _get_boto_session(creds, region=None):
 
 
 def get_event_credentials(request_data):
-    session = assumed_session(
-        role_arn=request_data["hookEncryptionKeyRole"],
-        session_name=str(uuid.uuid4()),
-        region=os.environ.get("AWS_REGION"),
-    )
+    if request_data.get("hookEncryptionKeyRole"):
+        session = assumed_session(
+            role_arn=request_data["hookEncryptionKeyRole"],
+            session_name=str(uuid.uuid4()),
+            region=os.environ.get("AWS_REGION"),
+        )
 
-    kms = session.client("kms")
-    caller_creds = kms.decrypt(
-        KeyId=request_data["hookEncryptionKeyArn"],
-        CiphertextBlob=base64.b64decode(request_data.pop("callerCredentials")),
-    )
-    provider_creds = kms.decrypt(
-        KeyId=request_data["hookEncryptionKeyArn"],
-        CiphertextBlob=base64.b64decode(request_data.pop("providerCredentials")),
-    )
+        kms = session.client("kms")
+        caller_creds = kms.decrypt(
+            KeyId=request_data["hookEncryptionKeyArn"],
+            CiphertextBlob=base64.b64decode(request_data.pop("callerCredentials")),
+        )
+        provider_creds = kms.decrypt(
+            KeyId=request_data["hookEncryptionKeyArn"],
+            CiphertextBlob=base64.b64decode(request_data.pop("providerCredentials")),
+        )
+    else:
+        caller_creds = request_data.pop("callerCredentials")
+        provider_creds = request_data.pop("providerCredentials")
 
     caller = _get_boto_session(json.loads(caller_creds))
     provider = _get_boto_session(json.loads(provider_creds))
@@ -71,6 +75,7 @@ def log_group(provider, event):
         yield handler
     except Exception:
         log.exception("Handler error", exc_info=True)
+    finally:
         logging.getLogger("custodian").removeHandler(handler)
         logging.getLogger("c7n_awscc").removeHandler(handler)
 
@@ -159,6 +164,7 @@ def handle(event, context):
     metrics = MetricOutput.get(provider, event)
     progress = ProgressOutput(message="")
 
+    start = datetime.utcnow()
     with log_group(provider, event):
         log.info("processing %s", event)
         with metrics:
@@ -167,4 +173,5 @@ def handle(event, context):
                 handler.dispatch_event(
                     event, {"context": context, "progress": progress}
                 )
+            metrics.put("HandlerInvocationDuration", datetime.utcnow() - start)
     return json.dumps(dict(progress))

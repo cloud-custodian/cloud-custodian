@@ -26,14 +26,26 @@ class HookMode(ServerlessExecutionMode):
         manager.add(hook_policy)
 
     def run(self, event, lambda_context):
+        progress = event["progress"]
         if not self.policy.is_runnable(event):
-            return
+            progress.set_progress("not applicable", "SUCCESS")
 
         resources = self.resolve_resources(event)
         rcount = len(resources)
-
-        self.policy.resource_manager.filter_resources(resources, event)
+        resources = self.policy.resource_manager.filter_resources(resources, event)
         self.policy.log.info("Filtered resources %d of %d", len(resources), rcount)
+        self.policy.log.debug("resources %s", resources)
+        if resources and not self.data.get("match-compliant"):
+            progress.set_progress(
+                "%d resources not compliant to %s" % (len(resources), self.policy.name),
+                "FAILED",
+            )
+        else:
+            progress.set_progress("stack resources compliant", "SUCCESS")
 
     def resolve_resources(self, event):
-        pass
+        resource = event["targetModel"]["resourceProperties"]
+        resource["targetLogicalId"] = event["targetLogicalId"]
+        resource["targetName"] = event["targetName"]
+        resource["targetType"] = event["targetType"]
+        return [resource]
