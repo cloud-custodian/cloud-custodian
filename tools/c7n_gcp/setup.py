@@ -1,4 +1,4 @@
-# Automatically generated from pyproject.toml
+# Automatically generated from poetry/pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
 from setuptools import setup
@@ -10,127 +10,33 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete (==2.0.0)',
- 'attrs (==22.1.0)',
- 'boto3 (==1.24.44)',
- 'botocore (==1.27.44)',
- 'c7n (==0.9.17)',
- 'cachetools==5.2.0; python_version >= "3.7" and python_version < "4.0" and '
- '(python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7")',
- 'certifi==2022.6.15; python_version >= "3.7" and python_version < "4" and '
- '(python_version >= "2.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7")',
- 'charset-normalizer==2.1.0; python_version >= "3.7" and python_version < "4" '
- 'and (python_version >= "2.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7") and python_full_version >= "3.6.0"',
- 'docutils (==0.17.1)',
- 'google-api-core==2.8.2; python_version >= "3.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7"',
- 'google-api-python-client==2.55.0; python_version >= "3.7"',
- 'google-auth-httplib2==0.1.0; python_version >= "3.7"',
- 'google-auth==2.9.1; (python_version >= "2.7" and python_full_version < '
- '"3.0.0") or (python_full_version >= "3.6.0")',
- 'google-cloud-appengine-logging==1.1.3; python_version >= "3.7"',
- 'google-cloud-audit-log==0.2.3; python_version >= "3.7"',
- 'google-cloud-core==2.3.2; python_version >= "3.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7"',
- 'google-cloud-logging==2.7.2; python_version >= "3.6"',
- 'google-cloud-monitoring==2.10.1; python_version >= "3.7"',
- 'google-cloud-storage==1.44.0; (python_version >= "2.7" and '
- 'python_full_version < "3.0.0") or (python_full_version >= "3.6.0")',
- 'google-crc32c==1.3.0; python_version >= "3.6" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"',
- 'google-resumable-media==2.3.3; python_version >= "3.6" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.6"',
- 'googleapis-common-protos==1.56.4; python_version >= "3.7" and '
- 'python_full_version < "3.0.0" and (python_version >= "3.6" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.6") or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7" and (python_version >= "3.6" and python_full_version '
- '< "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6")',
- 'grpc-google-iam-v1==0.12.4; python_version >= "3.6"',
- 'grpcio-status==1.48.0; python_version >= "3.7" and (python_version >= "3.6" '
- 'and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.6")',
- 'grpcio==1.48.0; python_version >= "3.7" and (python_version >= "3.6" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.6") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7")',
- 'httplib2==0.20.4; python_version >= "3.7" and python_full_version < "3.0.0" '
- 'or python_full_version >= "3.4.0" and python_version >= "3.7"',
- 'idna==3.3; python_version >= "3.7" and python_version < "4" and '
- '(python_version >= "2.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7")',
- 'importlib-metadata (==4.12.0)',
- 'importlib-resources (==5.9.0)',
- 'jmespath (==1.0.1)',
- 'jsonschema (==4.9.0)',
- 'pkgutil-resolve-name (==1.3.10)',
- 'proto-plus==1.20.6; python_version >= "3.7"',
- 'protobuf==3.20.1; python_version >= "3.7" and python_full_version < "3.0.0" '
- 'and (python_version >= "3.6" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.6") or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7" and '
- '(python_version >= "3.6" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.6")',
- 'pyasn1-modules==0.2.8; python_version >= "3.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7"',
- 'pyasn1==0.4.8; python_version >= "3.7" and python_full_version < "3.0.0" and '
- 'python_version < "4" and (python_version >= "3.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7") or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7" and '
- 'python_version < "4" and (python_version >= "3.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7")',
- 'pyparsing==3.0.9; python_full_version >= "3.6.8" and python_version >= "3.7"',
- 'pyrsistent (==0.18.1)',
- 'python-dateutil (==2.8.2)',
- 'pyyaml (==6.0)',
- 'ratelimiter==1.2.0.post0',
- 'requests==2.28.1; python_version >= "3.7" and python_version < "4" and '
- '(python_version >= "2.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7")',
- 'retrying==1.3.3',
- 'rsa==4.9; python_version >= "3.6" and python_version < "4" and '
- '(python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7")',
- 's3transfer (==0.6.0)',
- 'six (==1.16.0)',
- 'six==1.16.0; python_version >= "3.7" and python_full_version < "3.0.0" and '
- '(python_version >= "3.6" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.6") and '
- '(python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7") or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7" and '
- '(python_version >= "3.6" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.6") and '
- '(python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7")',
- 'tabulate (==0.8.10)',
- 'typing-extensions (==4.3.0)',
- 'uritemplate==4.1.1; python_version >= "3.7"',
- 'urllib3 (==1.26.11)',
- 'urllib3==1.26.11; python_version >= "3.7" and python_full_version < "3.0.0" '
- 'and python_version < "4" and (python_version >= "2.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0") and '
- '(python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0" and python_version >= "3.7") or '
- 'python_full_version >= "3.6.0" and python_version < "4" and python_version '
- '>= "3.7" and (python_version >= "2.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.6.0") and (python_version >= "3.7" and '
- 'python_full_version < "3.0.0" or python_full_version >= "3.6.0" and '
- 'python_version >= "3.7")',
- 'zipp (==3.8.1)']
+['argcomplete (>=2.0.0,<3.0.0)',
+ 'attrs (>=22.1.0,<23.0.0)',
+ 'boto3 (>=1.24.44,<2.0.0)',
+ 'botocore (>=1.27.44,<2.0.0)',
+ 'c7n (>=0.9.17,<0.10.0)',
+ 'docutils (>=0.17.1,<0.18.0)',
+ 'google-api-python-client>=2.0,<3.0',
+ 'google-auth>=2.1.0,<3.0.0',
+ 'google-cloud-logging>=2.6,<3.0',
+ 'google-cloud-monitoring>=2.5.0,<3.0.0',
+ 'google-cloud-storage>=1.42.2,<2.0.0',
+ 'importlib-metadata (>=4.12.0,<5.0.0)',
+ 'importlib-resources (>=5.9.0,<6.0.0)',
+ 'jmespath (>=1.0.1,<2.0.0)',
+ 'jsonschema (>=4.9.0,<5.0.0)',
+ 'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
+ 'pyrsistent (>=0.18.1,<0.19.0)',
+ 'python-dateutil (>=2.8.2,<3.0.0)',
+ 'pyyaml (>=6.0,<7.0)',
+ 'ratelimiter>=1.2.0,<2.0.0',
+ 'retrying>=1.3.3,<2.0.0',
+ 's3transfer (>=0.6.0,<0.7.0)',
+ 'six (>=1.16.0,<2.0.0)',
+ 'tabulate (>=0.8.10,<0.9.0)',
+ 'typing-extensions (>=4.3.0,<5.0.0)',
+ 'urllib3 (>=1.26.11,<2.0.0)',
+ 'zipp (>=3.8.1,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-gcp',

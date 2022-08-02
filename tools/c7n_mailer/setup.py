@@ -1,4 +1,4 @@
-# Automatically generated from pyproject.toml
+# Automatically generated from poetry/pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
 from setuptools import setup
@@ -10,51 +10,18 @@ package_data = \
 {'': ['*'], 'c7n_mailer': ['msg-templates/*']}
 
 install_requires = \
-['attrs==22.1.0; python_version >= "3.7"',
- 'boto3==1.24.44; python_version >= "3.7"',
- 'botocore==1.27.44; python_version >= "3.7"',
- 'certifi==2022.6.15; python_version >= "3.7" and python_version < "4"',
- 'charset-normalizer==2.1.0; python_version >= "3.7" and python_version < "4" '
- 'and python_full_version >= "3.6.0"',
- 'datadog==0.34.1',
- 'decorator==5.1.1; python_version >= "3.5"',
- 'idna==3.3; python_version >= "3.7" and python_version < "4"',
- 'importlib-metadata==4.12.0; python_version >= "3.7"',
- 'importlib-resources==5.9.0; python_version < "3.9" and python_version >= '
- '"3.7"',
- 'jinja2==3.1.2; python_version >= "3.7"',
- 'jmespath==1.0.1; python_version >= "3.7"',
- 'jsonpatch==1.32; (python_version >= "2.7" and python_full_version < "3.0.0") '
- 'or (python_full_version >= "3.5.0")',
- 'jsonpointer==2.3; (python_version >= "2.7" and python_full_version < '
- '"3.0.0") or (python_full_version >= "3.4.0")',
- 'jsonschema==4.9.0; python_version >= "3.7"',
- 'ldap3==2.9.1',
- 'markupsafe==2.1.1; python_version >= "3.7"',
- 'pkgutil-resolve-name==1.3.10; python_version < "3.9" and python_version >= '
- '"3.7"',
- 'pyasn1==0.4.8',
- 'pyrsistent==0.18.1; python_version >= "3.7"',
- 'python-dateutil==2.8.2; (python_version >= "2.7" and python_full_version < '
- '"3.0.0") or (python_full_version >= "3.3.0")',
- 'python-http-client==3.3.7; python_version >= "2.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.5.0"',
- 'pyyaml==6.0; python_version >= "3.6"',
- 'redis==3.5.3; (python_version >= "2.7" and python_full_version < "3.0.0") or '
- '(python_full_version >= "3.5.0")',
- 'requests==2.28.1; python_version >= "3.7" and python_version < "4"',
- 's3transfer==0.6.0; python_version >= "3.7"',
- 'sendgrid==6.9.7; (python_version >= "2.7" and python_full_version < "3.0.0") '
- 'or (python_full_version >= "3.5.0")',
- 'six==1.16.0; python_version >= "3.7" and python_full_version < "3.0.0" or '
- 'python_full_version >= "3.3.0" and python_version >= "3.7"',
- 'starkbank-ecdsa==2.0.3; python_version >= "2.7" and python_full_version < '
- '"3.0.0" or python_full_version >= "3.5.0"',
- 'typing-extensions==4.3.0; python_version < "3.8" and python_version >= "3.7"',
- 'urllib3==1.26.11; python_version >= "3.7" and python_full_version < "3.0.0" '
- 'and python_version < "4" or python_full_version >= "3.6.0" and '
- 'python_version < "4" and python_version >= "3.7"',
- 'zipp==3.8.1; python_version < "3.8" and python_version >= "3.7"']
+['Jinja2>=3.0,<4.0',
+ 'boto3>=1.11.12',
+ 'datadog>=0.34.0,<0.35.0',
+ 'importlib-metadata>=4.11.1',
+ 'jsonpatch>=1.25,<2.0',
+ 'jsonpointer>=2.0,<3.0',
+ 'jsonschema>=3.2.0',
+ 'ldap3>=2.6.1,<3.0.0',
+ 'python-dateutil>=2.8.1,<3.0.0',
+ 'pyyaml>=5.4.0',
+ 'redis>=3.4.1,<4.0.0',
+ 'sendgrid>=6.1.1,<7.0.0']
 
 entry_points = \
 {'console_scripts': ['c7n-mailer = c7n_mailer.cli:main',
