@@ -719,7 +719,7 @@ class RemoveSharingSSMDocument(Action):
                         AccountIdsToRemove=r['c7n:CrossAccountViolations']
                     )
                 except client.exceptions.InvalidDocumentOperation as e:
-                    raise(e)
+                    raise e
         else:
             for r in resources:
                 try:
@@ -730,7 +730,7 @@ class RemoveSharingSSMDocument(Action):
                         AccountIdsToRemove=remove_accounts
                     )
                 except client.exceptions.InvalidDocumentOperation as e:
-                    raise(e)
+                    raise e
 
 
 @SSMDocument.action_registry.register('delete')
@@ -783,7 +783,7 @@ class DeleteSSMDocument(Action):
                         Force=True
                     )
                 else:
-                    raise(e)
+                    raise e
 
 
 @resources.register('ssm-data-sync')

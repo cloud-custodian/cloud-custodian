@@ -542,7 +542,7 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        assert(
+        assert (
             resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
         )
 
@@ -637,7 +637,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
-        assert(
+        assert (
             policy['MinimumPasswordLength'] == 12
         )
         # assert defaults being set
