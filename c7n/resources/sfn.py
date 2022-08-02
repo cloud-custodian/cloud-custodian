@@ -19,7 +19,7 @@ class StepFunction(QueryResourceManager):
         arn = id = 'stateMachineArn'
         arn_service = 'states'
         arn_type = 'stateMachine'
-        cfn_type = config_type = 'AWS::StepFunctions::StateMachine'
+        cfn_type = 'AWS::StepFunctions::StateMachine'
         name = 'name'
         date = 'creationDate'
         detail_spec = (

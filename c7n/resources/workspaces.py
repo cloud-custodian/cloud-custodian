@@ -26,7 +26,7 @@ class Workspace(QueryResourceManager):
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
-        cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
+        cfn_type = 'AWS::WorkSpaces::Workspace'
 
     def augment(self, resources):
         return universal_augment(self, resources)
