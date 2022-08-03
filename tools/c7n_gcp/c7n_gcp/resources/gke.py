@@ -23,6 +23,8 @@ class KubernetesCluster(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
+        labels = True
+        labels_op = "setResourceLabels"
         name = id = "name"
         default_report_fields = [
             'name', 'description', 'status', 'currentMasterVersion', 'currentNodeVersion',
@@ -39,6 +41,20 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['project_id'],
                         resource_info['location'],
                         resource_info['cluster_name'])})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile('.*?/projects/(.*)/zones/(.*)/clusters/(.*)')
+            project, zone, instance = path_param_re.match(
+                resource['selfLink']).groups()
+            return {
+                "name": "projects/{}/locations/{}/clusters/{}".format(project, zone, instance),
+                "body": {
+                    'projectId': project, 'zone': zone, 'clusterId': instance,
+                    'resourceLabels': all_labels,
+                    'labelFingerprint': resource['labelFingerprint']
+                }
+            }
 
     def augment(self, resources):
         for r in resources:

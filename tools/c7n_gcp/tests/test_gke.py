@@ -7,6 +7,22 @@ from gcp_common import BaseTest, event_data
 
 class KubernetesClusterTest(BaseTest):
 
+    def test_cluster_label_params(self):
+        p = self.load_policy({
+            'name': 'gke-labels',
+            'resource': 'gcp.gke-cluster'})
+        model = p.resource_manager.resource_type
+        assert model.get_label_params(
+            {'selfLink': 'https://gcp-gke/projects/abc-123/zones/europe-north1-a/clusters/gke-123'},
+            {'k': 'v'}) == {
+                'name': 'projects/abc-123/locations/europe-north1-a/clusters/gke-123',
+                'body': {
+                    'projectId': 'abc-123', 'zone': 'europe-north1-a', 'clusterId': 'gke-123',
+                    'resourceLabels': {'k': 'v'},
+                    #'labelFingerprint': resource['labelFingerprint']
+                }
+            }
+
     def test_cluster_query(self):
         project_id = "cloud-custodian"
 
