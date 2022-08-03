@@ -16,12 +16,13 @@ from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.filters import FilterRegistry, And, Or, Not
 from c7n.manager import iter_filters
-from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
+from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
 from c7n import deprecated, utils
 from c7n.version import version
+from c7n.query import RetryPageIterator
 
 log = logging.getLogger('c7n.policy')
 
@@ -278,35 +279,39 @@ class PullMode(PolicyExecutionMode):
         if not self.policy.is_runnable():
             return []
 
-        with self.policy.ctx:
+        with self.policy.ctx as ctx:
             self.policy.log.debug(
                 "Running policy:%s resource:%s region:%s c7n:%s",
-                self.policy.name, self.policy.resource_type,
+                self.policy.name,
+                self.policy.resource_type,
                 self.policy.options.region or 'default',
-                version)
+                version,
+            )
 
             s = time.time()
             try:
                 resources = self.policy.resource_manager.resources()
             except ResourceLimitExceeded as e:
                 self.policy.log.error(str(e))
-                self.policy.ctx.metrics.put_metric(
-                    'ResourceLimitExceeded', e.selection_count, "Count")
+                ctx.metrics.put_metric(
+                    'ResourceLimitExceeded', e.selection_count, "Count"
+                )
                 raise
 
             rt = time.time() - s
             self.policy.log.info(
-                "policy:%s resource:%s region:%s count:%d time:%0.2f" % (
-                    self.policy.name,
-                    self.policy.resource_type,
-                    self.policy.options.region,
-                    len(resources), rt))
-            self.policy.ctx.metrics.put_metric(
-                "ResourceCount", len(resources), "Count", Scope="Policy")
-            self.policy.ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
+                "policy:%s resource:%s region:%s count:%d time:%0.2f",
+                self.policy.name,
+                self.policy.resource_type,
+                self.policy.options.region,
+                len(resources),
+                rt,
+            )
+            ctx.metrics.put_metric(
+                "ResourceCount", len(resources), "Count", Scope="Policy"
+            )
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
             if not resources:
                 return []
@@ -318,19 +323,19 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                with ctx.tracer.subsegment('action:%s' % a.type):
                     results = a.process(resources)
                 self.policy.log.info(
                     "policy:%s action:%s"
                     " resources:%d"
-                    " execution_time:%0.2f" % (
-                        self.policy.name, a.name,
-                        len(resources), time.time() - s))
+                    " execution_time:%0.2f"
+                    % (self.policy.name, a.name, len(resources), time.time() - s)
+                )
                 if results:
-                    self.policy._write_file(
-                        "action-%s" % a.name, utils.dumps(results))
-            self.policy.ctx.metrics.put_metric(
-                "ActionTime", time.time() - at, "Seconds", Scope="Policy")
+                    ctx.output.write_file("action-%s" % a.name, utils.dumps(results))
+            ctx.metrics.put_metric(
+                "ActionTime", time.time() - at, "Seconds", Scope="Policy"
+            )
             return resources
 
 
@@ -350,6 +355,7 @@ class LambdaMode(ServerlessExecutionMode):
             # Lambda passthrough config
             'layers': {'type': 'array', 'items': {'type': 'string'}},
             'concurrency': {'type': 'integer'},
+            # Do we really still support 2.7 and 3.6?
             'runtime': {'enum': ['python2.7', 'python3.6',
                                  'python3.7', 'python3.8', 'python3.9']},
             'role': {'type': 'string'},
@@ -467,28 +473,31 @@ class LambdaMode(ServerlessExecutionMode):
 
     def run_resource_set(self, event, resources):
         from c7n.actions import EventAction
-        with self.policy.ctx:
-            self.policy.ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
+
+        with self.policy.ctx as ctx:
+            ctx.metrics.put_metric(
+                'ResourceCount', len(resources), 'Count', Scope="Policy", buffer=False
+            )
 
             if 'debug' in event:
                 self.policy.log.info(
-                    "Invoking actions %s", self.policy.resource_manager.actions)
+                    "Invoking actions %s", self.policy.resource_manager.actions
+                )
 
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
+            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
             for action in self.policy.resource_manager.actions:
                 self.policy.log.info(
                     "policy:%s invoking action:%s resources:%d",
-                    self.policy.name, action.name, len(resources))
+                    self.policy.name,
+                    action.name,
+                    len(resources),
+                )
                 if isinstance(action, EventAction):
                     results = action.process(resources, event)
                 else:
                     results = action.process(resources)
-                self.policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
+                ctx.output.write_file("action-%s" % action.name, utils.dumps(results))
         return resources
 
     @property
@@ -575,6 +584,7 @@ class PHDMode(LambdaMode):
         entities = []
         paginator = client.get_paginator('describe_affected_entities')
         for event_set in utils.chunks(event_arns, 10):
+            # Note: we aren't using event_set here, just event_arns.
             entities.extend(list(itertools.chain(
                             *[p['entities'] for p in paginator.paginate(
                                 filter={'eventArns': event_arns})])))
@@ -802,6 +812,35 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
                 'policy:%s resource:%s does not have a cloudformation type'
                 ' and is there-fore not supported by config-poll-rule'))
 
+    @staticmethod
+    def get_obsolete_evaluations(client, cfg_rule_name, ordering_ts, evaluations):
+        """Get list of evaluations that are no longer applicable due to resources being deleted
+        """
+        latest_resource_ids = set()
+        for latest_eval in evaluations:
+            latest_resource_ids.add(latest_eval['ComplianceResourceId'])
+
+        obsolete_evaluations = []
+        paginator = client.get_paginator('get_compliance_details_by_config_rule')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        old_evals = paginator.paginate(
+            ConfigRuleName=cfg_rule_name,
+            ComplianceTypes=['COMPLIANT', 'NON_COMPLIANT'],
+            PaginationConfig={'PageSize': 100}).build_full_result().get('EvaluationResults', [])
+
+        for old_eval in old_evals:
+            eval_res_qual = old_eval['EvaluationResultIdentifier']['EvaluationResultQualifier']
+            old_resource_id = eval_res_qual['ResourceId']
+            if old_resource_id not in latest_resource_ids:
+                obsolete_evaluation = {
+                    'ComplianceResourceType': eval_res_qual['ResourceType'],
+                    'ComplianceResourceId': old_resource_id,
+                    'Annotation': 'The rule does not apply.',
+                    'ComplianceType': 'NOT_APPLICABLE',
+                    'OrderingTimestamp': ordering_ts}
+                obsolete_evaluations.append(obsolete_evaluation)
+        return obsolete_evaluations
+
     def _get_client(self):
         return utils.local_session(
             self.policy.session_factory).client('config')
@@ -819,6 +858,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
         resource_id = self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
+        cfg_rule_name = event['configRuleName']
+        ordering_ts = cfg_event['notificationCreationTime']
 
         matched_resources = set()
         for r in PullMode.run(self):
@@ -829,27 +870,30 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             if r[resource_id] not in matched_resources:
                 unmatched_resources.add(r[resource_id])
 
-        evaluations = [dict(
+        non_compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='NON_COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is not compliant with policy:%s.' % (
                 self.policy.name))
             for r in matched_resources]
-        if evaluations and token:
-            self.put_evaluations(client, token, evaluations)
-
-        evaluations = [dict(
+        compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is compliant with policy:%s.' % (
                 self.policy.name))
             for r in unmatched_resources]
+        evaluations = non_compliant_evals + compliant_evals
+        obsolete_evaluations = self.get_obsolete_evaluations(
+            client, cfg_rule_name, ordering_ts, evaluations)
+        evaluations = evaluations + obsolete_evaluations
+
         if evaluations and token:
             self.put_evaluations(client, token, evaluations)
+
         return list(matched_resources)
 
 
@@ -1247,10 +1291,11 @@ class Policy:
     run = __call__
 
     def _write_file(self, rel_path, value):
-        if isinstance(self.ctx.output, NullBlobOutput):
-            return
-        with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
-            fh.write(value)
+        """This method is no longer called within c7n, and despite being a private
+        method, caution is taken here to not break any external callers.
+        """
+        log.warning("policy _write_file is deprecated, use ctx.output.write_file")
+        self.ctx.output.write_file(rel_path, value)
 
     def load_resource_manager(self):
         factory = get_resource_class(self.data.get('resource'))

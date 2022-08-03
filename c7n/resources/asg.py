@@ -21,7 +21,7 @@ from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import (
-    local_session, type_schema, chunks, get_retry, select_keys)
+    FormatDate, local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -1146,6 +1146,8 @@ class Tag(Action):
         tags = self.get_tag_set()
         error = None
 
+        self.interpolate_values(tags)
+
         client = self.get_client()
         with self.executor_factory(max_workers=2) as w:
             futures = {}
@@ -1178,6 +1180,14 @@ class Tag(Action):
                 tag_params.append(atags)
                 a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
+
+    def interpolate_values(self, tags):
+        params = {
+            'account_id': self.manager.config.account_id,
+            'now': FormatDate.utcnow(),
+            'region': self.manager.config.region}
+        for t in tags:
+            t['Value'] = t['Value'].format(**params)
 
     def get_client(self):
         return local_session(self.manager.session_factory).client('autoscaling')

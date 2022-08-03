@@ -16,7 +16,7 @@ class CloudFrontWaf(BaseTest):
             {
                 "name": "waf-cfront",
                 "resource": "distribution",
-                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "filters": [{"type": "waf-enabled", "state": False}],
                 "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
             },
             session_factory=factory,
@@ -29,10 +29,60 @@ class CloudFrontWaf(BaseTest):
                 "name": "waf-cfront",
                 "resource": "distribution",
                 "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
             },
             session_factory=factory,
         )
-        self.assertEqual(p.run(), [])
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_waf_to_wafv2(self):
+        factory = self.replay_flight_data("test_distribution_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
 
 
 class CloudFront(BaseTest):
@@ -617,8 +667,56 @@ class CloudFrontWafV2(BaseTest):
             {
                 "name": "wafv2-cfront",
                 "resource": "distribution",
-                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": False}],
-                "actions": [{"type": "set-wafv2", "web-acl": "test", "state": True}],
+                "filters": [{"type": "wafv2-enabled", "state": False}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_wafv2_to_waf(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True, "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True, "force": True}],
             },
             session_factory=factory,
         )
@@ -633,4 +731,5 @@ class CloudFrontWafV2(BaseTest):
             },
             session_factory=factory,
         )
-        self.assertEqual(p.run(), [])
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
