@@ -128,18 +128,6 @@ RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry
 """
 
 BUILD_POLICYSTREAM = """\
-# Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
-RUN mkdir build && \\
-    wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \\
-    cd build && \\
-    tar xzf ../libgit2-1.0.0.tar.gz && \\
-    cd libgit2-1.0.0 && \\
-    mkdir build && cd build && \\
-    cmake .. && \\
-    make install && \\
-    rm -Rf /src/build
-
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
 RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
