@@ -9,6 +9,7 @@ from concurrent.futures import as_completed
 import functools
 import itertools
 import json
+from typing import List
 
 import jmespath
 import os
@@ -503,7 +504,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             'q': query
         }
 
-    def resources(self, query=None, augment=True):
+    def resources(self, query=None, augment=True) -> List[dict]:
         query = self.source.get_query_params(query)
         cache_key = self.get_cache_key(query)
         resources = None
