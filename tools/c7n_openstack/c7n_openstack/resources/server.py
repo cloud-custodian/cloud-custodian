@@ -227,5 +227,5 @@ def find_object_by_property(collection, k, v):
             result.append(d)
     if not result:
         return None
-    assert(len(result) == 1)
+    assert len(result) == 1
     return result[0]

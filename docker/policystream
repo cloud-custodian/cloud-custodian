@@ -1,6 +1,6 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
-FROM ubuntu:21.10 as build-env
+FROM ubuntu:22.04 as build-env
 
 ENV DEBIAN_FRONTEND=noninteractive
 # pre-requisite distro deps, and build env setup
@@ -58,7 +58,7 @@ RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/
 #  - as a sanity check to distributing known good assets / we test here
 RUN . /usr/local/bin/activate && pytest -p "no:terraform" tools/c7n_policystream
 
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 LABEL name="policystream" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
