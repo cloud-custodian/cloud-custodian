@@ -82,7 +82,9 @@ class SNSPostFinding(PostFinding):
 class HasStatementFilter(polstmt_filter.HasStatementFilter):
     def get_std_format_args(self, topic):
         return {
-            'topic_arn': topic['TopicArn']
+            'topic_arn': topic['TopicArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
         }
 
 

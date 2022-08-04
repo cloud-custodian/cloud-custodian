@@ -153,7 +153,9 @@ class SQSPostFinding(PostFinding):
 class HasStatementFilter(polstmt_filter.HasStatementFilter):
     def get_std_format_args(self, queue):
         return {
-            'queue_arn': queue['QueueArn']
+            'queue_arn': queue['QueueArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
         }
 
 
