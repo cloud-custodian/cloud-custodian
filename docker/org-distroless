@@ -7,7 +7,7 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 - -y --version 1.1.9
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py     | python3 - -y --version 1.1.9
 
 WORKDIR /src
 
@@ -33,6 +33,13 @@ ARG providers="azure gcp kube openstack"
 RUN . /usr/local/bin/activate && \
     for pkg in $providers; do cd tools/c7n_$pkg && \
     $HOME/.poetry/bin/poetry install && cd ../../; done
+
+RUN apt-get install --yes git && \
+    pip install git+https://github.com/clumio-code/azure-sdk-trim@v0.1.0#egg=azure-sdk-trim && \
+    azure-sdk-trim --azure_dir /usr/local/lib/python3.8/site-packages/azure/mgmt && \
+    python -m compileall -b /usr/local/lib/python3.8/site-packages/azure && \
+    find /usr/local/lib/python3.8/site-packages/azure -name '*.py' -delete && \
+    pip uninstall --yes azure-sdk-trim
 
 RUN mkdir /output
 
