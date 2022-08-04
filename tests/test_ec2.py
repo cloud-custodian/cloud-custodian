@@ -17,6 +17,82 @@ from c7n import tags, utils
 
 from .common import BaseTest
 
+from pytest_terraform import terraform
+
+
+@terraform('ec2_stop_protection_enabled')
+def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_stop_protection_enabled', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_stop_protection_enabled',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'type': 'stop-protected'},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['InstanceId'],
+        ec2_stop_protection_enabled['aws_instance.stop_protection.id'])
+
+
+@terraform('ec2_stop_protection_disabled')
+def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_stop_protection_disabled', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_stop_protection_disabled',
+            'resource': 'ec2',
+            'filters': [
+                {'State.Name': 'running'},
+                {'not': [{'type': 'stop-protected'}]},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 2)
+
+    resource_ids = [i['InstanceId'] for i in resources]
+    test.assertIn(
+        ec2_stop_protection_disabled['aws_instance.termination_protection.id'],
+        resource_ids)
+    test.assertIn(
+        ec2_stop_protection_disabled['aws_instance.no_protection.id'],
+        resource_ids)
+
+
+def test_ec2_stop_protection_filter_permissions(test):
+    policy = test.load_policy(
+        {
+            'name': 'ec2-stop-protection',
+            'resource': 'ec2',
+            'filters': [{'type': 'stop-protected'}],
+        },
+    )
+    permissions = policy.get_permissions()
+    test.assertEqual(
+        permissions,
+        {
+            'ec2:DescribeInstances',
+            'ec2:DescribeTags',
+            'ec2:DescribeInstanceAttribute',
+        },
+    )
+
 
 class TestEc2NetworkLocation(BaseTest):
     def test_ec2_network_location_terminated(self):
