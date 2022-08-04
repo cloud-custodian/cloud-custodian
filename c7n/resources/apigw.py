@@ -278,7 +278,8 @@ class RestStage(query.ChildResourceManager):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_stages', 'item', None)
-        name = id = 'stageName'
+        name = 'stageName'
+        id = 'deploymentId'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"
@@ -303,7 +304,7 @@ class RestStage(query.ChildResourceManager):
         arns = []
         for r in resources:
             arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
-             '/stages/' + r[self.get_model().id]))
+             '/stages/' + r[self.get_model().name]))
         return arns
 
 
@@ -487,8 +488,143 @@ class StageClientCertificateFilter(RelatedResourceFilter):
             }
 
 
+@RestStage.filter_registry.register('waf-enabled')
+class WafEnabled(Filter):
+    """Filter API Gateway stage by waf-regional web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-apigw-waf-regional
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
+    schema = type_schema(
+        'waf-enabled', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    permissions = ('waf:ListWebACLs', 'waf:GetWebACL')
+
+    def process(self, resources, event=None):
+        target_acl = self.data.get('web-acl')
+        state = self.data.get('state', False)
+
+        results = []
+        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        waf_name_arn_map = {w['Name']: w['WebACLArn'] for w in wafs}
+        target_acl_arn = waf_name_arn_map.get(target_acl, target_acl)
+        for r in resources:
+            r_web_acl_arn = r.get('webAclArn')
+            if state:
+                if target_acl_arn is None and r_web_acl_arn and \
+                        r_web_acl_arn in waf_name_arn_map.values():
+                    results.append(r)
+                elif target_acl_arn and r_web_acl_arn == target_acl_arn:
+                    results.append(r)
+            else:
+                if target_acl_arn is None and (not r_web_acl_arn or
+                     r_web_acl_arn and r_web_acl_arn not in waf_name_arn_map.values()):
+                    results.append(r)
+                elif target_acl_arn and r_web_acl_arn != target_acl_arn:
+                    results.append(r)
+        return results
+
+
+@RestStage.action_registry.register('set-waf')
+class SetWaf(BaseAction):
+    """Enable waf protection on API Gateway stage.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-stage
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+              - name: disassociate-wafv2-associate-waf-regional-apigw
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+    """
+    permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
+
+    schema = type_schema(
+        'set-waf', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            # 'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafEnabled) or isinstance(f, WafV2Enabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-waf should be used in conjunction with waf-enabled or wafv2-enabled \
+                filter on %s" % (self.manager.data,))
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
+        name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl')
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
+        if state and target_acl_id not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl))
+
+        client = utils.local_session(
+            self.manager.session_factory).client('waf-regional')
+
+        for r in resources:
+            r_arn = self.manager.get_arns([r])[0]
+            if state:
+                client.associate_web_acl(WebACLId=target_acl_id, ResourceArn=r_arn)
+            else:
+                client.disassociate_web_acl(WebACLId=target_acl_id, ResourceArn=r_arn)
+
+
 @RestStage.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(Filter):
+    """Filter API Gateway stage by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-wafv2-apigw
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+    """
+
     schema = type_schema(
         'wafv2-enabled', **{
             'web-acl': {'type': 'string'},
@@ -524,7 +660,33 @@ class WafV2Enabled(Filter):
 
 @RestStage.action_registry.register('set-wafv2')
 class SetWafv2(BaseAction):
-    """Enable/Disable wafv2 protection on applicable resource.
+    """Enable wafv2 protection on API Gateway stage.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-stage
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
+
+              - name: disassociate-waf-regional-associate-wafv2-apigw
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
 
     """
     permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
@@ -537,14 +699,14 @@ class SetWafv2(BaseAction):
     def validate(self):
         found = False
         for f in self.manager.iter_filters():
-            if isinstance(f, WafV2Enabled):
+            if isinstance(f, WafV2Enabled) or isinstance(f, WafEnabled):
                 found = True
                 break
         if not found:
             # try to ensure idempotent usage
             raise PolicyValidationError(
-                "set-wafv2 should be used in conjunction with wafv2-enabled filter on %s" % (
-                    self.manager.data,))
+                "set-wafv2 should be used in conjunction with wafv2-enabled or waf-enabled \
+                    filter on %s" % (self.manager.data,))
         return self
 
     def process(self, resources):
