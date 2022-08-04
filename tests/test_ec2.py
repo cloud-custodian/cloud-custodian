@@ -17,6 +17,7 @@ from c7n import tags, utils
 
 from .common import BaseTest
 
+import pytest
 from pytest_terraform import terraform
 
 
@@ -92,6 +93,40 @@ def test_ec2_stop_protection_filter_permissions(test):
             'ec2:DescribeInstanceAttribute',
         },
     )
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.6', '1.25.8', '0.27.27']
+)
+def test_ec2_stop_protection_lower_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        with test.assertRaises(PolicyValidationError) as cm:
+            policy = test.load_policy(
+                {
+                    'name': 'ec2-stop-protection',
+                    'resource': 'ec2',
+                    'filters': [{'type': 'stop-protected'}],
+                },
+            )
+            policy.validate()
+        test.assertIn('requires botocore version 1.26.7 or above', str(cm.exception))
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.7', '1.26.8', '1.27.0', '2.0.0']
+)
+def test_ec2_stop_protection_above_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        policy = test.load_policy(
+            {
+                'name': 'ec2-stop-protection',
+                'resource': 'ec2',
+                'filters': [{'type': 'stop-protected'}],
+            },
+        )
+        policy.validate()
 
 
 class TestEc2NetworkLocation(BaseTest):

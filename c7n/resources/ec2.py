@@ -8,6 +8,7 @@ import re
 import zlib
 from typing import List
 
+import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -345,6 +346,17 @@ class DisableApiStop(Filter):
             InstanceId=instance['InstanceId']
         )
         return attr_val['DisableApiStop']['Value']
+
+    def validate(self) -> None:
+        botocore_min_version = '1.26.7'
+
+        from pkg_resources import parse_version
+        if parse_version(botocore.__version__) < parse_version(botocore_min_version):
+            raise PolicyValidationError(
+                "'stop-protected' filter requires botocore version "
+                f'{botocore_min_version} or above. '
+                f'Installed version is {botocore.__version__}.'
+            )
 
 
 @filters.register('termination-protected')
