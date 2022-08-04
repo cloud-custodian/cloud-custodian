@@ -22,6 +22,9 @@ References
 - IAM Policy Reference
   https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 
+- IAM Global Condition Context Keys
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html
+
 """
 import fnmatch
 import logging
@@ -213,6 +216,10 @@ class PolicyChecker:
 
     # sns default policy
     def handle_aws_sourceowner(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    # AWS Connect default policy on Lex
+    def handle_aws_sourceaccount(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # s3 logging
