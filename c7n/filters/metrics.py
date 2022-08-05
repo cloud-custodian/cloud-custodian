@@ -130,11 +130,26 @@ class MetricsFilter(Filter):
         self.metric = self.data['name']
 
         # If the policy does not specify a period, derive a single period using
-        # the number of days. Ensure that the period is a clean multiple of
-        # hours so we fetch data points with the longest retention.
+        # the number of days. Ensure that the period boundaries line up with time
+        # bins that match CloudWatch's retention schedule defined here:
         #
-        # Reference: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric  # noqa
-        self.end = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+        # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric  # noqa
+
+        now = datetime.utcnow()
+        if duration <= timedelta(days=(1/8.0)):
+            # Align period with the start of the last second
+            self.end = now.replace(microsecond=0)
+        elif duration <= timedelta(days=15):
+            # Align period with the start of the last minute
+            self.end = now.replace(second=0, microsecond=0)
+        elif duration <= timedelta(days=63):
+            # Align period with the start of the last five-minute block
+            self.end = now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
+        else:
+            # Align period with the start of the last hour, which provides metrics
+            # up to 455 days old.
+            self.end = now.replace(minute=0, second=0, microsecond=0)
+
         self.start = (self.end - duration)
         self.period = int(self.data.get('period', (self.end - self.start).total_seconds()))
         self.statistics = self.data.get('statistics', 'Average')

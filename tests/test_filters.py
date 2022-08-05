@@ -1098,8 +1098,9 @@ class TestMetricsFilter(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(datapoints), 1)
 
-        # Using a period that is not a clean multiple of hours can inadvertently
-        # fetch data points with shorter retention.
+        # To be able to see 90 days worth of data, we need a period that is an even
+        # number of hours. (3600 second resolution metrics are available for up to
+        # 455 days)
         self.assertEqual(metrics_filter.period % 3600, 0)
 
 
