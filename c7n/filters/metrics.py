@@ -136,18 +136,21 @@ class MetricsFilter(Filter):
         # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric  # noqa
 
         now = datetime.utcnow()
-        if duration <= timedelta(days=(1/8.0)):
+        if duration <= timedelta(days=(1 / 8.0)):
             # Align period with the start of the last second
+            # CloudWatch retention: 3 hours
             self.end = now.replace(microsecond=0)
         elif duration <= timedelta(days=15):
             # Align period with the start of the last minute
+            # CloudWatch retention: 15 days
             self.end = now.replace(second=0, microsecond=0)
         elif duration <= timedelta(days=63):
             # Align period with the start of the last five-minute block
+            # CloudWatch retention: 63 days
             self.end = now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
         else:
-            # Align period with the start of the last hour, which provides metrics
-            # up to 455 days old.
+            # Align period with the start of the last hour
+            # CloudWatch retention: 455 days
             self.end = now.replace(minute=0, second=0, microsecond=0)
 
         self.start = (self.end - duration)
