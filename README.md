@@ -227,7 +227,7 @@ Joining the [mailing list](https://groups.google.com/forum/#!forum/cloud-custodi
 See the notes below for more technical information on joining the meeting. 
 
 - [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
-- [Community Meeting Notes Archive](https://github.com/cloud-custodian/community/discussions)
+- [Community Meeting Notes Archive](https://github.com/orgs/cloud-custodian/discussions/categories/announcements)
 - [Upcoming Community Events](https://cloudcustodian.io/events/)
 - [Cloud Custodian Annual Report 2021](https://github.com/cncf/toc/blob/main/reviews/2021-cloud-custodian-annual.md) - Annual health check provided to the CNCF outlining the health of the project
 
