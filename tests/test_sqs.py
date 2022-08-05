@@ -700,10 +700,11 @@ class QueueTests(BaseTest):
         session_factory = self.replay_flight_data(
             "test_sqs_has_statement"
         )
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
             {
                 "name": "test_sqs_has_statement_definition",
-                "resource": "sqs",
+                "resource": "aws.sqs",
                 "filters": [
                     {
                         "type": "has-statement",
