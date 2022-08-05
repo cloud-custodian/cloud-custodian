@@ -730,7 +730,7 @@ class TestGlueDataCatalog(BaseTest):
         session = session_factory()
         client = session.client("glue")
         before_cat_setting = client.get_resource_policy()
-        assert('o-4amkskbcf3' in before_cat_setting.get('PolicyInJson'))
+        assert 'o-4amkskbcf3' in before_cat_setting.get('PolicyInJson')
         p = self.load_policy(
             {
                 "name": "net-change-rbp-cross-account",
@@ -760,4 +760,4 @@ class TestGlueDataCatalog(BaseTest):
         )
         p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
         after_cat_setting = client.get_resource_policy()
-        assert('o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson'))
+        assert 'o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson')

@@ -66,7 +66,7 @@ class StructureParser:
                 'policy:%s must use a list for filters found:%s' % (
                     p['name'], type(p['filters']).__name__)))
         element_types = (dict, str)
-        for f in p.get('filters', ()):
+        for f in p.get('filters', ()) or []:
             if not isinstance(f, element_types):
                 raise PolicyValidationError((
                     'policy:%s filter must be a mapping/dict found:%s' % (
@@ -75,7 +75,7 @@ class StructureParser:
             raise PolicyValidationError((
                 'policy:%s must use a list for actions found:%s' % (
                     p.get('name', 'unknown'), type(p['actions']).__name__)))
-        for a in p.get('actions', ()):
+        for a in p.get('actions', ()) or []:
             if not isinstance(a, element_types):
                 raise PolicyValidationError((
                     'policy:%s action must be a mapping/dict found:%s' % (

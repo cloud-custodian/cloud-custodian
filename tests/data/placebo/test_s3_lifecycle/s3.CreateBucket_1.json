@@ -1,20 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Location": "/custodian-lifecycle-test", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "ymLGyadwFGttyvSvJ8Gz4y+32lmbtpDWn9krWebykBkTs+Nwr4Jb9yddHXRra8dtAGqnHgJr9Y4=", 
-            "RequestId": "D438BA28F50758AD", 
-            "HTTPHeaders": {
-                "content-length": "0", 
-                "x-amz-id-2": "ymLGyadwFGttyvSvJ8Gz4y+32lmbtpDWn9krWebykBkTs+Nwr4Jb9yddHXRra8dtAGqnHgJr9Y4=", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "D438BA28F50758AD", 
-                "location": "/custodian-lifecycle-test", 
-                "date": "Fri, 27 Oct 2017 19:53:49 GMT"
-            }
-        }
+        "ResponseMetadata": {},
+        "Location": "/c7n-lifecycle-test-again3"
     }
 }
