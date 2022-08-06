@@ -62,6 +62,16 @@ class HasStatementFilter(Filter):
     def process(self, resources, event=None):
         return list(filter(None, map(self.process_resource, resources)))
 
+    def action_resource_case_insensitive(self, actions):
+        if isinstance(actions, str):
+            actionsFormatted = '{}:{}'.format(actions.split(':')[0].lower(), actions.split(':')[1])
+        else:
+            actionsFormatted = []
+            for action in actions:
+                actionsFormatted.append('{}:{}'.format(action.split(':')[0].lower(),
+                action.split(':')[1]))
+        return actionsFormatted
+
     def process_resource(self, resource):
         p = resource.get('Policy')
         if p is None:
@@ -83,8 +93,13 @@ class HasStatementFilter(Filter):
             for statement in statements:
                 found = 0
                 for key, value in required_statement.items():
-                    if key in statement and value == statement[key]:
-                        found += 1
+                    if key in ['Action', 'NotAction']:
+                        if key in statement and self.action_resource_case_insensitive(value) \
+                           == self.action_resource_case_insensitive(statement[key]):
+                            found += 1
+                    else:
+                        if key in statement and value == statement[key]:
+                            found += 1
                 if found and found == len(required_statement):
                     required_statements.remove(required_statement)
                     break
@@ -93,9 +108,3 @@ class HasStatementFilter(Filter):
            (self.data.get('statements', []) and not required_statements):
             return resource
         return None
-
-    def get_std_format_args(self, _):
-        return {
-            'account_id': self.manager.config.account_id,
-            'region': self.manager.config.region,
-        }

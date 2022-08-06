@@ -711,7 +711,7 @@ class QueueTests(BaseTest):
                         "statements": [
                             {
                                 "Effect": "Deny",
-                                "Action": "SQS:*",
+                                "Action": "sqs:*",
                                 "Principal": "*",
                                 "Condition":
                                     {"Bool": {"aws:SecureTransport": "false"}},
