@@ -1,0 +1,1221 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "performance_schema_max_thread_classes",
+                "Description": "The maximum number of thread instruments.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-256",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "performance_schema_max_thread_instances",
+                "Description": "The maximum number of instrumented thread objects.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "performance_schema_session_connect_attrs_size",
+                "Description": "The amount of preallocated memory per thread used to hold connection attribute strings.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "performance_schema_setup_actors_size",
+                "Description": "The number of rows in the setup_actors table.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1024",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "performance_schema_setup_objects_size",
+                "Description": "The number of rows in the setup_objects table.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "performance_schema_users_size",
+                "Description": "The number of rows in the users table.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "pid_file",
+                "ParameterValue": "/rdsdbdata/log/mysql-{EndPointPort}.pid",
+                "Description": "The path name of the process ID file. This file is used by other programs such as MySQLd_safe to determine the server's process ID.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "plugin_dir",
+                "Description": "Directory searched by systems dynamic linker for UDF object files. Otherwise, user-defined function object files must be located the default directory.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "port",
+                "ParameterValue": "{EndPointPort}",
+                "Description": "The number of the port on which the server listens for TCP/IP connections.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "preload_buffer_size",
+                "Description": "The size of the buffer that is allocated when preloading indexes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-1073741824",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "profiling_history_size",
+                "Description": "The number of statements for which to maintain profiling if profiling is enabled.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_alloc_block_size",
+                "Description": "The allocation size of memory blocks that are allocated for objects created during statement parsing and execution. May help resolve fragmentation problems.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_cache_limit",
+                "Description": "Don't cache results that are larger than this number of bytes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_cache_min_res_unit",
+                "Description": "The minimum size (in bytes) for blocks allocated by the query cache.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "512-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_cache_size",
+                "ParameterValue": "{DBInstanceClassMemory/24}",
+                "Description": "The amount of memory allocated for caching query results.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-9223372036854774784",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_cache_type",
+                "ParameterValue": "1",
+                "Description": "For query results either don't cache (=OFF), cache except for NO_CACHE (=ON), or only CACHE (=DEMAND)",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_cache_wlock_invalidate",
+                "Description": "Setting this variable to 1 causes acquisition of a WRITE lock for a table to invalidate any queries in the query cache that refer to the table",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "query_prealloc_size",
+                "Description": "Increased size might help improve perf for complex queries (i.e. Reduces server memory allocation)",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8192-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "range_alloc_block_size",
+                "Description": "The size of blocks that are allocated when doing range optimization.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "range_optimizer_max_mem_size",
+                "Description": "The limit on memory consumption for the range optimizer.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "read_buffer_size",
+                "ParameterValue": "262144",
+                "Description": "Each thread that does a sequential scan allocates this buffer. Increased value may help perf if performing many sequential scans.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8200-2147479552",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "read_only",
+                "ParameterValue": "{TrueIfReplica}",
+                "Description": "When it is enabled, the server permits no updates except from updates performed by slave  threads.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1,{TrueIfReplica}",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "read_rnd_buffer_size",
+                "ParameterValue": "524288",
+                "Description": "Avoids disk reads when reading rows in sorted order following a key-sort operation. Large values can improve ORDER BY perf.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8200-2147479552",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "relay-log",
+                "ParameterValue": "/rdsdbdata/log/relaylog/relaylog",
+                "Description": "The basename for the relay log.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "relay_log_info_repository",
+                "ParameterValue": "TABLE",
+                "Description": "This option causes the server to log its relay log info to a file or a table.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "FILE,TABLE",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "relay_log_recovery",
+                "ParameterValue": "1",
+                "Description": "Enables automatic relay log recovery immediately following server startup.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "require_secure_transport",
+                "ParameterValue": "ON",
+                "Description": "Whether client connections to the server are required to use some form of secure transport.",
+                "Source": "user",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF",
+                "IsModifiable": true,
+                "ApplyMethod": "immediate",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "safe-user-create",
+                "Description": "If this option is enabled, a user cannot create new MySQL users by using the GRANT  statement unless the user has the INSERT privilege for the mysql.user table or any column in the table.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "secure_auth",
+                "ParameterValue": "1",
+                "Description": "Blocks connections from all accounts that have passwords stored in the old (pre-4.1) format.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "secure_file_priv",
+                "ParameterValue": "/tmp",
+                "Description": "Limits the effect of LOAD_FILE(), LOAD_DATA, and SELECT ??? INTO OUTFILE to specified directory.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_events",
+                "Description": "If set it specifies the set of types of events to log",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "list",
+                "AllowedValues": "CONNECT,QUERY,QUERY_DCL,QUERY_DDL,QUERY_DML,TABLE",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_excl_users",
+                "Description": "If not empty, it contains the list of users whose activity will NOT be logged",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_incl_users",
+                "Description": "If not empty, it contains a comma-delimited list of users whose activity will be logged",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_logging",
+                "ParameterValue": "0",
+                "Description": "Enables audit logging",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_logs_upload",
+                "ParameterValue": "0",
+                "Description": "Enables audit log upload to CloudWatch Logs",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "server_audit_query_log_limit",
+                "ParameterValue": "65536",
+                "Description": "Limit on the length of the query string in a record",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-1073741824",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "server_id",
+                "ParameterValue": "{ServerId}",
+                "Description": "Integer value used to identify the instance in a replication group",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "show_compatibility_56",
+                "Description": "Enable MySQL 5.6 compatability for certain system and status variables.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "skip-character-set-client-handshake",
+                "Description": "Ignore character set information sent by the client.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "skip_external_locking",
+                "Description": "Uses OS locking instead of internal",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "skip_name_resolve",
+                "ParameterValue": "1",
+                "Description": "Host names are not resolved. All Host column values in the grant tables must be IP numbers or localhost.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "skip_show_database",
+                "Description": "SHOW DATABASES statement is allowed only to users who have the SHOW DATABASES privilege",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "skip-slave-start",
+                "ParameterValue": "1",
+                "Description": "Tells the slave server not to start the slave threads when the server starts.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_checkpoint_group",
+                "Description": "Sets the maximum number of transactions that can be processed by a multi-threaded slave before a checkpoint operation is called to update its status as shown by SHOW SLAVE STATUS.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "32-524280",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_checkpoint_period",
+                "Description": "Sets the maximum time (in milliseconds) that is allowed to pass before a checkpoint operation is called to update the status of a multi-threaded slave as shown by SHOW SLAVE STATUS.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_parallel_type",
+                "Description": "Enable parallel execution on the slave of all uncommitted threads already in the prepare phase, without violating consistency.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "DATABASE,LOGICAL_CLOCK",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_parallel_workers",
+                "Description": "Sets the number of slave worker threads for executing replication events (transactions) in parallel. Setting this variable to 0 (the default) disables parallel execution.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1024",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_pending_jobs_size_max",
+                "Description": "For multithreaded slaves, this option sets the maximum amount of memory (in bytes) available to slave worker queues holding events not yet applied.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_rows_search_algorithms",
+                "Description": "When preparing batches of rows for row-based logging and replication, this variable controls how the rows are searched for matches, in particular whether hash scans are used.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "list",
+                "AllowedValues": "TABLE_SCAN,INDEX_SCAN,HASH_SCAN",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave-skip-errors",
+                "Description": "This variable causes the slave SQL thread to continue replication when a statement returns any of the errors listed in the variable value.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "OFF,all,ddl_exist_errors,<integer>",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_sql_verify_checksum",
+                "Description": "When this option is enabled, the slave examines checksums read from the relay log, in the event of a mismatch, the slave stops with an error.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slave_type_conversions",
+                "Description": "Set of slave type conversions that are enabled. Legal values are: ALL_LOSSY to enable lossy conversions and ALL_NON_LOSSY to enable non-lossy conversions. If the variable is assigned the empty set, no conversions are allowed and it is expected that the types match exactly.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "ALL_LOSSY, ALL_NON_LOSSY",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slow_launch_time",
+                "Description": "Increments Slow_launch_threads if creating thread takes longer than this many seconds.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "slow_query_log",
+                "Description": "Enable or disable the slow query log",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "slow_query_log_file",
+                "ParameterValue": "/rdsdbdata/log/slowquery/mysql-slowquery.log",
+                "Description": "Location of the mysql slow query log file.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "socket",
+                "ParameterValue": "/tmp/mysql.sock",
+                "Description": "(UNIX) socket file and (WINDOWS) named pipe used for local connections.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sort_buffer_size",
+                "Description": "Larger value improves perf for ORDER BY or GROUP BY operations.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "32768-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sql_mode",
+                "ParameterValue": "0",
+                "Description": "Current SQL Server Mode.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "list",
+                "AllowedValues": "0,ANSI,ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_DIR_IN_CREATE,NO_ENGINE_SUBSTITUTION,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PAD_CHAR_TO_FULL_LENGTH,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,TRADITIONAL",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "sql_select_limit",
+                "Description": "The maximum number of rows to return from SELECT statements.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ssl_cipher",
+                "ParameterValue": "AES256-SHA,AES128-SHA,DES-CBC3-SHA,ADH-DES-CBC3-SHA,EDH-RSA-DES-CBC3-SHA,EDH-DSS-DES-CBC3-SHA,ADH-AES256-SHA,DHE-RSA-AES256-SHA,DHE-DSS-AES256-SHA,ADH-AES128-SHA,DHE-RSA-AES128-SHA,DHE-DSS-AES128-SHA,HIGH",
+                "Description": "The list of permissible ciphers for connection encryption. Certain allowable cipher values in this list may not be supported by all engine versions.  Please refer to configurable SSL ciphers documentation.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "DHE-RSA-AES128-SHA,DHE-RSA-AES128-SHA256,DHE-RSA-AES128-GCM-SHA256,DHE-RSA-AES256-SHA,DHE-RSA-AES256-SHA256,DHE-RSA-AES256-GCM-SHA384,ECDHE-RSA-AES128-SHA,ECDHE-RSA-AES128-SHA256,ECDHE-RSA-AES128-GCM-SHA256,ECDHE-RSA-AES256-SHA,ECDHE-RSA-AES256-SHA384,ECDHE-RSA-AES256-GCM-SHA384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "stored_program_cache",
+                "Description": "Sets a soft upper limit for the number of cached stored routines per connection.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "256-524288",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sync_binlog",
+                "ParameterValue": "1",
+                "Description": "Sync binlog (MySQL flush to disk or rely on OS)",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sync_frm",
+                "Description": "For non-temporary tables controls if .frm file is sync'ed to disk.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sync_master_info",
+                "Description": "If the value of this variable is greater than 0, a replication slave synchronizes its master.info file to disk (using fdatasync()) after every sync_master_info events.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sync_relay_log",
+                "Description": "If the value of this variable is greater than 0, the MySQL server synchronizes its relay log to disk (using fdatasync()) after every sync_relay_log writes to the relay log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sync_relay_log_info",
+                "Description": "If the value of this variable is greater than 0, a replication slave synchronizes its relay-log.info file to disk (using fdatasync()) after every sync_relay_log_info transactions.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "sysdate-is-now",
+                "Description": "Causes SYSYDATE() to be an alias for NOW(). Replication related",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "table_cache_element_entry_ttl",
+                "Description": "table_cache_element_entry_ttl",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "5",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "table_definition_cache",
+                "ParameterValue": "LEAST({DBInstanceClassMemory/393040}, 20000)",
+                "Description": "The number of table definitions that can be stored in the definition cache",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1,400-524288",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "table_open_cache",
+                "ParameterValue": "LEAST({DBInstanceClassMemory/1179121}, 6000)",
+                "Description": "The number of open tables for all threads. Increasing this value increases the number of file descriptors.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-524288",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "table_open_cache_instances",
+                "Description": "The number of open tables cache instances.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "temp-pool",
+                "Description": "This option causes most temporary files created by the server to use a small set of names, rather than a unique name for each new file. This works around a problem in the Linux kernel dealing with creating many new files with different names.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "thread_cache_size",
+                "ParameterValue": "{DBInstanceClassMemory/1005785088}",
+                "Description": "Number of threads to be cached. Doesn't improve perf for good thread implementations.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-16384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "thread_handling",
+                "ParameterValue": "multiple-connections-per-thread",
+                "Description": "The thread-handling model used by the server for connection threads.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "multiple-connections-per-thread,no-threads,one-thread-per-connection,dynamically-loaded",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "thread_stack",
+                "ParameterValue": "262144",
+                "Description": "If the thread stack size is too small, it limits the complexity of the SQL statements that the server can handle, the recursion depth of stored procedures, and other memory-consuming actions.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "131072-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "time_zone",
+                "Description": "for changing time zone of db server locally",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "Africa/Harare,Africa/Monrovia,Africa/Nairobi,Africa/Windhoek,America/Bogota,America/Caracas,America/Chihuahua,America/Cuiaba,America/Denver,America/Fortaleza,America/Guatemala,America/Halifax,America/Manaus,America/Matamoros,America/Monterrey,America/Montevideo,America/Phoenix,America/Tijuana,Asia/Ashgabat,Asia/Baghdad,Asia/Baku,Asia/Bangkok,Asia/Beirut,Asia/Calcutta,Asia/Kabul,Asia/Karachi,Asia/Kathmandu,Asia/Muscat,Asia/Riyadh,Asia/Seoul,Asia/Shanghai,Asia/Singapore,Asia/Taipei,Asia/Tehran,Asia/Tokyo,Asia/Ulaanbaatar,Atlantic/Azores,Australia/Adelaide,Australia/Brisbane,Australia/Darwin,Australia/Hobart,Australia/Perth,Australia/Sydney,Canada/Saskatchewan,Brazil/East,Europe/Amsterdam,Europe/Athens,Europe/Dublin,Europe/Helsinki,Europe/Paris,Europe/Prague,Europe/Sarajevo,Pacific/Auckland,Pacific/Guam,Pacific/Honolulu,Pacific/Samoa,US/Alaska,US/Central,US/Eastern,US/East-Indiana,US/Pacific,UTC",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "tls_version",
+                "ParameterValue": "TLSv1.2",
+                "Description": "The protocols permitted by the server for encrypted connections.",
+                "Source": "user",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "tmpdir",
+                "ParameterValue": "/rdsdbdata/tmp/",
+                "Description": "The directory used for temporary files and temporary tables",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "tmp_table_size",
+                "Description": "If an in-memory temporary table exceeds the limit, MySQL automatically converts it to an on-disk MyISAM table. Increased value can improve perf for many advanced GROUP BY queries.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "transaction_alloc_block_size",
+                "Description": "The amount in bytes by which to increase a per-transaction memory pool which needs memory.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "transaction_prealloc_size",
+                "Description": "There is a per-transaction memory pool from which various transaction-related allocations take memory. For every allocation that cannot be satisfied from the pool because it has insufficient memory available, the pool is incremented.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1024-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "tx_isolation",
+                "Description": "Sets the default transaction isolation level.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "READ-UNCOMMITTED,READ-COMMITTED,REPEATABLE-READ,SERIALIZABLE",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "updatable_views_with_limit",
+                "Description": "This variable controls whether updates to a view can be made when the view does not contain all columns of the primary key defined in the underlying table, if the update statement contains a LIMIT clause (Often generated by GUI tools).",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate-password",
+                "Description": "This option controls how the server loads the validate_password plugin at startup.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF,FORCE,FORCE_PLUS_PERMANENT",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_dictionary_file",
+                "Description": "The path name of the dictionary file used by the validate_password plugin for checking passwords.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_length",
+                "Description": "The path name of the dictionary file used by the validate_password plugin for checking passwords.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_mixed_case_count",
+                "Description": "The minimum number of lowercase and uppercase characters that passwords checked by the validate_password plugin must have if the password policy is MEDIUM or stronger.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_number_count",
+                "Description": "The minimum number of numeric (digit) characters that passwords checked by the validate_password plugin must have if the password policy is MEDIUM or stronger.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_policy",
+                "Description": "The password policy enforced by the validate_password plugin.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "LOW,MEDIUM,STRONG",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "validate_password_special_char_count",
+                "Description": "The minimum number of nonalphanumeric characters that passwords checked by the validate_password plugin must have if the password policy is MEDIUM or stronger.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "wait_timeout",
+                "Description": "The number of seconds the server waits for activity on a non-interactive TCP/IP or UNIX File connection before closing it.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

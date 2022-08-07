@@ -1,0 +1,16 @@
+policies:
+     - name: rds-aurora-encr-in-transit
+       resource: rds-cluster
+       filters:
+               - type: value
+                 key: Engine
+                 op: eq
+                 value: aurora-mysql
+               - type: db-cluster-parameter
+                 key: tls_version
+                 op: ne
+                 value: TLSv1.2
+               - type: db-cluster-parameter
+                 key: require_secure_transport
+                 op: ne
+                 value: ON

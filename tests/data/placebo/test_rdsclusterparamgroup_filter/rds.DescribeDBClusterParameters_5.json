@@ -1,0 +1,1321 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "allow-suspicious-udfs",
+                "Description": "Controls whether user-defined functions that have only an xxx symbol for the main function can be loaded",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_binlog_read_buffer_size",
+                "ParameterValue": "5242880",
+                "Description": "Read buffer size used by master dump thread when the switch aurora_binlog_use_large_read_buffer is ON.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8192-536870912",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_binlog_replication_max_yield_seconds",
+                "ParameterValue": "0",
+                "Description": "For Aurora MySQL versions between 2.04.5 - 2.04.8 and between 2.05 - 2.08.* (inclusive), the maximum accepted value is 45. You can tune it to a higher value on 2.04.9 and later versions of 2.04.*, and on 2.09 and later versions. This parameter works only when the parameter aurora_binlog_use_large_read_buffer is set to 1.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-36000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_binlog_use_large_read_buffer",
+                "ParameterValue": "1",
+                "Description": "Switch for turning on the feature of replication improvement. When it is ON, aurora_binlog_read_buffer_size (see below) is used by master dump thread for binlog replication; otherwise default buffer size (8K) is used instead.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_disable_hash_join",
+                "Description": "A global user variable for user to disable hash join. When it is on, hash join is disabled by default, and customer can set it on per session.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_enable_repl_bin_log_filtering",
+                "Description": "Enable filtering of replication records that are unusable by Aurora replicas on the master.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_enable_replica_log_compression",
+                "Description": "Enable compression of replication payloads to improve network bandwidth utilization between the master and Aurora replicas.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_fwd_master_idle_timeout",
+                "ParameterValue": "60",
+                "Description": "The number of seconds the server waits for activity on a forwarded Replica connection before closing it.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-86400",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_fwd_master_max_connections_pct",
+                "ParameterValue": "10",
+                "Description": "The percentage of max_connections that can be used for connections forwarded from Replicas.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-90",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_lab_mode",
+                "ParameterValue": "0",
+                "Description": "Enables new features in the Aurora engine.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_load_from_s3_role",
+                "Description": "IAM role ARN used to load data from AWS S3",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_max_alter_table_log_entries",
+                "Description": "RDS ability to limit the number of maximum outstanding Fast Online DDL. Set 0 to disable FOD. Does not apply to tables which are already altered via FOD.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_parallel_query",
+                "ParameterValue": "OFF",
+                "Description": "This parameter can be used to enable and disable Aurora Parallel Query. The parameter applies to Aurora release 2.09.0 and later.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_read_replica_read_committed",
+                "ParameterValue": "OFF",
+                "Description": "Enable support for ANSI SQL Read Committed isolation level on Aurora reader nodes",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aurora_select_into_s3_role",
+                "Description": "IAM role ARN used to select data into AWS S3",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "autocommit",
+                "Description": "Sets the autocommit mode",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "auto_increment_increment",
+                "Description": "Intended for use with master-to-master replication, and can be used to control the operation of AUTO_INCREMENT columns",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-65535",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "auto_increment_offset",
+                "Description": "Determines the starting point for the AUTO_INCREMENT column value",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-65535",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "automatic_sp_privileges",
+                "Description": "When this variable has a value of 1 (the default), the server automatically grants the EXECUTE and ALTER ROUTINE privileges to the creator of a stored routine, if the user cannot already execute and alter or drop the routine.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aws_default_comprehend_role",
+                "Description": "Default IAM role ARN used for integration with AWS Comprehend",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aws_default_lambda_role",
+                "Description": "Default IAM role ARN used to access AWS Lambda Service",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "aws_default_logs_role",
+                "Description": "Arn for the role used to upload data to CloudWatch Logs",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aws_default_s3_role",
+                "Description": "Default IAM role ARN used to access AWS S3",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "aws_default_sagemaker_role",
+                "Description": "Default IAM role ARN used for integration with AWS SageMaker",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "back_log",
+                "Description": "The number of outstanding connection requests MySQL can have",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-65535",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "basedir",
+                "ParameterValue": "/rdsdbbin/oscar",
+                "Description": "The MySQL installation base directory.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_cache_size",
+                "ParameterValue": "32768",
+                "Description": "The size of the cache to hold the SQL statements for the binary log during a transaction.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_checksum",
+                "Description": "When enabled, this variable causes the master to write a checksum for each event in the binary log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "NONE,CRC32",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_error_action",
+                "Description": "Controls what happens when the server cannot write to the binary log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "IGNORE_ERROR,ABORT_SERVER",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_format",
+                "ParameterValue": "OFF",
+                "Description": "Binary logging format for replication",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "ROW,STATEMENT,MIXED,OFF",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_gtid_simple_recovery",
+                "Description": "Controls how binary logs are iterated during GTID recovery",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_max_flush_queue_time",
+                "Description": "How long in microseconds to keep reading transactions from the flush queue before proceeding with the group commit (and syncing the log to disk, if sync_binlog is greater than 0). If the value is 0 (the default), there is no timeout and the server keeps reading new transactions until the queue is empty.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-100000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_order_commits",
+                "Description": "If this variable is enabled (the default), transactions are committed in the same order they are written to the binary log. If disabled, transactions may be committed in parallel.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_row_image",
+                "Description": "Whether the server logs full or minimal rows with row-based replication.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "full,minimal,noblob",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_rows_query_log_events",
+                "Description": "When enabled, it causes a MySQL 5.6.2 or later server to write informational log events such as row query log events into its binary log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "binlog_stmt_cache_size",
+                "Description": "This variable determines the size of the cache for the binary log to hold nontransactional statements issued during a transaction.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "bulk_insert_buffer_size",
+                "Description": "Limits the size of the MyISAM cache tree in bytes per thread.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_client",
+                "Description": "The character set for statements that arrive from the client.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,cp1256,cp1257,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character-set-client-handshake",
+                "Description": "Don't ignore character set information sent by the client.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_connection",
+                "Description": "The character set used for literals that do not have a character set introducer and for number-to-string conversion.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,ucs2,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,utf16,cp1256,cp1257,utf32,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_database",
+                "Description": "The character set used by the default database.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,ucs2,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,utf16,cp1256,cp1257,utf32,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_filesystem",
+                "Description": "The file system character set.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,ucs2,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,utf16,cp1256,cp1257,utf32,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_results",
+                "Description": "The character set used for returning query results to the client.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,ucs2,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,utf16,cp1256,cp1257,utf32,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "character_set_server",
+                "Description": "The server's default character set.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5,dec8,cp850,hp8,koi8r,latin1,latin2,swe7,ascii,ujis,sjis,hebrew,tis620,euckr,koi8u,gb2312,greek,cp1250,gbk,latin5,armscii8,utf8,ucs2,cp866,keybcs2,macce,macroman,cp852,latin7,utf8mb4,cp1251,utf16,cp1256,cp1257,utf32,binary,geostd8,cp932,eucjpms",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "check_proxy_users",
+                "Description": "Controls whether the mysql_native_password and sha256_password built-in authentication plugins support proxy users.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "collation_connection",
+                "Description": "The collation of the connection character set.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5_chinese_ci,big5_bin,dec8_swedish_ci,dec8_bin,cp850_general_ci,cp850_bin,hp8_english_ci,hp8_bin,koi8r_general_ci,koi8r_bin,latin1_german1_ci,latin1_swedish_ci,latin1_danish_ci,latin1_german2_ci,latin1_bin,latin1_general_ci,latin1_general_cs,latin1_spanish_ci,latin2_czech_cs,latin2_general_ci,latin2_hungarian_ci,latin2_croatian_ci,latin2_bin,swe7_swedish_ci,swe7_bin,ascii_general_ci,ascii_bin,ujis_japanese_ci,ujis_bin,sjis_japanese_ci,sjis_bin,hebrew_general_ci,hebrew_bin,tis620_thai_ci,tis620_bin,euckr_korean_ci,euckr_bin,koi8u_general_ci,koi8u_bin,gb2312_chinese_ci,gb2312_bin,greek_general_ci,greek_bin,cp1250_general_ci,cp1250_czech_cs,cp1250_croatian_ci,cp1250_bin,cp1250_polish_ci,gbk_chinese_ci,gbk_bin,latin5_turkish_ci,latin5_bin,armscii8_general_ci,armscii8_bin,utf8_general_ci,utf8_bin,utf8_unicode_ci,utf8_icelandic_ci,utf8_latvian_ci,utf8_romanian_ci,utf8_slovenian_ci,utf8_polish_ci,utf8_estonian_ci,utf8_spanish_ci,utf8_swedish_ci,utf8_turkish_ci,utf8_czech_ci,utf8_danish_ci,utf8_lithuanian_ci,utf8_slovak_ci,utf8_spanish2_ci,utf8_roman_ci,utf8_persian_ci,utf8_esperanto_ci,utf8_hungarian_ci,utf8_sinhala_ci,ucs2_general_ci,ucs2_bin,ucs2_unicode_ci,ucs2_icelandic_ci,ucs2_latvian_ci,ucs2_romanian_ci,ucs2_slovenian_ci,ucs2_polish_ci,ucs2_estonian_ci,ucs2_spanish_ci,ucs2_swedish_ci,ucs2_turkish_ci,ucs2_czech_ci,ucs2_danish_ci,ucs2_lithuanian_ci,ucs2_slovak_ci,ucs2_spanish2_ci,ucs2_roman_ci,ucs2_persian_ci,ucs2_esperanto_ci,ucs2_hungarian_ci,ucs2_sinhala_ci,cp866_general_ci,cp866_bin,keybcs2_general_ci,keybcs2_bin,macce_general_ci,macce_bin,macroman_general_ci,macroman_bin,cp852_general_ci,cp852_bin,latin7_estonian_cs,latin7_general_ci,latin7_general_cs,latin7_bin,utf8mb4_general_ci,utf8mb4_bin,utf8mb4_unicode_ci,utf8mb4_icelandic_ci,utf8mb4_latvian_ci,utf8mb4_romanian_ci,utf8mb4_slovenian_ci,utf8mb4_polish_ci,utf8mb4_estonian_ci,utf8mb4_spanish_ci,utf8mb4_swedish_ci,utf8mb4_turkish_ci,utf8mb4_czech_ci,utf8mb4_danish_ci,utf8mb4_lithuanian_ci,utf8mb4_slovak_ci,utf8mb4_spanish2_ci,utf8mb4_roman_ci,utf8mb4_persian_ci,utf8mb4_esperanto_ci,utf8mb4_hungarian_ci,utf8mb4_sinhala_ci,cp1251_bulgarian_ci,cp1251_ukrainian_ci,cp1251_bin,cp1251_general_ci,cp1251_general_cs,utf16_general_ci,utf16_bin,utf16_unicode_ci,utf16_icelandic_ci,utf16_latvian_ci,utf16_romanian_ci,utf16_slovenian_ci,utf16_polish_ci,utf16_estonian_ci,utf16_spanish_ci,utf16_swedish_ci,utf16_turkish_ci,utf16_czech_ci,utf16_danish_ci,utf16_lithuanian_ci,utf16_slovak_ci,utf16_spanish2_ci,utf16_roman_ci,utf16_persian_ci,utf16_esperanto_ci,utf16_hungarian_ci,utf16_sinhala_ci,cp1256_general_ci,cp1256_bin,cp1257_lithuanian_ci,cp1257_bin,cp1257_general_ci,utf32_general_ci,utf32_bin,utf32_unicode_ci,utf32_icelandic_ci,utf32_latvian_ci,utf32_romanian_ci,utf32_slovenian_ci,utf32_polish_ci,utf32_estonian_ci,utf32_spanish_ci,utf32_swedish_ci,utf32_turkish_ci,utf32_czech_ci,utf32_danish_ci,utf32_lithuanian_ci,utf32_slovak_ci,utf32_spanish2_ci,utf32_roman_ci,utf32_persian_ci,utf32_esperanto_ci,utf32_hungarian_ci,utf32_sinhala_ci,binary,geostd8_general_ci,geostd8_bin,cp932_japanese_ci,cp932_bin,eucjpms_japanese_ci,eucjpms_bin",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "collation_server",
+                "Description": "The server's default collation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "big5_chinese_ci,big5_bin,dec8_swedish_ci,dec8_bin,cp850_general_ci,cp850_bin,hp8_english_ci,hp8_bin,koi8r_general_ci,koi8r_bin,latin1_german1_ci,latin1_swedish_ci,latin1_danish_ci,latin1_german2_ci,latin1_bin,latin1_general_ci,latin1_general_cs,latin1_spanish_ci,latin2_czech_cs,latin2_general_ci,latin2_hungarian_ci,latin2_croatian_ci,latin2_bin,swe7_swedish_ci,swe7_bin,ascii_general_ci,ascii_bin,ujis_japanese_ci,ujis_bin,sjis_japanese_ci,sjis_bin,hebrew_general_ci,hebrew_bin,tis620_thai_ci,tis620_bin,euckr_korean_ci,euckr_bin,koi8u_general_ci,koi8u_bin,gb2312_chinese_ci,gb2312_bin,greek_general_ci,greek_bin,cp1250_general_ci,cp1250_czech_cs,cp1250_croatian_ci,cp1250_bin,cp1250_polish_ci,gbk_chinese_ci,gbk_bin,latin5_turkish_ci,latin5_bin,armscii8_general_ci,armscii8_bin,utf8_general_ci,utf8_bin,utf8_unicode_ci,utf8_icelandic_ci,utf8_latvian_ci,utf8_romanian_ci,utf8_slovenian_ci,utf8_polish_ci,utf8_estonian_ci,utf8_spanish_ci,utf8_swedish_ci,utf8_turkish_ci,utf8_czech_ci,utf8_danish_ci,utf8_lithuanian_ci,utf8_slovak_ci,utf8_spanish2_ci,utf8_roman_ci,utf8_persian_ci,utf8_esperanto_ci,utf8_hungarian_ci,utf8_sinhala_ci,ucs2_general_ci,ucs2_bin,ucs2_unicode_ci,ucs2_icelandic_ci,ucs2_latvian_ci,ucs2_romanian_ci,ucs2_slovenian_ci,ucs2_polish_ci,ucs2_estonian_ci,ucs2_spanish_ci,ucs2_swedish_ci,ucs2_turkish_ci,ucs2_czech_ci,ucs2_danish_ci,ucs2_lithuanian_ci,ucs2_slovak_ci,ucs2_spanish2_ci,ucs2_roman_ci,ucs2_persian_ci,ucs2_esperanto_ci,ucs2_hungarian_ci,ucs2_sinhala_ci,cp866_general_ci,cp866_bin,keybcs2_general_ci,keybcs2_bin,macce_general_ci,macce_bin,macroman_general_ci,macroman_bin,cp852_general_ci,cp852_bin,latin7_estonian_cs,latin7_general_ci,latin7_general_cs,latin7_bin,utf8mb4_general_ci,utf8mb4_bin,utf8mb4_unicode_ci,utf8mb4_icelandic_ci,utf8mb4_latvian_ci,utf8mb4_romanian_ci,utf8mb4_slovenian_ci,utf8mb4_polish_ci,utf8mb4_estonian_ci,utf8mb4_spanish_ci,utf8mb4_swedish_ci,utf8mb4_turkish_ci,utf8mb4_czech_ci,utf8mb4_danish_ci,utf8mb4_lithuanian_ci,utf8mb4_slovak_ci,utf8mb4_spanish2_ci,utf8mb4_roman_ci,utf8mb4_persian_ci,utf8mb4_esperanto_ci,utf8mb4_hungarian_ci,utf8mb4_sinhala_ci,cp1251_bulgarian_ci,cp1251_ukrainian_ci,cp1251_bin,cp1251_general_ci,cp1251_general_cs,utf16_general_ci,utf16_bin,utf16_unicode_ci,utf16_icelandic_ci,utf16_latvian_ci,utf16_romanian_ci,utf16_slovenian_ci,utf16_polish_ci,utf16_estonian_ci,utf16_spanish_ci,utf16_swedish_ci,utf16_turkish_ci,utf16_czech_ci,utf16_danish_ci,utf16_lithuanian_ci,utf16_slovak_ci,utf16_spanish2_ci,utf16_roman_ci,utf16_persian_ci,utf16_esperanto_ci,utf16_hungarian_ci,utf16_sinhala_ci,cp1256_general_ci,cp1256_bin,cp1257_lithuanian_ci,cp1257_bin,cp1257_general_ci,utf32_general_ci,utf32_bin,utf32_unicode_ci,utf32_icelandic_ci,utf32_latvian_ci,utf32_romanian_ci,utf32_slovenian_ci,utf32_polish_ci,utf32_estonian_ci,utf32_spanish_ci,utf32_swedish_ci,utf32_turkish_ci,utf32_czech_ci,utf32_danish_ci,utf32_lithuanian_ci,utf32_slovak_ci,utf32_spanish2_ci,utf32_roman_ci,utf32_persian_ci,utf32_esperanto_ci,utf32_hungarian_ci,utf32_sinhala_ci,binary,geostd8_general_ci,geostd8_bin,cp932_japanese_ci,cp932_bin,eucjpms_japanese_ci,eucjpms_bin",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "completion_type",
+                "Description": "The transaction completion type (0 - default, 1 - chain, 2 - release)",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "concurrent_insert",
+                "Description": "Allows INSERT and SELECT statements to run concurrently for MyISAM tables that have no free blocks in the middle of the data file.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "connect_timeout",
+                "Description": "The number of seconds that the MySQLd  server waits for a connect packet before responding with Bad handshake.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "2-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "core-file",
+                "Description": "Write a core file if mysqld dies.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "datadir",
+                "ParameterValue": "/rdsdbdata/db/",
+                "Description": "MySQL data directory",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "default_password_lifetime",
+                "ParameterValue": "0",
+                "Description": "Defines the global automatic password expiration policy.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-65535",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "default_storage_engine",
+                "ParameterValue": "InnoDB",
+                "Description": "The default storage engine (table type).",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "InnoDB,MRG_MYISAM,BLACKHOLE,CSV,MEMORY,FEDERATED,ARCHIVE,MyISAM",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "default_time_zone",
+                "Description": "Server current time zone",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "default_tmp_storage_engine",
+                "ParameterValue": "InnoDB",
+                "Description": "The default storage engine for TEMPORARY tables.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "InnoDB,MyISAM",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "default_week_format",
+                "Description": "The default mode value to use for the WEEK() function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-7",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "delayed_insert_limit",
+                "Description": "After inserting delayed_insert_limit delayed rows, the INSERT DELAYED handler thread checks whether there are any SELECT statements pending. If so, it allows them to execute before continuing to insert delayed rows.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "delayed_insert_timeout",
+                "Description": "How many seconds an INSERT DELAYED handler thread should wait for INSERT statements before terminating.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "delayed_queue_size",
+                "Description": "If the queue becomes full, any client that issues an INSERT DELAYED statement waits until there is room in the queue again.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "delay_key_write",
+                "Description": "Determines when keys are flushed for MyISAM tables",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "OFF,ON,ALL",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "div_precision_increment",
+                "Description": "Number of digits by which to increase the scale of the result of division operations.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-30",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "end_markers_in_json",
+                "Description": "Whether optimizer JSON output should add end markers.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "enforce_gtid_consistency",
+                "Description": "Prevents execution of statements that cannot be logged in a transactionally safe manner",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "OFF,WARN,ON",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "eq_range_index_dive_limit",
+                "Description": "Number of equality ranges when the optimizer should switch from using index dives to index statistics.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "event_scheduler",
+                "Description": "Indicates the status of the Event Scheduler",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "explicit_defaults_for_timestamp",
+                "ParameterValue": "1",
+                "Description": "Needed for 5.6.7",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "flush",
+                "Description": "If ON, the server flushes all changes to disk after each SQL statement.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "flush_time",
+                "Description": "Frees up resources and synchronize unflushed data to disk. Recommended only on systems with minimal resources.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ft_boolean_syntax",
+                "Description": "The list of operators supported by boolean full-text searches",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ft_max_word_len",
+                "Description": "Maximum length of the word to be included in a FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "10-84",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ft_min_word_len",
+                "Description": "Minimum length of the word to be included in a FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-84",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ft_query_expansion_limit",
+                "Description": "Number of top matches to use for full-text searches performed using WITH QUERY EXPANSION.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "ft_stopword_file",
+                "Description": "File for Full Search Stop Words. NULL uses Default, /dev/null to disable Stop Words",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "/dev/null",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "general_log",
+                "Description": "Whether the general query log is enabled",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            },
+            {
+                "ParameterName": "general_log_file",
+                "ParameterValue": "/rdsdbdata/log/general/mysql-general.log",
+                "Description": "Location of mysql general log.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "group_concat_max_len",
+                "Description": "Maximum allowed result length in bytes for the GROUP_CONCAT().",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "gtid_executed_compression_period",
+                "Description": "Compress the mysql.gtid_executed table each time this many transactions have taken place",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "gtid-mode",
+                "ParameterValue": "OFF_PERMISSIVE",
+                "Description": "Controls whether GTID based logging is enabled and what type of transactions the logs can contain",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "OFF,OFF_PERMISSIVE,ON_PERMISSIVE,ON",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "gtid_purged",
+                "Description": "The set of all GTIDs that have been purged from the binary log",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "host_cache_size",
+                "Description": "The size of the internal host cache.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-65536",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "init_connect",
+                "Description": "String to be executed by the server for each client that connects.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_adaptive_flushing",
+                "Description": "Enables InnoDB Adaptive Flushing (default=on for RDS)",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_adaptive_hash_index",
+                "ParameterValue": "0",
+                "Description": "Whether innodb adaptive hash indexes are enabled or disabled",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_adaptive_hash_index_parts",
+                "Description": "Partitions the adaptive hash index search system.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-512",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_adaptive_max_sleep_delay",
+                "Description": "Allows InnoDB to automatically adjust the value of innodb_thread_concurrency up or down according to the current workload.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_autoextend_increment",
+                "Description": "The increment size (in MB) for extending the size of an auto-extending tablespace file when it becomes full",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_autoinc_lock_mode",
+                "Description": "The locking mode to use for generating auto-increment values",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_dump_at_shutdown",
+                "ParameterValue": "0",
+                "Description": "Specifies whether to record the pages cached in the InnoDB buffer pool when the MySQL server is shut down.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_dump_now",
+                "Description": "Immediately records the pages cached in the InnoDB buffer pool.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_filename",
+                "Description": "Specifies the file that holds the list of page numbers produced by innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_abort",
+                "Description": "Interrupts the process of restoring InnoDB buffer pool contents triggered by innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_at_startup",
+                "ParameterValue": "0",
+                "Description": "Specifies that, on MySQL server startup, the InnoDB buffer pool is automatically warmed up by loading the same pages it held at an earlier time.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_now",
+                "Description": "Immediately warms up the InnoDB buffer pool by loading a set of data pages, without waiting for a server restart. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_size",
+                "ParameterValue": "{DBInstanceClassMemory*3/4}",
+                "Description": "The size in bytes of the memory buffer innodb uses to cache data and indexes of its tables",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "67108864-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_change_buffer_max_size",
+                "Description": "Maximum size for the InnoDB change buffer, as a percentage of the total size of the buffer pool.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-50",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_checksum_algorithm",
+                "ParameterValue": "none",
+                "Description": "Specifies how to generate and verify the checksum stored in each disk block of each InnoDB tablespace.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "crc32,innodb,none,strict_crc32,strict_innodb,strict_none",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_checksums",
+                "ParameterValue": "0",
+                "Description": "InnoDB checksums serve no purpose in Oscar",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_cmp_per_index_enabled",
+                "Description": "Enables per-index compression-related statistics in the INFORMATION_SCHEMA.INNODB_CMP_PER_INDEX table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            },
+            {
+                "ParameterName": "innodb_commit_concurrency",
+                "Description": "The number of threads that can commit at the same time.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot",
+                "SupportedEngineModes": [
+                    "provisioned"
+                ]
+            }
+        ],
+        "Marker": "aW5ub2RiX2NvbW1pdF9jb25jdXJyZW5jeQ==",
+        "ResponseMetadata": {}
+    }
+}
