@@ -668,8 +668,8 @@ class ParameterFilter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: rds-pg
-                resource: rds
+              - name: rdscluster-pg
+                resource: rds-cluster
                 filters:
                   - type: db-cluster-parameter
                     key: someparam
