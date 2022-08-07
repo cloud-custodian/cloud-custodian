@@ -658,7 +658,7 @@ class ConsecutiveSnapshots(Filter):
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results
-#1588
+
 @RDSCluster.filter_registry.register('db-cluster-parameter')
 class ParameterFilter(ValueFilter):
     """
@@ -679,7 +679,7 @@ class ParameterFilter(ValueFilter):
     schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
-
+    policy_annotation = 'c7n:MatchedDBClusterParameter'
     @staticmethod
     def recast(val, datatype):
         """ Re-cast the value based upon an AWS supplied datatype
@@ -726,10 +726,11 @@ class ParameterFilter(ValueFilter):
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
                 for p in param_list if 'ParameterValue' in p}
             self.manager._cache.save(cache_key, paramcache[pg])
+
         for resource in resources:
                 pg_values = paramcache[resource['DBClusterParameterGroup']]
                 if self.match(pg_values):
-                    resource.setdefault('c7n:MatchedDBParameter', []).append(
+                    resource.setdefault(self.policy_annotation, []).append(
                         self.data.get('key'))
                     results.append(resource)
                     break
