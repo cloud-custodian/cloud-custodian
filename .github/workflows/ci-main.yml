@@ -74,7 +74,7 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}-1
+          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash
