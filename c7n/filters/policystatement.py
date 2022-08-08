@@ -73,7 +73,8 @@ class HasStatementFilter(Filter):
         return actionsFormatted
 
     def process_resource(self, resource):
-        p = resource.get('Policy')
+        policy_attribute = getattr(self, 'policy_attribute', 'Policy')
+        p = resource.get(policy_attribute)
         if p is None:
             return None
         p = json.loads(p)
