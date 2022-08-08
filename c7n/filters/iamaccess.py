@@ -126,9 +126,14 @@ class PolicyChecker:
         if not isinstance(principals, dict):
             principals = {'AWS': principals}
 
+        principals_types = set(principals)
+        # If principals only include services, evaluate separately
+        if len(principals_types) == 1 and 'Service' in principals_types:
+            return self.evaluateServicePrincipal(s)
+
         # Ignore service principals, merge the rest into a single set
         non_service_principals = set()
-        for principal_type in set(principals) - {'Service'}:
+        for principal_type in principals_types - {'Service'}:
             p = principals[principal_type]
             non_service_principals.update({p} if isinstance(p, str) else p)
 
@@ -148,6 +153,12 @@ class PolicyChecker:
                 if account_id not in self.allowed_accounts:
                     principal_ok = False
         return not principal_ok
+
+    def evaluateServicePrincipal(self, s):
+        if 'Condition' not in s:
+            return False
+
+        return not self.handle_conditions(s)
 
     def handle_conditions(self, s):
         conditions = self.normalize_conditions(s)
@@ -217,6 +228,9 @@ class PolicyChecker:
 
     # s3 logging
     def handle_aws_sourcearn(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_aws_sourceaccount(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     def handle_aws_sourceip(self, s, c):
