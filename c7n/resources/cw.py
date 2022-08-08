@@ -226,6 +226,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
         load_resources(
             [
                 "aws.sqs",
+                "aws.event-bus",
                 "aws.lambda",
                 "aws.ecs-cluster",
                 "aws.ecs-task",
