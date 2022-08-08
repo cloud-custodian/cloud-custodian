@@ -3286,8 +3286,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
 
         if not rule:
             return False
-        else:
-            algo = rule.get('SSEAlgorithm')
+        algo = rule.get('SSEAlgorithm')
 
         if not crypto and algo in allowed:
             return True
