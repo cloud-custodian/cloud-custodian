@@ -1543,7 +1543,7 @@ class Terminate(BaseAction):
         for batch in utils.chunks(instances, 100):
             self.manager.retry(
                 client.terminate_instances,
-                InstanceIds=[i['InstanceId'] for i in instances])
+                InstanceIds=[i['InstanceId'] for i in batch])
 
     def disable_deletion_protection(self, client, instances):
 
