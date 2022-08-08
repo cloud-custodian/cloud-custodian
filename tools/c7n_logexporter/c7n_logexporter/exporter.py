@@ -145,12 +145,12 @@ def _process_subscribe_group(client, group_name, subscription, distribution, rol
             client.delete_subscription_filter(
                 logGroupName=group_name, filterName=sub_name)
     kwargs = {
-      'logGroupName': group_name,
-      'destinationArn': subscription['destination-arn'],
-      'filterName': sub_name,
-      'filterPattern': "",
-      'distribution': distribution,
-      'roleArn': role_arn
+        'logGroupName': group_name,
+        'destinationArn': subscription['destination-arn'],
+        'filterName': sub_name,
+        'filterPattern': "",
+        'distribution': distribution,
+        'roleArn': role_arn
     }
     client.put_subscription_filter(**{k: v for k, v in kwargs.items() if v is not None})
 
