@@ -138,9 +138,14 @@ class CloudWatchEventTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_filter_resource_with_unknown_target(self):
-        r = {'Name': 'test-ebs-snapshot', 'Arn': 'arn:aws:events:us-east-1:644160558196:rule/test-ebs-snapshot','c7n:ChildArns': [
-            'arn:aws:events:us-east-1:644160558196:target/create-snapshot']}
-        self.assertFalse(cw.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
+        r = {
+            'Name': 'test-ebs-snapshot',
+            'Arn': 'arn:aws:events:us-east-1:644160558196:rule/test-ebs-snapshot',
+            'c7n:ChildArns': ['arn:aws:events:us-east-1:644160558196:target/create-snapshot',
+                            'arn:aws:lambda:us-east-1:644160558196:function:custodian-code']
+        }
+        self.assertFalse(
+            cw.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
 
 
 class CloudWatchEventsFacadeTest(TestCase):
