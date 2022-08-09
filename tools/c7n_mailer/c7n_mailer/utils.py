@@ -84,7 +84,7 @@ def get_rendered_jinja(
 def get_resource_tag_targets(resource, target_tag_keys):
     if 'Tags' not in resource and 'labels' not in resource:
         return []
-    tags = resource.get('Tags') or resource.get('labels')
+    tags = resource.get('Tags', []) or resource.get('labels', [])
     if isinstance(tags, list):
         tags = {tag['Key']: tag['Value'] for tag in tags}
     targets = []
