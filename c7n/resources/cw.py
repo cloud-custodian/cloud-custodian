@@ -198,7 +198,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
         "aws.sqs",
         "aws.event-bus",
         "aws.lambda",
-        "aws.ecs-cluster",
+        "aws.ecs",
         "aws.ecs-task",
         "aws.kinesis",
         "aws.sns",
