@@ -658,3 +658,55 @@ class ConsecutiveSnapshots(Filter):
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results
+
+
+@RDSCluster.filter_registry.register('count')
+class RDSClusterSnapshotCount(Filter):
+    """Filters RDS Clusters based on number of snapshots
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rdscls-snapshot-count
+                resource: rds-cluster
+                filters:
+                  - type: count
+                    num: 10
+                    op: gt
+    """
+
+    schema = type_schema(
+        'count', num={'type': 'number'},
+        op={'enum': ['gt', 'lt', 'eq']},
+        required=['num', 'op'])
+    permissions = ('rds:DescribeDBClusterSnapshots', 'rds:DescribeDBClusters')
+    annotation = 'c7n:DBClusterSnapshots'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        snap_num = self.data.get('num')
+        op = self.data.get('op')
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            ConsecutiveSnapshots.process_resource_set(self, client, resource_set)
+
+        for r in resources:
+            count = 0
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    count += 1
+            if op == 'eq':
+                if count == snap_num:
+                    results.append(r)
+            elif op == 'gt':
+                if count > snap_num:
+                    results.append(r)
+            elif op == 'lt':
+                if count < snap_num:
+                    results.append(r)
+
+        return results
