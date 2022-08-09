@@ -2000,7 +2000,7 @@ class CrossAccountChecker(TestCase):
             ]
         })
         for p, expected in zip(
-            policies, [False, True, True, False]
+            policies, [False, True, True, False, False, True]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

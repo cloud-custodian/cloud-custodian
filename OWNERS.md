@@ -24,6 +24,13 @@
 - Andy Luong (@aluong)
 - Kiril Logachev (@logachev)
 
+## Community Manager 
+
+Administrative duties on behalf of the maintainers,
+used for governance/CNCF contact, no code rights
+
+- Jorge Castro (@castrojo)
+
 # Emeritus
 
 Since the opensource inception of Cloud Custodian in April 2016, 
