@@ -93,22 +93,22 @@ class CheckRequireSSLStatusFilter(ValueFilter):
         return True
 
 
-@pg_actions.register('update-parameter-group')
-class UpdateParameterGroup(BaseAction):
+@pg_actions.register('enable-require-ssl-parameter-group')
+class EnableRequireSSLParameterGroup(BaseAction):
     """
     This action allows for updating parameter group with parameter require_ssl as true
     :example:
     .. code-block:: yaml
 
         actions:
-          - type: update-parameter-group
+          - type: enable-require-ssl-parameter-group
     """
-    schema = type_schema('update-parameter-group')
+    schema = type_schema('enable-require-ssl-parameter-group')
 
     def process(self, parameter_group_names):
         redshift_client = local_session(self.manager.session_factory).client('redshift')
         for pg in parameter_group_names:
-            self.process_update_parameter_group(redshift_client, pg)
+            return self.process_update_parameter_group(redshift_client, pg)
 
     def process_update_parameter_group(self, redshift_client, parameter_group_name):
         """
@@ -133,7 +133,7 @@ class UpdateParameterGroup(BaseAction):
         """
         logger.info("Enabling SSL for parameter group: %s.", parameter_group_name)
         try:
-            redshift_client.modify_cluster_parameter_group(
+            response = redshift_client.modify_cluster_parameter_group(
                 ParameterGroupName=parameter_group_name,
                 Parameters=[
                     {
@@ -144,3 +144,4 @@ class UpdateParameterGroup(BaseAction):
             )
         except Exception as ex:
             logger.error(str(ex))
+

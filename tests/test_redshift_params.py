@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import jmespath
 from .common import BaseTest
 
 
@@ -20,11 +21,7 @@ class TestRedshiftParameterGroup(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        print(resources)
-        if resources:
-            print("Filter worked successfully!!")
-        else:
-            self.fail("Test failed!!")
+
         self.assertEqual(len(resources), 1)
 
     def test_redshift_cluster_parameter_group_action(self):
@@ -40,15 +37,17 @@ class TestRedshiftParameterGroup(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "update-parameter-group"
+                        "type": "enable-require-ssl-parameter-group"
                     }
                 ]
             },
             session_factory=factory
         )
         resources = p.run()
-        if resources:
-            print("Action worked successfully!!")
-        else:
-            self.fail("Test failed!!")
-        self.assertEqual(len(resources), 1)
+        client = factory().client('redshift')
+        response = client.describe_cluster_parameters(
+            ParameterGroupName=resources[0])
+        param_val = jmespath.search(
+            "Parameters[?ParameterName=='require_ssl'].ParameterValue", response)
+        self.assertEqual(param_val[0], 'true')
+
