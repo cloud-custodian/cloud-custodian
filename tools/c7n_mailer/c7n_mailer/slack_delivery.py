@@ -30,7 +30,7 @@ class SlackDelivery:
         slack_messages = {}
 
         # Check for Slack targets in 'to' action and render appropriate template.
-        for target in sqs_message.get('action', {}).get('to'):
+        for target in sqs_message.get('action', ()).get('to', []):
             if target == 'slack://owners':
                 to_addrs_to_resources_map = \
                     self.email_handler.get_email_to_addrs_to_resources_map(sqs_message)

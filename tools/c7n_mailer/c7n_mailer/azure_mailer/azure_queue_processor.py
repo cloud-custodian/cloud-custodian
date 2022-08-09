@@ -71,7 +71,7 @@ class MailerAzureQueueProcessor(MessageTargetMixin):
             queue_message['policy']['resource'],
             len(queue_message['resources']),
             queue_message['policy']['name'],
-            ', '.join(queue_message['action'].get('to'))))
+            ', '.join(queue_message['action'].get('to', []))))
 
         self.handle_targets(queue_message, timestamp, email_delivery=False, sns_delivery=False)
 

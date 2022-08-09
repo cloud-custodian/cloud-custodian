@@ -15,7 +15,7 @@ from c7n_mailer.target import MessageTargetMixin
 DATA_MESSAGE = "maidmsg/1.0"
 
 
-class MailerSqsQueueIterator(MessageTargetMixin):
+class MailerSqsQueueIterator:
     # Copied from custodian to avoid runtime library dependency
     msg_attributes = ['sequence_id', 'op', 'ser']
 
@@ -58,7 +58,7 @@ class MailerSqsQueueIterator(MessageTargetMixin):
             ReceiptHandle=m['ReceiptHandle'])
 
 
-class MailerSqsQueueProcessor:
+class MailerSqsQueueProcessor(MessageTargetMixin):
 
     def __init__(self, config, session, logger, max_num_processes=16):
         self.config = config
@@ -138,7 +138,7 @@ class MailerSqsQueueProcessor:
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action'].get('to'))))
+            ', '.join(sqs_message['action'].get('to', []))))
 
         self.handle_targets(
             sqs_message,
