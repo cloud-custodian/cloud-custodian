@@ -205,6 +205,7 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
         "aws.ssm-parameter",
         "aws.batch-compute",
         "aws.codepipeline",
+        "aws.step-machine",
     )
 
     def validate(self):
