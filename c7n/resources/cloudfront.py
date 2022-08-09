@@ -26,7 +26,7 @@ class DescribeDistribution(DescribeSource):
         distribution_ids = []
         for id in ids:
             # if we get cloudfront distribution arn, we pick distribution id
-            if 'arn:aws:cloudfront' in id:
+            if id.startswith('arn:'):
                 _, ident = id.rsplit(':', 1)
                 parts = ident.split('/', 2)
                 distribution_ids.append(parts[1])
