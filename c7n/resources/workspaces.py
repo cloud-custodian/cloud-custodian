@@ -267,6 +267,45 @@ class WorkSpacesDirectorySg(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetIds[]"
 
 
+@WorkspaceDirectory.filter_registry.register('connection-aliases')
+class WorkspacesDirectoryConnectionAliases(ValueFilter):
+    """Filter workspace directories based on connection aliases
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: workspace-connection-alias
+           resource: aws.workspaces-directory
+           filters:
+            - type: connection-aliases
+              key: 'ConnectionAliases'
+              value: 'empty'
+
+    """
+
+    permissions = ('workspaces:DescribeConnectionAliases',)
+
+    schema = type_schema('connection-aliases', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ConnectionAliases'
+
+    def process(self, directories, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        results = []
+
+        for directory in directories:
+            if self.annotation_key not in directory:
+                connection_aliases = client.describe_connection_aliases(
+                    ResourceId=directory['DirectoryId'])
+                directory[self.annotation_key] = connection_aliases
+
+            if self.match(directory[self.annotation_key]):
+                results.append(directory)
+
+        return results
+
+
 @WorkspaceDirectory.filter_registry.register('client-properties')
 class WorkspacesDirectoryClientProperties(ValueFilter):
     """Filter workspace directories based off workspace client properties.
