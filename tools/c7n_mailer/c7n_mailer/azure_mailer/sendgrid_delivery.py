@@ -40,7 +40,7 @@ class SendGridDelivery:
     # are sent, while only ever sending emails to the respective parties.
     def get_email_to_addrs_to_resources_map(self, queue_message):
         email_to_addrs_to_resources_map = {}
-        targets = queue_message['action']['to']
+        targets = queue_message['action'].get('to', [])
 
         for resource in queue_message['resources']:
             # this is the list of emails that will be sent for this resource
