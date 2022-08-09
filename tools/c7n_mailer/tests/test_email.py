@@ -253,7 +253,7 @@ class EmailTest(unittest.TestCase):
 
     def test_no_mapping_if_no_valid_emails(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
-        SQS_MESSAGE['action']['to'].remove('ldap_uid_tags')
+        SQS_MESSAGE['action'].get('to', []).remove('ldap_uid_tags')
         SQS_MESSAGE['resources'][0].pop('Tags', None)
         emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
             SQS_MESSAGE

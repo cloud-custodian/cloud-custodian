@@ -68,13 +68,13 @@ class MailerAzureQueueProcessor:
             queue_message['policy']['resource'],
             len(queue_message['resources']),
             queue_message['policy']['name'],
-            ', '.join(queue_message['action'].get('to'))))
+            ', '.join(queue_message['action'].get('to', []))))
 
         if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in queue_message.get('action', ()).get('to')):
+                for e in queue_message.get('action', ()).get('to', [])):
             self._deliver_slack_message(queue_message)
 
-        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to')):
+        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to', [])):
             self._deliver_datadog_message(queue_message)
 
         email_result = self._deliver_email(queue_message)

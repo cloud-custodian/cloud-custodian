@@ -142,7 +142,7 @@ class MailerSqsQueueProcessor:
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action'].get('to'))))
+            ', '.join(sqs_message['action'].get('to', []))))
 
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -176,7 +176,7 @@ class MailerSqsQueueProcessor:
                 pass
 
         # this section gets the map of metrics to send to datadog and delivers it
-        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to')):
+        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to', [])):
             from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
@@ -190,7 +190,7 @@ class MailerSqsQueueProcessor:
         # this section sends the full event to a Splunk HTTP Event Collector (HEC)
         if any(
             e.startswith('splunkhec://')
-            for e in sqs_message.get('action', ()).get('to')
+            for e in sqs_message.get('action', ()).get('to', [])
         ):
             from .splunk_delivery import SplunkHecDelivery
             splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)
