@@ -25,6 +25,7 @@ ResourceMap = {
     "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",
     "aws.cloudsearch": "c7n.resources.cloudsearch.CloudSearch",
     "aws.cloudtrail": "c7n.resources.cloudtrail.CloudTrail",
+    "aws.connect-instance": "c7n.resources.connect.Connect",
     "aws.artifact-domain": "c7n.resources.artifact.ArtifactDomain",
     "aws.artifact-repo": "c7n.resources.artifact.ArtifactRepo",
     "aws.codebuild": "c7n.resources.code.CodeBuildProject",
