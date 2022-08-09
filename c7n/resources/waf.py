@@ -7,6 +7,7 @@ from c7n.tags import universal_augment
 
 class DescribeRegionalWaf(DescribeSource):
     def augment(self, resources):
+        resources = super().augment(resources)
         return universal_augment(self.manager, resources)
 
 
