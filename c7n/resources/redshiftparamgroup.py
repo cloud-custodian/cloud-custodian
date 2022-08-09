@@ -133,7 +133,7 @@ class EnableRequireSSLParameterGroup(BaseAction):
         """
         logger.info("Enabling SSL for parameter group: %s.", parameter_group_name)
         try:
-            response = redshift_client.modify_cluster_parameter_group(
+            redshift_client.modify_cluster_parameter_group(
                 ParameterGroupName=parameter_group_name,
                 Parameters=[
                     {
@@ -144,4 +144,3 @@ class EnableRequireSSLParameterGroup(BaseAction):
             )
         except Exception as ex:
             logger.error(str(ex))
-

@@ -50,4 +50,3 @@ class TestRedshiftParameterGroup(BaseTest):
         param_val = jmespath.search(
             "Parameters[?ParameterName=='require_ssl'].ParameterValue", response)
         self.assertEqual(param_val[0], 'true')
-
