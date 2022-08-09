@@ -3283,6 +3283,9 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         key = self.get_key(b)
         crypto = self.data.get('crypto')
         rule = sse.get('ApplyServerSideEncryptionByDefault')
+
+        if not rule:
+            return False
         algo = rule.get('SSEAlgorithm')
 
         if not crypto and algo in allowed:

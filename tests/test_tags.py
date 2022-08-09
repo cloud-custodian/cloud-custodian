@@ -11,6 +11,41 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+from pytest_terraform import terraform
+
+
+@terraform('tag_action_filter_call')
+def test_tag_action_filter_call(test, tag_action_filter_call):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('test_action_filter_call', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'delete_marked_for_op_tag',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'State.Name': 'running'
+                },
+                {
+                    'type': 'marked-for-op',
+                    'tag': 'action_tag',
+                    'op': 'stop'
+                }
+            ],
+            'actions': ['stop'],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    ec2 = session_factory().resource('ec2')
+    instance = ec2.Instance(stopped_ec2_instance_id)
+    test.assertEqual(instance.state['Name'], 'stopping')
 
 
 class UniversalTagTest(BaseTest):
