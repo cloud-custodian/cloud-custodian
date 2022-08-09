@@ -314,6 +314,7 @@ class TagActionFilter(Filter):
         except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
+            return False
 
         if self.current_date is None:
             self.current_date = datetime.now()

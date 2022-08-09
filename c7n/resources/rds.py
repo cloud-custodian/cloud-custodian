@@ -1825,7 +1825,8 @@ class ReservedRDS(QueryResourceManager):
 
 @filters.register('consecutive-snapshots')
 class ConsecutiveSnapshots(Filter):
-    """Returns instances where number of consective daily snapshots is equal to/or greater than n days.
+    """Returns instances where number of consective daily snapshots is
+    equal to/or greater than n days.
 
     :example:
 
