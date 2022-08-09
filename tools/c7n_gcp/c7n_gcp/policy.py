@@ -58,6 +58,8 @@ class PeriodicMode(FunctionMode, PullMode):
 
     Default region the function is deployed to is ``us-central1``. In
     case you want to change that, use the cli ``--region`` flag.
+
+    `target-type`: `pubsub` is recommended
     """
 
     schema = type_schema(
