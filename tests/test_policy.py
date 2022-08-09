@@ -249,19 +249,19 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q3 2022
-            'AwsCloudFormationStack'
-            'AwsWafRegionalRule'
-            'AwsWafRule'
-            'AwsWafRuleGroup'
-            'AwsKinesisStream'
-            'AwsWafRegionalRuleGroup'
-            'AwsEc2VpcPeeringConnection'
-            'AwsWafRegionalWebAcl'
-            'AwsCloudWatchAlarm'
-            'AwsEfsAccessPoint'
-            'AwsEc2TransitGateway'
-            'AwsEcsContainer'
-            'AwsEcsTask'
+            'AwsCloudFormationStack',
+            'AwsWafRegionalRule',
+            'AwsWafRule',
+            'AwsWafRuleGroup',
+            'AwsKinesisStream',
+            'AwsWafRegionalRuleGroup',
+            'AwsEc2VpcPeeringConnection',
+            'AwsWafRegionalWebAcl',
+            'AwsCloudWatchAlarm',
+            'AwsEfsAccessPoint',
+            'AwsEc2TransitGateway',
+            'AwsEcsContainer',
+            'AwsEcsTask',
             # q2 2022
             'AwsRdsDbSecurityGroup',
             # q1 2022
