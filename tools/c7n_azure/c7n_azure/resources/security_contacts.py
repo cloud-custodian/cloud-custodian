@@ -41,7 +41,7 @@ class SecurityContacts(SecurityContactsResourceManager, metaclass=QueryMeta):
         resource: azure.security-contacts
         filters:
             - name: default
-            - properties.alertNotifications: "{'state': 'On', 'minimalSeverity': 'High'}"
+            - properties.alertNotifications: "On"
     """
 
     # interior class that defines the metadata for resource
