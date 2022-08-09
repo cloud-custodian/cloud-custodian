@@ -420,7 +420,7 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
