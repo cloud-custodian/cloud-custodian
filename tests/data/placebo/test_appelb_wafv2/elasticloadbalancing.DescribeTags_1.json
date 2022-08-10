@@ -4,7 +4,12 @@
         "TagDescriptions": [
             {
                 "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:123456789123:loadbalancer/app/test/433ae0ba96204181",
-                "Tags": []
+                "Tags": [
+					{
+						"Key": "WAF",
+						"Value": "Internal"
+					}
+				]
             }
         ],
         "ResponseMetadata": {}

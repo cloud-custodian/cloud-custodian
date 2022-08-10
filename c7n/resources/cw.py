@@ -194,6 +194,19 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     )
 
     permissions = ('events:ListTargetsByRule',)
+    supported_resources = (
+        "aws.sqs",
+        "aws.event-bus",
+        "aws.lambda",
+        "aws.ecs",
+        "aws.ecs-task",
+        "aws.kinesis",
+        "aws.sns",
+        "aws.ssm-parameter",
+        "aws.batch-compute",
+        "aws.codepipeline",
+        "aws.step-machine",
+    )
 
     def validate(self):
         """
@@ -223,21 +236,11 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     def process(self, resources, event=None):
         # Due to lazy loading of resources, we need to explicilty load the following
         # potential targets for a event rule target:
-        load_resources(
-            [
-                "aws.sqs",
-                "aws.lambda",
-                "aws.ecs-cluster",
-                "aws.ecs-task",
-                "aws.kinesis",
-                "aws.sns",
-                "aws.ssm-parameter",
-                "aws.batch-compute",
-                "aws.codepipeline",
-            ]
-        )
+
+        load_resources(list(self.supported_resources))
         arn_resolver = ArnResolver(self.manager)
         resources = self.get_rules_with_children(resources)
+        resources = [r for r in resources if self.filter_unsupported_resources(r)]
         results = []
 
         if self.data.get('all'):
@@ -253,6 +256,14 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
                         r.setdefault('c7n:InvalidTargets', []).append(i)
                 results.append(r)
         return results
+
+    def filter_unsupported_resources(self, r):
+        for carn in r.get('c7n:ChildArns'):
+            if 'aws.' + str(ArnResolver.resolve_type(carn)) not in self.supported_resources:
+                self.log.info(
+                    f"Skipping resource {r.get('Arn')}, target type {carn} is not supported")
+                return False
+            return True
 
 
 @EventRule.action_registry.register('delete')
