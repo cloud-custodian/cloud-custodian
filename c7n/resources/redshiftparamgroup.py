@@ -34,7 +34,7 @@ class RedshiftParamGroup(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ParameterGroupName'
-        cfn_type = config_type = "AWS::Redshift::ClusterParameterGroup"
+        cfn_type = "AWS::Redshift::ClusterParameterGroup"
 
     augment = universal_augment
 
