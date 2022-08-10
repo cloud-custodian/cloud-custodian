@@ -87,7 +87,7 @@ class SlackDelivery:
                         "No %s tag found in resource." % tag_name)
                     continue
 
-                resolved_addr = result['Value']
+                resolved_addr = slack_target = result['Value']
 
                 if is_email(resolved_addr):
                     ims = self.retrieve_user_im([resolved_addr])
