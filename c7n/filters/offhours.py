@@ -459,17 +459,14 @@ class Time(Filter):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8').decode('utf8')
-        value = self.decode_tag_restrictions(value)
+        value = self.unescape_tag_restrictions(value)
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')
         return value
 
     @classmethod
-    def decode_tag_restrictions(cls, value: str):
-        if any(c in value for c in cls.TAG_RESTRICTIONS):
-            return value
-
+    def unescape_tag_restrictions(cls, value: str):
         for i, c in enumerate(cls.TAG_RESTRICTIONS_ESCAPE):
             value = value.replace(c, cls.TAG_RESTRICTIONS[i])
         return value
