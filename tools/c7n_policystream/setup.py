@@ -11,7 +11,7 @@ install_requires = \
  'boto3 (>=1.24.44,<2.0.0)',
  'boto3>=1.12.0,<2.0.0',
  'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.17,<0.10.0)',
+ 'c7n (>=0.9.18,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.12.0,<5.0.0)',
@@ -37,7 +37,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-policystream',
-    'version': '0.4.16',
+    'version': '0.4.17',
     'description': 'Cloud Custodian - Git Commits as Logical Policy Changes',
     'license': 'Apache-2.0',
     'classifiers': [
