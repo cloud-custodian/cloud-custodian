@@ -54,29 +54,41 @@ class ServiceQuota(QueryResourceManager):
         retry = get_retry(('TooManyRequestsException',))
 
         def get_quotas(client, s):
-            quotas = {}
-            token = None
-            kwargs = {
-                'ServiceCode': s['ServiceCode'],
-                'MaxResults': self.batch_size
-            }
-            while True:
-                if token:
-                    kwargs['NextToken'] = token
-                response = retry(
-                    client.list_service_quotas,
-                    **kwargs
-                )
-                rquotas = {q['QuotaCode']: q for q in response['Quotas']}
-                token = response.get('NextToken')
-                new = set(rquotas) - set(quotas)
-                quotas.update(rquotas)
-                if token is None:
-                    break
-                # ssm, ec2, kms have bad behaviors.
-                elif token and not new:
-                    break
+            def _get_quotas(client, s, attr):
+                quotas = {}
+                token = None
+                kwargs = {
+                    'ServiceCode': s['ServiceCode'],
+                    'MaxResults': self.batch_size
+                }
 
+                while True:
+                    if token:
+                        kwargs['NextToken'] = token
+                    response = retry(
+                        getattr(client, attr),
+                        **kwargs
+                    )
+                    rquotas = {q['QuotaCode']: q for q in response['Quotas']}
+                    token = response.get('NextToken')
+                    new = set(rquotas) - set(quotas)
+                    quotas.update(rquotas)
+                    if token is None:
+                        break
+                    # ssm, ec2, kms have bad behaviors.
+                    elif token and not new:
+                        break
+                return quotas.values()
+
+            dquotas = {
+                q['QuotaCode']: q
+                for q in _get_quotas(client, s, 'list_aws_default_service_quotas')
+            }
+            quotas = {
+                q['QuotaCode']: q
+                for q in _get_quotas(client, s, 'list_service_quotas')
+            }
+            quotas.update(dquotas)
             return quotas.values()
 
         results = []
