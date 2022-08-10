@@ -7,6 +7,7 @@ import random
 import re
 import zlib
 from typing import List
+from distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
@@ -350,8 +351,7 @@ class DisableApiStop(Filter):
     def validate(self) -> None:
         botocore_min_version = '1.26.7'
 
-        from pkg_resources import parse_version
-        if parse_version(botocore.__version__) < parse_version(botocore_min_version):
+        if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
             raise PolicyValidationError(
                 "'stop-protected' filter requires botocore version "
                 f'{botocore_min_version} or above. '
