@@ -884,13 +884,35 @@ class RDSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_rds_snapshot_count_filter_policy_2(self):
-        factory = self.replay_flight_data("test_rds_snapshot_count_filter")
         p = self.load_policy(
             {
                 "name": "rds-snapshot-count-filter",
                 "resource": "rds",
                 "filters": [{"type": "count", "num": 2, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-count-filter",
+                "resource": "rds",
+                "filters": [{"type": "count", "num": 3, "op": "eq"}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-count-filter",
+                "resource": "rds",
+                "filters": [{"type": "count", "num": 4, "op": "lt"}],
             },
             session_factory=factory,
         )
