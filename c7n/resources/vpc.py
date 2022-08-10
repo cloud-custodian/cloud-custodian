@@ -2078,7 +2078,7 @@ class AddressRelease(BaseAction):
                 client.disassociate_address(AssociationId=aa['AssociationId'])
             except ClientError as e:
                 # If its already been diassociated ignore, else raise.
-                if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                if not (e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
                        aa['AssocationId'] in e.response['Error']['Message']):
                     raise e
                 associated_addrs.remove(aa)

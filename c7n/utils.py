@@ -523,7 +523,7 @@ def reformat_schema(model):
     ret = copy.deepcopy(model.schema['properties'])
 
     if 'type' in ret:
-        del(ret['type'])
+        del ret['type']
 
     for key in model.schema.get('required', []):
         if key in ret:

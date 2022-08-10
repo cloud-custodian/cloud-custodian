@@ -248,6 +248,20 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2022
+            'AwsCloudFormationStack',
+            'AwsWafRegionalRule',
+            'AwsWafRule',
+            'AwsWafRuleGroup',
+            'AwsKinesisStream',
+            'AwsWafRegionalRuleGroup',
+            'AwsEc2VpcPeeringConnection',
+            'AwsWafRegionalWebAcl',
+            'AwsCloudWatchAlarm',
+            'AwsEfsAccessPoint',
+            'AwsEc2TransitGateway',
+            'AwsEcsContainer',
+            'AwsEcsTask',
             # q2 2022
             'AwsRdsDbSecurityGroup',
             # q1 2022
@@ -365,7 +379,16 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
             'AWS::WAFv2::WebACL',
-            'AWS::XRay::EncryptionConfig'
+            'AWS::XRay::EncryptionConfig',
+            'AWS::ElasticLoadBalancingV2::Listener',
+            'AWS::AccessAnalyzer::Analyzer',
+            'AWS::WorkSpaces::ConnectionAlias',
+            'AWS::DMS::ReplicationSubnetGroup',
+            'AWS::StepFunctions::Activity',
+            'AWS::Route53Resolver::ResolverEndpoint',
+            'AWS::Route53Resolver::ResolverRule',
+            'AWS::Route53Resolver::ResolverRuleAssociation',
+            'AWS::DMS::EventSubscription',
         }
 
         resource_map = {}
