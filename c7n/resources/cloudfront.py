@@ -12,6 +12,7 @@ from c7n.filters import ValueFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
+from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.resources.securityhub import PostFinding
 
@@ -20,6 +21,19 @@ class DescribeDistribution(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
+    def get_resources(self, ids, cache=True):
+        results = []
+        distribution_ids = []
+        for i in ids:
+            # if we get cloudfront distribution arn, we pick distribution id
+            if i.startswith('arn:'):
+                distribution_ids.append(Arn.parse(i).resource)
+            else:
+                distribution_ids.append(i)
+        if distribution_ids:
+            results = super().get_resources(distribution_ids, cache)
+        return results
 
 
 @resources.register('distribution')

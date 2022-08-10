@@ -8,13 +8,19 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.utils import get_retry, local_session, type_schema, chunks
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
+
+
+class DescribeWorkspace(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('workspaces')
@@ -26,10 +32,12 @@ class Workspace(QueryResourceManager):
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
-        cfn_type = 'AWS::WorkSpaces::Workspace'
+        cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
 
-    def augment(self, resources):
-        return universal_augment(self, resources)
+    source_mapping = {
+        'describe': DescribeWorkspace,
+        'config': ConfigSource
+    }
 
 
 @Workspace.filter_registry.register('connection-status')
