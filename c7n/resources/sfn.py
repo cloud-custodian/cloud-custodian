@@ -3,9 +3,16 @@
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import Tag, RemoveTag, universal_augment
 from c7n.utils import type_schema, local_session, dumps, chunks
+
+
+class DescribeStepFunction(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self, resources)
 
 
 @resources.register('step-machine')
@@ -26,9 +33,10 @@ class StepFunction(QueryResourceManager):
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
 
-    def augment(self, resources):
-        resources = super().augment(resources)
-        return universal_augment(self, resources)
+    source_mapping = {
+        'describe': DescribeStepFunction,
+        'config': ConfigSource
+    }
 
 
 class InvokeStepFunction(Action):
