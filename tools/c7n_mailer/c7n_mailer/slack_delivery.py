@@ -90,8 +90,8 @@ class SlackDelivery:
                 resolved_addr = result['Value']
 
                 if is_email(resolved_addr):
-                     ims = self.retrieve_user_im([resolved_addr])
-                     slack_target = ims[resolved_addr]
+                    ims = self.retrieve_user_im([resolved_addr])
+                    slack_target = ims[resolved_addr]
                 elif not resolved_addr.startswith("#"):
                     resolved_addr = "#" + resolved_addr
                     slack_target = resolved_addr
