@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Bootstrap poetry
         shell: bash
         run: |
@@ -62,7 +62,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-3.9-${{ hashFiles('**/poetry.lock') }}
+          key: venv-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up doc cache
         uses: actions/cache@v2
@@ -73,7 +73,8 @@ jobs:
             docs/source/aws/resources
             docs/source/gcp/resources
             docs/source/azure/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}
+            docs/source/awscc/resources
+          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash
@@ -84,17 +85,19 @@ jobs:
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
+        id: cache_check
         shell: bash
-        run: poetry run custodian version || rm -rf .venv
+        run: |
+          (poetry run custodian version && echo "::set-output name=venv::success") || (rm -rf .venv && echo "::set-output name=venv::recreate")
 
       - name: Virtualenv
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
         shell: bash
         run: |
           python -m venv .venv
 
       - name: Install Deps
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
         shell: bash
         run: |
           python -m pip install --upgrade pip
@@ -106,6 +109,14 @@ jobs:
         run: |
           make sphinx
 
+      - name: Deploy Docs
+        if: ${{ github.event_name == 'push' }}
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: docs/build/html
+          target-folder: docs
+
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
@@ -115,15 +126,18 @@ jobs:
         python-version: [3.9]
         include:
           - os: ubuntu-latest
+            python-version: "3.10"
+          - os: ubuntu-latest
             python-version: 3.8
           - os: ubuntu-latest
             python-version: 3.7
-          - os: ubuntu-latest
-            python-version: 3.6
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -134,7 +148,7 @@ jobs:
         shell: bash
         run: |
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.9
+            | python - -y --version 1.1.13
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -159,17 +173,24 @@ jobs:
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: poetry run custodian version || rm -rf .venv
-
-      - name: Virtualenv
-        if: steps.cache.outputs.cache-hit != 'true'
+        id: cache_check
         shell: bash
         run: |
+          (poetry run custodian version && echo "::set-output name=venv::success") || (rm -rf .venv && echo "::set-output name=venv::recreate")
+
+      - name: Virtualenv
+        if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
+        shell: bash
+        env:
+          CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
+          CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+        run: |
+          echo "check venv $CHECK_VENV"
+          echo "cache hit $CACHE_HIT"
           python -m venv .venv
 
       - name: Install Deps
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
         shell: bash
         run: |
           python -m pip install --upgrade pip

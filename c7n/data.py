@@ -12,6 +12,7 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
+from c7n.query import sources
 from c7n.registry import PluginRegistry
 from c7n.utils import load_file
 
@@ -39,6 +40,7 @@ class NullSession:
     """dummy session"""
 
 
+@sources.register('static')
 class StaticSource:
     def __init__(self, queries):
         self.queries = queries
@@ -55,6 +57,7 @@ class StaticSource:
                 raise PolicyValidationError("invalid static data source `records`")
 
 
+@sources.register('disk')
 class DiskSource:
     def __init__(self, queries):
         self.queries = queries

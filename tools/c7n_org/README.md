@@ -1,8 +1,8 @@
 # c7n-org: Multi Account Custodian Execution
 
-[//]: # (         !!! IMPORTANT !!!                    )
-[//]: # (This file is moved during document generation.)
-[//]: # (Only edit the original document at ./tools/c7n_org/README.md)
+% [comment]: # (         !!! IMPORTANT !!!                    )
+% [comment]: # (This file is moved during document generation.)
+% [comment]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
 Azure subscriptions, or GCP projects in parallel.
@@ -205,10 +205,12 @@ don't require quoting, i.e., "my_{charge_code}".
 
 ## Other commands
 
-c7n-org also supports running arbitrary scripts against accounts via the run-script command.
-For AWS the standard AWS SDK credential information is exported into the process environment before executing.
-For Azure and GCP, only the environment variables `AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition
-of the system env variables).
+c7n-org also supports running arbitrary scripts against accounts via
+the run-script command.  For AWS the standard AWS SDK credential
+information is exported into the process environment before executing.
+For Azure and GCP, only the environment variables
+`AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition of
+the system env variables).
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.

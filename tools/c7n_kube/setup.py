@@ -14,28 +14,31 @@ package_data = \
 {'': ['*']}
 
 install_requires = \
-['argcomplete (>=1.12.3,<2.0.0)',
- 'attrs (>=21.2.0,<22.0.0)',
- 'boto3 (>=1.18.21,<2.0.0)',
- 'botocore (>=1.21.21,<2.0.0)',
- 'c7n (>=0.9.14,<0.10.0)',
- 'importlib-metadata (>=4.6.4,<5.0.0)',
- 'jmespath (>=0.10.0,<0.11.0)',
- 'jsonschema (>=3.2.0,<4.0.0)',
+['argcomplete (>=2.0.0,<3.0.0)',
+ 'attrs (>=22.1.0,<23.0.0)',
+ 'boto3 (>=1.24.44,<2.0.0)',
+ 'botocore (>=1.27.44,<2.0.0)',
+ 'c7n (>=0.9.17,<0.10.0)',
+ 'docutils (>=0.17.1,<0.18.0)',
+ 'importlib-metadata (>=4.12.0,<5.0.0)',
+ 'importlib-resources (>=5.9.0,<6.0.0)',
+ 'jmespath (>=1.0.1,<2.0.0)',
+ 'jsonschema (>=4.9.0,<5.0.0)',
  'kubernetes>=10.0.1,<11.0.0',
- 'pyrsistent (>=0.18.0,<0.19.0)',
+ 'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
+ 'pyrsistent (>=0.18.1,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
- 'pyyaml (>=5.4.1,<6.0.0)',
- 's3transfer (>=0.5.0,<0.6.0)',
+ 'pyyaml (>=6.0,<7.0)',
+ 's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
- 'tabulate (>=0.8.9,<0.9.0)',
- 'typing-extensions (>=3.10.0.0,<4.0.0.0)',
- 'urllib3 (>=1.26.6,<2.0.0)',
- 'zipp (>=3.5.0,<4.0.0)']
+ 'tabulate (>=0.8.10,<0.9.0)',
+ 'typing-extensions (>=4.3.0,<5.0.0)',
+ 'urllib3 (>=1.26.11,<2.0.0)',
+ 'zipp (>=3.8.1,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.13',
+    'version': '0.2.16',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'license': 'Apache-2.0',
     'classifiers': [
@@ -53,7 +56,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
-    'python_requires': '>=3.6,<4.0',
+    'python_requires': '>=3.7,<4.0',
 }
 
 

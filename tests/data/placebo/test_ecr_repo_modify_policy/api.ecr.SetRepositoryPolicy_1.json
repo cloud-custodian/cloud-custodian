@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "registryId": "644160558196",
+        "repositoryName": "nginx",
+        "policyText": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"StatementAddedByC7N\",\n    \"Effect\" : \"Deny\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"ecr:BatchGetImage\"\n  } ]\n}",
+        "ResponseMetadata": {}
+    }
+}

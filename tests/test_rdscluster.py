@@ -1,12 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import sys
+
+import c7n.resources.rdscluster
+import pytest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
+from c7n.testing import mock_datetime_now
+from dateutil import parser
 
 from .common import BaseTest, event_data
-
-import pytest
-import sys
 
 
 class RDSClusterTest(BaseTest):
@@ -423,6 +426,20 @@ class RDSClusterTest(BaseTest):
         cluster = client.describe_db_clusters(
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
+
+    def test_rdscluster_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rdscluster_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster-snapshot-count-filter",
+                "resource": "rds-cluster",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rdscluster):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class RDSClusterSnapshotTest(BaseTest):

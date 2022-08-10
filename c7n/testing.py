@@ -12,9 +12,9 @@ import shutil
 import tempfile
 import textwrap
 import unittest
+from unittest import mock
 
 import pytest
-import mock
 import yaml
 
 from distutils.util import strtobool

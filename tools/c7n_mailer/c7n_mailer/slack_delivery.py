@@ -31,7 +31,7 @@ class SlackDelivery:
         slack_messages = {}
 
         # Check for Slack targets in 'to' action and render appropriate template.
-        for target in sqs_message.get('action', ()).get('to'):
+        for target in sqs_message.get('action', ()).get('to', []):
             if target == 'slack://owners':
                 to_addrs_to_resources_map = \
                     self.email_handler.get_email_to_addrs_to_resources_map(sqs_message)
@@ -87,16 +87,20 @@ class SlackDelivery:
                         "No %s tag found in resource." % tag_name)
                     continue
 
-                resolved_addrs = result['Value']
+                resolved_addr = slack_target = result['Value']
 
-                if not resolved_addrs.startswith("#"):
-                    resolved_addrs = "#" + resolved_addrs
+                if is_email(resolved_addr):
+                    ims = self.retrieve_user_im([resolved_addr])
+                    slack_target = ims[resolved_addr]
+                elif not resolved_addr.startswith("#"):
+                    resolved_addr = "#" + resolved_addr
+                    slack_target = resolved_addr
 
-                slack_messages[resolved_addrs] = get_rendered_jinja(
-                    resolved_addrs, sqs_message,
-                    resource_list,
+                slack_messages[resolved_addr] = get_rendered_jinja(
+                    slack_target, sqs_message, resource_list,
                     self.logger, 'slack_template', 'slack_default',
-                    self.config['templates_folders'])
+                    self.config['templates_folders']
+                )
                 self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 
@@ -111,7 +115,7 @@ class SlackDelivery:
                 key)
             )
 
-            self.send_slack_msg(key, payload)
+            self.send_slack_msg(key, payload.encode('utf-8'))
 
     def retrieve_user_im(self, email_addresses):
         list = {}
@@ -167,7 +171,7 @@ class SlackDelivery:
             response = requests.post(
                 url=key,
                 data=message_payload,
-                headers={'Content-Type': 'application/json'})
+                headers={'Content-Type': 'application/json;charset=utf-8'})
         else:
             response = requests.post(
                 url='https://slack.com/api/chat.postMessage',

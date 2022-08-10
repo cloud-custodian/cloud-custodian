@@ -448,6 +448,104 @@ class AppELBTest(BaseTest):
             resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
         )
 
+    def test_appelb_wafv2_any(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+        p = self.load_policy({
+            "name": "appelb-wafv2",
+            "resource": "app-elb",
+            "filters": [
+                {"type": "wafv2-enabled", "state": False}]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'test')
+
+    def test_appelb_wafv2(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": False}
+                ],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": True}
+                ],
+            },
+            session_factory=factory,
+        )
+        post_resources = p.run()
+        self.assertEqual(
+            resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
+        )
+
+    def test_appelb_wafv2_to_waf(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": False}
+                ],
+                "actions": [{"type": "set-waf", "web-acl": "test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_waf_to_wafv2(self):
+        factory = self.replay_flight_data("test_appelb_waf")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "web-acl": "test", "state": False}
+                ],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-appelb-active-response",
+                "resource": "app-elb",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "elasticloadbalancing.amazonaws.com",
+                    "ids": "requestParameters.resourceArns[0]",
+                    "event": "AddTags"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}, {"tag:WAF": "Internal"}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-appelb-add-tags.json"))
+        self.assertEqual(len(resources), 1)
+
     def test_appelb_net_metrics(self):
         factory = self.replay_flight_data('test_netelb_metrics')
         p = self.load_policy({
@@ -467,7 +565,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LoadBalancerName'], 'nicnoc')
         self.assertTrue(
-            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum' in resources[
+            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
 
 

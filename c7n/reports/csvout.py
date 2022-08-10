@@ -96,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
         records += policy_records
 
-    rows = formatter.to_csv(records)
+    rows = formatter.to_csv(records, unique=not options.all_findings)
 
     if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers(), quoting=csv.QUOTE_ALL)
@@ -213,9 +213,10 @@ class Formatter:
 
         if unique:
             uniq = self.uniq_by_id(records)
+            log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         else:
             uniq = records
-        log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
+            log.debug("Selected %d record(s)" % len(records))
         rows = list(map(self.extract_csv, uniq))
         return rows
 

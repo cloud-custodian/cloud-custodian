@@ -58,8 +58,9 @@ def main():
     found = False
     for d in sorted(metadata.distributions(), key=lambda d: d.metadata['Name']):
         dname = d.metadata['Name']
-
         if dname in seen:
+            continue
+        if d.metadata['License'] in accept:
             continue
 
         classifiers = d.metadata.get_all('Classifier') or ()
@@ -70,6 +71,7 @@ def main():
             print(f"{dname}: {d.metadata['License']} {classifiers}")
 
         seen.add(dname)
+
     if found:
         sys.exit(1)
 

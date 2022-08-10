@@ -61,6 +61,7 @@ class DataPipelineTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        assert resources[0]['pipelineId']
         resource = resources[0]
         self.assertEqual(resource["name"], "PipelinesFTW")
         self.assertEqual(resource["Tags"], [{"Key": "foo", "Value": "bar"}])

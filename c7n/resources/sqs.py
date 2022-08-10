@@ -6,7 +6,9 @@ import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters.core import Filter
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -145,6 +147,16 @@ class SQSPostFinding(PostFinding):
             payload['KmsDataKeyReusePeriodSeconds'] = int(
                 payload['KmsDataKeyReusePeriodSeconds'])
         return envelope
+
+
+@SQS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, queue):
+        return {
+            'queue_arn': queue['QueueArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SQS.action_registry.register('remove-statements')
@@ -371,3 +383,47 @@ class SetRetentionPeriod(BaseAction):
                 QueueUrl=q['QueueUrl'],
                 Attributes={
                     'MessageRetentionPeriod': period})
+
+
+@SQS.filter_registry.register('dead-letter')
+class DeadLetterFilter(Filter):
+    """
+    Filter for sqs queues that are dead letter queues
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+         - name: find-dead-letter-queues
+           resource: aws.sqs
+           filters:
+             - type: dead-letter
+    """
+
+    schema = type_schema('dead-letter')
+    permissions = ()
+
+    def process(self, resources, event=None):
+        # we need to inspect all the queues regardless of any filters that
+        # may have been applied earlier
+        all_resources = self.manager.get_resource_manager("sqs").resources()
+        all_queue_arn_map = {r['QueueArn']: r for r in all_resources}
+        queue_arn_map = {r['QueueArn']: r for r in resources}
+        has_redrive = []
+        for r in all_resources:
+            if r.get("RedrivePolicy"):
+                has_redrive.append(r['QueueArn'])
+        result = []
+        # dead letter queues must exist in the same region and account as the
+        # original queue so it should be safe to look for them in our existing
+        # resources
+        for r in all_resources:
+            if r['QueueArn'] in has_redrive:
+                queue = all_queue_arn_map[r['QueueArn']]
+                target = json.loads(queue['RedrivePolicy']).get('deadLetterTargetArn')
+                if queue_arn_map.get(target):
+                    result.append(target)
+        # in case there are multiple queues pointing at the same dead letter queue
+        # we need to only return the unique queues
+        return [queue_arn_map[r] for r in set(result)]

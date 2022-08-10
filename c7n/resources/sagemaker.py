@@ -4,11 +4,12 @@
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.offhours import OffHour, OnHour
 
 
 @resources.register('sagemaker-notebook')
@@ -43,6 +44,8 @@ class NotebookInstance(QueryResourceManager):
 
 
 NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
+NotebookInstance.filter_registry.register('offhour', OffHour)
+NotebookInstance.filter_registry.register('onhour', OnHour)
 
 
 @resources.register('sagemaker-job')
@@ -256,6 +259,21 @@ class SagemakerEndpointConfig(QueryResourceManager):
 SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+class DescribeModel(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _augment(r):
+            tags = self.manager.retry(client.list_tags,
+                ResourceArn=r['ModelArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        resources = super(DescribeModel, self).augment(resources)
+        return list(map(_augment, resources))
+
+
 @resources.register('sagemaker-model')
 class Model(QueryResourceManager):
 
@@ -268,21 +286,14 @@ class Model(QueryResourceManager):
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::Model'
+        cfn_type = config_type = 'AWS::SageMaker::Model'
+
+    source_mapping = {
+        'describe': DescribeModel,
+        'config': ConfigSource
+    }
 
     permissions = ('sagemaker:ListTags',)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(r):
-            tags = self.retry(client.list_tags,
-                ResourceArn=r['ModelArn'])['Tags']
-            r.setdefault('Tags', []).extend(tags)
-            return r
-
-        resources = super(Model, self).augment(resources)
-        return list(map(_augment, resources))
 
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)

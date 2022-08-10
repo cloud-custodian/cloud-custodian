@@ -54,6 +54,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
 from c7n import query
@@ -172,7 +173,8 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketLoggingConfiguration(self, resource, item_value):
         if ('destinationBucketName' not in item_value or
                 item_value['destinationBucketName'] is None):
-            return {}
+            resource[u'Logging'] = {}
+            return
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
             'TargetPrefix': item_value['logFilePrefix']}
@@ -196,7 +198,7 @@ class ConfigS3(query.ConfigSource):
             for t in (r.get('transitions') or ()):
                 tr = {}
                 for k in ('date', 'days', 'storageClass'):
-                    if t[k]:
+                    if t.get(k):
                         tr["%s%s" % (k[0].upper(), k[1:])] = t[k]
                 transitions.append(tr)
             if transitions:
@@ -292,7 +294,7 @@ class ConfigS3(query.ConfigSource):
         resource['Replication'] = {'ReplicationConfiguration': d}
 
     def handle_BucketPolicy(self, resource, item_value):
-        resource['Policy'] = item_value['policyText']
+        resource['Policy'] = item_value.get('policyText')
 
     def handle_BucketTaggingConfiguration(self, resource, item_value):
         resource['Tags'] = [
@@ -301,11 +303,19 @@ class ConfigS3(query.ConfigSource):
     def handle_BucketVersioningConfiguration(self, resource, item_value):
         # Config defaults versioning to 'Off' for a null value
         if item_value['status'] not in ('Enabled', 'Suspended'):
+            resource['Versioning'] = {}
             return
         resource['Versioning'] = {'Status': item_value['status']}
-        if item_value['isMfaDeleteEnabled']:
-            resource['Versioning']['MFADelete'] = item_value[
-                'isMfaDeleteEnabled'].title()
+        # `isMfaDeleteEnabled` is an optional boolean property - the key may be absent,
+        # present with a null value, or present with a boolean value.
+        # Mirror the describe source by populating Versioning.MFADelete only in the
+        # boolean case.
+        mfa_delete = item_value.get('isMfaDeleteEnabled')
+        if mfa_delete is None:
+            return
+        resource['Versioning']['MFADelete'] = (
+            'Enabled' if mfa_delete else 'Disabled'
+        )
 
     def handle_BucketWebsiteConfiguration(self, resource, item_value):
         website = {}
@@ -802,93 +812,15 @@ class BucketFinding(PostFinding):
         return filter_empty(resource)
 
 
-@filters.register('has-statement')
-class HasStatementFilter(BucketFilterBase):
-    """Find buckets with set of policy statements.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: s3-bucket-has-statement
-                resource: s3
-                filters:
-                  - type: has-statement
-                    statement_ids:
-                      - RequiredEncryptedPutObject
-
-
-            policies:
-              - name: s3-public-policy
-                resource: s3
-                filters:
-                  - type: has-statement
-                    statements:
-                      - Effect: Allow
-                        Action: 's3:*'
-                        Principal: '*'
-    """
-    schema = type_schema(
-        'has-statement',
-        statement_ids={'type': 'array', 'items': {'type': 'string'}},
-        statements={
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'Sid': {'type': 'string'},
-                    'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                    'Principal': {'anyOf': [
-                        {'type': 'string'},
-                        {'type': 'object'}, {'type': 'array'}]},
-                    'NotPrincipal': {
-                        'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-                    'Action': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotAction': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Resource': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotResource': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Condition': {'type': 'object'}
-                },
-                'required': ['Effect']
-            }
-        })
-
-    def process(self, buckets, event=None):
-        return list(filter(None, map(self.process_bucket, buckets)))
-
-    def process_bucket(self, b):
-        p = b.get('Policy')
-        if p is None:
-            return None
-        p = json.loads(p)
-
-        required = list(self.data.get('statement_ids', []))
-        statements = p.get('Statement', [])
-        for s in list(statements):
-            if s.get('Sid') in required:
-                required.remove(s['Sid'])
-
-        required_statements = format_string_values(list(self.data.get('statements', [])),
-                                                   **self.get_std_format_args(b))
-        for required_statement in required_statements:
-            for statement in statements:
-                found = 0
-                for key, value in required_statement.items():
-                    if key in statement and value == statement[key]:
-                        found += 1
-                if found and found == len(required_statement):
-                    required_statements.remove(required_statement)
-                    break
-
-        if (self.data.get('statement_ids', []) and not required) or \
-           (self.data.get('statements', []) and not required_statements):
-            return b
-        return None
+@S3.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+            'bucket_region': get_region(bucket)
+        }
 
 
 ENCRYPTION_STATEMENT_GLOB = {
@@ -3104,6 +3036,8 @@ class Lifecycle(BucketActionBase):
         config = (bucket.get('Lifecycle') or {}).get('Rules', [])
         for rule in self.data['rules']:
             for index, existing_rule in enumerate(config):
+                if not existing_rule:
+                    continue
                 if rule['ID'] == existing_rule['ID']:
                     if rule['Status'] == 'absent':
                         config[index] = None
@@ -3150,16 +3084,26 @@ class KMSKeyResolverMixin:
                 key_meta = client.describe_key(
                     KeyId=key
                 ).get('KeyMetadata', {})
+                key_id = key_meta.get('KeyId')
+
+                # We need a complete set of alias identifiers (names and ARNs)
+                # to fully evaluate bucket encryption filters.
+                key_aliases = client.list_aliases(
+                    KeyId=key_id
+                ).get('Aliases', [])
+
                 self.arns[r] = {
-                    # c7n:Key is the value provided in the policy filter data.
-                    # This may overlap with the key ID or ARN, but can also be
-                    # an alias.
-                    'c7n:Key': key,
-                    'KeyId': key_meta.get('KeyId'),
+                    'KeyId': key_id,
                     'Arn': key_meta.get('Arn'),
                     'KeyManager': key_meta.get('KeyManager'),
-                    'Description': key_meta.get('Description')
+                    'Description': key_meta.get('Description'),
+                    'Aliases': [
+                        alias[attr]
+                        for alias in key_aliases
+                        for attr in ('AliasArn', 'AliasName')
+                    ],
                 }
+
             except ClientError as e:
                 self.log.error('Error resolving kms ARNs for set-bucket-encryption: %s key: %s' % (
                     e, self.data.get('key')))
@@ -3171,7 +3115,7 @@ class KMSKeyResolverMixin:
         key = self.arns.get(region)
         if not key:
             self.log.warning('Unable to resolve key %s for bucket %s in region %s',
-                             key, bucket.get('Name'), region)
+                             self.data['key'], bucket.get('Name'), region)
         return key
 
 
@@ -3211,7 +3155,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
-    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey')
+    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
 
     def process(self, buckets, event=None):
@@ -3262,6 +3206,9 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         key = self.get_key(b)
         crypto = self.data.get('crypto')
         rule = sse.get('ApplyServerSideEncryptionByDefault')
+
+        if not rule:
+            return False
         algo = rule.get('SSEAlgorithm')
 
         if not crypto and algo in allowed:
@@ -3270,16 +3217,25 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         if crypto == 'AES256' and algo == 'AES256':
             return True
         elif crypto == 'aws:kms' and algo == 'aws:kms':
-            if key:
-                # The default encryption rule can specify a key by alias,
-                # ID or full ARN. Match against any of those attributes.
-                key_ids = {key[k] for k in ('Arn', 'KeyId', 'c7n:Key')}
-                if rule.get('KMSMasterKeyID') in key_ids:
-                    return True
-                else:
-                    return False
-            else:
-                return True
+            if not key:
+                # There are two broad reasons to have an empty value for
+                # the regional key here:
+                #
+                # * The policy did not specify a key, in which case this
+                #   filter should match _all_ buckets with a KMS default
+                #   encryption rule.
+                #
+                # * The policy specified a key that could not be
+                #   resolved, in which case this filter shouldn't match
+                #   any buckets.
+                return 'key' not in self.data
+
+            # The default encryption rule can specify a key ID,
+            # key ARN, alias name or alias ARN. Match against any of
+            # those attributes. A rule specifying KMS with no master key
+            # implies the AWS-managed key.
+            key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
+            return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
 
 
 @actions.register('set-bucket-encryption')
@@ -3399,11 +3355,103 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             if not key:
                 raise Exception('Valid KMS Key required but does not exist')
 
-            config['Rules'][0]['ApplyServerSideEncryptionByDefault'] = {
-                'KMSMasterKeyID': key['Arn'],
-                'BucketKeyEnabled': bucket_key
-            }
+            config['Rules'][0]['ApplyServerSideEncryptionByDefault']['KMSMasterKeyID'] = key['Arn']
         s3.put_bucket_encryption(
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
         )
+
+
+OWNERSHIP_CONTROLS = ['BucketOwnerEnforced', 'BucketOwnerPreferred', 'ObjectWriter']
+VALUE_FILTER_MAGIC_VALUES = ['absent', 'present', 'not-null', 'empty']
+
+
+@filters.register('ownership')
+class BucketOwnershipControls(BucketFilterBase, ValueFilter):
+    """Filter for object ownership controls
+
+    Reference: https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
+
+    :example
+
+    Find buckets with ACLs disabled
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-acls-disabled
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    value: BucketOwnerEnforced
+
+    :example
+
+    Find buckets with object ownership preferred or enforced
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-ownership-preferred
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    op: in
+                    value:
+                      - BucketOwnerEnforced
+                      - BucketOwnerPreferred
+
+    :example
+
+    Find buckets with no object ownership controls
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-no-ownership-controls
+                resource: aws.s3
+                region: us-east-1
+                filters:
+                  - type: ownership
+                    value: empty
+    """
+    schema = type_schema('ownership', rinherit=ValueFilter.schema, value={'oneOf': [
+        {'type': 'string', 'enum': OWNERSHIP_CONTROLS + VALUE_FILTER_MAGIC_VALUES},
+        {'type': 'array', 'items': {
+            'type': 'string', 'enum': OWNERSHIP_CONTROLS + VALUE_FILTER_MAGIC_VALUES}}]})
+    permissions = ('s3:GetBucketOwnershipControls',)
+    annotation_key = 'c7n:ownership'
+
+    def __init__(self, data, manager=None):
+        super(BucketOwnershipControls, self).__init__(data, manager)
+
+        # Ownership controls appear as an array of rules. There can only be one
+        # ObjectOwnership rule defined for a bucket, so we can automatically
+        # match against that if it exists.
+        self.data['key'] = f'("{self.annotation_key}".Rules[].ObjectOwnership)[0]'
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(),
+                                   b['Name'])
+                    continue
+        return super(BucketOwnershipControls, self).process(buckets, event)
+
+    def process_bucket(self, b):
+        if self.annotation_key in b:
+            return
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        try:
+            controls = client.get_bucket_ownership_controls(Bucket=b['Name'])
+            controls.pop('ResponseMetadata', None)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OwnershipControlsNotFoundError':
+                raise
+            controls = {}
+        b[self.annotation_key] = controls.get('OwnershipControls')

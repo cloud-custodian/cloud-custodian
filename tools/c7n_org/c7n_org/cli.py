@@ -10,6 +10,7 @@ import os
 import time
 import subprocess  # nosec
 import sys
+from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -27,7 +28,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
-from c7n.reports.csvout import Formatter, fs_record_set
+from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty
 
@@ -197,9 +198,16 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
 def resolve_regions(regions, account):
     if 'all' in regions:
-        session = get_session(account, 'c7n-org', "us-east-1")
-        client = session.client('ec2')
-        return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        try:
+            session = get_session(account, 'c7n-org', 'us-east-1')
+            client = session.client('ec2')
+            return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning('access denied listing available regions for account:%s',
+                    account['name'])
+                return []
+            raise
     if not regions:
         return ('us-east-1', 'us-west-2')
 
@@ -312,7 +320,20 @@ def report_account(account, region, policies_config, output_path, cache_path, de
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
+        if p.ctx.output.type == "s3":
+            delta = timedelta(days=1)
+            begin_date = datetime.now() - delta
+
+            policy_records = record_set(
+                p.session_factory,
+                p.ctx.output.config['netloc'],
+                strip_output_path(p.ctx.output.config['path'], p.name),
+                begin_date
+            )
+        else:
+            policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region
@@ -399,7 +420,7 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
