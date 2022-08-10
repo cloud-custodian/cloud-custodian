@@ -13,7 +13,7 @@ from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.utils import local_session, type_schema, select_keys
-from c7n.tags import universal_augment
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 
 from .securityhub import PostFinding
 
@@ -407,3 +407,40 @@ class KmsPostFinding(PostFinding):
             )
 
         return envelope
+
+
+Key.action_registry.register('mark-for-op', TagDelayedAction)
+Key.filter_registry.register('marked-for-op', TagActionFilter)
+
+@Key.action_registry.register('tag')
+class KmsTag(Tag):
+    """Tag a KMS key"""
+
+    permissions = ('kms:TagResource',)
+
+    def process_resource_set(self, client, kms_keys, tags):
+        mapped_tags = _tag_mapper(tags)
+        for k in kms_keys:
+            try:
+                self.manager.retry(
+                    client.tag_resource, KeyId=k['KeyId'], Tags=mapped_tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+@Key.action_registry.register('remove-tag')
+class KmsRemoveTag(RemoveTag):
+    """Remove tags from a KMS key."""
+
+    permissions = ('kms:UntagResource',)
+
+    def process_resource_set(self, client, kms_keys, tags):
+        for k in kms_keys:
+            try:
+                self.manager.retry(
+                    client.untag_resource, KeyId=k['KeyId'], TagKeys=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+def _tag_mapper(tags):
+    mapped = map(lambda t: { 'TagKey': t['Key'], 'TagValue': t['Value']}, tags)
+    return list(mapped)
