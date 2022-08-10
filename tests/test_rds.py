@@ -884,7 +884,7 @@ class RDSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_rds_snapshot_count_filter_2(self):
+    def test_rds_snapshot_count_filter_policy_2(self):
         factory = self.replay_flight_data("test_rds_snapshot_count_filter")
         p = self.load_policy(
             {

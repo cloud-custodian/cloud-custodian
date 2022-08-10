@@ -441,6 +441,20 @@ class RDSClusterTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rdscluster_snapshot_count_filter_policy_2(self):
+        factory = self.replay_flight_data("test_rdscluster_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster-snapshot-count-filter",
+                "resource": "rds-cluster",
+                "filters": [{"type": "count", "num": 2, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rdscluster):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSClusterSnapshotTest(BaseTest):
 
