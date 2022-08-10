@@ -1528,22 +1528,35 @@ class Terminate(BaseAction):
             permissions += ('ec2:ModifyInstanceAttribute',)
         return permissions
 
+    def process_terminate(self, instances):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        try:
+            self.manager.retry(
+                client.terminate_instances,
+                InstanceIds=[i['InstanceId'] for i in instances])
+            return
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OperationNotPermitted':
+                raise
+            if not self.data.get('force'):
+                raise
+
+            self.log.info("Disabling stop and termination protection on instances")
+            self.disable_deletion_protection(
+                client,
+                [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
+            self.manager.retry(
+                client.terminate_instances,
+                InstanceIds=[i['InstanceId'] for i in instances])
+
     def process(self, instances):
         instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
-        if self.data.get('force'):
-            self.log.info("Disabling termination protection on instances")
-            self.disable_deletion_protection(
-                client,
-                [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
-            self.manager.retry(
-                client.terminate_instances,
-                InstanceIds=[i['InstanceId'] for i in batch])
+            self.process_terminate(batch)
 
     def disable_deletion_protection(self, client, instances):
 
