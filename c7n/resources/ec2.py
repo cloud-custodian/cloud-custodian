@@ -329,11 +329,6 @@ class DisableApiStop(Filter):
     schema = type_schema('stop-protected')
     permissions = ('ec2:DescribeInstanceAttribute',)
 
-    def get_permissions(self) -> List[str]:
-        perms = list(self.permissions)
-        perms.extend(self.manager.get_permissions())
-        return perms
-
     def process(self, resources: List[dict], event=None) -> List[dict]:
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
