@@ -55,11 +55,12 @@ class TestRestApi(BaseTest):
 
     def test_rest_api_cross_account(self):
         session_factory = self.replay_flight_data('test_rest_api_cross_account_default')
-        p = self.load_policy({
-            'name': 'api-cross-account-default',
-            'resource': 'rest-api',
-            'filters': [{'type': 'cross-account'}],
-            }, session_factory=session_factory)
+        p = self.load_policy(
+            {'name': 'api-cross-account-default',
+             'resource': 'rest-api',
+             'filters': [{'type': 'cross-account'}]},
+            session_factory=session_factory
+        )
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
