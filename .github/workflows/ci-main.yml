@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Bootstrap poetry
         shell: bash
         run: |
@@ -62,7 +62,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-3.9-${{ hashFiles('**/poetry.lock') }}
+          key: venv-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up doc cache
         uses: actions/cache@v2
@@ -74,7 +74,7 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}-1
+          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash

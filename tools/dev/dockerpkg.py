@@ -36,7 +36,7 @@ RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
-    | python3 - -y --version 1.1.9
+ | python3 - -y --version 1.1.14
 
 WORKDIR /src
 
@@ -59,7 +59,7 @@ ADD tools/c7n_openstack /src/tools/c7n_openstack
 RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
-ARG providers="azure gcp kube openstack"
+ARG providers="gcp kube openstack azure"
 RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
     $HOME/.poetry/bin/poetry install && cd ../../; done
@@ -128,32 +128,15 @@ RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry
 """
 
 BUILD_POLICYSTREAM = """\
-# Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
-RUN mkdir build && \\
-    wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \\
-    cd build && \\
-    tar xzf ../libgit2-1.0.0.tar.gz && \\
-    cd libgit2-1.0.0 && \\
-    mkdir build && cd build && \\
-    cmake .. && \\
-    make install && \\
-    rm -Rf /src/build
-
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
 RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
-
-# Verify the install
-#  - policystream is not in ci due to libgit2 compilation needed
-#  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
 """
 
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:20.04", base_target_image="ubuntu:20.04")
+    defaults = dict(base_build_image="ubuntu:22.04", base_target_image="ubuntu:22.04")
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata

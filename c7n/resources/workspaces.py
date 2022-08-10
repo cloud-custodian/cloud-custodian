@@ -8,13 +8,19 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.utils import get_retry, local_session, type_schema, chunks
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
+
+
+class DescribeWorkspace(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('workspaces')
@@ -26,10 +32,12 @@ class Workspace(QueryResourceManager):
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
-        cfn_type = 'AWS::WorkSpaces::Workspace'
+        cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
 
-    def augment(self, resources):
-        return universal_augment(self, resources)
+    source_mapping = {
+        'describe': DescribeWorkspace,
+        'config': ConfigSource
+    }
 
 
 @Workspace.filter_registry.register('connection-status')
@@ -265,6 +273,45 @@ class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
 class WorkSpacesDirectorySg(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+@WorkspaceDirectory.filter_registry.register('connection-aliases')
+class WorkspacesDirectoryConnectionAliases(ValueFilter):
+    """Filter workspace directories based on connection aliases
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: workspace-connection-alias
+           resource: aws.workspaces-directory
+           filters:
+            - type: connection-aliases
+              key: 'ConnectionAliases'
+              value: 'empty'
+
+    """
+
+    permissions = ('workspaces:DescribeConnectionAliases',)
+
+    schema = type_schema('connection-aliases', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ConnectionAliases'
+
+    def process(self, directories, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        results = []
+
+        for directory in directories:
+            if self.annotation_key not in directory:
+                connection_aliases = client.describe_connection_aliases(
+                    ResourceId=directory['DirectoryId'])
+                directory[self.annotation_key] = connection_aliases
+
+            if self.match(directory[self.annotation_key]):
+                results.append(directory)
+
+        return results
 
 
 @WorkspaceDirectory.filter_registry.register('client-properties')

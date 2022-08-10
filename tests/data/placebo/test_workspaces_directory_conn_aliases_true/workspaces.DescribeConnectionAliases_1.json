@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConnectionAliases": [
+            {
+                "ConnectionString": "c7ntesting.com",
+                "AliasId": "wsca-429dmz49v",
+                "State": "CREATED",
+                "OwnerAccountId": "644160558196",
+                "Associations": [
+                    {
+                        "AssociationStatus": "ASSOCIATED_WITH_OWNER_ACCOUNT",
+                        "AssociatedAccountId": "644160558196",
+                        "ResourceId": "d-90674b67e1",
+                        "ConnectionIdentifier": "SLiad"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

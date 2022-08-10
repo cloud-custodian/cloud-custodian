@@ -69,5 +69,41 @@
         }
       }
     ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-SourceAccount-Positive",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sns:Publish"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "*"
+        },
+        "Condition": {
+          "StringEquals": {"AWS:SourceAccount": "111111111111"}
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-SourceAccount-Negative",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sns:Publish"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "*"
+        },
+        "Condition": {
+          "StringEquals": {"AWS:SourceAccount": "111111111112"}
+        }
+      }
+    ]
   }
 ]

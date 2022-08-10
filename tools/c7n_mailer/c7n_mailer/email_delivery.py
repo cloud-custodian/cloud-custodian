@@ -86,7 +86,7 @@ class EmailDelivery:
         return ldap_uid_emails
 
     def get_resource_owner_emails_from_resource(self, sqs_message, resource):
-        if 'resource-owner' not in sqs_message['action']['to']:
+        if 'resource-owner' not in sqs_message['action'].get('to', []):
             return []
         resource_owner_tag_keys = self.config.get('contact_tags', [])
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
@@ -111,7 +111,7 @@ class EmailDelivery:
     def get_account_emails(self, sqs_message):
         email_list = []
 
-        if 'account-emails' not in sqs_message['action']['to']:
+        if 'account-emails' not in sqs_message['action'].get('to', []):
             return []
 
         account_id = sqs_message.get('account_id', None)
@@ -134,7 +134,7 @@ class EmailDelivery:
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
-        targets = sqs_message['action']['to'] + \
+        targets = sqs_message['action'].get('to', []) + \
             (sqs_message['action']['cc'] if 'cc' in sqs_message['action'] else [])
         no_owner_targets = self.get_valid_emails_from_list(
             sqs_message['action'].get('owner_absent_contact', [])
