@@ -183,10 +183,12 @@ class RestApiCrossAccount(CrossAccountAccessFilter):
             # api gateway default iam policy is public
             # authorizers and app code may mitigate but
             # the iam policy intent here is clear.
-            policy = {'Statement': [{
-                'Action': 'execute-api:Invoke',
-                'Effect': 'Allow',
-                'Principal': '*'}]}
+            policy = {
+                'Statement': [{
+                    'Action': 'execute-api:Invoke',
+                    'Effect': 'Allow',
+                    'Principal': '*'}]
+            }
         return policy
 
 

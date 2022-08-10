@@ -62,9 +62,11 @@ class TestRestApi(BaseTest):
             }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-        assert resources[0]['CrossAccountViolations'] == [{'Action': 'execute-api:Invoke',
-                                                           'Effect': 'Allow',
-                                                           'Principal': '*'}]
+        self.assertEqual(
+            resources[0]['CrossAccountViolations'],
+            [{'Action': 'execute-api:Invoke',
+              'Effect': 'Allow',
+              'Principal': '*'}])
 
     def test_rest_api_update(self):
         session_factory = self.replay_flight_data('test_rest_api_update')
