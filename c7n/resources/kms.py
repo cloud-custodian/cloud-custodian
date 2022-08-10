@@ -412,6 +412,7 @@ class KmsPostFinding(PostFinding):
 Key.action_registry.register('mark-for-op', TagDelayedAction)
 Key.filter_registry.register('marked-for-op', TagActionFilter)
 
+
 @Key.action_registry.register('tag')
 class KmsTag(Tag):
     """Tag a KMS key"""
@@ -427,6 +428,7 @@ class KmsTag(Tag):
             except client.exceptions.NoSuchEntityException:
                 continue
 
+
 @Key.action_registry.register('remove-tag')
 class KmsRemoveTag(RemoveTag):
     """Remove tags from a KMS key."""
@@ -441,6 +443,7 @@ class KmsRemoveTag(RemoveTag):
             except client.exceptions.NoSuchEntityException:
                 continue
 
+
 def _tag_mapper(tags):
-    mapped = map(lambda t: { 'TagKey': t['Key'], 'TagValue': t['Value']}, tags)
+    mapped = map(lambda t: {'TagKey': t['Key'], 'TagValue': t['Value']}, tags)
     return list(mapped)
