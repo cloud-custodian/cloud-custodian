@@ -32,7 +32,7 @@ class DescribeDistribution(DescribeSource):
             else:
                 distribution_ids.append(i)
         if distribution_ids:
-            results = super(DescribeDistribution, self).get_resources(distribution_ids, cache)
+            results = super().get_resources(distribution_ids, cache)
         return results
 
 
