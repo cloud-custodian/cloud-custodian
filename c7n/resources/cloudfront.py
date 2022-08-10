@@ -52,7 +52,6 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
-        supports_trailevents = True
 
     source_mapping = {
         'describe': DescribeDistribution,
