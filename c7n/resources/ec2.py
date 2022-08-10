@@ -1502,7 +1502,7 @@ class Terminate(BaseAction):
     with api deletion termination protection, so we can't use the bulk call
     reliabily, we need to process the instances individually. Additionally
     If we're configured with 'force' then we'll turn off instance termination
-    protection.
+    and stop protection.
 
     :Example:
 
@@ -1547,17 +1547,21 @@ class Terminate(BaseAction):
 
     def disable_deletion_protection(self, client, instances):
 
-        def process_instance(i):
+        def modify_instance(i, attribute):
             try:
                 self.manager.retry(
                     client.modify_instance_attribute,
                     InstanceId=i['InstanceId'],
-                    Attribute='disableApiTermination',
+                    Attribute=attribute,
                     Value='false')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     return
                 raise
+
+        def process_instance(i):
+            modify_instance(i, 'disableApiTermination')
+            modify_instance(i, 'disableApiStop')
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))

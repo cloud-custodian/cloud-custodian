@@ -205,10 +205,12 @@ don't require quoting, i.e., "my_{charge_code}".
 
 ## Other commands
 
-c7n-org also supports running arbitrary scripts against accounts via the run-script command.
-For AWS the standard AWS SDK credential information is exported into the process environment before executing.
-For Azure and GCP, only the environment variables `AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition
-of the system env variables).
+c7n-org also supports running arbitrary scripts against accounts via
+the run-script command.  For AWS the standard AWS SDK credential
+information is exported into the process environment before executing.
+For Azure and GCP, only the environment variables
+`AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition of
+the system env variables).
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.
