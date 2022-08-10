@@ -260,7 +260,8 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     def filter_unsupported_resources(self, r):
         for carn in r.get('c7n:ChildArns'):
             if 'aws.' + str(ArnResolver.resolve_type(carn)) not in self.supported_resources:
-                self.log.info(f"Skipping resource, target type {carn} is not supported")
+                self.log.info(
+                    f"Skipping resource {r.get('Arn')}, target type {carn} is not supported")
                 return False
             return True
 
