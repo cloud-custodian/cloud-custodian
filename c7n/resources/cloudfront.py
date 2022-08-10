@@ -12,6 +12,7 @@ from c7n.filters import ValueFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
+from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.resources.securityhub import PostFinding
 
@@ -24,14 +25,12 @@ class DescribeDistribution(DescribeSource):
     def get_resources(self, ids, cache=True):
         results = []
         distribution_ids = []
-        for id in ids:
+        for i in ids:
             # if we get cloudfront distribution arn, we pick distribution id
-            if id.startswith('arn:'):
-                _, ident = id.rsplit(':', 1)
-                parts = ident.split('/', 2)
-                distribution_ids.append(parts[1])
+            if i.startswith('arn:'):
+                distribution_ids.append(Arn.parse(i).resource)
             else:
-                distribution_ids.append(id)
+                distribution_ids.append(i)
         if distribution_ids:
             results = super(DescribeDistribution, self).get_resources(distribution_ids, cache)
         return results
