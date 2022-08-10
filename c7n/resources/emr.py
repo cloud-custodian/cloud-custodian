@@ -1,19 +1,9 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import time
 import json
+import jmespath
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -24,6 +14,7 @@ from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
+import c7n.filters.vpc as net_filters
 
 filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
@@ -41,8 +32,8 @@ class EMRCluster(QueryResourceManager):
         service = 'emr'
         arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
-        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
-        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
+        default_cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', None)
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
@@ -55,9 +46,7 @@ class EMRCluster(QueryResourceManager):
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [
-                {'ClusterStates': [
-                    'running', 'bootstrapping', 'waiting']}]))
+            self.data.get('query', []))
 
     @classmethod
     def get_permissions(cls):
@@ -100,7 +89,7 @@ class EMRCluster(QueryResourceManager):
             result.append(
                 {
                     'Name': 'ClusterStates',
-                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
+                    'Values': self.resource_type.default_cluster_states
                 }
             )
         return result
@@ -284,6 +273,37 @@ class QueryFilter:
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@filters.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "Ec2InstanceAttributes.RequestedEc2SubnetIds[]"
+
+
+@filters.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('Ec2InstanceAttributes.EmrManagedMasterSecurityGroup',
+                'Ec2InstanceAttributes.EmrManagedSlaveSecurityGroup',
+                'Ec2InstanceAttributes.ServiceAccessSecurityGroup',
+                'Ec2InstanceAttributes.AdditionalMasterSecurityGroups[]',
+                'Ec2InstanceAttributes.AdditionalSlaveSecurityGroups[]')
+
+    def get_related_ids(self, resources):
+        sg_ids = set()
+        for r in resources:
+            for exp in self.expressions:
+                ids = jmespath.search(exp, r)
+                if isinstance(ids, list):
+                    sg_ids.update(tuple(ids))
+                elif isinstance(ids, str):
+                    sg_ids.add(ids)
+        return list(sg_ids)
+
+
+filters.register('network-location', net_filters.NetworkLocation)
 
 
 @resources.register('emr-security-configuration')

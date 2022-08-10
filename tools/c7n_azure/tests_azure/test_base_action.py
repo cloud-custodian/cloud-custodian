@@ -1,20 +1,9 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest
 from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 from c7n_azure.session import Session
-from mock import patch, MagicMock, ANY
+from mock import patch, MagicMock, ANY, call
 
 from c7n.utils import local_session
 
@@ -22,7 +11,7 @@ from c7n.utils import local_session
 class AzureBaseActionTest(BaseTest):
     def test_return_success(self):
         action = SampleAction()
-        action.process([{'id': '1'}, {'id': '2'}], None)
+        action.process([{'id': '1', 'message': 'foo'}, {'id': '2', 'message': 'foo'}], None)
 
         self.assertEqual(2, action.log.info.call_count)
 
@@ -56,7 +45,7 @@ class AzureBaseActionTest(BaseTest):
         action = SampleAction()
         action.process([
             {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
-            {'id': '2'}],
+            {'id': '2', 'message': 'foo'}],
             None)
 
         action.log.exception.assert_called_once_with(
@@ -72,7 +61,7 @@ class AzureBaseActionTest(BaseTest):
         action = SampleEventAction()
         action.process([
             {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
-            {'id': '2'}],
+            {'id': '2', 'message': 'foo'}],
             None)
 
         action.log.exception.assert_called_once_with(
@@ -82,6 +71,28 @@ class AzureBaseActionTest(BaseTest):
         action.log.info.assert_called_once_with(
             ANY,
             extra={'properties': {'resource_id': '2', 'action': 'test'}})
+
+    def test_log_modified_resource(self):
+        action = SampleEventAction()
+        action._get_action_log_metadata = lambda x: ''
+        logger = MagicMock()
+        action.log.info = logger
+
+        action._log_modified_resource(
+            {'name': 'rg1', 'type': 'resourcegroups', 'resourceGroup': 'r'}, 'Message')
+        action._log_modified_resource(
+            {'name': 'r1', 'type': 'none', 'resourceGroup': 'rg2'}, 'Message')
+        action._log_modified_resource(
+            {'name': 'rg1', 'type': 'resourcegroups', 'resourceGroup': 'r'}, None)
+        action._log_modified_resource(
+            {'name': 'r1', 'type': 'none', 'resourceGroup': 'rg2'}, None)
+
+        logger.assert_has_calls([
+            call("Action 'test' modified resource group 'rg1'. Message", extra=''),
+            call("Action 'test' modified 'r1' in resource group 'rg2'. Message", extra=''),
+            call("Action 'test' modified resource group 'rg1'. ", extra=''),
+            call("Action 'test' modified 'r1' in resource group 'rg2'. ", extra='')
+        ])
 
 
 class SampleAction(AzureBaseAction):

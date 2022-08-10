@@ -43,7 +43,45 @@
                 "SnapshotType": "manual", 
                 "IAMDatabaseAuthenticationEnabled": false, 
                 "Port": 5432, 
-                "DBInstanceIdentifier": "mxtest"
+                "DBInstanceIdentifier": "mxtest",
+                "TagList": [
+                    {
+                        "Value": "gp2",
+                        "Key": "StorageType"
+                    },
+                    {
+                        "Value": "default.postgres9.5",
+                        "Key": "ParameterGroupName"
+                    },
+                    {
+                        "Value": "sg-aa6c90c3",
+                        "Key": "VPCSecurityGroups"
+                    },
+                    {
+                        "Value": "default:postgres-9-5",
+                        "Key": "OptionGroupName"
+                    },
+                    {
+                        "Value": "db.m4.large",
+                        "Key": "InstanceClass"
+                    },
+                    {
+                        "Value": "default",
+                        "Key": "DBSubnetGroupName"
+                    },
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "False",
+                        "Key": "MultiAZ"
+                    },
+                    {
+                        "Value": "Testing",
+                        "Key": "AppName"
+                    }
+                ]
             }
         ]
     }

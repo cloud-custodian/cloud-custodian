@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "NatGateways": [
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 2,
+                    "day": 22,
+                    "hour": 12,
+                    "minute": 12,
+                    "second": 12,
+                    "microsecond": 0
+                },
+                "NatGatewayAddresses": [
+                    {
+                        "AllocationId": "eipalloc-12345678",
+                        "NetworkInterfaceId": "eni-aaaaaaaa",
+                        "PrivateIp": "192.1.1.1",
+                        "PublicIp": "8.8.8.8"
+                    }
+                ],
+                "NatGatewayId": "nat-12345678901112134",
+                "State": "available",
+                "SubnetId": "subnet-12345678",
+                "VpcId": "vpc-12345678",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "NAT Gateway"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

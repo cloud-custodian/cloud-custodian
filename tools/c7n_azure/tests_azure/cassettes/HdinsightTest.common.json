@@ -57,7 +57,7 @@
                                                 "name": "headnode",
                                                 "targetInstanceCount": 2,
                                                 "hardwareProfile": {
-                                                    "vmSize": "standard_a2m_v2"
+                                                    "vmSize": "STANDARD_D3_V2"
                                                 },
                                                 "osProfile": {
                                                     "linuxOperatingSystemProfile": {

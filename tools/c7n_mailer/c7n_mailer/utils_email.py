@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -78,7 +80,10 @@ def priority_header_is_valid(priority_header, logger):
         return False
 
 
-def set_mimetext_headers(message, subject, from_addr, to_addrs, cc_addrs, priority, logger):
+def set_mimetext_headers(
+    message, subject, from_addr, to_addrs, cc_addrs, additional_headers,
+    priority, logger
+):
     """Sets headers on Mimetext message"""
 
     message['Subject'] = subject
@@ -86,6 +91,9 @@ def set_mimetext_headers(message, subject, from_addr, to_addrs, cc_addrs, priori
     message['To'] = ', '.join(to_addrs)
     if cc_addrs:
         message['Cc'] = ', '.join(cc_addrs)
+    if additional_headers:
+        for k, v in additional_headers.items():
+            message[k] = v
 
     if priority and priority_header_is_valid(priority, logger):
         priority = PRIORITIES[str(priority)].copy()
@@ -111,6 +119,7 @@ def get_mimetext_message(config, logger, message, resources, to_addrs):
         from_addr=message['action'].get('from', config['from_address']),
         to_addrs=to_addrs,
         cc_addrs=message['action'].get('cc', []),
+        additional_headers=config.get('additional_email_headers', {}),
         priority=message['action'].get('priority_header', None),
         logger=logger
     )

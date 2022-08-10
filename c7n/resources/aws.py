@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.provider import clouds, Provider
 
@@ -152,6 +141,8 @@ class Arn(namedtuple('_Arn', (
 
     @classmethod
     def parse(cls, arn):
+        if isinstance(arn, Arn):
+            return arn
         parts = arn.split(':', 5)
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api'):
@@ -163,6 +154,11 @@ class Arn(namedtuple('_Arn', (
         elif ':' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split(':', 1)))
             parts.append(':')
+        elif len(parts) == 6:
+            parts.append('')
+            parts.append('')
+        # replace the literal 'arn' string with raw arn
+        parts[0] = arn
         return cls(*parts)
 
 
@@ -171,8 +167,36 @@ class ArnResolver:
     def __init__(self, manager):
         self.manager = manager
 
+    def resolve(self, arns):
+        arns = map(Arn.parse, arns)
+        a_service = operator.attrgetter('service')
+        a_resource = operator.attrgetter('resource_type')
+        kfunc = lambda a: (a_service(a), a_resource(a))  # noqa
+        arns = sorted(arns, key=kfunc)
+        results = {}
+        for (service, arn_type), arn_set in itertools.groupby(arns, key=kfunc):
+            arn_set = list(arn_set)
+            rtype = ArnResolver.resolve_type(arn_set[0])
+            rmanager = self.manager.get_resource_manager(rtype)
+            if rtype == 'sns':
+                resources = rmanager.get_resources(
+                    [rarn.arn for rarn in arn_set])
+            else:
+                resources = rmanager.get_resources(
+                    [rarn.resource for rarn in arn_set])
+            for rarn, r in zip(rmanager.get_arns(resources), resources):
+                results[rarn] = r
+
+            for rarn in arn_set:
+                if rarn.arn not in results:
+                    results[rarn.arn] = None
+        return results
+
     @staticmethod
     def resolve_type(arn):
+        arn = Arn.parse(arn)
+
+        # this would benefit from a class cache {service} -> rtypes
         for type_name, klass in AWS.resources.items():
             if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
                 continue
@@ -184,6 +208,9 @@ class ArnResolver:
                 return type_name
             elif (klass.resource_type.arn_type is not None and
                     klass.resource_type.arn_type == arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_service == arn.service and
+                    klass.resource_type.arn_type == ""):
                 return type_name
 
 
@@ -508,8 +535,12 @@ class S3Output(BlobOutput):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
         # can't use a local session as we dont want an unassumed session cached.
+        s3_client = self.ctx.session_factory(assume=False).client('s3')
+        region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+        # if region is None, we use us-east-1
+        region = region or "us-east-1"
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(region=region, assume=False).client('s3'))
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
@@ -561,7 +592,7 @@ class AWS(Provider):
         from c7n.policy import Policy, PolicyCollection
         policies = []
         service_region_map, resource_service_map = get_service_region_map(
-            options.regions, policy_collection.resource_types)
+            options.regions, policy_collection.resource_types, self.type)
         if 'all' in options.regions:
             enabled_regions = {
                 r['RegionName'] for r in
@@ -624,26 +655,26 @@ def join_output(output_dir, suffix):
 
 
 def fake_session():
-    session = boto3.Session(
+    session = boto3.Session(  # nosec nosemgrep
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')
     return session
 
 
-def get_service_region_map(regions, resource_types):
+def get_service_region_map(regions, resource_types, provider='aws'):
     # we're not interacting with the apis just using the sdk meta information.
 
     session = fake_session()
     normalized_types = []
     for r in resource_types:
-        if r.startswith('aws.'):
-            normalized_types.append(r[4:])
+        if r.startswith('%s.' % provider):
+            normalized_types.append(r[len(provider) + 1:])
         else:
             normalized_types.append(r)
 
     resource_service_map = {
-        r: clouds['aws'].resources.get(r).resource_type.service
+        r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
     # support for govcloud and china, we only utilize these regions if they
     # are explicitly passed in on the cli.

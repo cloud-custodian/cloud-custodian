@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
@@ -18,7 +7,23 @@ from c7n.tags import universal_augment
 
 class DescribeRegionalWaf(DescribeSource):
     def augment(self, resources):
+        resources = super().augment(resources)
         return universal_augment(self.manager, resources)
+
+
+class DescribeWafV2(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+    # set REGIONAL for Scope as default
+    def get_query_params(self, query):
+        q = super(DescribeWafV2, self).get_query_params(query)
+        if q:
+            if 'Scope' not in q:
+                q['Scope'] = 'REGIONAL'
+        else:
+            q = {'Scope': 'REGIONAL'}
+        return q
 
 
 @resources.register('waf')
@@ -57,5 +62,28 @@ class RegionalWAF(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeRegionalWaf,
+        'config': ConfigSource
+    }
+
+
+@resources.register('wafv2')
+class WAFV2(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "wafv2"
+        enum_spec = ("list_web_acls", "WebACLs", None)
+        detail_spec = ("get_web_acl", "Id", "Id", "WebACL")
+        name = "Name"
+        id = "Id"
+        dimension = "WebACL"
+        cfn_type = config_type = "AWS::WAFv2::WebACL"
+        arn_type = "webacl"
+        # override defaults to casing issues
+        permissions_enum = ('wafv2:ListWebACLs',)
+        permissions_augment = ('wafv2:GetWebACL',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeWafV2,
         'config': ConfigSource
     }

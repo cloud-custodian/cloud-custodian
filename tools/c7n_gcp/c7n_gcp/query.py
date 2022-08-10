@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import jmespath
 import json
@@ -86,7 +75,17 @@ class DescribeSource:
         return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
-        return ()
+        m = self.manager.resource_type
+        if m.permissions:
+            return m.permissions
+        method = m.enum_spec[0]
+        if method == 'aggregatedList':
+            method = 'list'
+        component = m.component
+        if '.' in component:
+            component = component.split('.')[-1]
+        return ("%s.%s.%s" % (
+            m.perm_service or m.service, component, method),)
 
     def augment(self, resources):
         return resources
@@ -156,7 +155,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):
-        return ()
+        return self.source.get_permissions()
 
     def get_source(self, source_type):
         return sources.get(source_type)(self)
@@ -212,10 +211,14 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         try:
             return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
-            error = extract_error(e)
-            if error is None:
+            error_reason, error_code, error_message = extract_errors(e)
+
+            if error_reason is None and error_code is None:
                 raise
-            elif error == 'accessNotConfigured':
+            if error_code == 403 and 'disabled' in error_message:
+                log.warning(error_message)
+                return []
+            elif error_reason == 'accessNotConfigured':
                 log.warning(
                     "Resource:%s not available -> Service:%s not enabled on %s",
                     self.type,
@@ -320,6 +323,8 @@ class TypeInfo(metaclass=TypeMeta):
     get = None
     # for get methods that require the full event payload
     get_requires_event = False
+    perm_service = None
+    permissions = ()
 
     labels = False
     labels_op = 'setLabels'
@@ -331,6 +336,10 @@ class TypeInfo(metaclass=TypeMeta):
 
     # cloud asset inventory type
     asset_type = None
+
+    @classmethod
+    def get_metric_resource_name(cls, resource):
+        return resource.get(cls.name)
 
 
 class ChildTypeInfo(TypeInfo):
@@ -344,15 +353,17 @@ class ChildTypeInfo(TypeInfo):
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')
+ERROR_CODE = jmespath.compile('error.code')
+ERROR_MESSAGE = jmespath.compile('error.message')
 
 
-def extract_error(e):
-
+def extract_errors(e):
     try:
         edata = json.loads(e.content)
     except Exception:
-        return None
-    return ERROR_REASON.search(edata)
+        edata = None
+
+    return ERROR_REASON.search(edata), ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
 
 class GcpLocation:

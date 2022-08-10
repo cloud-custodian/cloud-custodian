@@ -1,18 +1,8 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 import json
 import itertools
 import ipaddress
@@ -24,7 +14,10 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies
+from urllib.request import getproxies, proxy_bypass
+
+
+from dateutil.parser import ParserError, parse
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -114,6 +107,56 @@ def filter_empty(d):
     return d
 
 
+# We need a minimum floor when examining possible timestamp
+# values to distinguish from other numeric time usages. Use
+# the S3 Launch Date.
+DATE_FLOOR = time.mktime((2006, 3, 19, 0, 0, 0, 0, 0, 0))
+
+
+def parse_date(v, tz=None):
+    """Handle various permutations of a datetime serialization
+    to a datetime with the given timezone.
+
+    Handles strings, seconds since epoch, and milliseconds since epoch.
+    """
+
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime):
+        if v.tzinfo is None:
+            return v.astimezone(tz)
+        return v
+
+    if isinstance(v, str) and not v.isdigit():
+        try:
+            return parse(v).astimezone(tz)
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
+
+    if isinstance(v, (int, float, str)):
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v)).astimezone(tz)
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float, str)):
+        # try interpreting as milliseconds epoch
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
+        except exceptions:
+            pass
+
+    return isinstance(v, datetime) and v or None
+
+
 def type_schema(
         type_name, inherits=None, rinherit=None,
         aliases=None, required=None, **props):
@@ -149,6 +192,10 @@ def type_schema(
         s['additionalProperties'] = False
 
     s['properties'].update(props)
+
+    for k, v in props.items():
+        if v is None:
+            del s['properties'][k]
     if not required:
         required = []
     if isinstance(required, list):
@@ -198,20 +245,44 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def camelResource(obj):
+def camelResource(obj, implicitDate=False, implicitTitle=True):
     """Some sources from apis return lowerCased where as describe calls
 
     always return TitleCase, this function turns the former to the later
+
+    implicitDate ~ automatically sniff keys that look like isoformat date strings
+     and convert to python datetime objects.
     """
     if not isinstance(obj, dict):
         return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
-        obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if implicitTitle:
+            ok = "%s%s" % (k[0].upper(), k[1:])
+        else:
+            ok = k
+        obj[ok] = v
+
+        if implicitDate:
+            # config service handles datetime differently then describe sdks
+            # the sdks use knowledge of the shape to support language native
+            # date times, while config just turns everything into a serialized
+            # json with mangled keys without type info. to normalize to describe
+            # we implicitly sniff keys which look like datetimes, and have an
+            # isoformat marker ('T').
+            kn = k.lower()
+            if isinstance(v, (str, int)) and ('time' in kn or 'date' in kn):
+                try:
+                    dv = parse_date(v)
+                except ParserError:
+                    dv = None
+                if dv:
+                    obj[ok] = dv
         if isinstance(v, dict):
-            camelResource(v)
+            camelResource(v, implicitDate, implicitTitle)
         elif isinstance(v, list):
-            list(map(camelResource, v))
+            for e in v:
+                camelResource(e, implicitDate, implicitTitle)
     return obj
 
 
@@ -241,9 +312,11 @@ def query_instances(session, client=None, **query):
 CONN_CACHE = threading.local()
 
 
-def local_session(factory):
+def local_session(factory, region=None):
     """Cache a session thread local for up to 45m"""
     factory_region = getattr(factory, 'region', 'global')
+    if region:
+        factory_region = region
     s = getattr(CONN_CACHE, factory_region, {}).get('session')
     t = getattr(CONN_CACHE, factory_region, {}).get('time')
 
@@ -450,7 +523,7 @@ def reformat_schema(model):
     ret = copy.deepcopy(model.schema['properties'])
 
     if 'type' in ret:
-        del(ret['type'])
+        del ret['type']
 
     for key in model.schema.get('required', []):
         if key in ret:
@@ -530,14 +603,28 @@ def parse_url_config(url):
 
 def get_proxy_url(url):
     proxies = getproxies()
-    url_parts = parse_url_config(url)
+    parsed = urlparse.urlparse(url)
 
     proxy_keys = [
-        url_parts['scheme'] + '://' + url_parts['netloc'],
-        url_parts['scheme'],
-        'all://' + url_parts['netloc'],
+        parsed.scheme + '://' + parsed.netloc,
+        parsed.scheme,
+        'all://' + parsed.netloc,
         'all'
     ]
+
+    # Set port if not defined explicitly in url.
+    port = parsed.port
+    if port is None and parsed.scheme == 'http':
+        port = 80
+    elif port is None and parsed.scheme == 'https':
+        port = 443
+
+    hostname = parsed.hostname is not None and parsed.hostname or ''
+
+    # Determine if proxy should be used based on no_proxy entries.
+    # Note this does not support no_proxy ip or cidr entries.
+    if proxy_bypass("%s:%s" % (hostname, port)):
+        return None
 
     for key in proxy_keys:
         if key in proxies:
@@ -684,3 +771,35 @@ def select_keys(d, keys):
     for k in keys:
         result[k] = d.get(k)
     return result
+
+
+def get_human_size(size, precision=2):
+    # interesting discussion on 1024 vs 1000 as base
+    # https://en.wikipedia.org/wiki/Binary_prefix
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    suffixIndex = 0
+    while size > 1024:
+        suffixIndex += 1
+        size = size / 1024.0
+
+    return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def get_support_region(manager):
+    # support is a unique service in that it doesnt support regional endpoints
+    # thus, we need to construct the client based off the regions found here:
+    # https://docs.aws.amazon.com/general/latest/gr/awssupport.html
+    #
+    # aws-cn uses cn-north-1 for both the Beijing and Ningxia regions
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Beijing.html
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Ningxia.html
+
+    partition = get_partition(manager.config.region)
+    support_region = None
+    if partition == "aws":
+        support_region = "us-east-1"
+    elif partition == "aws-us-gov":
+        support_region = "us-gov-west-1"
+    elif partition == "aws-cn":
+        support_region = "cn-north-1"
+    return support_region

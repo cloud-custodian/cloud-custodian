@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"test\",\"configuration\":{\"engineVersion\":\"5.7.mysql_aurora.2.03.2\",\"masterUsername\":\"testing\",\"allocatedStorage\":0.0,\"snapshotType\":\"manual\",\"availabilityZones\":[{\"value\":\"us-east-2a\"},{\"value\":\"us-east-2b\"},{\"value\":\"us-east-2c\"}],\"storageEncrypted\":false,\"dbclusterSnapshotIdentifier\":\"test\",\"tagList\":[{\"value\":\"dev\",\"key\":\"Environment\"}],\"iamdatabaseAuthenticationEnabled\":false,\"dbclusterSnapshotArn\":\"arn:aws:rds:us-east-2:644160558196:cluster-snapshot:test\",\"dbclusterIdentifier\":\"test-cluster\",\"engine\":\"aurora-mysql\",\"port\":0.0,\"snapshotCreateTime\":1.609308615222E12,\"licenseModel\":\"aurora-mysql\",\"vpcId\":\"vpc-00e3a582e54e7f09a\",\"percentProgress\":100.0,\"clusterCreateTime\":1.609306416945E12,\"status\":\"available\"},\"supplementaryConfiguration\":{\"DBClusterSnapshotAttributes\":[{\"attributeValues\":[\"all\",\"644160558196\",\"644160558196\"],\"attributeName\":\"restore\"}],\"Tags\":[{\"value\":\"dev\",\"key\":\"Environment\"}]}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

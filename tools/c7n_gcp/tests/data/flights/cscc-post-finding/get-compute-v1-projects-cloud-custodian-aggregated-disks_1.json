@@ -1,0 +1,94 @@
+{
+  "headers": {
+    "expires": "Sun, 06 Jan 2019 11:14:28 GMT",
+    "date": "Sun, 06 Jan 2019 11:14:28 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"RgZKtbt5telFfAvzkV_I21I06-8=/LUjxeeuAxpsL17OSFwMMf2A-N74=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "22191",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/disks?alt=json"
+  },
+  "body": {
+    "kind": "compute#diskAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/disks",
+    "items": {
+      "zones/us-central1-a": {
+        "disks": [
+          {
+            "kind": "compute#disk",
+            "id": "7595388187556896112",
+            "creationTimestamp": "2019-01-01T04:57:05.076-08:00",
+            "name": "gke-dev-cluster-pool-1-faf29496-zp1k",
+            "sizeGb": "30",
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+            "status": "READY",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/gke-dev-cluster-pool-1-faf29496-zp1k",
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1115-gke5-cos-stable-69-10895-91-0-v181210-pre",
+            "sourceImageId": "368056898204918146",
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/diskTypes/pd-standard",
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/cos-cloud/global/licenses/cos",
+              "https://www.googleapis.com/compute/v1/projects/cos-cloud/global/licenses/cos-pcid",
+              "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/licenses/gke-node"
+            ],
+            "lastAttachTimestamp": "2019-01-01T04:57:05.083-08:00",
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/gke-dev-cluster-pool-1-faf29496-zp1k"
+            ],
+            "labelFingerprint": "42WmSpB8rSM=",
+            "licenseCodes": [
+              "1001010",
+              "6880041984096540132",
+              "1001003"
+            ],
+            "physicalBlockSizeBytes": "4096"
+          }
+        ]
+      },
+      "zones/us-east1-b": {
+        "disks": [
+          {
+            "kind": "compute#disk",
+            "id": "3417007078727732465",
+            "creationTimestamp": "2018-12-25T10:08:31.242-08:00",
+            "name": "instance-1",
+            "sizeGb": "10",
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b",
+            "status": "READY",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/disks/instance-1",
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-minimal-1804-bionic-v20181220",
+            "sourceImageId": "7076804980018437977",
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/diskTypes/pd-standard",
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-minimal-1804-lts"
+            ],
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              }
+            ],
+            "lastAttachTimestamp": "2018-12-25T10:08:31.244-08:00",
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/instances/instance-1"
+            ],
+            "labelFingerprint": "42WmSpB8rSM=",
+            "licenseCodes": [
+              "5378856944553710442"
+            ],
+            "physicalBlockSizeBytes": "4096"
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/disks"
+  }
+}

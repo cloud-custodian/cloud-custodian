@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from itertools import chain
 
 from c7n_mailer.smtp_delivery import SmtpDelivery
@@ -97,7 +86,7 @@ class EmailDelivery:
         return ldap_uid_emails
 
     def get_resource_owner_emails_from_resource(self, sqs_message, resource):
-        if 'resource-owner' not in sqs_message['action']['to']:
+        if 'resource-owner' not in sqs_message['action'].get('to', []):
             return []
         resource_owner_tag_keys = self.config.get('contact_tags', [])
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
@@ -122,7 +111,7 @@ class EmailDelivery:
     def get_account_emails(self, sqs_message):
         email_list = []
 
-        if 'account-emails' not in sqs_message['action']['to']:
+        if 'account-emails' not in sqs_message['action'].get('to', []):
             return []
 
         account_id = sqs_message.get('account_id', None)
@@ -145,7 +134,7 @@ class EmailDelivery:
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
-        targets = sqs_message['action']['to'] + \
+        targets = sqs_message['action'].get('to', []) + \
             (sqs_message['action']['cc'] if 'cc' in sqs_message['action'] else [])
         no_owner_targets = self.get_valid_emails_from_list(
             sqs_message['action'].get('owner_absent_contact', [])

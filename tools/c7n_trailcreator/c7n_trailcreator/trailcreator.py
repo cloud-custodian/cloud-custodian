@@ -1,16 +1,5 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """AWS AutoTag Resource Creators
 
 See readme for details
@@ -296,10 +285,14 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     while True:
         qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
-            stats['QueryExecutionTime'] = qexec['Statistics'][
-                'EngineExecutionTimeInMillis'] / 1000.0
-            stats['DataScannedInBytes'] = qexec['Statistics'][
-                'DataScannedInBytes']
+            stats['QueryExecutionTime'] = qexec['Statistics'].get(
+                'EngineExecutionTimeInMillis',
+                qexec['Statistics'].get(
+                    'TotalExecutionTimeInMillis',
+                    1000
+                )
+            ) / 1000.0
+            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
                 format_bytes(
@@ -371,7 +364,7 @@ class TrailDB:
             time.sleep(3)
             self.conn.commit()
 
-    def get_type_record_stats(self, account_id, region):
+    def get_type_record_stats(self, account_id, region):  # nosec
         self.cursor.execute('''
             select rtype, count(*) as rcount
             from events
@@ -381,7 +374,7 @@ class TrailDB:
         ''' % (account_id, region))
         return self.cursor.fetchall()
 
-    def get_resource_owners(self, resource_type, account_id, region):
+    def get_resource_owners(self, resource_type, account_id, region):  # nosec
         self.cursor.execute('''
            select user_id, resource_ids
            from events
@@ -556,9 +549,13 @@ class ResourceTagger:
         return resources, policy.resource_manager
 
 
-def get_bucket_path(prefix, account, region, day, month, year):
-    prefix = "%(prefix)s/AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
-        'prefix': prefix.strip('/'), 'account': account, 'region': region}
+def get_bucket_path(prefix, account, region, day, month, year, org_id=None):
+    if org_id:
+        prefix = "%(prefix)s/AWSLogs/%(org_id)s/%(account)s/CloudTrail/%(region)s/" % {
+            'prefix': prefix.strip('/'), 'org_id': org_id, 'account': account, 'region': region}
+    else:
+        prefix = "%(prefix)s/AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
+            'prefix': prefix.strip('/'), 'account': account, 'region': region}
     prefix = prefix.lstrip('/')
     date_prefix = None
     if day:
@@ -609,6 +606,7 @@ def cli():
 @cli.command('load-s3')
 @click.option('--bucket', required=True, help="Cloudtrail Bucket")
 @click.option('--prefix', help="CloudTrail Prefix", default="")
+@click.option('--org-id', required=False, help="For organization trails")
 @click.option('--account', required=True, help="Account to process trail records for")
 @click.option('--region', required=True, help="Region to process trail records for")
 @click.option('--resource-map', required=True,
@@ -619,12 +617,12 @@ def cli():
 @click.option("--year", help="Only process trail events for the given year")
 @click.option("--assume", help="Assume role for trail bucket access")
 @click.option("--profile", help="AWS cli profile for trail bucket access")
-def load(bucket, prefix, account, region, resource_map, db, day, month, year,
+def load(bucket, prefix, account, org_id, region, resource_map, db, day, month, year,
          assume, profile):
     """Ingest cloudtrail events from s3 into resource owner db.
     """
     load_resource_map(resource_map)
-    prefix = get_bucket_path(prefix, account, region, day, month, year)
+    prefix = get_bucket_path(prefix, account, region, day, month, year, org_id)
     session_factory = SessionFactory(region=region, profile=profile, assume_role=assume)
     process_bucket(session_factory, bucket, prefix, db)
 
@@ -708,7 +706,7 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     tag_org_account, a, r, db,
                     creator_tag, user_suffix, dryrun, type)] = (a, r)
@@ -763,7 +761,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
-    load_resources()
+    load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(

@@ -1,25 +1,17 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
+import json
 
-from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
+from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
+from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
+from c7n.filters.kms import KmsRelatedFilter
 
 from .securityhub import PostFinding
 
@@ -27,9 +19,8 @@ from .securityhub import PostFinding
 class DescribeDomain(DescribeSource):
 
     def get_resources(self, resource_ids):
-        client = local_session(self.manager.session_factory).client('es')
-        return client.describe_elasticsearch_domains(
-            DomainNames=resource_ids)['DomainStatusList']
+        # augment will turn these into resource dictionaries
+        return resource_ids
 
     def augment(self, domains):
         client = local_session(self.manager.session_factory).client('es')
@@ -101,6 +92,176 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyId'
+
+
+@ElasticSearchDomain.filter_registry.register('cross-account')
+class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """
+    Filter to return all elasticsearch domains with cross account access permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: check-elasticsearch-cross-account
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-account
+    """
+    policy_attribute = 'c7n:Policy'
+    permissions = ('es:DescribeElasticsearchDomainConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            if self.policy_attribute not in r:
+                result = self.manager.retry(
+                    client.describe_elasticsearch_domain_config,
+                    DomainName=r['DomainName'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                if result:
+                    r[self.policy_attribute] = json.loads(
+                        result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    )
+        return super().process(resources)
+
+
+@ElasticSearchDomain.filter_registry.register('cross-cluster')
+class ElasticSearchCrossClusterFilter(Filter):
+    """
+    Filter to return all elasticsearch domains with inbound cross-cluster with the given info
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: check-elasticsearch-cross-cluster
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-cluster
+                inbound:
+                    key: SourceDomainInfo.OwnerId
+                    op: eq
+                    value: '123456789'
+                outbound:
+                    key: SourceDomainInfo.OwnerId
+                    op: eq
+                    value: '123456789'
+    """
+    schema = type_schema(type_name="cross-cluster",
+                         inbound=type_schema(type_name='inbound',
+                                             required=('key', 'value'),
+                                             rinherit=ValueFilter.schema),
+                         outbound=type_schema(type_name='outbound',
+                                              required=('key', 'value'),
+                                              rinherit=ValueFilter.schema),)
+    schema_alias = False
+    annotation_key = "c7n:SearchConnections"
+    matched_key = "c7n:MatchedConnections"
+    annotate = False
+    permissions = ('es:ESCrossClusterGet',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = {}
+                try:
+                    if "inbound" in self.data:
+                        inbound = self.manager.retry(
+                            client.describe_inbound_cross_cluster_search_connections,
+                            Filters=[{'Name': 'destination-domain-info.domain-name',
+                                    'Values': [r['DomainName']]}])
+                        inbound.pop('ResponseMetadata')
+                        r[self.annotation_key]["inbound"] = inbound
+                    if "outbound" in self.data:
+                        outbound = self.manager.retry(
+                            client.describe_outbound_cross_cluster_search_connections,
+                            Filters=[{'Name': 'source-domain-info.domain-name',
+                                    'Values': [r['DomainName']]}])
+                        outbound.pop('ResponseMetadata')
+                        r[self.annotation_key]["outbound"] = outbound
+                except client.exceptions.ResourceNotFoundExecption:
+                    continue
+            matchFound = False
+            r[self.matched_key] = {}
+            for direction in r[self.annotation_key]:
+                matcher = self.data.get(direction)
+                valueFilter = ValueFilter(matcher)
+                valueFilter.annotate = False
+                matched = []
+                for conn in r[self.annotation_key][direction]['CrossClusterSearchConnections']:
+                    if valueFilter(conn):
+                        matched.append(conn)
+                        matchFound = True
+                r[self.matched_key][direction] = matched
+            if matchFound:
+                results.append(r)
+        return results
+
+
+@ElasticSearchDomain.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """
+    Action to remove policy statements from elasticsearch
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: elasticsearch-cross-account
+            resource: aws.elasticsearch
+            filters:
+              - type: cross-account
+            actions:
+              - type: remove-statements
+                statement_ids: matched
+    """
+
+    permissions = ('es:DescribeElasticsearchDomainConfig', 'es:UpdateElasticsearchDomainConfig',)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, ElasticSearchCrossAccountAccessFilter):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+        for r in resources:
+            try:
+                self.process_resource(client, r)
+            except Exception:
+                self.log.exception("Error processing es:%s", r['ARN'])
+
+    def process_resource(self, client, resource):
+        p = resource.get('c7n:Policy')
+
+        if p is None:
+            return
+
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if found:
+            client.update_elasticsearch_domain_config(
+                DomainName=resource['DomainName'],
+                AccessPolicies=json.dumps(p)
+            )
+
+        return
 
 
 @ElasticSearchDomain.action_registry.register('post-finding')
@@ -248,3 +409,18 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+
+
+@resources.register('elasticsearch-reserved')
+class ReservedInstances(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'es'
+        name = id = 'ReservedElasticsearchInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_elasticsearch_instances', 'ReservedElasticsearchInstances', None)
+        filter_name = 'ReservedElasticsearchInstances'
+        filter_type = 'list'
+        arn_type = "reserved-instances"
+        permissions_enum = ('es:DescribeReservedElasticsearchInstances',)

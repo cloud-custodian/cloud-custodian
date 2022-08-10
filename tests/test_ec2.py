@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
 import time
@@ -1351,6 +1340,25 @@ class TestTerminate(BaseTest):
         )
         self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
 
+    def test_ec2_terminate_with_protection_enabled(self):
+        # Test conditions: single running instance, with delete protection
+        session_factory = self.replay_flight_data("test_ec2_terminate_with_protection_enabled")
+        p = self.load_policy(
+            {
+                "name": "ec2-term",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-017fc9a2a33b853fe"}],
+                "actions": [{"type": "terminate", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-017fc9a2a33b853fe"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
+
 
 class TestDefaultVpc(BaseTest):
 
@@ -1977,3 +1985,81 @@ class TestMonitoringInstance(BaseTest):
         self.assertIn(
             instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
         )
+
+
+class TestDedicatedHost(BaseTest):
+
+    def test_dedicated_host_query(self):
+        factory = self.replay_flight_data('test_ec2_host_query')
+        p = self.load_policy({
+            'name': 'ec2-dedicated-hosts',
+            'resource': 'aws.ec2-host'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+
+class TestSpotFleetRequest(BaseTest):
+
+    def test_spot_fleet_request_query(self):
+        factory = self.replay_flight_data('test_ec2_spot_fleet_request_query')
+        p = self.load_policy({
+            'name': 'ec2-spot-fleet-request',
+            'resource': 'aws.ec2-spot-fleet-request'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_spot_fleet_request_autoscaling_offhours(self):
+        session_factory = self.replay_flight_data("test_spot_fleet_request_autoscaling_offhours")
+
+        p = self.load_policy(
+            {
+                "name": "all-ec2-spot-to-autoscaling",
+                "resource": "ec2-spot-fleet-request",
+                "filters": [
+                ],
+                "actions": [
+                    {
+                        'type': 'resize',
+                        'min-capacity': 0,
+                        'desired': 0,
+                        'save-options-tag': 'OffHoursPrevious',
+                        'suspend-scaling': True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 3)
+
+        client = session_factory().client("ec2")
+        sfrs = client.describe_spot_fleet_requests(
+        )["SpotFleetRequestConfigs"]
+        self.assertEqual(len(sfrs), 3)
+
+    def test_spot_fleet_request_autoscaling_onhours(self):
+        session_factory = self.replay_flight_data("test_spot_fleet_request_autoscaling_onhours")
+
+        p = self.load_policy(
+            {
+                "name": "all-ec2-spot-to-autoscaling",
+                "resource": "ec2-spot-fleet-request",
+                "filters": [
+                ],
+                "actions": [
+                    {
+                        'type': 'resize',
+                        'restore-options-tag': 'OffHoursPrevious',
+                        'restore-scaling': True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 3)
+
+        client = session_factory().client("ec2")
+        sfrs = client.describe_spot_fleet_requests(
+        )["SpotFleetRequestConfigs"]
+        self.assertEqual(len(sfrs), 3)

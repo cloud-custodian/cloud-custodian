@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
@@ -46,14 +35,15 @@ class SNS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sns'
-        arn_type = 'topic'
+        arn_type = ''
+        arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
         id = 'TopicArn'
         name = 'DisplayName'
         dimension = 'TopicName'
-        cfn_type = 'AWS::SNS::Topic'
+        cfn_type = config_type = 'AWS::SNS::Topic'
         default_report_fields = (
             'TopicArn',
             'DisplayName',
@@ -339,7 +329,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 new_policy = policy_statements
             new_policy, added = self.add_statements(new_policy)
 
-            if not removed or not added:
+            if not removed and not added:
                 continue
 
             results += {
@@ -358,22 +348,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filters SNS topic by kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sns-encrypt-key-check
-                  resource: sns
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: alias/aws/sns
-    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 
@@ -468,3 +442,60 @@ class DeleteTopic(BaseAction):
                 client.delete_topic(TopicArn=r['TopicArn'])
             except client.exceptions.NotFoundException:
                 continue
+
+
+@resources.register('sns-subscription')
+class SNSSubscription(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sns'
+        enum_spec = ('list_subscriptions', 'Subscriptions', None)
+        id = name = dimension = 'SubscriptionArn'
+        arn = 'SubscriptionArn'
+        cfn_type = 'AWS::SNS::Subscription'
+        default_report_fields = (
+            'SubscriptionArn',
+            'Owner',
+            'Protocol',
+            'Endpoint',
+            'TopicArn'
+        )
+
+
+@SNSSubscription.action_registry.register('delete')
+class SubscriptionDeleteAction(BaseAction):
+    """
+    Action to delete a subscription
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: external-owner-delete
+            resource: sns-subscription
+            filters:
+              - type: value
+                key: "Owner"
+                value: "{account_id}"
+                op: ne
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("sns:Unsubscribe",)
+
+    def process(self, subscriptions):
+        client = local_session(
+            self.manager.session_factory).client(self.manager.get_model().service)
+
+        for s in subscriptions:
+            self.process_subscription(client, s)
+
+    def process_subscription(self, client, subscription):
+        # Can't delete a pending subscription
+        if subscription['SubscriptionArn'] != 'PendingConfirmation':
+            self.manager.retry(
+                client.unsubscribe, SubscriptionArn=subscription['SubscriptionArn'],
+                ignore_err_codes=('NotFoundException',))

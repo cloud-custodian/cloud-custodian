@@ -1,0 +1,148 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:17 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "428"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlserverj6y6cbbtaphs4.database.windows.net"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/providers/microsoft.insights/metrics?timespan=2019-04-29%2023%3A59%3A59%2F2019-05-02%2023%3A59%3A59&interval=P1D&metricnames=dtu_consumption_percent&aggregation=minimum&$filter=DatabaseResourceId%20eq%20%27%2A%27&api-version=2018-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:19 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1377"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "cost": 0,
+                        "timespan": "2019-04-29T23:59:59Z/2019-05-02T23:59:59Z",
+                        "interval": "P1D",
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/providers/Microsoft.Insights/metrics/dtu_consumption_percent",
+                                "type": "Microsoft.Insights/metrics",
+                                "name": {
+                                    "value": "dtu_consumption_percent",
+                                    "localizedValue": "DTU percentage"
+                                },
+                                "unit": "Percent",
+                                "timeseries": [
+                                    {
+                                        "metadatavalues": [
+                                            {
+                                                "name": {
+                                                    "value": "DatabaseResourceId",
+                                                    "localizedValue": "DatabaseResourceId"
+                                                },
+                                                "value": "/SUBSCRIPTIONS/AA98974B-5D2A-4D98-A78A-382F3715D07E/RESOURCEGROUPS/TEST_SQLSERVER/PROVIDERS/MICROSOFT.SQL/SERVERS/CCTESTSQLSERVERJ6Y6CBBTAPHS4/DATABASES/MASTER"
+                                            }
+                                        ],
+                                        "data": [
+                                            {
+                                                "timeStamp": "2019-04-29T23:59:00Z"
+                                            },
+                                            {
+                                                "timeStamp": "2019-04-30T23:59:00Z"
+                                            },
+                                            {
+                                                "timeStamp": "2019-05-01T23:59:00Z",
+                                                "minimum": 10
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "metadatavalues": [
+                                            {
+                                                "name": {
+                                                    "value": "DatabaseResourceId",
+                                                    "localizedValue": "DatabaseResourceId"
+                                                },
+                                                "value": "/SUBSCRIPTIONS/AA98974B-5D2A-4D98-A78A-382F3715D07E/RESOURCEGROUPS/TEST_SQLSERVER/PROVIDERS/MICROSOFT.SQL/SERVERS/CCTESTSQLSERVERJ6Y6CBBTAPHS4/DATABASES/CCTESTDB"
+                                            }
+                                        ],
+                                        "data": [
+                                            {
+                                                "timeStamp": "2019-04-29T23:59:00Z"
+                                            },
+                                            {
+                                                "timeStamp": "2019-04-30T23:59:00Z"
+                                            },
+                                            {
+                                                "timeStamp": "2019-05-01T23:59:00Z",
+                                                "minimum": 10
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "namespace": "Microsoft.Sql/servers",
+                        "resourceregion": "eastus2"
+                    }
+                }
+            }
+        }
+    ]
+}

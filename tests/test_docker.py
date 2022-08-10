@@ -1,16 +1,5 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Functional Tests for the Docker
 
 The uses here is a little specialized to be invoked by tools/dev/dockerpkg.py
@@ -162,7 +151,7 @@ def test_image_metadata(image_name):
 def test_cli_providers_available():
     providers = os.environ.get("CUSTODIAN_PROVIDERS", None)
     if providers is None:
-        providers = {"aws", "azure", "gcp", "k8s"}
+        providers = {"aws", "azure", "gcp", "k8s", "openstack"}
     elif providers == "":
         providers = {"aws"}
     else:

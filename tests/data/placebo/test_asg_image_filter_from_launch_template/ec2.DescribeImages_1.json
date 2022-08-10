@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2020-08-14T17:23:53.000Z",
+                "ImageId": "ami-05dd97e95ca0b2ca1",
+                "ImageLocation": "123456789012/My-CentOS7-Image",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "123456789012",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-234567890abcdef11",
+                            "VolumeSize": 10,
+                            "VolumeType": "gp2",
+                            "Encrypted": true
+                        }
+                    }
+                ],
+                "Description": "My CentOS7 Image",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "My-CentOS7-Image",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "Tags": [],
+                "VirtualizationType": "hvm"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2020-08-14T18:07:01.000Z",
+                "ImageId": "ami-02354e95b39ca8dec",
+                "ImageLocation": "123456789012/My-AmazonLinux2-Image",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "123456789012",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-34567890abcdef121",
+                            "VolumeSize": 10,
+                            "VolumeType": "gp2",
+                            "Encrypted": true
+                        }
+                    }
+                ],
+                "Description": "My AmazonLinux2 Image",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "My-AmazonLinux2-Image",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "Tags": [],
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

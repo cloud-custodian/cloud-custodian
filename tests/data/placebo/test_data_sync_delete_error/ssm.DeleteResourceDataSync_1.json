@@ -1,0 +1,22 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "ResourceDataSyncNotFoundException",
+            "Message": "The specified sync name was not found."
+        },
+        "ResponseMetadata": {
+            "RequestId": "c72034b3-57be-11e9-aaec-afc784271d41",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c72034b3-57be-11e9-aaec-afc784271d41",
+                "content-type": "text/xml",
+                "content-length": "365",
+                "date": "Fri, 05 Apr 2019 16:20:50 GMT",
+                "connection": "close"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

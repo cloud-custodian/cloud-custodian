@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 import logging
 import json
@@ -47,11 +36,11 @@ CORE_DEPS = [
     # transport datadog - recursive deps
     'datadog', 'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
-    'requests', 'urllib3', 'idna', 'chardet', 'certifi',
+    'requests', 'urllib3', 'idna', 'charset_normalizer', 'certifi',
     # used by splunk mailer transport
     'jsonpointer', 'jsonpatch',
     # sendgrid dependencies
-    'sendgrid', 'python_http_client']
+    'sendgrid', 'python_http_client', 'ellipticcurve']
 
 
 def get_archive(config):

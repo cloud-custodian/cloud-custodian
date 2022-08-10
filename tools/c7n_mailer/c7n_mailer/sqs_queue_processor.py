@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 SQS Message Processing
 ===============
@@ -153,7 +142,7 @@ class MailerSqsQueueProcessor:
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action'].get('to'))))
+            ', '.join(sqs_message['action'].get('to', []))))
 
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -170,8 +159,8 @@ class MailerSqsQueueProcessor:
 
         # this section sends a notification to the resource owner via Slack
         if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in sqs_message.get('action', ()).get('to', []) +
-                sqs_message.get('action', ()).get('owner_absent_contact', [])):
+                for e in sqs_message.get('action', {}).get('to', []) +
+                sqs_message.get('action', {}).get('owner_absent_contact', [])):
             from .slack_delivery import SlackDelivery
 
             if self.config.get('slack_token'):
@@ -187,7 +176,7 @@ class MailerSqsQueueProcessor:
                 pass
 
         # this section gets the map of metrics to send to datadog and delivers it
-        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to')):
+        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to', [])):
             from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
@@ -201,7 +190,7 @@ class MailerSqsQueueProcessor:
         # this section sends the full event to a Splunk HTTP Event Collector (HEC)
         if any(
             e.startswith('splunkhec://')
-            for e in sqs_message.get('action', ()).get('to')
+            for e in sqs_message.get('action', ()).get('to', [])
         ):
             from .splunk_delivery import SplunkHecDelivery
             splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)

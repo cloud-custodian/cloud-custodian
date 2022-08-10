@@ -1,0 +1,21 @@
+# See syntax guidelines for owners file
+# https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+
+# These owners will be the default owners for everything in the repo.
+* @kapilt
+
+# Currently c7n is a mixture of aws and core, this mapping will get
+# much simpler as we extract core.
+
+# Bulk of aws resources
+c7n/resources/* @cloud-custodian/aws
+tests/* @cloud-custodian/aws
+
+# Azure Provider
+tools/c7n_azure @cloud-custodian/azure
+
+# GCP Provider
+tools/c7n_gcp @cloud-custodian/gcp
+
+# Docs
+docs/* @cloud-custodian/aws @cloud-custodian/azure @cloud-custodian/gcp

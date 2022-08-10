@@ -1,4 +1,5 @@
-# Copyright 2019 Microsoft Corporation
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -41,6 +42,7 @@ class LockActionTest(BaseTest):
                     resource['id'],
                     resource['lock']
                 )
+        super(LockActionTest, self).tearDown()
 
     def test_valid_policy(self):
         policy = {

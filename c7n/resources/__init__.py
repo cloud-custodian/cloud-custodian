@@ -1,17 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 # AWS resources to manage
 #
@@ -49,7 +37,7 @@ def should_load_provider(name, provider_types):
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc')
 
 
 def load_available(resources=True):
@@ -81,6 +69,10 @@ def load_providers(provider_types):
         import c7n.resources.sfn
         import c7n.resources.ssm # NOQA
 
+    if should_load_provider('awscc', provider_types):
+        from c7n_awscc.entry import initialize_awscc
+        initialize_awscc()
+
     if should_load_provider('azure', provider_types):
         from c7n_azure.entry import initialize_azure
         initialize_azure()
@@ -92,6 +84,10 @@ def load_providers(provider_types):
     if should_load_provider('k8s', provider_types):
         from c7n_kube.entry import initialize_kube
         initialize_kube()
+
+    if should_load_provider('openstack', provider_types):
+        from c7n_openstack.entry import initialize_openstack
+        initialize_openstack()
 
     if should_load_provider('c7n', provider_types):
         from c7n import data  # noqa

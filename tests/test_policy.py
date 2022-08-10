@@ -1,21 +1,11 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
 import mock
+import os
 import shutil
 import tempfile
 
@@ -26,7 +16,8 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
-from c7n.policy import ConfigPollRuleMode, PullMode
+from c7n.resources.kinesis import KinesisStream
+from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
@@ -88,6 +79,19 @@ class PolicyMetaLint(BaseTest):
                 "kinesis:DeleteStream",
             },
         )
+
+    def test_resource_type_repr_with_arn_type(self):
+        policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})
+        # check the repr absent a config type and cfn type but with an arn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert policy.resource_manager.resource_type.cfn_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::Ssm::Opsitem>'
+
+    def test_resource_type_repr(self):
+        policy = self.load_policy({'name': 'airflow', 'resource': 'aws.airflow'})
+        # check the repr absent a config type but with a cfn type
+        assert policy.resource_manager.resource_type.config_type is None
+        assert str(policy.resource_manager.resource_type) == '<TypeInfo AWS::MWAA::Environment>'
 
     def test_schema_plugin_name_mismatch(self):
         # todo iterate over all clouds not just aws resources
@@ -185,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -196,6 +200,27 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_filter_spec(self):
+        missing_fspec = []
+        for k, v in manager.resources.items():
+            if v.resource_type.filter_name is None:
+                continue
+            if not v.resource_type.filter_type:
+                missing_fspec.append(k)
+        if missing_fspec:
+            self.fail('aws resources missing filter specs: %s' % (
+                ', '.join(missing_fspec)))
+
+    def test_ec2_id_prefix(self):
+        missing_prefix = []
+        for k, v in manager.resources.items():
+            if v.resource_type.service != 'ec2':
+                continue
+            if v.resource_type.id_prefix is None:
+                missing_prefix.append(k)
+        if missing_prefix:
+            self.fail('ec2 resources missing id prefix %s' % (', '.join(missing_prefix)))
 
     def test_cfn_resource_validity(self):
         # for resources which are annotated with cfn_type ensure that it is
@@ -223,6 +248,70 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2022
+            'AwsCloudFormationStack',
+            'AwsWafRegionalRule',
+            'AwsWafRule',
+            'AwsWafRuleGroup',
+            'AwsKinesisStream',
+            'AwsWafRegionalRuleGroup',
+            'AwsEc2VpcPeeringConnection',
+            'AwsWafRegionalWebAcl',
+            'AwsCloudWatchAlarm',
+            'AwsEfsAccessPoint',
+            'AwsEc2TransitGateway',
+            'AwsEcsContainer',
+            'AwsEcsTask',
+            # q2 2022
+            'AwsRdsDbSecurityGroup',
+            # q1 2022
+            'AwsNetworkFirewallRuleGroup',
+            'AwsNetworkFirewallFirewall',
+            'AwsNetworkFirewallFirewallPolicy',
+            # q4 2021 - second wave
+            'AwsXrayEncryptionConfig',
+            'AwsOpenSearchServiceDomain',
+            'AwsEc2VpcEndpointService',
+            'AwsWafRateBasedRule',
+            'AwsWafRegionalRateBasedRule',
+            'AwsEcrRepository',
+            'AwsEksCluster',
+            # q4 2021
+            'AwsEcrContainerImage',
+            'AwsEc2VpnConnection',
+            'AwsAutoScalingLaunchConfiguration',
+            # q3 2021
+            'AwsEcsService',
+            'AwsRdsEventSubscription',
+            # q2 2021
+            'AwsEcsTaskDefinition',
+            'AwsEcsCluster',
+            'AwsEc2Subnet',
+            'AwsElasticBeanstalkEnvironment',
+            'AwsEc2NetworkAcl',
+            # newer wave q1 2021,
+            'AwsS3AccountPublicAccessBlock',
+            'AwsSsmPatchCompliance',
+            # newer wave q4 2020
+            'AwsApiGatewayRestApi',
+            'AwsApiGatewayStage',
+            'AwsApiGatewayV2Api',
+            'AwsApiGatewayV2Stage',
+            'AwsCertificateManagerCertificate',
+            'AwsCloudTrailTrail',
+            'AwsElbLoadBalancer',
+            'AwsIamGroup',
+            'AwsRedshiftCluster',
+            # newer wave q3 2020
+            'AwsDynamoDbTable',
+            'AwsEc2Eip',
+            'AwsIamPolicy',
+            'AwsIamUser',
+            'AwsRdsDbCluster',
+            'AwsRdsDbClusterSnapshot',
+            'AwsRdsDbSnapshot',
+            'AwsSecretsManagerSecret',
+            # older wave
             'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
@@ -240,43 +329,67 @@ class PolicyMetaLint(BaseTest):
 
         # for several of these we express support as filter or action instead
         # of a resource.
+
         whitelist = {
-            'AWS::EC2::Host',
-            'AWS::EC2::RegisteredHAInstance',
+            'AWS::ApiGatewayV2::Api',
+            'AWS::ApiGatewayV2::Stage',
+            'AWS::AutoScaling::ScalingPolicy',
+            'AWS::AutoScaling::ScheduledAction',
+            'AWS::Backup::BackupSelection',
+            'AWS::Backup::RecoveryPoint',
+            'AWS::CodeDeploy::DeploymentConfig',
+            'AWS::Config::ConformancePackCompliance',
+            'AWS::Config::ResourceCompliance',
             'AWS::EC2::EgressOnlyInternetGateway',
-            'AWS::EC2::VPCEndpointService',
             'AWS::EC2::FlowLog',
+            'AWS::EC2::LaunchTemplate',
+            'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::VPCEndpointService',
+            'AWS::ECR::PublicRepository',
+            'AWS::EFS::AccessPoint',
+            'AWS::EMR::SecurityConfiguration',
+            'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::GuardDuty::Detector',
+            'AWS::Kinesis::StreamConsumer',
+            'AWS::NetworkFirewall::FirewallPolicy',
+            'AWS::NetworkFirewall::RuleGroup',
+            'AWS::OpenSearch::Domain',  # this is effectively an alias
             'AWS::RDS::DBSecurityGroup',
             'AWS::RDS::EventSubscription',
-            'AWS::S3::AccountPublicAccessBlock',
             'AWS::Redshift::ClusterParameterGroup',
             'AWS::Redshift::ClusterSecurityGroup',
             'AWS::Redshift::EventSubscription',
+            'AWS::S3::AccountPublicAccessBlock',
+            'AWS::SSM::AssociationCompliance',
+            'AWS::SSM::FileData',
             'AWS::SSM::ManagedInstanceInventory',
-            'AWS::AutoScaling::ScalingPolicy',
-            'AWS::AutoScaling::ScheduledAction',
+            'AWS::SSM::PatchCompliance',
+            'AWS::SageMaker::CodeRepository',
+            'AWS::ServiceCatalog::CloudFormationProduct',
+            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
+            'AWS::ShieldRegional::Protection',
             'AWS::WAF::RateBasedRule',
             'AWS::WAF::Rule',
             'AWS::WAF::RuleGroup',
             'AWS::WAFRegional::RateBasedRule',
             'AWS::WAFRegional::Rule',
             'AWS::WAFRegional::RuleGroup',
-            'AWS::ElasticBeanstalk::ApplicationVersion',
-            'AWS::WAFv2::WebACL',
-            'AWS::WAFv2::RuleGroup',
             'AWS::WAFv2::IPSet',
-            'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::ManagedRuleSet',
+            'AWS::WAFv2::RegexPatternSet',
+            'AWS::WAFv2::RuleGroup',
+            'AWS::WAFv2::WebACL',
             'AWS::XRay::EncryptionConfig',
-            'AWS::SSM::AssociationCompliance',
-            'AWS::SSM::PatchCompliance',
-            'AWS::ShieldRegional::Protection',
-            'AWS::Config::ResourceCompliance',
-            'AWS::ApiGatewayV2::Stage',
-            'AWS::ApiGatewayV2::Api',
-            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
-            'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::Portfolio'}
+            'AWS::ElasticLoadBalancingV2::Listener',
+            'AWS::AccessAnalyzer::Analyzer',
+            'AWS::WorkSpaces::ConnectionAlias',
+            'AWS::DMS::ReplicationSubnetGroup',
+            'AWS::StepFunctions::Activity',
+            'AWS::Route53Resolver::ResolverEndpoint',
+            'AWS::Route53Resolver::ResolverRule',
+            'AWS::Route53Resolver::ResolverRuleAssociation',
+            'AWS::DMS::EventSubscription',
+        }
 
         resource_map = {}
         for k, v in manager.resources.items():
@@ -295,7 +408,15 @@ class PolicyMetaLint(BaseTest):
             raise AssertionError(
                 "Missing config types \n %s" % ('\n'.join(missing)))
 
+        # config service can't be bothered to update their sdk correctly
+        invalid_ignore = {
+            'AWS::ECS::Service',
+            'AWS::ECS::TaskDefinition',
+            'AWS::NetworkFirewall::Firewall',
+            'AWS::WAFv2::WebACL'
+        }
         bad_types = resource_config_types.difference(config_types)
+        bad_types = bad_types.difference(invalid_ignore)
         if bad_types:
             raise AssertionError(
                 "Invalid config types \n %s" % ('\n'.join(bad_types)))
@@ -313,7 +434,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -370,15 +491,16 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'healthcheck', 'event-rule-target',
-            'support-case', 'transit-attachment', 'config-recorder'}
+            'healthcheck', 'event-rule-target', 'log-metric',
+            'support-case', 'transit-attachment', 'config-recorder',
+            'apigw-domain-name'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -440,7 +562,7 @@ class PolicyMetaLint(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in list(v.filter_registry.items()):
-                if n in ("and", "or", "not", "missing"):
+                if n in ("and", "or", "not", "missing", "reduce"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -471,6 +593,7 @@ class PolicyMetaLint(BaseTest):
                     "instance-age",
                     "ephemeral",
                     "instance-uptime",
+                    "dead-letter",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
@@ -483,6 +606,40 @@ class PolicyMetaLint(BaseTest):
             self.fail(
                 "Missing permissions %d on \n\t%s"
                 % (len(missing), "\n\t".join(sorted(missing)))
+            )
+
+    def test_deprecation_dates(self):
+        def check_deprecations(source):
+            issues = set()
+            for dep in getattr(source, 'deprecations', ()):
+                when = dep.removed_after
+                if when is not None:
+                    name = f"{source.__module__}.{source.__name__}"
+                    if not isinstance(when, str):
+                        issues.add(f"{name}: \"{dep}\", removed_after attribute must be a string")
+                        continue
+                    try:
+                        datetime.strptime(when, "%Y-%m-%d")
+                    except ValueError:
+                        issues.add(f"{name}: \"{dep}\", removed_after must be a valid date"
+                                   f" in the format 'YYYY-MM-DD', got '{when}'")
+            return issues
+        issues = check_deprecations(Policy)
+        for name, cloud in clouds.items():
+            for resource_name, resource in cloud.resources.items():
+                issues = issues.union(check_deprecations(resource))
+                for fname, f in resource.filter_registry.items():
+                    if fname in ('and', 'or', 'not'):
+                        continue
+                    issues = issues.union(check_deprecations(f))
+                for aname, a in resource.action_registry.items():
+                    issues = issues.union(check_deprecations(a))
+        for name, mode in execution.items():
+            issues = issues.union(check_deprecations(mode))
+        if issues:
+            self.fail(
+                "Deprecation validation issues with \n\t%s" %
+                "\n\t".join(sorted(issues))
             )
 
 
@@ -639,6 +796,7 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        assert p.get_execution_mode().get_permissions() == ()
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
@@ -992,6 +1150,24 @@ class TestPolicy(BaseTest):
 
 class PolicyConditionsTest(BaseTest):
 
+    def test_value_from(self):
+        tmp_dir = self.change_cwd()
+        p = self.load_policy({
+            'name': 'fx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account_id',
+                'op': 'in',
+                'value_from': {
+                    'url': 'file:///{}/accounts.txt'.format(tmp_dir),
+                    'type': 'txt'}
+            }]
+        })
+        with open(os.path.join(tmp_dir, 'accounts.txt'), 'w') as fh:
+            fh.write(p.ctx.options.account_id)
+        self.assertTrue(p.is_runnable())
+
     def test_env_var_extension(self):
         p = self.load_policy({
             'name': 'profx',
@@ -1194,7 +1370,7 @@ class PullModeTest(BaseTest):
             session_factory=None)
         self.assertEqual(p.is_runnable(), True)
 
-        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        tomorrow_date = str(datetime.date(datetime.now()) + timedelta(days=1))
         p = self.load_policy(
             {'name': 'bad-start-date',
              'resource': 'ec2',
@@ -1282,12 +1458,65 @@ class ConfigModeTest(BaseTest):
         requests = []
 
         def record_requests(Evaluations, ResultToken):
-            requests.append(Evaluations)
+            requests.extend(Evaluations)
+
+        mocked_evaluations = {
+            'EvaluationResults': [
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev1'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is compliant with policy:kin-poll.',
+                },
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev2'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'NON_COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is not compliant with policy:kin-poll.',
+                },
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev3'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'NON_COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is not compliant with policy:kin-poll.',
+                },
+            ]
+        }
 
         cmock.put_evaluations.side_effect = record_requests
         cmock.put_evaluations.return_value = {}
+        cmock.get_paginator.return_value.paginate.return_value.build_full_result.return_value = \
+            mocked_evaluations
+
         self.patch(
             ConfigPollRuleMode, '_get_client', lambda self: cmock)
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
+
         p = self.load_policy({
             'name': 'kin-poll',
             'resource': 'aws.kinesis',
@@ -1295,22 +1524,68 @@ class ConfigModeTest(BaseTest):
             'mode': {
                 'type': 'config-poll-rule',
                 'schedule': 'Three_Hours'}},
-            session_factory=factory)
+            session_factory=factory,
+            validate=False)
+
         event = event_data('poll-evaluation.json', 'config')
         results = p.push(event, None)
         self.assertEqual(results, ['dev2'])
         self.assertEqual(
             requests,
-            [[{'Annotation': 'The resource is not compliant with policy:kin-poll.',
-               'ComplianceResourceId': 'dev2',
-               'ComplianceResourceType': 'AWS::Kinesis::Stream',
-               'ComplianceType': 'NON_COMPLIANT',
-               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}],
-             [{'Annotation': 'The resource is compliant with policy:kin-poll.',
-               'ComplianceResourceId': 'dev1',
-               'ComplianceResourceType': 'AWS::Kinesis::Stream',
-               'ComplianceType': 'COMPLIANT',
-               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
+            [{'Annotation': 'The resource is not compliant with policy:kin-poll.',
+              'ComplianceResourceId': 'dev2',
+              'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceType': 'NON_COMPLIANT',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'},
+             {'Annotation': 'The resource is compliant with policy:kin-poll.',
+              'ComplianceResourceId': 'dev1',
+              'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceType': 'COMPLIANT',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'},
+             {'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceResourceId': 'dev3',
+              'Annotation': 'The rule does not apply.',
+              'ComplianceType': 'NOT_APPLICABLE',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}])
+
+    related_resource_policy = {
+        "name": "vpc-flow-logs",
+        "resource": "aws.vpc",
+        "filters": [
+            {
+                "type": "flow-logs",
+                "destination-type": "s3",
+                "enabled": True,
+                "status": "active",
+            }
+        ]
+    }
+
+    def test_config_poll_supported_resource_warning(self):
+        with self.assertRaisesRegex(
+            PolicyValidationError,
+            r'fully supported by config'
+        ):
+            self.load_policy({
+                **self.related_resource_policy,
+                "mode": {
+                    "type": "config-poll-rule",
+                    "role": "arn:aws:iam::{account_id}:role/MyRole",
+                    "schedule": "TwentyFour_Hours"
+                }
+            })
+
+    def test_config_poll_ignore_support_check(self):
+        p = self.load_policy({
+            **self.related_resource_policy,
+            "mode": {
+                "type": "config-poll-rule",
+                "role": "arn:aws:iam::{account_id}:role/MyRole",
+                "schedule": "TwentyFour_Hours",
+                "ignore-support-check": True
+            }
+        })
+        p.validate()
 
 
 class GuardModeTest(BaseTest):

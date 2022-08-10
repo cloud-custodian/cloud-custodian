@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from .common import BaseTest, functional, Bag
@@ -299,3 +288,102 @@ class TestECR(BaseTest):
 
     def test_ecr_set_lifecycle(self):
         pass
+
+    def test_ecr_image_filter_security_finding(self):
+        session_factory = self.replay_flight_data("test_ecr_image_filter_security_finding")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding",
+                        "query": {
+                            "RecordState": [
+                                {
+                                    "Value": "ACTIVE",
+                                    "Comparison": "EQUALS"
+                                }
+                            ],
+                            "Title": [
+                                {
+                                    "Value": "CVE-2021-44228",
+                                    "Comparison": "PREFIX"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_image_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_image_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ],
+                        "remove-statements": [
+                            "OldStatementToDelete"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_repo_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_repo_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy",
+                "resource": "aws.ecr",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "createdAt",
+                        "value_type": "date",
+                        "op": "lt",
+                        "value": "2021/12/15"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

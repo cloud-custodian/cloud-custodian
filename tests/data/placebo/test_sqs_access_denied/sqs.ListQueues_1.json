@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://queue.amazonaws.com/123456789012/access_denied_test"
+        ],
+        "ResponseMetadata": {}
+    }
+}

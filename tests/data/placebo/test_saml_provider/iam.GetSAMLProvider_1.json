@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "SAMLMetadataDocument": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"https://portal.sso.us-east-1.amazonaws.com/saml/assertion/MDMwNTk1ODQ3MDk5X2lucy\">\n  <md:IDPSSODescriptor WantAuthnRequestsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <md:KeyDescriptor use=\"signing\">\n      <ds:KeyInfo xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n        <ds:X509Data>\n          <ds:X509Certificate>MIIDAzCCAeugAwIBAgIBATANBgkqhkiG9w0BAQsFADBFMRYwFAYDVQQDDA1hbWF6b25hd3MuY29tMQ0wCwYDVQQLDARJREFTMQ8wDQYDVQQKDAZBbWF6b24xCzAJBgNVBAYTAlVTMB4XDTIwMDcxNDE3MjYyNloXDTI1MDcxNDE3MjYyNlowRTEWMBQGA1UEAwwNYW1hem9uYXdzLmNvbTENMAsGA1UECwwESURBUzEPMA0GA1UECgwGQW1hem9uMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALhEnLYZ5G2+d8bHH/MyGvEzQtmVp0GiojfwrizRK4s1nwkswlX1bhPbo6qY2y2spUFia0jzrNYY4c78/e4OuVoth7OszyCD+8AE8Lallg8fdJtkkuDoOD/7grd/47fkmjY1nP/B+QzdA9A5t9o0bmSAjXe4Ypw543gsSsfNVK0XHWZVx1hLkKwyyaHQTTbXTfmNDpTIBZtaOXxLx0SdNxj1JpCm0HUZVI5dyum1oPus5l9sQsop8owbURJQCyauO61BOpwFWLI8dZeXKbw5y8co6Ew4Ej6CSBYnuRtMUk4yEFvJPzQ6Cgg4zqTbDel6Api6uN+aLfiV74+H8zPAHyOW45ZNsZcKJdZRlrsOSD9yIhLnnZlixbLGtfDwn9Ub90r3uOYWWv0xpn525VWg==</ds:X509Certificate>\n        </ds:X509Data>\n      </ds:KeyInfo>\n    </md:KeyDescriptor>\n    <md:SingleLogoutService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://portal.sso.us-east-1.amazonaws.com/saml/logout/MDMwNTk1ODQ3MDk5X2lucy\"/>\n    <md:SingleLogoutService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"https://portal.sso.us-east-1.amazonaws.com/saml/logout/MDMwNTk1ODQ3MDk5X2lucy\"/>\n    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>\n    <md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://portal.sso.us-east-1.amazonaws.com/saml/assertion/MDMwNTk1ODQ3MDk5X2lucy\"/>\n    <md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"https://portal.sso.us-east-1.amazonaws.com/saml/assertion/MDMwNTk1ODQ3MDk5X2lucy\"/>\n  </md:IDPSSODescriptor>\n</md:EntityDescriptor>\n",
+        "CreateDate": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 7,
+            "day": 14,
+            "hour": 17,
+            "minute": 26,
+            "second": 27,
+            "microsecond": 0
+        },
+        "ValidUntil": {
+            "__class__": "datetime",
+            "year": 2120,
+            "month": 7,
+            "day": 14,
+            "hour": 17,
+            "minute": 26,
+            "second": 26,
+            "microsecond": 971000
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,28 @@
+{
+  "body": {
+    "instances": [
+      {
+        "nodeCount": 1, 
+        "displayName": "custodian-spanner", 
+        "state": "READY", 
+        "config": "projects/cloud-custodian/instanceConfigs/regional-asia-east1", 
+        "name": "projects/cloud-custodian/instances/custodian-spanner"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "284", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 22 Apr 2019 12:52:59 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

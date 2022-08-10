@@ -1,16 +1,5 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 """
 Build Docker Artifacts
@@ -25,8 +14,10 @@ We also support running functional tests and image cve scanning before pushing.
 
 import logging
 import os
+import time
 import subprocess
 import sys
+import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -44,7 +35,8 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
+ | python3 - -y --version 1.1.14
 
 WORKDIR /src
 
@@ -52,7 +44,8 @@ WORKDIR /src
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
-RUN . /usr/local/bin/activate && pip install -q wheel
+RUN . /usr/local/bin/activate && pip install -q wheel && \
+      pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
 # Add provider packages
@@ -62,9 +55,11 @@ ADD tools/c7n_azure /src/tools/c7n_azure
 RUN rm -R tools/c7n_azure/tests_azure
 ADD tools/c7n_kube /src/tools/c7n_kube
 RUN rm -R tools/c7n_kube/tests
+ADD tools/c7n_openstack /src/tools/c7n_openstack
+RUN rm -R tools/c7n_openstack/tests
 
 # Install requested providers
-ARG providers="azure gcp kube"
+ARG providers="gcp kube openstack azure"
 RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
     $HOME/.poetry/bin/poetry install && cd ../../; done
@@ -133,32 +128,15 @@ RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry
 """
 
 BUILD_POLICYSTREAM = """\
-# Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
-RUN mkdir build && \\
-    wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \\
-    cd build && \\
-    tar xzf ../libgit2-1.0.0.tar.gz && \\
-    cd libgit2-1.0.0 && \\
-    mkdir build && cd build && \\
-    cmake .. && \\
-    make install && \\
-    rm -Rf /src/build
-
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
 RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
-
-# Verify the install
-#  - policystream is not in ci due to libgit2 compilation needed
-#  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
 """
 
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:20.04", base_target_image="ubuntu:20.04")
+    defaults = dict(base_build_image="ubuntu:22.04", base_target_image="ubuntu:22.04")
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata
@@ -285,8 +263,11 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
     """
     try:
         import docker
-    except ImportError:
+    except ImportError as e:
+        print("import error %s" % e)
+        traceback.print_exc()
         print("python docker client library required")
+        print("python %s" % ("\n".join(sys.path)))
         sys.exit(1)
     if quiet:
         logging.getLogger().setLevel(logging.WARNING)
@@ -319,7 +300,7 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
         if scan:
             scan_image(":".join(image_refs[0]))
         if push:
-            push_image(client, image_id, image_refs)
+            retry(3, (RuntimeError,), push_image, client, image_id, image_refs)
 
 
 def get_labels(image):
@@ -342,6 +323,19 @@ def get_labels(image):
     if hub_env.get("sha"):
         labels["org.opencontainers.image.revision"] = hub_env["sha"]
     return labels
+
+
+def retry(retry_count, exceptions, func, *args, **kw):
+    attempts = 1
+    while attempts <= retry_count:
+        try:
+            return func(*args, **kw)
+        except exceptions:
+            log.warn('retrying on %s' % func)
+            attempts += 1
+            time.sleep(5)
+            if attempts > retry_count:
+                raise
 
 
 def get_github_env():
@@ -460,7 +454,8 @@ def test_image(image_id, image_name, providers):
     if providers not in (None, ()):
         env["CUSTODIAN_PROVIDERS"] = " ".join(providers)
     subprocess.check_call(
-        [Path(sys.executable).parent / "pytest", "-v", "tests/test_docker.py"],
+        [Path(sys.executable).parent / "pytest", "-p",
+         "no:terraform", "-v", "tests/test_docker.py"],
         env=env,
         stderr=subprocess.STDOUT,
     )
@@ -470,7 +465,7 @@ def push_image(client, image_id, image_refs):
     if "HUB_TOKEN" in os.environ and "HUB_USER" in os.environ:
         log.info("docker hub login %s" % os.environ["HUB_USER"])
         result = client.login(os.environ["HUB_USER"], os.environ["HUB_TOKEN"])
-        if result["Status"] != "Login Succeeded":
+        if result.get("Status", "") != "Login Succeeded":
             raise RuntimeError("Docker Login failed %s" % (result,))
 
     for (repo, tag) in image_refs:

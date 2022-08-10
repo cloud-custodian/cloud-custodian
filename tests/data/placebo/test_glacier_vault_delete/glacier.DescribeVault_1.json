@@ -1,0 +1,13 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Vault not found for ARN: arn:aws:glacier:us-east-1:644160558196:vaults/c7n-test-delete",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "type": "Client",
+        "code": "ResourceNotFoundException",
+        "message": "Vault not found for ARN: arn:aws:glacier:us-east-1:644160558196:vaults/c7n-test-delete"
+    }
+}

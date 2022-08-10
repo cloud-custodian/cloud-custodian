@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
@@ -22,6 +11,41 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+from pytest_terraform import terraform
+
+
+@terraform('tag_action_filter_call')
+def test_tag_action_filter_call(test, tag_action_filter_call):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('test_action_filter_call', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'delete_marked_for_op_tag',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'State.Name': 'running'
+                },
+                {
+                    'type': 'marked-for-op',
+                    'tag': 'action_tag',
+                    'op': 'stop'
+                }
+            ],
+            'actions': ['stop'],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    ec2 = session_factory().resource('ec2')
+    instance = ec2.Instance(stopped_ec2_instance_id)
+    test.assertEqual(instance.state['Name'], 'stopping')
 
 
 class UniversalTagTest(BaseTest):
@@ -87,6 +111,31 @@ class UniversalTagTest(BaseTest):
             {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "PermissionDenied"}}}
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
+
+    def test_mark_for_op_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'actions': [{'type': 'mark-for-op', 'op': 'stop'}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                mark-for-op: optional fields deprecated (one of 'hours' or 'days' must be specified)
+            """)
+
+    def test_unmark_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'filters': [{'tag:foo': 'exists'}],
+            'actions': [{'type': 'unmark', 'tags': ['foo']}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                remove-tag: alias 'unmark' has been deprecated
+            """)
 
 
 class CoalesceCopyUserTags(BaseTest):

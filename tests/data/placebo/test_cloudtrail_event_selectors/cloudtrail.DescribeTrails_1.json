@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "MultiRegion1CloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegion1CloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            },
+            {
+                "Name": "MultiRegion2CloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-2",
+                "TrailARN": "arn:aws:cloudtrail:us-east-2:123456789012:trail/MultiRegion2CloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            },
+            {
+                "Name": "SingleCloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": false,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/SingleCloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            },
+            {
+                "Name": "orgTrail",
+                "S3BucketName": "c7n-vpc-flow-logs",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/orgTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

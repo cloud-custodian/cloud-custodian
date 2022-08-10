@@ -44,7 +44,31 @@ c7n-log-exporter export --help
 To ease usage when running across multiple accounts, a config file can be specified, as
 an example.
 
+### Using S3 Bucket as destination
+
 ```
+destination:
+  bucket: custodian-log-archive
+  prefix: logs2
+
+accounts:
+  - name: custodian-demo
+    role: "arn:aws:iam::111111111111:role/CloudCustodianRole"
+    groups:
+      - "/aws/lambda/*"
+      - "vpc-flow-logs"
+```
+
+### Using CloudWatch Destination as destination cross account
+The Cloudwatch Destination needs setup in account and access policy set on CloudWatch Destination to to allow 
+source account access to the Cloudwatch Destination
+
+```
+subscription:
+  destination-arn: "arn:aws:logs:us-east-1:111111111111:destination:CustodianCWLogsDestination"
+  destination-role: "arn:aws:iam::111111111111:role/CWLtoKinesisRole"
+  name: "CustodianCWLogsDestination"
+
 destination:
   bucket: custodian-log-archive
   prefix: logs2

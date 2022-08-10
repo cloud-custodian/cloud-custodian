@@ -1,16 +1,6 @@
 # Copyright 2017 Manheim / Cox Automotive
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import requests
@@ -96,6 +86,59 @@ class TestGetSplunkPayloads(DeliveryTester):
                 'host': 'cloud-custodian',
                 'source': 'unknown-cloud-custodian',
                 'sourcetype': '_json',
+                'index': 'indexB',
+                'event': {'resource': 2}
+            }
+        ]
+        assert mock_gse.mock_calls == [call(msg)]
+        assert mock_sifm.mock_calls == [call(msg)]
+
+    @patch(
+        '%s.get_splunk_events' % pb,
+        return_value=[
+            {'account': 'A', 'resource': 1},
+            {'resource': 2}
+        ]
+    )
+    @patch(
+        '%s._splunk_indices_for_message' % pb,
+        return_value=['indexA', 'indexB']
+    )
+    def test_sourcetype(self, mock_gse, mock_sifm):
+        self.config['splunk_hec_sourcetype'] = 'custom-sourcetype'
+        msg = {'some': 'message'}
+        ts = 1557493290000
+        result = self.cls.get_splunk_payloads(msg, ts)
+        assert result == [
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'A-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexA',
+                'event': {'account': 'A', 'resource': 1}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'A-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexB',
+                'event': {'account': 'A', 'resource': 1}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'unknown-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
+                'index': 'indexA',
+                'event': {'resource': 2}
+            },
+            {
+                'time': ts,
+                'host': 'cloud-custodian',
+                'source': 'unknown-cloud-custodian',
+                'sourcetype': 'custom-sourcetype',
                 'index': 'indexB',
                 'event': {'resource': 2}
             }

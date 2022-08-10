@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "0123456789012/test",
+                "DomainName": "test",
+                "ARN": "arn:aws:es:us-east-1:0123456789012:domain/test",
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:0123456789012:key/6917a312-adce-4bbc-8202-958f2db490fa"
+                }
+            }
+        ]
+    }
+}

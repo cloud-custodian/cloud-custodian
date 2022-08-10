@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import ipaddress
 import os
@@ -89,15 +78,37 @@ class UrlConfTest(BaseTest):
 
         self.assertEqual(
             dict(utils.parse_url_config('')),
-            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+            {
+                'netloc': '',
+                'path': '',
+                'scheme': '',
+                'url': ''
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws://')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
+
+        self.assertEqual(
+            dict(utils.parse_url_config('http://example.com:8080')),
+            dict(url='http://example.com:8080',
+                 netloc='example.com:8080',
+                 path='',
+                 scheme='http'))
 
 
 class ProxyUrlTest(BaseTest):
@@ -126,6 +137,36 @@ class ProxyUrlTest(BaseTest):
             proxy_url = utils.get_proxy_url('http://web.site')
             self.assertEqual(proxy_url, 'http://mock.all.proxy.server:8000')
 
+    def test_http_proxy_with_no_proxy_without_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, None)
+
+    def test_http_proxy_with_no_proxy_mismatch_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, 'http://mock.http.proxy.server:8000')
+
+    def test_http_proxy_with_no_proxy_match_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site:8080')
+            self.assertEqual(proxy_url, None)
+
 
 class UtilTest(BaseTest):
 
@@ -137,7 +178,7 @@ class UtilTest(BaseTest):
 
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
-                    'eventSource': ['ec2.amazonaws.com']},
+                        'eventSource': ['ec2.amazonaws.com']},
              'detail-type': ['AWS API Call via CloudTrail']}
         b = {'detail': {'userIdentity': {
             'userName': [{'anything-but': 'deputy'}]}}}
@@ -330,6 +371,17 @@ class UtilTest(BaseTest):
             ],
         )
 
+    def test_camel_case_implicit(self):
+        d = {'ownerId': 'abc',
+             'modifyDateIso': '2021-01-05T13:43:26.749906',
+             'createTimeMillis': '1609854135165',
+             'createTime': '1609854135'}
+        r = utils.camelResource(d, implicitTitle=False, implicitDate=True)
+        assert set(r) == {'ownerId', 'modifyDateIso', 'createTimeMillis', 'createTime'}
+        r.pop('ownerId')
+        for k in r:
+            assert r[k].strftime('%Y/%m/%d') == '2021/01/05'
+
     def test_camel_case(self):
         d = {
             "zebraMoon": [{"instanceId": 123}, "moon"],
@@ -457,3 +509,44 @@ class UtilTest(BaseTest):
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
              'b': '21'})
+
+    def test_get_support_region(self):
+        # AWS Partition
+        mock_manager = mock.MagicMock()
+        mock_manager.config.region = "us-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "us-west-2"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "eu-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        # GovCloud Partition
+        mock_manager.config.region = "us-gov-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        mock_manager.config.region = "us-gov-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        # AWS CN Partition
+        mock_manager.config.region = "cn-northwest-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+        mock_manager.config.region = "cn-north-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+
+def test_parse_date_floor():
+    # bulk of parse date tests are actually in test_filters
+    assert utils.parse_date(30) is None
+    assert utils.parse_date(1) is None
+    assert utils.parse_date('3000') is None
+    assert utils.parse_date('30') is None

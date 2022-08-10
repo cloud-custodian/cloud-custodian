@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 15 Mar 2021 18:01:18 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "645",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "4342258526968749569",
+    "name": "operation-1615831278522-5bd97095f90e2-d5a85187-a5d80b80",
+    "operationType": "delete",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/test",
+    "targetId": "5789677160149163724",
+    "status": "RUNNING",
+    "progress": 0,
+    "insertTime": "2021-03-15T11:01:18.755-07:00",
+    "startTime": "2021-03-15T11:01:18.761-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1615831278522-5bd97095f90e2-d5a85187-a5d80b80",
+    "kind": "compute#operation"
+  }
+}

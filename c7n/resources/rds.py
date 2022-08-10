@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 RDS Resource Manager
 ====================
@@ -48,6 +37,7 @@ import logging
 import operator
 import jmespath
 import re
+from datetime import datetime, timedelta
 from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
@@ -63,8 +53,9 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
-from c7n import tags
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, RetryPageIterator)
+from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
@@ -81,16 +72,18 @@ actions = ActionRegistry('rds.actions')
 class DescribeRDS(DescribeSource):
 
     def augment(self, dbs):
-        return universal_augment(
-            self.manager, super(DescribeRDS, self).augment(dbs))
+        for d in dbs:
+            d['Tags'] = d.pop('TagList', ())
+        return dbs
 
 
 class ConfigRDS(ConfigSource):
 
     def load_resource(self, item):
-        resource = super(ConfigRDS, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
+        resource = super().load_resource(item)
+        for k in list(resource.keys()):
+            if k.startswith('Db'):
+                resource["DB%s" % k[2:]] = resource[k]
         return resource
 
 
@@ -642,6 +635,9 @@ class CopySnapshotTags(BaseAction):
                   - type: set-snapshot-copy-tags
                     enable: True
     """
+    deprecations = (
+        deprecated.action("use modify-db instead with `CopyTagsToSnapshot`"),
+    )
 
     schema = type_schema(
         'set-snapshot-copy-tags',
@@ -926,33 +922,56 @@ class RDSSubscription(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subscription'
+        arn_type = 'es'
         cfn_type = 'AWS::RDS::EventSubscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
-        name = id = "EventSubscriptionArn"
+        name = id = "CustSubscriptionId"
+        arn = 'EventSubscriptionArn'
         date = "SubscriptionCreateTime"
-        # SubscriptionName isn't part of describe events results?! all the
-        # other subscription apis.
-        # filter_name = 'SubscriptionName'
-        # filter_type = 'scalar'
+        permissions_enum = ('rds:DescribeEventSubscriptions',)
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@RDSSubscription.action_registry.register('delete')
+class RDSSubscriptionDelete(BaseAction):
+    """Deletes a RDS snapshot resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-subscription-delete
+                resource: rds-subscription
+                filters:
+                  - type: value
+                    key: CustSubscriptionId
+                    value: xyz
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('rds:DeleteEventSubscription',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            self.manager.retry(
+                client.delete_event_subscription, SubscriptionName=r['CustSubscriptionId'],
+                ignore_err_codes=('SubscriptionNotFoundFault',
+                'InvalidEventSubscriptionStateFault'))
 
 
 class DescribeRDSSnapshot(DescribeSource):
 
     def augment(self, snaps):
-        return universal_augment(
-            self.manager, super(DescribeRDSSnapshot, self).augment(snaps))
-
-
-class ConfigRDSSnapshot(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDSSnapshot, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        # TODO: Load DBSnapshotAttributes into annotation
-        return resource
+        for s in snaps:
+            s['Tags'] = s.pop('TagList', ())
+        return snaps
 
 
 @resources.register('rds-snapshot')
@@ -969,12 +988,13 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        filter_type = "scalar"
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBSnapshots',)
 
     source_mapping = {
         'describe': DescribeRDSSnapshot,
-        'config': ConfigRDSSnapshot
+        'config': ConfigSource
     }
 
 
@@ -1144,6 +1164,8 @@ class RestoreInstance(BaseAction):
 class CrossAccountAccess(CrossAccountAccessFilter):
 
     permissions = ('rds:DescribeDBSnapshotAttributes',)
+    attributes_key = 'c7n:attributes'
+    annotation_key = 'c7n:CrossAccountViolations'
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
@@ -1171,13 +1193,106 @@ class CrossAccountAccess(CrossAccountAccessFilter):
                 client.describe_db_snapshot_attributes,
                 DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
-            r['c7n:attributes'] = attrs
+            r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
-                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                r[self.annotation_key] = list(delta_accounts)
                 results.append(r)
         return results
+
+
+@RDSSnapshot.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Set permissions for copying or restoring an RDS snapshot
+
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove, respectively.  The default is to remove any
+    permissions granted to other AWS accounts.
+
+    Use `remove: matched` in combination with the `cross-account` filter
+    for more flexible removal options such as preserving access for
+    a set of whitelisted accounts:
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-snapshot-remove-cross-account
+                resource: rds-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist:
+                      - '112233445566'
+                actions:
+                  - type: set-permissions
+                    remove: matched
+    """
+    schema = type_schema(
+        'set-permissions',
+        remove={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
+                ],
+            }}
+        ]},
+        add={
+            'type': 'array', 'items': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 12, 'maxLength': 12},
+                    {'enum': ['all']},
+                ]
+            }
+        }
+    )
+
+    permissions = ('rds:ModifyDBSnapshotAttribute',)
+
+    def validate(self):
+        if self.data.get('remove') == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, CrossAccountAccessFilter):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
+
+    def process(self, snapshots):
+        client = local_session(self.manager.session_factory).client('rds')
+        for s in snapshots:
+            self.process_snapshot(client, s)
+
+    def process_snapshot(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+
+        if not (add_accounts or remove_accounts):
+            if CrossAccountAccess.attributes_key not in snapshot:
+                attrs = {
+                    t['AttributeName']: t['AttributeValues']
+                    for t in self.manager.retry(
+                        client.describe_db_snapshot_attributes,
+                        DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier']
+                    )['DBSnapshotAttributesResult']['DBSnapshotAttributes']
+                }
+                snapshot[CrossAccountAccess.attributes_key] = attrs
+            remove_accounts = snapshot[CrossAccountAccess.attributes_key].get('restore', [])
+        elif remove_accounts == 'matched':
+            remove_accounts = snapshot.get(CrossAccountAccess.annotation_key, [])
+
+        if add_accounts or remove_accounts:
+            client.modify_db_snapshot_attribute(
+                DBSnapshotIdentifier=snapshot['DBSnapshotIdentifier'],
+                AttributeName='restore',
+                ValuesToRemove=remove_accounts,
+                ValuesToAdd=add_accounts)
 
 
 @RDSSnapshot.action_registry.register('region-copy')
@@ -1376,14 +1491,16 @@ class RDSSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-subnet-group'
+        arn_type = 'subgrp'
         id = name = 'DBSubnetGroupName'
+        arn_separator = ':'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
         permissions_enum = ('rds:DescribeDBSubnetGroups',)
         cfn_type = config_type = 'AWS::RDS::DBSubnetGroup'
+        universal_taggable = object()
 
     source_mapping = {
         'config': ConfigSource,
@@ -1626,8 +1743,11 @@ class ModifyDb(BaseAction):
                         'PerformanceInsightsKMSKeyId',
                         'PerformanceInsightsRetentionPeriod',
                         'CloudwatchLogsExportConfiguration',
+                        'ProcessorFeatures',
                         'UseDefaultProcessorFeatures',
-                        'DeletionProtection']},
+                        'DeletionProtection',
+                        'MaxAllocatedStorage',
+                        'CertificateRotationRestart']},
                     'value': {}
                 },
             },
@@ -1635,6 +1755,17 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
+    conversion_map = {
+        'DBSubnetGroupName': 'DBSubnetGroup.DBSubnetGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].VpcSecurityGroupId',
+        'DBParameterGroupName': 'DBParameterGroups[].DBParameterGroupName',
+        'OptionGroupName': 'OptionGroupMemberships[].OptionGroupName',
+        'NewDBInstanceIdentifier': 'DBInstanceIdentifier',
+        'Domain': 'DomainMemberships[].DomainName',
+        'DBPortNumber': 'Endpoint.Port',
+        'EnablePerformanceInsights': 'PerformanceInsightsEnabled',
+        'CloudwatchLogsExportConfiguration': 'EnabledCloudwatchLogsExports'
+    }
 
     def validate(self):
         if self.data.get('update'):
@@ -1644,16 +1775,25 @@ class ModifyDb(BaseAction):
                 raise PolicyValidationError(
                     "A MonitoringRoleARN value is required \
                     if you specify a MonitoringInterval value other than 0")
+            if ('CloudwatchLogsExportConfiguration' in update_dict
+                and all(
+                    k not in update_dict.get('CloudwatchLogsExportConfiguration')
+                    for k in ('EnableLogTypes', 'DisableLogTypes'))):
+                raise PolicyValidationError(
+                    "A EnableLogTypes or DisableLogTypes input list is required\
+                    for setting CloudwatchLogsExportConfiguration")
         return self
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
-
         for r in resources:
-            param = {}
-            for update in self.data.get('update'):
-                if r[update['property']] != update['value']:
-                    param[update['property']] = update['value']
+            param = {
+                u['property']: u['value'] for u in self.data.get('update')
+                if r.get(
+                    u['property'],
+                    jmespath.search(
+                        self.conversion_map.get(u['property'], 'None'), r))
+                    != u['value']}
             if not param:
                 continue
             param['ApplyImmediately'] = self.data.get('immediate', False)
@@ -1675,6 +1815,119 @@ class ReservedRDS(QueryResourceManager):
             'describe_reserved_db_instances', 'ReservedDBInstances', None)
         filter_name = 'ReservedDBInstances'
         filter_type = 'list'
-        arn_type = "reserved-db"
+        arn_type = "ri"
         arn = "ReservedDBInstanceArn"
         permissions_enum = ('rds:DescribeReservedDBInstances',)
+        universal_taggable = object()
+
+    augment = universal_augment
+
+
+@filters.register('consecutive-snapshots')
+class ConsecutiveSnapshots(Filter):
+    """Returns instances where number of consective daily snapshots is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-daily-snapshot-count
+                resource: rds
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('rds:DescribeDBSnapshots', 'rds:DescribeDBInstances')
+    annotation = 'c7n:DBSnapshots'
+
+    def process_resource_set(self, client, resources):
+        rds_instances = [r['DBInstanceIdentifier'] for r in resources]
+        paginator = client.get_paginator('describe_db_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        db_snapshots = paginator.paginate(Filters=[{'Name': 'db-instance-id',
+          'Values': rds_instances}]).build_full_result().get('DBSnapshots', [])
+
+        inst_map = {}
+        for snapshot in db_snapshots:
+            inst_map.setdefault(snapshot['DBInstanceIdentifier'], []).append(snapshot)
+        for r in resources:
+            r[self.annotation] = inst_map.get(r['DBInstanceIdentifier'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results
+
+
+@filters.register('engine')
+class EngineFilter(ValueFilter):
+    """
+    Filter a rds resource based on its Engine Metadata
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-deprecated-versions
+              resource: aws.rds
+              filters:
+                - type: engine
+                  key: Status
+                  value: deprecated
+    """
+
+    schema = type_schema('engine', rinherit=ValueFilter.schema)
+
+    permissions = ("rds:DescribeDBEngineVersions", )
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        engines = set()
+        engine_versions = set()
+        for r in resources:
+            engines.add(r['Engine'])
+            engine_versions.add(r['EngineVersion'])
+
+        paginator = client.get_paginator('describe_db_engine_versions')
+        response = paginator.paginate(
+            Filters=[
+                {'Name': 'engine', 'Values': list(engines)},
+                {'Name': 'engine-version', 'Values': list(engine_versions)}
+            ],
+            IncludeAll=True,
+        )
+        all_versions = {}
+        matched = []
+        for page in response:
+            for e in page['DBEngineVersions']:
+                all_versions.setdefault(e['Engine'], {})
+                all_versions[e['Engine']][e['EngineVersion']] = e
+        for r in resources:
+            v = all_versions[r['Engine']][r['EngineVersion']]
+            if self.match(v):
+                r['c7n:Engine'] = v
+                matched.append(r)
+        return matched

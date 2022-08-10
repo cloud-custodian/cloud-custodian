@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
@@ -20,7 +9,7 @@ from c7n.resources import account
 from c7n.testing import mock_datetime_now
 
 import datetime
-from dateutil import parser
+from dateutil import parser, tz
 import json
 import mock
 import time
@@ -31,6 +20,52 @@ TRAIL = "nosetest"
 
 
 class AccountTests(BaseTest):
+
+    def test_macie(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie')
+        p = self.load_policy({
+            'name': 'macie-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'or': [
+                    {'type': 'check-macie',
+                     'value': 'absent',
+                     'key': 'master.accountId'},
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['c7n:macie'] == {
+            'createdAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+            'findingPublishingFrequency': 'FIFTEEN_MINUTES',
+            'master': {},
+            'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
+                            'macie.amazonaws.com/'
+                            'AWSServiceRoleForAmazonMacie').format(
+                                p.options.account_id),
+            'status': 'ENABLED',
+            'updatedAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+        }
+
+    def test_macie_disabled(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_disabled')
+        p = self.load_policy({
+            'name': 'macie-check-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'not': [
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_missing(self):
         session_factory = self.replay_flight_data(
@@ -507,9 +542,7 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        assert(
-            resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
-        )
+        assert resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
 
     def test_account_password_policy_update(self):
         factory = self.replay_flight_data("test_account_password_policy_update")
@@ -602,9 +635,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
-        assert(
-            policy['MinimumPasswordLength'] == 12
-        )
+        assert policy['MinimumPasswordLength'] == 12
         # assert defaults being set
         self.assertEqual(
             [
@@ -868,6 +899,22 @@ class AccountTests(BaseTest):
         arn = test_trail["TrailARN"]
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status["IsLogging"])
+
+    def test_account_access_analyzer_filter(self):
+        session_factory = self.replay_flight_data("test_account_access_analyzer_filter")
+        p = self.load_policy(
+            {
+                "name": "account-access-analyzer",
+                "resource": "account",
+                "filters": [{"type": "access-analyzer",
+                             "key": "status",
+                             "value": "ACTIVE",
+                             "op": "eq"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_account_shield_filter(self):
         session_factory = self.replay_flight_data("test_account_shield_advanced_filter")

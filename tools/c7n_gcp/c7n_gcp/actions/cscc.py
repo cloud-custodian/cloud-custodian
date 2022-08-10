@@ -1,16 +1,5 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import json
 import hashlib
@@ -21,6 +10,8 @@ from c7n.utils import local_session, type_schema
 from .core import MethodAction
 
 from c7n_gcp.provider import resources as gcp_resources
+
+SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'SEVERITY_UNSPECIFIED']
 
 
 class PostFinding(MethodAction):
@@ -55,7 +46,8 @@ class PostFinding(MethodAction):
                 'description': 'qualified name of source to post to CSCC as'},
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
-            'category': {'type': 'string'}})
+            'category': {'type': 'string'},
+            'severity': {'type': 'string', 'enum': SEVERITIES}})
     schema_alias = True
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
 
@@ -64,10 +56,21 @@ class PostFinding(MethodAction):
 
     CustodianSourceName = 'CloudCustodian'
     DefaultCategory = 'Custodian'
+    DefaultSeverity = 'SEVERITY_UNSPECIFIED'
     Service = 'securitycenter'
-    ServiceVersion = 'v1beta1'
+    ServiceVersion = 'v1'
 
     _source = None
+
+    # security center permission model is pretty obtuse to correct
+    permissions = (
+        'securitycenter.findings.list',
+        'securitycenter.findings.update',
+        'resourcemanager.organizations.get',
+        'securitycenter.assetsecuritymarks.update',
+        'securitycenter.sources.update',
+        'securitycenter.sources.list'
+    )
 
     def validate(self):
         if not any([self.data.get(k) for k in ('source', 'org-domain', 'org-id')]):
@@ -153,6 +156,7 @@ class PostFinding(MethodAction):
             'resourceName': resource_name,
             'state': 'ACTIVE',
             'category': self.data.get('category', self.DefaultCategory),
+            'severity': self.data.get('severity', self.DefaultSeverity),
             'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
             'sourceProperties': {
                 'resource_type': self.manager.type,

@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Azure Queue Message Processing
 ==============================
@@ -79,13 +68,13 @@ class MailerAzureQueueProcessor:
             queue_message['policy']['resource'],
             len(queue_message['resources']),
             queue_message['policy']['name'],
-            ', '.join(queue_message['action'].get('to'))))
+            ', '.join(queue_message['action'].get('to', []))))
 
         if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in queue_message.get('action', ()).get('to')):
+                for e in queue_message.get('action', ()).get('to', [])):
             self._deliver_slack_message(queue_message)
 
-        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to')):
+        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to', [])):
             self._deliver_datadog_message(queue_message)
 
         email_result = self._deliver_email(queue_message)

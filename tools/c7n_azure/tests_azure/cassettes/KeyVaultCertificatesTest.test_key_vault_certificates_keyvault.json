@@ -14,25 +14,25 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-length": [
+                        "297"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 05 Mar 2021 18:47:38 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "content-length": [
-                        "514"
-                    ],
-                    "date": [
-                        "Mon, 19 Aug 2019 20:59:57 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
-                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu",
+                                "name": "cckeyvault1zd2yzvhwvtnsu",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
                                 "tags": {}
@@ -45,8 +45,8 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates?api-version=7.0",
-                "body": "",
+                "uri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/certificates?api-version=7.1",
+                "body": null,
                 "headers": {}
             },
             "response": {
@@ -55,20 +55,20 @@
                     "message": "Unauthorized"
                 },
                 "headers": {
+                    "content-length": [
+                        "87"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "www-authenticate": [
-                        "Bearer authorization=\"https://login.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47\", resource=\"https://vault.azure.net\""
+                    "date": [
+                        "Fri, 05 Mar 2021 18:47:39 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Mon, 19 Aug 2019 20:59:58 GMT"
-                    ],
-                    "content-length": [
-                        "87"
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.windows.net/408b7351-82bd-44b5-aed5-59198cd1c1c6\", resource=\"https://vault.azure.net\""
                     ]
                 },
                 "body": {
@@ -84,8 +84,8 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates?api-version=7.0",
-                "body": "",
+                "uri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/certificates?api-version=7.1",
+                "body": null,
                 "headers": {}
             },
             "response": {
@@ -94,43 +94,43 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-length": [
+                        "495"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 05 Mar 2021 18:47:39 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Mon, 19 Aug 2019 20:59:58 GMT"
-                    ],
-                    "content-length": [
-                        "495"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates/cctest1",
-                                "x5t": "PqWxMOXkyDs1PkY9PH7VVugNLGk",
+                                "id": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/certificates/cctest1",
+                                "x5t": "TUV9UY9a6B-g9g1xQ9tcnW8T480",
                                 "attributes": {
                                     "enabled": true,
-                                    "nbf": 1566243128,
-                                    "exp": 1597866128,
-                                    "created": 1566243729,
-                                    "updated": 1566243729
+                                    "nbf": 1605762963,
+                                    "exp": 1637299563,
+                                    "created": 1605763564,
+                                    "updated": 1605763564
                                 },
                                 "subject": ""
                             },
                             {
-                                "id": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates/cctest2",
-                                "x5t": "Wkdnd04E5KA6im-ciOSYoHTl9mk",
+                                "id": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/certificates/cctest2",
+                                "x5t": "o0XEi0vkEmeOlHmlNes5p_dEgU0",
                                 "attributes": {
                                     "enabled": true,
-                                    "nbf": 1566243144,
-                                    "exp": 1597866144,
-                                    "created": 1566243744,
-                                    "updated": 1566243744
+                                    "nbf": 1605762982,
+                                    "exp": 1637299582,
+                                    "created": 1605763582,
+                                    "updated": 1605763582
                                 },
                                 "subject": ""
                             }

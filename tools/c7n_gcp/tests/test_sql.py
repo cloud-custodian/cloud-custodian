@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import time
 
@@ -19,6 +8,23 @@ from googleapiclient.errors import HttpError
 
 
 class SqlInstanceTest(BaseTest):
+
+    def test_sqlinstance_label_params(self):
+        p = self.load_policy({
+            'name': 'sql-labels',
+            'resource': 'gcp.sql-instance'})
+        model = p.resource_manager.resource_type
+        assert model.get_label_params(
+            {'selfLink': 'https://gcp-sql/projects/abc-123/instances/rds-123'},
+            {'k': 'v'}) == {
+                'project': 'abc-123',
+                'instance': 'rds-123',
+                'body': {
+                    'settings': {
+                        'userLabels': {'k': 'v'}
+                    }
+                }
+        }
 
     def test_sqlinstance_query(self):
         project_id = 'cloud-custodian'
@@ -60,6 +66,44 @@ class SqlInstanceTest(BaseTest):
             'get', {'project': project_id,
                     'instance': instance_name})
         self.assertEqual(result['settings']['activationPolicy'], 'NEVER')
+
+    def test_start_instance(self):
+        project_id = 'cloud-custodian'
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'istart',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'state',
+                        'op': 'equal',
+                        'value': 'RUNNABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.activationPolicy',
+                        'op': 'equal',
+                        'value': 'NEVER'
+                    }
+                ],
+                'actions': ['start']
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['activationPolicy'], 'ALWAYS')
 
     def test_delete_instance(self):
         project_id = 'cloud-custodian'

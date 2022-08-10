@@ -1,18 +1,9 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import jmespath
-from .common import BaseTest
+
+from .common import BaseTest, event_data
+from c7n.resources.aws import shape_validate
 from c7n.utils import local_session
 from unittest.mock import MagicMock
 
@@ -25,7 +16,7 @@ class CloudFrontWaf(BaseTest):
             {
                 "name": "waf-cfront",
                 "resource": "distribution",
-                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "filters": [{"type": "waf-enabled", "state": False}],
                 "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
             },
             session_factory=factory,
@@ -38,10 +29,102 @@ class CloudFrontWaf(BaseTest):
                 "name": "waf-cfront",
                 "resource": "distribution",
                 "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
             },
             session_factory=factory,
         )
-        self.assertEqual(p.run(), [])
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_waf_to_wafv2(self):
+        factory = self.replay_flight_data("test_distribution_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "waf-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-active-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "responseElements.distribution.id",
+                    "event": "CreateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True,
+                             "force": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-create-distribution.json"))
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_active_response_tag_resource(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-active-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.resource",
+                    "event": "TagResource"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True,
+                             "force": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
+        self.assertEqual(len(resources), 1)
 
 
 class CloudFront(BaseTest):
@@ -430,6 +513,66 @@ class CloudFront(BaseTest):
 
         self.assertEqual(east_resources, west_resources)
 
+    def test_cloudfront_update_deep_attribute(self):
+        factory = self.replay_flight_data(
+            "test_distribution_update_deep_attribute",
+            region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-update-tls",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "DomainName": "dal78uzs60406.cloudfront.net",
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.MinimumProtocolVersion",
+                        "op": "in",
+                        "value": ["TLSv1.1_2016", "TLSv1_2016", "TLSv1", "SSLv3"],
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.CertificateSource",
+                        "op": "in",
+                        "value": ["acm", "iam"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-attributes",
+                        "attributes": {
+                            "ViewerCertificate": {
+                                "MinimumProtocolVersion": "TLSv1.2_2018",
+                            }
+                        },
+                    },
+                ],
+            },
+            config=dict(region='us-east-2'),
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_distribution_config(Id=dist_id)
+
+        # Check attribute updated by policy action
+        self.assertEqual(
+            resp['DistributionConfig']['ViewerCertificate']['MinimumProtocolVersion'],
+            'TLSv1.2_2018'
+        )
+
+        # Check deep attribute from original configuration
+        self.assertEqual(
+            resp['DistributionConfig']['ViewerCertificate']['CertificateSource'],
+            'acm'
+        )
+
     def test_cloudfront_update_distribution(self):
         factory = self.replay_flight_data("test_distribution_update_distribution")
         p = self.load_policy(
@@ -514,3 +657,121 @@ class CloudFront(BaseTest):
         self.assertEqual(
             resp['StreamingDistributionConfig']['Logging']['Enabled'], True
         )
+
+    def test_cloudfront_post_finding(self):
+        factory = self.replay_flight_data(
+            "test_distribution_post_finding",
+            region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-post-finding",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "DomainName": "dal78uzs60406.cloudfront.net",
+                    },
+                    {
+                        "type": "distribution-config",
+                        "key": "ViewerCertificate.MinimumProtocolVersion",
+                        "op": "in",
+                        "value": ["TLSv1.1_2016", "TLSv1_2016", "TLSv1", "SSLv3"],
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "compliance_status": "FAILED",
+                        "description": "Deprecated TLS version support",
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    },
+                ],
+            },
+            config={'region': 'us-east-2'},
+            session_factory=factory,
+        )
+
+        resources = p.resource_manager.resources()
+        self.assertEqual(len(resources), 1)
+        formatted_resource = p.resource_manager.actions[0].format_resource(resources[0])
+        shape_validate(
+            formatted_resource['Details']['AwsCloudFrontDistribution'],
+            'AwsCloudFrontDistributionDetails',
+            'securityhub')
+
+
+class CloudFrontWafV2(BaseTest):
+
+    def test_wafv2(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_wafv2_to_waf(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True, "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True, "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-cfront",
+                "resource": "distribution",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "test", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

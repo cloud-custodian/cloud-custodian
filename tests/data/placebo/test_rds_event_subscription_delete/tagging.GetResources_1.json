@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:es:c7n-test-pratyush",
+                "Tags": [
+                    {
+                        "Key": "name",
+                        "Value": "pratyush"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

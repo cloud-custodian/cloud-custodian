@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 CloudWatch Metrics suppport for resources
 """
@@ -108,6 +97,7 @@ class MetricsFilter(Filter):
 
     # ditto for spot fleet
     DEFAULT_NAMESPACE = {
+        'apigateway': 'AWS/ApiGateway',
         'cloudfront': 'AWS/CloudFront',
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
@@ -134,13 +124,16 @@ class MetricsFilter(Filter):
     }
 
     def process(self, resources, event=None):
-        days = self.data.get('days', 14)
+        self.days = days = self.data.get('days', 14)
         duration = timedelta(days)
 
         self.metric = self.data['name']
         self.end = datetime.utcnow()
-        self.start = self.end - duration
-        self.period = int(self.data.get('period', duration.total_seconds()))
+
+        # Adjust the start time to gracefully handle CloudWatch's retention schedule, which rolls up
+        # data points progressively (1 minute --> 5 minutes --> 1 hour) over time.
+        self.start = (self.end - duration).replace(minute=0)
+        self.period = int(self.data.get('period', (self.end - self.start).total_seconds()))
         self.statistics = self.data.get('statistics', 'Average')
         self.model = self.manager.get_model()
         self.op = OPERATORS[self.data.get('op', 'less-than')]
@@ -199,7 +192,7 @@ class MetricsFilter(Filter):
             # policies, still the lack of full qualification on the key
             # means multiple filters within a policy using the same metric
             # across different periods or dimensions would be problematic.
-            key = "%s.%s.%s" % (self.namespace, self.metric, self.statistics)
+            key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
             if key not in collected_metrics:
                 collected_metrics[key] = client.get_metric_statistics(
                     Namespace=self.namespace,

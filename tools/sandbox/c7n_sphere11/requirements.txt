@@ -10,7 +10,7 @@ pyasn1>=0.4.2
 python-dateutil>=2.6.1
 PyYAML>=4.2b4
 requests>=2.12.5
-rsa==4.0
+rsa>=4.6
 s3transfer>=0.1.10
 six>=1.10.0
 c7n>=0.8.22.0
