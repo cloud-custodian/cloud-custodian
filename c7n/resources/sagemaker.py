@@ -262,15 +262,15 @@ SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilte
 class DescribeModel(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client('sagemaker')
+        client = local_session(self.manager.session_factory).client('sagemaker')
 
         def _augment(r):
-            tags = self.retry(client.list_tags,
+            tags = self.manager.retry(client.list_tags,
                 ResourceArn=r['ModelArn'])['Tags']
             r.setdefault('Tags', []).extend(tags)
             return r
 
-        resources = super(Model, self).augment(resources)
+        resources = super(DescribeModel, self).augment(resources)
         return list(map(_augment, resources))
 
 

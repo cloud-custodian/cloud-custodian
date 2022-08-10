@@ -12,7 +12,7 @@ class DescribeStepFunction(DescribeSource):
 
     def augment(self, resources):
         resources = super().augment(resources)
-        return universal_augment(self, resources)
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('step-machine')

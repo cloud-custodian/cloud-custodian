@@ -20,7 +20,7 @@ import c7n.filters.vpc as net_filters
 class DescribeWorkspace(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment(self, resources)
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('workspaces')
