@@ -22,6 +22,7 @@ class DescribeKafka(DescribeSource):
             r['Tags'] = tags
         return resources
 
+
 @resources.register('kafka')
 class Kafka(QueryResourceManager):
 
