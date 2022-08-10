@@ -99,7 +99,7 @@ class TestRestApi(BaseTest):
             ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         tags = client.get_tags(resourceArn='arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27')
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
@@ -114,8 +114,8 @@ class TestRestApi(BaseTest):
             "actions": [{"type": "delete"}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
-        self.assertTrue(resources[0]['id'], 'am0c2fyskg')
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'am0c2fyskg')
         client = session_factory().client("apigateway")
         with self.assertRaises(ClientError) as e:
             client.delete_rest_api(restApiId='am0c2fyskg')
@@ -416,7 +416,7 @@ class TestRestStage(BaseTest):
             ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         tags = client.get_tags(
             resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
         self.assertEqual(tags.get('tags', {}),
@@ -671,3 +671,41 @@ class TestCustomDomainName(BaseTest):
         client = factory().client("apigateway")
         result = client.get_domain_name(domainName="bad.example.com")
         self.assertEqual(result['securityPolicy'], 'TLS_1_2')
+
+
+class TestResourcePolicy(BaseTest):
+    def test_rest_api_default_resource_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_api_default_resource_policy')
+        p = self.load_policy({
+            'name': 'test-rest-api-default-resource-policy',
+            'resource': 'rest-api',
+            'filters': [{'type': 'cross-account'}],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], '6wv8r5sehj')
+
+    def test_rest_api_custom_resource_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_api_custom_resource_policy')
+        p = self.load_policy({
+            'name': 'test-rest-api-custom-resource-policy',
+            'resource': 'rest-api',
+            'filters': [
+                {
+                    'type': 'cross-account',
+                    'whitelist_vpc': ['vpc-011b11111fb2a6b11']
+                }
+            ],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        # self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['id'], 'kjh6l7usy5')
+        self.assertEqual(resources[0]['name'], 'bad-api-gw-1')
+        self.assertEqual(resources[1]['id'], '6l7kjhusy5')
+        self.assertEqual(resources[1]['name'], 'bad-api-gw-2')
+        # raise NotImplementedError()
