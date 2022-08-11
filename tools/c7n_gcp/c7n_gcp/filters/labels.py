@@ -81,13 +81,14 @@ class LabelActionFilter(Filter):
         return super(LabelActionFilter, self).process(resources, event)
 
     def parse(self, v: str):
-        msg, remainder = v.split('-', 1)
+        remainder, action_date = v.rsplit('-', 1)
         found = False
-        action_date = None
+        msg = ""
         for a in self.valid_actions:
-            if remainder.startswith(a):
+            if remainder.endswith(a):
                 found = a
-                action_date = remainder[len(a) + 1:]
+                msg = remainder[:-len(a)-1]
+                break
         return msg, found, action_date
 
     def __call__(self, i):

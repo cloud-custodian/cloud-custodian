@@ -105,3 +105,6 @@ class LabelActionFilterTest(BaseTest):
 
         assert marked_for.parse("resource_policy-delete-2022_10_23_12_10") == (
             'resource_policy', 'delete', '2022_10_23_12_10')
+
+        assert marked_for.parse("custom-message-delete-2022_10_23_12_10") == (
+            'custom-message', 'delete', '2022_10_23_12_10')
