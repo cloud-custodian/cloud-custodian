@@ -18,7 +18,7 @@ install_requires = \
  'attrs (>=22.1.0,<23.0.0)',
  'boto3 (>=1.24.44,<2.0.0)',
  'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.17,<0.10.0)',
+ 'c7n (>=0.9.18,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.12.0,<5.0.0)',
  'importlib-resources (>=5.9.0,<6.0.0)',
@@ -38,7 +38,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.16',
+    'version': '0.2.17',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'license': 'Apache-2.0',
     'classifiers': [

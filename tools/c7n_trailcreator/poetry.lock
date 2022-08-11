@@ -60,7 +60,7 @@ crt = ["awscrt (==0.13.8)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.17"
+version = "0.9.18"
 description = "Cloud Custodian - Policy Rules Engine"
 category = "dev"
 optional = false
@@ -83,7 +83,7 @@ url = "../.."
 
 [[package]]
 name = "c7n-org"
-version = "0.6.16"
+version = "0.6.17"
 description = "Cloud Custodian - Parallel Execution"
 category = "dev"
 optional = false

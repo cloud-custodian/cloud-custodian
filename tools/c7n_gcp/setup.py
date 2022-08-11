@@ -14,7 +14,7 @@ install_requires = \
  'attrs (>=22.1.0,<23.0.0)',
  'boto3 (>=1.24.44,<2.0.0)',
  'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.17,<0.10.0)',
+ 'c7n (>=0.9.18,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
  'google-api-python-client>=2.0,<3.0',
  'google-auth>=2.1.0,<3.0.0',
@@ -40,7 +40,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-gcp',
-    'version': '0.4.16',
+    'version': '0.4.17',
     'description': 'Cloud Custodian - Google Cloud Provider',
     'license': 'Apache-2.0',
     'classifiers': [
