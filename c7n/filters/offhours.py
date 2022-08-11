@@ -202,13 +202,13 @@ above. The best current workaround is to define a separate policy with a unique
 resources with that tag name and a value of ``on``. Note that this can only be
 used in opt-in mode, not opt-out.
 
-Another option is to escape the tag value with the following mapping.
+Another option is to escape the tag value with the following mapping, generated
+with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
 
-.. code-block:: python
-
-    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";"]
-    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b']
-    TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
+- ( and ) as u28 and u29
+- [ and ] as u5b and u5d
+- , as u2c
+- ; as u3b
 
 **Examples**::
 
