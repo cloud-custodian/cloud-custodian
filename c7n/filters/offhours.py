@@ -202,6 +202,21 @@ above. The best current workaround is to define a separate policy with a unique
 resources with that tag name and a value of ``on``. Note that this can only be
 used in opt-in mode, not opt-out.
 
+Another option is to escape the tag value with the following mapping.
+
+.. code-block:: python
+
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b']
+    TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
+
+**Examples**::
+
+    # off=(M-F,18);tz=Australia/Sydney
+    off=u28M-Fu2c18u29u3btz=Australia/Sydney
+    # off=[(M-F,18),(S,13)]
+    off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d
+
 Public Holidays
 ===============
 
