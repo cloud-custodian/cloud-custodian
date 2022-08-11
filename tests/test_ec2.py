@@ -1340,6 +1340,25 @@ class TestTerminate(BaseTest):
         )
         self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
 
+    def test_ec2_terminate_with_protection_enabled(self):
+        # Test conditions: single running instance, with delete protection
+        session_factory = self.replay_flight_data("test_ec2_terminate_with_protection_enabled")
+        p = self.load_policy(
+            {
+                "name": "ec2-term",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-017fc9a2a33b853fe"}],
+                "actions": [{"type": "terminate", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-017fc9a2a33b853fe"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
+
 
 class TestDefaultVpc(BaseTest):
 

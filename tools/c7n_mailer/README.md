@@ -186,6 +186,8 @@ Slack integration for the mailer supports several flavors of messaging, listed b
 Slack delivery can also be set via a resource's tag name. For example, using "slack://tag/slack_channel" will look for a tag name of 'slack_channel', and if matched on a resource will deliver the message to the value of that resource's tag:
 
 `slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
+`slack_channel:custodian-test`
+`owner:foo@bar`
 
 Delivery via tag has been tested with webhooks but should support all delivery methods.
 

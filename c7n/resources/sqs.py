@@ -8,6 +8,7 @@ from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.core import Filter
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -146,6 +147,16 @@ class SQSPostFinding(PostFinding):
             payload['KmsDataKeyReusePeriodSeconds'] = int(
                 payload['KmsDataKeyReusePeriodSeconds'])
         return envelope
+
+
+@SQS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, queue):
+        return {
+            'queue_arn': queue['QueueArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SQS.action_registry.register('remove-statements')
