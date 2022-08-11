@@ -87,7 +87,7 @@ class LabelActionFilter(Filter):
         for a in self.valid_actions:
             if remainder.endswith(a):
                 found = a
-                msg = remainder[:-len(a)-1]
+                msg = remainder[:-len(a) - 1]
                 break
         return msg, found, action_date
 
