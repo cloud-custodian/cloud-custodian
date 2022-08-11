@@ -14,8 +14,8 @@ install_requires = \
  'attrs (>=22.1.0,<23.0.0)',
  'boto3 (>=1.24.44,<2.0.0)',
  'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.17,<0.10.0)',
- 'c7n-org (>=0.6.16,<0.7.0)',
+ 'c7n (>=0.9.18,<0.10.0)',
+ 'c7n-org (>=0.6.17,<0.7.0)',
  'click (>=8.1.3,<9.0.0)',
  'click>=8.0,<9.0',
  'colorama (>=0.4.5,<0.5.0)',
@@ -40,7 +40,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-trailcreator',
-    'version': '0.2.16',
+    'version': '0.2.17',
     'description': 'Cloud Custodian - Retroactive Tag Resource Creators from CloudTrail',
     'license': 'Apache-2.0',
     'classifiers': [

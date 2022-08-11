@@ -175,6 +175,20 @@ class RestApiCrossAccount(CrossAccountAccessFilter):
     policy_attribute = 'policy'
     permissions = ('apigateway:GET',)
 
+    def get_resource_policy(self, r):
+        policy = super().get_resource_policy(r)
+        if policy:
+            policy = policy.replace('\\', '')
+        else:
+            # api gateway default iam policy is public
+            # authorizers and app code may mitigate but
+            # the iam policy intent here is clear.
+            policy = {'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Effect': 'Allow',
+                'Principal': '*'}]}
+        return policy
+
 
 @RestApi.action_registry.register('update')
 class UpdateApi(BaseAction):
