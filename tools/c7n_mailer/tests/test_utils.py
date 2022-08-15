@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import os
+from time import sleep
 import unittest
 import jinja2
 import logging
@@ -401,6 +403,12 @@ class OtherTests(unittest.TestCase):
             logging.getLogger('c7n_mailer.utils.email'),
             'template', 'default', MAILER_CONFIG['templates_folders'])
         self.assertIsNotNone(body)
+
+    def test_get_date_age(self):
+        now = datetime.utcnow().isoformat() + "Z"
+        sleep(1.0)
+        assert utils.get_date_age(now) == 0
+        assert utils.get_date_age(now, "seconds") >= 1
 
     def test_get_message_subject(self):
         subject = utils.get_message_subject(SQS_MESSAGE_1)

@@ -202,6 +202,21 @@ above. The best current workaround is to define a separate policy with a unique
 resources with that tag name and a value of ``on``. Note that this can only be
 used in opt-in mode, not opt-out.
 
+Another option is to escape the tag value with the following mapping, generated
+with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
+
+- ( and ) as u28 and u29
+- [ and ] as u5b and u5d
+- , as u2c
+- ; as u3b
+
+**Examples**::
+
+    # off=(M-F,18);tz=Australia/Sydney
+    off=u28M-Fu2c18u29u3btz=Australia/Sydney
+    # off=[(M-F,18),(S,13)]
+    off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d
+
 Public Holidays
 ===============
 
@@ -308,6 +323,9 @@ class Time(Filter):
         'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b']
+    TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
 
     z_names = list(zoneinfo.get_zonefile_instance().zones)
     non_title_case_zones = (
@@ -456,9 +474,16 @@ class Time(Filter):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8').decode('utf8')
+        value = self.unescape_tag_restrictions(value)
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')
+        return value
+
+    @classmethod
+    def unescape_tag_restrictions(cls, value: str):
+        for i, c in enumerate(cls.TAG_RESTRICTIONS_ESCAPE):
+            value = value.replace(c, cls.TAG_RESTRICTIONS[i])
         return value
 
     @classmethod

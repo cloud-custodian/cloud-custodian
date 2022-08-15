@@ -87,16 +87,20 @@ class SlackDelivery:
                         "No %s tag found in resource." % tag_name)
                     continue
 
-                resolved_addrs = result['Value']
+                resolved_addr = slack_target = result['Value']
 
-                if not resolved_addrs.startswith("#"):
-                    resolved_addrs = "#" + resolved_addrs
+                if is_email(resolved_addr):
+                    ims = self.retrieve_user_im([resolved_addr])
+                    slack_target = ims[resolved_addr]
+                elif not resolved_addr.startswith("#"):
+                    resolved_addr = "#" + resolved_addr
+                    slack_target = resolved_addr
 
-                slack_messages[resolved_addrs] = get_rendered_jinja(
-                    resolved_addrs, sqs_message,
-                    resource_list,
+                slack_messages[resolved_addr] = get_rendered_jinja(
+                    slack_target, sqs_message, resource_list,
                     self.logger, 'slack_template', 'slack_default',
-                    self.config['templates_folders'])
+                    self.config['templates_folders']
+                )
                 self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 

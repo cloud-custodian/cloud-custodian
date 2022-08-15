@@ -696,6 +696,38 @@ class QueueTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n:AccessAnalysis', resources[0])
 
+    def test_sqs_has_statement_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sqs_has_statement"
+        )
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "test_sqs_has_statement_definition",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "sqs:*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{queue_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["QueueArn"],
+        "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement")
+
     def test_sqs_deadletter_filter(self):
         factory = self.replay_flight_data("test_sqs_deadletter_filter")
         self.patch(SQS, "executor_factory", MainThreadExecutor)
