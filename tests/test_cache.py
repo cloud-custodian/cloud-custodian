@@ -48,6 +48,7 @@ def test_sqlkv(tmp_path):
     assert kv.get(k1) is None
     kv.save(k1, v1)
     assert kv.get(k1) == v1
+    kv.close()
 
 
 def test_sqlkv_get_expired(tmp_path):
@@ -73,6 +74,7 @@ def test_sqlkv_load_gc(tmp_path):
     kv.load()
     assert kv.get(kv1) is None
     assert kv.get(kv2) == kv2
+    kv.close()
 
 
 def test_sqlkv_parent_dir_create(tmp_path):
@@ -80,14 +82,16 @@ def test_sqlkv_parent_dir_create(tmp_path):
     kv = cache.SqlKvCache(config.Bag(cache=cache_path, cache_period=60))
     kv.load()
     assert os.path.exists(os.path.dirname(cache_path))
+    kv.close()
 
 
 def test_sqlkv_convert(tmp_path):
-    cache_path = tmp_path / "cache.db"
+    cache_path = tmp_path / "cache2.db"
     with open(cache_path, 'wb') as fh:
         pickle.dump({'kv': 'abc'}, fh)
+        fh.close()
     kv = cache.SqlKvCache(config.Bag(cache=cache_path, cache_period=60))
     kv.load()
-
+    kv.close()
     with open(cache_path, 'rb') as fh:
         assert fh.read(15) == b"SQLite format 3"
