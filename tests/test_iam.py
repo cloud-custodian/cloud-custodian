@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import datetime
 import os
 import mock
 import tempfile
@@ -9,7 +8,6 @@ import time
 
 from unittest import TestCase
 from .common import load_data, BaseTest, functional
-from .test_offhours import mock_datetime_now
 
 import freezegun
 import pytest
