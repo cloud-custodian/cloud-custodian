@@ -1,12 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from datetime import datetime, timedelta
-from unittest import TestCase
-from c7n import cache, config
 from argparse import Namespace
-import pickle
+from datetime import datetime, timedelta
 import os
+import pickle
 import sqlite3
+import sys
+from unittest import TestCase
+
+import pytest
+
+from c7n import cache, config
 
 
 class TestCache(TestCase):
@@ -57,7 +61,6 @@ def test_sqlkv_get_expired(tmp_path):
     kv1 = {'a': 'b', 'c': 'd'}
     kv.save(kv1, kv1, datetime.utcnow() - timedelta(days=10))
     assert kv.get(kv1) is None
-    kv.close()
 
 
 def test_sqlkv_load_gc(tmp_path):
@@ -74,7 +77,6 @@ def test_sqlkv_load_gc(tmp_path):
     kv.load()
     assert kv.get(kv1) is None
     assert kv.get(kv2) == kv2
-    kv.close()
 
 
 def test_sqlkv_parent_dir_create(tmp_path):
@@ -82,9 +84,11 @@ def test_sqlkv_parent_dir_create(tmp_path):
     kv = cache.SqlKvCache(config.Bag(cache=cache_path, cache_period=60))
     kv.load()
     assert os.path.exists(os.path.dirname(cache_path))
-    kv.close()
 
 
+@pytest.mark.skipif(
+    sys.platform == 'win32',
+    reason="windows can't remove a recently created but closed file")
 def test_sqlkv_convert(tmp_path):
     cache_path = tmp_path / "cache2.db"
     with open(cache_path, 'wb') as fh:
