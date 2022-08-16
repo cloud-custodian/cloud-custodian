@@ -11,6 +11,7 @@ from unittest import TestCase
 from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
+import freezegun
 import pytest
 from pytest_terraform import terraform
 from dateutil import parser
@@ -120,7 +121,7 @@ class UserCredentialReportTest(BaseTest):
                  'matched': True}]},
             session_factory=factory)
 
-        with mock_datetime_now(parser.parse("2020-01-01"), datetime):
+        with freezegun.freeze_time('2020-01-01'):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
@@ -240,7 +241,7 @@ class UserCredentialReportTest(BaseTest):
             session_factory=session_factory,
             cache=True,
         )
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27"):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted([r["UserName"] for r in resources]), ["kapil"])
@@ -271,7 +272,7 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
 
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27:00+00:00"):
             resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
