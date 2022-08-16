@@ -62,7 +62,7 @@ CONFIG_SCHEMA = {
             'required': ['role', 'groups'],
             'properties': {
                 'name': {'type': 'string'},
-                'role-for-put-subscription-filter': {'type': 'string'},
+                'subscription-role': {'type': 'string'},
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string'}]},
@@ -208,7 +208,7 @@ def subscribe(config, accounts, region, merge, debug):
         session = get_session(t_account['role'], region)
         client = session.client('logs')
         distribution = subscription.get('distribution', 'ByLogStream')
-        role_arn = account.get('role-for-put-subscription-filter')
+        role_arn = account.get('subscription-role')
 
         for g in account.get('groups'):
             if (g.endswith('*')):

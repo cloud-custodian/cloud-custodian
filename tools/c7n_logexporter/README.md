@@ -76,7 +76,7 @@ destination:
 accounts:
   - name: custodian-demo
     # https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateSubscriptionFilter-IAMrole.html
-    role-for-put-subscription-filter: "arn:aws:iam::111111111111:role/<name>"
+    subscription-role: "arn:aws:iam::111111111111:role/<role-name>"
     role: "arn:aws:iam::111111111111:role/CloudCustodianRole"
     groups:
       - "/aws/lambda/*"
