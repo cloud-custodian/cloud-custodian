@@ -135,10 +135,10 @@ class FlowLogFilter(Filter):
                     dest_type_match = (destination_type is None) or op(
                         fl['LogDestinationType'], destination_type)
                     if fl['LogDestinationType'] == "s3":
-                      dest_match = (destination is None) or op(
-                          fl['LogDestination'], destination)
+                        dest_match = (destination is None) or op(
+                            fl['LogDestination'], destination)
                     else:
-                      dest_match = (destination is None)
+                        dest_match = (destination is None)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
                     delivery_status_match = (delivery_status is None) or op(
                         fl['DeliverLogsStatus'], delivery_status.upper())
