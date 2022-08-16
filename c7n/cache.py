@@ -118,6 +118,7 @@ class SqlKvCache:
             cursor.execute(
                 'delete from c7n_cache where create_date < ?',
                 [datetime.utcnow() - timedelta(minutes=self.cache_period)])
+        return True
 
     def get(self, key):
         with self.conn as cursor:
