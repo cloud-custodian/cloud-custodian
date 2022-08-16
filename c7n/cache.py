@@ -52,6 +52,9 @@ class NullCache:
     def size(self):
         return 0
 
+    def close(self):
+        pass
+
 
 class InMemoryCache:
     # Running in a temporary environment, so keep as a cache.
@@ -72,6 +75,9 @@ class InMemoryCache:
 
     def size(self):
         return sum(map(len, self.data.values()))
+
+    def close(self):
+        pass
 
 
 def encode(key):
@@ -144,3 +150,7 @@ class SqlKvCache:
 
     def size(self):
         return os.path.exists(self.cache_path) and os.path.getsize(self.cache_path) or 0
+
+    def close(self):
+        if self.conn:
+            self.conn.close()

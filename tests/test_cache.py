@@ -36,6 +36,7 @@ class MemCacheTest(TestCase):
         self.assertEqual(
             mem_cache.get({'region': 'us-east-1'}),
             {'hello': 'world'})
+        mem_cache.close()
 
 
 def test_sqlkv(tmp_path):
@@ -55,6 +56,7 @@ def test_sqlkv_get_expired(tmp_path):
     kv1 = {'a': 'b', 'c': 'd'}
     kv.save(kv1, kv1, datetime.utcnow() - timedelta(days=10))
     assert kv.get(kv1) is None
+    kv.close()
 
 
 def test_sqlkv_load_gc(tmp_path):
