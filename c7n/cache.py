@@ -132,7 +132,7 @@ class SqlKvCache:
             create_date = sqlite3.converters['TIMESTAMP'](create_date.encode('utf8'))
             if (datetime.utcnow() - create_date).total_seconds() / 60.0 > self.cache_period:
                 return None
-            return pickle.loads(value)
+            return pickle.loads(value) # nosec nosemgrep
 
     def save(self, key, data, timestamp=None):
         with self.conn as cursor:
