@@ -159,7 +159,8 @@ class ChildResourceQuery(ResourceQuery):
                             .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
-
+        # close the parent to dispose its cache reference
+        parents.close()
         return results
 
 
