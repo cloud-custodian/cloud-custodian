@@ -1013,5 +1013,4 @@ class ParentFilter(Filter):
         parent_resources = self.parent_filter.process(self.parent_manager.resources())
         parent_resources_ids = [p['id'] for p in parent_resources]
         parent_key = self.manager.resource_type.parent_key
-        self.parent_manager.close()
         return [r for r in resources if r[parent_key] in parent_resources_ids]

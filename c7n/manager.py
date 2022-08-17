@@ -149,7 +149,3 @@ class ResourceManager:
     def get_deprecations(self):
         """Return any matching deprecations for the resource itself."""
         return deprecated.check_deprecations(self)
-
-    def close(self):
-        """Release any network/file/resources"""
-        self._cache.close()

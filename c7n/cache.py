@@ -31,11 +31,11 @@ def factory(config):
         if not CACHE_NOTIFY:
             log.debug("Using in-memory cache")
             CACHE_NOTIFY = True
-        return InMemoryCache()
+        return InMemoryCache(config)
     return SqlKvCache(config)
 
 
-class NullCache:
+class Cache:
 
     def __init__(self, config):
         self.config = config
@@ -55,13 +55,25 @@ class NullCache:
     def close(self):
         pass
 
+    def __enter__(self):
+        self.load()
+        return self
 
-class InMemoryCache:
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+
+class NullCache(Cache):
+    pass
+
+
+class InMemoryCache(Cache):
     # Running in a temporary environment, so keep as a cache.
 
     __shared_state = {}
 
-    def __init__(self):
+    def __init__(self, config):
+        super().__init__(config)
         self.data = self.__shared_state
 
     def load(self):
@@ -76,9 +88,6 @@ class InMemoryCache:
     def size(self):
         return sum(map(len, self.data.values()))
 
-    def close(self):
-        pass
-
 
 def encode(key):
     return pickle.dumps(key, protocol=pickle.HIGHEST_PROTOCOL)  # nosemgrep
@@ -90,7 +99,7 @@ def resolve_path(path):
             os.path.expandvars(path)))
 
 
-class SqlKvCache:
+class SqlKvCache(Cache):
 
     create_table = """
     create table if not exists c7n_cache (
@@ -101,7 +110,7 @@ class SqlKvCache:
     """
 
     def __init__(self, config):
-        self.config = config
+        super().__init__(config)
         self.cache_period = config.cache_period
         self.cache_path = resolve_path(config.cache)
         self.conn = None
@@ -154,3 +163,4 @@ class SqlKvCache:
     def close(self):
         if self.conn:
             self.conn.close()
+            self.conn = None

@@ -1605,7 +1605,12 @@ class CredentialReport(Filter):
         return self.schema['properties'][k]['default']
 
     def get_credential_report(self):
-        report = self.manager._cache.get('iam-credential-report')
+        cache = self.manager._cache
+        cache.load()
+        cache_key = self.manager.get_cache_key({'iam-credential-report': True})
+        cache_key.pop('region')
+        report = cache.get(cache_key)
+
         if report:
             return report
         data = self.fetch_credential_report()
@@ -1618,7 +1623,9 @@ class CredentialReport(Filter):
         for line in reader:
             info = dict(zip(headers, line))
             report[info['user']] = self.process_user_record(info)
-        self.manager._cache.save('iam-credential-report', report)
+
+        cache.save(cache_key, report)
+        cache.close()
         return report
 
     @classmethod

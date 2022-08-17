@@ -527,6 +527,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 # Don't pollute cache with unaugmented resources.
                 self._cache.save(cache_key, resources)
 
+        self._cache.close()
+
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
@@ -555,6 +557,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 m = self.get_model()
                 id_set = set(ids)
                 return [r for r in resources if r[m.id] in id_set]
+        self._cache.close()
         return None
 
     def get_resources(self, ids, cache=True, augment=True):
