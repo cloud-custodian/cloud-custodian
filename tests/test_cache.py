@@ -31,12 +31,12 @@ class MemCacheTest(TestCase):
             cache.InMemoryCache)
 
     def test_get_set(self):
-        mem_cache = cache.InMemoryCache()
+        mem_cache = cache.InMemoryCache({})
         mem_cache.save({'region': 'us-east-1'}, {'hello': 'world'})
         self.assertEqual(mem_cache.size(), 1)
         self.assertEqual(mem_cache.load(), True)
 
-        mem_cache = cache.InMemoryCache()
+        mem_cache = cache.InMemoryCache({})
         self.assertEqual(
             mem_cache.get({'region': 'us-east-1'}),
             {'hello': 'world'})

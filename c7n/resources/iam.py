@@ -1607,8 +1607,7 @@ class CredentialReport(Filter):
     def get_credential_report(self):
         cache = self.manager._cache
         with cache:
-            cache_key = self.manager.get_cache_key({'iam-credential-report': True})
-            cache_key.pop('region')
+            cache_key = {'account': self.manager.config.account_id, 'iam-credential-report': True}
             report = cache.get(cache_key)
 
             if report:
