@@ -10,8 +10,7 @@ class LakeFormationRegisteredLocation(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'lakeformation'
         enum_spec = ('list_resources', 'ResourceInfoList', None)
-        arn = id = 'ResourceArn'
-        name = ''
+        name = arn = id = 'ResourceArn'
         cfn_type = "AWS::LakeFormation::Resource"
         arn_type = ''
 
