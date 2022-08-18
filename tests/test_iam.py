@@ -1677,6 +1677,123 @@ class KMSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
+    def test_kms_cross_account_condition_keys_1(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_cross_account_kms")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Good condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "some_service.eu-west-1.amazonaws.com",
+                            "kms:CallerAccount": "644160558196"
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-3"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_kms_cross_account_condition_keys_2(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_cross_account_kms")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Bad condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "some_service.eu-west-1.amazonaws.com",
+                            "kms:CallerAccount": "*"
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-3"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
 
 class GlacierCrossAccount(BaseTest):
 
