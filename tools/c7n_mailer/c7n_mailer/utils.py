@@ -137,8 +137,11 @@ def get_date_time_delta(delta):
     return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
 
-def get_date_age(date):
-    return (datetime.now(tz=tzutc()) - parser.parse(date)).days
+def get_date_age(date, unit="days"):
+    delta = datetime.now(tz=tzutc()) - parser.parse(date)
+    if unit == "seconds":
+        return delta.seconds
+    return delta.days
 
 
 def format_struct(evt):

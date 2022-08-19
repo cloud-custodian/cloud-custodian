@@ -4,10 +4,23 @@ from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate
+
+
+class DescribeKafka(DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            if 'Tags' not in r:
+                continue
+            tags = []
+            for k, v in r['Tags'].items():
+                tags.append({'Key': k, 'Value': v})
+            r['Tags'] = tags
+        return resources
 
 
 @resources.register('kafka')
@@ -22,17 +35,12 @@ class Kafka(QueryResourceManager):
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
         universal_taggable = object()
-        cfn_type = 'AWS::MSK::Cluster'
+        cfn_type = config_type = 'AWS::MSK::Cluster'
 
-    def augment(self, resources):
-        for r in resources:
-            if 'Tags' not in r:
-                continue
-            tags = []
-            for k, v in r['Tags'].items():
-                tags.append({'Key': k, 'Value': v})
-            r['Tags'] = tags
-        return resources
+    source_mapping = {
+        'describe': DescribeKafka,
+        'config': ConfigSource
+    }
 
 
 @Kafka.filter_registry.register('security-group')

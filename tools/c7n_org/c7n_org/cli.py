@@ -341,6 +341,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
+                    if k in r:
+                        k = 'tag:' + k
                     r[k] = v
         records.extend(policy_records)
     return records

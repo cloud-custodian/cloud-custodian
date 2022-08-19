@@ -526,6 +526,26 @@ class AppELBTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-appelb-active-response",
+                "resource": "app-elb",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "elasticloadbalancing.amazonaws.com",
+                    "ids": "requestParameters.resourceArns[0]",
+                    "event": "AddTags"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}, {"tag:WAF": "Internal"}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-appelb-add-tags.json"))
+        self.assertEqual(len(resources), 1)
+
     def test_appelb_net_metrics(self):
         factory = self.replay_flight_data('test_netelb_metrics')
         p = self.load_policy({
