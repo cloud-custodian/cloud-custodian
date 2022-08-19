@@ -650,6 +650,22 @@ class StorageTest(BaseTest):
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
 
+    def test_storage_soft_delete(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage-blob',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                'key': 'name',
+                'op': 'glob',
+                'value_type': 'normalize',
+                'value': 'cctstorage*'},
+                {'type': 'soft-delete',
+                'enabled': True}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
 
 class StorageFirewallFilterTest(BaseTest):
 
