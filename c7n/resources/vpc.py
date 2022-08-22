@@ -134,7 +134,7 @@ class FlowLogFilter(Filter):
                 for fl in flogs:
                     dest_type_match = (destination_type is None) or op(
                         fl['LogDestinationType'], destination_type)
-                    if fl['LogDestinationType'] == "s3":
+                    if fl.get('LogDestinationType') == "s3":
                         dest_match = (destination is None) or op(
                             fl['LogDestination'], destination)
                     else:
