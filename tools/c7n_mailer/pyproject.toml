@@ -31,11 +31,15 @@ ldap3 = "^2.6.1"
 redis = "^3.4.1"
 jsonpointer = "^2.0"
 jsonpatch = "^1.25"
+types-six = "^1.16.10"
+google-cloud-secret-manager = "^2.8.0"
 importlib-metadata = ">=4.11.1"
 
 [tool.poetry.dev-dependencies]
 fakeredis = "^1.2.0"
 pytest = "^6.0.0"
+mypy = "^0.931"
+black = "^22.1.0"
 
 [build-system]
 requires = ["poetry>=0.12", "setuptools"]
