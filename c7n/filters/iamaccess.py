@@ -210,18 +210,6 @@ class PolicyChecker:
 
     # Condition handlers
 
-    # kms specific
-    # https://docs.aws.amazon.com/kms/latest/developerguide/policy-conditions.html#conditions-kms
-    def handle_kms_calleraccount(self, s, c):
-        raise Exception(self.allowed_accounts)
-        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
-
-    def handle_kms_viaservice(self, s, c):
-        return False
-
-    def handle_kms_grantoperations(self, s, c):
-        return False
-
     # sns default policy
     def handle_aws_sourceowner(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
