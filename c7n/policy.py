@@ -1285,8 +1285,7 @@ class Policy:
             resources = mode.provision()
         else:
             resources = mode.run()
-        # clear out resource manager post run, to clear cache
-        self.resource_manager = self.load_resource_manager()
+
         return resources
 
     run = __call__
