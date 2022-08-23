@@ -85,15 +85,23 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('workspaces')
-        annotate_map = {r['WorkspaceId']: r for r in resources if self.annotation_key not in r}
+        unannotated = {r['WorkspaceId']: r for r in resources if self.annotation_key not in r}
+        status_map = {}
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
-                'Querying connection status for %d workspaces' % len(annotate_map))
+                'Querying connection status for %d workspaces' % len(unannotated))
             for status in itertools.chain(*w.map(
                 functools.partial(self.get_connection_status, client),
-                chunks(annotate_map.keys(), 25)
+                chunks(unannotated.keys(), 25)
             )):
-                annotate_map[status['WorkspaceId']][self.annotation_key] = status
+                status_map[status['WorkspaceId']] = status
+
+        # Note: In some cases (e.g. workspaces that just launched or reached ERROR state during
+        # initialization) there will be no connection status information. Here we'll make
+        # sure that every workspace gets _some_ status annotation, even if it's empty.
+        for ws_id, r in unannotated.items():
+            r[self.annotation_key] = status_map.get(ws_id, {})
+
         return list(filter(self, resources))
 
     def get_resource_value(self, k, i):

@@ -9,6 +9,7 @@ from concurrent.futures import as_completed
 import functools
 import itertools
 import json
+from typing import List
 
 import jmespath
 import os
@@ -506,7 +507,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             'q': query
         }
 
-    def resources(self, query=None, augment=True):
+    def resources(self, query=None, augment=True) -> List[dict]:
         query = self.source.get_query_params(query)
         cache_key = self.get_cache_key(query)
         resources = None
@@ -529,6 +530,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                     resources = self.augment(resources)
                 # Don't pollute cache with unaugmented resources.
                 self._cache.save(cache_key, resources)
+
+        self._cache.close()
 
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):
@@ -558,6 +561,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 m = self.get_model()
                 id_set = set(ids)
                 return [r for r in resources if r[m.id] in id_set]
+        self._cache.close()
         return None
 
     def get_resources(self, ids, cache=True, augment=True):

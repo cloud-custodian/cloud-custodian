@@ -6,7 +6,10 @@ import operator
 import random
 import re
 import zlib
+from typing import List
+from distutils.version import LooseVersion
 
+import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -293,6 +296,62 @@ class AttachedVolume(ValueFilter):
                     if a['Device'] in self.skip:
                         volumes.remove(v)
         return self.operator(map(self.match, volumes))
+
+
+@filters.register('stop-protected')
+class DisableApiStop(Filter):
+    """EC2 instances with ``disableApiStop`` attribute set
+
+    Filters EC2 instances with ``disableApiStop`` attribute set to true.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-enabled
+            resource: ec2
+            filters:
+              - type: stop-protected
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-NOT-enabled
+            resource: ec2
+            filters:
+              - not:
+                - type: stop-protected
+    """
+
+    schema = type_schema('stop-protected')
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources: List[dict], event=None) -> List[dict]:
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self._is_stop_protection_enabled(client, r)]
+
+    def _is_stop_protection_enabled(self, client, instance: dict) -> bool:
+        attr_val = self.manager.retry(
+            client.describe_instance_attribute,
+            Attribute='disableApiStop',
+            InstanceId=instance['InstanceId']
+        )
+        return attr_val['DisableApiStop']['Value']
+
+    def validate(self) -> None:
+        botocore_min_version = '1.26.7'
+
+        if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
+            raise PolicyValidationError(
+                "'stop-protected' filter requires botocore version "
+                f'{botocore_min_version} or above. '
+                f'Installed version is {botocore.__version__}.'
+            )
 
 
 @filters.register('termination-protected')
