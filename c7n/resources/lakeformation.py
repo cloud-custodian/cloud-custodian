@@ -64,6 +64,4 @@ class DataLakeLocationsCrossAccount(Filter):
             b['Name'] for b in
             self.manager.get_resource_manager('s3').resources(augment=False)}
         cross_account = lake_bucket.difference(buckets)
-        if not cross_account:
-            return False
-        return True
+        return cross_account
