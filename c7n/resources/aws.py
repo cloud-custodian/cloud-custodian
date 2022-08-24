@@ -132,7 +132,13 @@ def get_bucket_region_clientless(bucket):
     region. This avoids some issues with cross-account/cross-region uses of the
     GetBucketPolicy API action.
 
-    Note that this approach will only work in the standard AWS partition.
+    This approach is inspired by some sample code from a Go SDK issue comment,
+    which @sean-zou mentioned in #7593:
+
+    https://github.com/aws/aws-sdk-go/issues/720#issuecomment-613038544
+
+    Note that since we're only targeting the default `s3.amazonaws.com` endpoint,
+    this will only work in the standard AWS partition.
 
     Return a region string, or None if we're unable to determine one.
     """
