@@ -26,7 +26,7 @@ class URIResolver:
         self.cache = cache
 
     def resolve(self, uri):
-        if self.cache:
+        if self.cache.load():
             contents = self.cache.get(("uri-resolver", uri))
             if contents is not None:
                 return contents
@@ -141,7 +141,7 @@ class ValuesFrom:
         return contents, format
 
     def get_values(self):
-        if self.cache:
+        if self.cache.load():
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
             # the results.
