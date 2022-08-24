@@ -711,6 +711,59 @@ class TestSNS(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'false')
 
+    def test_sns_has_statement_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_definition",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "SNS:Publish",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{topic_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+
+    def test_sns_has_statement_id(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_id",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statement_ids": ["BlockNonSSL"]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+
 
 class TestSubscription(BaseTest):
 
