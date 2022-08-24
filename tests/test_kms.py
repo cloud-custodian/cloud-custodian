@@ -407,7 +407,7 @@ class KMSCrossAccount(BaseTest):
                 {
                     "Sid": "Enable IAM User Permissions",
                     "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::353444730604:root"},
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
                     "Action": "kms:*",
                     "Resource": "*",
                 },
@@ -460,7 +460,7 @@ class KMSCrossAccount(BaseTest):
                 {
                     "Sid": "Enable IAM User Permissions",
                     "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::353444730604:root"},
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
                     "Action": "kms:*",
                     "Resource": "*",
                 },
@@ -474,7 +474,7 @@ class KMSCrossAccount(BaseTest):
                     "Resource": "*",
                     "Condition": {
                         "StringEquals": {
-                            "kms:CallerAccount": "353444730604"
+                            "kms:CallerAccount": "644160558196"
                         }
                     }
                 },
@@ -519,7 +519,7 @@ class KMSCrossAccount(BaseTest):
                 {
                     "Sid": "Enable IAM User Permissions",
                     "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::353444730604:root"},
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
                     "Action": "kms:*",
                     "Resource": "*",
                 },
@@ -527,7 +527,7 @@ class KMSCrossAccount(BaseTest):
                     "Sid": "Good condition key",
                     "Effect": "Allow",
                     "Principal": {
-                        "AWS": "353444730604"
+                        "AWS": "644160558196"
                     },
                     "Action": "kms:Encrypt",
                     "Resource": "*",
@@ -585,7 +585,7 @@ class KMSCrossAccount(BaseTest):
                 {
                     "Sid": "Enable IAM User Permissions",
                     "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::353444730604:root"},
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
                     "Action": "kms:*",
                     "Resource": "*",
                 },
