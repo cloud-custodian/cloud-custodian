@@ -30,6 +30,9 @@ class FakeCache:
         self.saves += 1
         self.state[pickle.dumps(key)] = data
 
+    def load(self):
+        return True
+
 
 class FakeResolver:
 
