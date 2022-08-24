@@ -4,6 +4,8 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 import contextlib
 import copy
 import datetime
@@ -25,7 +27,6 @@ from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import get_bucket_region_clientless
 
 from .resource_map import ResourceMap
 
@@ -122,6 +123,32 @@ def shape_validate(params, shape_name, service):
     report = validator.validate(params, shape)
     if report.has_errors():
         raise PolicyValidationError(report.generate_report())
+
+
+def get_bucket_region_clientless(bucket):
+    """Attempt to determine a bucket region without a client
+
+    We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
+    region. This avoids some issues with cross-account/cross-region uses of the
+    GetBucketPolicy API action.
+
+    Note that this approach will only work in the standard AWS partition.
+
+    Return a region string, or None if we're unable to determine one.
+    """
+    region = None
+    request = Request(f'https://{bucket}.s3.amazonaws.com', method='HEAD')
+    try:
+        # Bandit error B310 suggests auditing the scheme of urlopen requests.
+        # In this case, we're hardcoding the https scheme above.
+        response = urlopen(request)  # nosec B310
+        region = response.headers.get('x-amz-bucket-region')
+    except HTTPError as err:
+        # Permission errors or redirects for valid buckets should still contain a
+        # header we can use to determine the bucket region.
+        region = err.headers.get('x-amz-bucket-region')
+
+    return region
 
 
 class Arn(namedtuple('_Arn', (
