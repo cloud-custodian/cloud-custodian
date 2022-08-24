@@ -14,7 +14,8 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies, proxy_bypass
+from urllib.error import HTTPError
+from urllib.request import getproxies, proxy_bypass, urlopen, Request
 
 
 from dateutil.parser import ParserError, parse
@@ -803,3 +804,27 @@ def get_support_region(manager):
     elif partition == "aws-cn":
         support_region = "cn-north-1"
     return support_region
+
+
+def get_bucket_region_clientless(bucket):
+    """Attempt to determine a bucket region without a client
+
+    We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
+    region. This avoids some issues with cross-account/cross-region uses of the
+    GetBucketPolicy API action.
+
+    Note that this approach will only work in the standard AWS partition.
+
+    Return a region string, or None if we're unable to determine one.
+    """
+    region = None
+    request = Request(f'https://{bucket}.s3.amazonaws.com', method='HEAD')
+    try:
+        response = urlopen(request)
+        region = response.headers.get('x-amz-bucket-region')
+    except HTTPError as err:
+        # Permission errors or redirects for valid buckets should still contain a
+        # header we can use to determine the bucket region.
+        region = err.headers.get('x-amz-bucket-region')
+
+    return region

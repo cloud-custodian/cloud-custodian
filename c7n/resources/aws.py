@@ -23,8 +23,9 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.log import CloudWatchLogHandler
+from c7n.utils import get_bucket_region_clientless
 
 from .resource_map import ResourceMap
 
@@ -534,11 +535,22 @@ class S3Output(BlobOutput):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        # can't use a local session as we dont want an unassumed session cached.
-        s3_client = self.ctx.session_factory(assume=False).client('s3')
-        region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
-        # if region is None, we use us-east-1
-        region = region or "us-east-1"
+        region = get_bucket_region_clientless(self.bucket)
+        if not region:
+            # If we can't determine a region without a client, try using the
+            # active AWS credentials. This should help cover uses outside
+            # the standard AWS partition (GovCloud, etc).
+            #
+            # can't use a local session as we dont want an unassumed session cached.
+            s3_client = self.ctx.session_factory(assume=False).client('s3')
+            region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+        if not region:
+            # If we get here, we haven't been able to find the bucket region through
+            # HTTP HEAD requests or the GetBucketLocation API action. Give up,
+            # something is broken.
+            raise InvalidOutputConfig(
+                f'unable to determine region for output bucket: {self.bucket}'
+            )
         self.transfer = S3Transfer(
             self.ctx.session_factory(region=region, assume=False).client('s3'))
 
