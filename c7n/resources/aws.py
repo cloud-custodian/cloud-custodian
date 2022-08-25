@@ -4,7 +4,7 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
-from urllib.request import urlopen, Request
+from urllib.request import urlopen, urlparse, Request
 from urllib.error import HTTPError
 import contextlib
 import copy
@@ -125,25 +125,27 @@ def shape_validate(params, shape_name, service):
         raise PolicyValidationError(report.generate_report())
 
 
-def get_bucket_region_clientless(bucket):
+def get_bucket_region_clientless(bucket, s3_endpoint):
     """Attempt to determine a bucket region without a client
 
     We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
     region. This avoids some issues with cross-account/cross-region uses of the
-    GetBucketPolicy API action.
+    GetBucketPolicy API action. Because bucket names are unique within
+    AWS partitions, we can make requests to a single regional S3 endpoint
+    and get redirected if a bucket lives in another region within the
+    same partition.
 
     This approach is inspired by some sample code from a Go SDK issue comment,
     which @sean-zou mentioned in #7593:
 
     https://github.com/aws/aws-sdk-go/issues/720#issuecomment-613038544
 
-    Note that since we're only targeting the default `s3.amazonaws.com` endpoint,
-    this will only work in the standard AWS partition.
-
     Return a region string, or None if we're unable to determine one.
     """
     region = None
-    request = Request(f'https://{bucket}.s3.amazonaws.com', method='HEAD')
+    s3_endpoint_parts = urlparse(s3_endpoint)
+    bucket_endpoint = f'https://{bucket}.{s3_endpoint_parts.netloc}'
+    request = Request(bucket_endpoint, method='HEAD')
     try:
         # Bandit error B310 suggests auditing the scheme of urlopen requests.
         # In this case, we're hardcoding the https scheme above.
@@ -568,19 +570,21 @@ class S3Output(BlobOutput):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        region = get_bucket_region_clientless(self.bucket)
+        # can't use a local session as we dont want an unassumed session cached.
+        s3_client = self.ctx.session_factory(assume=False).client('s3')
+
+        # We don't yet use the S3 client to make an API call, but we do
+        # use it to find an appropriate regional endpoint for the active
+        # AWS partition
+        region = get_bucket_region_clientless(self.bucket, s3_client._endpoint.host)
+
         if not region:
-            # If we can't determine a region without a client, try using the
-            # active AWS credentials. This should help cover uses outside
-            # the standard AWS partition (GovCloud, etc).
-            #
-            # can't use a local session as we dont want an unassumed session cached.
-            s3_client = self.ctx.session_factory(assume=False).client('s3')
+            # If we can't determine a region without a client, try the
+            # GetBucketLocation API action.
             region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
         if not region:
             # If we get here, we haven't been able to find the bucket region through
-            # HTTP HEAD requests or the GetBucketLocation API action. Give up,
-            # something is broken.
+            # HTTP HEAD requests or GetBucketLocation. Give up, something is broken.
             raise InvalidOutputConfig(
                 f'unable to determine region for output bucket: {self.bucket}'
             )
