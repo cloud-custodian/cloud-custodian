@@ -1,5 +1,6 @@
 from .common import BaseTest
 
+
 class TestRDSParameterGroupFilter(BaseTest):
 
     PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
@@ -38,5 +39,5 @@ class TestRDSParameterGroupFilter(BaseTest):
             print('Assert check : {}'.format(f_resources))
 
             if not assertion(f_resources):
-               print(len(f_resources), fdata, assertion)
-               self.fail(err_msg)
+                print(len(f_resources), fdata, assertion)
+                self.fail(err_msg)
