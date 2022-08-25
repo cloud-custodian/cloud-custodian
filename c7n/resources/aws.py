@@ -147,8 +147,11 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
     bucket_endpoint = f'https://{bucket}.{s3_endpoint_parts.netloc}'
     request = Request(bucket_endpoint, method='HEAD')
     try:
-        # Bandit error B310 suggests auditing the scheme of urlopen requests.
-        # In this case, we're hardcoding the https scheme above.
+        # Dynamic use of urllib trips up static analyzers because
+        # of the potential to accidentally allow unexpected schemes
+        # like file:/. Here we're hardcoding the https scheme, so
+        # we can ignore those specific checks.
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
         response = urlopen(request)  # nosec B310
         region = response.headers.get('x-amz-bucket-region')
     except HTTPError as err:
