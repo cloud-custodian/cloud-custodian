@@ -6,6 +6,7 @@ multiple policies on the same resource type.
 import pickle  # nosec nosemgrep
 
 from datetime import datetime, timedelta
+from functools import lru_cache
 import os
 import logging
 import sqlite3
@@ -113,9 +114,24 @@ class SqlKvCache(Cache):
         super().__init__(config)
         self.cache_period = config.cache_period
         self.cache_path = resolve_path(config.cache)
-        self.conn = None
+        self._conn = None
 
-    def init(self):
+    @property
+    def conn(self):
+        # If a connection is closed or hasn't been created yet,
+        # open a fresh one.
+        try:
+            self._conn.in_transaction
+        except (AttributeError, sqlite3.ProgrammingError):
+            self._conn = sqlite3.connect(self.cache_path)
+        return self._conn
+
+    @conn.setter
+    def conn(self, value):
+        self._conn = value
+
+    @lru_cache(maxsize=1)
+    def load(self):
         # migration from pickle cache file
         if os.path.exists(self.cache_path):
             with open(self.cache_path, 'rb') as fh:
@@ -126,17 +142,12 @@ class SqlKvCache(Cache):
         elif not os.path.exists(os.path.dirname(self.cache_path)):
             # parent directory creation
             os.makedirs(os.path.dirname(self.cache_path))
-        self.conn = sqlite3.connect(self.cache_path)
         self.conn.execute(self.create_table)
         with self.conn as cursor:
             log.debug('expiring stale cache entries')
             cursor.execute(
                 'delete from c7n_cache where create_date < ?',
                 [datetime.utcnow() - timedelta(minutes=self.cache_period)])
-
-    def load(self):
-        if not self.conn:
-            self.init()
         return True
 
     def get(self, key):
