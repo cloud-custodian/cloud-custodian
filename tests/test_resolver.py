@@ -34,6 +34,9 @@ class FakeCache:
     def load(self):
         return True
 
+    def close(self):
+        pass
+
 
 class FakeResolver:
 

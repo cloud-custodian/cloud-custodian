@@ -29,6 +29,7 @@ class URIResolver:
         if self.cache and self.cache.load():
             contents = self.cache.get(("uri-resolver", uri))
             if contents is not None:
+                self.cache.close()
                 return contents
 
         if uri.startswith('s3://'):
@@ -40,6 +41,7 @@ class URIResolver:
 
         if self.cache:
             self.cache.save(("uri-resolver", uri), contents)
+            self.cache.close()
         return contents
 
     def handle_response_encoding(self, response):
@@ -153,6 +155,7 @@ class ValuesFrom:
         contents = self._get_values()
         if self.cache:
             self.cache.save(("value-from", key), contents)
+            self.cache.close()
         return contents
 
     def _get_values(self):
