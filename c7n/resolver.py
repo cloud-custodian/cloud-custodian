@@ -141,11 +141,11 @@ class ValuesFrom:
         return contents, format
 
     def get_values(self):
+        key = [self.data.get(i) for i in ('url', 'format', 'expr')]
         if self.cache and self.cache.load():
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
             # the results.
-            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
             contents = self.cache.get(("value-from", key))
             if contents is not None:
                 return contents
