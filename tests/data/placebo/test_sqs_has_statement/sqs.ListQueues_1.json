@@ -4,7 +4,8 @@
         "QueueUrls": [
             "https://queue.amazonaws.com/644160558196/sqs-test-has-statement",
             "https://queue.amazonaws.com/644160558196/sqs-test-no-access-policy",
-            "https://queue.amazonaws.com/644160558196/sqs-test-not-has-statement"
+            "https://queue.amazonaws.com/644160558196/sqs-test-not-has-statement",
+            "https://queue.amazonaws.com/644160558196/sqs-test-has-statement-star"
         ],
         "ResponseMetadata": {}
     }
