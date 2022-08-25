@@ -1271,6 +1271,10 @@ class Policy:
 
         # Update ourselves in place
         self.data = updated
+
+        # NOTE rebuild the policy conditions base on the new self.data
+        self.conditions = PolicyConditions(self, self.data)
+
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
         m = self.resource_manager
