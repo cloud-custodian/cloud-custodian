@@ -97,7 +97,6 @@ class ResolverTest(BaseTest):
             self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
 
 
-
 def test_value_from_sqlkv(tmp_path):
 
     kv = SqlKvCache(Bag(cache=tmp_path / "cache.db", cache_period=60))
