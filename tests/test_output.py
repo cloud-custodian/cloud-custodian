@@ -12,10 +12,13 @@ from dateutil.parser import parse as date_parse
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
 from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
-from c7n.resources.aws import S3Output, MetricsOutput
+from c7n.resources.aws import S3Output, MetricsOutput, get_bucket_region_clientless
 from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest
+
+import pytest
+import vcr
 
 
 class MetricsTest(BaseTest):
@@ -173,3 +176,41 @@ class S3OutputTest(TestUtils):
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
+
+
+@pytest.mark.parametrize(
+    'bucket, endpoint, expected_region',
+    [
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-east-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-cross-region',
+        ),
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-west-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-east-1.amazonaws.com',
+            'us-east-1',
+            id='us-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-west-2.amazonaws.com',
+            'us-east-1',
+            id='us-cross-region',
+        ),
+    ]
+)
+def test_get_bucket_region(bucket, endpoint, expected_region, request):
+    with vcr.use_cassette(
+        f'tests/data/vcr_cassettes/test_output/{request.node.name}.yaml',
+        record_mode='none'
+    ):
+        region = get_bucket_region_clientless(bucket, endpoint)
+        assert region == expected_region

@@ -1,0 +1,34 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - gis-publicportal.s3-us-gov-east-1.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://gis-publicportal.s3-us-gov-east-1.amazonaws.com
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Fri, 26 Aug 2022 13:41:02 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-gov-west-1
+      x-amz-id-2:
+      - 2pnFt2oGZOjy+ejT/RG+LSuGGzE20TJkoASKNfGUaT3L60FNayLh/0cR0/EIJVzyNw41IZQv084=
+      x-amz-request-id:
+      - 8RG85TFRCQ1E62AH
+    status:
+      code: 301
+      message: Moved Permanently
+version: 1

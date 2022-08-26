@@ -1,0 +1,34 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - apigateway.s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://apigateway.s3.us-west-2.amazonaws.com
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Fri, 26 Aug 2022 13:41:02 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - l+Andfi8S26XhN9ujmchqvllZokZhqInjTeT8E6hGjNRXiGjkkG0wl5GGgk6lEJzIKxF7juhTG4=
+      x-amz-request-id:
+      - 160WP2DRBPH9FV68
+    status:
+      code: 301
+      message: Moved Permanently
+version: 1

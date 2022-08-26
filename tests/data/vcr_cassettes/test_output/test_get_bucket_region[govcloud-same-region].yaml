@@ -1,0 +1,34 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - gis-publicportal.s3-us-gov-west-1.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://gis-publicportal.s3-us-gov-west-1.amazonaws.com
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Fri, 26 Aug 2022 13:41:02 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-gov-west-1
+      x-amz-id-2:
+      - 1sk7umBJzIkRXIKVmGDdeP08AgRx4rOTYSsI5Hb6NUE/GihdfgR/fuDSYe9otyQh0bTaqugnLYc=
+      x-amz-request-id:
+      - 8RG1AZS1YS7C5HNP
+    status:
+      code: 403
+      message: Forbidden
+version: 1
