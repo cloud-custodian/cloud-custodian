@@ -582,9 +582,11 @@ class S3Output(BlobOutput):
         region = get_bucket_region_clientless(self.bucket, s3_client._endpoint.host)
 
         if not region:
-            # If we can't determine a region without a client, try the
-            # GetBucketLocation API action.
-            region = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+            # If we can't determine a region via HTTP, try the GetBucketLocation API action.
+            location = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+            # Remap region for cases where the location constraint doesn't match
+            # See also: https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
+            region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
         if not region:
             # If we get here, we haven't been able to find the bucket region through
             # HTTP HEAD requests or GetBucketLocation. Give up, something is broken.
