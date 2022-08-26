@@ -51,12 +51,13 @@ class S3OutputTest(TestUtils):
     def get_s3_output(self, output_url=None, cleanup=True, klass=S3Output):
         if output_url is None:
             output_url = "s3://cloud-custodian/policies"
-        output = klass(
-            ExecutionContext(
-                lambda assume=False, region="us-east-1": mock.MagicMock(),
-                Bag(name="xyz", provider_name="ostack"),
-                Config.empty(output_dir=output_url, account_id='112233445566')),
-            {'url': output_url, 'test': True})
+        with mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value='us-east-1'):
+            output = klass(
+                ExecutionContext(
+                    lambda assume=False, region="us-east-1": mock.MagicMock(),
+                    Bag(name="xyz", provider_name="ostack"),
+                    Config.empty(output_dir=output_url, account_id='112233445566')),
+                {'url': output_url, 'test': True})
 
         if cleanup:
             self.addCleanup(shutil.rmtree, output.root_dir)
