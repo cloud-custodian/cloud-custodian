@@ -318,7 +318,7 @@ class RestStage(query.ChildResourceManager):
         arns = []
         for r in resources:
             arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
-                                          '/stages/' + r[self.get_model().name]))
+             '/stages/' + r[self.get_model().name]))
         return arns
 
 
@@ -543,7 +543,7 @@ class WafEnabled(Filter):
                     results.append(r)
             else:
                 if target_acl_arn is None and (not r_web_acl_arn or
-                                               r_web_acl_arn and r_web_acl_arn not in waf_name_arn_map.values()):
+                     r_web_acl_arn and r_web_acl_arn not in waf_name_arn_map.values()):
                     results.append(r)
                 elif target_acl_arn and r_web_acl_arn != target_acl_arn:
                     results.append(r)
