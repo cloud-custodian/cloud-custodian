@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import functools
 import jmespath
+import re
 from botocore.exceptions import ClientError
 
 from concurrent.futures import as_completed
@@ -317,7 +318,8 @@ class RestStage(query.ChildResourceManager):
     def get_arns(self, resources):
         arns = []
         for r in resources:
-            arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
+            restapi_id = r.get('RestApiId', r.get('restApiId', ''))
+            arns.append(self.generate_arn('/restapis/' + restapi_id +
              '/stages/' + r[self.get_model().name]))
         return arns
 
@@ -460,6 +462,58 @@ class RestClientCertificate(query.QueryResourceManager):
         permissions_enum = ('apigateway:GET',)
         cfn_type = 'AWS::ApiGateway::ClientCertificate'
 
+
+@RestStage.filter_registry.register('rest-api')
+class RestStageRestApiFilterIntu(RelatedResourceFilter):
+    """Filter RestStages based on the RelatedResourceFilter RestApi
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: apigateway-add-tag
+                resource: rest-stage
+                filters:
+                  - type: rest-api
+                    key: endpointConfiguration.types
+                    op: intersect
+                    value:
+                      - REGIONAL
+                      - EDGE
+    """
+    schema = type_schema(
+        'rest-api', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.apigw.RestApi"
+    RelatedIdsExpression = '[items][].id'
+    AnnotationKey = "matched-rest-apis"
+
+    def get_related(self, resources):
+        rr = self.data.get('type', '')
+        return self.manager.get_resource_manager(rr).resources()
+
+    def augment(self, r, rr):
+        restapi_id = rr.get('id', '')
+        stage_id = r.get('stageName', '') if r.get(
+            'stageName', '') else r.get('StageName', '')
+        return f'arn:aws:apigateway:{self.manager.config.region}::' \
+               f'/restapis/{restapi_id}/stages/{stage_id}'
+
+    @staticmethod
+    def matched(r, rr):
+        return r.get('restApiId', '') == rr.get('id', '') \
+               or r.get('RestApiId', '') == rr.get('id', '')
+
+    def process(self, resources, event=None):
+        rr = self.get_related(resources)
+        rrf = ValueFilter(self.data).process(rr)
+
+        augmented_resources = []
+        for r in resources:
+            for rr in rrf:
+                if self.matched(r, rr):
+                    r['StageArn'] = self.augment(r, rr)
+                    augmented_resources.append(r)
+        return augmented_resources
 
 @RestStage.filter_registry.register('client-certificate')
 class StageClientCertificateFilter(RelatedResourceFilter):
@@ -637,6 +691,13 @@ class WafV2Enabled(Filter):
                   - type: wafv2-enabled
                     state: false
                     web-acl: testv2
+
+              - name: filter-wafv2-apigw-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
     schema = type_schema(
@@ -647,27 +708,31 @@ class WafV2Enabled(Filter):
     permissions = ('wafv2:ListWebACLs',)
 
     def process(self, resources, event=None):
-        target_acl = self.data.get('web-acl')
+        target_acl = self.data.get('web-acl', '')
         state = self.data.get('state', False)
 
         results = []
         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         waf_name_arn_map = {w['Name']: w['ARN'] for w in wafs}
+        print(f'\ncahn0 waf_name_arn_map: {waf_name_arn_map}')
         target_acl_id = waf_name_arn_map.get(target_acl, target_acl)
+        print(f'\ncahn1 target_acl: {target_acl_id}')
+
+        target_acl_ids = [v for k, v in waf_name_arn_map.items() if
+                          re.match(target_acl, k)]
+        print(f'\ncahn1 {len(target_acl_ids)} matched -> target_acl_ids: {target_acl_ids}\n')
         for r in resources:
             r_web_acl_arn = r.get('webAclArn')
+            print(f'\ncahn2 {r.get("stageName")} => {r_web_acl_arn}\n')
             if state:
-                if target_acl_id is None and r_web_acl_arn and \
-                        r_web_acl_arn in waf_name_arn_map.values():
+                if not target_acl and r_web_acl_arn:
                     results.append(r)
-                elif target_acl_id and r_web_acl_arn == target_acl_id:
+                elif target_acl and r_web_acl_arn in target_acl_ids:
                     results.append(r)
             else:
-                if target_acl_id is None and (
-                        not r_web_acl_arn or r_web_acl_arn and r_web_acl_arn
-                        not in waf_name_arn_map.values()):
+                if not target_acl and not r_web_acl_arn:
                     results.append(r)
-                elif target_acl_id and r_web_acl_arn != target_acl_id:
+                elif target_acl and r_web_acl_arn not in target_acl_ids:
                     results.append(r)
         return results
 
@@ -702,13 +767,32 @@ class SetWafv2(BaseAction):
                     state: true
                     web-acl: testv2
 
+            policies:
+              - name: set-wafv2-for-stage-regex
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
     """
     permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
 
     schema = type_schema(
-        'set-wafv2', required=['web-acl'], **{
+        'set-wafv2', **{
             'web-acl': {'type': 'string'},
             'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
 
     def validate(self):
         found = False
@@ -726,23 +810,33 @@ class SetWafv2(BaseAction):
     def process(self, resources):
         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        target_acl = self.data.get('web-acl')
-        target_acl_id = name_id_map.get(target_acl, target_acl)
+        print(f'kayden0: name_id_map={name_id_map}')
+        # target_acl = self.data.get('web-acl', '')
+        # target_acl_id = name_id_map.get(target_acl, target_acl)
         state = self.data.get('state', True)
 
-        if state and target_acl_id not in name_id_map.values():
-            raise ValueError("invalid web acl: %s" % (target_acl_id))
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
 
+        print(f'kayden1: target_acl_id={target_acl_id}')
         client = utils.local_session(self.manager.session_factory).client('wafv2')
 
         for r in resources:
             r_arn = self.manager.get_arns([r])[0]
             if state:
-                client.associate_web_acl(
-                    WebACLArn=target_acl_id, ResourceArn=r_arn)
+                self.retry(client.associate_web_acl,
+                           WebACLArn=target_acl_id,
+                           ResourceArn=r_arn)
             else:
-                client.disassociate_web_acl(
-                    WebACLArn=target_acl_id, ResourceArn=r_arn)
+                self.retry(client.disassociate_web_acl,
+                           ResourceArn=r_arn)
 
 
 @RestResource.filter_registry.register('rest-integration')
