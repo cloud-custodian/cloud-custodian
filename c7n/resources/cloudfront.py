@@ -201,20 +201,15 @@ class IsWafV2Enabled(Filter):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        print(f'\ncahn0 waf_name_arn_map: {waf_name_id_map}')
-        state = self.data.get('state', False)
-        target_acl = self.data.get('web-acl', '')
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
-        print(f'\ncahn1 target_acl: {target_acl_id}')
 
+        target_acl = self.data.get('web-acl', '')
+        state = self.data.get('state', False)
         target_acl_ids = [v for k, v in waf_name_id_map.items() if
                           re.match(target_acl, k)]
-        print(f'\ncahn1 {len(target_acl_ids)} matched -> target_acl_ids: {target_acl_ids}\n')
 
         results = []
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
-            print(f'\ncahn2 {r.get("Id")} => {r_web_acl_id}\n')
             if state:
                 if not target_acl and r_web_acl_id:
                     results.append(r)
@@ -547,7 +542,6 @@ class SetWafv2(BaseAction):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        print(f'kayden0: waf_name_id_map={waf_name_id_map}')
         state = self.data.get('state', True)
 
         target_acl_id = ''
@@ -560,7 +554,6 @@ class SetWafv2(BaseAction):
                                  f'multiple webacls')
             target_acl_id = target_acl_ids[0]
 
-        print(f'kayden1: target_acl_id={target_acl_id}')
         client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)
 

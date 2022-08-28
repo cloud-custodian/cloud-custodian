@@ -313,15 +313,11 @@ class WafV2Enabled(Filter):
                     ResourceType='APPLICATION_LOAD_BALANCER').get('ResourceArns', [])
                 w['c7n:AssociatedResources'] = arns
             name_arn_map[w['Name']] = w['ARN']
-            print(f'\ncahn0 w["c7n:AssociatedResources"]:'
-                  f' {w["c7n:AssociatedResources"]}\n')
             for r in w['c7n:AssociatedResources']:
                 resource_map[r] = w['ARN']
-        print(f'\ncahn0 name_arn_map: {name_arn_map}')
 
         target_acl_ids = [v for k, v in name_arn_map.items() if
                           re.match(target_acl, k)]
-        print(f'\ncahn1 {len(target_acl_ids)} matched -> target_acl_ids: {target_acl_ids}\n')
 
         arn_key = self.manager.resource_type.id
         state_map = {}
@@ -330,13 +326,8 @@ class WafV2Enabled(Filter):
             # NLB & GLB doesn't support WAF. So, skip such resources
             if r['Type'] == 'application':
                 if arn not in resource_map:
-                    #r['c7n_webacl'] = resource_map[arn] = ''
                     state_map[arn] = False
-                    #print(f'cahn1a: {r["LoadBalancerArn"]} ->
-                    # {r["c7n_webacl"]}')
                     continue
-                #r['c7n_webacl'] = resource_map[arn]
-                #print(f'cahn1a: {r["LoadBalancerArn"]} -> {r["c7n_webacl"]}')
                 if not target_acl:
                     state_map[arn] = True
                     continue
@@ -344,7 +335,6 @@ class WafV2Enabled(Filter):
                     state_map[arn] = True
                     continue
                 state_map[arn] = False
-        print(f'\ncahn2 state_map: {state_map}\n')
         return [r for r in resources if state_map[r[arn_key]] == state]
 
 
@@ -503,7 +493,6 @@ class SetWafV2(BaseAction):
     def process(self, resources):
         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        print(f'kayden0: name_id_map={name_id_map}')
         state = self.data.get('state', True)
 
         target_acl_id = ''
