@@ -208,7 +208,9 @@ class S3OutputTest(TestUtils):
         ),
     ]
 )
-def test_get_bucket_region(bucket, endpoint, expected_region, request):
+def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
+    """Test finding the output bucket region via HTTP requests"""
+
     with vcr.use_cassette(
         f'tests/data/vcr_cassettes/test_output/{request.node.name}.yaml',
         record_mode='none'
