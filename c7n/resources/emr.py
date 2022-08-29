@@ -132,7 +132,7 @@ class TagDelayedAction(TagDelayedAction):
                     tag: custodian_cleanup
                     op: terminate
                     days: 4
-                    msg: "Cluster does not have required tags"
+                    msg: "Cluster missing 'Name' tag: {op}@{action_date}"
     """
 
 

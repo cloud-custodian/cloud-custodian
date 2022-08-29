@@ -1,0 +1,14 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_datapipeline_pipeline": {
+            "test_pipeline": {
+                "description": "",
+                "id": "df-07882323512BA2GXXHAJ",
+                "name": "7aa9537b-2709-7a2f-e6b7-e0c32cdc71a1",
+                "tags": null
+            }
+        }
+    }
+}

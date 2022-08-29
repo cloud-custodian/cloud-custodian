@@ -3,11 +3,16 @@
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
+import pytest
 import time
-from mock import MagicMock, call
+from mock import Mock, MagicMock, call
 
-from c7n.tags import universal_retry, coalesce_copy_user_tags
+import datetime
+from dateutil import tz as tzutil
+
+from c7n.tags import universal_retry, coalesce_copy_user_tags, TagDelayedAction
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+from c7n.testing import mock_datetime_now
 from c7n.utils import yaml_load
 
 from .common import BaseTest
@@ -450,3 +455,84 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+
+class TagDelayedActionTest(BaseTest):
+
+    def manager(self):
+        return Mock(action_registry={
+            'stop': 0, 'terminate': 1,  # only care about the keys
+        })
+
+    def action(self, data):
+        return TagDelayedAction(data, self.manager()).validate()
+
+    def test_validate_requires_op(self):
+        with pytest.raises(PolicyValidationError) as exec:
+            self.action({'type': 'mark-for-op'})
+        self.assertIn('invalid op:None', str(exec))
+
+    def test_validate_msg_good(self):
+        good_messages = [
+            "something: {op}@{action_date}",
+            "something:{op}@{action_date}",
+            "something: {op}@{action_date} ",
+            # It isn't great, but acceptable.
+            ": {op}@{action_date}",
+        ]
+        for msg in good_messages:
+            self.action({
+                'type': 'mark-for-op',
+                'op': 'stop',
+                'msg': msg,
+            })
+
+    def test_validate_msg_bag(self):
+        bad_messages = [
+            "blah blah blah",
+            "{op}@{action_date}",
+            "something: {op}@{action-date}",
+            "something: {op}@{actiondate}",
+            "something: {op}@{action_date} blah",
+        ]
+        for msg in bad_messages:
+            self.assertRaises(
+                PolicyValidationError,
+                self.action,
+                {
+                    'type': 'mark-for-op',
+                    'op': 'stop',
+                    'msg': msg,
+                })
+
+    def test_default_config_values(self):
+        action = self.action({
+            'type': 'mark-for-op',
+            'op': 'stop',
+        })
+        now = datetime.datetime(2020, 8, 30, 12, tzinfo=tzutil.UTC)
+        with mock_datetime_now(now, datetime):
+            self.assertDictEqual(
+                action.get_config_values(),
+                {
+                    'op': 'stop',
+                    'tag': 'maid_status',
+                    'action_date': '2020/09/03',
+                    'msg': 'Resource does not meet policy: {op}@{action_date}',
+                    'tz': 'utc',
+                    'days': 0,
+                    'hours': 0,
+                })
+
+    def test_generate_timestamp(self):
+        action = self.action({
+            'type': 'mark-for-op',
+            'op': 'stop',
+        })
+        now = datetime.datetime(2020, 8, 30, 12, tzinfo=tzutil.UTC)
+        with mock_datetime_now(now, datetime):
+            self.assertEqual(action.generate_timestamp(0, 0), '2020/09/03')
+            self.assertEqual(action.generate_timestamp(1, 0), '2020/08/31')
+            self.assertEqual(action.generate_timestamp(2, 0), '2020/09/01')
+            self.assertEqual(action.generate_timestamp(0, 4), '2020/08/30 1600 UTC')
+            self.assertEqual(action.generate_timestamp(2, 4), '2020/09/01 1600 UTC')

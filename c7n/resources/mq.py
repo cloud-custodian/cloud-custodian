@@ -159,7 +159,7 @@ class MarkForOpMessageBroker(TagDelayedAction):
                 actions:
                   - type: mark-for-op
                     tag: custodian_cleanup
-                    msg: "Unused mq"
+                    msg: "Unused mq: {op}@{action_date}"
                     op: delete
                     days: 7
     """

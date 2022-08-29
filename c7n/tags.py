@@ -11,11 +11,13 @@ snapshots) and resources that support Amazon's Resource Groups Tagging API
 from collections import Counter
 from concurrent.futures import as_completed
 
-from datetime import datetime, timedelta
+# datetime is imported as a module to facilitate patching of datetime.now
+import datetime
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import jmespath
+import re
 import time
 
 from c7n.manager import resources as aws_resources
@@ -317,15 +319,15 @@ class TagActionFilter(Filter):
             return False
 
         if self.current_date is None:
-            self.current_date = datetime.now()
+            self.current_date = datetime.datetime.now()
 
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            self.current_date = datetime.datetime.now(tz=tz)
 
         return self.current_date >= (
-            action_date - timedelta(days=skew, hours=skew_hours))
+            action_date - datetime.timedelta(days=skew, hours=skew_hours))
 
 
 class TagCountFilter(Filter):
@@ -597,6 +599,7 @@ class TagDelayedAction(Action):
           actions:
             - type: mark-for-op
               op: stop
+              days: 1
     """
     deprecations = (
         deprecated.optional_fields(('hours', 'days')),
@@ -633,14 +636,26 @@ class TagDelayedAction(Action):
             raise PolicyValidationError(
                 "Invalid timezone specified %s in %s" % (
                     self.tz, self.manager.data))
+
+        # Ensure that the msg writes a message in a format that marked-for-op will recognize.
+        # The expectation is that the string ends with ": op@date", so a simple regex to handle
+        # whitespace should be good.
+        msg = self.data.get('msg', self.default_template)
+        if not re.fullmatch(r".*: *{op}@{action_date} *", msg):
+            raise PolicyValidationError(
+                "Invalid msg specified, must end with ': {op}@{action_date}'")
+
+        if self.data.get('hours') is None and self.data.get('days') is None:
+            self.log.warning('"hours" or "days" should be specified in the filter args')
+
         return self
 
     def generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz)
-        if days is None or hours is None:
+        n = datetime.datetime.now(tz=self.tz)
+        if days == 0 and hours == 0:
             # maintains default value of days being 4 if nothing is provided
             days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
+        action_date = (n + datetime.timedelta(days=days, hours=hours))
         if hours > 0:
             action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
         else:

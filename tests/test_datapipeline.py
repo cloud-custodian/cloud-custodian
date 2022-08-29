@@ -1,6 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+
+import time
+
 from .common import BaseTest, functional
+from pytest_terraform import terraform
+
 
 # datapipeline is not available in us-east-2 where we run our functional tests
 # so we do a forced override here.
@@ -124,41 +129,6 @@ class DataPipelineTest(BaseTest):
         )
 
     @functional
-    def test_mark_datapipeline(self):
-        factory = self.replay_flight_data("test_datapipeline_mark", region=REGION)
-
-        session = factory()
-        client = session.client("datapipeline")
-        pipeline = client.create_pipeline(
-            name="PipelineMarkTest", uniqueId="PipelineMarkTest1"
-        )
-        pipe_id = pipeline["pipelineId"]
-        self.addCleanup(client.delete_pipeline, pipelineId=pipe_id)
-        p = self.load_policy(
-            {
-                "name": "datapipeline-mark-test",
-                "resource": "datapipeline",
-                "filters": [{"name": "PipelineMarkTest"}],
-                "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "custodian_mark",
-                        "op": "delete",
-                        "msg": "marked for op with no date",
-                        "days": 7,
-                    }
-                ],
-            },
-            session_factory=factory,
-        )
-        p.run()
-        response = client.describe_pipelines(pipelineIds=[pipe_id])
-        self.assertEqual(
-            response["pipelineDescriptionList"][0]["tags"],
-            [{"key": "custodian_mark", "value": "marked for op with no date"}],
-        )
-
-    @functional
     def test_remove_tag_datapipeline(self):
         factory = self.replay_flight_data("test_datapipeline_remove_tag", region=REGION)
 
@@ -234,3 +204,43 @@ class DataPipelineTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+@terraform('mark_datapipeline')
+def test_mark_datapipeline(test, mark_datapipeline):
+    factory = test.replay_flight_data("test_datapipeline_mark", region=REGION)
+
+    pipe_id = mark_datapipeline["aws_datapipeline_pipeline.test_pipeline.id"]
+    pipe_name = mark_datapipeline["aws_datapipeline_pipeline.test_pipeline.name"]
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            "name": "datapipeline-mark-test",
+            "resource": "datapipeline",
+            "filters": [{"name": pipe_name}],
+            "actions": [
+                {
+                    "type": "mark-for-op",
+                    "tag": "custodian_mark",
+                    "op": "delete",
+                    "days": 7,
+                }
+            ],
+        },
+        config={'region': REGION},
+        session_factory=factory,
+    )
+    p.run()
+
+    session = factory()
+    client = session.client("datapipeline")
+    response = client.describe_pipelines(pipelineIds=[pipe_id])
+
+    tags = response["pipelineDescriptionList"][0]["tags"]
+    test.assertEqual(len(tags), 1)
+    tag = tags[0]
+    test.assertEqual(tag["key"], "custodian_mark")
+    test.assertRegex(tag["value"], "Resource does not meet policy: delete@.*")

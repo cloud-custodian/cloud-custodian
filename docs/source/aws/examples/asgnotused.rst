@@ -43,7 +43,6 @@ If value won't change cloudCustodian will send an alert with ASGs.
     comments: |
       Alert for ASG which have MinSize < 0 and DesiredCapacity < 0
     filters:
-      - "tag:maid_status": not-null
       - type: marked-for-op
         op: notify
     actions:
