@@ -23,6 +23,28 @@ class TestSecretsManager(BaseTest):
               'Principal': {'AWS': 'arn:aws:iam::123456789012:root'},
               'Resource': '*'}])
 
+    def test_secrets_manager_kms_filter(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-secrets-manager-kms-filter',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/skunk/trails'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+        
     def test_secrets_manager_tag_resource(self):
         session = self.replay_flight_data("test_secrets_manager_tag")
         client = session(region="us-east-1").client("secretsmanager")
