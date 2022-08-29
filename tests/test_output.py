@@ -242,8 +242,11 @@ def test_get_bucket_location_api(test, request, output_url, expected_region, exp
 
     factory = test.replay_flight_data(request.node.name)
 
-    # simulate a failure when checking the bucket region via HTTP requests
-    with expected_flow, mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value=None):
+    with (
+        expected_flow,
+        # simulate a failure checking the bucket region via HTTP requests
+        mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value=None),
+    ):
         ctx = ExecutionContext(
             factory,
             Bag(name="test", provider_name="aws"),

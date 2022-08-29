@@ -25,7 +25,7 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import ClientError, PolicyValidationError, InvalidOutputConfig
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
 
 from .resource_map import ResourceMap
