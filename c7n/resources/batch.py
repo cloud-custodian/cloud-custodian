@@ -20,7 +20,7 @@ class ComputeEnvironment(QueryResourceManager):
         arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
-        cfn_type = 'AWS::Batch::ComputeEnvironment'
+        cfn_type = config_type = 'AWS::Batch::ComputeEnvironment'
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
@@ -180,4 +180,4 @@ class BatchJobQueue(QueryResourceManager):
         arn_type = 'job-queue'
         enum_spec = (
             'describe_job_queues', 'jobQueues', None)
-        cfn_type = 'AWS::Batch::JobQueue'
+        cfn_type = config_type = 'AWS::Batch::JobQueue'

@@ -4,8 +4,19 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
+
+
+class DescribeIdentityPool(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+class DescribeUserPool(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('identity-pool')
@@ -20,6 +31,11 @@ class CognitoIdentityPool(QueryResourceManager):
         name = 'IdentityPoolName'
         arn_type = "identitypool"
         cfn_type = 'AWS::Cognito::IdentityPool'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeIdentityPool,
+    }
 
 
 @CognitoIdentityPool.action_registry.register('delete')
@@ -68,6 +84,10 @@ class CognitoUserPool(QueryResourceManager):
         name = 'Name'
         arn_type = "userpool"
         cfn_type = 'AWS::Cognito::UserPool'
+
+    source_mapping = {
+        'describe': DescribeUserPool,
+    }
 
 
 @CognitoUserPool.action_registry.register('delete')

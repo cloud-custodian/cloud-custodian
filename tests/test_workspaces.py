@@ -204,6 +204,41 @@ class WorkspacesTest(BaseTest):
         call = client.describe_workspace_images(ImageIds=[imageId])
         self.assertTrue(call['Images'])
 
+    def test_workspaces_directory_connection_aliases_false(self):
+        session_factory = self.replay_flight_data("test_workspaces_directory_conn_aliases_false")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-connection-aliases",
+                "resource": "workspaces-directory",
+                "filters": [{
+                    'type': 'connection-aliases',
+                    'key': 'ConnectionAliases',
+                    'value': 'empty',
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_workspaces_directory_connection_aliases_true(self):
+        session_factory = self.replay_flight_data("test_workspaces_directory_conn_aliases_true")
+        p = self.load_policy(
+            {
+                "name": "workspace-directory-connection-aliases",
+                "resource": "workspaces-directory",
+                "filters": [{
+                    'type': 'connection-aliases',
+                    'key': 'ConnectionAliases',
+                    'value': 'empty',
+                    'op': 'ne'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_workspaces_directory_deregister(self):
         factory = self.replay_flight_data("test_workspaces_directory_deregister")
         p = self.load_policy(

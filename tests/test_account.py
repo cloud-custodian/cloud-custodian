@@ -542,9 +542,7 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        assert(
-            resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
-        )
+        assert resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
 
     def test_account_password_policy_update(self):
         factory = self.replay_flight_data("test_account_password_policy_update")
@@ -637,9 +635,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
-        assert(
-            policy['MinimumPasswordLength'] == 12
-        )
+        assert policy['MinimumPasswordLength'] == 12
         # assert defaults being set
         self.assertEqual(
             [
@@ -1232,3 +1228,20 @@ class AccountDataEvents(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_lakeformation_filter(self):
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3")
+        p = self.load_policy(
+            {
+                'name': 'test-lakeformation-cross-account-bucket',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'lakeformation-s3-cross-account'
+                }],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(
+            resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])

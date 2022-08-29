@@ -60,7 +60,7 @@ class SqlInstance(QueryResourceManager):
     def augment(self, resources):
         for r in resources:
             if 'userLabels' in r['settings']:
-                r['labels'] = r['settings']['labels']
+                r['labels'] = r['settings']['userLabels']
         return resources
 
 

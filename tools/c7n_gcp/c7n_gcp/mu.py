@@ -194,7 +194,7 @@ def delta_resource(old_config, new_config, ignore=()):
     for k in new_config:
         if k in ignore:
             continue
-        if new_config[k] != old_config[k]:
+        if new_config[k] != old_config.get(k):
             found.append(k)
     return found
 
@@ -285,12 +285,18 @@ import os
 import logging
 import sys
 
+from flask import Request, Response
+
 
 def run(event, context=None):
     logging.info("starting function execution")
 
     trigger_type = os.environ.get('FUNCTION_TRIGGER_TYPE', '')
-    if trigger_type == 'HTTP_TRIGGER':
+
+    if isinstance(event, Request):
+        event = event.json
+
+    if trigger_type in ('HTTP_TRIGGER', 'http',):
         event = {'request': event}
     else:
         event = json.loads(base64.b64decode(event['data']).decode('utf-8'))
@@ -299,8 +305,9 @@ def run(event, context=None):
     try:
         from c7n_gcp.handler import run
         result = run(event, context)
+        print(result)
         logging.info("function execution complete")
-        if trigger_type == 'HTTP_TRIGGER':
+        if trigger_type in ('HTTP_TRIGGER', 'http',):
             return json.dumps(result), 200, (('Content-Type', 'application/json'),)
         return result
     except Exception as e:
@@ -638,7 +645,10 @@ class PeriodicEvent(EventSource):
                 'uri': 'https://{}-{}.cloudfunctions.net/{}'.format(
                     self.region,
                     self.session.get_default_project(),
-                    func.name)
+                    func.name),
+                'oidcToken': {
+                    'serviceAccountEmail': self.data.get('service-account')
+                }
             }
         elif self.target_type == 'pubsub':
             job['pubsubTarget'] = {
