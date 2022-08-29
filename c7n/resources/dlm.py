@@ -17,3 +17,9 @@ class DLMPolicy(QueryResourceManager):
         filter_type = 'list'
         arn = False
         cfn_type = 'AWS::DLM::LifecyclePolicy'
+
+    def augment(self, resources):
+        super().augment(resources)
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
+        return resources
