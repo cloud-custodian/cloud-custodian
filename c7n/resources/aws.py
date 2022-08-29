@@ -25,7 +25,7 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
+from c7n.exceptions import ClientError, PolicyValidationError, InvalidOutputConfig
 from c7n.log import CloudWatchLogHandler
 
 from .resource_map import ResourceMap
@@ -576,23 +576,21 @@ class S3Output(BlobOutput):
         # can't use a local session as we dont want an unassumed session cached.
         s3_client = self.ctx.session_factory(assume=False).client('s3')
 
-        # We don't yet use the S3 client to make an API call, but we do
-        # use it to find an appropriate regional endpoint for the active
-        # AWS partition
+        # Try determining the output bucket region via HTTP requests to
+        # a regional S3 endpoint based on the active AWS credentials.
         region = get_bucket_region_clientless(self.bucket, s3_client._endpoint.host)
 
         if not region:
             # If we can't determine a region via HTTP, try the GetBucketLocation API action.
-            location = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
-            # Remap region for cases where the location constraint doesn't match
-            # See also: https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
-            region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
-        if not region:
-            # If we get here, we haven't been able to find the bucket region through
-            # HTTP HEAD requests or GetBucketLocation. Give up, something is broken.
-            raise InvalidOutputConfig(
-                f'unable to determine region for output bucket: {self.bucket}'
-            )
+            try:
+                location = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
+                # Remap region for cases where the location constraint doesn't match
+                # See also: https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
+                region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
+            except ClientError as err:
+                log.error('unable to determine a region for output bucket %s: %s',
+                    self.bucket, err)
+                sys.exit(1)
         self.transfer = S3Transfer(
             self.ctx.session_factory(region=region, assume=False).client('s3'))
 

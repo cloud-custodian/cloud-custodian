@@ -7,6 +7,7 @@ import mock
 import shutil
 import os
 
+from contextlib import nullcontext as no_exception
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
@@ -217,3 +218,35 @@ def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
     ):
         region = get_bucket_region_clientless(bucket, endpoint)
         assert region == expected_region
+
+@pytest.mark.parametrize(
+    'output_url, expected_region, expected_flow',
+    [
+        pytest.param(
+            's3://c7n-test-us-west-2/out',
+            'us-west-2',
+            no_exception(),
+            id='success',
+        ),
+        pytest.param(
+            's3://nonexistentbucket/out',
+            None,
+            pytest.raises(SystemExit),
+            id='error',
+        ),
+    ]
+)
+def test_get_bucket_location_api(test, request, output_url, expected_region, expected_flow):
+    """Test finding the output bucket region via API calls"""
+
+    factory = test.replay_flight_data(request.node.name)
+
+    # simulate a failure when checking the bucket region via HTTP requests
+    with expected_flow, mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value=None):
+        ctx = ExecutionContext(
+            factory,
+            Bag(name="test", provider_name="aws"),
+            Config.empty(output_dir=output_url, account_id='123456789012')
+        )
+        output = S3Output(ctx, {'url': output_url, 'test': True})
+        assert output is not None
