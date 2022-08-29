@@ -38,7 +38,7 @@ class DLMPolicy(QueryResourceManager):
 @DLMPolicy.action_registry.register('tag')
 class TagDLMPolicy(Tag):
 
-    permissions = ('dlm:TagResource')
+    permissions = ('dlm:TagResource', )
 
     def process_resource_set(self, client, resource_set, tags):
         arns = self.manager.get_arns(resource_set)
@@ -50,6 +50,9 @@ class TagDLMPolicy(Tag):
 
 @DLMPolicy.action_registry.register('remove-tag')
 class DLMPolicyRemoveTag(RemoveTag):
+
+    permissions = ('dlm:UntagResource', )
+
     def process_resource_set(self, client, resource_set, tag_keys):
         arns = self.manager.get_arns(resource_set)
         for arn in arns:
