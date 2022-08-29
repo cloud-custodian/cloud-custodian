@@ -554,8 +554,8 @@ class SetS3Logging(BaseAction):
         if self.data.get('state') == 'enabled':
             if 'bucket' not in self.data or 'prefix' not in self.data:
                 raise PolicyValidationError((
-                        "alb logging enablement requires `bucket` "
-                        "and `prefix` specification on %s" % (self.manager.data,)))
+                    "alb logging enablement requires `bucket` "
+                    "and `prefix` specification on %s" % (self.manager.data,)))
         return self
 
     def process(self, resources):
@@ -565,7 +565,7 @@ class SetS3Logging(BaseAction):
             attributes = [{
                 'Key': 'access_logs.s3.enabled',
                 'Value': (
-                        self.data.get('state') == 'enabled' and 'true' or 'value')}]
+                    self.data.get('state') == 'enabled' and 'true' or 'value')}]
 
             if self.data.get('state') == 'enabled':
                 attributes.append({
