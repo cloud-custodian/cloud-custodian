@@ -219,6 +219,7 @@ def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
         region = get_bucket_region_clientless(bucket, endpoint)
         assert region == expected_region
 
+
 @pytest.mark.parametrize(
     'output_url, expected_region, expected_flow',
     [
@@ -249,4 +250,4 @@ def test_get_bucket_location_api(test, request, output_url, expected_region, exp
             Config.empty(output_dir=output_url, account_id='123456789012')
         )
         output = S3Output(ctx, {'url': output_url, 'test': True})
-        assert output is not None
+        assert output.bucket_region == expected_region

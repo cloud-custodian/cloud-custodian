@@ -162,6 +162,19 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
     return region
 
 
+def get_bucket_region(bucket, client):
+    """Determine a bucket's region using the GetBucketLocation API action
+
+    Look up a bucket's location constraint and map it to a region name as described in
+    https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
+    """
+    location = client.get_bucket_location(Bucket=bucket)['LocationConstraint']
+
+    # Remap region for cases where the location constraint doesn't match
+    region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
+    return region
+
+
 class Arn(namedtuple('_Arn', (
         'arn', 'partition', 'service', 'region',
         'account_id', 'resource', 'resource_type', 'separator'))):
@@ -576,23 +589,20 @@ class S3Output(BlobOutput):
         # can't use a local session as we dont want an unassumed session cached.
         s3_client = self.ctx.session_factory(assume=False).client('s3')
 
-        # Try determining the output bucket region via HTTP requests to
-        # a regional S3 endpoint based on the active AWS credentials.
-        region = get_bucket_region_clientless(self.bucket, s3_client._endpoint.host)
-
-        if not region:
-            # If we can't determine a region via HTTP, try the GetBucketLocation API action.
-            try:
-                location = s3_client.get_bucket_location(Bucket=self.bucket)['LocationConstraint']
-                # Remap region for cases where the location constraint doesn't match
-                # See also: https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
-                region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
-            except ClientError as err:
-                log.error('unable to determine a region for output bucket %s: %s',
-                    self.bucket, err)
-                sys.exit(1)
+        # Try determining the output bucket region via HTTP requests since
+        # that works more consistently in cross-region scenarios. Fall back
+        # the GetBucketLocation API if necessary.
+        try:
+            self.bucket_region = (
+                get_bucket_region_clientless(self.bucket, s3_client._endpoint.host) or
+                get_bucket_region(self.bucket, s3_client)
+            )
+        except ClientError as err:
+            log.error('unable to determine a region for output bucket %s: %s',
+                self.bucket, err)
+            sys.exit(1)
         self.transfer = S3Transfer(
-            self.ctx.session_factory(region=region, assume=False).client('s3'))
+            self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
