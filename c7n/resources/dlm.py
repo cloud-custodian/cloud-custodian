@@ -17,7 +17,7 @@ class DLMPolicy(QueryResourceManager):
         detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy')
         filter_name = 'PolicyIds'
         filter_type = 'list'
-        arn = False
+        arn = True
         cfn_type = 'AWS::DLM::LifecyclePolicy'
         # arn:aws:dlm:us-east-1:532725030595:policy/policy-0e23a047d0fdb7761
 
