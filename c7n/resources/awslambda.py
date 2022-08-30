@@ -9,7 +9,7 @@ from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 
-from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction, BaseAction
+from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
