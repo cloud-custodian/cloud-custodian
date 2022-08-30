@@ -5,7 +5,6 @@ from unittest import mock
 
 from gcp_common import BaseTest
 from c7n_gcp.client import Session
-from c7n_gcp.actions.notify import version
 
 
 class NotifyTest(BaseTest):
