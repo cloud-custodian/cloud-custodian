@@ -157,7 +157,7 @@ class IsWafEnabled(Filter):
             if state and target_acl_id is None and r.get('WebACLId'):
                 results.append(r)
             elif not state and target_acl_id is None and (not r.get('WebACLId') or
-                                                          r.get('WebACLId') not in waf_name_id_map.values()):
+                    r.get('WebACLId') not in waf_name_id_map.values()):
                 results.append(r)
             elif state and target_acl_id and r['WebACLId'] == target_acl_id:
                 results.append(r)
@@ -752,8 +752,8 @@ class DistributionSSLAction(BaseAction):
 
 class BaseUpdateAction(BaseAction):
     schema = type_schema('set-attributes',
-                         attributes={"type": "object"},
-                         required=('attributes',))
+                        attributes={"type": "object"},
+                        required=('attributes',))
     schema_alias = False
 
     def validate(self, config_name, shape):
