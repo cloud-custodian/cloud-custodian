@@ -560,7 +560,7 @@ class IamRoleTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             p.resource_manager.get_arns(resources),
-            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369'])  # NOQA
 
         self.assertDeprecation(p, """
             policy 'iam-inuse-role'
@@ -1622,60 +1622,6 @@ class IamInlinePolicyUsage(BaseTest):
         client = session_factory().client("iam")
         inline_policies_after = client.list_group_policies(GroupName=noncompliant_group)
         self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
-
-
-class KMSCrossAccount(BaseTest):
-
-    def test_kms_cross_account(self):
-        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_cross_account_kms")
-        client = session_factory().client("kms")
-
-        policy = {
-            "Id": "Lulu",
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "Enable IAM User Permissions",
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
-                    "Action": "kms:*",
-                    "Resource": "*",
-                },
-                {
-                    "Sid": "Enable Cross Account",
-                    "Effect": "Allow",
-                    "Principal": "*",
-                    "Action": "kms:Encrypt",
-                    "Resource": "*",
-                },
-            ],
-        }
-
-        key_info = client.create_key(
-            Policy=json.dumps(policy), Description="test-cross-account-3"
-        )[
-            "KeyMetadata"
-        ]
-
-        # disable and schedule deletion
-        self.addCleanup(
-            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
-        )
-        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
-
-        p = self.load_policy(
-            {
-                "name": "kms-cross",
-                "resource": "kms-key",
-                "filters": [{"KeyState": "Enabled"}, "cross-account"],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
 
 class GlacierCrossAccount(BaseTest):
