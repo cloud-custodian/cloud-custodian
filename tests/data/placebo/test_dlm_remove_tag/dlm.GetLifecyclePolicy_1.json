@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": {
+            "PolicyId": "policy-0e23a047d0fdb7761",
+            "Description": "test",
+            "State": "ENABLED",
+            "StatusMessage": "ENABLED",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/AWSDataLifecycleManagerDefaultRole",
+            "DateCreated": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 29,
+                "hour": 11,
+                "minute": 1,
+                "second": 18,
+                "microsecond": 841000
+            },
+            "DateModified": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 29,
+                "hour": 11,
+                "minute": 1,
+                "second": 19,
+                "microsecond": 18000
+            },
+            "PolicyDetails": {
+                "PolicyType": "EBS_SNAPSHOT_MANAGEMENT",
+                "ResourceTypes": [
+                    "VOLUME"
+                ],
+                "ResourceLocations": [
+                    "CLOUD"
+                ],
+                "TargetTags": [
+                    {
+                        "Key": "ActionNeeded",
+                        "Value": "foo"
+                    }
+                ],
+                "Schedules": [
+                    {
+                        "Name": "Schedule 1",
+                        "CopyTags": false,
+                        "CreateRule": {
+                            "Location": "CLOUD",
+                            "Interval": 12,
+                            "IntervalUnit": "HOURS",
+                            "Times": [
+                                "09:00"
+                            ]
+                        },
+                        "RetainRule": {
+                            "Count": 1,
+                            "Interval": 0
+                        }
+                    }
+                ]
+            },
+            "Tags": {
+                "asdf": "qwer",
+                "foo": "bar"
+            },
+            "PolicyArn": "arn:aws:dlm:us-east-1:644160558196:policy/policy-0e23a047d0fdb7761"
+        }
+    }
+}
