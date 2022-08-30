@@ -385,6 +385,32 @@ class LambdaTest(BaseTest):
         self.assertEqual(resources[0]["FunctionName"], "mys3")
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-f9cc4d9f"])
 
+    def test_enable_xray_tracing(self):
+        factory = self.replay_flight_data("test_enable_xray_tracing")
+
+        p = self.load_policy(
+            {
+                "name": "xray-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "check-xray-tracing-enabled"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "enable-xray-tracing"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        client = factory().client('lambda')
+        response = client.get_function(
+            FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'Active')
+
 
 class LambdaTagTest(BaseTest):
 
