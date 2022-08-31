@@ -525,8 +525,13 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             if augment:
                 with self.ctx.tracer.subsegment('resource-augment'):
                     resources = self.augment(resources)
+                    # For some resources (e.g. sqs) model data is only
+                    # available after augment
+                    resources = self.model_augment(resources)
                 # Don't pollute cache with unaugmented resources.
                 self._cache.save(cache_key, resources)
+            else:
+                resources = self.model_augment(resources)
 
         self._cache.close()
 
@@ -572,6 +577,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             resources = self.source.get_resources(ids)
             if augment:
                 resources = self.augment(resources)
+            resources = self.model_augment(resources)
             return resources
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))

@@ -123,6 +123,17 @@ class ResourceManager:
         """
         return self.query.resolve(self.resource_type)
 
+    def model_augment(self, resources):
+        """Add resource-level model metadata to resource records"""
+        model = self.get_model()
+        for r in resources:
+            r["c7n:resource-model"] = {
+                "arn": r[model.arn] if model.arn else self.generate_arn(r[model.id]),
+                "id": r[model.id],
+                "name": r[model.name],
+            }
+        return resources
+
     def iter_filters(self, block_end=False):
         return iter_filters(self.filters, block_end=block_end)
 
