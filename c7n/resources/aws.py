@@ -25,7 +25,7 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import ClientError, PolicyValidationError
+from c7n.exceptions import ClientError, InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
 
 from .resource_map import ResourceMap
@@ -144,7 +144,17 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
     """
     region = None
     s3_endpoint_parts = urlparse(s3_endpoint)
-    bucket_endpoint = f'https://{bucket}.{s3_endpoint_parts.netloc}'
+    # Use a "path-style" S3 URL here to avoid failing TLS certificate validation
+    # on buckets with a dot in the name.
+    #
+    # According to the following blog post, before deprecating path-style
+    # URLs AWS will provide a way for virtual-hosted-style URLs to handle
+    # buckets with dots in their names. Using path-style URLs here in
+    # the meantime seems reasonable, compared to alternatives like forcing
+    # HTTP or ignoring certificate validation.
+    #
+    # https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
+    bucket_endpoint = f'https://{s3_endpoint_parts.netloc}/{bucket}'
     request = Request(bucket_endpoint, method='HEAD')
     try:
         # Dynamic use of urllib trips up static analyzers because
@@ -594,13 +604,12 @@ class S3Output(BlobOutput):
         # the GetBucketLocation API if necessary.
         try:
             self.bucket_region = (
-                get_bucket_region_clientless(self.bucket, s3_client._endpoint.host) or
+                get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
                 get_bucket_region(self.bucket, s3_client)
             )
         except ClientError as err:
-            log.error('unable to determine a region for output bucket %s: %s',
-                self.bucket, err)
-            sys.exit(1)
+            raise InvalidOutputConfig(
+                f'unable to determine a region for output bucket {self.bucket}: {err}') from None
         self.transfer = S3Transfer(
             self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
 

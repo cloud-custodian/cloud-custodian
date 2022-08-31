@@ -5,11 +5,11 @@ interactions:
       Connection:
       - close
       Host:
-      - apigateway.s3.us-east-1.amazonaws.com
+      - s3.us-east-1.amazonaws.com
       User-Agent:
       - Python-urllib/3.10
     method: HEAD
-    uri: https://apigateway.s3.us-east-1.amazonaws.com
+    uri: https://s3.us-east-1.amazonaws.com/apigateway
   response:
     body:
       string: ''
@@ -19,15 +19,15 @@ interactions:
       Content-Type:
       - application/xml
       Date:
-      - Fri, 26 Aug 2022 13:41:02 GMT
+      - Wed, 31 Aug 2022 13:26:04 GMT
       Server:
       - AmazonS3
       x-amz-bucket-region:
       - us-east-1
       x-amz-id-2:
-      - SvQJrY0SWiCeEmzTPT9p7TmRbYYPzEIrbih0cGN9yDhoGyIWRRzGh6bl9eW1pXDJ5pkxnLNlBvI=
+      - GtQvi1oDp7l5PLD6pyCbCOzprt7NzP8BvUUV6LT6SQDYE9ZN7txCSH3AfFcDsdcofioo/fN9FRo=
       x-amz-request-id:
-      - 160ZMP6ZY5KK0TBA
+      - EQ0BNNFQCE2KBVTC
     status:
       code: 403
       message: Forbidden

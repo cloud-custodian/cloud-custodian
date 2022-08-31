@@ -5,11 +5,11 @@ interactions:
       Connection:
       - close
       Host:
-      - apigateway.s3.us-west-2.amazonaws.com
+      - s3.us-west-2.amazonaws.com
       User-Agent:
       - Python-urllib/3.10
     method: HEAD
-    uri: https://apigateway.s3.us-west-2.amazonaws.com
+    uri: https://s3.us-west-2.amazonaws.com/apigateway
   response:
     body:
       string: ''
@@ -19,15 +19,15 @@ interactions:
       Content-Type:
       - application/xml
       Date:
-      - Fri, 26 Aug 2022 13:41:02 GMT
+      - Wed, 31 Aug 2022 13:26:05 GMT
       Server:
       - AmazonS3
       x-amz-bucket-region:
       - us-east-1
       x-amz-id-2:
-      - l+Andfi8S26XhN9ujmchqvllZokZhqInjTeT8E6hGjNRXiGjkkG0wl5GGgk6lEJzIKxF7juhTG4=
+      - pb7UmTtxSCIil+ZPi14Yf9BYNlo4VlMeidI48E8t+V3He4q+OleWqKHhllwLGUqFQOeEs8gGkFA=
       x-amz-request-id:
-      - 160WP2DRBPH9FV68
+      - EQ09KGK4TPHYMQTA
     status:
       code: 301
       message: Moved Permanently
