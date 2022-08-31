@@ -129,15 +129,21 @@ class ResourceManager:
 
         def _get_arn(model, resource):
             """Get or generate a resource ARN, if applicable"""
-            if not self.has_arn():
-                return None
-            return r[model.arn] or self.generate_arn(resource[model.id])
+            if model.arn:
+                return r.get(model.arn)
+            if self.has_arn() and model.id in resource:
+                return self.generate_arn(resource[model.id])
+            # It's not possible to get or generate an ARN for
+            # this resource. Explicitly return None.
+            return None
 
         for r in resources:
+            if not isinstance(r, dict):
+                continue
             r["c7n:resource-model"] = {
                 "arn": _get_arn(model, r),
-                "id": r[model.id],
-                "name": r[model.name],
+                "id": r.get(model.id),
+                "name": r.get(model.name),
             }
 
         return resources
