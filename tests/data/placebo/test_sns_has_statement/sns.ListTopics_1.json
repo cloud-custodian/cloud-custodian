@@ -7,6 +7,9 @@
             },
             {
                 "TopicArn": "arn:aws:sns:us-west-1:644160558196:sns-test-not-has-statement"
+            },
+            {
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement-star"
             }
         ],
         "ResponseMetadata": {}

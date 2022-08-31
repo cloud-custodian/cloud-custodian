@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import time
 
 import requests
@@ -24,9 +25,7 @@ class SlackDelivery:
             return None
 
     def get_to_addrs_slack_messages_map(self, sqs_message):
-        resource_list = []
-        for resource in sqs_message['resources']:
-            resource_list.append(resource)
+        resource_list = copy.deepcopy(sqs_message['resources'])
 
         slack_messages = {}
 
@@ -78,9 +77,9 @@ class SlackDelivery:
                     resource_list,
                     self.logger, 'slack_template', 'slack_default',
                     self.config['templates_folders'])
-            elif target.startswith('slack://tag/') and 'Tags' in resource:
+            elif target.startswith('slack://tag/') and 'Tags' in resource_list[0]:
                 tag_name = target.split('tag/', 1)[1]
-                result = next((item for item in resource.get('Tags', [])
+                result = next((item for item in resource_list[0].get('Tags', [])
                                if item["Key"] == tag_name), None)
                 if not result:
                     self.logger.debug(

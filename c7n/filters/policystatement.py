@@ -64,7 +64,11 @@ class HasStatementFilter(Filter):
 
     def action_resource_case_insensitive(self, actions):
         if isinstance(actions, str):
-            actionsFormatted = '{}:{}'.format(actions.split(':')[0].lower(), actions.split(':')[1])
+            if len(actions.split(':')) > 1:
+                actionsFormatted = '{}:{}'.format(actions.split(':')[0].lower(),
+                    actions.split(':')[1])
+            else:
+                actionsFormatted = actions
         else:
             actionsFormatted = []
             for action in actions:

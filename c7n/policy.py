@@ -7,6 +7,7 @@ import itertools
 import logging
 import os
 import time
+from typing import List
 
 from dateutil import parser, tz as tzutil
 import jmespath
@@ -66,12 +67,12 @@ class PolicyCollection:
 
     log = logging.getLogger('c7n.policies')
 
-    def __init__(self, policies, options):
+    def __init__(self, policies: 'List[Policy]', options):
         self.options = options
         self.policies = policies
 
     @classmethod
-    def from_data(cls, data, options, session_factory=None):
+    def from_data(cls, data: dict, options, session_factory=None):
         # session factory param introduction needs an audit and review
         # on tests.
         sf = session_factory if session_factory else cls.session_factory()
@@ -1101,15 +1102,15 @@ class Policy:
             self.resource_type, self.name, self.options.region)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.data['name']
 
     @property
-    def resource_type(self):
+    def resource_type(self) -> str:
         return self.data['resource']
 
     @property
-    def provider_name(self):
+    def provider_name(self) -> str:
         if '.' in self.resource_type:
             provider_name, resource_type = self.resource_type.split('.', 1)
         else:
@@ -1285,8 +1286,7 @@ class Policy:
             resources = mode.provision()
         else:
             resources = mode.run()
-        # clear out resource manager post run, to clear cache
-        self.resource_manager = self.load_resource_manager()
+
         return resources
 
     run = __call__

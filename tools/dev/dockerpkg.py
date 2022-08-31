@@ -30,19 +30,23 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
+ARG POETRY_VERSION="1.1.14"
+
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
+RUN apt-get --yes install build-essential curl python3-venv python3-dev \
+    --no-install-recommends
 RUN python3 -m venv /usr/local
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
- | python3 - -y --version 1.1.14
+    | python3 - -y --version {poetry_version}
 
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && pip install -U pip
 RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
@@ -77,7 +81,9 @@ COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
 COPY --from=build-env /output /output
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get --yes update \\
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get --yes update \\
         && apt-get --yes install python3 python3-venv --no-install-recommends \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
@@ -114,6 +120,12 @@ ENTRYPOINT ["{entrypoint}"]
 CMD ["--help"]
 """
 
+TARGET_CLI = """\
+LABEL "org.opencontainers.image.title"="cli"
+LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
 
 BUILD_ORG = """\
 # Install c7n-org
@@ -121,10 +133,23 @@ ADD tools/c7n_org /src/tools/c7n_org
 RUN . /usr/local/bin/activate && cd tools/c7n_org && $HOME/.poetry/bin/poetry install
 """
 
+TARGET_ORG = """\
+LABEL "org.opencontainers.image.title"="org"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
 RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry install
+
+"""
+
+TARGET_MAILER = """\
+LABEL "org.opencontainers.image.title"="mailer"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Notification Delivery"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 BUILD_POLICYSTREAM = """\
@@ -133,10 +158,20 @@ ADD tools/c7n_policystream /src/tools/c7n_policystream
 RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
 """
 
+TARGET_POLICYSTREAM = """\
+LABEL "org.opencontainers.image.title"="policystream"
+LABEL "org.opencontainers.image.description"="Custodian policy changes streamed from Git"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:22.04", base_target_image="ubuntu:22.04")
+    defaults = dict(
+        base_build_image="ubuntu:22.04",
+        base_target_image="ubuntu:22.04",
+        poetry_version="${POETRY_VERSION}"
+    )
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata
@@ -166,7 +201,7 @@ class Image:
 
 
 ImageMap = {
-    "docker/cli": Image(
+    "docker/c7n": Image(
         dict(
             name="cli",
             repo="c7n",
@@ -174,9 +209,9 @@ ImageMap = {
             entrypoint="/usr/local/bin/custodian",
         ),
         build=[BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
     ),
-    "docker/org": Image(
+    "docker/c7n-org": Image(
         dict(
             name="org",
             repo="c7n-org",
@@ -184,7 +219,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
     ),
     "docker/mailer": Image(
         dict(
@@ -193,7 +228,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
     ),
     "docker/policystream": Image(
         dict(
@@ -202,7 +237,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
     ),
 }
 
