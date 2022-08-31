@@ -203,11 +203,13 @@ def resolve_regions(regions, account):
             client = session.client('ec2')
             return [region['RegionName'] for region in client.describe_regions()['Regions']]
         except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                log.warning('access denied listing available regions for account:%s',
-                    account['name'])
-                return []
-            raise
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
 
