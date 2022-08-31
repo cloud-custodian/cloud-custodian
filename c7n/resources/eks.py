@@ -10,6 +10,7 @@ from c7n.utils import local_session, type_schema, get_retry
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @query.sources.register('describe-eks-nodegroup')
@@ -124,6 +125,9 @@ class EKSVpcFilter(VpcFilter):
 
     RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
 
+@EKS.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
 
 @EKS.action_registry.register('tag')
 class EKSTag(tags.Tag):
