@@ -1,0 +1,6 @@
+certifi==2022.6.15; python_version >= "3.7" and python_version < "4"
+charset-normalizer>=2.1.0; python_version >= "3.7" and python_version < "4" and python_full_version >= "3.6.0"
+idna==3.3; python_version >= "3.7" and python_version < "4"
+requests==2.28.1; python_version >= "3.7" and python_version < "4"
+tencentcloud-sdk-python==3.0.717
+urllib3>=1.26.11; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.7"
