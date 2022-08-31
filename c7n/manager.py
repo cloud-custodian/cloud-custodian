@@ -134,12 +134,12 @@ class ResourceManager:
             return r[model.arn] or self.generate_arn(resource[model.id])
 
         for r in resources:
-
             r["c7n:resource-model"] = {
                 "arn": _get_arn(model, r),
                 "id": r[model.id],
                 "name": r[model.name],
             }
+
         return resources
 
     def iter_filters(self, block_end=False):
