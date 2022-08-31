@@ -387,3 +387,26 @@ class TestECR(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ecr_metrics_filter(self):
+        session_factory = self.replay_flight_data("test_ecr_metrics_filter")
+        p = self.load_policy(
+            {
+                "name": "ecr-metrics-filter",
+                "resource": "aws.ecr",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "statistics": "Sum",
+                        "days": 5,
+                        "period": 86400,
+                        "op": "greater-than",
+                        "value": 1,
+                        "name": "RepositoryPullCount"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
