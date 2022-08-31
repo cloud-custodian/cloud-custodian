@@ -15,6 +15,7 @@ cryptography==37.0.4; sys_platform == "linux" and python_version >= "3.7"
 docutils==0.17.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 execnet==1.9.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.5.0" and python_version >= "3.6" and python_version < "4.0"
 flake8==3.9.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
+freezegun==1.2.2; python_version >= "3.6"
 idna==3.3; python_version >= "3.7" and python_version < "4"
 importlib-metadata==4.12.0; python_version >= "3.7"
 importlib-resources==5.9.0; python_version < "3.9" and python_version >= "3.7"
