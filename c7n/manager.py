@@ -126,9 +126,17 @@ class ResourceManager:
     def model_augment(self, resources):
         """Add resource-level model metadata to resource records"""
         model = self.get_model()
+
+        def _get_arn(model, resource):
+            """Get or generate a resource ARN, if applicable"""
+            if not self.has_arn():
+                return None
+            return r[model.arn] or self.generate_arn(resource[model.id])
+
         for r in resources:
+
             r["c7n:resource-model"] = {
-                "arn": r[model.arn] if model.arn else self.generate_arn(r[model.id]),
+                "arn": _get_arn(model, r),
                 "id": r[model.id],
                 "name": r[model.name],
             }
