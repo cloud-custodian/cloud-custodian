@@ -37,6 +37,12 @@ class FakeCache:
     def close(self):
         pass
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kw):
+        return
+
 
 class FakeResolver:
 
