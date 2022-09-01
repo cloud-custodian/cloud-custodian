@@ -47,10 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: Lint
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Install poetry
         run: pipx install poetry==1.1.15
-      - uses: actions/setup-python@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
           cache: "poetry"
