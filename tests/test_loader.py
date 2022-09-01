@@ -69,7 +69,7 @@ class TestDirectoryLoader(BaseTest):
                 json.dump(
                     {"policies": [{'name': 'test2', 'resource': 'ec2'}]}, f
                 )
-            with open(f"{temp_dir}/policy3.yaml", "w+") as f:
+            with open(f"{temp_dir}/policy.3.yaml", "w+") as f:
                 json.dump(
                     {"policies": [{'name': 'test3', 'resource': 'ebs'}]}, f
                 )

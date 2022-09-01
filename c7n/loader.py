@@ -194,7 +194,7 @@ class DirectoryLoader(PolicyLoader):
             raw_policies = []
             for root, dirs, files in os.walk(directory, topdown=False):
                 for name in files:
-                    fmt = name.split('.', 1)[-1]
+                    fmt = name.rsplit('.', 1)[-1]
                     if fmt in ('yaml', 'yml', 'json',):
                         data = load_file(f"{root}/{name}")
                         errors.extend(_validate(data))
