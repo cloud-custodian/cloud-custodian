@@ -125,9 +125,11 @@ class EKSVpcFilter(VpcFilter):
 
     RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
 
+
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
 
 @EKS.action_registry.register('tag')
 class EKSTag(tags.Tag):
