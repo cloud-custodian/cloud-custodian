@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Automatically generated from poetry/pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
