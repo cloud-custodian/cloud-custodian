@@ -826,7 +826,6 @@ def run(event, context):
 class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into a lambda function.
     """
-    handler = "custodian_policy.run"
 
     def __init__(self, policy):
         self.policy = policy
@@ -843,6 +842,10 @@ class PolicyLambda(AbstractLambdaFunction):
     def description(self):
         return self.policy.data.get(
             'description', 'cloud-custodian lambda policy')
+
+    @property
+    def handler(self):
+        return self.policy.data['mode'].get('handler', 'custodian_policy.run')
 
     @property
     def role(self):

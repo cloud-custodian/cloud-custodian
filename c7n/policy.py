@@ -360,6 +360,7 @@ class LambdaMode(ServerlessExecutionMode):
             'runtime': {'enum': ['python2.7', 'python3.6',
                                  'python3.7', 'python3.8', 'python3.9']},
             'role': {'type': 'string'},
+            'handler': {'type': 'string'},
             'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
