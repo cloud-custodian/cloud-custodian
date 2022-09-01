@@ -75,7 +75,7 @@ jobs:
       - name: Build Docs
         shell: bash
         run: |
-          make sphinx
+          poetry run make sphinx
 
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
