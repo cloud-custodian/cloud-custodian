@@ -204,6 +204,7 @@ used in opt-in mode, not opt-out.
 
 Another option is to escape the tag value with the following mapping, generated
 with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
+This works for GCP resources as well.
 
 - ( and ) as u28 and u29
 - [ and ] as u5b and u5d
