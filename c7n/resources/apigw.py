@@ -295,19 +295,18 @@ class DescribeRestStage(query.ChildDescribeSource):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for id in ids:
-            # if we get stage arn, we pick rest_api_id
-            if 'arn:aws:apigateway' in id:
+            # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
+            if id.startswith('arn:'):
                 _, ident = id.rsplit(':', 1)
                 parts = ident.split('/', 4)
                 # if we get stage name in arn, use stage_name to get stage information
+                # from stage information, pick deploymentId
                 if len(parts) > 3:
                     response = self.manager.retry(
                         client.get_stage,
                         restApiId=parts[2],
                         stageName=parts[4])
                     deployment_ids.append(response[self.manager.resource_type.id])
-                else:
-                    deployment_ids.append(parts[2])
             else:
                 deployment_ids.append(id)
         return super(DescribeRestStage, self).get_resources(deployment_ids, cache)
