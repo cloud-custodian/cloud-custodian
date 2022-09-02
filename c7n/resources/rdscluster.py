@@ -721,7 +721,8 @@ class ParameterFilter(ValueFilter):
             if pg_values is not None:
                 paramcache[pg] = pg_values
                 continue
-            param_list = list(itertools.chain(*[p['Parameters'] for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+            param_list = list(itertools.chain(*[p['Parameters']
+                                                for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
             paramcache[pg] = {
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
                 for p in param_list if 'ParameterValue' in p}
