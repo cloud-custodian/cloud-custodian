@@ -3,6 +3,7 @@
 """
 CloudWatch Metrics suppport for resources
 """
+from collections import namedtuple
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -102,6 +103,7 @@ class MetricsFilter(Filter):
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
         'ecs': 'AWS/ECS',
+        'ecr': 'AWS/ECR',
         'efs': 'AWS/EFS',
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
@@ -123,16 +125,51 @@ class MetricsFilter(Filter):
         'workspaces': 'AWS/WorkSpaces',
     }
 
+    def __init__(self, data, manager=None):
+        super(MetricsFilter, self).__init__(data, manager)
+        self.days = self.data.get('days', 14)
+
+    def validate(self):
+        if self.days > 455:
+            raise PolicyValidationError(
+                "metrics filter days value (%s) cannot exceed 455" % self.days)
+
+    def get_metric_window(self):
+        """Determine start and end times for the CloudWatch metric window
+
+        Ensure that the window aligns with time segments based on CloudWatch's retention
+        schedule defined here:
+
+        https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric  # noqa
+        """
+
+        duration = timedelta(self.days)
+        now = datetime.utcnow()
+        MetricWindow = namedtuple('MetricWindow', 'start end')
+
+        if duration <= timedelta(days=(1 / 8.0)):
+            # Align period with the start of the next second
+            # CloudWatch retention: 3 hours
+            end = now.replace(microsecond=0) + timedelta(seconds=1)
+        elif duration <= timedelta(days=15):
+            # Align period with the start of the next minute
+            # CloudWatch retention: 15 days
+            end = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
+        elif duration <= timedelta(days=63):
+            # Align period with the start of the next five-minute block
+            # CloudWatch retention: 63 days
+            end = (now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
+                + timedelta(minutes=5))
+        else:
+            # Align period with the start of the next hour
+            # CloudWatch retention: 455 days
+            end = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+
+        return MetricWindow((end - duration), end)
+
     def process(self, resources, event=None):
-        self.days = days = self.data.get('days', 14)
-        duration = timedelta(days)
-
+        self.start, self.end = self.get_metric_window()
         self.metric = self.data['name']
-        self.end = datetime.utcnow()
-
-        # Adjust the start time to gracefully handle CloudWatch's retention schedule, which rolls up
-        # data points progressively (1 minute --> 5 minutes --> 1 hour) over time.
-        self.start = (self.end - duration).replace(minute=0)
         self.period = int(self.data.get('period', (self.end - self.start).total_seconds()))
         self.statistics = self.data.get('statistics', 'Average')
         self.model = self.manager.get_model()

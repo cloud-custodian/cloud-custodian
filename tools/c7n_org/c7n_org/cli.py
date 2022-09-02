@@ -203,11 +203,13 @@ def resolve_regions(regions, account):
             client = session.client('ec2')
             return [region['RegionName'] for region in client.describe_regions()['Regions']]
         except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                log.warning('access denied listing available regions for account:%s',
-                    account['name'])
-                return []
-            raise
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
 
@@ -341,6 +343,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
+                    if k in r:
+                        k = 'tag:' + k
                     r[k] = v
         records.extend(policy_records)
     return records
@@ -420,7 +424,7 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)

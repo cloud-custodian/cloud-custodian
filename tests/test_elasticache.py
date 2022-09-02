@@ -494,7 +494,7 @@ class TestElastiCacheReplicationGroup(BaseTest):
 
         client = session_factory().client("elasticache")
         response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
-        while(response.get('ReplicationGroups')[0].get('Status') == 'modifying'):
+        while response.get('ReplicationGroups')[0].get('Status') == 'modifying':
             response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
         arn = p.resource_manager.get_arns(resources)[0]
         tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
