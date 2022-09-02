@@ -255,30 +255,6 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
-@AWSLambda.filter_registry.register('check-xray-tracing-enabled')
-class LambdaCheckXrayTracingEnabled(ValueFilter):
-    """Filters lambda functions with xray tracing not enabled
-
-    :example:
-
-    .. code-block:: yaml
-
-            filters:
-              - type: check-xray-tracing-enabled
-
-    """
-
-    schema = type_schema('check-xray-tracing-enabled')
-    permissions = ('lambda:ListFunctions',)
-
-    def process(self, resources, event=None):
-        results = []
-        for resource in resources:
-            if resource["TracingConfig"]["Mode"] != "Active":
-                results.append(resource)
-        return results
-
-
 @AWSLambda.action_registry.register('enable-xray-tracing')
 class LambdaEnableXrayTracing(Action):
     """
@@ -304,17 +280,18 @@ class LambdaEnableXrayTracing(Action):
         client = local_session(self.manager.session_factory).client('lambda')
 
         for resource in resources:
-            function_name = resource["FunctionName"]
-            self.log.info(f"Enabling Xray tracing for lambda {function_name}")
-            try:
-                client.update_function_configuration(
-                    FunctionName=function_name,
-                    TracingConfig={
-                        'Mode': 'Active'
-                    }
-                )
-            except Exception as ex:
-                self.log.error(str(ex))
+            if resource["TracingConfig"]["Mode"] != "Active":
+                function_name = resource["FunctionName"]
+                self.log.info(f"Enabling Xray tracing for lambda {function_name}")
+                try:
+                    client.update_function_configuration(
+                        FunctionName=function_name,
+                        TracingConfig={
+                            'Mode': 'Active'
+                        }
+                    )
+                except Exception as ex:
+                    self.log.error(str(ex))
 
 
 @AWSLambda.action_registry.register('post-finding')

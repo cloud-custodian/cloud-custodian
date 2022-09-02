@@ -394,7 +394,10 @@ class LambdaTest(BaseTest):
                 "resource": "lambda",
                 "filters": [
                     {
-                        "type": "check-xray-tracing-enabled"
+                        "type": "value",
+                        "key": "TracingConfig.Mode",
+                        "value": "Active",
+                        "op": "not-equal"
                     }
                 ],
                 "actions": [
