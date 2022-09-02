@@ -1,0 +1,188 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DatabaseName": "",
+                "DBClusterIdentifier": "aurora-mysql",
+                "DBClusterParameterGroup": "aurora-msql-pg-test",
+                "DBSubnetGroup": "raza-test-db-subnet",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 58,
+                    "second": 21,
+                    "microsecond": 466000
+                },
+                "Endpoint": "aurora-mysql.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "aurora-mysql.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.10.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 10,
+                    "second": 35,
+                    "microsecond": 43000
+                },
+                "Port": 3306,
+                "MasterUsername": "admin",
+                "PreferredBackupWindow": "08:46-09:16",
+                "PreferredMaintenanceWindow": "wed:06:20-wed:06:50",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "aurora-mysql-instance-1-us-west-2a",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "aurora-mysql-instance-1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0abc3036a97274644",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/22832423-8954-43f7-9516-5525a3ed570c",
+                "DbClusterResourceId": "cluster-BZRXN5EBHW6QWXJYPKSQDFTDIU",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:aurora-mysql",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 2,
+                    "second": 50,
+                    "microsecond": 658000
+                },
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": true,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [],
+                "AutoMinorVersionUpgrade": false
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DatabaseName": "",
+                "DBClusterIdentifier": "aurora-mysql-nc",
+                "DBClusterParameterGroup": "default.aurora-mysql5.7",
+                "DBSubnetGroup": "raza-test-db-subnet",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 28,
+                    "second": 30,
+                    "microsecond": 537000
+                },
+                "Endpoint": "aurora-mysql-nc.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "aurora-mysql-nc.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.10.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 2,
+                    "minute": 11,
+                    "second": 20,
+                    "microsecond": 561000
+                },
+                "Port": 3306,
+                "MasterUsername": "admin",
+                "PreferredBackupWindow": "11:17-11:47",
+                "PreferredMaintenanceWindow": "mon:10:36-mon:11:06",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "aurora-mysql-nc-instance-1-us-west-2a",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "aurora-mysql-nc-instance-1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0abc3036a97274644",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/22832423-8954-43f7-9516-5525a3ed570c",
+                "DbClusterResourceId": "cluster-XO454FPLBGTT6SE55ZF6NZ3YUI",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:aurora-mysql-nc",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 2,
+                    "hour": 11,
+                    "minute": 23,
+                    "second": 30,
+                    "microsecond": 406000
+                },
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": true,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [],
+                "AutoMinorVersionUpgrade": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
