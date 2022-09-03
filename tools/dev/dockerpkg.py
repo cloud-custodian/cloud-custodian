@@ -30,24 +30,22 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.1.14"
+ARG POETRY_VERSION="1.1.15"
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install build-essential curl python3-venv python3-dev \
-    --no-install-recommends
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
-    | python3 - -y --version {poetry_version}
-
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/main/install-poetry.py | python3 - -y --version {poetry_version}
+ARG PATH="/root/.local/bin:$PATH"
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && pip install -U pip
-RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
+RUN . /usr/local/bin/activate && poetry install --no-dev
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
@@ -66,7 +64,7 @@ RUN rm -R tools/c7n_openstack/tests
 ARG providers="gcp kube openstack azure"
 RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
-    $HOME/.poetry/bin/poetry install && cd ../../; done
+    poetry install && cd ../../; done
 
 RUN mkdir /output
 """
@@ -130,7 +128,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_ORG = """\
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN . /usr/local/bin/activate && cd tools/c7n_org && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_org && poetry install
 """
 
 TARGET_ORG = """\
@@ -142,7 +140,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install
 
 """
 
@@ -155,7 +153,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_POLICYSTREAM = """\
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_policystream && poetry install
 """
 
 TARGET_POLICYSTREAM = """\
