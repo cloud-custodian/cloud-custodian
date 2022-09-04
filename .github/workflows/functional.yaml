@@ -1,0 +1,145 @@
+name: "Functional"
+
+env:
+  terraform_version: "1.2.8"
+  C7N_FUNCTIONAL: true
+  C7N_TEST_RUN: true
+
+on:
+  push:
+    branches:
+      - gcp-azure-ft
+
+jobs:
+ #   AWS:
+ #     runs-on: ubuntu-latest
+ #     permissions:
+ #       id-token: write
+ #       contents: read
+ #       checks: write
+ #     steps:
+ #       - uses: actions/checkout@v3
+ #       - uses: actions/setup-python@v4.2.0
+ #         with:
+ #           python-version: "3.8"
+ #       - uses: aws-actions/configure-aws-credentials@v1.7.0
+ #         with:
+ #           role-to-assume: arn:aws:iam::532725030595:role/GithubActionsTest
+ #           aws-region: us-east-1
+ #       - name: Install Terraform
+ #         run: |
+ #           wget -q https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_amd64.zip
+ #           unzip -qq terraform*.zip
+ #           mv terraform /usr/local/bin
+ #           mkdir -p .tfcache
+ #       - name: Install Requirements
+ #         run: |
+ #           pip install --cache-dir=./.pip-cache -r requirements.txt
+ #       - name: Test
+ #         run: |
+ #           pytest tests -m "not skiplive" -m terraform -n auto --junit-xml=report-aws.xml
+ #       - name: JUnit Report Action
+ #         uses: mikepenz/action-junit-report@v3.3.3
+ #         if: always()
+ #         with:
+ #           report_paths: 'report-aws.xml'
+
+
+  GCP:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.2.0
+        with:
+          python-version: "3.8"
+
+      - name: 'Authenticate to Google Cloud'
+        id: auth
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: 'projects/18998076121/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
+          service_account: 'github-actions@sonny-sandbox.iam.gserviceaccount.com'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: 'Sanity Check'
+        run: |
+          env
+          echo ${{ steps.auth.output.credentials_file_path }}
+          gcloud auth login --brief --cred-file=${{ steps.auth.outputs.credentials_file_path }}
+          gcloud projects list
+
+      - name: Install Terraform
+        run: |
+          wget -q https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_amd64.zip
+          unzip -qq terraform*.zip
+          mv terraform /usr/local/bin
+          mkdir -p .tfcache
+
+      - name: Install Requirements
+        run: |
+          pip install -qr requirements.txt
+          python setup.py -q install
+          cd tools/c7n_gcp
+          pip install -r requirements.txt
+          python setup.py -q install
+          pip install git+https://github.com/cloud-custodian/pytest-terraform.git@better-logging
+
+      - name: Test
+        run: |
+          cd tools/c7n_gcp
+          pytest tests -s -v --junit-xml=report-gcp.xml -m terraform -n auto
+
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v3.3.3
+        if: always()
+        with:
+          report_paths: '/home/runner/work/cloud-custodian/cloud-custodian/report-gcp.xml'
+
+  Azure:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.2.0
+        with:
+          python-version: "3.8"
+
+      - name: 'Azure Login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Terraform
+        run: |
+          wget -q https://releases.hashicorp.com/terraform/${terraform_version}/terraform_${terraform_version}_linux_amd64.zip
+          unzip -qq terraform*.zip
+          mv terraform /usr/local/bin
+          mkdir -p .tfcache
+
+      - name: Install Requirements
+        run: |
+          python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
+          curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+          az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice apimanagement databricks search
+          /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice apimanagement databricks search
+
+      - name: Test
+        run: |
+          pytest -v -m "not skiplive" tools/c7n_azure/tests_azure --junix-xml=report-azure.xml
+
+      - name: Cleanup
+        run: |
+          /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice apimanagement databricks search

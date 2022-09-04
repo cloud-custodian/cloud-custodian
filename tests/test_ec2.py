@@ -31,6 +31,13 @@ def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
             'name': 'ec2_stop_protection_enabled',
             'resource': 'ec2',
             'filters': [
+                {
+                    'or': [
+                        {'InstanceId': ec2_stop_protection_enabled['aws_instance.termination_protection.id']},  # noqa
+                        {'InstanceId': ec2_stop_protection_enabled['aws_instance.no_protection.id']},  # noqa
+                        {'InstanceId': ec2_stop_protection_enabled['aws_instance.stop_protection.id']},  # noqa
+                    ]
+                },
                 {'State.Name': 'running'},
                 {'type': 'stop-protected'},
             ],
@@ -45,6 +52,13 @@ def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
         resources[0]['InstanceId'],
         ec2_stop_protection_enabled['aws_instance.stop_protection.id'])
 
+    # set the api stop protection to false to allow terraform to handle the teardown
+    client = session_factory().client('ec2')
+    client.modify_instance_attribute(
+        InstanceId=resources[0]['InstanceId'],
+        DisableApiStop={'Value': False}
+    )
+
 
 @terraform('ec2_stop_protection_disabled')
 def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
@@ -56,6 +70,13 @@ def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
             'name': 'ec2_stop_protection_disabled',
             'resource': 'ec2',
             'filters': [
+                {
+                    'or': [
+                        {'InstanceId': ec2_stop_protection_disabled['aws_instance.termination_protection.id']},  # noqa
+                        {'InstanceId': ec2_stop_protection_disabled['aws_instance.no_protection.id']},  # noqa
+                        {'InstanceId': ec2_stop_protection_disabled['aws_instance.stop_protection.id']},  # noqa
+                    ]
+                },
                 {'State.Name': 'running'},
                 {'not': [{'type': 'stop-protected'}]},
             ],
@@ -74,6 +95,13 @@ def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
     test.assertIn(
         ec2_stop_protection_disabled['aws_instance.no_protection.id'],
         resource_ids)
+
+    # set the api stop protection to false to allow terraform to handle the teardown
+    client = session_factory().client('ec2')
+    client.modify_instance_attribute(
+        InstanceId=ec2_stop_protection_disabled['aws_instance.stop_protection.id'],
+        DisableApiStop={'Value': False}
+    )
 
 
 def test_ec2_stop_protection_filter_permissions(test):
