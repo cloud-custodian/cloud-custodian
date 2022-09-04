@@ -1,0 +1,102 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Sep 2022 02:26:55 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4281",
+    "-content-encoding": "gzip",
+    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "items": [
+      {
+        "kind": "sql#instance",
+        "state": "RUNNABLE",
+        "databaseVersion": "MYSQL_8_0",
+        "settings": {
+          "authorizedGaeApplications": [],
+          "tier": "db-f1-micro",
+          "kind": "sql#settings",
+          "userLabels": {
+            "custodian_onhours": "onu3du28m-fu2c11u29u3btzu3daustraliau2fsydney",
+            "custodian_offhours": "offu3du28m-fu2c02u29u3btzu3dutc"
+          },
+          "availabilityType": "ZONAL",
+          "pricingPlan": "PER_USE",
+          "replicationType": "SYNCHRONOUS",
+          "activationPolicy": "ALWAYS",
+          "ipConfiguration": {
+            "privateNetwork": "projects/cloud-custodian/global/networks/kent-testing-vpc",
+            "authorizedNetworks": [],
+            "ipv4Enabled": false
+          },
+          "locationPreference": {
+            "zone": "us-central1-c",
+            "kind": "sql#locationPreference"
+          },
+          "dataDiskType": "PD_SSD",
+          "maintenanceWindow": {
+            "updateTrack": "stable",
+            "kind": "sql#maintenanceWindow",
+            "hour": 0,
+            "day": 0
+          },
+          "backupConfiguration": {
+            "startTime": "06:00",
+            "kind": "sql#backupConfiguration",
+            "location": "us",
+            "backupRetentionSettings": {
+              "retentionUnit": "COUNT",
+              "retainedBackups": 7
+            },
+            "enabled": true,
+            "binaryLogEnabled": true,
+            "transactionLogRetentionDays": 7
+          },
+          "connectorEnforcement": "NOT_REQUIRED",
+          "settingsVersion": "3",
+          "storageAutoResizeLimit": "0",
+          "storageAutoResize": true,
+          "dataDiskSizeGb": "10",
+          "deletionProtectionEnabled": true
+        },
+        "etag": "beaa44e8aaa58edb500fa024aae4ca0207628fc6d3063d634b15eb3df2015652",
+        "ipAddresses": [
+          {
+            "type": "PRIVATE",
+            "ipAddress": "10.210.0.3"
+          }
+        ],
+        "serverCaCert": {
+          "kind": "sql#sslCert",
+          "certSerialNumber": "0",
+          "cert": "-----BEGIN CERTIFICATE-----\nMVmaHw55nXHmH2N1G7P0Ro4RDnP3SXOp+x70rELwErPxlei\nt6F5J004+ZgPkC1/LcUxZS0F5GGmn2MWjh5uWSwG6NwgiP7VzRppBCzNjkor4bgA\niOBTMA9nMBGVmDWfmIUP8XRGNXmpbSHtzZ9KcXh43SlCU7xUL7nQrRksJ/KT9r6t\nkE+N4PBQ7a8pOpEr6eoahRsuKMy72ckZCXckZx9pRHGTkTRV6CNtPh3NhvLLWhlX\nGKPkFZJHeez/nBfXWgMF50FZ7gF75IyXoIPOlZH0BdmNi96QL+VxK1Rb6Pye6Vjq\nZ+6uosotJrg21mVdfH0Z/gSpAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAw\nDQYJKoZIhvcNAQELBQADggEBAJaQXW/mb+rG5+d/2HpeDvpw0/4cZGQWY2Rt3Srr\nLMTJxULJADtINOE0nTdroaxTiSjpIai7QEW9tQsXS8ciw69kT+db6zBXI+BI64Ej\ntChIjsZ1rgWpKG2macXRmF6xbyUO+tqu8+DyEJFSkC1rQxXuiAlXwPnUbiRSEvgK\np+FY/CWq42MI4LjKPv6IFS9gbleY9N3ozVHgevQwuMM3yEn4w+ZO51Fu51x2Rm+W\nHBptVQByXIQI9PRXfXCTZewgJEk0Rf4m9oRmi06DNZl1gNF4JTBebaDe7qAojQ/B\nrfcBZtH0zxOLpM0sSycwqtFpA/GoS4fIOuzQylOaKuyWiLE=\n-----END CERTIFICATE-----",
+          "commonName": "C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA,dnQualifier=7557339c-fea2-448f-9370-2939f8b23783",
+          "sha1Fingerprint": "e4e35607e581870ee78995370d57777ad3b38e1e",
+          "instance": "kent-testing-sql",
+          "createTime": "2022-09-01T00:55:47.457Z",
+          "expirationTime": "2032-08-29T00:56:47.457Z"
+        },
+        "instanceType": "CLOUD_SQL_INSTANCE",
+        "project": "cloud-custodian",
+        "serviceAccountEmailAddress": "p300975412108-z85u3n@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+        "backendType": "SECOND_GEN",
+        "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/kent-testing-sql",
+        "connectionName": "cloud-custodian:us-central1:kent-testing-sql",
+        "name": "kent-testing-sql",
+        "region": "us-central1",
+        "gceZone": "us-central1-c",
+        "databaseInstalledVersion": "MYSQL_8_0_26",
+        "createTime": "2022-09-01T00:52:41.788Z"
+      }
+    ]
+  }
+}
