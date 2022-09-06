@@ -689,14 +689,14 @@ class TableConsecutiveBackups(Filter):
     """
     schema = type_schema('consecutive-backups', days={'type': 'number', 'minimum': 1},
         required=['days'])
-    permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable')
-    annotation = 'c7n:Dynamodb-backups'
+    permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable', )
+    annotation = 'c7n:DynamodbBackups'
 
-    def process_resource_set(self, client, resources):
+    def process_resource_set(self, client, resources, lbdate):
         paginator = client.get_paginator('list_backups')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
         ddb_backups = paginator.paginate(
-            BackupType='ALL').build_full_result().get('BackupSummaries', [])
+            BackupType='ALL', TimeRangeLowerBound=lbdate).build_full_result().get('BackupSummaries', [])
 
         table_map = {}
         for backup in ddb_backups:
@@ -709,13 +709,14 @@ class TableConsecutiveBackups(Filter):
         results = []
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
+        lbdate = utcnow - timedelta(days=retention)
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
 
         for resource_set in chunks(
                 [r for r in resources if self.annotation not in r], 50):
-            self.process_resource_set(client, resource_set)
+            self.process_resource_set(client, resource_set, lbdate)
 
         for r in resources:
             backup_dates = set()
