@@ -696,7 +696,8 @@ class TableConsecutiveBackups(Filter):
         paginator = client.get_paginator('list_backups')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
         ddb_backups = paginator.paginate(
-            BackupType='ALL', TimeRangeLowerBound=lbdate).build_full_result().get('BackupSummaries', [])
+            BackupType='ALL', TimeRangeLowerBound=lbdate).build_full_result().get(
+                'BackupSummaries', [])
 
         table_map = {}
         for backup in ddb_backups:
