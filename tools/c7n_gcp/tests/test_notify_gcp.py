@@ -9,7 +9,10 @@ from c7n_gcp.client import Session
 
 class NotifyTest(BaseTest):
 
-    def test_pubsub_notify(self):
+    @mock.patch("c7n.ctx.uuid.uuid4", return_value="00000000-0000-0000-0000-000000000000")
+    @mock.patch("c7n.ctx.time.time", return_value=1661883360)
+    @mock.patch("c7n_gcp.actions.notify.version", '0.9.18')
+    def test_pubsub_notify(self, *args, **kwargs):
         factory = self.replay_flight_data("notify-action")
 
         orig_client = Session.client
@@ -54,12 +57,12 @@ class NotifyTest(BaseTest):
                 'topic': 'projects/cloud-custodian/topics/gcptestnotifytopic',
                 'body': {
                     'messages': {
-                        'data': ('eJzdUrtqAzEQ7PUVh+qcjd2EuEqVLl8QgpFXe2cFnVZIq8Bh/O/'
-                                 'RA58vkCqkSrHNDDuPZS9C4ic6lofOJWsfhFQAlBwfjc6YhBSZtFGu3'
-                                 '+2fdvLO/0wGHA25wilrC+DJGpgzcBHSqQkLxRi5d8RmmNtOpBSgUiP4jU'
-                                 '+nmE49kzdQ+MFYxhAz/SZWKj7QBwLHLVhKul+'
-                                 'ybOti3GapYtR8mpi4ivfagHPIRZBnXwXviRgnbxVXVOOgkuXaJRgKhuf'
-                                 'jGZXGUNh9wXPakuRWzbixa1pdc6qSVO1kihieNU3KuA3QJGsgDspFT4Hb'
-                                 'nW6B2iHadon/69K5trguxb+b/OPWq9/6i+/JcvDoDq+'
-                                 'K4Yz6ZfWVTbUcucwX+HoY5Q==')
+                        'data': ('eJzdU7tuAjEQ7P0VyHXu4EAiQJUqXb4gipCxF+LI57XsNcoJ8e/xg6dEFaW'
+                                 'KJV8xo52d2fUdGIc9WOKrkY3GPDEupMRoaa1VwriMgVBpYZtuuuz4lX9Met'
+                                 'hptJkTxmTAodFySMCBcSt6yBRBoMYi6e1QawJGLwu1k651cRPipiF0WmZ+q'
+                                 'w2BD4l+ZzcqzuMXSApjaTCq5uJlXArDOEnlRrVPFWNH9lESUDJ5EaTBFcGr'
+                                 'I4LeGUEFVbAV0VDJ4jV6TcP6E4QCn9lpxpPb7OQcTdvdqGqNaqciiaUdjwH'
+                                 '8i8JeaNtK7HkxRF7Y4NBTndPZUB1Erc72fx06xWbHJAPfIGN2dFru5HSaB5'
+                                 '/z4Xd1gURx2c3n3WIxm80nid6n7Zy2PmmXbbfglyHfB/rHE755x3/xUpOcf'
+                                 'LarN0HyE9TrzR9QVfNC8/0BI3Q0PA==')
                     }}})
