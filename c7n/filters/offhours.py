@@ -204,16 +204,19 @@ used in opt-in mode, not opt-out.
 
 Another option is to escape the tag value with the following mapping, generated
 with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
+This works for GCP resources as well.
 
 - ( and ) as u28 and u29
 - [ and ] as u5b and u5d
 - , as u2c
 - ; as u3b
+- = as u3d
+- / as u2f
 
 **Examples**::
 
     # off=(M-F,18);tz=Australia/Sydney
-    off=u28M-Fu2c18u29u3btz=Australia/Sydney
+    offu3du28M-Fu2c18u29u3btzu3dAustraliau2fSydney
     # off=[(M-F,18),(S,13)]
     off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d
 
@@ -323,8 +326,8 @@ class Time(Filter):
         'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
-    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";"]
-    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b']
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";", "=", "/"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b', 'u3d', 'u2f']
     TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
 
     z_names = list(zoneinfo.get_zonefile_instance().zones)
@@ -470,6 +473,9 @@ class Time(Filter):
             if t['Key'].lower() == self.tag_key:
                 found = t['Value']
                 break
+        # NOTE for GCP resources, eg sql-instance
+        if found == self.fallback_schedule and 'labels' in i:
+            found = i.get('labels', {}).get(self.tag_key) or found
         if found in (False, None):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
