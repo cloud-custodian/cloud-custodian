@@ -637,6 +637,74 @@ class AutoScalingTest(BaseTest):
         self.assertFalse("Platform" in tag_map)
         self.assertTrue("Linux" in tag_map)
 
+    def test_asg_rename_tag_list(self):
+        factory = self.replay_flight_data("test_asg_rename_list")
+        p = self.load_policy(
+            {
+                "name": "asg-rename-tag",
+                "resource": "asg",
+                "filters": [
+                    {"tag:Test": "absent"},
+                    {"tag:tEst": "absent"},
+                    {"tag:TEST": "testALLUPPER"},
+                    {"tag:test": "testLower"},
+                    {"tag:tesT": "testLast"},
+                    {"tag:teSt": "testRandom"},
+                ],
+                "actions": [
+                    {
+                        "type": "rename-tag",
+                        "source": ["tEst", "TEST", "teSt", "tesT", "test"],
+                        "dest": "Test"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        # Fetch ASG
+        session = factory()
+        client = session.client("autoscaling")
+        result = client.describe_auto_scaling_groups()["AutoScalingGroups"].pop()
+
+        # Fetch instance and make sure it has tags
+        ec2 = session.client("ec2")
+        instance_id = result["Instances"][0]["InstanceId"]
+
+        tag_map = self.get_ec2_tags(ec2, instance_id)
+        self.assertTrue("test" in tag_map)
+        self.assertTrue("tesT" in tag_map)
+        self.assertTrue("teSt" in tag_map)
+        self.assertTrue("TEST" in tag_map)
+
+        # Run the policy
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Validate the ASG tag changed
+        result = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+        )[
+            "AutoScalingGroups"
+        ].pop()
+        tag_map = {
+            t["Key"]: (t["Value"], t["PropagateAtLaunch"]) for t in result["Tags"]
+        }
+        self.assertTrue("Test" in tag_map)
+        self.assertFalse("test" in tag_map)
+        self.assertFalse("teSt" in tag_map)
+        self.assertFalse("tEst" in tag_map)
+        self.assertFalse("tesT" in tag_map)
+        self.assertFalse("TEST" in tag_map)
+
+        tag_map = self.get_ec2_tags(ec2, instance_id)
+        self.assertFalse("test" in tag_map)
+        self.assertFalse("teSt" in tag_map)
+        self.assertFalse("tEst" in tag_map)
+        self.assertFalse("tesT" in tag_map)
+        self.assertFalse("TEST" in tag_map)
+        self.assertTrue("Test" in tag_map)
+
     def test_asg_suspend(self):
         factory = self.replay_flight_data("test_asg_suspend")
         p = self.load_policy(

@@ -1,0 +1,91 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:a5c8106b-db9b-44ee-bb29-0469bfc44c13:autoScalingGroupName/test",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0bda4bb037bcada0a",
+                    "LaunchTemplateName": "test",
+                    "Version": "$Default"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-076de1f337c5191e5",
+                        "InstanceType": "t1.micro",
+                        "AvailabilityZone": "us-east-1a",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0bda4bb037bcada0a",
+                            "LaunchTemplateName": "test",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 13,
+                    "hour": 18,
+                    "minute": 3,
+                    "second": 22,
+                    "microsecond": 334000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-0724af477b102ce74",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "TEST",
+                        "Value": "testALLUPPER",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "teSt",
+                        "Value": "testRandom",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "tesT",
+                        "Value": "testLast",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "test",
+                        "Value": "testLower",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

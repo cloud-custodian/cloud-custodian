@@ -258,7 +258,11 @@
                                 "Key": "Name"
                             }, 
                             {
-                                "Value": "Result2", 
+                                "Value": "Result2",
+                                "Key": "testing"
+                            },
+                            {
+                                "Value": "Result2",
                                 "Key": "Testing"
                             }
                         ], 
@@ -381,9 +385,13 @@
                         "VirtualizationType": "hvm", 
                         "Tags": [
                             {
-                                "Value": "Result1", 
+                                "Value": "Result1",
                                 "Key": "Testing"
                             }, 
+                            {
+                                "Value": "Result1",
+                                "Key": "testing"
+                            },
                             {
                                 "Value": "c7n-ec2-test-02", 
                                 "Key": "Name"

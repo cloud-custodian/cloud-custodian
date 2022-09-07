@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "TEST",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "testALLUPPER"
+            },
+            {
+                "Key": "aws:autoscaling:groupName",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "test"
+            },
+            {
+                "Key": "aws:ec2launchtemplate:id",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "lt-0bda4bb037bcada0a"
+            },
+            {
+                "Key": "aws:ec2launchtemplate:version",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "1"
+            },
+            {
+                "Key": "teSt",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "testRandom"
+            },
+            {
+                "Key": "tesT",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "testLast"
+            },
+            {
+                "Key": "test",
+                "ResourceId": "i-076de1f337c5191e5",
+                "ResourceType": "instance",
+                "Value": "testLower"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

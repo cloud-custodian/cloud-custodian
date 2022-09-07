@@ -492,7 +492,12 @@ class RenameTag(Action):
 
     schema = utils.type_schema(
         'rename-tag',
-        old_key={'type': 'string'},
+        old_key={
+            'oneOf': [
+                {'type': 'string'},
+                {'type': 'array', 'items': {'type': 'string'}},
+            ]
+        },
         new_key={'type': 'string'})
     schema_alias = True
 
@@ -500,10 +505,18 @@ class RenameTag(Action):
 
     tag_count_max = 50
 
-    def delete_tag(self, client, ids, key, value):
+    def delete_tag(self, client, ids, key=None, value=None, keys=None):
+        # tag values are optional, if they're specified the client will only delete
+        # the tag if the value matches
+        if keys:
+            tags = [{'Key': k} for k in keys]
+        else:
+            tags = [{'Key': key}]
+        if value:
+            tags[0]['Value'] = value
         client.delete_tags(
             Resources=ids,
-            Tags=[{'Key': key, 'Value': value}])
+            Tags=tags)
 
     def create_tag(self, client, ids, key, value):
         client.create_tags(
@@ -528,8 +541,19 @@ class RenameTag(Action):
         if resource_ids:
             self.create_tag(client, resource_ids, new_key, tag_value)
 
-        self.delete_tag(
-            client, [r[self.id_key] for r in resource_set], old_key, tag_value)
+        old_key_resource_set = {}
+        for r in resource_set:
+            old_key_resource_set.setdefault(r['c7n:oldKey'], []).append(r)
+
+        for old_key, resources in old_key_resource_set.items():
+            self.delete_tag(
+                client, [r[self.id_key] for r in resources], key=old_key)
+
+        if isinstance(self.data.get('old_key'), list):
+            # because we don't know the tag value of the other keys, we can't pass
+            # the value in when deleting
+            self.delete_tag(
+                client, [r[self.id_key] for r in resources], keys=self.data.get('old_key'))
 
         # For resources with 50 tags, we need to delete first and then create.
         resource_ids = [r[self.id_key] for r in resource_set if len(
@@ -538,10 +562,10 @@ class RenameTag(Action):
             self.create_tag(client, resource_ids, new_key, tag_value)
 
     def create_set(self, instances):
-        old_key = self.data.get('old_key', None)
         resource_set = {}
-        for r in instances:
+        for r, old_key in instances:
             tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            r['c7n:oldKey'] = old_key
             if tags[old_key] not in resource_set:
                 resource_set[tags[old_key]] = []
             resource_set[tags[old_key]].append(r)
@@ -549,13 +573,28 @@ class RenameTag(Action):
 
     def filter_resources(self, resources):
         old_key = self.data.get('old_key', None)
-        res = 0
+        results = []
+        idx = 0
         for r in resources:
             tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if old_key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
+            if isinstance(old_key, list):
+                found = False
+                for t in old_key:
+                    if t in tags.keys():
+                        results.append((r, t,))
+                        found = True
+                        break
+                if found:
+                    break
+                # none of the keys in old_tags are on the resource, skipping
+                resources.pop(idx)
+                continue
+            if old_key in tags.keys():
+                results.append((r, old_key,))
+            else:
+                resources.pop(idx)
+            idx += 1
+        return results
 
     def process(self, resources):
         count = len(resources)
