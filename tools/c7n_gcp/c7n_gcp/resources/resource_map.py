@@ -10,7 +10,6 @@ ResourceMap = {
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
-    "gcp.bq-project": "c7n_gcp.resources.bigquery.BigQueryProject",
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
