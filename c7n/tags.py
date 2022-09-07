@@ -16,6 +16,7 @@ from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import jmespath
+import re
 import time
 
 from c7n.manager import resources as aws_resources
@@ -62,6 +63,7 @@ def register_universal_tags(filters, actions, compatibility=True):
         actions.register('untag', UniversalUntag)
 
     actions.register('remove-tag', UniversalUntag)
+    actions.register('normalize-tag', NormalizeTag)
 
 
 def universal_augment(self, resources):
@@ -700,134 +702,6 @@ class TagDelayedAction(Action):
                 self.manager.resource_type.service)
 
 
-class NormalizeTag(Action):
-    """Transform the value of a tag.
-
-    Set the tag value to uppercase, title, lowercase, or strip text
-    from a tag key.
-
-    .. code-block :: yaml
-
-        policies:
-          - name: ec2-service-transform-lower
-            resource: ec2
-            comment: |
-              ec2-service-tag-value-to-lower
-            query:
-              - instance-state-name: running
-            filters:
-              - "tag:testing8882": present
-            actions:
-              - type: normalize-tag
-                key: lower_key
-                action: lower
-
-          - name: ec2-service-strip
-            resource: ec2
-            comment: |
-              ec2-service-tag-strip-blah
-            query:
-              - instance-state-name: running
-            filters:
-              - "tag:testing8882": present
-            actions:
-              - type: normalize-tag
-                key: strip_key
-                action: strip
-                value: blah
-
-    """
-
-    schema_alias = True
-    schema = utils.type_schema(
-        'normalize-tag',
-        key={'type': 'string'},
-        action={'type': 'string',
-                'items': {
-                    'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
-        value={'type': 'string'})
-
-    permissions = ('ec2:CreateTags',)
-
-    def create_tag(self, client, ids, key, value):
-
-        self.manager.retry(
-            client.create_tags,
-            Resources=ids,
-            Tags=[{'Key': key, 'Value': value}])
-
-    def process_transform(self, tag_value, resource_set):
-        """
-        Transform tag value
-
-        - Collect value from tag
-        - Transform Tag value
-        - Assign new value for key
-        """
-        self.log.info("Transforming tag value on %s instances" % (
-            len(resource_set)))
-        key = self.data.get('key')
-
-        c = utils.local_session(self.manager.session_factory).client('ec2')
-
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            key, tag_value)
-
-    def create_set(self, instances):
-        key = self.data.get('key', None)
-        resource_set = {}
-        for r in instances:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if tags[key] not in resource_set:
-                resource_set[tags[key]] = []
-            resource_set[tags[key]].append(r)
-        return resource_set
-
-    def filter_resources(self, resources):
-        key = self.data.get('key', None)
-        res = 0
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
-
-    def process(self, resources):
-        count = len(resources)
-        resources = self.filter_resources(resources)
-        self.log.info(
-            "Filtered from %s resources to %s" % (count, len(resources)))
-        self.id_key = self.manager.get_model().id
-        resource_set = self.create_set(resources)
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for r in resource_set:
-                action = self.data.get('action')
-                value = self.data.get('value')
-                new_value = False
-                if action == 'lower' and not r.islower():
-                    new_value = r.lower()
-                elif action == 'upper' and not r.isupper():
-                    new_value = r.upper()
-                elif action == 'title' and not r.istitle():
-                    new_value = r.title()
-                elif action == 'strip' and value and value in r:
-                    new_value = r.strip(value)
-                if new_value:
-                    futures.append(
-                        w.submit(self.process_transform, new_value, resource_set[r]))
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception renaming tag set \n %s" % (
-                            f.exception()))
-        return resources
-
-
 class UniversalTag(Tag):
     """Applies one or more tags to the specified resources.
 
@@ -987,6 +861,153 @@ class UniversalTagDelayedAction(TagDelayedAction):
             and 'us-east-1' or self.manager.region)
         return utils.local_session(self.manager.session_factory).client(
             'resourcegroupstaggingapi', region_name=region)
+
+
+class NormalizeTag(UniversalTag):
+    """Transform the value of a tag.
+
+    Set the tag value to uppercase, title, lowercase, or strip text
+    from a tag key.
+
+    .. code-block :: yaml
+
+        policies:
+          - name: ec2-service-transform-lower
+            resource: ec2
+            comment: |
+              Transform a tag value to lower case
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:service": present
+            actions:
+              - type: normalize-tag
+                key: service
+                action: lower
+
+          - name: ec2-service-strip
+            resource: ec2
+            comment: |
+              Strip characters from the beginning or end of a tag value
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:service": present
+            actions:
+              - type: normalize-tag
+                key: service
+                action: strip
+                value: ' '
+
+          - name: ec2-service-replace
+            resource: ec2
+            comment: |
+              Replace tag values if they match defined regex patterns
+            query:
+              - instance-state-name: running
+            filters:
+              - "tag:service": present
+            actions:
+              - type: normalize-tag
+                key: service
+                action: replace
+                pattern: '.*deprecated.*name.*pattern.*'
+                value: my-app
+              - type: normalize-tag
+                key: service
+                action: replace
+                pattern: '.*other.*app'
+                value: other-app
+
+    """
+
+    schema_alias = True
+    schema = utils.type_schema(
+        'normalize-tag',
+        key={'type': 'string'},
+        action={'type': 'string',
+                'items': {
+                    'enum': ['upper', 'lower', 'title' 'strip', 'replace']}},
+        pattern={'type': 'string'},
+        value={'type': 'string'})
+
+    def validate(self):
+        if 'pattern' in self.data and self.data.get('action') != 'replace':
+            raise PolicyValidationError(
+                "'pattern' can only be used with 'action: replace' %s" % (
+                    self.manager.data,))
+        if 'pattern' not in self.data and self.data.get('action') == 'replace':
+            raise PolicyValidationError(
+                "'pattern' is required when using 'action: replace' %s" % (
+                    self.manager.data,))
+        return self
+
+    def process_transform(self, tag_value, resource_set):
+        """
+        Transform tag value
+
+        - Collect value from tag
+        - Transform Tag value
+        - Assign new value for key
+        """
+        self.log.info("Transforming tag value on %s instances" % (
+            len(resource_set)))
+        tags = {self.data.get('key'): tag_value}
+        client = self.get_client()
+
+        _common_tag_processer(
+            self.executor_factory, self.batch_size, self.concurrency, client,
+            self.process_resource_set, self.id_key, resource_set, tags, self.log)
+
+    def create_set(self, instances):
+        key = self.data.get('key', None)
+        resource_set = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags[key] not in resource_set:
+                resource_set[tags[key]] = []
+            resource_set[tags[key]].append(r)
+        return resource_set
+
+    def filter_resources(self, resources):
+        key = self.data.get('key', None)
+        res = 0
+        for r in resources:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if key not in tags.keys():
+                resources.pop(res)
+            res += 1
+        return resources
+
+    def process(self, resources):
+        count = len(resources)
+        resources = self.filter_resources(resources)
+        self.log.info(
+            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.id_key = self.manager.get_model().id
+        resource_set = self.create_set(resources)
+        for r in resource_set:
+            action = self.data.get('action')
+            value = self.data.get('value')
+            new_value = False
+            if action == 'lower' and not r.islower():
+                new_value = r.lower()
+            elif action == 'upper' and not r.isupper():
+                new_value = r.upper()
+            elif action == 'title' and not r.istitle():
+                new_value = r.title()
+            elif action == 'strip' and value and value in r:
+                new_value = r.strip(value)
+            elif action == 'replace':
+                pattern = self.data['pattern']  # pattern is required with action=replace
+                if re.match(pattern, r):
+                    new_value = value
+                else:
+                    self.log.debug(
+                        "'%s' doesn't match pattern '%s', skipping replace" % (r, pattern))
+            if new_value:
+                self.process_transform(new_value, resource_set[r])
+        return resources
 
 
 class CopyRelatedResourceTag(Tag):

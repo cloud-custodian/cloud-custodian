@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://us-west-2.queue.amazonaws.com/644160558196/tag-normalization-test1",
+            "https://us-west-2.queue.amazonaws.com/644160558196/tag-normalization-test2"
+        ],
+        "ResponseMetadata": {}
+    }
+}

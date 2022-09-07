@@ -527,3 +527,55 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+
+class NormalizeTagTest(BaseTest):
+
+    def test_normalize_tag_replace(self):
+        """
+        Replace occurrences of a tag that match a given pattern.
+
+        Given:
+        - 2 resources which have a given tag populated
+        - 1 resource has a tag value matching a pattern, 1 does not
+
+        We should see 2 resources match the policy, but the normalize-tag
+        action should only affect one resource.
+        """
+        session_factory = self.replay_flight_data("test_normalize_tag_replace", region="us-west-2")
+
+        policy = self.load_policy(
+            {
+                "name": "test-normalize-tag-replace",
+                "resource": "sqs",
+                "filters": [{"tag:TestTag": "not-null"}],
+                "actions": [
+                    {"type": "normalize-tag",
+                     "key": "TestTag",
+                     "action": "replace",
+                     "pattern": ".*Old.*",
+                     "value": "new-value"}
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        tags_before = {
+            r['QueueArn']: {t['Key']: t['Value']} for r in resources for t in r['Tags']}
+
+        client = session_factory().client("resourcegroupstaggingapi")
+        tag_mapping = client.get_resources(
+            ResourceTypeFilters=["sqs"],
+            TagFilters=[{"Key": "TestTag"}])["ResourceTagMappingList"]
+        tags_after = {
+            r["ResourceARN"]: {t["Key"]: t["Value"]} for r in tag_mapping for t in r['Tags']}
+
+        tags_changed = len([
+            r for r in resources
+            if (
+                tags_before[r["QueueArn"]].get("TestTag") !=
+                tags_after[r["QueueArn"]].get("TestTag")
+            )])
+        self.assertTrue(tags_changed == 1)

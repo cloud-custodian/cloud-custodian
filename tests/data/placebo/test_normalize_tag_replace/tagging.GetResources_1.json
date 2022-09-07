@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sqs:us-west-2:644160558196:tag-normalization-test1",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "new-tag-scheme"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sqs:us-west-2:644160558196:tag-normalization-test2",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "OldTagScheme"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
