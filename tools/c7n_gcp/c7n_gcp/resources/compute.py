@@ -53,18 +53,8 @@ class Instance(QueryResourceManager):
                     }}
 
 
-@Instance.filter_registry.register('offhour')
-class InstanceOffHour(OffHour):
-
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
-
-
-@Instance.filter_registry.register('onhour')
-class InstanceOnHour(OnHour):
-
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
+Instance.filter_registry.register('offhour', OffHour)
+Instance.filter_registry.register('onhour', OnHour)
 
 
 @Instance.filter_registry.register('effective-firewall')
