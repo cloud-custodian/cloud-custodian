@@ -551,7 +551,7 @@ class RenameTag(Action):
         old_key = self.data.get('old_key', None)
         filtered_resources = [
             r for r in resources
-            if old_key in ( t['Key'] for t in r.get('Tags', []) )
+            if old_key in (t['Key'] for t in r.get('Tags', []))
         ]
         return filtered_resources
 
@@ -788,7 +788,7 @@ class NormalizeTag(Action):
         key = self.data.get('key', None)
         filtered_resources = [
             r for r in resources
-            if old_key in ( t['Key'] for t in r.get('Tags', []) )
+            if key in (t['Key'] for t in r.get('Tags', []))
         ]
         return filtered_resources
 
