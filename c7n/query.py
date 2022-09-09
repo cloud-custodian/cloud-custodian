@@ -100,6 +100,9 @@ class ResourceQuery:
             # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, str), resources)):
                 resources = [r for r in resources if r in identities]
+            # This logic should fix https://github.com/cloud-custodian/cloud-custodian/issues/7573
+            elif all(map(lambda r: isinstance(r, tuple), resources)):
+                resources = [(p, r) for p, r in resources if r[m.id] in identities]
             else:
                 resources = [r for r in resources if r[m.id] in identities]
 
@@ -509,26 +512,23 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         cache_key = self.get_cache_key(query)
         resources = None
 
-        if self._cache.load():
+        with self._cache:
             resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (self.__class__.__module__,
-                               self.__class__.__name__),
+                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
                     len(resources)))
 
-        if resources is None:
-            if query is None:
-                query = {}
-            with self.ctx.tracer.subsegment('resource-fetch'):
-                resources = self.source.resources(query)
-            if augment:
-                with self.ctx.tracer.subsegment('resource-augment'):
-                    resources = self.augment(resources)
-                # Don't pollute cache with unaugmented resources.
-                self._cache.save(cache_key, resources)
-
-        self._cache.close()
+            if resources is None:
+                if query is None:
+                    query = {}
+                with self.ctx.tracer.subsegment('resource-fetch'):
+                    resources = self.source.resources(query)
+                if augment:
+                    with self.ctx.tracer.subsegment('resource-augment'):
+                        resources = self.augment(resources)
+                    # Don't pollute cache with unaugmented resources.
+                    self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):
@@ -551,14 +551,13 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
-        if self._cache.load():
+        with self._cache:
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached results for get_resources")
                 m = self.get_model()
                 id_set = set(ids)
                 return [r for r in resources if r[m.id] in id_set]
-        self._cache.close()
         return None
 
     def get_resources(self, ids, cache=True, augment=True):

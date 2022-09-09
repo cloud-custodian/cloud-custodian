@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 
 class TestRestAccount(BaseTest):
@@ -559,6 +559,50 @@ class TestRestStage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-apigw-active-response",
+                "resource": "rest-stage",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "apigateway.amazonaws.com",
+                    "ids": "responseElements.deploymentId",
+                    "event": "CreateStage"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        event = {
+            "detail": event_data("event-cloud-trail-create-rest-stage.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_active_response_tag_resource(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-apigw-active-response-tag-resource",
+                "resource": "rest-stage",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "apigateway.amazonaws.com",
+                    "ids": "requestParameters.resourceArn",
+                    "event": "TagResource"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-tag-rest-stage.json"))
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestClientCertificate(BaseTest):
