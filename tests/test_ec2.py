@@ -897,7 +897,7 @@ class TestTag(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
 
         policy = self.load_policy(
             {
