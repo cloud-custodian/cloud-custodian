@@ -13,14 +13,14 @@ def tc_provider():
     return TencentCloud()
 
 
-def test_get_session_factory(tc_provider, mock_env_aksk):
+def test_get_session_factory(tc_provider):
     session = tc_provider.get_session_factory(None)
     assert isinstance(session, Session)
 
     endpoint = "cvm.tencentcloudapi.com"
     service = "cvm"
     version = "2017-03-12"
-    region = "ap-shanghai"
+    region = "ap-unknown"
     cli = session.client(endpoint, service, version, region)
 
     with pytest.raises(TencentCloudSDKException):
