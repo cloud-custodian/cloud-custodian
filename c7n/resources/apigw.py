@@ -266,6 +266,12 @@ class DeleteApi(BaseAction):
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+        self.query.capture_parent_id = True
+
     def get_query(self):
         query = super(DescribeRestStage, self).get_query()
         query.capture_parent_id = True
@@ -284,6 +290,27 @@ class DescribeRestStage(query.ChildDescribeSource):
             results.append(r)
         return results
 
+    def get_resources(self, ids, cache=True):
+        deployment_ids = []
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for id in ids:
+            # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
+            if id.startswith('arn:'):
+                _, ident = id.rsplit(':', 1)
+                parts = ident.split('/', 4)
+                # if we get stage name in arn, use stage_name to get stage information
+                # from stage information, pick deploymentId
+                if len(parts) > 3:
+                    response = self.manager.retry(
+                        client.get_stage,
+                        restApiId=parts[2],
+                        stageName=parts[4])
+                    deployment_ids.append(response[self.manager.resource_type.id])
+            else:
+                deployment_ids.append(id)
+        return super(DescribeRestStage, self).get_resources(deployment_ids, cache)
+
 
 @resources.register('rest-stage')
 class RestStage(query.ChildResourceManager):
@@ -299,6 +326,7 @@ class RestStage(query.ChildResourceManager):
         cfn_type = config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
+        supports_trailevents = True
 
     child_source = 'describe'
     source_mapping = {
