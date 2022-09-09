@@ -18,7 +18,7 @@ from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry
-
+from botocore.config import Config
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
@@ -285,7 +285,13 @@ class LambdaEnableXrayTracing(Action):
             Returns:
                 None
         """
-        client = local_session(self.manager.session_factory).client('lambda')
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('lambda', config=config)
         updateState = self.data.get('state', True)
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
