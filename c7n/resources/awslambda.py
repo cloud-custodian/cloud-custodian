@@ -289,10 +289,10 @@ class LambdaEnableXrayTracing(Action):
         updateState = self.data.get('state', True)
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
+        mode = self.get_mode_val(updateState)
         for resource in resources:
             state = bool(resource["TracingConfig"]["Mode"] == "Active")
             if updateState != state:
-                mode = self.get_mode_val(updateState)
                 function_name = resource["FunctionName"]
                 self.log.info(f"Set Xray tracing to {mode} for lambda {function_name}")
                 try:
