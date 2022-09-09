@@ -14,16 +14,26 @@
                 "DBClusterIdentifier": "aurora-mysql",
                 "DBClusterParameterGroup": "aurora-msql-pg-test",
                 "DBSubnetGroup": "raza-test-db-subnet",
-                "Status": "available",
+                "Status": "stopped",
+                "AutomaticRestartTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 14,
+                    "hour": 10,
+                    "minute": 11,
+                    "second": 39,
+                    "microsecond": 635000
+                },
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 8,
-                    "day": 5,
+                    "month": 9,
+                    "day": 6,
                     "hour": 8,
                     "minute": 58,
-                    "second": 21,
-                    "microsecond": 466000
+                    "second": 58,
+                    "microsecond": 588000
                 },
                 "Endpoint": "aurora-mysql.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "aurora-mysql.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
@@ -33,12 +43,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 8,
+                    "month": 9,
                     "day": 7,
-                    "hour": 2,
-                    "minute": 10,
-                    "second": 35,
-                    "microsecond": 43000
+                    "hour": 10,
+                    "minute": 5,
+                    "second": 25,
+                    "microsecond": 156000
                 },
                 "Port": 3306,
                 "MasterUsername": "admin",
@@ -89,7 +99,12 @@
                 "CopyTagsToSnapshot": true,
                 "CrossAccountClone": false,
                 "DomainMemberships": [],
-                "TagList": [],
+                "TagList": [
+                    {
+                        "Key": "pe_rdscluster_unused_stopped",
+                        "Value": "Yes"
+                    }
+                ],
                 "AutoMinorVersionUpgrade": false
             },
             {
@@ -104,16 +119,26 @@
                 "DBClusterIdentifier": "aurora-mysql-nc",
                 "DBClusterParameterGroup": "default.aurora-mysql5.7",
                 "DBSubnetGroup": "raza-test-db-subnet",
-                "Status": "available",
+                "Status": "stopped",
+                "AutomaticRestartTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 14,
+                    "hour": 10,
+                    "minute": 14,
+                    "second": 38,
+                    "microsecond": 390000
+                },
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 8,
+                    "month": 9,
                     "day": 5,
                     "hour": 11,
-                    "minute": 28,
-                    "second": 30,
-                    "microsecond": 537000
+                    "minute": 27,
+                    "second": 22,
+                    "microsecond": 586000
                 },
                 "Endpoint": "aurora-mysql-nc.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "aurora-mysql-nc.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
@@ -123,12 +148,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 8,
+                    "month": 9,
                     "day": 7,
-                    "hour": 2,
-                    "minute": 11,
-                    "second": 20,
-                    "microsecond": 561000
+                    "hour": 10,
+                    "minute": 7,
+                    "second": 41,
+                    "microsecond": 315000
                 },
                 "Port": 3306,
                 "MasterUsername": "admin",
@@ -179,7 +204,12 @@
                 "CopyTagsToSnapshot": true,
                 "CrossAccountClone": false,
                 "DomainMemberships": [],
-                "TagList": [],
+                "TagList": [
+                    {
+                        "Key": "pe_rdscluster_unused_stopped",
+                        "Value": "Yes"
+                    }
+                ],
                 "AutoMinorVersionUpgrade": false
             }
         ],

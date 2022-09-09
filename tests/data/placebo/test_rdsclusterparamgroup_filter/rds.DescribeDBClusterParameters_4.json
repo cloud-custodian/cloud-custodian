@@ -348,14 +348,13 @@
             },
             {
                 "ParameterName": "require_secure_transport",
-                "ParameterValue": "ON",
                 "Description": "Whether client connections to the server are required to use some form of secure transport.",
-                "Source": "user",
+                "Source": "engine-default",
                 "ApplyType": "dynamic",
                 "DataType": "string",
                 "AllowedValues": "ON,OFF",
                 "IsModifiable": true,
-                "ApplyMethod": "immediate",
+                "ApplyMethod": "pending-reboot",
                 "SupportedEngineModes": [
                     "provisioned",
                     "serverless"
@@ -1020,9 +1019,8 @@
             },
             {
                 "ParameterName": "tls_version",
-                "ParameterValue": "TLSv1.2",
                 "Description": "The protocols permitted by the server for encrypted connections.",
-                "Source": "user",
+                "Source": "engine-default",
                 "ApplyType": "static",
                 "DataType": "list",
                 "AllowedValues": "TLSv1,TLSv1.1,TLSv1.2",

@@ -19,6 +19,8 @@ from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
+from c7n.resources.rds import ParameterFilter
+
 log = logging.getLogger('custodian.rds-cluster')
 
 
@@ -661,7 +663,7 @@ class ConsecutiveSnapshots(Filter):
 
 
 @RDSCluster.filter_registry.register('db-cluster-parameter')
-class ParameterFilter(ValueFilter):
+class ClusterParameterFilter(ParameterFilter):
     """
     Applies value type filter on set db cluster parameter values.
     :example:
@@ -679,60 +681,23 @@ class ParameterFilter(ValueFilter):
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
     policy_annotation = 'c7n:MatchedDBClusterParameter'
+    paramcache = {}
 
-    @staticmethod
-    def recast(val, datatype):
-        """ Re-cast the value based upon an AWS supplied datatype
-            and treat nulls sensibly.
-        """
-        ret_val = val
-        if datatype == 'string':
-            ret_val = str(val)
-        elif datatype == 'boolean':
-            # AWS returns 1s and 0s for boolean for most of the cases
-            if val.isdigit():
-                ret_val = bool(int(val))
-            # AWS returns 'TRUE,FALSE' for Oracle engine
-            elif val == 'TRUE':
-                ret_val = True
-            elif val == 'FALSE':
-                ret_val = False
-        elif datatype == 'integer':
-            if val.isdigit():
-                ret_val = int(val)
-        elif datatype == 'float':
-            ret_val = float(val) if val else 0.0
-        return ret_val
+    def _get_para_list(self,pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+        return param_list
 
     def process(self, resources, event=None):
         results = []
-        paramcache = {}
-
-        client = local_session(self.manager.session_factory).client('rds')
-        paginator = client.get_paginator('describe_db_cluster_parameters')
-        param_groups = {db['DBClusterParameterGroup']for db in resources}
-        for pg in param_groups:
-            cache_key = {
-                'region': self.manager.config.region,
-                'account_id': self.manager.config.account_id,
-                'rds-pg': pg}
-
-            pg_values = self.manager._cache.get(cache_key)
-            if pg_values is not None:
-                paramcache[pg] = pg_values
-                continue
-            param_list = list(itertools.chain(*[p['Parameters']
-                                                for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
-            paramcache[pg] = {
-                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in param_list if 'ParameterValue' in p}
-            self.manager._cache.save(cache_key, paramcache[pg])
-
+        parameter_group_list = {db['DBClusterParameterGroup'] for db in resources}
+        self.cache_param_groups(parameter_group_list)
         for resource in resources:
-            pg_values = paramcache[resource['DBClusterParameterGroup']]
+            pg_values = self.paramcache[resource['DBClusterParameterGroup']]
             if self.match(pg_values):
                 resource.setdefault(self.policy_annotation, []).append(
                     self.data.get('key'))
                 results.append(resource)
-                break
         return results

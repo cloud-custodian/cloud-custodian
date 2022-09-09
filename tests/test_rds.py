@@ -1816,3 +1816,38 @@ class RDSEventSubscription(BaseTest):
         client = session_factory().client("rds")
         response = client.describe_event_subscriptions()
         self.assertEqual(len(response.get('EventSubscriptionsList')), 0)
+
+
+class TestRDSParameterGroupFilterModified(BaseTest):
+
+    def test_param_value_cases(self):
+        session_factory = self.replay_flight_data('test_rds_parameter_group')
+        policy = self.load_policy(
+            {
+                "name": "rds-paramter-group-test",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBClusterIdentifier",
+                        "value": "absent"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Engine",
+                        "op": "eq",
+                        "value": "mysql"
+                    },
+                    {
+                        "type": "db-parameter",
+                        "key": "tls_version",
+                        "op": "ne",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 2)

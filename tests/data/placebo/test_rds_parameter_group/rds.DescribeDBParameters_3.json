@@ -1,0 +1,1019 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "innodb_rollback_on_timeout",
+                "Description": "Controls whether timeouts rollback the last statement or the entire transaction",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_rollback_segments",
+                "Description": "Defines how many of the rollback segments in the system tablespace that InnoDB uses within a transaction.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-128",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_scan_directories",
+                "Description": "If tablespace map files are lost or corrupted, the innodb_scan_directories startup option can be used to specify tablespace file directories. This option causes InnoDB to read the first page of each tablespace file in the specified directories and recreate tablespace map files so that the recovery process can apply redo logs to affected tablespaces.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_segment_reserve_factor",
+                "ParameterValue": "12.5",
+                "Description": "Defines the percentage of tablespace file segment pages reserved as empty pages",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0.03-40",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.26",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_sort_buffer_size",
+                "Description": "Specifies the sizes of several buffers used for sorting data during creation of an InnoDB index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "65536-67108864",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_spin_wait_delay",
+                "Description": "The maximum delay between polls for a spin lock.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_auto_recalc",
+                "Description": "Causes InnoDB to automatically recalculate persistent statistics after the data in a table is changed substantially.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_include_delete_marked",
+                "ParameterValue": "0",
+                "Description": "When innodb_stats_include_delete_marked is enabled, ANALYZE TABLE considers delete-marked records when recalculating statistics.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_method",
+                "Description": "How the server treats NULL values when collecting statistics about the distribution of index values for InnoDB tables.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "nulls_equal,nulls_unequal,nulls_ignored",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_on_metadata",
+                "Description": "Controls whether table and index stats are updated when getting status information via SHOW STATUS or the INFORMATION_SCHEMA",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_persistent",
+                "Description": "Specifies whether the InnoDB index statistics produced by the ANALYZE TABLE command are stored on disk.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "OFF,ON,0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_persistent_sample_pages",
+                "Description": "The number of index pages to sample when estimating cardinality and other statistics for an indexed column, such as those calculated by ANALYZE TABLE.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_stats_transient_sample_pages",
+                "Description": "The number of index pages to sample when estimating cardinality and other statistics for an indexed column, such as those calculated by ANALYZE TABLE.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_status_output",
+                "Description": "Enables or disables periodic output for the standard InnoDB Monitor.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_status_output_locks",
+                "Description": "Enables or disables the InnoDB Lock Monitor.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_strict_mode",
+                "Description": "Whether InnoDB returns errors rather than warnings for exceptional conditions.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_sync_array_size",
+                "Description": "Splits an internal data structure used to coordinate threads, for higher concurrency in workloads with large numbers of waiting threads.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-1024",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_sync_spin_loops",
+                "Description": "The number of times a thread waits for an innodb mutex to be freed before the thread is suspended",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_table_locks",
+                "Description": "If autocommit = 0, innodb honors LOCK TABLES",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_temp_data_file_path",
+                "Description": "Specifies the path, file name, and file size for InnoDB temporary table tablespace data files.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_thread_concurrency",
+                "Description": "The number of threads that can enter innodb concurrently",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_thread_sleep_delay",
+                "Description": "How long innodb threads sleep before joining the innodb queue, in microseconds.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_tmpdir",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_undo_directory",
+                "Description": "The relative or absolute directory path where InnoDB creates separate tablespaces for the undo logs",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_undo_log_encrypt",
+                "ParameterValue": "0",
+                "Description": "Controls encryption of undo log data for tables encrypted using the InnoDB tablespace encryption feature.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_undo_log_truncate",
+                "Description": "Undo tablespaces that exceed the threshold value defined by innodb_max_undo_log_size are marked for truncation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_undo_tablespaces",
+                "Description": "The number of tablespace files that the undo logs are divided between, when you use a non-zero innodb_undo_logs setting.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-126",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_use_native_aio",
+                "Description": "Controls whether or not MySQL uses Linux native asynchronous IO.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_write_io_threads",
+                "Description": "The number of I/O threads for write operations in InnoDB.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "interactive_timeout",
+                "Description": "Number of seconds the server waits for activity on an interactive connection before closing it.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "internal_tmp_mem_storage_engine",
+                "ParameterValue": "TempTable",
+                "Description": "The default storage engine for in-memory internal temporary tables.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "list",
+                "AllowedValues": "TempTable,MEMORY",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "join_buffer_size",
+                "Description": "Increase the value of join_buffer_size to get a faster full join when adding indexes is not possible.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "128-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "keep_files_on_create",
+                "Description": "Suppress behavior to overwrite MyISAM file created in DATA DIRECTORY or INDEX DIRECTORY.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "key_buffer_size",
+                "ParameterValue": "16777216",
+                "Description": "Increase the buffer size to get better index handling used for index blocks (for all reads and multiple writes).",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8-9223372036854771712",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "key_cache_age_threshold",
+                "Description": "Controls the demotion of buffers from the hot sub-chain of a key cache to the warm sub-chain. Lower values cause demotion to happen more quickly.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "100-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "key_cache_block_size",
+                "Description": "Size in bytes of blocks in the key cache.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "512-16384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "key_cache_division_limit",
+                "Description": "The division point between the hot and warm sub-chains of the key cache buffer chain. The value is the percentage of the buffer chain to use for the warm sub-chain.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "keyring_operations",
+                "ParameterValue": "1",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "large_pages",
+                "ParameterValue": "0",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lc_messages",
+                "ParameterValue": "en_US",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lc_messages_dir",
+                "ParameterValue": "en_US",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lc_time_names",
+                "Description": "This variable specifies the locale that controls the language used to display day and month names and abbreviations.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ar_AE,ar_BH,ar_DZ,ar_EG,ar_IN,ar_IQ,ar_JO,ar_KW,ar_LB,ar_LY,ar_MA,ar_OM,ar_QA,ar_SA,ar_SD,ar_SY,ar_TN,ar_YE,be_BY,bg_BG,ca_ES,cs_CZ,da_DK,de_AT,de_BE,de_CH,de_DE,de_LU,el_GR,en_AU,en_CA,en_GB,en_IN,en_NZ,en_PH,en_US,en_ZA,en_ZW,es_AR,es_BO,es_CL,es_CO,es_CR,es_DO,es_EC,es_ES,es_GT,es_HN,es_MX,es_NI,es_PA,es_PE,es_PR,es_PY,es_SV,es_US,es_UY,es_VE,et_EE,eu_ES,fi_FI,fo_FO,fr_BE,fr_CA,fr_CH,fr_FR,fr_LU,gl_ES,gu_IN,he_IL,hi_IN,hr_HR,hu_HU,id_ID,is_IS,it_CH,it_IT,ja_JP,ko_KR,lt_LT,lv_LV,mk_MK,mn_MN,ms_MY,nb_NO,nl_BE,nl_NL,no_NO,pl_PL,pt_BR,pt_PT,ro_RO,ru_RU,ru_UA,sk_SK,sl_SI,sq_AL,sr_RS,sv_FI,sv_SE,ta_IN,te_IN,th_TH,tr_TR,uk_UA,ur_PK,vi_VN,zh_CN,zh_HK,zh_TW",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "local_infile",
+                "ParameterValue": "1",
+                "Description": "Controls whetther LOCAL is supported for LOAD DATA INFILE",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lock_wait_timeout",
+                "Description": "Specifies the timeout in seconds for attempts to acquire metadata locks",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_bin",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log-bin",
+                "ParameterValue": "/rdsdbdata/log/binlog/mysql-bin-changelog",
+                "Description": "Controls binary logging.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_bin_basename",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_bin_index",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_bin_trust_function_creators",
+                "Description": "Enforces restrictions on stored functions / triggers - logging for replication.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_bin_use_v1_row_events",
+                "Description": "Whether MySQL writes binary log events using a Version 1 or Version 2 logging events",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_error",
+                "ParameterValue": "/rdsdbdata/log/error/mysql-error.log",
+                "Description": "Location  of error log.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_error_services",
+                "ParameterValue": "log_filter_internal; log_sink_internal",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_error_verbosity",
+                "Description": "Controls verbosity of the server in writing error, warning, and note messages to the error log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-3",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_output",
+                "ParameterValue": "TABLE",
+                "Description": "Controls where to store query logs",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "TABLE,FILE,NONE",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_queries_not_using_indexes",
+                "Description": "Logs queries that are expected to retrieve all rows to slow query log",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_slave_updates",
+                "ParameterValue": "1",
+                "Description": "Allow for chain replication - ingression",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_slow_admin_statements",
+                "Description": "Include slow administrative statements in the statements written to the slow query log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_slow_extra",
+                "Description": "When the slow query log is enabled and the output destination as FILE, additional information related to the slow query is written to the slow query log file. TABLE output is unaffected.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "ON,OFF",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.15",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_slow_slave_statements",
+                "Description": "When the slow query log is enabled, this variable enables logging for queries that have taken more than long_query_time seconds to execute on the slave.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_statements_unsafe_for_binlog",
+                "ParameterValue": "0",
+                "Description": "If error 1592 is encountered, controls whether the generated warnings are added to the error log or not.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_syslog",
+                "Description": "Whether to write error log output to syslog.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_throttle_queries_not_using_indexes",
+                "Description": "Limits the number of such queries per minute that can be written to the slow query log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "log_timestamps",
+                "Description": "This variable controls the timestamp time zone of error log messages, and of general query log and slow query log messages written to files.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "UTC,SYSTEM",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "long_query_time",
+                "Description": "Defines what MySQL considers long queries",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-31536000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lower_case_file_system",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "lower_case_table_names",
+                "Description": "Affects how the server handles identifier case sensitivity",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "low_priority_updates",
+                "Description": "INSERT, UPDATE, DELETE, and LOCK TABLE WRITE wait until no pending SELECT. Affects only storage engines that use only table-level locking (MyISAM, MEMORY, MERGE).",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "mandatory_roles",
+                "Description": "All the specified roles are always considered granted to every user and they can't be revoked. Mandatory roles still require activation unless they are made into default roles. The granted roles will not be visible in the mysql.role_edges table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "master_info_repository",
+                "ParameterValue": "TABLE",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "master-info-repository",
+                "ParameterValue": "TABLE",
+                "Description": "This option causes the server to write its master info log to a file or a table.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "FILE,TABLE",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "master_verify_checksum",
+                "Description": "Enabling this variable causes the master to examine checksums when reading from the binary log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_allowed_packet",
+                "Description": "This value by default is small, to catch large (possibly incorrect) packets. Must be increased if using large BLOB columns or long strings. As big as largest BLOB. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "16777216-1073741824",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_binlog_cache_size",
+                "Description": "Maximum binlog cache size a transaction may use",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_binlog_size",
+                "ParameterValue": "134217728",
+                "Description": "Server rotates the binlog once it reaches this size",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-1073741824",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_binlog_stmt_cache_size",
+                "Description": "If nontransactional statements within a transaction require more than this many bytes of memory, the server generates an error.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_connect_errors",
+                "Description": "A host is blocked from further connections if there are more than this number of interrupted connections",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_connections",
+                "ParameterValue": "{DBInstanceClassMemory/12582880}",
+                "Description": "The number of simultaneous client connections allowed.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-100000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_delayed_threads",
+                "Description": "Do not start more than this number of threads to handle INSERT DELAYED statements.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-16384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_digest_length",
+                "ParameterValue": "1024",
+                "Description": "The maximum number of bytes available for computing statement digests.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_error_count",
+                "Description": "The maximum number of error, warning, and note messages to be stored for display.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-65535",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_execution_time",
+                "Description": "The execution timeout for SELECT statements, in milliseconds.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_heap_table_size",
+                "Description": "Maximum size to which MEMORY tables are allowed to grow.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "16384-1844674407370954752",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_insert_delayed_threads",
+                "Description": "Synonym for max_delayed_threads",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-16384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_join_size",
+                "Description": "Catch SELECT statements where keys are not used properly and would probably take a long time. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_length_for_sort_data",
+                "Description": "ORDER BY Optimization. The cutoff on the size of index values that determines which filesort algorithm to use.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4-8388608",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_points_in_geometry",
+                "Description": "The maximum value of the points_per_circle argument to the ST_Buffer_Strategy() function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "3-3145728",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_prepared_stmt_count",
+                "Description": "Used if the potential for denial-of-service attacks based on running the server out of memory by preparing huge numbers of statements.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1048576",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_relay_log_size",
+                "ParameterValue": "0",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1073741824",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_seeks_for_key",
+                "Description": "A low value can force MySQL to prefer indexes instead of table scans.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_sort_length",
+                "Description": "The number of bytes to use when sorting BLOB or TEXT values.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4-8388608",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_sp_recursion_depth",
+                "Description": "Limits the number of times a stored procedure can be called recursively minimizing the demand on thread stack space.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-255",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_user_connections",
+                "Description": "Maximum number of simultaneous connections allowed to any given MySQL account. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "max_write_lock_count",
+                "Description": "After this many write locks, allow some pending read lock requests to be processed in between.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "mecab_rc_file",
+                "Description": "Defines the path to the mecabrc configuration file.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "min_examined_row_limit",
+                "Description": "Can be used to cause queries which examine fewer than the stated number of rows not to be logged.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "myisam_data_pointer_size",
+                "Description": "The default pointer size in bytes, to be used by CREATE TABLE for MyISAM tables when no MAX_ROWS option is specified.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "2-7",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "myisam_max_sort_file_size",
+                "Description": "The maximum size of the temporary file that MySQL is allowed to use while re-creating a MyISAM index",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-9223372036853727232",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "myisam_mmap_size",
+                "Description": "Maximum amount of memory to use for memory mapping compressed MyISAM files",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "7-922337203685477807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "myisam_repair_threads",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-18446744073709551615",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "myisam_sort_buffer_size",
+                "Description": "Size of the buffer that is allocated when sorting MyISAM indexes during a REPAIR TABLE or when creating indexes with CREATE INDEX or ALTER TABLE.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4-9223372036854775807",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "Marker": "bXlpc2FtX3NvcnRfYnVmZmVyX3NpemU=",
+        "ResponseMetadata": {}
+    }
+}

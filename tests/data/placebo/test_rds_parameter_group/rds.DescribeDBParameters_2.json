@@ -1,0 +1,1021 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "innodb_autoextend_increment",
+                "Description": "The increment size (in MB) for extending the size of an auto-extending tablespace file when it becomes full",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_autoinc_lock_mode",
+                "Description": "The locking mode to use for generating auto-increment values",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_chunk_size",
+                "Description": "Defines the chunk size for online InnoDB buffer pool resizing operations.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1048576-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_dump_at_shutdown",
+                "Description": "Specifies whether to record the pages cached in the InnoDB buffer pool when the MySQL server is shut down.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_dump_now",
+                "Description": "Immediately records the pages cached in the InnoDB buffer pool.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_dump_pct",
+                "Description": "Specifies the percentage of the most recently used pages for each buffer pool to read out and dump.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_filename",
+                "Description": "Specifies the file that holds the list of page numbers produced by innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_instances",
+                "Description": "The number of regions that the InnoDB buffer pool is divided into",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_abort",
+                "Description": "Interrupts the process of restoring InnoDB buffer pool contents triggered by innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_at_startup",
+                "Description": "Specifies that, on MySQL server startup, the InnoDB buffer pool is automatically warmed up by loading the same pages it held at an earlier time.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_load_now",
+                "Description": "Immediately warms up the InnoDB buffer pool by loading a set of data pages, without waiting for a server restart. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_buffer_pool_size",
+                "ParameterValue": "{DBInstanceClassMemory*3/4}",
+                "Description": "The size in bytes of the memory buffer innodb uses to cache data and indexes of its tables",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "5242880-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_change_buffering",
+                "Description": "Controls InnoDB change buffering",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "inserts,deletes,purges,changes,all,none",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_change_buffer_max_size",
+                "Description": "Maximum size for the InnoDB change buffer, as a percentage of the total size of the buffer pool.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-50",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_checkpoint_disabled",
+                "Description": "This is a debug option that is only intended for expert debugging use. It disables checkpoints so that a deliberate server exit always initiates InnoDB recovery.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_checksum_algorithm",
+                "Description": "Specifies how to generate and verify the checksum stored in each disk block of each InnoDB tablespace.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "crc32,innodb,none,strict_crc32,strict_innodb,strict_none",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_cmp_per_index_enabled",
+                "Description": "Enables per-index compression-related statistics in the INFORMATION_SCHEMA.INNODB_CMP_PER_INDEX table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_commit_concurrency",
+                "Description": "The number of threads that can commit at the same time.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-1000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_compression_failure_threshold_pct",
+                "Description": "Sets the cutoff point at which MySQL begins adding padding within compressed pages to avoid expensive compression failures.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_compression_level",
+                "Description": "Sets the cutoff point at which MySQL begins adding padding within compressed pages to avoid expensive compression failures.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-9",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_compression_pad_pct_max",
+                "Description": "Specifies the maximum percentage that can be reserved as free space within each compressed page, allowing room to reorganize the data and modification log within the page when a compressed table or index is updated and the data might be recompressed.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-75",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_concurrency_tickets",
+                "Description": "Number of times a thread can enter and leave Innodb before it is subject to innodb-thread-concurrency",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_data_file_path",
+                "ParameterValue": "ibdata1:12M:autoextend",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_data_home_dir",
+                "ParameterValue": "/rdsdbdata/db/innodb",
+                "Description": "Directory where innodb files are stored",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ddl_log_crash_reset_debug",
+                "Description": "Enable this debug option to reset DDL log crash injection counters to 1.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_deadlock_detect",
+                "Description": "This option is used to disable deadlock detection.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_dedicated_server",
+                "Description": "Automatically scale innodb_buffer_pool_size and innodb_log_file_size based on system memory. Also set innodb_flush_method=O_DIRECT_NO_FSYNC, if supported.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_default_row_format",
+                "Description": "Defines the default row format for InnoDB tables (including user-created InnoDB temporary tables).",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "DYNAMIC,COMPACT,REDUNDANT",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_directories",
+                "Description": "Defines directories to scan at startup for tablespace files.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_disable_sort_file_cache",
+                "Description": "If enabled, this variable disables the operating system file system cache for merge-sort temporary files.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_doublewrite",
+                "ParameterValue": "1",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_doublewrite_batch_size",
+                "ParameterValue": "16",
+                "Description": "Defines the number of doublewrite pages to write in a batch.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-256",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.20",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_doublewrite_files",
+                "Description": "Defines the number of doublewrite files.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "2-256",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.20",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_doublewrite_pages",
+                "ParameterValue": "32",
+                "Description": "Defines the maximum number of doublewrite pages per thread for a batch write. If no value is specified, innodb_doublewrite_pages is set to the innodb_write_io_threads value.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-512",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.20",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_fast_shutdown",
+                "Description": "The InnoDB shutdown mode",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0,1,2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_file_per_table",
+                "ParameterValue": "1",
+                "Description": "Use tablespaces or files for Innodb.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_fill_factor",
+                "Description": "Defines the percentage of space on each B-tree page that is filled during a sorted index build, with the remaining space reserved for future index growth.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "10-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flushing_avg_loops",
+                "Description": "Number of iterations for which InnoDB keeps the previously calculated snapshot of the flushing state, controlling how quickly adaptive flushing responds to changing workloads.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-1000",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flush_log_at_timeout",
+                "Description": "Write and flush the logs every N seconds. This setting has an effect only when innodb_flush_log_at_trx_commit has a value of 2.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2700",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flush_log_at_trx_commit",
+                "Description": "Determines Innodb transaction durability",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flush_method",
+                "ParameterValue": "O_DIRECT",
+                "Description": "Determines Innodb flush method",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "O_DIRECT",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flush_neighbors",
+                "Description": "Specifies whether flushing a page from the InnoDB buffer pool also flushes other dirty pages in the same extent.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_flush_sync",
+                "Description": "Ignore the innodb_io_capacity setting to be ignored for bursts of I/O activity that occur at checkpoints.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_force_load_corrupted",
+                "Description": "Lets InnoDB load tables at startup that are marked as corrupted",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_force_recovery",
+                "ParameterValue": "0",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-6",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_aux_table",
+                "Description": "Specifies the qualified name of an InnoDB table containing a FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_cache_size",
+                "Description": "Size of the cache that holds a parsed document in memory while creating an InnoDB FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_enable_diag_print",
+                "Description": "Whether to enable additional full-text search (FTS) diagnostic output.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_enable_stopword",
+                "Description": "Specifies that a set of stopwords is associated with an InnoDB FULLTEXT index at the time the index is created.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_max_token_size",
+                "Description": "Maximum length of words that are stored in an InnoDB FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "10-252",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_min_token_size",
+                "Description": "Minimum length of words that are stored in an InnoDB FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-16",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_num_word_optimize",
+                "Description": "Number of words to process during each OPTIMIZE TABLE operation on an InnoDB FULLTEXT index.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_result_cache_limit",
+                "Description": "The InnoDB FULLTEXT search (FTS) query result cache limit (defined in bytes) per FTS query or per thread.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1000000-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_server_stopword_table",
+                "Description": "Name of the table containing a list of words to ignore when creating an InnoDB FULLTEXT index, in the format db_name/table_name.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_sort_pll_degree",
+                "Description": "Number of threads used in parallel to index and tokenize text in an InnoDB FULLTEXT index, when building a search index for a large table.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-32",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_total_cache_size",
+                "Description": "The total memory allocated, in bytes, for the InnoDB FULLTEXT search index cache for all tables.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "32000000-1600000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_ft_user_stopword_table",
+                "Description": "Name of the table containing a list of words to ignore when creating an InnoDB FULLTEXT index, in the format db_name/table_name.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_io_capacity",
+                "Description": "The maximum number of I/O operations per second that InnoDB will perform.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "100-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_io_capacity_max",
+                "Description": "The limit up to which InnoDB is allowed to extend the innodb_io_capacity setting in case of emergency.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "2000-18446744073709547520",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_lock_wait_timeout",
+                "Description": "Timeout in seconds an innodb transaction may wait for a row lock before giving up",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-1073741824",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_buffer_size",
+                "ParameterValue": "8388608",
+                "Description": "The size in bytes of the buffer that innodb uses to write to the log files on disk",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "262144-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_checksums",
+                "Description": "Enables or disables checksums for redo log pages.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_compressed_pages",
+                "Description": "Specifies whether images of re-compressed pages are stored in InnoDB redo logs. ",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_files_in_group",
+                "ParameterValue": "2",
+                "Description": " ",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "2-100",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_file_size",
+                "ParameterValue": "134217728",
+                "Description": "The size in bytes of each log file in a log group",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "4194304-644160558196",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_group_home_dir",
+                "ParameterValue": "/rdsdbdata/log/innodb",
+                "Description": "The directory path to the innodb log files",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_spin_cpu_abs_lwm",
+                "ParameterValue": "80",
+                "Description": "Defines the minimum amount of CPU usage below which user threads no longer spin while waiting for flushed redo.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_spin_cpu_pct_hwm",
+                "ParameterValue": "50",
+                "Description": "Defines the maximum amount of CPU usage above which user threads no longer spin while waiting for flushed redo.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_wait_for_flush_spin_hwm",
+                "ParameterValue": "400",
+                "Description": "Defines the maximum average log flush time beyond which user threads no longer spin while waiting for flushed redo.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_log_write_ahead_size",
+                "Description": "The write-ahead block size for the redo log, in bytes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "512-16384",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_lru_scan_depth",
+                "Description": "A parameter that influences the algorithms and heuristics for the flush operation for the InnoDB buffer pool.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "100-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_max_dirty_pages_pct",
+                "Description": "Maximum percentage of dirty pages in the buffer pool",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-99",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_max_dirty_pages_pct_lwm",
+                "Description": "Low water mark representing percentage of dirty pages where preflushing is enabled to control the dirty page ratio.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-99.99",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_max_purge_lag",
+                "Description": "Controls how to delay INSERT, UPDATE, and DELETE operations when purge operations are lagging",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_max_purge_lag_delay",
+                "Description": "Specifies the maximum delay in milliseconds for the delay imposed by the innodb_max_purge_lag configuration option",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_max_undo_log_size",
+                "Description": "Defines a threshold size for undo tablespaces.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "10485760-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_monitor_disable",
+                "Description": "Turns off one or more counters in the information_schema.innodb_metrics table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_monitor_enable",
+                "Description": "Turns on one or more counters in the information_schema.innodb_metrics table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_monitor_reset",
+                "Description": "Resets to zero the count value for one or more counters in the information_schema.innodb_metrics table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_monitor_reset_all",
+                "Description": "Resets all values (minimum, maximum, and so on) for one or more counters in the information_schema.innodb_metrics table.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_old_blocks_pct",
+                "Description": "Specifies the approximate percentage of the InnoDB buffer pool used for the old block sublist.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "5-95",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_old_blocks_time",
+                "Description": "Specifies how long in milliseconds (ms) a block inserted into the old sublist must stay there after its first access before it can be moved to the new sublist.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_online_alter_log_max_size",
+                "Description": "Specifies an upper limit on the size of the temporary log files used during online DDL operations for InnoDB tables.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "65536-18446744073709551615",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_open_files",
+                "Description": "Relevant only if you use multiple tablespaces in innodb. It specifies the maximum number of .ibd files that innodb can keep open at one time",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1,10-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_optimize_fulltext_only",
+                "Description": "Changes the way the OPTIMIZE TABLE statement operates on InnoDB tables.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_page_cleaners",
+                "Description": "The number of page cleaner threads that flush dirty pages from buffer pool instances.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_page_size",
+                "Description": "Specifies the page size for all InnoDB tablespaces in a MySQL instance.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_parallel_read_threads",
+                "Description": "Defines the number of threads that can be used for parallel clustered index reads.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-256",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.15",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_print_all_deadlocks",
+                "Description": "When this option is enabled, information about all deadlocks in InnoDB user transactions is recorded in the mysqld error log.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_print_ddl_logs",
+                "ParameterValue": "0",
+                "Description": "Enabling this option causes MySQL to write DDL logs to stderr.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_purge_batch_size",
+                "Description": "The granularity of changes, expressed in units of redo log records, that trigger a purge operation, flushing the changed buffer pool blocks to disk",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-5000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_purge_rseg_truncate_frequency",
+                "Description": "Defines the frequency with which the purge system frees rollback segments.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-128",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_purge_threads",
+                "ParameterValue": "1",
+                "Description": "The number of background threads devoted to the InnoDB purge operation",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-32",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_random_read_ahead",
+                "Description": "Enables or disables Innodb Random Read Ahead",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_read_ahead_threshold",
+                "Description": "Controls the sensitivity of linear read-ahead that InnoDB uses to prefetch pages into the buffer cache.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_read_io_threads",
+                "Description": "The number of I/O threads for read operations in InnoDB.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-64",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_read_only",
+                "Description": "Starts the server in read-only mode.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_redo_log_capacity",
+                "ParameterValue": "2147483648",
+                "Description": "Defines the amount of disk space occupied by redo log files.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "8388608-644160558196",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "8.0.30",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_redo_log_encrypt",
+                "ParameterValue": "0",
+                "Description": "Controls encryption of redo log data for tables encrypted using the InnoDB tablespace encryption feature.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "innodb_replication_delay",
+                "Description": "The replication thread delay (in ms) on a slave server if innodb_thread_concurrency is reached.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-4294967295",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "Marker": "aW5ub2RiX3JlcGxpY2F0aW9uX2RlbGF5",
+        "ResponseMetadata": {}
+    }
+}
