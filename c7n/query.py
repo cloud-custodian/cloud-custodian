@@ -100,6 +100,9 @@ class ResourceQuery:
             # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, str), resources)):
                 resources = [r for r in resources if r in identities]
+            # This logic should fix https://github.com/cloud-custodian/cloud-custodian/issues/7573
+            elif all(map(lambda r: isinstance(r, tuple), resources)):
+                resources = [(p, r) for p, r in resources if r[m.id] in identities]
             else:
                 resources = [r for r in resources if r[m.id] in identities]
 

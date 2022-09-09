@@ -10,7 +10,9 @@ class CVM(QueryResourceManager):
     """CVM"""
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+        id = "InstanceId"
         endpoint = "cvm.tencentcloudapi.com"
         service = "cvm"
         version = "2017-03-12"
         enum_spec = ("DescribeInstances", "Response.InstanceSet[]", None)
+        resource_preifx = "instance"
