@@ -979,7 +979,7 @@ class ReservedNode(QueryResourceManager):
         filter_type = 'list'
         arn_type = "reserved-nodes"
         permissions_enum = ('redshift:DescribeReservedNodes',)
-    
+
 
 @Redshift.filter_registry.register('consecutive-snapshots')
 class ClusterConsecutiveSnapshots(Filter):

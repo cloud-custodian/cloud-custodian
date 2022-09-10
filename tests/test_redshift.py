@@ -430,6 +430,7 @@ class TestRedshift(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+
 class TestRedshiftSnapshot(BaseTest):
 
     def test_redshift_snapshot_simple(self):

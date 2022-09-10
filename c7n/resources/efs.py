@@ -8,9 +8,8 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource, RetryPageIterator
-)
+from c7n.query import (QueryResourceManager, ChildResourceManager,
+    TypeInfo, DescribeSource, ConfigSource, RetryPageIterator)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry, chunks
 from .aws import shape_validate
@@ -328,12 +327,11 @@ class EfsConsecutiveSnapshots(Filter):
     permissions = ('elasticfilesystem:DescribeFileSystems', 'backup:ListBackupJobs', )
     annotation = 'c7n:EfsSnapshots'
 
-    def process_resource_set(self, resources, lbdate):
-        client = local_session(self.manager.session_factory).client('backup')
+    def process_resource_set(self, client, resources, lbdate):
         paginator = client.get_paginator('list_backup_jobs')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        efs_snapshots = paginator.paginate(ByResourceType='EFS', ByCreatedAfter=lbdate).build_full_result().get(
-            'BackupJobs', [])
+        efs_snapshots = paginator.paginate(
+            ByResourceType='EFS', ByCreatedAfter=lbdate).build_full_result().get('BackupJobs', [])
 
         efs_map = {}
         for snap in efs_snapshots:
@@ -342,7 +340,7 @@ class EfsConsecutiveSnapshots(Filter):
             r[self.annotation] = efs_map.get(r['FileSystemArn'], [])
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('efs')
+        client = local_session(self.manager.session_factory).client('backup')
         results = []
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
@@ -353,7 +351,7 @@ class EfsConsecutiveSnapshots(Filter):
 
         for resource_set in chunks(
                 [r for r in resources if self.annotation not in r], 50):
-            self.process_resource_set(resource_set, lbdate)
+            self.process_resource_set(client, resource_set, lbdate)
 
         for r in resources:
             snapshot_dates = set()
