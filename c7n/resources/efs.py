@@ -9,11 +9,12 @@ from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
+    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource, RetryPageIterator
 )
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, chunks
 from .aws import shape_validate
+from datetime import datetime, timedelta
 
 
 class EFSDescribe(DescribeSource):
@@ -303,4 +304,62 @@ class CheckSecureTransport(Filter):
         self.log.info(
             "%d of %d EFS policies don't enforce secure transport",
             len(results), len(resources))
+        return results
+
+
+@ElasticFileSystem.filter_registry.register('consecutive-snapshots')
+class EfsConsecutiveSnapshots(Filter):
+    """Returns filesystems where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: efs-daily-snapshot-count
+                resource: efs
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('elasticfilesystem:DescribeFileSystems', 'backup:ListBackupJobs', )
+    annotation = 'c7n:EfsSnapshots'
+
+    def process_resource_set(self, resources, lbdate):
+        client = local_session(self.manager.session_factory).client('backup')
+        paginator = client.get_paginator('list_backup_jobs')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        efs_snapshots = paginator.paginate(ByResourceType='EFS', ByCreatedAfter=lbdate).build_full_result().get(
+            'BackupJobs', [])
+
+        efs_map = {}
+        for snap in efs_snapshots:
+            efs_map.setdefault(snap['ResourceArn'], []).append(snap)
+        for r in resources:
+            r[self.annotation] = efs_map.get(r['FileSystemArn'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('efs')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        lbdate = utcnow - timedelta(days=retention)
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(resource_set, lbdate)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['State'] == 'COMPLETED':
+                    snapshot_dates.add(snapshot['CompletionDate'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
         return results

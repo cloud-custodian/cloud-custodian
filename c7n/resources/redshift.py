@@ -10,17 +10,18 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter)
+    ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter, Filter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
 from .aws import shape_validate
+from datetime import datetime, timedelta
 
 
 @resources.register('redshift')
@@ -978,3 +979,60 @@ class ReservedNode(QueryResourceManager):
         filter_type = 'list'
         arn_type = "reserved-nodes"
         permissions_enum = ('redshift:DescribeReservedNodes',)
+    
+
+@Redshift.filter_registry.register('consecutive-snapshots')
+class ClusterConsecutiveSnapshots(Filter):
+    """Returns Clusters where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: redshift-daily-snapshot-count
+                resource: redshift
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('redshift:DescribeClusterSnapshots', 'redshift:DescribeClusters', )
+    annotation = 'c7n:RedshiftSnapshots'
+
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('describe_cluster_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        rs_snapshots = paginator.paginate(EndTime=lbdate).build_full_result().get(
+            'Snapshots', [])
+
+        cluster_map = {}
+        for snap in rs_snapshots:
+            cluster_map.setdefault(snap['ClusterIdentifier'], []).append(snap)
+        for r in resources:
+            r[self.annotation] = cluster_map.get(r['ClusterIdentifier'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('redshift')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        lbdate = utcnow - timedelta(days=retention)
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set, lbdate)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results
