@@ -1634,8 +1634,8 @@ class ParameterFilter(ValueFilter):
 
         return ret_val
 
-    # Creating private method, as paginator parameter 'DBParameterGroupName' is specific to rds resource
-    def _get_para_list(self,pg):
+    # Private method for 'DBParameterGroupName' paginator
+    def _get_para_list(self, pg):
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_parameters')
         param_list = list(itertools.chain(*[p['Parameters']
@@ -1643,7 +1643,7 @@ class ParameterFilter(ValueFilter):
         return param_list
 
     # Making class more re-usable
-    def cache_param_groups(self,param_groups):
+    def cache_param_groups(self, param_groups):
         for pg in param_groups:
             cache_key = {
                 'region': self.manager.config.region,
@@ -1661,7 +1661,7 @@ class ParameterFilter(ValueFilter):
 
     def process(self, resources, event=None):
         results = []
-        parameter_group_list ={db['DBParameterGroups'][0]['DBParameterGroupName']
+        parameter_group_list = {db['DBParameterGroups'][0]['DBParameterGroupName']
                     for db in resources}
         self.cache_param_groups(parameter_group_list)
         for resource in resources:
@@ -1673,7 +1673,6 @@ class ParameterFilter(ValueFilter):
                     results.append(resource)
                     break
         return results
-
 
 
 @actions.register('modify-db')

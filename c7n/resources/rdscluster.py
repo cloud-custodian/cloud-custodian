@@ -683,7 +683,7 @@ class ClusterParameterFilter(ParameterFilter):
     policy_annotation = 'c7n:MatchedDBClusterParameter'
     paramcache = {}
 
-    def _get_para_list(self,pg):
+    def _get_para_list(self, pg):
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_cluster_parameters')
         param_list = list(itertools.chain(*[p['Parameters']

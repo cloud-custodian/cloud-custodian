@@ -698,4 +698,3 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
         )
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 1)
-
