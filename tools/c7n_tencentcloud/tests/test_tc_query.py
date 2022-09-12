@@ -1,161 +1,65 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from copy import deepcopy
-import jmespath
 import pytest
-from c7n.query import sources
-from c7n_tencentcloud.query import (ResourceTypeInfo, ResourceQuery,
-                                    DescribeSource, QueryResourceManager)
+from c7n_tencentcloud.query import ResourceTypeInfo, ResourceQuery, QueryResourceManager
+from c7n_tencentcloud.utils import PageMethod
 
 
-def test_resource_type():
-    service_data = "Foo"
-    version_data = "2022-01-01"
-
-    class Foo(ResourceTypeInfo):
-        service = service_data
-        version = version_data
-
-    expected = f"<Type info service:{service_data} client:{version_data}>"
-    assert repr(Foo) == expected
-
-
-class ResourceType_1(ResourceTypeInfo):
-    id: str = "id"
-    endpoint: str = "endpoint_1"
-    service: str = "service_1"
-    version: str = "version_1"
-    enum_spec = ("action_1", "Response.data", None)
+class RegionInfo(ResourceTypeInfo):
+    """RegionInfo"""
+    id = "InstanceId"
+    endpoint = "cvm.tencentcloudapi.com"
+    service = "cvm"
+    version = "2017-03-12"
+    enum_spec = ("DescribeRegions", "Response.RegionSet[]", {})
+    metrics_instance_id_name = "InstanceId"
+    resource_preifx = "instance"
+    taggable = True
 
 
-class ResourceType_2(ResourceTypeInfo):
-    id: str = "id"
-    endpoint: str = "endpoint_2"
-    service: str = "service_2"
-    version: str = "version_2"
-    enum_spec = ("action_2", "Response.data[]", {"Limit": 10})
+class CVMInfo(ResourceTypeInfo):
+    """CVMInfo"""
+    id = "InstanceId"
+    endpoint = "cvm.tencentcloudapi.com"
+    service = "cvm"
+    version = "2017-03-12"
+    enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
+    metrics_instance_id_name = "InstanceId"
+    paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+    resource_preifx = "instance"
+    taggable = True
 
 
-response = {
-    "action_1": {
-        "Response": {
-            "data": [{
-                "id": "id_1",
-                "type": "cvm"
-            }],
-            "ResourceTagMappingList": [
-                {"Tags": [{
-                    "TagKey": "key1",
-                    "TagValue": "tag_value"
-                }]}
-            ]
-        }
-    },
-    "action_2": {
-        "Response": {
-            "data": [
-                {
-                    "id": "id_2",
-                    "type": "cvm"
-                },
-                {
-                    "id": "id_3",
-                    "type": "cvm"
-                }
-            ],
-            "ResourceTagMappingList": [
-                {"Tags": [{
-                    "TagKey": "key2",
-                    "TagValue": "tag_value"
-                }]}
-            ]
-        }
-    }
-}
+class CVMInfoNoPagination(ResourceTypeInfo):
+    """CVMInfo"""
+    id = "InstanceId"
+    endpoint = "cvm.tencentcloudapi.com"
+    service = "cvm"
+    version = "2017-03-12"
+    enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
+    metrics_instance_id_name = "InstanceId"
+    resource_preifx = "instance"
+    taggable = True
 
 
-# (resource_type, response_data, expected_params, expected_return_value,
-# TestQueryMananger:expected_return_valu)
-resource_query_test_cases = [
-    (
-        ResourceType_1,
-        response[ResourceType_1.enum_spec[0]],
-        {},
-        response[ResourceType_1.enum_spec[0]]["Response"]["data"],
-        [{"id": "id_1", "type": "cvm", "Tags": [{"Key": "key1", "Value": "tag_value"}]}]
-    ),
-    (
-        ResourceType_2,
-        response[ResourceType_2.enum_spec[0]],
-        {"Limit": 10},
-        response[ResourceType_2.enum_spec[0]]["Response"]["data"],
-        [
-            {"id": "id_2", "type": "cvm", "Tags": [{"Key": "key2", "Value": "tag_value"}]},
-            {"id": "id_3", "type": "cvm", "Tags": [{"Key": "key2", "Value": "tag_value"}]}
-        ]
-    )
-]
+def test_meta_str():
+    assert str(RegionInfo) == "<Type info service:cvm client:2017-03-12>"
+    assert str(CVMInfo) == "<Type info service:cvm client:2017-03-12>"
 
 
-@pytest.fixture()
-def session():
-    class Client:
-        def __init__(self) -> None:
-            self.test_case = None
-            self.check_params_flag = True
+class TestResourcetQuery:
+    @pytest.mark.vcr
+    def test_filter(self, session):
+        resource_query = ResourceQuery(session)
+        res = resource_query.filter("ap-singapore", RegionInfo, {})
+        assert len(res) == 41
 
-        def set_test_case(self, test_case):
-            self.test_case = test_case
-
-        def set_check_params_flag(self, flag):
-            self.check_params_flag = flag
-
-        def execute_query(self, action, params):
-            if self.check_params_flag and params != self.test_case[2]:
-                raise Exception(f"wrong params, {params} != {self.test_case[2]}")
-            return deepcopy(self.test_case[1])
-
-        def execute_paged_query(self, action, params, jsonpath, paging_def):
-            if self.check_params_flag and params != self.test_case[2]:
-                raise Exception("wrong params")
-            return deepcopy(jmespath.search(jsonpath, self.test_case[1]))
-
-    class Sesion:
-        def __init__(self) -> None:
-            self._cli = Client()
-
-        def client(self, *args, **kwargs):
-            return self._cli
-
-    return Sesion()
-
-
-@pytest.fixture(params=resource_query_test_cases)
-def test_case(request):
-    return request.param
-
-
-def test_resource_query_filter(session, test_case):
-    client = session.client()
-    client.set_test_case(test_case)
-
-    resource_query = ResourceQuery(session)
-    res = resource_query.filter("ap-shanghai", test_case[0], {})
-    assert res == test_case[3]
-
-
-def test_resource_query_paged_filter(session, test_case):
-    client = session.client()
-    client.set_test_case(test_case)
-
-    resource_query = ResourceQuery(session)
-    res = resource_query.paged_filter("ap-shanghai", test_case[0], {})
-    assert res == test_case[3]
-
-
-def source_get(*args):
-    return DescribeSource
+    @pytest.mark.vcr
+    def test_paged_filter(self, session):
+        resource_query = ResourceQuery(session)
+        res = resource_query.paged_filter("ap-singapore", CVMInfo, {})
+        assert len(res) == 40
 
 
 # (data, expected_query_params)
@@ -171,23 +75,25 @@ def data_test_case(request):
 
 
 class TestQueryResourceManager:
-    def test_get_permissions(self, ctx, monkeypatch):
-        monkeypatch.setattr(sources, "get", source_get)
+    def test_get_permissions(self, ctx):
         resource_manager = QueryResourceManager(ctx, {})
         assert resource_manager.get_permissions() == []
 
-    def test_get_resource_query_params(self, ctx, data_test_case, monkeypatch):
-        monkeypatch.setattr(sources, "get", source_get)
+    def test_get_resource_query_params(self, ctx, data_test_case):
         resource_manager = QueryResourceManager(ctx, data_test_case[0])
         res = resource_manager.get_resource_query_params()
         assert res == data_test_case[1]
 
-    def test_resources(self, ctx, session, test_case, monkeypatch):
-        client = session.client()
-        client.set_test_case(test_case)
-        client.set_check_params_flag(False)
-        monkeypatch.setattr(sources, "get", source_get)
-        monkeypatch.setattr(QueryResourceManager, "resource_type", test_case[0])
+    @pytest.mark.vcr
+    def test_resources(self, ctx, monkeypatch):
+        monkeypatch.setattr(QueryResourceManager, "resource_type", CVMInfo)
         resource_manager = QueryResourceManager(ctx, {})
         res = resource_manager.resources()
-        assert res == test_case[4]
+        assert len(res) == 40
+
+    @pytest.mark.vcr
+    def test_resources_no_pagination(self, ctx, monkeypatch):
+        monkeypatch.setattr(QueryResourceManager, "resource_type", CVMInfoNoPagination)
+        resource_manager = QueryResourceManager(ctx, {})
+        res = resource_manager.resources()
+        assert len(res) == 20
