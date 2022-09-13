@@ -12,7 +12,10 @@ from c7n.tags import (
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from datetime import datetime, timedelta
+from c7n.filters import Filter
 from c7n.filters import ValueFilter
+from c7n.query import RetryPageIterator
 
 
 class ConfigTable(query.ConfigSource):
@@ -666,3 +669,61 @@ class DaxSubnetFilter(SubnetFilter):
         subnet_groups = client.describe_subnet_groups()['SubnetGroups']
         self.groups = {s['SubnetGroupName']: s for s in subnet_groups}
         return super(DaxSubnetFilter, self).process(resources)
+
+
+@Table.filter_registry.register('consecutive-backups')
+class TableConsecutiveBackups(Filter):
+    """Returns tables where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-daily-backup-count
+                resource: dynamodb-table
+                filters:
+                  - type: consecutive-backups
+                    days: 7
+    """
+    schema = type_schema('consecutive-backups', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable', )
+    annotation = 'c7n:DynamodbBackups'
+
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('list_backups')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ddb_backups = paginator.paginate(
+            BackupType='ALL', TimeRangeLowerBound=lbdate).build_full_result().get(
+                'BackupSummaries', [])
+
+        table_map = {}
+        for backup in ddb_backups:
+            table_map.setdefault(backup['TableName'], []).append(backup)
+        for r in resources:
+            r[self.annotation] = table_map.get(r['TableName'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        lbdate = utcnow - timedelta(days=retention)
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set, lbdate)
+
+        for r in resources:
+            backup_dates = set()
+            for backup in r[self.annotation]:
+                if backup['BackupStatus'] == 'AVAILABLE':
+                    backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(backup_dates):
+                results.append(r)
+        return results

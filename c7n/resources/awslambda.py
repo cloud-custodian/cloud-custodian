@@ -17,8 +17,8 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date
-
+from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry
+from botocore.config import Config
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
@@ -253,6 +253,64 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.action_registry.register('set-xray-tracing')
+class LambdaEnableXrayTracing(Action):
+    """
+        This action allows for enable Xray tracing to Active
+       :example:
+       .. code-block:: yaml
+           actions:
+             - type: enable-xray-tracing
+    """
+
+    schema = type_schema(
+        'set-xray-tracing',
+        **{'state': {'default': True, 'type': 'boolean'}}
+    )
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def get_mode_val(self, state):
+        if state:
+            return "Active"
+        return "PassThrough"
+
+    def process(self, resources):
+        """
+            Enables the Xray Tracing for the function.
+
+            Args:
+                resources: AWS lamdba resources
+            Returns:
+                None
+        """
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('lambda', config=config)
+        updateState = self.data.get('state', True)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        mode = self.get_mode_val(updateState)
+        for resource in resources:
+            state = bool(resource["TracingConfig"]["Mode"] == "Active")
+            if updateState != state:
+                function_name = resource["FunctionName"]
+                self.log.info(f"Set Xray tracing to {mode} for lambda {function_name}")
+                try:
+                    retry(
+                        client.update_function_configuration,
+                        FunctionName=function_name,
+                        TracingConfig={
+                            'Mode': mode
+                        }
+                    )
+                except client.exceptions.ResourceNotFoundException:
+                    continue
 
 
 @AWSLambda.action_registry.register('post-finding')
