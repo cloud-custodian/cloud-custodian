@@ -9,6 +9,8 @@ on:
       - 0.*
 jobs:
   Publish:
+    permissions:
+      id-token: write
     strategy:
       matrix:
         image:
