@@ -339,6 +339,28 @@ class BucketEncryption(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_s3_filter_bucket_encryption_disabled_malformed_statement(self):
+        bname = "xcc-services-alb-access-logs-prod-eu-central-1"
+        self.patch(s3.S3, "executor-factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+
+        session_factory = self.replay_flight_data(
+            "test_s3_filter_bucket_encryption_disabled_malformed_statement"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "s3-disabled-encryption-malformed-statement",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname}, {"type": "bucket-encryption", "state": False}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_s3_bucket_encryption_bucket_key(self):
         session_factory = self.replay_flight_data("test_s3_bucket_encryption_bucket_key")
 
@@ -1595,6 +1617,40 @@ class S3Test(BaseTest):
                             {
                                 "Effect": "Deny",
                                 "Action": "s3:PutObject",
+                                "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
+                            }
+                        ],
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_has_statement_policy_action_star(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, "executor_factory", MainThreadExecutor
+        )
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        session_factory = self.replay_flight_data("test_s3_has_statement")
+        bname = "custodian-policy-test1"
+        p = self.load_policy(
+            {
+                "name": "s3-has-policy",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
                                 "Principal": "*",
                                 "Resource": "arn:aws:s3:::{bucket_name}/*"
                             }
@@ -3863,9 +3919,11 @@ class TestBucketOwnership:
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
 
-    def test_s3_access_analyzer_filter_with_no_results(self, test):
-        factory = test.replay_flight_data("test_s3_iam_analyzers")
+    def test_s3_access_analyzer_filter_with_no_results(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
         test.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
         p = test.load_policy({
             'name': 'check-s3',
             'resource': 'aws.s3',

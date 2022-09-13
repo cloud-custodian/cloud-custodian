@@ -189,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy', })
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -248,6 +248,20 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2022
+            'AwsCloudFormationStack',
+            'AwsWafRegionalRule',
+            'AwsWafRule',
+            'AwsWafRuleGroup',
+            'AwsKinesisStream',
+            'AwsWafRegionalRuleGroup',
+            'AwsEc2VpcPeeringConnection',
+            'AwsWafRegionalWebAcl',
+            'AwsCloudWatchAlarm',
+            'AwsEfsAccessPoint',
+            'AwsEc2TransitGateway',
+            'AwsEcsContainer',
+            'AwsEcsTask',
             # q2 2022
             'AwsRdsDbSecurityGroup',
             # q1 2022
@@ -365,7 +379,16 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
             'AWS::WAFv2::WebACL',
-            'AWS::XRay::EncryptionConfig'
+            'AWS::XRay::EncryptionConfig',
+            'AWS::ElasticLoadBalancingV2::Listener',
+            'AWS::AccessAnalyzer::Analyzer',
+            'AWS::WorkSpaces::ConnectionAlias',
+            'AWS::DMS::ReplicationSubnetGroup',
+            'AWS::StepFunctions::Activity',
+            'AWS::Route53Resolver::ResolverEndpoint',
+            'AWS::Route53Resolver::ResolverRule',
+            'AWS::Route53Resolver::ResolverRuleAssociation',
+            'AWS::DMS::EventSubscription',
         }
 
         resource_map = {}
@@ -1435,10 +1458,60 @@ class ConfigModeTest(BaseTest):
         requests = []
 
         def record_requests(Evaluations, ResultToken):
-            requests.append(Evaluations)
+            requests.extend(Evaluations)
+
+        mocked_evaluations = {
+            'EvaluationResults': [
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev1'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is compliant with policy:kin-poll.',
+                },
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev2'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'NON_COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is not compliant with policy:kin-poll.',
+                },
+                {
+                    'EvaluationResultIdentifier': {
+                        'EvaluationResultQualifier': {
+                            'ConfigRuleName': 'kin-poll',
+                            'ResourceType': 'AWS::Kinesis::Stream',
+                            'ResourceId': 'dev3'
+                        },
+                        'OrderingTimestamp': datetime(2015, 1, 1)
+                    },
+                    'ComplianceType': 'NON_COMPLIANT',
+                    'ResultRecordedTime': datetime(2015, 1, 1),
+                    'ConfigRuleInvokedTime': datetime(2015, 1, 1),
+                    'Annotation': 'The resource is not compliant with policy:kin-poll.',
+                },
+            ]
+        }
 
         cmock.put_evaluations.side_effect = record_requests
         cmock.put_evaluations.return_value = {}
+        cmock.get_paginator.return_value.paginate.return_value.build_full_result.return_value = \
+            mocked_evaluations
+
         self.patch(
             ConfigPollRuleMode, '_get_client', lambda self: cmock)
         self.patch(
@@ -1459,16 +1532,21 @@ class ConfigModeTest(BaseTest):
         self.assertEqual(results, ['dev2'])
         self.assertEqual(
             requests,
-            [[{'Annotation': 'The resource is not compliant with policy:kin-poll.',
-               'ComplianceResourceId': 'dev2',
-               'ComplianceResourceType': 'AWS::Kinesis::Stream',
-               'ComplianceType': 'NON_COMPLIANT',
-               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}],
-             [{'Annotation': 'The resource is compliant with policy:kin-poll.',
-               'ComplianceResourceId': 'dev1',
-               'ComplianceResourceType': 'AWS::Kinesis::Stream',
-               'ComplianceType': 'COMPLIANT',
-               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
+            [{'Annotation': 'The resource is not compliant with policy:kin-poll.',
+              'ComplianceResourceId': 'dev2',
+              'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceType': 'NON_COMPLIANT',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'},
+             {'Annotation': 'The resource is compliant with policy:kin-poll.',
+              'ComplianceResourceId': 'dev1',
+              'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceType': 'COMPLIANT',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'},
+             {'ComplianceResourceType': 'AWS::Kinesis::Stream',
+              'ComplianceResourceId': 'dev3',
+              'Annotation': 'The rule does not apply.',
+              'ComplianceType': 'NOT_APPLICABLE',
+              'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}])
 
     related_resource_policy = {
         "name": "vpc-flow-logs",

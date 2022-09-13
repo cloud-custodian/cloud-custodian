@@ -180,7 +180,20 @@ class VpcFilter(net_filters.VpcFilter):
 
 @AppELB.filter_registry.register('waf-enabled')
 class WafEnabled(Filter):
+    """Filter Application LoadBalancer by waf-regional web-acl
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-elb-waf-regional
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
     schema = type_schema(
         'waf-enabled', **{
             'web-acl': {'type': 'string'},
@@ -240,6 +253,20 @@ class WafEnabled(Filter):
 
 @AppELB.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(Filter):
+    """Filter Application LoadBalancer by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-wafv2-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+    """
 
     schema = type_schema(
         'wafv2-enabled', **{
@@ -276,29 +303,53 @@ class WafV2Enabled(Filter):
         for r in resources:
             arn = r[arn_key]
             if arn in resource_map:
-                # NLB doesn't support WAF. So, skip NLB resources
-                if r['Type'] == 'network':
-                    continue
-                r['c7n_webacl'] = resource_map[arn]
-                if not target_acl:
-                    state_map[arn] = True
-                    continue
-                r_acl = resource_map[arn]
-                if r_acl == target_acl_id:
-                    state_map[arn] = True
-                    continue
-                state_map[arn] = False
+                # NLB & GLB doesn't support WAF. So, skip such resources
+                if r['Type'] == 'application':
+                    r['c7n_webacl'] = resource_map[arn]
+                    if not target_acl:
+                        state_map[arn] = True
+                        continue
+                    r_acl = resource_map[arn]
+                    if r_acl == target_acl_id:
+                        state_map[arn] = True
+                        continue
+                    state_map[arn] = False
             else:
-                # NLB doesn't support WAF. So, skip NLB resources
-                if r['Type'] == 'network':
-                    continue
-                state_map[arn] = False
+                # NLB & GLB doesn't support WAF. So, skip such resources
+                if r['Type'] == 'application':
+                    state_map[arn] = False
         return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
 
 
 @AppELB.action_registry.register('set-waf')
 class SetWaf(BaseAction):
-    """Enable/Disable waf protection on applicable resource.
+    """Enable wafv2 protection on Application LoadBalancer.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-elb
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+              - name: disassociate-wafv2-associate-waf-regional-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
 
     """
     permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
@@ -312,14 +363,14 @@ class SetWaf(BaseAction):
     def validate(self):
         found = False
         for f in self.manager.iter_filters():
-            if isinstance(f, WafEnabled):
+            if isinstance(f, WafEnabled) or isinstance(f, WafV2Enabled):
                 found = True
                 break
         if not found:
             # try to ensure idempotent usage
             raise PolicyValidationError(
-                "set-waf should be used in conjunction with waf-enabled filter on %s" % (
-                    self.manager.data,))
+                "set-waf should be used in conjunction with waf-enabled or wafv2-enabled \
+                    filter on %s" % (self.manager.data,))
         return self
 
     def process(self, resources):
@@ -350,7 +401,33 @@ class SetWaf(BaseAction):
 
 @AppELB.action_registry.register('set-wafv2')
 class SetWafV2(BaseAction):
-    """Enable/Disable wafv2 protection on applicable resource.
+    """Enable wafv2 protection on Application LoadBalancer.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
+
+              - name: disassociate-waf-regional-associate-wafv2-elb
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
 
     """
     permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
@@ -363,14 +440,14 @@ class SetWafV2(BaseAction):
     def validate(self):
         found = False
         for f in self.manager.iter_filters():
-            if isinstance(f, WafV2Enabled):
+            if isinstance(f, WafV2Enabled) or isinstance(f, WafEnabled):
                 found = True
                 break
         if not found:
             # try to ensure idempotent usage
             raise PolicyValidationError(
-                "set-wafv2 should be used in conjunction with wafv2-enabled filter on %s" % (
-                    self.manager.data,))
+                "set-wafv2 should be used in conjunction with wafv2-enabled or waf-enabled \
+                    filter on %s" % (self.manager.data,))
         return self
 
     def process(self, resources):

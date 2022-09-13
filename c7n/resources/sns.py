@@ -5,6 +5,7 @@ import json
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -75,6 +76,16 @@ class SNSPostFinding(PostFinding):
                 'Owner': r['Owner'],
                 'TopicName': r['TopicArn'].rsplit(':', 1)[-1]}))
         return envelope
+
+
+@SNS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, topic):
+        return {
+            'topic_arn': topic['TopicArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SNS.action_registry.register('tag')

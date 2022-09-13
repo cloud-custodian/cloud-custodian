@@ -1605,20 +1605,25 @@ class CredentialReport(Filter):
         return self.schema['properties'][k]['default']
 
     def get_credential_report(self):
-        report = self.manager._cache.get('iam-credential-report')
-        if report:
-            return report
-        data = self.fetch_credential_report()
-        report = {}
-        if isinstance(data, bytes):
-            reader = csv.reader(io.StringIO(data.decode('utf-8')))
-        else:
-            reader = csv.reader(io.StringIO(data))
-        headers = next(reader)
-        for line in reader:
-            info = dict(zip(headers, line))
-            report[info['user']] = self.process_user_record(info)
-        self.manager._cache.save('iam-credential-report', report)
+        cache = self.manager._cache
+        with cache:
+            cache_key = {'account': self.manager.config.account_id, 'iam-credential-report': True}
+            report = cache.get(cache_key)
+
+            if report:
+                return report
+            data = self.fetch_credential_report()
+            report = {}
+            if isinstance(data, bytes):
+                reader = csv.reader(io.StringIO(data.decode('utf-8')))
+            else:
+                reader = csv.reader(io.StringIO(data))
+            headers = next(reader)
+            for line in reader:
+                info = dict(zip(headers, line))
+                report[info['user']] = self.process_user_record(info)
+            cache.save(cache_key, report)
+
         return report
 
     @classmethod

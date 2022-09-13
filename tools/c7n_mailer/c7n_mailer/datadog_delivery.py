@@ -91,7 +91,7 @@ class DataDogDelivery:
         metric_config_map = []
         if sqs_message and sqs_message.get(
                 'action', False) and sqs_message['action'].get('to', False):
-            for to in sqs_message['action']['to']:
+            for to in sqs_message['action'].get('to', []):
                 if to.startswith('datadog://'):
                     parsed = urlparse(to)
                     metric_config_map.append(dict(parse_qsl(parsed.query)))

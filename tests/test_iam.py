@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import datetime
 import os
 import mock
 import tempfile
@@ -9,8 +8,8 @@ import time
 
 from unittest import TestCase
 from .common import load_data, BaseTest, functional
-from .test_offhours import mock_datetime_now
 
+import freezegun
 import pytest
 from pytest_terraform import terraform
 from dateutil import parser
@@ -120,7 +119,7 @@ class UserCredentialReportTest(BaseTest):
                  'matched': True}]},
             session_factory=factory)
 
-        with mock_datetime_now(parser.parse("2020-01-01"), datetime):
+        with freezegun.freeze_time('2020-01-01'):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
@@ -240,7 +239,7 @@ class UserCredentialReportTest(BaseTest):
             session_factory=session_factory,
             cache=True,
         )
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27"):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted([r["UserName"] for r in resources]), ["kapil"])
@@ -271,7 +270,7 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
 
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27:00+00:00"):
             resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
@@ -561,7 +560,7 @@ class IamRoleTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             p.resource_manager.get_arns(resources),
-            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369'])  # NOQA
 
         self.assertDeprecation(p, """
             policy 'iam-inuse-role'
@@ -1625,60 +1624,6 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
 
 
-class KMSCrossAccount(BaseTest):
-
-    def test_kms_cross_account(self):
-        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_cross_account_kms")
-        client = session_factory().client("kms")
-
-        policy = {
-            "Id": "Lulu",
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "Enable IAM User Permissions",
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
-                    "Action": "kms:*",
-                    "Resource": "*",
-                },
-                {
-                    "Sid": "Enable Cross Account",
-                    "Effect": "Allow",
-                    "Principal": "*",
-                    "Action": "kms:Encrypt",
-                    "Resource": "*",
-                },
-            ],
-        }
-
-        key_info = client.create_key(
-            Policy=json.dumps(policy), Description="test-cross-account-3"
-        )[
-            "KeyMetadata"
-        ]
-
-        # disable and schedule deletion
-        self.addCleanup(
-            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
-        )
-        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
-
-        p = self.load_policy(
-            {
-                "name": "kms-cross",
-                "resource": "kms-key",
-                "filters": [{"KeyState": "Enabled"}, "cross-account"],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
-
-
 class GlacierCrossAccount(BaseTest):
 
     def test_glacier_cross_account(self):
@@ -2000,7 +1945,7 @@ class CrossAccountChecker(TestCase):
             ]
         })
         for p, expected in zip(
-            policies, [False, True, True, False]
+            policies, [False, True, True, False, False, True]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
