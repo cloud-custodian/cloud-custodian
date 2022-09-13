@@ -9,6 +9,10 @@ on:
       - 0.*
 jobs:
   Publish:
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
     strategy:
       matrix:
         image:
