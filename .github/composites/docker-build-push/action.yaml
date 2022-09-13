@@ -6,7 +6,7 @@ inputs:
     required: true
     default: 'cloudcustodian'
   name:
-    description: 'image name, should match dockerfile name'
+    description: 'Image name, should match dockerfile name'
     required: true
   push:
     description: 'Push image: true/false'
@@ -16,7 +16,7 @@ inputs:
     description: "Poetry Version to use"
     default: "1.1.14"
   trivy_version:
-    description: "trivy version to use"
+    description: "Trivy version to use"
     default: "0.5.4"
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
@@ -26,9 +26,11 @@ runs:
   steps:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
+
     - name: Set up Docker Buildx
       id: buildx
       uses: docker/setup-buildx-action@v1
+
     # until we get read only credentials, we'll only login if we're pushing
     # note that we can hit rate limits on pulling though
     - name: Login to Docker Hub
@@ -63,7 +65,7 @@ runs:
         images: |
           ${{ inputs.repository }}/${{ inputs.name }}
         tags: |
-          type=semver,pattern={raw}
+          type=ref,event=tag
           type=raw,value=${{ steps.get_tag.outputs.tag }}
         sep-tags: ','
 
@@ -144,3 +146,22 @@ runs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: "docker/${{ inputs.name }}"
+
+    - name: Install cosign
+      if: "${{ inputs.push == 'true' }}"
+      uses: sigstore/cosign-installer@v2.5.0
+      with:
+        cosign-release: 'v1.11.0'
+
+    - name: Sign
+      if: "${{ inputs.push == 'true' }}"
+      shell: bash
+      env:
+        COSIGN_EXPERIMENTAL: "true"
+        TAGS: ${{ steps.meta.outputs.tags }}
+      run: |
+        tags=(${TAGS//,/ })
+        for i in "${tags[@]}"
+        do
+          cosign sign $i
+        done
