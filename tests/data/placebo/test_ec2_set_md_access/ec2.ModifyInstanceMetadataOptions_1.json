@@ -6,7 +6,8 @@
             "State": "pending",
             "HttpTokens": "required",
             "HttpPutResponseHopLimit": 1,
-            "HttpEndpoint": "enabled"
+            "HttpEndpoint": "enabled",
+            "InstanceMetadataTags": "disabled"
         },
         "ResponseMetadata": {}
     }

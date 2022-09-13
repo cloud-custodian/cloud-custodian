@@ -267,10 +267,12 @@ class TestSetMetadata(BaseTest):
             [{'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
+              'InstanceMetadataTags': 'disabled',
               'State': 'pending'},
              {'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
+              'InstanceMetadataTags': 'disabled',
               'State': 'applied'}])
         self.assertEqual(len(resources), 2)
         self.assertEqual(
