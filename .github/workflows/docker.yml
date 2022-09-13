@@ -12,8 +12,6 @@ jobs:
     permissions:
       id-token: write
     strategy:
-      fail-fast: false
-    strategy:
       matrix:
         image:
           - c7n
