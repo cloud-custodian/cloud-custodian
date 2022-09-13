@@ -36,7 +36,6 @@ class ResourceTypeInfo(metaclass=TypeMeta):
     # enum_spec: ("action", "jsonpath", "extra_params")
     enum_spec = ()
     paging_def: dir = {}  # define how to do paging
-    page_number_path: str = ""
     batch_size: int = 10
 
     # used by metric filter
@@ -225,7 +224,12 @@ class DescribeSource:
         if params is None:
             params = {}
 
-        res = self.query_helper.filter(self.resource_manager.config.region,
+        if self.resource_manager.resource_type.paging_def:
+            res = self.query_helper.paged_filter(self.resource_manager.config.region,
+                                            self.resource_manager.resource_type,
+                                            params)
+        else:
+            res = self.query_helper.filter(self.resource_manager.config.region,
                                        self.resource_manager.resource_type,
                                        params)
         self.augment(res)
@@ -246,7 +250,7 @@ class DescribeSource:
         """
         result = []
         resouce_id = resource[self.resource_type.id]
-        ce6 = self.get_resource6(resouce_id)
+        ce6 = self.get_resource_qcs(resouce_id)
         res = self.query_helper.get_resource_tags(self.region, ce6)
         if res:
             # get the resource's tags
@@ -257,9 +261,9 @@ class DescribeSource:
                 })
         return result
 
-    def get_resource6(self, resource_id):
+    def get_resource_qcs(self, resource_id):
         """
-        get_resource6
+        get_resource_qcs
         resource description https://cloud.tencent.com/document/product/598/10606
         """
         # qcs::${ServiceType}:${Region}:${Account}:${ResourcePreifx}/${ResourceId}

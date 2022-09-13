@@ -16,6 +16,7 @@ pytest = "^7.1.2"
 c7n = {path = "../..", develop = true}
 freezegun = "^1.2.2"
 pytest-cov = "^3.0.0"
+pytest-recording = "^0.12.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

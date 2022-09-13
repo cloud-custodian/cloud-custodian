@@ -18,13 +18,15 @@ class TAG(QueryResourceManager):
         taggable = True
         enum_spec = ("GetResources",
                      "Response.ResourceTagMappingList[]",
-                     {
-                         "PaginationToken": "",
-                         "MaxResults": 20
-                     })
+                     {}
+                     )
         paging_def = {
             "method": PageMethod.PaginationToken,
-            "pagination_token_path": "Response.PaginationToken"
+            "pagination_token_path": "Response.PaginationToken",
+            "limit": {
+                "Key": "MaxResults",
+                "value": 200
+            }
         }
 
     def get_resource_query_params(self):
