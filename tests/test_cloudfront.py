@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 from c7n.resources.aws import shape_validate
 from c7n.utils import local_session
 from unittest.mock import MagicMock
@@ -83,6 +83,48 @@ class CloudFrontWaf(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-active-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "responseElements.distribution.id",
+                    "event": "CreateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True,
+                             "force": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-create-distribution.json"))
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_active_response_tag_resource(self):
+        factory = self.replay_flight_data("test_distribution_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-active-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.resource",
+                    "event": "TagResource"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True,
+                             "force": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
+        self.assertEqual(len(resources), 1)
 
 
 class CloudFront(BaseTest):

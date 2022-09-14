@@ -1,10 +1,12 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # Automatically generated from poetry/pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
 packages = \
-['c7n_mailer', 'c7n_mailer.azure_mailer']
+['c7n_mailer', 'c7n_mailer.azure_mailer', 'c7n_mailer.gcp_mailer']
 
 package_data = \
 {'': ['*'], 'c7n_mailer': ['msg-templates/*']}
@@ -29,7 +31,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-mailer',
-    'version': '0.6.16',
+    'version': '0.7.0',
     'description': 'Cloud Custodian - Reference Mailer',
     'license': 'Apache-2.0',
     'classifiers': [

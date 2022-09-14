@@ -5,6 +5,7 @@ import jmespath
 import re
 
 from c7n.utils import type_schema
+from c7n.filters.offhours import OffHour, OnHour
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
@@ -62,6 +63,10 @@ class SqlInstance(QueryResourceManager):
             if 'userLabels' in r['settings']:
                 r['labels'] = r['settings']['userLabels']
         return resources
+
+
+SqlInstance.filter_registry.register('offhour', OffHour)
+SqlInstance.filter_registry.register('onhour', OnHour)
 
 
 class SqlInstanceAction(MethodAction):

@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import calendar
+from collections import namedtuple
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
@@ -185,6 +186,7 @@ class TestValueFilter(unittest.TestCase):
         value = "10.10.10.10"
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
+
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
         res = vf.process_value_type(sentinel, value, resource)
@@ -239,6 +241,48 @@ class TestValueFilter(unittest.TestCase):
         self.assertTrue(vf.content_initialized)
         self.assertEqual(vf.v, None)
         self.assertFalse(res)
+
+    def test_value_type_cidr(self):
+        # test cidr range match
+        resource = {"ingress": "10.10.10.0/24"}
+        TestCidrValue = namedtuple("TestCidrValue", ["value", "contains_resource"])
+
+        test_networks = [
+            TestCidrValue("10.10.0.0/16", True),
+            TestCidrValue(["10.10.0.0/16"], True),
+            TestCidrValue(["172.17.0.0/24", "10.10.0.0/16"], True),
+            TestCidrValue("10.0.0.0/16", False),
+            TestCidrValue(["10.0.0.0/16"], False),
+            TestCidrValue(["172.17.0.0/24", "10.0.0.0/16"], False)
+        ]
+
+        for net in test_networks:
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, net.contains_resource)
+
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "not-in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, not net.contains_resource)
+
+        resource = {"ingress": "xyz"}
+        vf = filters.factory({
+            "type": "value",
+            "value": ["abc"],
+            "op": "in",
+            "value_type": "cidr",
+            "key": "ingress"})
+        self.assertRaises(TypeError, vf.match(resource))
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -1065,38 +1109,57 @@ class TestMetricsFilter(BaseTest):
         )
 
     def test_metric_period_rounding(self):
-        """Round the start time for metrics queries to the top of the previous hour"""
+        """Round metrics start and end times to align with CloudWatch retention periods"""
 
-        factory = self.replay_flight_data("test_metric_period_rounding")
+        with mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), base_filters.metrics):
+            for (days, expected_start, expected_end) in (
+                ((1 / 24.0), "2020-12-03T03:47:16+00:00", "2020-12-03T04:47:16+00:00"),
+                (1, "2020-12-02T04:48:00+00:00", "2020-12-03T04:48:00+00:00"),
+                (20, "2020-11-13T04:50:00+00:00", "2020-12-03T04:50:00+00:00"),
+                (90, "2020-09-04T05:00:00+00:00", "2020-12-03T05:00:00+00:00"),
+            ):
+                p = self.load_policy(
+                    {
+                        "name": "sqs-no-messages",
+                        "resource": "sqs",
+                        "filters": [
+                            {
+                                "type": "metrics",
+                                "name": "NumberOfMessagesSent",
+                                "statistics": "Sum",
+                                "days": days,
+                                "value": 0,
+                                "op": "eq"
+                            }
+                        ]
+                    }
+                )
+                metrics_filter = p.resource_manager.filters[0]
+                window = metrics_filter.get_metric_window()
+                self.assertEqual(parse_date(expected_start), window.start)
+                self.assertEqual(parse_date(expected_end), window.end)
 
-        p = self.load_policy(
-            {
-                "name": "sqs-no-messages",
+    def test_metric_period_too_long(self):
+        """The longest CloudWatch retention period is 455 days. If we specify a period like 900
+        days, CloudWatch will happily show us 455 days of data with a start date 900 days ago.
+        Avoid that sort of confusion in validation."""
+
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                "name": "sqs-metrics-period-too-long",
                 "resource": "sqs",
                 "filters": [
                     {
                         "type": "metrics",
                         "name": "NumberOfMessagesSent",
                         "statistics": "Sum",
-                        "days": 90,
+                        "days": 900,
                         "value": 0,
                         "op": "eq"
                     }
                 ]
-            },
-            config={"region": "us-east-2"},
-            session_factory=factory
-        )
-        metrics_filter = p.resource_manager.filters[0]
-
-        # Set a fixed end time for the metrics filter with a non-zero minute component.
-        with mock_datetime_now(parse_date("2020-12-03T04:45:00+00:00"), base_filters.metrics):
-            resources = p.run()
-            datapoints = resources[0]["c7n.metrics"]["AWS/SQS.NumberOfMessagesSent.Sum.90"]
-
-        self.assertEqual(metrics_filter.start.strftime("%H:%M"), "04:00")
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(datapoints), 1)
+            })
+        self.assertIn('cannot exceed 455', str(err.exception))
 
 
 class TestReduceFilter(BaseFilterTest):

@@ -1,0 +1,69 @@
+# Dockerfiles are generated from tools/dev/dockerpkg.py
+
+FROM ubuntu:22.04 as build-env
+
+ARG POETRY_VERSION="1.1.14"
+
+# pre-requisite distro deps, and build env setup
+RUN adduser --disabled-login --gecos "" custodian
+RUN apt-get --yes update
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
+RUN python3 -m venv /usr/local
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/main/install-poetry.py | python3 - -y --version ${POETRY_VERSION}
+ARG PATH="/root/.local/bin:$PATH"
+WORKDIR /src
+
+# Add core & aws packages
+ADD pyproject.toml poetry.lock README.md /src/
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && pip install -U pip
+RUN . /usr/local/bin/activate && poetry install --no-dev
+RUN . /usr/local/bin/activate && pip install -q wheel &&       pip install -U pip
+RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+
+# Add provider packages
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+RUN rm -R tools/c7n_gcp/tests
+ADD tools/c7n_azure /src/tools/c7n_azure
+RUN rm -R tools/c7n_azure/tests_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
+RUN rm -R tools/c7n_kube/tests
+ADD tools/c7n_openstack /src/tools/c7n_openstack
+RUN rm -R tools/c7n_openstack/tests
+
+# Install requested providers
+ARG providers="gcp kube openstack azure"
+RUN . /usr/local/bin/activate && \
+    for pkg in $providers; do cd tools/c7n_$pkg && \
+    poetry install && cd ../../; done
+
+RUN mkdir /output
+
+FROM ubuntu:22.04
+
+LABEL name="cli" \
+      repository="http://github.com/cloud-custodian/cloud-custodian"
+
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /output /output
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get --yes update \
+        && apt-get --yes install python3 python3-venv --no-install-recommends \
+        && rm -Rf /var/cache/apt \
+        && rm -Rf /var/lib/apt/lists/* \
+        && rm -Rf /var/log/*
+
+RUN adduser --disabled-login --gecos "" custodian
+USER custodian
+WORKDIR /home/custodian
+ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
+VOLUME ["/home/custodian"]
+ENTRYPOINT ["/usr/local/bin/custodian"]
+CMD ["--help"]
+
+LABEL "org.opencontainers.image.title"="cli"
+LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"

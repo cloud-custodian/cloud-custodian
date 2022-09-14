@@ -1228,3 +1228,20 @@ class AccountDataEvents(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_lakeformation_filter(self):
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3")
+        p = self.load_policy(
+            {
+                'name': 'test-lakeformation-cross-account-bucket',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'lakeformation-s3-cross-account'
+                }],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(
+            resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])

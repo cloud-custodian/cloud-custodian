@@ -1629,6 +1629,40 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_has_statement_policy_action_star(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, "executor_factory", MainThreadExecutor
+        )
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        session_factory = self.replay_flight_data("test_s3_has_statement")
+        bname = "custodian-policy-test1"
+        p = self.load_policy(
+            {
+                "name": "s3-has-policy",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
+                                "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
+                            }
+                        ],
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_bucket_replication_policy_remove(self):
         replicated_from_name = "replication-from-12345"
 
@@ -3885,9 +3919,11 @@ class TestBucketOwnership:
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
 
-    def test_s3_access_analyzer_filter_with_no_results(self, test):
-        factory = test.replay_flight_data("test_s3_iam_analyzers")
+    def test_s3_access_analyzer_filter_with_no_results(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
         test.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
         p = test.load_policy({
             'name': 'check-s3',
             'resource': 'aws.s3',
