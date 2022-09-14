@@ -148,6 +148,9 @@ def setup_parser():
         '-c', '--config', dest="config_files", nargs="*", action='append',
         help="Policy configuration files(s)", default=[])
     parser.add_argument(
+        "--path",
+        help="Path to policy configuration files(s). Respects subdirectories.")
+    parser.add_argument(
         "--present", action="store_true", default=False,
         help='Target policies present in config files for removal instead of skipping them.')
     parser.add_argument(
@@ -195,8 +198,16 @@ def main():
         options.regions = [os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')]
 
     files = []
-    files.extend(itertools.chain(*options.config_files))
-    files.extend(options.configs)
+
+    if options.path:
+      for root, dirs, policies in os.walk(options.path):
+        for policy in policies:
+          files.append(os.path.join(root, policy))
+
+    if options.config_files:
+      files.extend(itertools.chain(*options.config_files))
+      files.extend(options.configs)
+
     options.config_files = files
 
     if not files:
