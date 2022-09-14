@@ -507,6 +507,33 @@ class ElasticSearch(BaseTest):
             }
         )
 
+    def test_elasticsearch_has_statement(self):
+        factory = self.record_flight_data("test_elasticsearch_has_statement")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-has-statement",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "es:*",
+                                "Principal": {"AWS" : "*"},
+                                "Resource": "{domain_arn}/*"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory, config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        # self.assertEqual(len(resources), 1)
+        # access_policy = json.loads(resources[0]['AccessPolicies'])
+        # self.assertEqual(resources[0]['c7n:Policy'], access_policy)
+
 
 class TestReservedInstances(BaseTest):
 
