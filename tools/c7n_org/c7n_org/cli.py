@@ -153,7 +153,8 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
+def init(config, use, debug, verbose, accounts, tags, policies,
+         resource=None, policy_tags=(), invert_conditional_execution=False):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -188,7 +189,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-    filter_accounts(accounts_config, tags, accounts)
+    filter_accounts(accounts_config, tags, accounts, None, invert_conditional_execution)
 
     load_available()
     MainThreadExecutor.c7n_async = False
@@ -256,8 +257,10 @@ def get_session(account, session_name, region):
             "No profile or role assume specified for account %s" % account)
 
 
-def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
-    filtered_accounts = []
+def filter_accounts(accounts_config, tags, accounts,
+                    not_accounts=None, invert_conditional_execution=False):
+    filtered = []
+    inverted = []
     accounts = comma_expand(accounts)
     not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
@@ -272,9 +275,10 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
                 if t in a.get('tags', ()):
                     found.add(t)
             if not found == set(tags):
+                inverted.append(a)
                 continue
-        filtered_accounts.append(a)
-    accounts_config['accounts'] = filtered_accounts
+        filtered.append(a)
+    accounts_config['accounts'] = inverted if invert_conditional_execution else filtered
 
 
 def filter_policies(policies_config, tags, policies, resource, not_policies=None):
@@ -486,14 +490,16 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
+@click.option('-i', '--invert-conditional-execution', default=False, is_flag=True)
 @click.option('--echo', default=False, is_flag=True)
 @click.option('--serial', default=False, is_flag=True)
 @click.argument('script_args', nargs=-1, type=click.UNPROCESSED)
-def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
+def run_script(config, output_dir, accounts, tags, region,
+               invert_conditional_execution, echo, serial, script_args):
     """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
     accounts_config, custodian_config, executor = init(
-        config, None, serial, True, accounts, tags, (), ())
+        config, None, serial, True, accounts, tags, (), (), (), invert_conditional_execution)
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
         return

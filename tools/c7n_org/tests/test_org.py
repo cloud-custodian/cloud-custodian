@@ -257,3 +257,9 @@ class OrgTest(TestUtils):
         self.assertEqual(
             [a['name'] for a in t4['accounts']],
             ['dev'])
+        
+        t5 = copy.deepcopy(d)
+        org.filter_accounts(t5, ['blue'], [], [], True)
+        self.assertEqual(
+            [a['name'] for a in 5['accounts']],
+            ['prod'])
