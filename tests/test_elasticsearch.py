@@ -520,7 +520,7 @@ class ElasticSearch(BaseTest):
                             {
                                 "Effect": "Deny",
                                 "Action": "es:*",
-                                "Principal": {"AWS" : "*"},
+                                "Principal": {"AWS": "*"},
                                 "Resource": "{domain_arn}/*"
                             }
                         ]
@@ -534,8 +534,9 @@ class ElasticSearch(BaseTest):
         access_policy = json.loads(resources[0]['AccessPolicies'])
         self.assertEqual(access_policy['Statement'][0]['Effect'], 'Deny')
         self.assertEqual(access_policy['Statement'][0]['Action'], 'es:*')
-        self.assertEqual(access_policy['Statement'][0]['Principal'], {"AWS" : "*"})
-        self.assertEqual(access_policy['Statement'][0]['Resource'], 'arn:aws:es:us-east-1:644160558196:domain/my-test-cluster/*')
+        self.assertEqual(access_policy['Statement'][0]['Principal'], {"AWS": "*"})
+        self.assertEqual(access_policy['Statement'][0]['Resource'], 
+        'arn:aws:es:us-east-1:644160558196:domain/my-test-cluster/*')
 
     def test_elasticsearch_not_has_statement(self):
         factory = self.replay_flight_data("test_elasticsearch_has_statement")
@@ -550,7 +551,7 @@ class ElasticSearch(BaseTest):
                             {
                                 "Effect": "Allow",
                                 "Action": "es:*",
-                                "Principal": {"AWS" : "*"},
+                                "Principal": {"AWS": "*"},
                                 "Resource": "{domain_arn}/*"
                             }
                         ]
