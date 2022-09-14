@@ -200,13 +200,13 @@ def main():
     files = []
 
     if options.path:
-      for root, dirs, policies in os.walk(options.path):
-        for policy in policies:
-          files.append(os.path.join(root, policy))
+        for root, dirs, policies in os.walk(options.path):
+            for policy in policies:
+                files.append(os.path.join(root, policy))
 
     if options.config_files:
-      files.extend(itertools.chain(*options.config_files))
-      files.extend(options.configs)
+        files.extend(itertools.chain(*options.config_files))
+        files.extend(options.configs)
 
     options.config_files = files
 
