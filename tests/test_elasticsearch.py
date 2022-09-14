@@ -535,7 +535,7 @@ class ElasticSearch(BaseTest):
         self.assertEqual(access_policy['Statement'][0]['Effect'], 'Deny')
         self.assertEqual(access_policy['Statement'][0]['Action'], 'es:*')
         self.assertEqual(access_policy['Statement'][0]['Principal'], {"AWS": "*"})
-        self.assertEqual(access_policy['Statement'][0]['Resource'], 
+        self.assertEqual(access_policy['Statement'][0]['Resource'],
         'arn:aws:es:us-east-1:644160558196:domain/my-test-cluster/*')
 
     def test_elasticsearch_not_has_statement(self):
