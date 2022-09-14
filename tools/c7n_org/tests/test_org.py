@@ -261,5 +261,5 @@ class OrgTest(TestUtils):
         t5 = copy.deepcopy(d)
         org.filter_accounts(t5, ['blue'], [], [], True)
         self.assertEqual(
-            [a['name'] for a in 5['accounts']],
+            [a['name'] for a in t5['accounts']],
             ['prod'])
