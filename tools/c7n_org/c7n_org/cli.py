@@ -5,6 +5,7 @@
 
 import csv
 from collections import Counter
+import json
 import logging
 import os
 import time
@@ -486,14 +487,14 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
-@click.option('--echo', default=False, is_flag=True)
-@click.option('--serial', default=False, is_flag=True)
+@click.option('-e', '--echo', default=False, is_flag=True)
+@click.option('-d', '--debug', default=False, is_flag=True)
 @click.argument('script_args', nargs=-1, type=click.UNPROCESSED)
-def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
+def run_script(config, output_dir, accounts, tags, region, echo, debug, script_args):
     """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
     accounts_config, custodian_config, executor = init(
-        config, None, serial, True, accounts, tags, (), ())
+        config, None, debug, True, accounts, tags, (), ())
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
         return
@@ -507,14 +508,19 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
+            # We need account-info in mugc for conditional policy removal (conditions-block in yml)
+            # We pass it as a json string here
+            script_args.extend(["--accountinfo", json.dumps(a)])
             for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[
                     w.submit(run_account_script, a, r, output_dir,
-                             serial, script_args)] = (a, r)
+                             debug, script_args)] = (a, r)
+            del script_args[-2:]
+            
         for f in as_completed(futures):
             a, r = futures[f]
             if f.exception():
-                if serial:
+                if debug:
                     raise
                 log.warning(
                     "Error running script in %s @ %s exception: %s",
