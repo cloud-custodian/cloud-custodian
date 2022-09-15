@@ -32,6 +32,11 @@ class DescribeQueue(DescribeSource):
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
                 queue['QueueUrl'] = r
+                region = str(self.manager.config.region)
+                if 'queue' in r:
+                    queueUrl = r.replace("{0}.queue.amazonaws.com".format(region),
+                    "sqs.{0}.amazonaws.com".format(region))
+                    queue['QueueUrl'] = queueUrl
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
