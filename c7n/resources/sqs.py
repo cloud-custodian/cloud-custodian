@@ -32,8 +32,8 @@ class DescribeQueue(DescribeSource):
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
                 queue['QueueUrl'] = r
-                region = str(self.manager.config.region)
                 if 'queue' in r:
+                    region = str(self.manager.config.region)
                     queueUrl = r.replace('{0}.queue.amazonaws.com'.format(region),
                     'sqs.{0}.amazonaws.com'.format(region))
                     queue['QueueUrl'] = queueUrl
