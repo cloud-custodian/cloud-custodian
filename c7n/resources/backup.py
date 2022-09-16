@@ -97,3 +97,18 @@ class BackupVault(QueryResourceManager):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'EncryptionKeyArn'
+
+
+@resources.register('backup-job')
+class BackupJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'backup'
+        enum_spec = ('list_backup_jobs', 'BackupJobs', None)
+        filter_name = 'BackupJobs'
+        filter_type = 'list'
+        name = id = 'BackupJobId'
+        date = 'CompletionDate'
+        arn = False
+        cfn_type = None
+        universal_taggable = object()

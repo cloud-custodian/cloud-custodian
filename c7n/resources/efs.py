@@ -9,11 +9,12 @@ from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import (QueryResourceManager, ChildResourceManager,
-    TypeInfo, DescribeSource, ConfigSource, RetryPageIterator)
+    TypeInfo, DescribeSource, ConfigSource)
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry, chunks
 from .aws import shape_validate
 from datetime import datetime, timedelta
+from c7n.filters.related import RelatedResourceFilter
 
 
 class EFSDescribe(DescribeSource):
@@ -325,22 +326,24 @@ class EfsConsecutiveSnapshots(Filter):
     schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
         required=['days'])
     permissions = ('elasticfilesystem:DescribeFileSystems', 'backup:ListBackupJobs', )
-    annotation = 'c7n:EfsSnapshots'
+    annotation_key = 'c7n:EfsSnapshots'
+    RelatedResource = 'c7n.resources.backup.BackupJob'
+    RelatedIdsExpression = 'ResourceArn'
 
-    def process_resource_set(self, client, resources, lbdate):
-        paginator = client.get_paginator('list_backup_jobs')
-        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        efs_snapshots = paginator.paginate(
-            ByResourceType='EFS', ByCreatedAfter=lbdate).build_full_result().get('BackupJobs', [])
+    def process_resource_set(self, resources, lbdate):
+        backups = RelatedResourceFilter.get_resource_manager(self).resources()
+        efs_snapshots = []
+        for b in backups:
+            if b['ResourceType'] == 'EFS':
+                efs_snapshots.append(b)
 
         efs_map = {}
         for snap in efs_snapshots:
             efs_map.setdefault(snap['ResourceArn'], []).append(snap)
         for r in resources:
-            r[self.annotation] = efs_map.get(r['FileSystemArn'], [])
+            r[self.annotation_key] = efs_map.get(r['FileSystemArn'], [])
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('backup')
         results = []
         retention = self.data.get('days')
         utcnow = datetime.utcnow()
@@ -350,12 +353,12 @@ class EfsConsecutiveSnapshots(Filter):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
 
         for resource_set in chunks(
-                [r for r in resources if self.annotation not in r], 50):
-            self.process_resource_set(client, resource_set, lbdate)
+                [r for r in resources if self.annotation_key not in r], 50):
+            self.process_resource_set(resource_set, lbdate)
 
         for r in resources:
             snapshot_dates = set()
-            for snapshot in r[self.annotation]:
+            for snapshot in r[self.annotation_key]:
                 if snapshot['State'] == 'COMPLETED':
                     snapshot_dates.add(snapshot['CompletionDate'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(snapshot_dates):
