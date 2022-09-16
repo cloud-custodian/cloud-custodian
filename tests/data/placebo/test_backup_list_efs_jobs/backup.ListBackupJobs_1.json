@@ -1,0 +1,117 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "bd57a2f5-7b66-458b-a7da-781637495119",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Tue, 3 Mar 2020 22:43:28 GMT",
+                "x-amzn-requestid": "bd57a2f5-7b66-458b-a7da-781637495119",
+                "content-length": "332",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "BackupJobs": [
+            {
+                "AccountId": "513912345678", 
+                "BackupJobId": "17627C31-E883-1860-F11F-1188A4C34CC5", 
+                "BackupVaultName": "FakeAWSBackupVault", 
+                "BackupVaultArn": "arn:aws:backup:us-west-2:513912345678:backup-vault:FakeAWSBackupVault", 
+                "RecoveryPointArn": "arn:aws:dynamodb:us-west-2:513912345678:table/test-crcm/backup/01663304400000-bc295002", 
+                "ResourceArn": "arn:aws:dynamodb:us-west-2:513912345678:table/test-crcm", 
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 9,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "CompletionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "State": "COMPLETED", 
+                "PercentDone": "100.0", 
+                "BackupSizeInBytes": 0, 
+                "IamRoleArn": "arn:aws:iam::513912345678:role/service-role/AWSServiceRoleForBackup", 
+                "CreatedBy": {
+                    "BackupPlanId": "ab4573ea-daff-423b-af58-1f3bf5ab25c6", 
+                    "BackupPlanArn": "arn:aws:backup:us-west-2:513912345678:backup-plan:ab4573ea-daff-423b-af58-1f3bf5ab25c6", 
+                    "BackupPlanVersion": "NDg3MTU3ZDAtNTgwOC00ODIzLTk1NDEtNTI2YWZlZDc2OGNi", 
+                    "BackupRuleId": "359dbabc-a33b-45e5-aac6-fb5929079007"
+                }, 
+                "StartBy": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 9,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "ResourceType": "DynamoDB"
+            }, 
+            {
+                "AccountId": "513912345678", 
+                "BackupJobId": "6B99F6BB-F7D2-6AE8-BE8A-32CBEAA60AFF", 
+                "BackupVaultName": "aws/efs/automatic-backup-vault", 
+                "BackupVaultArn": "arn:aws:backup:us-west-2:513912345678:backup-vault:aws/efs/automatic-backup-vault", 
+                "RecoveryPointArn": "arn:aws:backup:us-west-2:513912345678:recovery-point:c4eb0336-11fb-4b10-b1ef-482a11bdb3f3", 
+                "ResourceArn": "arn:aws:elasticfilesystem:us-west-2:513912345678:file-system/fs-03594190a64502ffd", 
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 9,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "CompletionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "State": "COMPLETED", 
+                "PercentDone": "100.0", 
+                "BackupSizeInBytes": 0, 
+                "IamRoleArn": "arn:aws:iam::513912345678:role/aws-service-role/backup.amazonaws.com/AWSServiceRoleForBackup", 
+                "CreatedBy": {
+                    "BackupPlanId": "aws/efs/73d922fb-9312-3a70-99c3-e69367f9fdad", 
+                    "BackupPlanArn": "arn:aws:backup:us-west-2:513912345678:backup-plan:aws/efs/73d922fb-9312-3a70-99c3-e69367f9fdad", 
+                    "BackupPlanVersion": "NzI1YzQxOTItOWI0My00YjgzLWIyMGMtZWE1YTU3ODY0Mjcy", 
+                    "BackupRuleId": "6af7fdde-2b69-4fac-b48c-c14f0e564e91"
+                }, 
+                "StartBy": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 9,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }, 
+                "ResourceType": "EFS"
+            }
+        ]
+    }
+}
