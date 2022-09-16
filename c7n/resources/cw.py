@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+import re
 
 import botocore.exceptions
 
@@ -833,3 +834,60 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('put-subscription-filter')
+class SubscriptionFilter(BaseAction):
+    """Create/Update a subscription filter and associate with a log group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-put-subscription-filter
+            resource: log-group
+            actions:
+              - type: put-subscription-filter
+                filter_name_prefix: AllLambda
+                destination_acct_id: 1234567890
+                destination_name: lambda-logs
+                distribution_type: Random
+    """
+    schema = type_schema(
+        'put-subscription-filter',
+        filter_name_prefix={'type': 'string'},
+        destination_acct_id={'type': 'integer'},
+        destination_name={'type': 'string'},
+        distribution_type={'type': 'string'})
+    permissions = ('logs:PutSubscriptionFilter',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        filter_name_prefix = self.data.get('filter_name_prefix')
+        destination_acct_id = str(self.data.get('destination_acct_id'))
+        destination_name = self.data.get('destination_name').lower()
+        distribution_type = self.data.get('distribution_type')
+
+        for r in resources:
+            arn = r['arn']
+            acct_id_match = re.search(r":(\d+):", arn)
+            region_match = re.search(r":(\w{2}-\w+-\d):", arn)
+
+            if acct_id_match and region_match:
+                region = region_match.group(1)
+                acct_id = acct_id_match.group(1)
+
+                destination_arn = "arn:aws:logs:" + region + ":" + destination_acct_id +\
+                                  ":destination:" + destination_name + "-" + acct_id
+                client.put_subscription_filter(
+                    logGroupName=r['logGroupName'],
+                    filterName=filter_name_prefix,
+                    filterPattern="",
+                    destinationArn=destination_arn,
+                    distribution=distribution_type)
+            else:
+                self.log.error('Unable to search for account ID and region from log group ARN: {m}'
+                    .format(m=r))
