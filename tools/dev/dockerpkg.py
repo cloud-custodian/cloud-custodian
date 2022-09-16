@@ -37,7 +37,7 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/main/install-poetry.py | python3 - -y --version {poetry_version}
+RUN curl -sSL https://install.python-poetry.org | python3 - -y --version {poetry_version}
 ARG PATH="/root/.local/bin:$PATH"
 WORKDIR /src
 

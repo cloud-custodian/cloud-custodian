@@ -125,6 +125,7 @@ ResourceMap = {
     "aws.kinesis-video": "c7n.resources.kinesis.KinesisVideoStream",
     "aws.kms": "c7n.resources.kms.KeyAlias",
     "aws.kms-key": "c7n.resources.kms.Key",
+    "aws.datalake-location": "c7n.resources.lakeformation.LakeFormationRegisteredLocation",
     "aws.lambda": "c7n.resources.awslambda.AWSLambda",
     "aws.lambda-layer": "c7n.resources.awslambda.LambdaLayerVersion",
     "aws.launch-config": "c7n.resources.asg.LaunchConfig",
