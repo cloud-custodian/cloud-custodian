@@ -55,3 +55,14 @@ pytest-recording = "^0.12.1"
 
 [tool.black]
 skip-string-normalization = true
+
+[tool.pylint.messages_control]
+disable = [
+  "missing-docstring",
+  "invalid-name",
+  "too-many-lines",
+  "unused-argument",
+  "fixme",
+  "empty-docstring",
+  "logging-not-lazy"
+]

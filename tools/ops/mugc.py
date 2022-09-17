@@ -9,7 +9,7 @@ import logging
 import sys
 
 from c7n.credentials import SessionFactory
-from c7n.config import Config
+from c7n.config import Config, Bag
 from c7n.policy import load as policy_load, PolicyCollection
 from c7n import mu
 
@@ -27,6 +27,82 @@ def load_policies(options, config):
     for f in options.config_files:
         policies += policy_load(config, f).filter(options.policy_filter)
     return policies
+
+
+def get_events(client, func, session_factory, region):
+    events = []
+    events.extend(get_events_from_tag(client, func, session_factory, region))
+    if not events:
+        log.debug('getting policy events')
+        pevents = get_events_from_policy(client, func, session_factory, region)
+        events.extend(pevents)
+    return events
+
+
+def get_events_from_tag(client, func, session_factory, region):
+    events = []
+    try:
+        result = client.get_function(FunctionName=func['FunctionName'])
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            log.warning(
+                "Region:%s Lambda Function or Access Policy Statement missing: %s",
+                region, func['FunctionName'])
+        else:
+            log.warning(
+                "Region:%s Unexpected error: %s for function %s",
+                region, e, func['FunctionName'])
+
+        return events
+
+    info = result.get('Tags', {}).get('custodian-info')
+    info = dict([t.split('=') for t in info.split(':')])
+    if info['mode'] in ('config-rule', 'config-poll-rule'):
+        events.append(mu.ConfigRule({}, session_factory))
+    elif info['mode'] in (
+            'cloudtrail', 'periodic', 'phd',
+            'ec2-instance-state', 'asg-instance-state',
+            'guard-duty', 'hub-finding'):
+        events.append(mu.CloudWatchEventSource({}, session_factory))
+    elif info['mode'] == 'hub-action':
+        events.append(mu.SecurityHubAction(Bag({'mode': {}})))
+
+    return events
+
+
+def get_events_from_policy(client, func, session_factory, region):
+    events = []
+    try:
+        result = client.get_policy(FunctionName=func['FunctionName'])
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            log.warning(
+                "Region:%s Lambda Function or Access Policy Statement missing: %s",
+                region, func['FunctionName'])
+        else:
+            log.warning(
+                "Region:%s Unexpected error: %s for function %s",
+                region, e, func['FunctionName'])
+
+        # Continue on with next function instead of raising an exception
+        return events
+
+    if 'Policy' not in result:
+        pass
+    else:
+        p = json.loads(result['Policy'])
+        for s in p['Statement']:
+            principal = s.get('Principal')
+            if not isinstance(principal, dict):
+                log.info("Skipping function %s" % func['FunctionName'])
+                continue
+            if principal == {'Service': 'events.amazonaws.com'}:
+                events.append(
+                    mu.CloudWatchEventSource({}, session_factory))
+            elif principal == {'Service': 'config.amazonaws.com'}:
+                events.append(
+                    mu.ConfigRule({}, session_factory))
+    return events
 
 
 def region_gc(options, region, policy_config, policies):
@@ -59,38 +135,7 @@ def region_gc(options, region, policy_config, policies):
             remove.append(f)
 
     for n in remove:
-        events = []
-        try:
-            result = client.get_policy(FunctionName=n['FunctionName'])
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                log.warning(
-                    "Region:%s Lambda Function or Access Policy Statement missing: %s",
-                    region, n['FunctionName'])
-            else:
-                log.warning(
-                    "Region:%s Unexpected error: %s for function %s",
-                    region, e, n['FunctionName'])
-
-            # Continue on with next function instead of raising an exception
-            continue
-
-        if 'Policy' not in result:
-            pass
-        else:
-            p = json.loads(result['Policy'])
-            for s in p['Statement']:
-                principal = s.get('Principal')
-                if not isinstance(principal, dict):
-                    log.info("Skipping function %s" % n['FunctionName'])
-                    continue
-                if principal == {'Service': 'events.amazonaws.com'}:
-                    events.append(
-                        mu.CloudWatchEventSource({}, session_factory))
-                elif principal == {'Service': 'config.amazonaws.com'}:
-                    events.append(
-                        mu.ConfigRule({}, session_factory))
-
+        events = get_events(client, n, session_factory, region)
         f = mu.LambdaFunction({
             'name': n['FunctionName'],
             'role': n['Role'],
