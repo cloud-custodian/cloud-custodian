@@ -110,5 +110,4 @@ class BackupJob(QueryResourceManager):
         name = id = 'BackupJobId'
         date = 'CompletionDate'
         arn = False
-        cfn_type = None
         universal_taggable = object()

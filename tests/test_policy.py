@@ -500,7 +500,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name'}
+            'apigw-domain-name', 'backup-job'}
 
         missing_method = []
         for k, v in manager.resources.items():
