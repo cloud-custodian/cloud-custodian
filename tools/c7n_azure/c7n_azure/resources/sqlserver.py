@@ -23,6 +23,41 @@ class SqlServer(ArmResourceManager):
 
     :example:
 
+    This policy will all qudit logs to be used to check for anomalies and give insight 
+    into suspected breaches or misuse of information and access
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cfb-azure-database-ensure-auditing-retention-greater-than-90-days
+            resource: azure.sql-server
+            filters:
+              - type: extended-auditing-policy
+                enabled: true
+                properties.retentionDays: "greater_than_or_equal"            
+
+
+    class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Databases']
+
+        service = 'azure.mgmt.sql'
+        client = 'SqlManagementClient'
+        enum_spec = ('servers', 'list', None)
+        resource_type = 'Microsoft.Sql/servers'
+
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'version'
+        )
+
+@resources.register('sql-server', aliases=['sqlserver'])
+class SqlServer(ArmResourceManager):
+    """SQL Server Resource
+
+    :example:
+
     This policy will find all SQL servers with average DTU consumption under
     10 percent over the last 72 hours
 
