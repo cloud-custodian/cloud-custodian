@@ -264,6 +264,22 @@ class UtilTest(BaseTest):
         self.assertTrue(a1 in n3)
         self.assertFalse(a1 in n4)
 
+    def test_ipv4_list(self):
+        n1 = utils.IPv4Network(u"10.0.0.0/16")
+        n2 = utils.IPv4Network(u"10.0.1.0/24")
+        n3 = utils.IPv4Network(u"10.0.0.5/32")
+        n4 = utils.IPv4Network(u"192.168.1.0/24")
+        IPV4_list = utils.IPv4List([n1, n2])
+        self.assertTrue(n3 in IPV4_list)
+        self.assertFalse(n4 in IPV4_list)
+
+        a1 = ipaddress.ip_address(u"10.0.1.16")
+        self.assertTrue(a1 in IPV4_list)
+        self.assertTrue(a1 in utils.IPv4List([a1, n4]))
+
+        IPV4_list2 = utils.IPv4List([n3, n4])
+        self.assertFalse(a1 in IPV4_list2)
+
     def test_chunks(self):
         self.assertEqual(
             list(utils.chunks(range(100), size=50)),

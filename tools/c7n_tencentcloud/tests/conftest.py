@@ -7,15 +7,24 @@ from c7n.ctx import ExecutionContext
 from c7n_tencentcloud.client import Session
 
 
-@pytest.fixture
-def mock_env_aksk(monkeypatch):
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", "xxx")
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", "yyy")
+@pytest.fixture(scope="package")
+def vcr_config():
+    return {"filter_headers": ["authorization"]}
 
 
 @pytest.fixture
-def session(mock_env_aksk):
+def session():
     return Session()
+
+
+@pytest.fixture
+def client_cvm(session):
+    return session.client("cvm.tencentcloudapi.com", "cvm", "2017-03-12", "ap-singapore")
+
+
+@pytest.fixture
+def client_tag(session):
+    return session.client("tag.tencentcloudapi.com", "tag", "2018-08-13", "ap-singapore")
 
 
 @pytest.fixture

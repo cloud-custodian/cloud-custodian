@@ -1,0 +1,95 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeRegions
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 41, "RequestId": "9891a274-bf13-4c11-9dc0-f0e57dab1a2c",
+        "RegionSet": [{"RegionState": "AVAILABLE", "Region": "ap-guangzhou", "RegionName":
+        "\u534e\u5357\u5730\u533a(\u5e7f\u5dde)"}, {"RegionState": "AVAILABLE", "Region":
+        "ap-shenzhen-fsi", "RegionName": "\u534e\u5357\u5730\u533a(\u6df1\u5733\u91d1\u878d)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-guangzhou-open", "RegionName":
+        "\u534e\u5357\u5730\u533a(\u5e7f\u5ddeOPEN)"}, {"RegionState": "AVAILABLE",
+        "Region": "ap-shenzhen", "RegionName": "\u534e\u5357\u5730\u533a(\u6df1\u5733)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-qingyuan", "RegionName": "\u534e\u5357\u5730\u533a(\u6e05\u8fdc)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-qingyuan-xinan", "RegionName":
+        "\u534e\u5357\u5730\u533a(\u6e05\u8fdc\u4fe1\u5b89)"}, {"RegionState": "AVAILABLE",
+        "Region": "ap-shenzhen-sycft", "RegionName": "\u534e\u5357\u5730\u533a(\u6df1\u5733\u6df1\u5b87\u8d22\u4ed8\u901a)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-shanghai", "RegionName": "\u534e\u4e1c\u5730\u533a(\u4e0a\u6d77)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-shanghai-fsi", "RegionName": "\u534e\u4e1c\u5730\u533a(\u4e0a\u6d77\u91d1\u878d)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-jinan-ec", "RegionName": "\u534e\u4e1c\u5730\u533a(\u6d4e\u5357)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-hangzhou-ec", "RegionName": "\u534e\u4e1c\u5730\u533a(\u676d\u5dde)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-nanjing", "RegionName": "\u534e\u4e1c\u5730\u533a(\u5357\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-fuzhou-ec", "RegionName": "\u534e\u4e1c\u5730\u533a(\u798f\u5dde)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-hefei-ec", "RegionName": "\u534e\u4e1c\u5730\u533a(\u5408\u80a5)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-shanghai-adc", "RegionName": "\u534e\u4e1c\u5730\u533a(\u4e0a\u6d77\u81ea\u52a8\u9a7e\u9a76\u4e91)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-beijing", "RegionName": "\u534e\u5317\u5730\u533a(\u5317\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-tianjin", "RegionName": "\u534e\u5317\u5730\u533a(\u5929\u6d25)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-beijing-fsi", "RegionName": "\u534e\u5317\u5730\u533a(\u5317\u4eac\u91d1\u878d)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-shijiazhuang-ec", "RegionName":
+        "\u534e\u5317\u5730\u533a(\u77f3\u5bb6\u5e84)"}, {"RegionState": "AVAILABLE",
+        "Region": "ap-wuhan-ec", "RegionName": "\u534e\u4e2d\u5730\u533a(\u6b66\u6c49)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-changsha-ec", "RegionName": "\u534e\u4e2d\u5730\u533a(\u957f\u6c99)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-zhengzhou-ec", "RegionName": "\u534e\u4e2d\u5730\u533a(\u90d1\u5dde)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-chengdu", "RegionName": "\u897f\u5357\u5730\u533a(\u6210\u90fd)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-chongqing", "RegionName": "\u897f\u5357\u5730\u533a(\u91cd\u5e86)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-xian-ec", "RegionName": "\u897f\u5317\u5730\u533a(\u897f\u5b89)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-xibei-ec", "RegionName": "\u897f\u5317\u5730\u533a(\u897f\u5317)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-shenyang-ec", "RegionName": "\u4e1c\u5317\u5730\u533a(\u6c88\u9633)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-hongkong", "RegionName": "\u6e2f\u6fb3\u53f0\u5730\u533a(\u4e2d\u56fd\u9999\u6e2f)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-taipei", "RegionName": "\u6e2f\u6fb3\u53f0\u5730\u533a(\u4e2d\u56fd\u53f0\u5317)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-seoul", "RegionName": "\u4e9a\u592a\u4e1c\u5317(\u9996\u5c14)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-tokyo", "RegionName": "\u4e9a\u592a\u4e1c\u5317(\u4e1c\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-singapore", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u65b0\u52a0\u5761)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-bangkok", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u66fc\u8c37)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-jakarta", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u96c5\u52a0\u8fbe)"},
+        {"RegionState": "AVAILABLE", "Region": "na-siliconvalley", "RegionName": "\u7f8e\u56fd\u897f\u90e8(\u7845\u8c37)"},
+        {"RegionState": "AVAILABLE", "Region": "eu-frankfurt", "RegionName": "\u6b27\u6d32\u5730\u533a(\u6cd5\u5170\u514b\u798f)"},
+        {"RegionState": "AVAILABLE", "Region": "eu-moscow", "RegionName": "\u6b27\u6d32\u5730\u533a(\u83ab\u65af\u79d1)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-mumbai", "RegionName": "\u4e9a\u592a\u5357\u90e8(\u5b5f\u4e70)"},
+        {"RegionState": "AVAILABLE", "Region": "na-ashburn", "RegionName": "\u7f8e\u56fd\u4e1c\u90e8(\u5f17\u5409\u5c3c\u4e9a)"},
+        {"RegionState": "AVAILABLE", "Region": "sa-saopaulo", "RegionName": "\u5357\u7f8e\u5730\u533a(\u5723\u4fdd\u7f57)"},
+        {"RegionState": "AVAILABLE", "Region": "na-toronto", "RegionName": "\u5317\u7f8e\u5730\u533a(\u591a\u4f26\u591a)"}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4901'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:11 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1
