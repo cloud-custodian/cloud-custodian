@@ -27,10 +27,12 @@ def test_sqs_endpoint_url(test):
     urls = [q['QueueUrl'] for q in p.run()]
     assert urls == [
         'https://sqs.us-east-1.amazonaws.com/644160558196/devtest2',
-        'https://sqs.us-east-1.amazonaws.com/644160558196/hubalytics-dev-ArchiveHourlyQueue-1VHR8KVX2MY48',
+        'https://sqs.us-east-1.amazonaws.com/644160558196/hubalytics-dev-ArchiveHourlyQueue-1VHR8KVX2MY48', # noqa
         'https://sqs.us-east-1.amazonaws.com/644160558196/maid-delivery',
     ]
-    assert p.resource_manager.get_client().meta.endpoint_url == "https://sqs.us-east-1.amazonaws.com"
+    assert p.resource_manager.get_client().meta.endpoint_url == (
+        "https://sqs.us-east-1.amazonaws.com")
+
 
 def test_sqs_config_translate(test):
     # we're using a cwe event as a config, so have to mangle to
