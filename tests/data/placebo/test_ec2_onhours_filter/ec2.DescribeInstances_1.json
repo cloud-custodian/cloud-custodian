@@ -139,7 +139,8 @@
                             "State": "applied",
                             "HttpTokens": "optional",
                             "HttpPutResponseHopLimit": 1,
-                            "HttpEndpoint": "enabled"
+                            "HttpEndpoint": "enabled",
+                            "InstanceMetadataTags": "disabled"
                         }
                     },
                     {
@@ -280,7 +281,8 @@
                             "State": "applied",
                             "HttpTokens": "optional",
                             "HttpPutResponseHopLimit": 1,
-                            "HttpEndpoint": "enabled"
+                            "HttpEndpoint": "enabled",
+                            "InstanceMetadataTags": "disabled"
                         }
                     }
                 ],
