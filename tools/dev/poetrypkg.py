@@ -9,7 +9,7 @@ from collections import defaultdict
 import click
 import os
 import sys
-import toml
+import tomli as toml
 from pathlib import Path
 
 
