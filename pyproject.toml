@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.17"
+version = "0.9.19"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -50,6 +50,8 @@ psutil = "^5.7.0"
 twine = "^3.1.1"
 pytest-sugar = "^0.9.2"
 click = "^8.0"
+freezegun = "^1.2.2"
+pytest-recording = "^0.12.1"
 
 [tool.black]
 skip-string-normalization = true

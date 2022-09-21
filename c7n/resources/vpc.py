@@ -1028,6 +1028,28 @@ class SGPermission(Filter):
           op: in
           value: x.y.z
 
+    `value_type: cidr` can also filter if cidr is a subset of cidr
+    value range. In this example we are allowing any smaller cidrs within
+    allowed_cidrs.csv.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value_from:
+            url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
+            format: csv
+
+    or value can be specified as a list:
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value: ["10.0.0.0/8", "192.168.0.0/16"]
+
     `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
     this example we are blocking global inbound connections to SSH or
     RDP.
@@ -2035,7 +2057,7 @@ class NetworkAddress(query.QueryResourceManager):
         id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
-        config_type = "AWS::EC2::EIP"
+        config_type = cfn_type = "AWS::EC2::EIP"
 
     source_mapping = {
         'describe': DescribeElasticIp,
@@ -2710,3 +2732,91 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'
+
+
+@RouteTable.filter_registry.register('cross-az-nat-gateway-route')
+class CrossAZRouteTable(Filter):
+    """Filter route-tables to find those with routes which send traffic
+    from a subnet in an az to a nat gateway in a different az.
+
+    This filter is useful for cost optimization, resiliency, and
+    performance use-cases, where we don't want network traffic to
+    cross from one availability zone (AZ) to another AZ.
+
+    :Example:
+    .. code-block:: yaml
+            policies:
+              - name: cross-az-nat-gateway-traffic
+                resource: aws.route-table
+                filters:
+                    - type: cross-az-nat-gateway-route
+                actions:
+                  - notify
+
+    """
+    schema = type_schema('cross-az-nat-gateway-route')
+    permissions = ("ec2:DescribeRouteTables", "ec2:DescribeNatGateways", "ec2:DescribeSubnets")
+
+    table_annotation = "c7n:route-table"
+    mismatch_annotation = "c7n:nat-az-mismatch"
+
+    def resolve_subnets(self, resource, subnets):
+        return {s['SubnetId'] for s in subnets
+                if s[self.table_annotation] == resource['RouteTableId']}
+
+    def annotate_subnets_table(self, tables: list, subnets: dict):
+        # annotate route table associations onto their respective subnets
+        main_tables = []
+        # annotate explicit associations
+        for t in tables:
+            for association in t['Associations']:
+                if association.get('SubnetId'):
+                    subnets[association['SubnetId']][
+                        self.table_annotation] = t['RouteTableId']
+                if association.get('Main'):
+                    main_tables.append(t)
+        # annotate main tables
+        for s in subnets.values():
+            if self.table_annotation in s:
+                continue
+            for t in main_tables:
+                if t['VpcId'] == s['VpcId']:
+                    s[self.table_annotation] = t['RouteTableId']
+
+    def process_route_table(self, subnets, nat_subnets, resource):
+        matched = {}
+        found = False
+        associated_subnets = self.resolve_subnets(resource, subnets.values())
+        for route in resource['Routes']:
+            if not route.get("NatGatewayId") or route.get("State") != "active":
+                continue
+            nat_az = subnets[nat_subnets[route['NatGatewayId']]]['AvailabilityZone']
+            mismatch_subnets = {
+                s: subnets[s]['AvailabilityZone'] for s in associated_subnets
+                if subnets[s]['AvailabilityZone'] != nat_az}
+            if not mismatch_subnets:
+                continue
+            found = True
+            matched.setdefault(route['NatGatewayId'], {})['NatGatewayAz'] = nat_az
+            matched[route['NatGatewayId']].setdefault('Subnets', {}).update(mismatch_subnets)
+        if not found:
+            return
+        resource[self.mismatch_annotation] = matched
+        return resource
+
+    def process(self, resources, event=None):
+        subnets = {
+            s['SubnetId']: s for s in
+            self.manager.get_resource_manager('aws.subnet').resources()
+        }
+        nat_subnets = {
+            nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
+            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+
+        results = []
+        self.annotate_subnets_table(resources, subnets)
+        for resource in resources:
+            if self.process_route_table(subnets, nat_subnets, resource):
+                results.append(resource)
+
+        return results

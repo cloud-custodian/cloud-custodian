@@ -8,6 +8,7 @@ from c7n_azure.storage_utils import StorageUtilities
 from c7n import utils
 from c7n.actions import BaseNotify
 from c7n.resolver import ValuesFrom
+from c7n.version import version
 
 
 class Notify(BaseNotify):
@@ -74,6 +75,9 @@ class Notify(BaseNotify):
         subscription_id = session.get_subscription_id()
         message = {
             'event': event,
+            'execution_id': self.manager.ctx.execution_id,
+            'execution_start': self.manager.ctx.start_time,
+            'version': version,
             'account_id': subscription_id,
             'account': subscription_id,
             'region': 'all',

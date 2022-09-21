@@ -103,6 +103,7 @@ class MetricsFilter(Filter):
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
         'ecs': 'AWS/ECS',
+        'ecr': 'AWS/ECR',
         'efs': 'AWS/EFS',
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
@@ -147,21 +148,22 @@ class MetricsFilter(Filter):
         MetricWindow = namedtuple('MetricWindow', 'start end')
 
         if duration <= timedelta(days=(1 / 8.0)):
-            # Align period with the start of the last second
+            # Align period with the start of the next second
             # CloudWatch retention: 3 hours
-            end = now.replace(microsecond=0)
+            end = now.replace(microsecond=0) + timedelta(seconds=1)
         elif duration <= timedelta(days=15):
-            # Align period with the start of the last minute
+            # Align period with the start of the next minute
             # CloudWatch retention: 15 days
-            end = now.replace(second=0, microsecond=0)
+            end = now.replace(second=0, microsecond=0) + timedelta(minutes=1)
         elif duration <= timedelta(days=63):
-            # Align period with the start of the last five-minute block
+            # Align period with the start of the next five-minute block
             # CloudWatch retention: 63 days
-            end = now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
+            end = (now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
+                + timedelta(minutes=5))
         else:
-            # Align period with the start of the last hour
+            # Align period with the start of the next hour
             # CloudWatch retention: 455 days
-            end = now.replace(minute=0, second=0, microsecond=0)
+            end = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
 
         return MetricWindow((end - duration), end)
 

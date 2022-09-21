@@ -88,8 +88,8 @@ class ServiceQuota(QueryResourceManager):
                 q['QuotaCode']: q
                 for q in _get_quotas(client, s, 'list_service_quotas')
             }
-            quotas.update(dquotas)
-            return quotas.values()
+            dquotas.update(quotas)
+            return dquotas.values()
 
         results = []
         with self.executor_factory(max_workers=self.max_workers) as w:

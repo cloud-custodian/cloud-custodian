@@ -14,16 +14,16 @@ install_requires = \
  'Sphinx>=4.2.0,<5.0.0',
  'argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.24.44,<2.0.0)',
- 'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.17,<0.10.0)',
+ 'boto3 (>=1.24.76,<2.0.0)',
+ 'botocore (>=1.27.76,<2.0.0)',
+ 'c7n (>=0.9.18,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
  'docutils>=0.14,<0.18',
  'importlib-metadata (>=4.12.0,<5.0.0)',
  'importlib-resources (>=5.9.0,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
- 'jsonschema (>=4.9.0,<5.0.0)',
+ 'jsonschema (>=4.16.0,<5.0.0)',
  'myst-parser>=0.18.0,<0.19.0',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrsistent (>=0.18.1,<0.19.0)',
@@ -36,7 +36,7 @@ install_requires = \
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.3.0,<5.0.0)',
- 'urllib3 (>=1.26.11,<2.0.0)',
+ 'urllib3 (>=1.26.12,<2.0.0)',
  'zipp (>=3.8.1,<4.0.0)']
 
 entry_points = \
@@ -44,7 +44,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.16',
+    'version': '1.1.18',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'license': 'Apache-2.0',
     'classifiers': [

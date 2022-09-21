@@ -17,6 +17,23 @@ from c7n.resources.sqs import SQS
 from c7n.resources.aws import shape_validate, Arn
 
 
+def test_sqs_endpoint_url(test):
+    session_factory = test.replay_flight_data(
+        "test_sqs_endpoint_url", region="us-east-1")
+    p = test.load_policy({
+        'name': 'sqs-check',
+        'resource': 'aws.sqs'
+    }, session_factory=session_factory)
+    urls = [q['QueueUrl'] for q in p.run()]
+    assert urls == [
+        'https://sqs.us-east-1.amazonaws.com/644160558196/devtest2',
+        'https://sqs.us-east-1.amazonaws.com/644160558196/hubalytics-dev-ArchiveHourlyQueue-1VHR8KVX2MY48', # noqa
+        'https://sqs.us-east-1.amazonaws.com/644160558196/maid-delivery',
+    ]
+    assert p.resource_manager.get_client().meta.endpoint_url == (
+        "https://sqs.us-east-1.amazonaws.com")
+
+
 def test_sqs_config_translate(test):
     # we're using a cwe event as a config, so have to mangle to
     # config's inane format (json strings in json)
@@ -727,6 +744,38 @@ class QueueTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["QueueArn"],
         "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement")
+
+    def test_sqs_has_statement_star_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sqs_has_statement"
+        )
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "test_sqs_has_statement_star_definition",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{queue_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["QueueArn"],
+        "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement-star")
 
     def test_sqs_deadletter_filter(self):
         factory = self.replay_flight_data("test_sqs_deadletter_filter")

@@ -10,7 +10,7 @@ class CloudBuild(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudbuild'
         version = 'v1'
-        component = 'projects.builds.list'
+        component = 'projects.builds'
         enum_spec = ('list', 'builds[]', None)
         scope = 'project'
         scope_key = 'projectId'

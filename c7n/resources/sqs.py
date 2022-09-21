@@ -23,7 +23,7 @@ from c7n.resources.securityhub import PostFinding
 class DescribeQueue(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
 
         def _augment(r):
             try:
@@ -81,6 +81,29 @@ class SQS(QueryResourceManager):
         'describe': DescribeQueue,
         'config': QueueConfigSource
     }
+
+    def get_client(self):
+        # Work around the fact that boto picks a legacy endpoint by default
+        # which leads to queue urls pointing to legacy instead of standard
+        # which is at odds with config's resource id for the queues.
+        # additionally we need the standard endpoint to work with vpc endpoints.
+        #
+        # sqs canonoical endpoints
+        #  https://docs.aws.amazon.com/general/latest/gr/sqs-service.html
+        # boto3 bug
+        #  https://github.com/boto/botocore/issues/2683 - index of several other bugs
+        #  https://github.com/boto/boto3/issues/1900
+        #
+        # boto3 is transitioning to standard urls per https://github.com/boto/botocore/issues/2705
+        #
+        endpoint = 'https://sqs.{region}.amazonaws.com'.format(region=self.config.region)
+        # these only seem to have the legacy endpoints, so fall through to boto behavior.
+        if self.config.region in ('cn-north-1', 'cn-northwest-1'):
+            endpoint = None
+        params = {}
+        if endpoint:
+            params['endpoint_url'] = endpoint
+        return local_session(self.session_factory).client('sqs', **params)
 
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
@@ -181,7 +204,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for r in resources:
             try:
                 results += filter(None, [self.process_resource(client, r)])
@@ -240,7 +263,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for r in resources:
             policy = json.loads(r.get('Policy') or '{}')
             policy_statements = policy.setdefault('Statement', [])
@@ -292,7 +315,7 @@ class DeleteSqsQueue(BaseAction):
     permissions = ('sqs:DeleteQueue',)
 
     def process(self, queues):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for q in queues:
             self.process_queue(client, q)
 
@@ -333,7 +356,7 @@ class SetEncryption(BaseAction):
         session = local_session(self.manager.session_factory)
         key_id = session.client(
             'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
-        client = session.client('sqs')
+        client = self.manager.get_client()
 
         for q in queues:
             self.process_queue(client, q, key_id)
@@ -376,7 +399,7 @@ class SetRetentionPeriod(BaseAction):
     permissions = ('sqs:SetQueueAttributes',)
 
     def process(self, queues):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         period = str(self.data.get('period', 345600))
         for q in queues:
             client.set_queue_attributes(
