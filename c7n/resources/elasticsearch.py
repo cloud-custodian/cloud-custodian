@@ -12,6 +12,7 @@ from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeIn
 from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 
 from .securityhub import PostFinding
 
@@ -207,6 +208,20 @@ class ElasticSearchCrossClusterFilter(Filter):
             if matchFound:
                 results.append(r)
         return results
+
+
+@ElasticSearchDomain.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'AccessPolicies'
+
+    def get_std_format_args(self, domain):
+        return {
+            'domain_arn': domain['ARN'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @ElasticSearchDomain.action_registry.register('remove-statements')

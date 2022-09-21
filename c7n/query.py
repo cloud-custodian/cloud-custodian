@@ -68,8 +68,11 @@ class ResourceQuery:
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
-        client = local_session(self.session_factory).client(
-            m.service, resource_manager.config.region)
+        if resource_manager.get_client:
+            client = resource_manager.get_client()
+        else:
+            client = local_session(self.session_factory).client(
+                m.service, resource_manager.config.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
@@ -442,6 +445,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     permissions = ()
 
     _generate_arn = None
+
+    get_client = None
 
     retry = staticmethod(
         get_retry((
