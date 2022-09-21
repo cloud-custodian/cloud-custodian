@@ -1820,7 +1820,7 @@ class RDSEventSubscription(BaseTest):
 
 class TestRDSParameterGroupFilterModified(BaseTest):
 
-    def test_param_value_cases(self):
+    def test_param_filter_value_cases(self):
         session_factory = self.replay_flight_data('test_rds_parameter_group')
         policy = self.load_policy(
             {
