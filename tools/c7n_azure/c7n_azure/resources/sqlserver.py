@@ -7,7 +7,7 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, StringUtils
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.utils import type_schema
@@ -17,42 +17,6 @@ AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
 
 
-@resources.register('sql-server', aliases=['sqlserver'])
-class SqlServer(ArmResourceManager):
-    """SQL Server Resource
-
-    :example:
-
-    This policy will all qudit logs to be used to check for anomalies and give insight 
-    into suspected breaches or misuse of information and access
-
-    .. code-block:: yaml
-
-        policies:
-          - name: cfb-azure-database-ensure-auditing-retention-greater-than-90-days
-            resource: azure.sql-server
-            filters:
-              - type: extended-auditing-policy
-                enabled: true
-                properties.retentionDays: "greater_than_or_equal"            
-
-
-    class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Databases']
-
-        service = 'azure.mgmt.sql'
-        client = 'SqlManagementClient'
-        enum_spec = ('servers', 'list', None)
-        resource_type = 'Microsoft.Sql/servers'
-
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup',
-            'version'
-        )
-
-@resources.register('sql-server', aliases=['sqlserver'])
 class SqlServer(ArmResourceManager):
     """SQL Server Resource
 
@@ -242,6 +206,71 @@ class VulnerabilityAssessmentFilter(Filter):
 
         return result
 
+@SqlServer.filter_registry.register('extended-auditing-policy')
+class ExtendedAuditingFilter(Filter):
+    """
+    Filter by the current extended auditing
+    policy for this sql server.
+    :example:
+    Ensure audit logs are retained for at least 90 days
+    .. code-block:: yaml
+        policies:
+          - name: auditing-retention-greater-than-90-days
+            resource: azure.sql-server
+            filters:
+              - type: extended-auditing-policy
+                enabled: true
+                properties.retentionDays: "greater_than_or_equal"
+                value: "90"
+    """
+
+    schema = type_schema(
+        'extended-auditing-policy',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqlserver.extended-auditing-filter')
+
+    def __init__(self, data, manager=None):
+        super(ExtendedAuditingFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+                
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'extendedauditingSettings' not in resource['properties']:
+                extended_auditing_settings = client.server_blob_extended_auditing_policies.get(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['ExtendedauditingSettings'] = \
+                    extended_auditing_settings.serialize(True).get('properties', {})
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['properties']['ExtendedauditingSettings'].get('state'),
+                    required_status):
+                result.append(resource)
+
+        return result
 
 @SqlServer.filter_registry.register('firewall-rules')
 class SqlServerFirewallRulesFilter(FirewallRulesFilter):
@@ -295,7 +324,6 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
             if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':  # nosec
                 return ['AzureServices']
         return []
-
 
 @SqlServer.action_registry.register('set-firewall-rules')
 class SqlSetFirewallAction(SetFirewallAction):
