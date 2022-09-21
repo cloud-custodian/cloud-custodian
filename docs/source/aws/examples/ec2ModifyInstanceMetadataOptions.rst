@@ -8,21 +8,26 @@ https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyInstanceMetadat
 To filter the list of instances you can choose any combination of Ec2 mwtadate-instances elements.
 
  As of now below options are available:
+ 
   - HttpEndpoint
-    Valid Values: disabled | enabled
-    Action value: HttpEndpoint
+
+    - Valid Values: disabled | enabled
+    - Action value: HttpEndpoint
 
   - HttpPutResponseHopLimit
-    Possible values: Integers from 1 to 64
-    Action value: HttpPutResponseHopLimit
+
+    - Possible values: Integers from 1 to 64
+    - Action value: HttpPutResponseHopLimit
 
   - HttpTokens
-    Valid Values: optional | required
-    Action value: tokens
+
+    - Valid Values: optional | required
+    - Action value: tokens
 
   - InstanceMetadataTags
-    Valid Values: disabled | enabled
-    Action value: metadatatags
+
+    - Valid Values: disabled | enabled
+    - Action value: metadatatags
 
 Examples:
 +++++++++
