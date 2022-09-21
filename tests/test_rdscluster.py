@@ -681,12 +681,6 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
                 "resource": "rds-cluster",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "Engine",
-                        "op": "eq",
-                        "value": "aurora-mysql"
-                    },
-                    {
                         "type": "db-cluster-parameter",
                         "key": "tls_version",
                         "op": "ne",

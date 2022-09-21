@@ -19,21 +19,21 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 14,
-                    "hour": 10,
-                    "minute": 11,
-                    "second": 39,
-                    "microsecond": 635000
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 13,
+                    "second": 27,
+                    "microsecond": 785000
                 },
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 6,
-                    "hour": 8,
-                    "minute": 58,
-                    "second": 58,
-                    "microsecond": 588000
+                    "day": 13,
+                    "hour": 10,
+                    "minute": 28,
+                    "second": 49,
+                    "microsecond": 692000
                 },
                 "Endpoint": "aurora-mysql.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "aurora-mysql.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
@@ -44,11 +44,11 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 7,
-                    "hour": 10,
-                    "minute": 5,
-                    "second": 25,
-                    "microsecond": 156000
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 7,
+                    "second": 34,
+                    "microsecond": 146000
                 },
                 "Port": 3306,
                 "MasterUsername": "admin",
@@ -59,13 +59,13 @@
                     {
                         "DBInstanceIdentifier": "aurora-mysql-instance-1-us-west-2a",
                         "IsClusterWriter": false,
-                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "DBClusterParameterGroupStatus": "in-sync",
                         "PromotionTier": 1
                     },
                     {
                         "DBInstanceIdentifier": "aurora-mysql-instance-1",
                         "IsClusterWriter": true,
-                        "DBClusterParameterGroupStatus": "pending-reboot",
+                        "DBClusterParameterGroupStatus": "in-sync",
                         "PromotionTier": 1
                     }
                 ],
@@ -124,21 +124,21 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 14,
-                    "hour": 10,
-                    "minute": 14,
-                    "second": 38,
-                    "microsecond": 390000
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 9,
+                    "second": 25,
+                    "microsecond": 977000
                 },
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 5,
-                    "hour": 11,
-                    "minute": 27,
-                    "second": 22,
-                    "microsecond": 586000
+                    "day": 13,
+                    "hour": 10,
+                    "minute": 26,
+                    "second": 39,
+                    "microsecond": 542000
                 },
                 "Endpoint": "aurora-mysql-nc.cluster-chmgzfmvphon.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "aurora-mysql-nc.cluster-ro-chmgzfmvphon.us-west-2.rds.amazonaws.com",
@@ -149,11 +149,11 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 9,
-                    "day": 7,
-                    "hour": 10,
-                    "minute": 7,
-                    "second": 41,
-                    "microsecond": 315000
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 1,
+                    "second": 44,
+                    "microsecond": 165000
                 },
                 "Port": 3306,
                 "MasterUsername": "admin",

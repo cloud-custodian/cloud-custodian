@@ -1828,17 +1828,6 @@ class TestRDSParameterGroupFilterModified(BaseTest):
                 "resource": "rds",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "DBClusterIdentifier",
-                        "value": "absent"
-                    },
-                    {
-                        "type": "value",
-                        "key": "Engine",
-                        "op": "eq",
-                        "value": "mysql"
-                    },
-                    {
                         "type": "db-parameter",
                         "key": "tls_version",
                         "op": "ne",
@@ -1850,4 +1839,4 @@ class TestRDSParameterGroupFilterModified(BaseTest):
         )
 
         resources = policy.resource_manager.resources()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
