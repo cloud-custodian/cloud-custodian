@@ -37,7 +37,7 @@ importlib-metadata = ">=4.11.1"
 
 [tool.poetry.dev-dependencies]
 fakeredis = "^1.2.0"
-pytest = "^6.0.0"
+pytest = "^7.1.2"
 mypy = "^0.931"
 black = "^22.1.0"
 

@@ -159,11 +159,11 @@ msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-identity"
-version = "1.10.0"
+version = "1.11.0"
 description = "Microsoft Azure Identity Library for Python"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 azure-core = ">=1.11.0,<2.0.0"
@@ -187,7 +187,7 @@ azure-keyvault-secrets = ">=4.4,<5.0"
 
 [[package]]
 name = "azure-keyvault-certificates"
-version = "4.5.1"
+version = "4.6.0"
 description = "Microsoft Azure Key Vault Certificates Client Library for Python"
 category = "main"
 optional = false
@@ -201,7 +201,7 @@ six = ">=1.11.0"
 
 [[package]]
 name = "azure-keyvault-keys"
-version = "4.6.1"
+version = "4.7.0"
 description = "Microsoft Azure Key Vault Keys Client Library for Python"
 category = "main"
 optional = false
@@ -216,7 +216,7 @@ six = ">=1.12.0"
 
 [[package]]
 name = "azure-keyvault-secrets"
-version = "4.5.1"
+version = "4.6.0"
 description = "Microsoft Azure Key Vault Secrets Client Library for Python"
 category = "main"
 optional = false
@@ -858,14 +858,14 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.24.76"
+version = "1.24.77"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.76,<1.28.0"
+botocore = ">=1.27.77,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -874,7 +874,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.76"
+version = "1.27.77"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
@@ -890,7 +890,7 @@ crt = ["awscrt (==0.14.0)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.18"
+version = "0.9.19"
 description = "Cloud Custodian - Policy Rules Engine"
 category = "dev"
 optional = false
@@ -1077,14 +1077,14 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 
 [[package]]
 name = "msal"
-version = "1.18.0"
+version = "1.19.0"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-cryptography = ">=0.6,<40"
+cryptography = ">=0.6,<41"
 PyJWT = {version = ">=1.0.0,<3", extras = ["crypto"]}
 requests = ">=2.0.0,<3"
 
@@ -1512,24 +1512,24 @@ azure-graphrbac = [
     {file = "azure_graphrbac-0.61.1-py2.py3-none-any.whl", hash = "sha256:7b4e0f05676acc912f2b33c71c328d9fb2e4dc8e70ebadc9d3de8ab08bf0b175"},
 ]
 azure-identity = [
-    {file = "azure-identity-1.10.0.zip", hash = "sha256:656e5034d9cef297cf9b35376ed620085273c18cfa52cea4a625bf0d5d2d6409"},
-    {file = "azure_identity-1.10.0-py3-none-any.whl", hash = "sha256:b386f1ccbea6a48b9ab7e7f162adc456793c345193a7c1a713959562b08dcbbd"},
+    {file = "azure-identity-1.11.0.zip", hash = "sha256:c3fc800af58b857e7faf0e310376e5ef10f5dad5090914cc42ffa6d7d23b6729"},
+    {file = "azure_identity-1.11.0-py3-none-any.whl", hash = "sha256:f5eb0035ac9ceca26658b30bb2a375755c4cda61d0e3fd236b0e52ade2cb0995"},
 ]
 azure-keyvault = [
     {file = "azure-keyvault-4.2.0.zip", hash = "sha256:731add108a3e29ab4fd501a3c477256c286c34d0996b383fb6a3945462933761"},
     {file = "azure_keyvault-4.2.0-py2.py3-none-any.whl", hash = "sha256:16b29039244cbe8b940c98a0d795626d76d2a579cb9b8c559983ad208082c0de"},
 ]
 azure-keyvault-certificates = [
-    {file = "azure-keyvault-certificates-4.5.1.zip", hash = "sha256:e1e20817dd1949a8eece5185ad439069c591d4076648fd9c63c11e33931c1990"},
-    {file = "azure_keyvault_certificates-4.5.1-py3-none-any.whl", hash = "sha256:0ebd1a150d99884a7fa915e03cdcc936089d1b86cdf0f81f8d88feade9a101a2"},
+    {file = "azure-keyvault-certificates-4.6.0.zip", hash = "sha256:e7091b0611a0382c57c4c6fc7a7458c99f10a8ca0dd4f9d83658318cec71399e"},
+    {file = "azure_keyvault_certificates-4.6.0-py3-none-any.whl", hash = "sha256:e64e55444d30375c7efcd80078e49fada8ae5125657a7d31d73ddd32eb7b69ca"},
 ]
 azure-keyvault-keys = [
-    {file = "azure-keyvault-keys-4.6.1.zip", hash = "sha256:0f7ec31d2a4eb339ff9d96af7f2b0f5ba3bd28b5eee061a38f1b788726c949ae"},
-    {file = "azure_keyvault_keys-4.6.1-py3-none-any.whl", hash = "sha256:ac3acb8ced51f29cb48c73f71a718ca77726d6670f4927feca17ca5047c47915"},
+    {file = "azure-keyvault-keys-4.7.0.zip", hash = "sha256:f63740f5dc0d9b142d8ad65909f4a849ef549a20e86dff2ec322c13de0482d8c"},
+    {file = "azure_keyvault_keys-4.7.0-py3-none-any.whl", hash = "sha256:cab6d1efc19381c6d9b1a1c8e38c3673af5b2f5a98314c85cd3b725aff346e06"},
 ]
 azure-keyvault-secrets = [
-    {file = "azure-keyvault-secrets-4.5.1.zip", hash = "sha256:21fcd2ad4b62e04e1067313c740a879c845fe029655b38a7645d8c2395d03ab2"},
-    {file = "azure_keyvault_secrets-4.5.1-py3-none-any.whl", hash = "sha256:6a1cbd6272c0fcd0f80f3aea59bbe982decb4bc92b8a7f991c94113fc94b4b79"},
+    {file = "azure-keyvault-secrets-4.6.0.zip", hash = "sha256:fa8c11d4ff57a40b5e4207a0252c7dd29d0a9399688056b49d7e2b4c436d3a5a"},
+    {file = "azure_keyvault_secrets-4.6.0-py3-none-any.whl", hash = "sha256:79369336c91b2dcadd2b53127cc2d2700421fcfd0d51e4131a6afec314eca90e"},
 ]
 azure-mgmt-advisor = [
     {file = "azure-mgmt-advisor-9.0.0.zip", hash = "sha256:fc408b37315fe84781b519124f8cb1b8ac10b2f4241e439d0d3e25fd6ca18d7b"},
@@ -1743,12 +1743,12 @@ azure-storage-queue = [
     {file = "backports.zoneinfo-0.2.1.tar.gz", hash = "sha256:fadbfe37f74051d024037f223b8e001611eac868b5c5b06144ef4d8b799862f2"},
 ]
 boto3 = [
-    {file = "boto3-1.24.76-py3-none-any.whl", hash = "sha256:5bfcced1a30597b06b3426024c7a9220526882e8fc2dd255f03b9389b5ad8623"},
-    {file = "boto3-1.24.76.tar.gz", hash = "sha256:aee98e60c7d2ce1396a3beaf47f8ff749e64804cbdaed8e19d4338a6f628f2dc"},
+    {file = "boto3-1.24.77-py3-none-any.whl", hash = "sha256:fc16e50263c24631d5fe75464e76f3a1b454b4c0015c864948a61691f9702a6e"},
+    {file = "boto3-1.24.77.tar.gz", hash = "sha256:16646de3303779d6dc9c192d8a863095244de81d2e0b94f50692fbde767c6f1b"},
 ]
 botocore = [
-    {file = "botocore-1.27.76-py3-none-any.whl", hash = "sha256:0d4a67801e5a4be4cd84795320ad9fb8c315ed1e7a63e1191b2b3f7a7171d43c"},
-    {file = "botocore-1.27.76.tar.gz", hash = "sha256:b5c32922eba727a466f171dcc281f309d2a313e2f6dc592d43044caad96de338"},
+    {file = "botocore-1.27.77-py3-none-any.whl", hash = "sha256:d88509ed291b95525205cc06ca87b54d077aae996827039f5e32375949c5aaf7"},
+    {file = "botocore-1.27.77.tar.gz", hash = "sha256:77a43e970d0762080b4b79a7e00ea572ef2ae7a9f578c3c8e7f0a344ee4b4e6d"},
 ]
 c7n = []
 certifi = [
@@ -1894,8 +1894,8 @@ jsonschema = [
     {file = "jsonschema-4.16.0.tar.gz", hash = "sha256:165059f076eff6971bae5b742fc029a7b4ef3f9bcf04c14e4776a7605de14b23"},
 ]
 msal = [
-    {file = "msal-1.18.0-py2.py3-none-any.whl", hash = "sha256:9c10e6cb32e0b6b8eaafc1c9a68bc3b2ff71505e0c5b8200799582d8b9f22947"},
-    {file = "msal-1.18.0.tar.gz", hash = "sha256:576af55866038b60edbcb31d831325a1bd8241ed272186e2832968fd4717d202"},
+    {file = "msal-1.19.0-py2.py3-none-any.whl", hash = "sha256:2206b44a739918b3ba0ee1bacd904e548fc91706cada9f1673b763c8d5f3364e"},
+    {file = "msal-1.19.0.tar.gz", hash = "sha256:65e329d69cbfe48bb3dd3236b1ef8e4cc91f869637606c184e227e86d2b0629d"},
 ]
 msal-extensions = [
     {file = "msal-extensions-1.0.0.tar.gz", hash = "sha256:c676aba56b0cce3783de1b5c5ecfe828db998167875126ca4b47dc6436451354"},

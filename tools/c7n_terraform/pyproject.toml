@@ -19,7 +19,7 @@ click = "^8.0"
 python-hcl2 = "^2.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0.0"
+pytest = "^7.1.2"
 c7n = {path = "../..", develop = true}
 
 [build-system]

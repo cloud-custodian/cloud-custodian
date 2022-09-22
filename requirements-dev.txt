@@ -2,6 +2,7 @@
 
 # Note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
 -r requirements.txt
+-r tools/c7n_awscc/requirements.txt
 -r tools/c7n_azure/requirements.txt
 -r tools/c7n_gcp/requirements.txt
 -r tools/c7n_kube/requirements.txt
@@ -15,6 +16,8 @@
 -e .
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
+# Local package required for c7n_awscc
+-e tools/c7n_awscc
 # Local package required for c7n_azure tests
 -e tools/c7n_azure
 # Local package required for c7n_gcp tests

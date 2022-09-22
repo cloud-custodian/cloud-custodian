@@ -27,7 +27,7 @@ pygit2 = "~1.9"
 boto3 = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0.0"
+pytest = "^7.1.2"
 c7n = {path = "../..", develop = true}
 mock = "^4.0.2"
 
