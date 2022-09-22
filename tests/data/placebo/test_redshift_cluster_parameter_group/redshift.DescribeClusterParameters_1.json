@@ -1,0 +1,144 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "auto_analyze",
+                "ParameterValue": "true",
+                "Description": "Use auto analyze",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "auto_mv",
+                "ParameterValue": "true",
+                "Description": "Enable AutoMV",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "datestyle",
+                "ParameterValue": "ISO, MDY",
+                "Description": "Sets the display format for date and time values.",
+                "Source": "engine-default",
+                "DataType": "string",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "enable_case_sensitive_identifier",
+                "ParameterValue": "false",
+                "Description": "Preserve case sensitivity for database identifiers such as table or column names in parser",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "enable_user_activity_logging",
+                "ParameterValue": "false",
+                "Description": "parameter for audit logging purpose",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "extra_float_digits",
+                "ParameterValue": "0",
+                "Description": "Sets the number of digits displayed for floating-point values",
+                "Source": "engine-default",
+                "DataType": "integer",
+                "AllowedValues": "-15-2",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "max_concurrency_scaling_clusters",
+                "ParameterValue": "1",
+                "Description": "The maximum concurrency scaling clusters can be used.",
+                "Source": "engine-default",
+                "DataType": "integer",
+                "AllowedValues": "0-10",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "max_cursor_result_set_size",
+                "ParameterValue": "default",
+                "Description": "Sets the max cursor result set size",
+                "Source": "engine-default",
+                "DataType": "integer",
+                "AllowedValues": "0-14400000",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "query_group",
+                "ParameterValue": "default",
+                "Description": "This parameter applies a user-defined label to a group of queries that are run during the same session..",
+                "Source": "engine-default",
+                "DataType": "string",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "require_ssl",
+                "ParameterValue": "false",
+                "Description": "require ssl for all databaseconnections",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "search_path",
+                "ParameterValue": "$user, public",
+                "Description": "Sets the schema search order for names that are not schema-qualified.",
+                "Source": "engine-default",
+                "DataType": "string",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "statement_timeout",
+                "ParameterValue": "0",
+                "Description": "Aborts any statement that takes over the specified number of milliseconds.",
+                "Source": "engine-default",
+                "DataType": "integer",
+                "AllowedValues": "0,100-2147483647",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "use_fips_ssl",
+                "ParameterValue": "false",
+                "Description": "Use fips ssl library",
+                "Source": "engine-default",
+                "DataType": "boolean",
+                "AllowedValues": "true,false",
+                "ApplyType": "static",
+                "IsModifiable": true
+            },
+            {
+                "ParameterName": "wlm_json_configuration",
+                "ParameterValue": "[{\"auto_wlm\":true}]",
+                "Description": "wlm json configuration",
+                "Source": "engine-default",
+                "DataType": "string",
+                "ApplyType": "static",
+                "IsModifiable": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

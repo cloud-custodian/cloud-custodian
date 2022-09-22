@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ParameterGroups": [
+            {
+                "ParameterGroupName": "default.redshift-1.0",
+                "ParameterGroupFamily": "redshift-1.0",
+                "Description": "Default parameter group for redshift-1.0",
+                "Tags": []
+            },
+            {
+                "ParameterGroupName": "test123",
+                "ParameterGroupFamily": "redshift-1.0",
+                "Description": "test ",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
