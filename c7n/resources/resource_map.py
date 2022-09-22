@@ -160,6 +160,7 @@ ResourceMap = {
     "aws.rds-subnet-group": "c7n.resources.rds.RDSSubnetGroup",
     "aws.rds-subscription": "c7n.resources.rds.RDSSubscription",
     "aws.redshift": "c7n.resources.redshift.Redshift",
+    "aws.redshift-param-group": "c7n.resources.redshiftparamgroup.RedshiftParamGroup",
     "aws.redshift-snapshot": "c7n.resources.redshift.RedshiftSnapshot",
     "aws.redshift-subnet-group": "c7n.resources.redshift.RedshiftSubnetGroup",
     "aws.redshift-reserved": "c7n.resources.redshift.ReservedNode",
