@@ -207,7 +207,7 @@ class VulnerabilityAssessmentFilter(Filter):
         return result
 
 @SqlServer.filter_registry.register('extended-auditing-policy')
-class ExtendedAuditingFilter(Filter):
+class ExtendedAuditingFilter(ValueFilter):
     """
     Filter by the current extended auditing
     policy for this sql server.
@@ -218,59 +218,32 @@ class ExtendedAuditingFilter(Filter):
           - name: auditing-retention-greater-than-90-days
             resource: azure.sql-server
             filters:
-              - type: extended-auditing-policy
-                enabled: true
-                properties.retentionDays: "greater_than_or_equal"
-                value: "90"
+                - type: extended-auditing-policy
+                  key: retentionDays
+                  op: lt
+                  value: 90
+                - type: extended-auditing-policy
+                  key: state
+                  op: ne
+                  value: Enabled
     """
+    schema = type_schema('extended-auditing-policy', rinherit=ValueFilter.schema)
 
-    schema = type_schema(
-        'extended-auditing-policy',
-        required=['type', 'enabled'],
-        **{
-            'enabled': {"type": "boolean"},
-        }
-    )
+    def __call__(self, resource):
+        key = 'extendedAuditingSettings'
+        if key not in resource['properties']:
+            client = self.manager.get_client()
+            extended_auditing_settings = client.extended_server_blob_auditing_policies.get(
+                resource['resourceGroup'],
+                resource['name'])
 
-    log = logging.getLogger('custodian.azure.sqlserver.extended-auditing-filter')
-
-    def __init__(self, data, manager=None):
-        super(ExtendedAuditingFilter, self).__init__(data, manager)
-        self.enabled = self.data['enabled']
-
-    def process(self, resources, event=None):
-        resources, exceptions = ThreadHelper.execute_in_parallel(
-            resources=resources,
-            event=event,
-            execution_method=self._process_resource_set,
-            executor_factory=self.executor_factory,
-            log=log
-        )
-        if exceptions:
-            raise exceptions[0]
-                
-        return resources
-
-    def _process_resource_set(self, resources, event=None):
-        client = self.manager.get_client()
-        result = []
-        for resource in resources:
-            if 'extendedauditingSettings' not in resource['properties']:
-                extended_auditing_settings = client.server_blob_extended_auditing_policies.get(
-                    resource['resourceGroup'],
-                    resource['name'])
-
-                resource['properties']['ExtendedauditingSettings'] = \
+            if extended_auditing_settings:
+                resource['properties'][key] = \
                     extended_auditing_settings.serialize(True).get('properties', {})
+            else:
+                resource['properties'][key] = {}
 
-            required_status = 'Enabled' if self.enabled else 'Disabled'
-
-            if StringUtils.equal(
-                    resource['properties']['ExtendedauditingSettings'].get('state'),
-                    required_status):
-                result.append(resource)
-
-        return result
+        return super(ExtendedAuditingFilter, self).__call__(resource['properties'][key])
 
 @SqlServer.filter_registry.register('firewall-rules')
 class SqlServerFirewallRulesFilter(FirewallRulesFilter):

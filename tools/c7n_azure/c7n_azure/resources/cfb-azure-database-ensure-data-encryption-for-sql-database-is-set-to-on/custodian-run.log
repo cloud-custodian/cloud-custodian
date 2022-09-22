@@ -1,0 +1,1 @@
+2022-09-21 11:51:00,847 - custodian.policy - INFO - policy:cfb-azure-database-ensure-data-encryption-for-sql-database-is-set-to-on resource:azure.sql-database region:AzureCloud count:1 time:1.93

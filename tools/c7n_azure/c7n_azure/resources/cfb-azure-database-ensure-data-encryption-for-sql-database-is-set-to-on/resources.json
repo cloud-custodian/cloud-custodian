@@ -1,0 +1,39 @@
+[
+  {
+    "id": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourceGroups/dfh-test-group/providers/Microsoft.Sql/servers/dfh-sql-server/databases/master",
+    "name": "master",
+    "type": "Microsoft.Sql/servers/databases",
+    "location": "eastus",
+    "sku": {
+      "name": "Basic",
+      "tier": "Basic",
+      "capacity": 5
+    },
+    "kind": "v12.0,system",
+    "managedBy": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourceGroups/dfh-test-group/providers/Microsoft.Sql/servers/dfh-sql-server",
+    "properties": {
+      "collation": "SQL_Latin1_General_CP1_CI_AS",
+      "maxSizeBytes": 53687091200,
+      "status": "Online",
+      "databaseId": "a482e942-018e-4435-b085-275707baf835",
+      "creationDate": "2022-03-28T18:52:06.773Z",
+      "currentServiceObjectiveName": "Basic",
+      "requestedServiceObjectiveName": "Basic",
+      "defaultSecondaryLocation": "westus",
+      "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+      "zoneRedundant": false,
+      "readScale": "Disabled",
+      "readReplicaCount": 0,
+      "currentSku": {
+        "name": "Basic",
+        "tier": "Basic",
+        "capacity": 5
+      },
+      "transparentDataEncryption": {
+        "status": "Disabled"
+      }
+    },
+    "c7n:parent-id": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourceGroups/dfh-test-group/providers/Microsoft.Sql/servers/dfh-sql-server",
+    "resourceGroup": "dfh-test-group"
+  }
+]

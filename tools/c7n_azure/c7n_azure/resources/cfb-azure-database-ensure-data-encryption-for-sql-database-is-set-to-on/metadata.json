@@ -1,0 +1,118 @@
+{
+  "policy": {
+    "name": "cfb-azure-database-ensure-data-encryption-for-sql-database-is-set-to-on",
+    "resource": "azure.sql-database",
+    "mode": {
+      "type": "pull"
+    },
+    "metadata": {
+      "category": [
+        "cfb/azure/database"
+      ],
+      "compliance": [
+        {
+          "type": "CIS",
+          "version": "1.4.0",
+          "control-mappings": [
+            "4.1.2"
+          ]
+        }
+      ],
+      "creator": "McKinsey",
+      "severity": "high",
+      "matter_assurance": {
+        "control_id": "CFB-AZURE-DATABASE-5AE6FEFE-CF82-4AA6-869D-E61C38598FE9",
+        "classification": "urgent",
+        "remediation_level": "low"
+      },
+      "recommended_actions": {
+        "remediation": [
+          {
+            "name": "Azure Docs",
+            "description": "Enable transparent data encryption on every SQL server.\n",
+            "type": "link",
+            "content": "https://docs.microsoft.com/en-us/azure/azure-sql/database/transparent-data-encryption-tde-overview?view=azuresql&viewFallbackFrom=sql-server-ver16&tabs=azure-portal"
+          }
+        ]
+      }
+    },
+    "description": "This policy will ensure that Data Encryption is set to 'On' on a SQL Database\n",
+    "filters": [
+      {
+        "type": "transparent-data-encryption",
+        "enabled": false
+      }
+    ]
+  },
+  "version": "0.9.17",
+  "execution": {
+    "id": "34641b68-704c-4e65-9273-3ee321055a66",
+    "start": 1663775458.9157498,
+    "end_time": 1663775460.849629,
+    "duration": 1.9338791370391846
+  },
+  "config": {
+    "region": "AzureCloud",
+    "regions": [],
+    "cache": "memory",
+    "profile": null,
+    "account_id": "19ce288e-d065-4362-8ad1-8c5acbfeb94e",
+    "assume_role": null,
+    "external_id": null,
+    "log_group": null,
+    "tracer": null,
+    "metrics_enabled": null,
+    "metrics": null,
+    "output_dir": ".",
+    "cache_period": 15,
+    "dryrun": false,
+    "authorization_file": null,
+    "subparser": "run",
+    "config": null,
+    "configs": [
+      "/Users/albertina_webster/GitRepos/matter-compliance-c7n-policies/azure/database/ensure-data-encryption-for-sql-database-is-set-to-on/ensure-data-encryption-for-sql-database-is-set-to-on.yaml"
+    ],
+    "policy_filters": [],
+    "resource_types": [],
+    "verbose": null,
+    "quiet": null,
+    "debug": false,
+    "skip_validation": false,
+    "command": "c7n.commands.run",
+    "vars": null
+  },
+  "sys-stats": {
+    "num_threads": 2,
+    "snapshot_time": 1.9339120388031006,
+    "cache_size": 3,
+    "num_fds": 4,
+    "cpu_user": 0.04586745599999997,
+    "cpu_system": 0.017421408000000027,
+    "num_ctx_switches_voluntary": 98,
+    "rss": 3833856,
+    "vms": 135634944,
+    "pfaults": 5651,
+    "pageins": 25
+  },
+  "api-stats": {},
+  "metrics": [
+    {
+      "MetricName": "ResourceCount",
+      "Timestamp": "2022-09-21T11:51:00.847929",
+      "Value": 1,
+      "Unit": "Count"
+    },
+    {
+      "MetricName": "ResourceTime",
+      "Timestamp": "2022-09-21T11:51:00.847969",
+      "Value": 1.9300286769866943,
+      "Unit": "Seconds"
+    },
+    {
+      "MetricName": "ActionTime",
+      "Timestamp": "2022-09-21T11:51:00.849601",
+      "Value": 5.0067901611328125e-06,
+      "Unit": "Seconds"
+    }
+  ]
+}
