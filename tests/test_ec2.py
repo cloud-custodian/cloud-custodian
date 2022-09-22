@@ -280,6 +280,7 @@ class TestSetMetadata(BaseTest):
             ('set-metadata-access implicitly filtered 1 of 2 resources '
              'key:MetadataOptions.HttpTokens on optional\n'))
 
+
 class TestSetMetadataTags(BaseTest):
 
     def test_set_metadata_server(self):
@@ -317,6 +318,7 @@ class TestSetMetadataTags(BaseTest):
             output.getvalue(),
             ('set-metadata-access implicitly filtered 1 of 2 resources '
              'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
+
 
 class TestMetricFilter(BaseTest):
 
