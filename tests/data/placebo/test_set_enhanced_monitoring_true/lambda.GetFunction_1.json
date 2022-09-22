@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "lambda-set-enhanced-monitoring",
+            "FunctionArn": "arn:aws:lambda:us-east-1:1234:function:lambda-set-enhanced-monitoring",
+            "Runtime": "python3.9",
+            "Role": "arn:aws:iam::1234:role/service-role/lambda-set-enhanced-monitoring-role-1234",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 275,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2022-09-22T06:29:54.000+0000",
+            "CodeSha256": "7654/1234=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "Active"
+            },
+            "RevisionId": "ce3b417e-b363-444d-8659-8fb764015472",
+            "Layers": [
+                {
+                    "Arn": "arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21",
+                    "CodeSize": 4197733
+                }
+            ],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://dev-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/12345/lambda-set-enhanced-monitoring-1234"
+        }
+    }
+}
