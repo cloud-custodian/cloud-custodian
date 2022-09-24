@@ -1137,7 +1137,7 @@ class SetMetadataServerAccess(BaseAction):
              - MetadataOptions.HttpEndpoint: enabled
            actions:
              - type: set-metadata-access
-               endpoint: disabled 
+               endpoint: disabled
 
        policies:
          - name: ec2-disable-imds
