@@ -1641,22 +1641,24 @@ class ParameterFilter(ValueFilter):
 
         param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
                         for db in resources}
+        cache = self.manager._cache
 
         for pg in param_groups:
-            cache_key = {
-                'region': self.manager.config.region,
-                'account_id': self.manager.config.account_id,
-                'rds-pg': pg}
-            pg_values = self.manager._cache.get(cache_key)
-            if pg_values is not None:
-                paramcache[pg] = pg_values
-                continue
-            param_list = list(itertools.chain(*[p['Parameters']
-                for p in paginator.paginate(DBParameterGroupName=pg)]))
-            paramcache[pg] = {
-                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in param_list if 'ParameterValue' in p}
-            self.manager._cache.save(cache_key, paramcache[pg])
+            with cache:
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'rds-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    paramcache[pg] = pg_values
+                    continue
+                param_list = list(itertools.chain(*[p['Parameters']
+                    for p in paginator.paginate(DBParameterGroupName=pg)]))
+                paramcache[pg] = {
+                    p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
+                    for p in param_list if 'ParameterValue' in p}
+                cache.save(cache_key, paramcache[pg])
 
         for resource in resources:
             for pg in resource['DBParameterGroups']:
