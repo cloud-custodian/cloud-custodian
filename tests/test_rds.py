@@ -1672,7 +1672,11 @@ class TestRDSParameterGroupFilter(BaseTest):
             },
             session_factory=session_factory, cache=True,
         )
+        output = self.capture_logging(
+            name=p.resource_manager.log.name, level=logging.DEBUG
+        )
         resources = pol.run()
+        self.assertTrue("Using cached c7n.resources.rds.RDS: 1", output.getvalue())
         self.assertEqual(len(resources), 0)
 
 
