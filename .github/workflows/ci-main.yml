@@ -1,5 +1,6 @@
 name: "CI"
-
+env:
+  POETRY_VERSION: "1.2.1"
 on:
   push:
     branches:
@@ -55,7 +56,7 @@ jobs:
         shell: bash
         run: |
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.9
+            | python - -y --version $POETRY_VERSION
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -148,7 +149,7 @@ jobs:
         shell: bash
         run: |
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.13
+            | python - -y --version $POETRY_VERSION
 
       - name: Set up cache
         uses: actions/cache@v2
