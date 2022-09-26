@@ -1886,6 +1886,7 @@ class LakeformationFilter(Filter):
         account[self.annotation] = list(cross_account)
         return True
 
+
 @actions.register('toggle-config-managed-rule')
 class ToggleConfigManagedRule(BaseAction):
     """Enables or disables an AWS Config Managed Rule
