@@ -19,6 +19,7 @@ from c7n.resources import rds
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
+from c7n import cache, config
 
 from .common import BaseTest, event_data
 
@@ -1649,7 +1650,7 @@ class TestRDSParameterGroupFilter(BaseTest):
                     },
                 ],
             },
-            session_factory=session_factory, cache=True
+            session_factory=session_factory, cache=True,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -1670,7 +1671,7 @@ class TestRDSParameterGroupFilter(BaseTest):
                     },
                 ],
             },
-            session_factory=session_factory, cache=True
+            session_factory=session_factory, cache=True,
         )
         resources = pol.run()
         self.assertEqual(len(resources), 0)
