@@ -1835,9 +1835,9 @@ class SecHubEnabled(Filter):
         return []
 
 
-@actions.register('enable-config-managed-rule')
-class EnableConfigManagedRule(BaseAction):
-    """Enables an AWS Config Managed Rule
+@actions.register('toggle-config-managed-rule')
+class ToggleConfigManagedRule(BaseAction):
+    """Enables or disables an AWS Config Managed Rule
 
     :example:
 
@@ -1890,10 +1890,11 @@ class EnableConfigManagedRule(BaseAction):
         'config:PutConfigRule',
     )
 
-    schema = type_schema('enable-config-managed-rule',
+    schema = type_schema('toggle-config-managed-rule',
+        enabled={'type': 'boolean', 'default': True},
         rule_name={'type': 'string'},
-        rule_id={'type': 'string'},
         rule_prefix={'type': 'string'},
+        managed_rule_id={'type': 'string'},
         resource_types={'type': 'array', 'items':
                         {'pattern': '^AWS::*', 'type': 'string'}},
         resource_tag={
@@ -1925,20 +1926,39 @@ class EnableConfigManagedRule(BaseAction):
             },
         },
         tags={'type': 'object'},
-        required=['rule_id', 'rule_name'],
+        required=['rule_name'],
     )
 
     def process(self, accounts):
         client = local_session(self.manager.session_factory).client('config')
         rule = self.ConfigManagedRule(self.data)
         params = self.get_rule_params(rule)
-        client.put_config_rule(**params)
 
-        if rule.remediation:
-            remediation_params = self.get_remediation_params(rule)
-            client.put_remediation_configurations(
-                RemediationConfigurations=[remediation_params]
-            )
+        if self.data.get('enabled', True):
+            if not rule.managed_rule_id:
+                raise PolicyValidationError("missing managed config rule id")
+
+            client.put_config_rule(**params)
+
+            if rule.remediation:
+                remediation_params = self.get_remediation_params(rule)
+                client.put_remediation_configurations(
+                    RemediationConfigurations=[remediation_params]
+                )
+        else:
+            try:
+                client.delete_remediation_configuration(
+                    ConfigRuleName=rule.name
+                )
+            except client.exceptions.NoSuchRemediationConfigurationException:
+                pass
+
+            try:
+                client.delete_config_rule(
+                    ConfigRuleName=rule.name
+                )
+            except client.exceptions.NoSuchConfigRuleException:
+                pass
 
     def get_rule_params(self, rule):
         params = dict(
@@ -1998,7 +2018,7 @@ class EnableConfigManagedRule(BaseAction):
 
         @property
         def managed_rule_id(self):
-            return self.data.get('rule_id', '')
+            return self.data.get('managed_rule_id', '')
 
         @property
         def resource_tag(self):

@@ -1218,18 +1218,18 @@ class AccountDataEvents(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_enable_config_managed_rule(self):
-        session_factory = self.replay_flight_data("test_enable_config_managed_rule")
+    def test_toggle_config_managed_rule(self):
+        session_factory = self.replay_flight_data("test_toggle_config_managed_rule")
         p = self.load_policy(
             {
                 "name": "enable-config-managed-rule",
                 "resource": "account",
                 "actions": [
                     {
-                        "type": "enable-config-managed-rule",
+                        "type": "toggle-config-managed-rule",
                         "rule_name": "enable-config-managed-rule",
                         "rule_prefix": "test-",
-                        "rule_id": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED",
+                        "managed_rule_id": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED",
                         "resource_types": [
                             "AWS::S3::Bucket"
                         ],
