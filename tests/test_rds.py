@@ -1651,14 +1651,6 @@ class TestRDSParameterGroupFilter(BaseTest):
             },
             session_factory=session_factory, cache=True,
         )
-        cache = p.resource_manager._cache
-        cache_key = {
-            'region': 'us-east-1',
-            'account_id': '644160558196',
-            'rds-pg': 'test'}
-        with cache:
-            pg_values = cache.get(cache_key)
-        assert pg_values is None
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
@@ -1666,10 +1658,6 @@ class TestRDSParameterGroupFilter(BaseTest):
             'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
         self.assertIn(('DBParameterGroupName', 'test'), resources[0].get(
             'DBParameterGroups')[0].items())
-        with cache:
-            pg_values = cache.get(cache_key)
-        self.assertEqual(
-            pg_values.get('rds.force_admin_logging_level'), 'info')
         pol = self.load_policy(
             {
                 "name": "rds-param-value",
@@ -1686,11 +1674,7 @@ class TestRDSParameterGroupFilter(BaseTest):
             },
             session_factory=session_factory, cache=True,
         )
-        output = self.capture_logging(
-            name=p.resource_manager.log.name, level=logging.DEBUG
-        )
         resources = pol.run()
-        self.assertTrue("Using cached c7n.resources.rds.RDS: 1", output.getvalue())
         self.assertEqual(len(resources), 0)
 
 
