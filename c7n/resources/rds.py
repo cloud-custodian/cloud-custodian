@@ -1655,7 +1655,7 @@ class ParameterFilter(ValueFilter):
         return pgcache
 
     def process(self, resources, event=None):
-        results = []        
+        results = []
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_parameters')
         param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
