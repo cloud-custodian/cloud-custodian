@@ -1656,6 +1656,24 @@ class TestRDSParameterGroupFilter(BaseTest):
         self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
         self.assertEqual(resources[0].get(
             'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
+        pol = self.load_policy(
+            {
+                "name": "rds-param-value",
+                "resource": "aws.rds",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "rds.force_admin_logging_level",
+                        "value": "info",
+                        "value_type": "normalize",
+                        "op": "ne",
+                    },
+                ],
+            },
+            session_factory=session_factory, cache=True
+        )
+        resources = pol.run()
+        self.assertEqual(len(resources), 0)
 
 
 class Resize(BaseTest):
