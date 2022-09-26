@@ -1656,7 +1656,8 @@ class TestRDSParameterGroupFilter(BaseTest):
         self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
         self.assertEqual(resources[0].get(
             'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
-        self.assertIn(('DBParameterGroupName', 'test'), resources[0].get('DBParameterGroups')[0].items())
+        self.assertIn(('DBParameterGroupName', 'test'), resources[0].get(
+            'DBParameterGroups')[0].items())
         pol = self.load_policy(
             {
                 "name": "rds-param-value",
