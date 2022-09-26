@@ -1,0 +1,356 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "track_activities",
+                "Description": "Collects information about executing commands.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "track_activity_query_size",
+                "ParameterValue": "4096",
+                "Description": "Sets the size reserved for pg_stat_activity.current_query, in bytes.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "100-102400",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "track_commit_timestamp",
+                "Description": "Collects transaction commit time.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "track_counts",
+                "Description": "Collects statistics on database activity.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "track_functions",
+                "ParameterValue": "pl",
+                "Description": "Collects function-level statistics on database activity.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "none,pl,all",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "track_io_timing",
+                "ParameterValue": "1",
+                "Description": "Collects timing statistics on database IO activity.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "transform_null_equals",
+                "Description": "Treats expr=NULL as expr IS NULL.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "unix_socket_directories",
+                "ParameterValue": "/tmp",
+                "Description": "Sets the directory where the Unix-domain socket will be created.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "unix_socket_group",
+                "ParameterValue": "rdsdb",
+                "Description": "Sets the owning group of the Unix-domain socket.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "unix_socket_permissions",
+                "ParameterValue": "0700",
+                "Description": "Sets the access permissions of the Unix-domain socket.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-511",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "update_process_title",
+                "Description": "Updates the process title to show the active SQL command.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cleanup_index_scale_factor",
+                "Description": "Number of tuple inserts prior to index cleanup as a fraction of reltuples.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-10000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cost_delay",
+                "Description": "(ms) Vacuum cost delay in milliseconds.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-100",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cost_limit",
+                "Description": "Vacuum cost amount available before napping.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-10000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cost_page_dirty",
+                "Description": "Vacuum cost for a page dirtied by vacuum.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-10000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cost_page_hit",
+                "Description": "Vacuum cost for a page found in the buffer cache.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-10000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_cost_page_miss",
+                "ParameterValue": "5",
+                "Description": "Vacuum cost for a page not found in the buffer cache.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-10000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_defer_cleanup_age",
+                "Description": "Number of transactions by which VACUUM and HOT cleanup should be deferred, if any.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_freeze_min_age",
+                "Description": "Minimum age at which VACUUM should freeze a table row.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_freeze_table_age",
+                "Description": "Age at which VACUUM should scan whole table to freeze tuples.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_multixact_freeze_min_age",
+                "Description": "Minimum age at which VACUUM should freeze a MultiXactId in a table row.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-1000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "vacuum_multixact_freeze_table_age",
+                "Description": "Multixact age at which VACUUM should scan whole table to freeze tuples.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_buffers",
+                "Description": "(8kB) Sets the number of disk-page buffers in shared memory for WAL.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "-1-262143",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_compression",
+                "Description": "Compresses full-page writes written in WAL file.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_keep_segments",
+                "ParameterValue": "32",
+                "Description": "Sets the number of WAL files held for standby servers.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_receiver_status_interval",
+                "Description": "(s) Sets the maximum interval between WAL receiver status reports to the primary.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_receiver_timeout",
+                "ParameterValue": "30000",
+                "Description": "(ms) Sets the maximum wait time to receive data from the primary.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-3600000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_sender_timeout",
+                "ParameterValue": "30000",
+                "Description": "(ms) Sets the maximum time to wait for WAL replication.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-3600000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_sync_method",
+                "Description": "Selects the method used for forcing WAL updates to disk.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "fsync,fdatasync,open_sync,open_datasync",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_writer_delay",
+                "Description": "(ms) WAL writer sleep time between WAL flushes.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-10000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "wal_writer_flush_after",
+                "Description": "(8Kb) Amount of WAL written out by WAL writer triggering a flush.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "work_mem",
+                "Description": "(kB) Sets the maximum memory to be used for query workspaces.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "64-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "xmlbinary",
+                "Description": "Sets how binary values are to be encoded in XML.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "base64,hex",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "xmloption",
+                "Description": "Sets whether XML data in implicit parsing and serialization operations is to be considered as documents or content fragments.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "content,document",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

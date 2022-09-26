@@ -1,0 +1,1028 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "pg_prewarm.autoprewarm",
+                "Description": "Starts the autoprewarm worker.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_prewarm.autoprewarm_interval",
+                "Description": "Sets the interval between dumps of shared buffers",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.block_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.block_threshold",
+                "Description": "Sets the threshold used by the Block similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.block_tokenizer",
+                "Description": "Sets the tokenizer for Block similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_threshold",
+                "Description": "Sets the threshold used by the Cosine similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.cosine_tokenizer",
+                "Description": "Sets the tokenizer for Cosine similarity function.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.dice_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.dice_threshold",
+                "Description": "Sets the threshold used by the Dice similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.dice_tokenizer",
+                "Description": "Sets the tokenizer for Dice similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_threshold",
+                "Description": "Sets the threshold used by the Euclidean similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.euclidean_tokenizer",
+                "Description": "Sets the tokenizer for Euclidean similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.hamming_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.hamming_threshold",
+                "Description": "Sets the threshold used by the Block similarity metric.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jaccard_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jaccard_threshold",
+                "Description": "Sets the threshold used by the Jaccard similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jaccard_tokenizer",
+                "Description": "Sets the tokenizer for Jaccard similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jaro_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jaro_threshold",
+                "Description": "Sets the threshold used by the Jaro similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jarowinkler_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.jarowinkler_threshold",
+                "Description": "Sets the threshold used by the Jarowinkler similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.levenshtein_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.levenshtein_threshold",
+                "Description": "Sets the threshold used by the Levenshtein similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.matching_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.matching_threshold",
+                "Description": "Sets the threshold used by the Matching Coefficient similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.matching_tokenizer",
+                "Description": "Sets the tokenizer for Matching Coefficient similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.mongeelkan_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.mongeelkan_threshold",
+                "Description": "Sets the threshold used by the Monge-Elkan similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.mongeelkan_tokenizer",
+                "Description": "Sets the tokenizer for Monge-Elkan similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.nw_gap_penalty",
+                "Description": "Sets the gap penalty used by the Needleman-Wunsch similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "-9223370000000000000-9223370000000000000",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.nw_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.nw_threshold",
+                "Description": "Sets the threshold used by the Needleman-Wunsch similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.overlap_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.overlap_threshold",
+                "Description": "Sets the threshold used by the Overlap Coefficient similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.overlap_tokenizer",
+                "Description": "Sets the tokenizer for Overlap Coefficientsimilarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.qgram_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.qgram_threshold",
+                "Description": "Sets the threshold used by the Q-Gram similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.qgram_tokenizer",
+                "Description": "Sets the tokenizer for Q-Gram measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "alnum,gram,word,camelcase",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.swg_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.swg_threshold",
+                "Description": "Sets the threshold used by the Smith-Waterman-Gotoh similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.sw_is_normalized",
+                "Description": "Sets if the result value is normalized or not.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_similarity.sw_threshold",
+                "Description": "Sets the threshold used by the Smith-Waterman similarity measure.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_stat_statements.max",
+                "Description": "Sets the maximum number of statements tracked by pg_stat_statements.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "100-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_stat_statements.save",
+                "Description": "Save pg_stat_statements statistics across server shutdowns.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_stat_statements.track",
+                "Description": "Selects which statements are tracked by pg_stat_statements.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "NONE,TOP,ALL",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_stat_statements.track_utility",
+                "Description": "Selects whether utility commands are tracked by pg_stat_statements.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_transport.num_workers",
+                "Description": "Number of workers to use for a physical transport.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1-32",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_transport.timing",
+                "Description": "Specifies whether to report timing information during transport.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "12.2",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "pg_transport.work_mem",
+                "Description": "(kB) Amount of memory each worker can allocate for a physical transport.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "65536-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "plan_cache_mode",
+                "Description": "Controls the planner selection of custom or generic plan.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "auto,force_generic_plan,force_custom_plan",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "port",
+                "ParameterValue": "{EndPointPort}",
+                "Description": "Sets the TCP port the server listens on.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "1-65535",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "postgis.gdal_enabled_drivers",
+                "ParameterValue": "ENABLE_ALL",
+                "Description": "Enable for disable GDAL drivers used with PostGIS in Postgres 9.3.5 and above.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "AllowedValues": "ENABLE_ALL,DISABLE_ALL",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "quote_all_identifiers",
+                "Description": "When generating SQL fragments, quote all identifiers.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "random_page_cost",
+                "Description": "Sets the planners estimate of the cost of a nonsequentially fetched disk page.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1.79769e+308",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rdkit.dice_threshold",
+                "Description": "Lower threshold of Dice similarity. Molecules with similarity lower than threshold are not similar by # operation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "12.4",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rdkit.do_chiral_sss",
+                "Description": "Should stereochemistry be taken into account in substructure matching. If false, no stereochemistry information is used in substructure matches.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "12.4",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rdkit.tanimoto_threshold",
+                "Description": "Lower threshold of Tanimoto similarity. Molecules with similarity lower than threshold are not similar by % operation.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "12.4",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.adaptive_autovacuum",
+                "ParameterValue": "1",
+                "Description": "RDS parameter to enable/disable adaptive autovacuum.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.allowed_extensions",
+                "Description": "Comma-delimited list of extensions that may be installed.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "MinimumEngineVersion": "12.6",
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.custom_dns_resolution",
+                "ParameterValue": "0",
+                "Description": "Allow DNS resolution in Customer VPC.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.extensions",
+                "ParameterValue": "address_standardizer, address_standardizer_data_us, amcheck, aws_commons, aws_lambda, aws_s3, bloom, btree_gin, btree_gist, citext, cube, dblink, dict_int, dict_xsyn, earthdistance, fuzzystrmatch, hll, hstore, hstore_plperl, intagg, intarray, ip4r, isn, jsonb_plperl, lo, log_fdw, ltree, oracle_fdw, orafce, pageinspect, pgaudit, pgcrypto, pglogical, pgrouting, pgrowlocks, pgstattuple, pgtap, pg_bigm, pg_buffercache, pg_cron, pg_freespacemap, pg_hint_plan, pg_partman, pg_prewarm, pg_proctab, pg_repack, pg_similarity, pg_stat_statements, pg_transport, pg_trgm, pg_visibility, plcoffee, plls, plperl, plpgsql, plprofiler, pltcl, plv8, postgis, postgis_tiger_geocoder, postgis_raster, postgis_topology, postgres_fdw, prefix, rdkit, sslinfo, tablefunc, test_parser, tsm_system_rows, tsm_system_time, unaccent, uuid-ossp",
+                "Description": "List of extensions provided by RDS",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.force_admin_logging_level",
+                "ParameterValue": "info",
+                "Description": "See log messages for RDS admin user actions in customer databases.",
+                "Source": "user",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "disabled,debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "immediate"
+            },
+            {
+                "ParameterName": "rds.force_autovacuum_logging_level",
+                "ParameterValue": "INFO",
+                "Description": "See log messages related to autovacuum operations.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "disabled,debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.force_ssl",
+                "ParameterValue": "0",
+                "Description": "Force SSL connections.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.logical_replication",
+                "ParameterValue": "0",
+                "Description": "Enables logical decoding.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.log_retention_period",
+                "ParameterValue": "4320",
+                "Description": "Amazon RDS will delete PostgreSQL log that are older than N minutes.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "1440-10080",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.max_tcp_buffers",
+                "ParameterValue": "33554432",
+                "Description": "Sets the maximum size for tcp buffers.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "4096-1000000000",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.pg_stat_ramdisk_size",
+                "ParameterValue": "0",
+                "Description": "Size of the stats ramdisk in MB. A nonzero value signals HM to set up the ramdisk.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-8196",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.rds_superuser_reserved_connections",
+                "ParameterValue": "2",
+                "Description": "Sets the number of connection slots reserved for rds_superusers.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-8388607",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.restrict_password_commands",
+                "Description": "restricts password-related commands to members of rds_password",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "rds.superuser_variables",
+                "ParameterValue": "session_replication_role",
+                "Description": "List of superuser-only variables for which we elevate rds_superuser modification statements.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "restart_after_crash",
+                "Description": "Reinitialize server after backend crash.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "row_security",
+                "Description": "Enable row security.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "search_path",
+                "Description": "Sets the schema search order for names that are not schema-qualified.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "seq_page_cost",
+                "Description": "Sets the planners estimate of the cost of a sequentially fetched disk page.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "float",
+                "AllowedValues": "0-1.79769e+308",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "session_replication_role",
+                "Description": "Sets the sessions behavior for triggers and rewrite rules.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "origin,replica,local",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "shared_buffers",
+                "ParameterValue": "{DBInstanceClassMemory/32768}",
+                "Description": "(8kB) Sets the number of shared memory buffers used by the server.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "16-1073741823",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "shared_preload_libraries",
+                "ParameterValue": "pg_stat_statements",
+                "Description": "Lists shared libraries to preload into server.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "auto_explain,orafce,pgaudit,pglogical,pg_bigm,pg_cron,pg_hint_plan,pg_prewarm,pg_similarity,pg_stat_statements,pg_transport,plprofiler",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl",
+                "ParameterValue": "1",
+                "Description": "Enables SSL connections.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_ca_file",
+                "ParameterValue": "/rdsdbdata/rds-metadata/ca-cert.pem",
+                "Description": "Location of the SSL server authority file.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_cert_file",
+                "ParameterValue": "/rdsdbdata/rds-metadata/server-cert.pem",
+                "Description": "Location of the SSL server certificate file.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_ciphers",
+                "Description": "Sets the list of allowed SSL ciphers.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_key_file",
+                "ParameterValue": "/rdsdbdata/rds-metadata/server-key.pem",
+                "Description": "Location of the SSL server private key file",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_max_protocol_version",
+                "Description": "Sets the maximum SSL/TLS protocol version to use.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "ssl_min_protocol_version",
+                "ParameterValue": "TLSv1.2",
+                "Description": "Sets the minimum SSL/TLS protocol version to use.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "standard_conforming_strings",
+                "Description": "Causes ... strings to treat backslashes literally.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "statement_timeout",
+                "Description": "(ms) Sets the maximum allowed duration of any statement.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "stats_temp_directory",
+                "ParameterValue": "/rdsdbdata/db/pg_stat_tmp",
+                "Description": "Writes temporary statistics files to the specified directory.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "superuser_reserved_connections",
+                "ParameterValue": "3",
+                "Description": "Sets the number of connection slots reserved for superusers.",
+                "Source": "system",
+                "ApplyType": "static",
+                "DataType": "integer",
+                "AllowedValues": "0-8388607",
+                "IsModifiable": false,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "synchronize_seqscans",
+                "Description": "Enable synchronized sequential scans.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "boolean",
+                "AllowedValues": "0,1",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "synchronous_commit",
+                "ParameterValue": "on",
+                "Description": "Sets the current transactions synchronization level.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "local,on,off",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "tcp_keepalives_count",
+                "Description": "Maximum number of TCP keepalive retransmits.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "tcp_keepalives_idle",
+                "Description": "(s) Time between issuing TCP keepalives.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "tcp_keepalives_interval",
+                "Description": "(s) Time between TCP keepalive retransmits.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "0-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "temp_buffers",
+                "Description": "(8kB) Sets the maximum number of temporary buffers used by each session.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "100-1073741823",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "temp_file_limit",
+                "Description": "(kB) Limits the total size of all temporary files used by each process.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "-1-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "temp_tablespaces",
+                "Description": "Sets the tablespace(s) to use for temporary tables and sort files.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            },
+            {
+                "ParameterName": "timezone",
+                "ParameterValue": "UTC",
+                "Description": "Sets the time zone for displaying and interpreting time stamps.",
+                "Source": "system",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "Marker": "dGltZXpvbmU=",
+        "ResponseMetadata": {}
+    }
+}
