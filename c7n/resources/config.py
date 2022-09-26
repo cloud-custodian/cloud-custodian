@@ -6,6 +6,7 @@ from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
+from c7n.tags import universal_augment
 
 
 @resources.register('config-recorder')
@@ -84,6 +85,8 @@ class ConfigRule(QueryResourceManager):
         filter_type = 'list'
         cfn_type = 'AWS::Config::ConfigRule'
         universal_taggable = True
+
+    augment = universal_augment
 
 
 @ConfigRule.filter_registry.register('status')

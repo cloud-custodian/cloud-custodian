@@ -2,8 +2,9 @@
 
 ## Leads
 
-- Kapil Thangavelu @kapilt (@kapilt)
+- Kapil Thangavelu (@kapilt)
   project lead (bdfl)
+- Darren Dao (@darrendao)
 
 ## Aws Provider Maintainers
 
@@ -22,6 +23,13 @@
 - Stefan Gordon (@stefangordon)
 - Andy Luong (@aluong)
 - Kiril Logachev (@logachev)
+
+## Community Manager 
+
+Administrative duties on behalf of the maintainers,
+used for governance/CNCF contact, no code rights
+
+- Jorge Castro (@castrojo)
 
 # Emeritus
 

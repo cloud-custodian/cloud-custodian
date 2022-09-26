@@ -889,6 +889,13 @@ class PolicyLambdaProvision(Publish):
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
         )
 
+    def test_different_lambda_handler(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {"handler": "custom.handler"}}}))
+        self.assertEqual(
+            p.get_config()["Handler"],
+            "custom.handler"
+        )
+
     def test_config_defaults(self):
         p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
         self.maxDiff = None
@@ -902,7 +909,7 @@ class PolicyLambdaProvision(Publish):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.8",
+                "Runtime": "python3.9",
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},

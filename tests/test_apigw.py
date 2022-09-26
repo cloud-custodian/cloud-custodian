@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 
 class TestRestAccount(BaseTest):
@@ -53,6 +53,22 @@ class TestRestAccount(BaseTest):
 
 class TestRestApi(BaseTest):
 
+    def test_rest_api_cross_account(self):
+        session_factory = self.replay_flight_data('test_rest_api_cross_account_default')
+        p = self.load_policy(
+            {'name': 'api-cross-account-default',
+             'resource': 'rest-api',
+             'filters': [{'type': 'cross-account'}]},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            resources[0]['CrossAccountViolations'],
+            [{'Action': 'execute-api:Invoke',
+              'Effect': 'Allow',
+              'Principal': '*'}])
+
     def test_rest_api_update(self):
         session_factory = self.replay_flight_data('test_rest_api_update')
         p = self.load_policy({
@@ -99,7 +115,7 @@ class TestRestApi(BaseTest):
             ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         tags = client.get_tags(resourceArn='arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27')
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
@@ -114,8 +130,8 @@ class TestRestApi(BaseTest):
             "actions": [{"type": "delete"}]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
-        self.assertTrue(resources[0]['id'], 'am0c2fyskg')
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'am0c2fyskg')
         client = session_factory().client("apigateway")
         with self.assertRaises(ClientError) as e:
             client.delete_rest_api(restApiId='am0c2fyskg')
@@ -416,12 +432,177 @@ class TestRestStage(BaseTest):
             ]},
             session_factory=session_factory)
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         tags = client.get_tags(
             resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})
+
+    def test_wafv2(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "wafv2-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        self.assertEqual(len(resources), 2)
+
+    def test_waf(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_waf_no_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafregional_to_wafv2(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafregional_to_wafv2_with_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "web-acl": "test", "state": False}],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2", "state": True}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafv2_to_wafregional(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_wafv2_to_wafregional_with_acl(self):
+        factory = self.replay_flight_data("test_rest_stage_waf")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "web-acl": "testv2", "state": False}],
+                "actions": [{"type": "set-waf", "web-acl": "test", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-apigw-active-response",
+                "resource": "rest-stage",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "apigateway.amazonaws.com",
+                    "ids": "responseElements.deploymentId",
+                    "event": "CreateStage"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        event = {
+            "detail": event_data("event-cloud-trail-create-rest-stage.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_active_response_tag_resource(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-apigw-active-response-tag-resource",
+                "resource": "rest-stage",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "apigateway.amazonaws.com",
+                    "ids": "requestParameters.resourceArn",
+                    "event": "TagResource"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-tag-rest-stage.json"))
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestClientCertificate(BaseTest):
@@ -550,3 +731,37 @@ class TestCustomDomainName(BaseTest):
         client = factory().client("apigateway")
         result = client.get_domain_name(domainName="bad.example.com")
         self.assertEqual(result['securityPolicy'], 'TLS_1_2')
+
+
+class TestResourcePolicy(BaseTest):
+    def test_rest_api_default_resource_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_api_default_resource_policy')
+        p = self.load_policy({
+            'name': 'test-rest-api-default-resource-policy',
+            'resource': 'rest-api',
+            'filters': [{'type': 'cross-account'}],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], '6wv8r5sehj')
+
+    def test_rest_api_custom_resource_policy(self):
+        session_factory = self.replay_flight_data(
+            'test_rest_api_custom_resource_policy')
+        p = self.load_policy({
+            'name': 'test-rest-api-custom-resource-policy',
+            'resource': 'rest-api',
+            'filters': [
+                {
+                    'type': 'cross-account',
+                    'whitelist_vpc': ['vpc-011b11111fb2a6b11']
+                }
+            ],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'kjh6l7usy5')
+        self.assertEqual(resources[0]['name'], 'bad-api-gw')

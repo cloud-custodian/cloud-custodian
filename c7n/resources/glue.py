@@ -165,6 +165,62 @@ class DeleteJob(BaseAction):
                 continue
 
 
+@GlueJob.action_registry.register('toggle-metrics')
+class GlueJobToggleMetrics(BaseAction):
+    """Enable or disable CloudWatch metrics for a Glue job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gluejob-enable-metrics
+            resource: glue-job
+            filters:
+              - type: value
+                key: 'DefaultArguments."--enable-metrics"'
+                value: absent
+            actions:
+              - type: toggle-metrics
+                enabled: true
+    """
+    schema = type_schema(
+        'toggle-metrics',
+        enabled={'type': 'boolean'},
+        required=['enabled'],
+    )
+    permissions = ('glue:UpdateJob',)
+
+    def prepare_params(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        update_keys = client.meta._service_model.shape_for('JobUpdate').members
+        want_keys = set(r).intersection(update_keys) - {'AllocatedCapacity'}
+        params = {k: r[k] for k in want_keys}
+
+        # Can't specify MaxCapacity when updating/creating a job if
+        # job configuration includes WorkerType or NumberOfWorkers
+        if 'WorkerType' in params or 'NumberOfWorkers' in params:
+            del params['MaxCapacity']
+
+        if self.data.get('enabled'):
+            params["DefaultArguments"]["--enable-metrics"] = ""
+        else:
+            del params["DefaultArguments"]["--enable-metrics"]
+
+        return params
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+
+        for r in resources:
+            try:
+                job_name = r["Name"]
+                updated_resource = self.prepare_params(r)
+                client.update_job(JobName=job_name, JobUpdate=updated_resource)
+            except Exception as e:
+                self.log.error('Error updating glue job: {}'.format(e))
+
+
 @resources.register('glue-crawler')
 class GlueCrawler(QueryResourceManager):
 

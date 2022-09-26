@@ -1,5 +1,6 @@
 name: "CI"
-
+env:
+  POETRY_VERSION: "1.2.1"
 on:
   push:
     branches:
@@ -50,19 +51,19 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Bootstrap poetry
         shell: bash
         run: |
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.9
+            | python - -y --version $POETRY_VERSION
 
       - name: Set up cache
         uses: actions/cache@v2
         id: cache
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-3.9-${{ hashFiles('**/poetry.lock') }}
+          key: venv-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up doc cache
         uses: actions/cache@v2
@@ -74,7 +75,7 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}-1
+          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash
@@ -109,6 +110,14 @@ jobs:
         run: |
           make sphinx
 
+      - name: Deploy Docs
+        if: ${{ github.event_name == 'push' }}
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: docs/build/html
+          target-folder: docs
+
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
@@ -140,7 +149,7 @@ jobs:
         shell: bash
         run: |
           curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.13
+            | python - -y --version $POETRY_VERSION
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -200,7 +209,7 @@ jobs:
             . test.env && poetry run pytest -n auto tests tools \
               --cov c7n --cov tools/c7n_azure/c7n_azure \
               --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
-              --cov tools/c7n_mailer/c7n_mailer
+              --cov tools/c7n_mailer/c7n_mailer --cov tools/c7n_tencentcloud/c7n_tencentcloud
             poetry run coverage xml
           else
             . test.env && poetry run pytest -n auto tests tools

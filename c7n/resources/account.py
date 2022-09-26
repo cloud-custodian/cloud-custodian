@@ -5,6 +5,7 @@
 import json
 import time
 import datetime
+import jmespath
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -17,13 +18,13 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-from .aws import shape_validate
+from .aws import shape_validate, Arn
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -48,6 +49,7 @@ class Account(ResourceManager):
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(QueryResourceManager.retry)
+    source_type = 'describe'
 
     class resource_type(TypeInfo):
         id = 'account_id'
@@ -56,6 +58,8 @@ class Account(ResourceManager):
         global_resource = True
         # fake this for doc gen
         service = "account"
+        # for posting config rule evaluations
+        cfn_type = 'AWS::::Account'
 
     @classmethod
     def get_permissions(cls):
@@ -117,6 +121,8 @@ class MacieEnabled(ValueFilter):
 
         if super().process([resources[0][self.annotation_key]]):
             return resources
+
+        return []
 
     def get_macie_info(self, account):
         client = local_session(
@@ -724,9 +730,9 @@ class ServiceLimit(Filter):
         return True
 
     def process(self, resources, event=None):
+        support_region = get_support_region(self.manager)
         client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
-
+            'support', region_name=support_region)
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
@@ -855,8 +861,9 @@ class RequestLimitIncrease(BaseAction):
     }
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        client = session.client('support', region_name='us-east-1')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         account_id = self.manager.config.account_id
         service_map = {}
         region_map = {}
@@ -1835,6 +1842,50 @@ class SecHubEnabled(Filter):
         return []
 
 
+@filters.register('lakeformation-s3-cross-account')
+class LakeformationFilter(Filter):
+    """Flags an account if its using a lakeformation s3 bucket resource from a different account.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: lakeformation-cross-account-bucket
+           resource: aws.account
+           filters:
+            - type: lakeformation-s3-cross-account
+
+    """
+
+    schema = type_schema('lakeformation-s3-cross-account', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lakeformation:ListResources',)
+    annotation = 'c7n:lake-cross-account-s3'
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.process_account(r):
+                results.append(r)
+        return results
+
+    def process_account(self, account):
+        client = local_session(self.manager.session_factory).client('lakeformation')
+        lake_buckets = {
+            Arn.parse(r).resource for r in jmespath.search(
+                'ResourceInfoList[].ResourceArn',
+                client.list_resources())
+        }
+        buckets = {
+            b['Name'] for b in
+            self.manager.get_resource_manager('s3').resources(augment=False)}
+        cross_account = lake_buckets.difference(buckets)
+        if not cross_account:
+            return False
+        account[self.annotation] = list(cross_account)
+        return True
+
 @actions.register('toggle-config-managed-rule')
 class ToggleConfigManagedRule(BaseAction):
     """Enables or disables an AWS Config Managed Rule
@@ -1876,7 +1927,7 @@ class ToggleConfigManagedRule(BaseAction):
             actions:
               - type: enable-config-managed-rule
                 rule_name: *rule_name
-                rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+                managed_rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
                 resource_types:
                   - 'AWS::S3::Bucket'
                 rule_parameters: '{}'

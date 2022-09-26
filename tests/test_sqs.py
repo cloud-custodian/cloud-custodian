@@ -6,14 +6,32 @@ from dateutil.tz import tzutc
 from pytest_terraform import terraform
 from botocore.exceptions import ClientError
 
-
 import json
 import logging
 import pytest
 import time
 from pathlib import Path
 
+from c7n.executor import MainThreadExecutor
+from c7n.resources.sqs import SQS
 from c7n.resources.aws import shape_validate, Arn
+
+
+def test_sqs_endpoint_url(test):
+    session_factory = test.replay_flight_data(
+        "test_sqs_endpoint_url", region="us-east-1")
+    p = test.load_policy({
+        'name': 'sqs-check',
+        'resource': 'aws.sqs'
+    }, session_factory=session_factory)
+    urls = [q['QueueUrl'] for q in p.run()]
+    assert urls == [
+        'https://sqs.us-east-1.amazonaws.com/644160558196/devtest2',
+        'https://sqs.us-east-1.amazonaws.com/644160558196/hubalytics-dev-ArchiveHourlyQueue-1VHR8KVX2MY48', # noqa
+        'https://sqs.us-east-1.amazonaws.com/644160558196/maid-delivery',
+    ]
+    assert p.resource_manager.get_client().meta.endpoint_url == (
+        "https://sqs.us-east-1.amazonaws.com")
 
 
 def test_sqs_config_translate(test):
@@ -694,3 +712,91 @@ class QueueTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n:AccessAnalysis', resources[0])
+
+    def test_sqs_has_statement_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sqs_has_statement"
+        )
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "test_sqs_has_statement_definition",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "sqs:*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{queue_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["QueueArn"],
+        "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement")
+
+    def test_sqs_has_statement_star_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sqs_has_statement"
+        )
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "test_sqs_has_statement_star_definition",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{queue_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["QueueArn"],
+        "arn:aws:sqs:us-east-1:644160558196:sqs-test-has-statement-star")
+
+    def test_sqs_deadletter_filter(self):
+        factory = self.replay_flight_data("test_sqs_deadletter_filter")
+        self.patch(SQS, "executor_factory", MainThreadExecutor)
+        policy = self.load_policy(
+            {
+                "name": "sqs-deadletter",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "QueueArn",
+                        "value": "arn:aws:sqs:us-east-1:644160558196:bar",
+                        "op": "ne"
+                    },
+                    {
+                        "type": "dead-letter"
+                    },
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)

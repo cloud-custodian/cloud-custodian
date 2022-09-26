@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 from c7n.filters.core import Filter, ValueFilter
 

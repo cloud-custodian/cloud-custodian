@@ -5,9 +5,28 @@ import time
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from dateutil import parser
+from freezegun import freeze_time
 
 
 class SqlInstanceTest(BaseTest):
+
+    def test_sqlinstance_label_params(self):
+        p = self.load_policy({
+            'name': 'sql-labels',
+            'resource': 'gcp.sql-instance'})
+        model = p.resource_manager.resource_type
+        assert model.get_label_params(
+            {'selfLink': 'https://gcp-sql/projects/abc-123/instances/rds-123'},
+            {'k': 'v'}) == {
+                'project': 'abc-123',
+                'instance': 'rds-123',
+                'body': {
+                    'settings': {
+                        'userLabels': {'k': 'v'}
+                    }
+                }
+        }
 
     def test_sqlinstance_query(self):
         project_id = 'cloud-custodian'
@@ -29,6 +48,28 @@ class SqlInstanceTest(BaseTest):
             {'project_id': 'cloud-custodian',
              'database_id': 'cloud-custodian:brenttest-2'})
         self.assertEqual(instance['state'], 'RUNNABLE')
+
+    def test_sqlinstance_offhour(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data("sqlinstance-offhour", project_id=project_id)
+        p = self.load_policy(
+            {
+                "name": "sql-offhour",
+                "resource": "gcp.sql-instance",
+                "filters": [
+                    {
+                        "type": "offhour",
+                        "default_tz": "utc",
+                        "offhour": 18,
+                        "tag": "custodian_offhours",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        with freeze_time(parser.parse("2022/09/01 02:15:00")):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
 
     def test_stop_instance(self):
         project_id = 'cloud-custodian'

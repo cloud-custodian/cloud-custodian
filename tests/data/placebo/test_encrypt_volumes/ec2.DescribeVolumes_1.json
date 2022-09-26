@@ -40,6 +40,12 @@
                 "VolumeId": "vol-0f53c81b92b4ecfce", 
                 "State": "in-use", 
                 "Iops": 100, 
+                "Tags": [
+                    {
+                        "Key": "owner",
+                        "Value": "custodian"
+                    }
+                ],
                 "SnapshotId": "snap-0120309fef406aa90", 
                 "CreateTime": {
                     "hour": 17, 
@@ -78,7 +84,13 @@
                 "VolumeType": "gp2", 
                 "VolumeId": "vol-06fb3a30a68993a66", 
                 "State": "in-use", 
-                "Iops": 100, 
+                "Iops": 100,
+                "Tags": [
+                    {
+                        "Key": "owner",
+                        "Value": "custodian"
+                    }
+                ],
                 "SnapshotId": "snap-0120309fef406aa90", 
                 "CreateTime": {
                     "hour": 17, 

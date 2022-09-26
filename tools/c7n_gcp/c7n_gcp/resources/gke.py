@@ -40,6 +40,12 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['location'],
                         resource_info['cluster_name'])})
 
+    def augment(self, resources):
+        for r in resources:
+            if r.get('resourceLabels'):
+                r['labels'] = r['resourceLabels']
+        return resources
+
 
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):

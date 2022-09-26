@@ -84,7 +84,7 @@ The standard way to do a DataDog integration is use the
 c7n integration with AWS CloudWatch and use the
 [DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/)
 to collect CloudWatch metrics. The mailer/messenger integration is only
-for the case you don't want or you can't use AWS CloudWatch.
+for the case you don't want or you can't use AWS CloudWatch, e.g. in Azure or GCP.
 
 Note this integration requires the additional dependency of datadog python bindings:
 ```
@@ -186,6 +186,8 @@ Slack integration for the mailer supports several flavors of messaging, listed b
 Slack delivery can also be set via a resource's tag name. For example, using "slack://tag/slack_channel" will look for a tag name of 'slack_channel', and if matched on a resource will deliver the message to the value of that resource's tag:
 
 `slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
+`slack_channel:custodian-test`
+`owner:foo@bar`
 
 Delivery via tag has been tested with webhooks but should support all delivery methods.
 
@@ -264,12 +266,14 @@ configuration you specify in a YAML file.  Here is [the
 schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform,
 and here is a description of the options:
 
-| Required? | Key             | Type             | Notes                                                                                                                                                                               |
-|:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
-|           | `from_address`  | string           | default from address                                                                                                                                                                |
-|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                                                                                                                                                                |
-|           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
+| Required? | Key             | Type             | Notes                                                             |
+|:---------:|:----------------|:-----------------|:------------------------------------------------------------------|
+| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                               | 
+|           | `from_address`  | string           | default from address                                              |
+|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                          |
+|           | `contact_tags`  | array of strings | tags that we should look at for address information               |
+|           | `email_base_url`| string           | Base URL to construct a valid email address from a resource owner |
+
 
 ### Standard Lambda Function Config
 
@@ -289,9 +293,9 @@ and here is a description of the options:
 | Required? | Key                   | Type   | Notes                                                                                  |
 |:---------:|:----------------------|:-------|:---------------------------------------------------------------------------------------|
 |           | `function_properties` | object | Contains `appInsights`, `storageAccount` and `servicePlan` objects                     |
-|           | `appInsights`         | object | Contains `name`, `location` and `resourceGroupName` properties                       |
-|           | `storageAccount`      | object | Contains `name`, `location` and `resourceGroupName` properties                       |
-|           | `servicePlan`         | object | Contains `name`, `location`, `resourceGroupName`, `skuTier` and `skuName` properties |
+|           | `appInsights`         | object | Contains `name`, `location` and `resourceGroupName` properties                         |
+|           | `storageAccount`      | object | Contains `name`, `location` and `resourceGroupName` properties                         |
+|           | `servicePlan`         | object | Contains `name`, `location`, `resourceGroupName`, `skuTier` and `skuName` properties   |
 |           | `name`                | string |                                                                                        |
 |           | `location`            | string | Default: `west us 2`                                                                   |
 |           | `resourceGroupName`   | string | Default `cloud-custodian`                                                              |
@@ -310,7 +314,7 @@ and here is a description of the options:
 |           | `debug`                     | boolean | debug on/off                                                                                                                                                                                       |
 |           | `ldap_bind_dn`              | string  | eg: ou=people,dc=example,dc=com                                                                                                                                                                    |
 |           | `ldap_bind_user`            | string  | eg: FOO\\BAR                                                                                                                                                                                       |
-|           | `ldap_bind_password`        | string  | ldap bind password                                                                                                                                                                                 |
+|           | `ldap_bind_password`        | secured string  | ldap bind password                                                                                                                                                                                 |
 |           | `ldap_bind_password_in_kms` | boolean | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`      | string  |                                                                                                                                                                                                    |
 |           | `ldap_email_key`            | string  | eg 'mail'                                                                                                                                                                                          |
@@ -407,6 +411,27 @@ You can store your secrets in Azure Key Vault secrets and reference them from th
 ```
 
 Note: `secrets.get` permission on the KeyVault for the Service Principal is required.
+
+#### GCP
+
+You can store your secrets as GCP Secret Manager secrets and reference them from the policy.
+
+```yaml
+  plaintext_secret: <raw_secret>
+  secured_string:
+    type: gcp.secretmanager
+    secret: projects/12345678912/secrets/your-secret
+```
+
+An example of an SMTP password set as a secured string:
+
+```yaml
+  smtp_password:
+    type: gcp.secretmanager
+    secret: projects/59808015552/secrets/smtp_pw
+```
+
+Note: If you do not specify a version, `/versions/latest` will be appended to your secret location.
 
 ## Configuring a policy to send email
 
@@ -598,6 +623,64 @@ function_properties:
   identity:
     type: SystemAssigned
 ```
+
+## Using on GCP
+
+Requires:
+
+- `c7n_gcp` package.  See [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
+- `google-cloud-secret-manager` package, for pulling in secured string values.
+- A working SMTP Account.
+- [GCP Pubsub Subscription](https://cloud.google.com/pubsub/docs/)
+
+The mailer supports GCP Pubsub transports and SMTP/Email delivery, as well as Datadog and Splunk.
+Configuration for this scenario requires only minor changes from AWS deployments.
+
+The notify action in your policy will reflect transport type `projects` with the URL
+to a GCP Pub/Sub Topic.  For example:
+
+```yaml
+policies:
+  - name: gcp-notify
+    resource: gcp.compute
+    description: example policy
+    actions:
+      - type: notify
+        template: default
+        priority_header: '2'
+        subject: Hello from C7N Mailer
+        to:
+          - you@youremail.com
+        transport:
+          type: pubsub
+          topic: projects/myproject/topics/mytopic
+```
+
+In your mailer configuration, you'll need to provide your SMTP account information
+as well as your topic subscription path in the queue_url variable. Please note that the
+subscription you specify should be subscribed to the topic you assign in your policies'
+notify action for GCP resources.
+
+```yaml
+queue_url: projects/myproject/subscriptions/mysubscription
+from_address: you@youremail.com
+# c7n-mailer currently requires a role be present, even if it's empty
+role: ""
+
+smtp_server: my.smtp.add.ress
+smtp_port: 25
+smtp_ssl: true
+smtp_username: smtpuser
+smtp_password:
+  type: gcp.secretmanager
+  secret: projects/12345678912/secrets/smtppassword
+```
+
+The mailer will transmit all messages found on the queue on each execution using SMTP/Email delivery.
+
+### Deploying GCP Functions
+
+GCP Cloud Functions for c7n-mailer are currently not supported.
 
 ## Writing an email template
 

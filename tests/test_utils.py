@@ -264,6 +264,22 @@ class UtilTest(BaseTest):
         self.assertTrue(a1 in n3)
         self.assertFalse(a1 in n4)
 
+    def test_ipv4_list(self):
+        n1 = utils.IPv4Network(u"10.0.0.0/16")
+        n2 = utils.IPv4Network(u"10.0.1.0/24")
+        n3 = utils.IPv4Network(u"10.0.0.5/32")
+        n4 = utils.IPv4Network(u"192.168.1.0/24")
+        IPV4_list = utils.IPv4List([n1, n2])
+        self.assertTrue(n3 in IPV4_list)
+        self.assertFalse(n4 in IPV4_list)
+
+        a1 = ipaddress.ip_address(u"10.0.1.16")
+        self.assertTrue(a1 in IPV4_list)
+        self.assertTrue(a1 in utils.IPv4List([a1, n4]))
+
+        IPV4_list2 = utils.IPv4List([n3, n4])
+        self.assertFalse(a1 in IPV4_list2)
+
     def test_chunks(self):
         self.assertEqual(
             list(utils.chunks(range(100), size=50)),
@@ -509,6 +525,39 @@ class UtilTest(BaseTest):
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
              'b': '21'})
+
+    def test_get_support_region(self):
+        # AWS Partition
+        mock_manager = mock.MagicMock()
+        mock_manager.config.region = "us-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "us-west-2"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "eu-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        # GovCloud Partition
+        mock_manager.config.region = "us-gov-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        mock_manager.config.region = "us-gov-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        # AWS CN Partition
+        mock_manager.config.region = "cn-northwest-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+        mock_manager.config.region = "cn-north-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
 
 
 def test_parse_date_floor():

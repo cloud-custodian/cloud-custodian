@@ -1,6 +1,6 @@
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
-PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc
+PKG_SET = tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure
 
 install:
 	python3 -m venv .
@@ -61,7 +61,7 @@ pkg-increment:
 	@$(MAKE) pkg-gen-setup
 	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
-pkg-publish-wheel:
+pkg-build-wheel:
 # azure pin uses ancient wheel version, upgrade first
 	pip install -U wheel
 # clean up any artifacts first
@@ -73,6 +73,8 @@ pkg-publish-wheel:
 # check wheel
 	twine check dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine check dist/* && cd ../..; done
+
+pkg-publish-wheel:
 # upload to test pypi
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done

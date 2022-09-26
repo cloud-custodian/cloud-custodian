@@ -17,6 +17,151 @@ from c7n import tags, utils
 
 from .common import BaseTest
 
+import pytest
+from pytest_terraform import terraform
+
+
+@terraform('ec2_stop_protection_enabled')
+def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_stop_protection_enabled', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_stop_protection_enabled',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'value',
+                    'op': 'in',
+                    'key': 'InstanceId',
+                    'value': [
+                        ec2_stop_protection_enabled['aws_instance.termination_protection.id'],
+                        ec2_stop_protection_enabled['aws_instance.no_protection.id'],
+                        ec2_stop_protection_enabled['aws_instance.stop_protection.id'],
+                    ],
+                },
+                {'State.Name': 'running'},
+                {'type': 'stop-protected'},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(
+        resources[0]['InstanceId'],
+        ec2_stop_protection_enabled['aws_instance.stop_protection.id'])
+
+    # set the api stop protection to false to allow terraform to handle the teardown
+    client = session_factory().client('ec2')
+    client.modify_instance_attribute(
+        InstanceId=resources[0]['InstanceId'],
+        DisableApiStop={'Value': False}
+    )
+
+
+@terraform('ec2_stop_protection_disabled')
+def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_stop_protection_disabled', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_stop_protection_disabled',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'value',
+                    'op': 'in',
+                    'key': 'InstanceId',
+                    'value': [
+                        ec2_stop_protection_disabled['aws_instance.termination_protection.id'],
+                        ec2_stop_protection_disabled['aws_instance.no_protection.id'],
+                        ec2_stop_protection_disabled['aws_instance.stop_protection.id'],
+                    ],
+                },
+                {'State.Name': 'running'},
+                {'not': [{'type': 'stop-protected'}]},
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 2)
+
+    resource_ids = [i['InstanceId'] for i in resources]
+    test.assertIn(
+        ec2_stop_protection_disabled['aws_instance.termination_protection.id'],
+        resource_ids)
+    test.assertIn(
+        ec2_stop_protection_disabled['aws_instance.no_protection.id'],
+        resource_ids)
+
+    # set the api stop protection to false to allow terraform to handle the teardown
+    client = session_factory().client('ec2')
+    client.modify_instance_attribute(
+        InstanceId=ec2_stop_protection_disabled['aws_instance.stop_protection.id'],
+        DisableApiStop={'Value': False}
+    )
+
+
+def test_ec2_stop_protection_filter_permissions(test):
+    policy = test.load_policy(
+        {
+            'name': 'ec2-stop-protection',
+            'resource': 'ec2',
+            'filters': [{'type': 'stop-protected'}],
+        },
+    )
+    permissions = policy.get_permissions()
+    test.assertEqual(
+        permissions,
+        {
+            'ec2:DescribeInstances',
+            'ec2:DescribeTags',
+            'ec2:DescribeInstanceAttribute',
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.6', '1.25.8', '0.27.27']
+)
+def test_ec2_stop_protection_lower_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        with test.assertRaises(PolicyValidationError) as cm:
+            policy = test.load_policy(
+                {
+                    'name': 'ec2-stop-protection',
+                    'resource': 'ec2',
+                    'filters': [{'type': 'stop-protected'}],
+                },
+            )
+            policy.validate()
+        test.assertIn('requires botocore version 1.26.7 or above', str(cm.exception))
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.7', '1.26.8', '1.27.0', '2.0.0']
+)
+def test_ec2_stop_protection_above_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        policy = test.load_policy(
+            {
+                'name': 'ec2-stop-protection',
+                'resource': 'ec2',
+                'filters': [{'type': 'stop-protected'}],
+            },
+        )
+        policy.validate()
+
 
 class TestEc2NetworkLocation(BaseTest):
     def test_ec2_network_location_terminated(self):
@@ -752,7 +897,7 @@ class TestTag(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
 
         policy = self.load_policy(
             {
@@ -1337,6 +1482,25 @@ class TestTerminate(BaseTest):
         self.assertEqual(len(resources), 1)
         instances = utils.query_instances(
             session_factory(), InstanceIds=["i-017cf4e2a33b853fe"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
+
+    def test_ec2_terminate_with_protection_enabled(self):
+        # Test conditions: single running instance, with delete protection
+        session_factory = self.replay_flight_data("test_ec2_terminate_with_protection_enabled")
+        p = self.load_policy(
+            {
+                "name": "ec2-term",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-017fc9a2a33b853fe"}],
+                "actions": [{"type": "terminate", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-017fc9a2a33b853fe"]
         )
         self.assertEqual(instances[0]["State"]["Name"], "shutting-down")
 
