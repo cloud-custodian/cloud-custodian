@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/cfst-1449-1421af439633bad492a3dd3c366-InitFunction-LSoEFXQN79NH",
+                "creationTime": 1664181272043,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/cfst-1449-1421af439633bad492a3dd3c366-InitFunction-LSoEFXQN79NH:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/lambda/custodian_test_lambda_name",
+                "creationTime": 1664190781929,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian_test_lambda_name:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

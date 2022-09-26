@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/codebuild/custodian_test_codebuild_project_name",
+                "creationTime": 1664203881558,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/custodian_test_codebuild_project_name:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/codebuild/testing-testing",
+                "creationTime": 1664196945924,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/testing-testing:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/lambda/cfst-1449-cf2af7b50e9b9c80543d2cf6248-InitFunction-ua21B80ekQNv",
+                "creationTime": 1664195860068,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/cfst-1449-cf2af7b50e9b9c80543d2cf6248-InitFunction-ua21B80ekQNv:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/lambda/custodian_test_lambda_name",
+                "creationTime": 1664203881559,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian_test_lambda_name:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

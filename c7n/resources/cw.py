@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from typing import List
 
 import botocore.exceptions
 
@@ -833,3 +834,204 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('copy-aws-service-tags')
+class CopyAwsServiceTags(BaseAction):
+    """
+    Copy tags from related AWS resources to CloudWatch log groups.
+    A related resource is found by CloudWatch log group name
+    removing '/aws/<service>' prefix.
+
+    This action can be useful to tag CloudWatch log groups created automatically
+    (for example, a lambda function may create a log group if it doesn't exist)
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cloudwatch-aws-service-log-groups
+          resource: aws.log-group
+          filters:
+          - type: value
+            key: 'logGroupName'
+            op: 'regex'
+            value: '^/aws/lambda/.*'
+          actions:
+          - type: copy-aws-service-tags
+            services:
+            - lambda
+            skip_existing_tags: true
+            tags:
+            - 'tag1'
+    """
+    schema = type_schema(
+        'copy-aws-service-tags',
+        required=[
+            'services',
+        ],
+        services={
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'enum': [
+                    'lambda',
+                    'codebuild',
+                ],
+            },
+        },
+        tags={
+            'type': 'array',
+            'items': {
+                'type': 'string'
+            }
+        },
+        skip_existing_tags={'type': 'boolean'},
+    )
+
+    permissions = (
+        'cloudwatch:TagResource',
+        'lambda:GetFunction',
+        'codebuild:BatchGetProjects',
+    )
+
+    def process(self, log_groups: List[dict]) -> None:
+        desired_tag_keys = self.data.get('tags', [])
+
+        RELATED_SERVICE_CONFIGURATION = {
+            'lambda': {
+                'log_group_prefix': '/aws/lambda/',
+                'retrieve_tags_method': self._get_lambda_function_tags,
+                'boto3_client': local_session(self.manager.session_factory).client('lambda')
+            },
+            'codebuild': {
+                'log_group_prefix': '/aws/codebuild/',
+                'retrieve_tags_method': self._get_codebuild_project_tags,
+                'boto3_client': local_session(self.manager.session_factory).client('codebuild')
+            }
+        }
+
+        services = self.data.get('services', [])
+
+        aws_service_log_group_configurations = []
+        for log_group in log_groups:
+            for service in services:
+                prefix = RELATED_SERVICE_CONFIGURATION[service]['log_group_prefix']
+                method = RELATED_SERVICE_CONFIGURATION[service]['retrieve_tags_method']
+                client = RELATED_SERVICE_CONFIGURATION[service]['boto3_client']
+
+                if log_group['logGroupName'].startswith(prefix):
+                    aws_service_log_group_configurations.append(
+                        {
+                            'log_group': log_group,
+                            'prefix': prefix,
+                            'retrieve_tags_method': method,
+                            'client': client,
+                        }
+                    )
+                    break
+
+        log_groups_count = len(log_groups)
+        aws_service_log_groups_count = len(aws_service_log_group_configurations)
+
+        if aws_service_log_groups_count != log_groups_count:
+            self.log.warning(
+                'AWS service tags action implicitly filtered from %d to %d',
+                log_groups_count, aws_service_log_groups_count
+            )
+
+        cloudwatch_client = local_session(self.manager.session_factory).client('logs')
+
+        with self.executor_factory(max_workers=10) as executor:
+            futures = []
+            for chunk in chunks(aws_service_log_group_configurations, size=100):
+                futures.append(
+                    executor.submit(
+                        self._process_chunk,
+                        cloudwatch_client,
+                        chunk,
+                        desired_tag_keys
+                    )
+                )
+            for future in as_completed(futures):
+                if future.exception():
+                    self.log.error(
+                        'Exception copying AWS service tags: %s',
+                        future.exception()
+                    )
+
+    def _process_chunk(
+        self,
+        cloudwatch_client: botocore.client.BaseClient,
+        aws_service_log_group_configurations: List[dict],
+        desired_tag_keys: List[str]
+    ) -> None:
+        for log_group_configuration in aws_service_log_group_configurations:
+            log_group_name = log_group_configuration['log_group']['logGroupName']
+            related_resource_name = log_group_name[len(log_group_configuration['prefix']):]
+
+            aws_service_tags = log_group_configuration['retrieve_tags_method'](
+                client=log_group_configuration['client'],
+                resource_name=related_resource_name
+            )
+
+            log_group_tag_keys = [i['Key'] for i in log_group_configuration['log_group']['Tags']]
+            filtered_desired_tag_keys = []
+            if self.data.get('skip_existing_tags', False):
+                filtered_desired_tag_keys = [
+                    i for i in desired_tag_keys if i not in log_group_tag_keys
+                ]
+            else:
+                filtered_desired_tag_keys = desired_tag_keys
+
+            related_tags = {}
+            for key, value in aws_service_tags.items():
+                if key in filtered_desired_tag_keys:
+                    related_tags[key] = value
+
+            if related_tags:
+                try:
+                    cloudwatch_client.tag_log_group(
+                        logGroupName=log_group_name,
+                        tags=related_tags
+                    )
+                except cloudwatch_client.exceptions.ResourceNotFoundException:
+                    pass
+
+    def _get_lambda_function_tags(
+        self,
+        client: botocore.client.BaseClient,
+        resource_name: str
+    ) -> dict:
+        tags = {}
+        try:
+            function = self.manager.retry(
+                client.get_function,
+                FunctionName=resource_name,
+            )
+            if 'Tags' in function:
+                tags = function['Tags']
+        except client.exceptions.ResourceNotFoundException:
+            pass
+
+        return tags
+
+    def _get_codebuild_project_tags(
+        self,
+        client: botocore.client.BaseClient,
+        resource_name: str
+    ) -> dict:
+        tags = {}
+        project_configurations = self.manager.retry(
+            client.batch_get_projects,
+            names=[resource_name],
+        )
+        if (
+            resource_name not in project_configurations['projectsNotFound']
+            and 'tags' in project_configurations['projects'][0]
+        ):
+            for tag in project_configurations['projects'][0]['tags']:
+                tags[tag['key']] = tag['value']
+
+        return tags

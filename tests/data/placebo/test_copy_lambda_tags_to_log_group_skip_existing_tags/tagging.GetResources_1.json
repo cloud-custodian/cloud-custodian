@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian_test_lambda_name",
+                "Tags": [
+                    {
+                        "Key": "existing_tag",
+                        "Value": "log_group_existing_tag"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

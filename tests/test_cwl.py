@@ -368,3 +368,394 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertIn('c7n:MetricAlarms', resources[0])
+
+
+@terraform('copy_lambda_tags_to_log_group')
+def test_copy_lambda_tags_to_log_group(test, copy_lambda_tags_to_log_group):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_lambda_tags_to_log_group', region=aws_region)
+
+    log_group_name = copy_lambda_tags_to_log_group['aws_cloudwatch_log_group.this.name']
+    lambda_tags = copy_lambda_tags_to_log_group[
+        'aws_lambda_function.this.tags']
+    copy_tag1_value = lambda_tags['copy_tag1']
+    copy_tag2_value = lambda_tags['copy_tag2']
+
+    assert 'non_existing_lambda_tag' not in lambda_tags
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['lambda'],
+                    'tags': [
+                        'copy_tag1',
+                        'copy_tag2',
+                        'non_existing_lambda_tag',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags) == 2
+    assert log_group_tags['tags']['copy_tag1'] == copy_tag1_value
+    assert log_group_tags['tags']['copy_tag2'] == copy_tag2_value
+    assert 'non_existing_lambda_tag' not in log_group_tags['tags']
+
+
+@terraform('copy_lambda_tags_to_log_group_skip_existing_tags')
+def test_copy_lambda_tags_to_log_group_skip_existing_tags(
+    test,
+    copy_lambda_tags_to_log_group_skip_existing_tags
+):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_lambda_tags_to_log_group_skip_existing_tags',
+        region=aws_region
+    )
+
+    log_group_name = copy_lambda_tags_to_log_group_skip_existing_tags[
+        'aws_cloudwatch_log_group.this.name']
+    log_group_existing_tag_value = copy_lambda_tags_to_log_group_skip_existing_tags[
+        'aws_cloudwatch_log_group.this.tags.existing_tag']
+    lambda_tags = copy_lambda_tags_to_log_group_skip_existing_tags[
+        'aws_lambda_function.this.tags']
+    copy_tag1_value = lambda_tags['copy_tag1']
+    lambda_existing_tag_value = lambda_tags['existing_tag']
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['lambda'],
+                    'skip_existing_tags': True,
+                    'tags': [
+                        'existing_tag',
+                        'copy_tag1',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags) == 2
+    assert log_group_tags['tags']['existing_tag'] != lambda_existing_tag_value
+    assert log_group_tags['tags']['existing_tag'] == log_group_existing_tag_value
+    assert log_group_tags['tags']['copy_tag1'] == copy_tag1_value
+
+
+@terraform('copy_lambda_tags_to_log_group_do_not_skip_existing_tags')
+def test_copy_lambda_tags_to_log_group_do_not_skip_existing_tags(
+    test,
+    copy_lambda_tags_to_log_group_do_not_skip_existing_tags
+):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_lambda_tags_to_log_group_do_not_skip_existing_tags',
+        region=aws_region
+    )
+
+    log_group_name = copy_lambda_tags_to_log_group_do_not_skip_existing_tags[
+        'aws_cloudwatch_log_group.this.name']
+    log_group_existing_tag_value = copy_lambda_tags_to_log_group_do_not_skip_existing_tags[
+        'aws_cloudwatch_log_group.this.tags.existing_tag']
+    lambda_tags = copy_lambda_tags_to_log_group_do_not_skip_existing_tags[
+        'aws_lambda_function.this.tags']
+    copy_tag1_value = lambda_tags['copy_tag1']
+    lambda_existing_tag_value = lambda_tags['existing_tag']
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['lambda'],
+                    'skip_existing_tags': False,
+                    'tags': [
+                        'existing_tag',
+                        'copy_tag1',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags) == 2
+    assert log_group_tags['tags']['existing_tag'] != log_group_existing_tag_value
+    assert log_group_tags['tags']['existing_tag'] == lambda_existing_tag_value
+    assert log_group_tags['tags']['copy_tag1'] == copy_tag1_value
+
+
+@terraform('copy_codebuild_tags_to_log_group')
+def test_copy_codebuild_tags_to_log_group(test, copy_codebuild_tags_to_log_group):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_codebuild_tags_to_log_group', region=aws_region)
+
+    log_group_name = copy_codebuild_tags_to_log_group['aws_cloudwatch_log_group.this.name']
+    codebuild_tags = copy_codebuild_tags_to_log_group[
+        'aws_codebuild_project.this.tags']
+    copy_tag1_value = codebuild_tags['copy_tag1']
+    copy_tag2_value = codebuild_tags['copy_tag2']
+
+    assert 'non_existing_codebuild_tag' not in codebuild_tags
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['codebuild'],
+                    'tags': [
+                        'copy_tag1',
+                        'copy_tag2',
+                        'non_existing_codebuild_tag',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags) == 2
+    assert log_group_tags['tags']['copy_tag1'] == copy_tag1_value
+    assert log_group_tags['tags']['copy_tag2'] == copy_tag2_value
+    assert 'non_existing_lambda_tag' not in log_group_tags['tags']
+
+
+@terraform('copy_multiple_service_tags_to_log_group')
+def test_copy_multiple_service_tags_to_log_group(test, copy_multiple_service_tags_to_log_group):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_multiple_service_tags_to_log_group', region=aws_region)
+
+    codebuild_log_group_name = copy_multiple_service_tags_to_log_group[
+        'aws_cloudwatch_log_group.codebuild.name']
+    codebuild_tags = copy_multiple_service_tags_to_log_group[
+        'aws_codebuild_project.this.tags']
+    codebuild_copy_tag1_value = codebuild_tags['copy_tag1']
+    codebuild_copy_tag2_value = codebuild_tags['copy_tag2']
+    assert 'non_existing_codebuild_tag' not in codebuild_tags
+
+    lambda_log_group_name = copy_multiple_service_tags_to_log_group[
+        'aws_cloudwatch_log_group.lambda.name']
+    lambda_tags = copy_multiple_service_tags_to_log_group[
+        'aws_lambda_function.this.tags']
+    lambda_copy_tag1_value = lambda_tags['copy_tag1']
+    lambda_copy_tag2_value = lambda_tags['copy_tag2']
+    assert 'non_existing_lambda_tag' not in lambda_tags
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'in',
+                    'value': [codebuild_log_group_name, lambda_log_group_name]
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': [
+                        'lambda',
+                        'codebuild',
+                    ],
+                    'tags': [
+                        'copy_tag1',
+                        'copy_tag2',
+                        'non_existing_codebuild_tag',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 2
+
+    client = session_factory().client('logs')
+
+    codebuild_log_group_tags = client.list_tags_log_group(logGroupName=codebuild_log_group_name)
+    assert len(codebuild_log_group_tags) == 2
+    assert codebuild_log_group_tags['tags']['copy_tag1'] == codebuild_copy_tag1_value
+    assert codebuild_log_group_tags['tags']['copy_tag2'] == codebuild_copy_tag2_value
+    assert 'non_existing_codebuild_tag' not in codebuild_log_group_tags['tags']
+
+    lambda_log_group_tags = client.list_tags_log_group(logGroupName=lambda_log_group_name)
+    assert len(lambda_log_group_tags) == 2
+    assert lambda_log_group_tags['tags']['copy_tag1'] == lambda_copy_tag1_value
+    assert lambda_log_group_tags['tags']['copy_tag2'] == lambda_copy_tag2_value
+    assert 'non_existing_lambda_tag' not in lambda_log_group_tags['tags']
+
+
+@terraform('copy_lambda_tags_to_log_group_without_related_resource')
+def test_copy_lambda_tags_to_log_group_without_related_resource(
+    test,
+    copy_lambda_tags_to_log_group_without_related_resource
+):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_lambda_tags_to_log_group_without_related_resource', region=aws_region)
+
+    log_group_name = copy_lambda_tags_to_log_group_without_related_resource[
+        'aws_cloudwatch_log_group.this.name']
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['lambda'],
+                    'tags': [
+                        'copy_tag1',
+                        'copy_tag2',
+                        'non_existing_lambda_tag',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags['tags']) == 0
+
+
+@terraform('copy_codebuild_tags_to_log_group_without_related_resource')
+def test_copy_codebuild_tags_to_log_group_without_related_resource(
+    test,
+    copy_codebuild_tags_to_log_group_without_related_resource
+):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'test_copy_codebuild_tags_to_log_group_without_related_resource', region=aws_region)
+
+    log_group_name = copy_codebuild_tags_to_log_group_without_related_resource[
+        'aws_cloudwatch_log_group.this.name']
+
+    p = test.load_policy(
+        {
+            'name': 'cloudwatch-aws-service-log-groups',
+            'resource': 'aws.log-group',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'logGroupName',
+                    'op': 'eq',
+                    'value': log_group_name
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'copy-aws-service-tags',
+                    'services': ['codebuild'],
+                    'tags': [
+                        'copy_tag1',
+                        'copy_tag2',
+                        'non_existing_lambda_tag',
+                    ]
+                }
+            ]
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+
+    client = session_factory().client('logs')
+    log_group_tags = client.list_tags_log_group(logGroupName=log_group_name)
+    assert len(log_group_tags['tags']) == 0
