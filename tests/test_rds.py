@@ -19,7 +19,6 @@ from c7n.resources import rds
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
-from c7n import cache, config
 
 from .common import BaseTest, event_data
 
