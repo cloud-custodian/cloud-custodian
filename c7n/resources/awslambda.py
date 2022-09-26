@@ -346,7 +346,7 @@ class LambdaEnhancedMonitoring(Action):
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
         for resource in resources:
-            lambda_arch = resource["Architectures"][0]
+            lambda_arch = resource.get("Architectures", ['x86_64'])[0]
             lambda_layers = resource.get('Layers', [])
             new_list_of_lambda_layers = self.get_insights_updated_layers(updateState, lambda_arch, lambda_layers,
                                                                          lambda_insights_arn)
