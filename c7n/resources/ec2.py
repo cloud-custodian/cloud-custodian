@@ -1162,7 +1162,7 @@ class SetMetadataServerAccess(BaseAction):
         'set-metadata-access',
         anyOf=[{'required': ['endpoint']},
                {'required': ['tokens']},
-               {'required': ['metadatatags']},
+               {'required': ['metadata-tags']},
                {'required': ['hop-limit']}],
         **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
            'tokens': {'enum': AllowedValues['HttpTokens']},
