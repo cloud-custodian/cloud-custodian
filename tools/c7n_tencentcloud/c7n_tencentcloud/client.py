@@ -126,8 +126,15 @@ class Session:
                region: str) -> Client:
         """client"""
         http_profile = HttpProfile()
-        http_profile.endpoint = endpoint
 
+        # use regional endpoint, instead of roundtripping to centralized one.
+        # in practice this can greatly reduce latency on roundtrips
+        if region:
+            parts = endpoint.split('.')
+            parts.insert(1, region)
+            endpoint = '.'.join(parts)
+
+        http_profile.endpoint = endpoint
         client_profile = ClientProfile()
         client_profile.httpProfile = http_profile
 
