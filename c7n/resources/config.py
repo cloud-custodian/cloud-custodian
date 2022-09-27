@@ -140,7 +140,7 @@ class RuleRemediation(Filter):
     .. code-block:: yaml
 
         policies:
-          - name: config-managed-s3-bucket-public-write-remediate-event
+          - name: config-managed-s3-bucket-public-write-remediate-event-with-filter
             description: |
               This policy detects if S3 bucket allows public write by the bucket policy
               or ACL and remediates.
