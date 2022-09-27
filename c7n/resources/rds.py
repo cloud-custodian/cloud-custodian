@@ -1636,8 +1636,8 @@ class ParameterFilter(ValueFilter):
         pgcache = {}
         cache = self.manager._cache
 
-        for pg in param_groups:
-            with cache:
+        with cache:
+            for pg in param_groups:
                 cache_key = {
                     'region': self.manager.config.region,
                     'account_id': self.manager.config.account_id,
