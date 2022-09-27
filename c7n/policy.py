@@ -865,7 +865,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
-        resource_id = self.policy.resource_manager.resource_type.id
+        resource_id = self.policy.resource_manager.resource_type.config_id or \
+            self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
         cfg_rule_name = event['configRuleName']
