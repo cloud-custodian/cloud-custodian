@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "gin_pending_list_limit",
+                "Description": "(kB) Sets the maximum size of the pending list for GIN index.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "integer",
+                "AllowedValues": "64-2147483647",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "Marker": "cGdsb2dpY2FsLnVzZV9zcGk=",
+        "ResponseMetadata": {}
+    }
+}

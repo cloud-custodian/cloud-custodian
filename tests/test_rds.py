@@ -1633,6 +1633,32 @@ class TestRDSParameterGroupFilter(BaseTest):
                 print(len(f_resources), fdata, assertion)
                 self.fail(err_msg)
 
+    def test_rds_param_value(self):
+        session_factory = self.replay_flight_data("test_rds_param_value")
+        p = self.load_policy(
+            {
+                "name": "rds-param-value",
+                "resource": "aws.rds",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "rds.force_admin_logging_level",
+                        "value": "info",
+                        "value_type": "normalize",
+                        "op": "eq",
+                    },
+                ],
+            },
+            session_factory=session_factory, cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
+        self.assertEqual(resources[0].get(
+            'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
+        self.assertIn(('DBParameterGroupName', 'test'), resources[0].get(
+            'DBParameterGroups')[0].items())
+
 
 class Resize(BaseTest):
 

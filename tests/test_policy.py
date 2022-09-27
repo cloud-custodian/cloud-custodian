@@ -262,6 +262,10 @@ class PolicyMetaLint(BaseTest):
             'AwsEc2TransitGateway',
             'AwsEcsContainer',
             'AwsEcsTask',
+            'AwsBackupRecoveryPoint',
+            # https://github.com/cloud-custodian/cloud-custodian/issues/7775
+            'AwsBackupBackupPlan',
+            'AwsBackupBackupVault',
             # q2 2022
             'AwsRdsDbSecurityGroup',
             # q1 2022
@@ -389,6 +393,15 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53Resolver::ResolverRule',
             'AWS::Route53Resolver::ResolverRuleAssociation',
             'AWS::DMS::EventSubscription',
+            'AWS::GlobalAccelerator::Accelerator',
+            'AWS::Athena::DataCatalog',
+            'AWS::EC2::TransitGatewayAttachment',
+            'AWS::Athena::WorkGroup',
+            'AWS::GlobalAccelerator::EndpointGroup',
+            'AWS::GlobalAccelerator::Listener',
+            'AWS::DMS::Certificate',
+            'AWS::Detective::Graph',
+            'AWS::EC2::TransitGatewayRouteTable',
         }
 
         resource_map = {}

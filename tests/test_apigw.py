@@ -604,6 +604,43 @@ class TestRestStage(BaseTest):
         resources = policy.push(event_data("event-cloud-trail-tag-rest-stage.json"))
         self.assertEqual(len(resources), 1)
 
+    def test_config_id_stagearn_response(self):
+        factory = self.replay_flight_data("test_rest_stage_config_id")
+        p = self.load_policy(
+            {
+                "name": "config_id-apigw-rest-stage-check",
+                "resource": "rest-stage",
+                "mode": {
+                    "type": "config-poll-rule",
+                    "role": "arn:aws:iam::{account_id}:role/MyRole",
+                    "schedule": "TwentyFour_Hours",
+                    "ignore-support-check": True
+                }
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'},
+            validate=False
+        )
+        event = event_data('poll-evaluation.json', 'config')
+        results = p.push(event, None)
+        self.assertEqual(len(results), 1)
+
+    def test_rest_stage_arn_addition(self):
+        factory = self.replay_flight_data("test_rest_stage_arn_addition")
+        stagearn = 'arn:aws:apigateway:us-west-2::/restapis/atgw0gohmh/stages/test'
+        p = self.load_policy(
+            {
+                "name": "config_id-apigw-rest-stage-check",
+                "resource": "rest-stage",
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'},
+            validate=False
+        )
+        results = p.run()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['stageArn'], stagearn)
+
 
 class TestRestClientCertificate(BaseTest):
 
