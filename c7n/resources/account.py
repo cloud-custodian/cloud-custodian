@@ -1926,7 +1926,7 @@ class ToggleConfigManagedRule(BaseAction):
                             ResourceValue:
                               Value: RESOURCE_ID
             actions:
-              - type: enable-config-managed-rule
+              - type: toggle-config-managed-rule
                 rule_name: *rule_name
                 managed_rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
                 resource_types:
