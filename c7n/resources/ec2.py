@@ -1140,7 +1140,7 @@ class SetMetadataServerAccess(BaseAction):
                endpoint: disabled
 
        policies:
-         - name: ec2-disable-imds
+         - name: ec2-enable-metadata-tags
            resource: ec2
            filters:
              - MetadataOptions.InstanceMetadataTags: disabled
@@ -1166,7 +1166,7 @@ class SetMetadataServerAccess(BaseAction):
                {'required': ['hop-limit']}],
         **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
            'tokens': {'enum': AllowedValues['HttpTokens']},
-           'metadatatags': {'enum': AllowedValues['InstanceMetadataTags']},
+           'metadata-tags': {'enum': AllowedValues['InstanceMetadataTags']},
            'hop-limit': {'type': 'integer', 'minimum': 1, 'maximum': 64}}
     )
     permissions = ('ec2:ModifyInstanceMetadataOptions',)
@@ -1175,7 +1175,7 @@ class SetMetadataServerAccess(BaseAction):
         return filter_empty({
             'HttpEndpoint': self.data.get('endpoint'),
             'HttpTokens': self.data.get('tokens'),
-            'InstanceMetadataTags': self.data.get('metadatatags'),
+            'InstanceMetadataTags': self.data.get('metadata-tags'),
             'HttpPutResponseHopLimit': self.data.get('hop-limit')})
 
     def process(self, resources):
