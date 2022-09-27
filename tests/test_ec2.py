@@ -252,6 +252,7 @@ class TestSetMetadata(BaseTest):
             'resource': 'aws.ec2',
             'actions': [
                 {'type': 'set-metadata-access',
+                 'metadata-tags': 'enabled',
                  'tokens': 'required'},
             ]},
             session_factory=session_factory)
@@ -267,12 +268,12 @@ class TestSetMetadata(BaseTest):
             [{'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
-              'InstanceMetadataTags': 'disabled',
+              'InstanceMetadataTags': 'enabled',
               'State': 'pending'},
              {'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
-              'InstanceMetadataTags': 'disabled',
+              'InstanceMetadataTags': 'enabled',
               'State': 'applied'}])
         self.assertEqual(len(resources), 2)
         self.assertEqual(
@@ -291,7 +292,7 @@ class TestSetMetadataTags(BaseTest):
             'resource': 'aws.ec2',
             'actions': [
                 {'type': 'set-metadata-access',
-                 'metadatatags': 'enabled'},
+                 'metadata-tags': 'enabled'},
             ]},
             session_factory=session_factory)
         resources = policy.run()

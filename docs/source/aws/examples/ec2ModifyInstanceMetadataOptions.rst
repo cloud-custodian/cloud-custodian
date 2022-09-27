@@ -27,7 +27,7 @@ To filter the list of instances you can choose any combination of Ec2 mwtadate-i
   - InstanceMetadataTags
 
     - Valid Values: disabled | enabled
-    - Action value: metadatatags
+    - Action value: metadata-tags
 
 Examples:
 +++++++++
@@ -66,7 +66,7 @@ Examples:
              - MetadataOptions.InstanceMetadataTags: disabled
            actions:
              - type: set-metadata-access
-               metadatatags: enabled
+               metadata-tags: enabled
 
 
 Intance MetaDate Tags Reference: https://amzn.to/2XOuxpQ

@@ -325,7 +325,7 @@
                         },
                         "MetadataOptions": {
                             "State": "applied",
-                            "HttpTokens": "required",
+                            "HttpTokens": "optional",
                             "HttpPutResponseHopLimit": 1,
                             "HttpEndpoint": "enabled",
                             "InstanceMetadataTags": "disabled"
