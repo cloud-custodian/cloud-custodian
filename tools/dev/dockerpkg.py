@@ -50,6 +50,9 @@ RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
+# Add mugc tool
+ADD tools/ops/mugc.py /src/tools/ops/mugc.py
+
 # Add provider packages
 ADD tools/c7n_gcp /src/tools/c7n_gcp
 RUN rm -R tools/c7n_gcp/tests
