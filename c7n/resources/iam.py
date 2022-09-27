@@ -1975,6 +1975,51 @@ class UserSSHKeyFilter(ValueFilter):
         return matched
 
 
+@User.filter_registry.register('login-profile')
+class UserLoginProfile(ValueFilter):
+    """Filter IAM users that have an associated login-profile
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+            - name: iam-users-with-console-access
+            resource: iam-user
+            filters:
+                - type: login-profile
+    """
+
+    schema = type_schema('login-profile', rinherit=ValueFilter.schema)
+    permissions = ('iam:GetLoginProfile',)
+    annotation_key = 'c7n:LoginProfile'
+
+    def user_login_profiles(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u[self.annotation_key] = False
+            try:
+                login_profile_resp = client.get_login_profile(UserName=u['UserName'])
+                if u['UserName'] == login_profile_resp['LoginProfile']['UserName']:
+                    u[self.annotation_key] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                    raise
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users' for login profile" % len(resources))
+            list(w.map(self.user_login_profiles, user_set))
+
+        matched = []
+        for r in resources:
+            if r[self.annotation_key]:
+                matched.append(r)
+        return matched
+
+
 # Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
