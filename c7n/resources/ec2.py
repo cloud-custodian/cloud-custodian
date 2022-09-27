@@ -1146,7 +1146,7 @@ class SetMetadataServerAccess(BaseAction):
              - MetadataOptions.InstanceMetadataTags: disabled
            actions:
              - type: set-metadata-access
-               metadatatags: enabled
+               metadata-tags: enabled
 
     Reference: https://amzn.to/2XOuxpQ
     """
