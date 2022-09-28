@@ -1,9 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
-from c7n.testing import mock_datetime_now
-from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.resources import ec2
 from ..common import BaseTest
 from pytest_terraform import terraform
 
