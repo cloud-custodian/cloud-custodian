@@ -30,7 +30,7 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.1.15"
+ARG POETRY_VERSION="1.2.1"
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian

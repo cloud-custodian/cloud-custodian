@@ -824,6 +824,9 @@ class TypeInfo(metaclass=TypeMeta):
         passed as this value. Further customizations of dimensions require subclass metrics filter
     :param cfn_type: AWS Cloudformation type
     :param config_type: AWS Config Service resource type name
+    :param config_id: Resource attribute that maps to the resourceId field in AWS Config. Intended
+        for resources which use one ID attribute for service API calls and a different one for
+        AWS Config (example: IAM resources).
     :param universal_taggable: Whether or not resource group tagging api can be used, in which case
         we'll automatically register tag actions/filters. Note: values of True will register legacy
         tag filters/actions, values of object() will just register current standard
@@ -865,6 +868,7 @@ class TypeInfo(metaclass=TypeMeta):
     dimension = None
     cfn_type = None
     config_type = None
+    config_id = None
     universal_taggable = False
     global_resource = False
     metrics_namespace = None
