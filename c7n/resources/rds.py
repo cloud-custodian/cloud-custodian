@@ -1635,14 +1635,13 @@ class ParameterFilter(ValueFilter):
         return ret_val
 
     # Private method for 'DBParameterGroupName' paginator
-    def _get_para_list(self, pg):
+    def _get_param_list(self, pg):
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_parameters')
         param_list = list(itertools.chain(*[p['Parameters']
             for p in paginator.paginate(DBParameterGroupName=pg)]))
         return param_list
 
-    # Making class more re-usable
     def cache_param_groups(self, param_groups):
         for pg in param_groups:
             cache_key = {
@@ -1653,7 +1652,7 @@ class ParameterFilter(ValueFilter):
             if pg_values is not None:
                 self.paramcache[pg] = pg_values
                 continue
-            param_list = self._get_para_list(pg)
+            param_list = self._get_param_list(pg)
             self.paramcache[pg] = {
                 p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
                 for p in param_list if 'ParameterValue' in p}

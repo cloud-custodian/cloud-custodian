@@ -682,8 +682,9 @@ class ClusterParameterFilter(ParameterFilter):
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
     policy_annotation = 'c7n:MatchedDBClusterParameter'
     paramcache = {}
+    param_group_attribute = 'DBClusterParameterGroup'
 
-    def _get_para_list(self, pg):
+    def _get_param_list(self, pg):
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_cluster_parameters')
         param_list = list(itertools.chain(*[p['Parameters']
@@ -692,7 +693,7 @@ class ClusterParameterFilter(ParameterFilter):
 
     def process(self, resources, event=None):
         results = []
-        parameter_group_list = {db['DBClusterParameterGroup'] for db in resources}
+        parameter_group_list = {db.get(self.param_group_attribute) for db in resources}
         self.cache_param_groups(parameter_group_list)
         for resource in resources:
             pg_values = self.paramcache[resource['DBClusterParameterGroup']]
