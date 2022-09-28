@@ -26,6 +26,7 @@ install_requires = \
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrsistent (>=0.18.1,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
+ 'python-linq>=2.0.4,<3.0.0',
  'pytz>=2022.1',
  'pyyaml (>=6.0,<7.0)',
  'retrying>=1.3.3,<2.0.0',
