@@ -257,6 +257,7 @@ class User(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        config_id = 'UserId'
 
     source_mapping = {
         'describe': DescribeUser,
