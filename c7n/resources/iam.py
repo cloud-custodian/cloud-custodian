@@ -1985,10 +1985,10 @@ class UserLoginProfile(ValueFilter):
     .. code-block: yaml
 
         policies:
-            - name: iam-users-with-console-access
+          - name: iam-users-with-console-access
             resource: iam-user
             filters:
-                - type: login-profile
+              - type: login-profile
     """
 
     schema = type_schema('login-profile', rinherit=ValueFilter.schema)
