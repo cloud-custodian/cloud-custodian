@@ -53,11 +53,11 @@ def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
         resources[0]['InstanceId'],
         ec2_metadata_tags_enabled['aws_instance.metadata_tags.id'])
 
-    # set the api stop protection to false to allow terraform to handle the teardown
+    # set the aws_instance.metadata_tags to false to allow terraform to handle the teardown
     client = session_factory().client('ec2')
     client.modify_instance_attribute(
         InstanceId=resources[0]['InstanceId'],
-        DisableApiStop={'Value': False}
+        DisableApiStop={'Value': 'enabled'}
     )
 
 
@@ -92,17 +92,14 @@ def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
 
     resource_ids = [i['InstanceId'] for i in resources]
     test.assertIn(
-        ec2_metadata_tags_disabled['aws_instance.termination_protection.id'],
-        resource_ids)
-    test.assertIn(
-        ec2_metadata_tags_disabled['aws_instance.no_protection.id'],
+        ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
         resource_ids)
 
-    # set the api stop protection to false to allow terraform to handle the teardown
+    # set the aws_instance.metadata_tags to false to allow terraform to handle the teardown
     client = session_factory().client('ec2')
     client.modify_instance_attribute(
         InstanceId=ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
-        DisableApiStop={'Value': False}
+        DisableApiStop={'Value': 'disabled'}
     )
 
 
