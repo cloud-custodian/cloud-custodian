@@ -691,4 +691,4 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.resource_manager.resources()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
