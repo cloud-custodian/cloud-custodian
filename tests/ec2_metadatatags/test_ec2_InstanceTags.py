@@ -1,23 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import logging
-import unittest
 import time
-
-import datetime
-from dateutil import tz
-import jmespath
-from mock import mock
-
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 
-from .common import BaseTest
-
-import pytest
+from ..common import BaseTest
 from pytest_terraform import terraform
 
 
@@ -179,5 +169,3 @@ class TestSetMetadataTags(BaseTest):
             output.getvalue(),
             ('set-metadata-access implicitly filtered 1 of 2 resources '
              'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
-
-
