@@ -14,7 +14,7 @@ inputs:
     default: false
   poetry_version:
     description: "Poetry Version to use"
-    default: "1.1.14"
+    default: "1.2.1"
   trivy_version:
     description: "Trivy version to use"
     default: "0.5.4"

@@ -1658,6 +1658,7 @@ class ParameterFilter(ValueFilter):
                 for p in param_list if 'ParameterValue' in p}
             self.manager._cache.save(cache_key, self.paramcache[pg])
 
+
     def process(self, resources, event=None):
         results = []
         parameter_group_list = {db['DBParameterGroups'][0]['DBParameterGroupName']
