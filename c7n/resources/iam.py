@@ -2011,7 +2011,7 @@ class UserLoginProfile(ValueFilter):
         user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
-                "Querying %d users' for login profile" % len(resources))
+                "Querying %d users for login profile" % len(resources))
             list(w.map(self.user_login_profiles, user_set))
 
         matched = []
