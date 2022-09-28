@@ -24,42 +24,6 @@ from .securityhub import PostFinding
 ErrAccessDenied = "AccessDeniedException"
 
 
-lambda_insights_version_x86_64 = {
-    "us-east-1": "arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21",
-    "us-east-2": "arn:aws:lambda:us-east-2:580247275435:layer:LambdaInsightsExtension:21",
-    "us-west-1": "arn:aws:lambda:us-west-1:580247275435:layer:LambdaInsightsExtension:20",
-    "us-west-2": "arn:aws:lambda:us-west-2:580247275435:layer:LambdaInsightsExtension:21",
-    "ap-south-1": "arn:aws:lambda:ap-south-1:580247275435:layer:LambdaInsightsExtension:21",
-    "ap-northeast-2": "arn:aws:lambda:ap-northeast-2:580247275435:layer:LambdaInsightsExtension:20",
-    "ap-southeast-1": "arn:aws:lambda:ap-southeast-1:580247275435:layer:LambdaInsightsExtension:21",
-    "ap-southeast-2": "arn:aws:lambda:ap-southeast-2:580247275435:layer:LambdaInsightsExtension:21",
-    "ap-northeast-1": "arn:aws:lambda:ap-northeast-1:580247275435:layer:LambdaInsightsExtension:32",
-    "ca-central-1": "arn:aws:lambda:ca-central-1:580247275435:layer:LambdaInsightsExtension:20",
-    "eu-central-1": "arn:aws:lambda:eu-central-1:580247275435:layer:LambdaInsightsExtension:21",
-    "eu-west-1": "arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:21",
-    "eu-west-2": "arn:aws:lambda:eu-west-2:580247275435:layer:LambdaInsightsExtension:21",
-    "eu-west-3": "arn:aws:lambda:eu-west-3:580247275435:layer:LambdaInsightsExtension:20",
-    "eu-north-1": "arn:aws:lambda:eu-north-1:580247275435:layer:LambdaInsightsExtension:20",
-    "sa-east-1": "arn:aws:lambda:sa-east-1:580247275435:layer:LambdaInsightsExtension:20",
-    "cn-north-1": "arn:aws-cn:lambda:cn-north-1:488211338238:layer:LambdaInsightsExtension:14",
-    "cn-northwest-1": "arn:aws-cn:lambda:cn-northwest-1:488211338238:layer:LambdaInsightsExtension:14",
-    "af-south-1": "arn:aws:lambda:af-south-1:012438385374:layer:LambdaInsightsExtension:13",
-    "ap-east-1": "arn:aws:lambda:ap-east-1:519774774795:layer:LambdaInsightsExtension:13",
-    "me-south-1": "arn:aws:lambda:me-south-1:285320876703:layer:LambdaInsightsExtension:13",
-    "eu-south-1": "arn:aws:lambda:eu-south-1:339249233099:layer:LambdaInsightsExtension:13"
-}
-lambda_insights_version_arm64 = {
-    "us-east-1": "arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "us-east-2": "arn:aws:lambda:us-east-2:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "us-west-2": "arn:aws:lambda:us-west-2:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "ap-south-1": "arn:aws:lambda:ap-south-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "ap-southeast-1": "arn:aws:lambda:ap-southeast-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "ap-southeast-2": "arn:aws:lambda:ap-southeast-2:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "ap-northeast-1": "arn:aws:lambda:ap-northeast-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "eu-central-1": "arn:aws:lambda:eu-central-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "eu-west-1": "arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension-Arm64:2",
-    "eu-west-2": "arn:aws:lambda:eu-west-2:580247275435:layer:LambdaInsightsExtension-Arm64:2"
-}
 
 
 class DescribeLambda(query.DescribeSource):
@@ -293,40 +257,29 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
-@AWSLambda.action_registry.register('set-enhanced-monitoring')
+@AWSLambda.action_registry.register('inject-layer')
 class LambdaEnhancedMonitoring(Action):
     """
-        This action allows for set enhanced monitoring
+        This action allows to inject lambda layer
        :example:
        .. code-block:: yaml
            actions:
-             - type: set-enhanced-monitoring
+             - type: inject-layer
     """
 
     schema = type_schema(
-        'set-enhanced-monitoring',
-        **{'state': {'default': True, 'type': 'boolean'},
-           'insights-extension-arn': {'default': None, 'type': 'string'}}
+        'inject-layer',
+        required=['lambda-layer-arn'],
+        **{'lambda-layer-arn': {
+            'type': 'array',
+            'items': {
+                'type': 'string'}}}
     )
     permissions = ("lambda:UpdateFunctionConfiguration",)
 
-    def get_insights_updated_layers(self, state, lambda_arch, lambda_layers, lambda_insights_arn):
-        region = self.manager.config.region
-        list_of_lambda_layer = [layers['Arn'] for layers in lambda_layers if "580247275435:layer" \
-                                                                             ":LambdaInsightsExtension" not in
-                                layers['Arn']]
-        if state:
-            if lambda_insights_arn is not None:
-                list_of_lambda_layer.append(lambda_insights_arn)
-            if lambda_arch == "arm64":
-                list_of_lambda_layer.append(lambda_insights_version_x86_64[region])
-            else:
-                list_of_lambda_layer.append(lambda_insights_version_x86_64[region])
-        return list_of_lambda_layer
-
     def process(self, resources):
         """
-            Set the enhanced monitoring for the function.
+            inject layer for the function.
             Args:
                 resources: AWS Lambda resources
             Returns:
@@ -340,23 +293,21 @@ class LambdaEnhancedMonitoring(Action):
         )
 
         client = local_session(self.manager.session_factory).client('lambda', config=config)
-        updateState = self.data.get('state', True)
 
-        lambda_insights_arn = self.data.get('insights-extension-arn')
+        lambda_insights_arn = self.data.get('lambda-layer-arn')
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
         for resource in resources:
-            lambda_arch = resource.get("Architectures", ['x86_64'])[0]
             lambda_layers = resource.get('Layers', [])
-            new_list_of_lambda_layers = self.get_insights_updated_layers(updateState, lambda_arch, lambda_layers,
-                                                                         lambda_insights_arn)
+            list_of_lambda_layer = [layers['Arn'] for layers in lambda_layers]
+            list_of_lambda_layer.extend(lambda_insights_arn)
             function_name = resource["FunctionName"]
             try:
-                self.log.info(f"Set enhanced monitoring for lambda")
+                self.log.info(f"inject layer for lambda")
                 retry(
                     client.update_function_configuration,
                     FunctionName=function_name,
-                    Layers=new_list_of_lambda_layers
+                    Layers=list_of_lambda_layer
                 )
             except client.exceptions.ResourceNotFoundException:
                 continue

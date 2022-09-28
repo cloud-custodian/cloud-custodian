@@ -415,17 +415,17 @@ class LambdaTest(BaseTest):
             FunctionName=resources[0]['FunctionName'])
         self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'Active')
 
-    def test_set_enhanced_monitoring_true(self):
-        factory = self.replay_flight_data("test_set_enhanced_monitoring_true")
+    def test_inject_layer(self):
+        factory = self.replay_flight_data("test_inject_layer")
 
         p = self.load_policy(
             {
-                "name": "enhanced_monitoring-lambda",
+                "name": "inject-layer",
                 "resource": "lambda",
                 "actions": [
                     {
-                        "type": "set-enhanced-monitoring",
-                        "state": True
+                        "type": "inject-layer",
+                        "lambda-layer-arn": ["arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21"]
                     }
                 ]
             },
@@ -436,29 +436,6 @@ class LambdaTest(BaseTest):
         response = client.get_function(
             FunctionName=resources[0]['FunctionName'])
         self.assertIn("arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21", response['Configuration']['Layers'][0]['Arn'])
-
-    def test_set_enhanced_monitoring_false(self):
-        factory = self.replay_flight_data("test_set_enhanced_monitoring_false")
-
-        p = self.load_policy(
-            {
-                "name": "enhanced_monitoring-lambda",
-                "resource": "lambda",
-                "actions": [
-                    {
-                        "type": "set-enhanced-monitoring",
-                        "state": False
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        client = factory().client('lambda')
-        response = client.get_function(
-            FunctionName=resources[0]['FunctionName'])
-        self.assertNotIn("Layers", response['Configuration'])
-
 
     def test_set_xray_tracing_false(self):
         factory = self.replay_flight_data("test_set_xray_tracing_false")
