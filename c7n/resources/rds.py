@@ -1931,3 +1931,43 @@ class EngineFilter(ValueFilter):
                 r['c7n:Engine'] = v
                 matched.append(r)
         return matched
+
+
+@filters.register('db-option-groups')
+class DbOptionGroups(ValueFilter):
+    """This filter describes RDS option groups for associated RDS instances.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-data-in-transit-encrypted
+            resource: aws.rds
+            filters:
+              - type: db-option-groups
+              - type: value
+                key: Options
+                value: not-null
+              - type: value
+                key: Options[].OptionName
+                op: intersect
+                value:
+                  - NATIVE_NETWORK_ENCRYPTION
+                  - SSL
+    """
+
+    schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            option_group_name = r['OptionGroupMemberships'][0]['OptionGroupName']
+            paginator = client.get_paginator('describe_option_groups')
+            response = paginator.paginate(
+                OptionGroupName=option_group_name).build_full_result().get('OptionGroupsList', [])
+            for pg in response:
+                results.append(pg)
+        return results

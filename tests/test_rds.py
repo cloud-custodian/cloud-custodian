@@ -884,6 +884,39 @@ class RDSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_data_in_transit_encrypt(self):
+        session_factory = self.replay_flight_data("test_rds_data_in_transit_encrypt")
+        p = self.load_policy(
+            {
+                "name": "rds-data-in-transit-encrypt",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "db-option-groups"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Options",
+                        "value": "not-null"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Options[].OptionName",
+                        "op": "intersect",
+                        "value": [
+                            "NATIVE_NETWORK_ENCRYPTION",
+                            "SSL"
+                        ]
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSSnapshotTest(BaseTest):
 
