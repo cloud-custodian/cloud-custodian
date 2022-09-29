@@ -94,8 +94,7 @@ class IAACSourceMode(PolicyExecutionMode):
         return event
 
     def as_results(self, resources):
-        return ResultSet([
-            PolicyResourceResult(r, self.policy) for r in resources])
+        return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
 
     def get_resource_types(self, graph):
         resource_type = self.manager.policy.resource_type
@@ -113,7 +112,6 @@ class ResultSet(list):
 
 
 class PolicyResourceResult:
-
     def __init__(self, resource, policy):
         self.resource = resource
         self.policy = policy
@@ -208,7 +206,7 @@ class TerraformResourceMap(IAACResourceMap):
 @clouds.register("terraform")
 class TerraformProvider(IAACSourceProvider):
 
-    display_name = 'Terraform'
+    display_name = "Terraform"
     resource_prefix = "terraform"
     resource_map = TerraformResourceMap(resource_prefix)
     resources = resource_map
@@ -237,7 +235,7 @@ class TerraformSource(IAACSourceMode):
 
 class TerraformResource(dict):
 
-    __slots__ = ('name', 'data', 'location')
+    __slots__ = ("name", "data", "location")
 
     def __init__(self, name, data):
         self.name = name
