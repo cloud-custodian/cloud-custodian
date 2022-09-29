@@ -1,5 +1,3 @@
-# Copyright The Cloud Custodian Authors.
-# SPDX-License-Identifier: Apache-2.0
 # Automatically generated from poetry/pyproject.toml
 # flake8: noqa
 # -*- coding: utf-8 -*-
@@ -14,10 +12,10 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.24.44,<2.0.0)',
- 'botocore (>=1.27.44,<2.0.0)',
- 'c7n (>=0.9.18,<0.10.0)',
- 'c7n-org (>=0.6.17,<0.7.0)',
+ 'boto3 (>=1.24.77,<2.0.0)',
+ 'botocore (>=1.27.77,<2.0.0)',
+ 'c7n (>=0.9.19,<0.10.0)',
+ 'c7n-org (>=0.6.18,<0.7.0)',
  'click (>=8.1.3,<9.0.0)',
  'click>=8.0,<9.0',
  'colorama (>=0.4.5,<0.5.0)',
@@ -25,7 +23,7 @@ install_requires = \
  'importlib-metadata (>=4.12.0,<5.0.0)',
  'importlib-resources (>=5.9.0,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
- 'jsonschema (>=4.9.0,<5.0.0)',
+ 'jsonschema (>=4.16.0,<5.0.0)',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrsistent (>=0.18.1,<0.19.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
@@ -34,7 +32,7 @@ install_requires = \
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.3.0,<5.0.0)',
- 'urllib3 (>=1.26.11,<2.0.0)',
+ 'urllib3 (>=1.26.12,<2.0.0)',
  'zipp (>=3.8.1,<4.0.0)']
 
 entry_points = \
@@ -42,7 +40,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-trailcreator',
-    'version': '0.2.17',
+    'version': '0.2.18',
     'description': 'Cloud Custodian - Retroactive Tag Resource Creators from CloudTrail',
     'license': 'Apache-2.0',
     'classifiers': [

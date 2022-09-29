@@ -1,7 +1,7 @@
 # Copyright 2020 Cloud Custodian Project and Contributors. All Rights Reserved.
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import toml
+import tomli
 from pathlib import Path
 import pytest
 
@@ -24,7 +24,7 @@ def test_package_metadata(package):
             found = True
             p = c
     assert found, "could not find pyproject.yaml"
-    data = toml.loads(p.read_text())
+    data = tomli.loads(p.read_text())
     md = data['tool']['poetry']
     assert md.get('homepage') == 'https://cloudcustodian.io'
     assert md.get('documentation').startswith('https://cloudcustodian.io/docs')
