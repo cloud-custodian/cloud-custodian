@@ -524,6 +524,13 @@ class UtilTest(BaseTest):
                 {'k': '{limit}',
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
+             'b': 21})
+
+        self.assertEqual(
+            utils.format_string_values(
+                {'k': '{limit}',
+                 'b': '{account_id}'}, account_id='21'),
+            {'k': '{limit}',
              'b': '21'})
 
     def test_get_support_region(self):
