@@ -1,0 +1,215 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-delete-protection-enable-daily",
+                "creationTime": 1663177571218,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-delete-protection-enable-daily:*",
+                "storedBytes": 16019
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-enable-performanceinsights-daily",
+                "creationTime": 1663091187569,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-enable-performanceinsights-daily:*",
+                "storedBytes": 18633
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-public-remediate-hourly",
+                "creationTime": 1663091183956,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-public-remediate-hourly:*",
+                "storedBytes": 416609
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-unused-stop-alert-daily",
+                "creationTime": 1663167617590,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-unused-stop-alert-daily:*",
+                "storedBytes": 17013
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-unused-stop-aws-start-remediate-weekly",
+                "creationTime": 1663153236406,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-unused-stop-aws-start-remediate-weekly:*",
+                "storedBytes": 3430
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-unused-stop-remedate-weekly",
+                "creationTime": 1663149645528,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-unused-stop-remedate-weekly:*",
+                "storedBytes": 3414
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-unused-stop-tag-remediate-weekly",
+                "creationTime": 1663171245479,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-unused-stop-tag-remediate-weekly:*",
+                "storedBytes": 3635
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-rds-unused-stop-untag-remediate-daily",
+                "creationTime": 1663167658791,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-rds-unused-stop-untag-remediate-daily:*",
+                "storedBytes": 17396
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-public-remediate-hourly",
+                "creationTime": 1663091212994,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-public-remediate-hourly:*",
+                "storedBytes": 423022
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unencrypted-delete-remediate-hourly",
+                "creationTime": 1663094771463,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unencrypted-delete-remediate-hourly:*",
+                "storedBytes": 421560
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unused-pause-alert-daily",
+                "creationTime": 1663167636327,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unused-pause-alert-daily:*",
+                "storedBytes": 17307
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unused-pause-enable-snapshot-weekly",
+                "creationTime": 1663182017488,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unused-pause-enable-snapshot-weekly:*",
+                "storedBytes": 3454
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unused-pause-remediate-weekly",
+                "creationTime": 1663149612349,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unused-pause-remediate-weekly:*",
+                "storedBytes": 3428
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unused-pause-tag-remediate-weekly",
+                "creationTime": 1663174836881,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unused-pause-tag-remediate-weekly:*",
+                "storedBytes": 3631
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-redshift-unused-pause-untag-remediate-daily",
+                "creationTime": 1663167643617,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-redshift-unused-pause-untag-remediate-daily:*",
+                "storedBytes": 17163
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-s3-block-non-ssl-requests-daily",
+                "creationTime": 1663099478274,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-s3-block-non-ssl-requests-daily:*",
+                "storedBytes": 87483
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-s3-block-non-ssl-requests-event",
+                "creationTime": 1663947045422,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-s3-block-non-ssl-requests-event:*",
+                "storedBytes": 3205
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-s3-encrypt-unencrypted-buckets-event",
+                "creationTime": 1663947040116,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-s3-encrypt-unencrypted-buckets-event:*",
+                "storedBytes": 2548
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-sg-tag-firewall-manager-daily",
+                "creationTime": 1663091221866,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-sg-tag-firewall-manager-daily:*",
+                "storedBytes": 18506
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-sns-unencrypted-snstopic-encrypt-daily",
+                "creationTime": 1663091226879,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-sns-unencrypted-snstopic-encrypt-daily:*",
+                "storedBytes": 18218
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-tmt-tag-shared-targets-daily",
+                "creationTime": 1663091223452,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-tmt-tag-shared-targets-daily:*",
+                "storedBytes": 18570
+            },
+            {
+                "logGroupName": "/aws/lambda/pe-v2-vpc-flow-logs-enable-daily",
+                "creationTime": 1663177582974,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-vpc-flow-logs-enable-daily:*",
+                "storedBytes": 17000
+            },
+            {
+                "logGroupName": "/aws/lambda/raghu-route53-cwlog-subscription-remediate-daily",
+                "creationTime": 1663776938990,
+                "retentionInDays": 365,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/raghu-route53-cwlog-subscription-remediate-daily:*",
+                "storedBytes": 52073
+            },
+            {
+                "logGroupName": "c7n-test-a",
+                "creationTime": 1664483998840,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-test-a:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "oil-ec2-securitylogs-loggroup",
+                "creationTime": 1663090322795,
+                "retentionInDays": 7,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:oil-ec2-securitylogs-loggroup:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "raghu/aws/route53/test-644160558196",
+                "creationTime": 1663779749179,
+                "retentionInDays": 7,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:raghu/aws/route53/test-644160558196:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

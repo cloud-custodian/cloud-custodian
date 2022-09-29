@@ -1,0 +1,900 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-api-gw-cache-encryption-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-ecb-set-waf-remediate-hourly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-ecb-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-intuit-set-waf-remediate-hourly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-logging-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-unset-waf-remediate-hourly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-waf-fail-open-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-alb-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-apigateway-ecb-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-apigw-set-ecb-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-apigw-set-intuit-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-apigw-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-appsync-ecb-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-appsync-set-ecb-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-appsync-set-intuit-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-catalog-product-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cf-set-ecb-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cf-set-intuit-waf-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cfn-agienvmgr-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cloudfront-ecb-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cloudfront-waf-report-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-cloudtrail-enabled-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-dax-cluster-intransit-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-dax-cluster-nonvpc-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-documentdb-tls-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-ebs-snapshot-public-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-ec2-instance-profile-role-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-efs-encryption-in-transit-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-efs-prohibit-public-access-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-eks-atrest-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-eks-logging-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-eks-nonvpc-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-eks-public-quad-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-eks-subnet-igw-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-elasticache-encryption-at-rest-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-elasticache-encryption-in-tran-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-elasticache-nonvpc-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-elb-logging-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-emr-longrunning-unused-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-emr-nonvpc-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-emr-public-subnet-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-fsx-backup-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-fsx-nonvpc-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-instance-profile-no-policy-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-lambda-in-vpc-three-az-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-msk-cluster-inrest-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-msk-cluster-ptpb-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-msk-cluster-tls-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-msk-subnet-igw-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-neptune-ssl-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-nlb-logging-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-r53hostedzone-logging-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rds-aurora-encr-in-transit-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rds-encr-in-transit-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rds-proxy-tls-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rds-public-subnet-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rds-snapshot-unused-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rdsclus-aurora-connection-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-rdscluster-maz-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-redshift-snapshot-unencrypted-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-redshift-subnet-igw-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-s3-bucket-delete-r53-remediate-event",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sagemaker-nbinrest-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sagemaker-nonvpc-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sg-non-intuit-ingress-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sg-non-intuit-ingress-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sg-public-not-http-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-sqs-queue-tls-check-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-vpc-endpoint-dynamodb-enabled-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-custom-vpc-endpoint-s3-enabled-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-config-rule-policyengine-tag-remediation-event",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-cwlogs-subscription-pe-lambda-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-cwlogs-subscription-pe-lambda-remediate-event",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ebs-public-snapshot-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ec2-autoscaling-cost-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ec2-instance-profile-no-role-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ec2-instance-profile-role-no-policy-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-elasticsearch-public-acp-alert-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-elasticsearch-public-remediate-bihourly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-emr-encryption-at-rest-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-emr-encryption-at-transit-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-emr-unused-longrunning-cost-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-gluejob-list-jobs-weekly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-iam-user-console-access-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-rds-aurora-snapshot-unused-cost-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-rds-snapshot-unused-cost-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-route53-cwlog-subscription-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-sagemaker-instance-lifecycle-cost-weekly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-sagemaker-ml-trainingjob-in-transit-acp-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-ses-bouncerate-metrics-notify-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-trusted-advisor-service-limits-remediate-weekly",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/custodian-vpc-unusedngw-costwastesensor-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "3388976311891418679"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-alb-insecure-listener-delete-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-alb-logging-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-ami-tag-containerization-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-ami-tag-cpd-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-ami-tag-gbs-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-ami-tag-selinux-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-backup-default-vault-tag-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
