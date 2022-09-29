@@ -553,7 +553,10 @@ class DynamoDbAccelerator(BaseTest):
                 "filters": [
                     {
                         "type": "consecutive-backups",
-                        "days": 2
+                        "count": 2,
+                        "period": "days",
+                        "backuptype": "ALL",
+                        "status": "AVAILABLE"
                     }
                 ]
             },
