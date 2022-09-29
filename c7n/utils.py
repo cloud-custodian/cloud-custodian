@@ -42,6 +42,14 @@ class SafeDumper(BaseSafeDumper or object):
 
 log = logging.getLogger('custodian.utils')
 
+# regex pattern for a policy data value that contains
+# only a single variable replacement
+single_replacement = re.compile(r'''
+    ^\{                # starts with a curly brace
+    (?P<field_name>.+) # followed by one or more characters to indicate a field name
+    \}$                # ends with a curly brace
+''', re.VERBOSE)
+
 
 class VarsSubstitutionError(Exception):
     pass
@@ -596,6 +604,16 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
             new.append(format_string_values(item, *args, **kwargs))
         return new
     elif isinstance(obj, str):
+        # Attempt a direct replacement rather than string
+        # interpolation if the target string consists of
+        # solely a single field replacement.
+        #
+        # This is most useful to allow non-string variables
+        # to be injected into a policy.
+        m = single_replacement.match(obj)
+        field = m and m.groupdict()['field_name']
+        if field in kwargs:
+            return kwargs[field]
         try:
             return obj.format(*args, **kwargs)
         except err_fallback:
