@@ -69,7 +69,10 @@ def import_resource_classes(resource_map, resource_types):
         if r not in resource_map:
             not_found.add(r)
             continue
-        rmodule, rclass = resource_map[r].rsplit('.', 1)
+        provider_value = resource_map[r]
+        if isinstance(provider_value, type):
+            continue
+        rmodule, rclass = provider_value.rsplit('.', 1)
         rmods.add(rmodule)
 
     for rmodule in rmods:
@@ -77,6 +80,10 @@ def import_resource_classes(resource_map, resource_types):
 
     for rtype in resource_types:
         if rtype in not_found:
+            continue
+        provider_value = resource_map[rtype]
+        if isinstance(provider_value, type):
+            found.append(provider_value)
             continue
         rmodule, rclass = resource_map[rtype].rsplit('.', 1)
         r = getattr(mod_map[rmodule], rclass, None)

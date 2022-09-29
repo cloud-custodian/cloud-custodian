@@ -3,7 +3,7 @@ from c7n.output import OutputRegistry
 from rich.console import Console
 
 
-report_outputs = OutputRegistry()
+report_outputs = OutputRegistry("left")
 report_outputs.default = "rich"
 
 
