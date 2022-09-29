@@ -8,7 +8,7 @@
                 "filterPattern": "id",
                 "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:r53query-log-destination-644160558196",
                 "distribution": "ByLogStream",
-                "creationTime": 1664484000454
+                "creationTime": 1664486090871
             }
         ],
         "ResponseMetadata": {}

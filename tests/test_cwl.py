@@ -95,8 +95,6 @@ class LogGroupTest(BaseTest):
         distribution = "ByLogStream"
         
         client = factory().client("logs")
-        client.create_log_group(logGroupName=log_group)
-        self.addCleanup(client.delete_log_group, logGroupName=log_group)
         p = self.load_policy(
             {
                 "name": "put-subscription-filter",
@@ -111,11 +109,6 @@ class LogGroupTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-        print("subscription filter: ", client.describe_subscription_filters(logGroupName = log_group, 
-            filterNamePrefix = filter_name, 
-            limit = 1)["subscriptionFilters"][0])
-
         self.assertEqual(
             client.describe_subscription_filters(logGroupName = log_group, 
             filterNamePrefix = filter_name, 
