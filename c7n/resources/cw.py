@@ -851,7 +851,7 @@ class SubscriptionFilter(BaseAction):
               - type: put-subscription-filter
                 filter_name: AllLambda
                 filter_pattern: ip
-                destination_arn: "arn:aws:logs:us-east-1:1234567890:destination:lambda-logs-2345678901"
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda-logs-2345678901
                 distribution: Random
     """
     schema = type_schema(
