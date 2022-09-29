@@ -4,7 +4,6 @@ import itertools
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
-import re
 
 import botocore.exceptions
 
