@@ -28,14 +28,14 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "boto3"
-version = "1.24.66"
+version = "1.24.81"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.66,<1.28.0"
+botocore = ">=1.27.81,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -44,7 +44,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.66"
+version = "1.27.81"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
@@ -60,7 +60,7 @@ crt = ["awscrt (==0.14.0)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.18"
+version = "0.9.19"
 description = "Cloud Custodian - Policy Rules Engine"
 category = "dev"
 optional = false
@@ -83,7 +83,7 @@ url = "../.."
 
 [[package]]
 name = "certifi"
-version = "2022.6.15"
+version = "2022.9.24"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
@@ -143,7 +143,7 @@ python-dateutil = ">=2.7"
 
 [[package]]
 name = "idna"
-version = "3.3"
+version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
@@ -199,7 +199,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "jsonschema"
-version = "4.15.0"
+version = "4.16.0"
 description = "An implementation of JSON Schema validation for Python"
 category = "dev"
 optional = false
@@ -243,6 +243,14 @@ description = "Resolve a name to an object."
 category = "dev"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "placebo"
+version = "0.9.0"
+description = "Make boto3 calls that look real but have no effect"
+category = "dev"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "pluggy"
@@ -426,7 +434,7 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.727"
+version = "3.0.741"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -514,7 +522,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "07f75fb93130a154903ba1edcafa7693eb9a8ec770bd867a4e4a834bf1d1d175"
+content-hash = "be80a80509e59944bc991d8e98a0314b09f64a9db8ed8b0901fea8a73b2fbd1d"
 
 [metadata.files]
 argcomplete = []
@@ -540,6 +548,7 @@ packaging = [
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 pkgutil-resolve-name = []
+placebo = []
 pluggy = []
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
