@@ -850,7 +850,7 @@ class SubscriptionFilter(BaseAction):
               - type: put-subscription-filter
                 filter_name: AllLambda
                 filter_pattern: ip
-                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda-logs-2345678901
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
                 distribution: Random
     """
     schema = type_schema(
@@ -872,8 +872,8 @@ class SubscriptionFilter(BaseAction):
 
         for r in resources:
             client.put_subscription_filter(
-                    logGroupName=r['logGroupName'],
-                    filterName=filter_name,
-                    filterPattern=filter_pattern,
-                    destinationArn=destination_arn,
-                    distribution=distribution)
+                logGroupName=r['logGroupName'],
+                filterName=filter_name,
+                filterPattern=filter_pattern,
+                destinationArn=destination_arn,
+                distribution=distribution)

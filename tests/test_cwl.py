@@ -87,20 +87,18 @@ class LogGroupTest(BaseTest):
 
     def test_put_subscription_filter(self):
         factory = self.replay_flight_data("test_log_group_put_subscription_filter")
-        
         log_group = "c7n-test-a"
         filter_name = "log-susbscription-filter-a"
         filter_pattern = "id"
-        destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:r53query-log-destination-644160558196"
+        destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:lambda"
         distribution = "ByLogStream"
-        
         client = factory().client("logs")
         p = self.load_policy(
             {
                 "name": "put-subscription-filter",
                 "resource": "log-group",
                 "filters": [{"logGroupName": log_group}],
-                "actions": [{"type": "put-subscription-filter", 
+                "actions": [{"type": "put-subscription-filter",
                 "filter_name": filter_name,
                 "filter_pattern": filter_pattern,
                 "destination_arn": destination_arn}],
@@ -110,33 +108,33 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            client.describe_subscription_filters(logGroupName = log_group, 
-            filterNamePrefix = filter_name, 
-            limit = 1)["subscriptionFilters"][0][
+            client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0][
                 "logGroupName"
             ],
             log_group,
         )
         self.assertEqual(
-            client.describe_subscription_filters(logGroupName = log_group, 
-            filterNamePrefix = filter_name, 
-            limit = 1)["subscriptionFilters"][0][
+            client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0][
                 "filterName"
             ],
             filter_name,
         )
         self.assertEqual(
-            client.describe_subscription_filters(logGroupName = log_group, 
-            filterNamePrefix = filter_name, 
-            limit = 1)["subscriptionFilters"][0][
+            client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0][
                 "destinationArn"
             ],
             destination_arn,
         )
         self.assertEqual(
-            client.describe_subscription_filters(logGroupName = log_group, 
-            filterNamePrefix = filter_name, 
-            limit = 1)["subscriptionFilters"][0][
+            client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0][
                 "distribution"
             ],
             distribution,

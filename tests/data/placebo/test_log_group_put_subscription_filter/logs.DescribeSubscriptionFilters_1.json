@@ -6,7 +6,7 @@
                 "filterName": "log-susbscription-filter-a",
                 "logGroupName": "c7n-test-a",
                 "filterPattern": "id",
-                "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:r53query-log-destination-644160558196",
+                "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:lambda",
                 "distribution": "ByLogStream",
                 "creationTime": 1664486090871
             }
