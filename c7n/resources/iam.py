@@ -1980,9 +1980,9 @@ class UserSSHKeyFilter(ValueFilter):
 class UserLoginProfile(ValueFilter):
     """Filter IAM users that have an associated login-profile
 
-    For quicker evaluation and reduced API traffic, it is recommended
-    to instead use the 'credential' filter with 'password_enabled': true
-    when a delay of up to four hours for credential report syncing is acceptable.
+    For quicker evaluation and reduced API traffic, it is recommended to
+    instead use the 'credential' filter with 'password_enabled': true when
+    a delay of up to four hours for credential report syncing is acceptable.
 
     (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
 
