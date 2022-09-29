@@ -4,10 +4,15 @@ from rich.console import Console
 
 
 report_outputs = OutputRegistry("left")
-report_outputs.default = "rich"
+report_outputs.default_protocol = "rich"
+
+
+def get_reporter(config):
+    return report_outputs.select(None, None)
 
 
 @report_outputs.register("rich")
+@report_outputs.register("default")
 class RichCli:
     def __init__(self, ctx, config):
         self.ctx = ctx
@@ -15,4 +20,7 @@ class RichCli:
         self.console = Console()
 
     def report(self, results):
+        self.console.print(results)
+
+    def flush(self):
         pass

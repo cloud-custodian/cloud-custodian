@@ -2,10 +2,14 @@ import fnmatch
 import logging
 
 from c7n.actions import ActionRegistry
-from c7n.filters import FilterRegistry
 from c7n.cache import NullCache
+from c7n.filters import FilterRegistry
+from c7n.manager import ResourceManager
+from c7n.policy import execution
+
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
+from c7n.utils import type_schema
 
 from tfparse import load_from_path
 
@@ -20,39 +24,74 @@ class IAACSourceProvider(Provider):
     def get_session_factory(self, options):
         return lambda *args, **kw: None
 
-    def initialize(self):
+    def initialize(self, options):
         pass
 
-    def initialize_policies(self, policies):
-        pass
+    def initialize_policies(self, policies, options):
+        return policies
+
+
+class CollectionRunner:
+    def __init__(self, policies, options):
+        self.policies = policies
+        self.options = options
+
+    def run(self):
+        event = self.get_event()
+        provider = self.get_provider()
+        if not provider.match_dir(self.options.source_dir):
+            raise NotImplementedError(
+                "no %s source files found" % provider.provider_name
+            )
+
+        graph = provider.parse(self.options.source_dir)
+
+        for p in self.policies:
+            p.expand_variables(p.get_variables())
+            p.validate()
+
+        for rtype, resources in graph.get_resources_by_type():
+            for p in self.policies:
+                if rtype != p.resource_type.split(".", 1)[-1]:
+                    continue
+                yield self.run_policy(p, graph, resources, event)
+
+    def run_policy(self, policy, graph, resources, event):
+        event = dict(event)
+        event.update({"graph": graph, "resources": resources})
+        return policy.push(event)
+
+    def get_provider(self):
+        provider_name = {p.provider_name for p in self.policies}.pop()
+        provider = clouds[provider_name]()
+        return provider
+
+    def get_event(self):
+        return {}
+
+    @staticmethod
+    def match_type(rtype, policies):
+        for p in policies:
+            if p.resource_type == rtype:
+                return True
 
 
 class IAACSourceMode(PolicyExecutionMode):
-    def run(self, event=None):
-        event = self.resolve_event(event)
+    @property
+    def manager(self):
+        return self.policy.resource_manager
 
+    def run(self, event, ctx):
         if not self.policy.is_runnable(event):
             pass
 
-        source_format = self.get_source_format(event["source_dir"])
-        if not source_format:
-            log.warning("iaac definition format not detected")
-
-        self.manager.source_format = source_format
-        self.manager.graph = graph = source_format.parse(
-            self.manager.ctxt.options["source_dir"]
-        )
-        resources = graph.get_resources_by_type(self.get_resource_types(graph))
-
-        rcount = len(resources)
-        log.debug("loaded %d resources", rcount)
+        resources = event["resources"]
+        log.debug("loaded %d resources", len(resources))
         resources = self.manager.filter_resources(resources, event)
-        results = source_format.as_results(resources)
-
-        return results
+        return self.as_results(resources)
 
     def resolve_event(self, event):
-        event = dict(self.manager.ctx.options)
+        event = dict(self.policy.options)
         return event
 
     def as_results(self, resources):
@@ -67,11 +106,6 @@ class IAACSourceMode(PolicyExecutionMode):
         for r in rtypes:
             rtypes += fnmatch.filter(graph.get_resource_types())
         return sorted(set(rtypes))
-
-    def get_source_format(self, source_dir):
-        if self.manager.ctx.options.format == "terraform":
-            return TerraformSource(self.manager)
-        raise NotImplementedError()
 
 
 class ResultSet(list):
@@ -92,10 +126,11 @@ class PolicyResourceResult(dict):
         pass
 
 
-class IAACResource:
+class IAACResourceManager(ResourceManager):
 
     filter_registry = FilterRegistry("iaac.filters")
     action_registry = ActionRegistry("iaac.actions")
+    log = log
 
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -156,13 +191,13 @@ class IAACResourceMap(object):
             return default
 
 
-class TerraformResource(IAACResource):
+class TerraformResourceManager(IAACResourceManager):
     pass
 
 
 class TerraformResourceMap(IAACResourceMap):
 
-    resource_class = TerraformResource
+    resource_class = TerraformResourceManager
 
 
 @clouds.register("terraform")
@@ -172,26 +207,49 @@ class TerraformProvider(IAACSourceProvider):
     resource_map = TerraformResourceMap(resource_prefix)
     resources = resource_map
 
-
-class TerraformSource(IAACSourceMode):
-    @staticmethod
-    def match_dir(self, source_dir):
-        files = source_dir.glob("*.tf")
-        files += source_dir.glob("*.tf.json")
-        return files
+    def initialize_policies(self, policies, options):
+        for p in policies:
+            p.data["mode"] = {"type": "terraform-source"}
+        return policies
 
     def parse(self, source_dir):
-        return TerraformGraph(load_from_path(source_dir))
+        graph = TerraformGraph(load_from_path(source_dir))
+        log.debug("Loaded %d resources", len(graph))
+        return graph
+
+    def match_dir(self, source_dir):
+        files = list(source_dir.glob("*.tf"))
+        files += list(source_dir.glob("*.tf.json"))
+        return files
+
+
+@execution.register("terraform-source")
+class TerraformSource(IAACSourceMode):
+
+    schema = type_schema("terraform-source")
+
+
+class TerraformResource:
+    def __init__(self, name, data):
+        self.name = name
+        self.location = data["__tfmeta"]
+        self.data = data
 
 
 class ResourceGraph:
     def __init__(self, resource_data):
         self.resource_data = resource_data
 
-    def get_resource_types(self):
+    def get_resource_by_type(self):
         raise NotImplementedError()
 
 
 class TerraformGraph(ResourceGraph):
-    def get_resoruce_types(self):
-        pass
+    def __len__(self):
+        return sum(map(len, self.resource_data.values()))
+
+    def get_resources_by_type(self):
+        for type_name, type_items in self.resource_data.items():
+            yield type_name, [
+                TerraformResource(name, data) for name, data in type_items.items()
+            ]

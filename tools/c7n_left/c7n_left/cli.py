@@ -1,16 +1,18 @@
+import logging
+from pathlib import Path
+
 import click
-
-
-from c7n.loader import DirectoryLoader
 from c7n.config import Config
 
-# from .output import report_outputs
-from .provider import ResultSet
+from .output import get_reporter
+from .provider import CollectionRunner
+from .utils import load_policies
 
 
 @click.group()
 def cli():
     """Shift Left Policy"""
+    logging.basicConfig(level=logging.DEBUG)
 
 
 @cli.command()
@@ -20,19 +22,15 @@ def cli():
 @click.option("-o", "--output", type=click.Path())
 def run(format, policy_dir, directory, output):
     """evaluate policies against iaac sources"""
-    loader = DirectoryLoader(Config.empty(source_dir=directory))
-    policies = loader.load_directory(policy_dir)
-    # reporter = report_outputs.select()
-    all_results = ResultSet()
-
-    for p in policies:
-        p.expand_variables(p.get_variables())
-        p.validate()
-        results = p()
-        if results:
-            all_results += results
-
-    # reporter.report(all_results)
+    config = Config.empty(
+        source_dir=Path(directory), policy_dir=Path(policy_dir), output=output
+    )
+    policies = load_policies(policy_dir, config)
+    reporter = get_reporter(config)
+    runner = CollectionRunner(policies, config)
+    for results in runner.run():
+        reporter.report(results)
+    reporter.flush()
 
 
 if __name__ == "__main__":
