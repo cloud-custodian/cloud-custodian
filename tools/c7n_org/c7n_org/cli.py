@@ -722,3 +722,7 @@ def run(config, use, output_dir, accounts, tags, region,
 
     if not success:
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    cli()
