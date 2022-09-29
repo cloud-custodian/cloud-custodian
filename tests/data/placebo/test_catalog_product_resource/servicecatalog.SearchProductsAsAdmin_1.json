@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProductViewDetails": [
+            {
+                "ProductViewSummary": {
+                    "Id": "testview-ipzsltwzr26dq",
+                    "ProductId": "test-6orqs3iobd7om",
+                    "Name": "testProduct",
+                    "Owner": "testOwner",
+                    "ShortDescription": "test-product",
+                    "Type": "CLOUD_FORMATION_TEMPLATE",
+                    "Distributor": "xyz",
+                    "HasDefaultPath": true,
+                    "SupportEmail": "xyz@test.com",
+                    "SupportDescription": "",
+                    "SupportUrl": ""
+                },
+                "Status": "AVAILABLE",
+                "ProductARN": "arn:aws:catalog:us-east-2:123456789012:product/test-6orqs3iobd7om",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 6,
+                    "minute": 1,
+                    "second": 58,
+                    "microsecond": 667000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
