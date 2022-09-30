@@ -16,6 +16,7 @@ from c7n_tencentcloud.utils import PageMethod
 class CVMDescribe(DescribeSource):
 
     def augment(self, resources):
+        self.set_qcs_on_resources(resources)
         return resources
 
 

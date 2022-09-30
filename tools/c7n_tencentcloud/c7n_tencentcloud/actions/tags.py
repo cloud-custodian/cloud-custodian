@@ -51,7 +51,7 @@ class TagAction(TencentCloudBaseAction):
         The tag request parameter, the default is to add the tag parameter,
         if the action is UnTagResources, it means to delete the tag
         """
-        qcs_list = self.manager.source.get_resource_qcs(resources)
+        qcs_list = [r['qcs'] for r in resources]
 
         if self.t_api_method_name == "UnTagResources":
             return {"ResourceList": qcs_list, "TagKeys": tags}
@@ -127,7 +127,7 @@ class RenameTagAction(TagAction):
         """
         param = {}
         old_tag = self._get_tag_params(resource)
-        qcs_list = self.manager.source.get_resource_qcs([resource])
+        qcs_list = [resource['qcs']]
         param.update({"Resource": qcs_list[0]})
         if old_tag is not None:
             replaceTags = {"ReplaceTags": [{

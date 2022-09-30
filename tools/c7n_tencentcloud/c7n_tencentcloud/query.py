@@ -156,14 +156,19 @@ class DescribeSource:
         return []
 
     def augment(self, resources):
+        self.set_qcs_on_resources(resources)
         return self.get_resource_tag(resources)
+
+    def set_qcs_on_resources(self, resources):
+        for qcs, resource in zip(self.get_resource_qcs(resources), resources):
+            resource['qcs'] = qcs
 
     def get_resource_tag(self, resources):
         """
         Get resource tag
         All resource tags need to be obtained separately
         """
-        resource_map = dict(zip(self.get_resource_qcs(resources), resources))
+        resource_map = {r['qcs']:r for r in resources}
 
         for batch in chunks(resource_map, self.tag_batch_size):
             # construct a separate id to qcs code map,since we're using unqualified qcs
@@ -182,7 +187,7 @@ class DescribeSource:
         get_resource_qcs
         resource description https://cloud.tencent.com/document/product/598/10606
         """
-        # qcs::${ServiceType}:${Region}:${Account}:${ResourcePreifx}/${ResourceId}
+        # qcs::${ServiceType}:${Region}:${Account}:${ResourcePrefix}/${ResourceId}
         # qcs::cvm:ap-singapore::instance/ins-ibu7wp2a
         qcs_list = []
         for r in resources:
@@ -280,7 +285,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         params = self.get_resource_query_params()
         resources = self.source.resources(params)
 
-        # filter resoures
+        # filter resources
         resources = self.filter_resources(resources)
 
         self.check_resource_limit(resources)

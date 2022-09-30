@@ -31,7 +31,8 @@ def test_get_session_factory(tc_provider):
 
 
 test_cases = [
-    ([], os.environ.get('TENCENTCLOUD_REGION', DEFAULT_REGION)),
+    # Default region matches the TENCENTCLOUD_REGION configured in conftest.py
+    ([], "na-ashburn"),
     (["ap-shanghai"], "ap-shanghai"),
     (["ap-shanghai", "others"], "ap-shanghai")
 ]
