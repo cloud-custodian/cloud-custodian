@@ -107,38 +107,13 @@ class LogGroupTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            client.describe_subscription_filters(logGroupName=log_group,
+        subscription_filter = client.describe_subscription_filters(logGroupName=log_group,
             filterNamePrefix=filter_name,
-            limit=1)["subscriptionFilters"][0][
-                "logGroupName"
-            ],
-            log_group,
-        )
-        self.assertEqual(
-            client.describe_subscription_filters(logGroupName=log_group,
-            filterNamePrefix=filter_name,
-            limit=1)["subscriptionFilters"][0][
-                "filterName"
-            ],
-            filter_name,
-        )
-        self.assertEqual(
-            client.describe_subscription_filters(logGroupName=log_group,
-            filterNamePrefix=filter_name,
-            limit=1)["subscriptionFilters"][0][
-                "destinationArn"
-            ],
-            destination_arn,
-        )
-        self.assertEqual(
-            client.describe_subscription_filters(logGroupName=log_group,
-            filterNamePrefix=filter_name,
-            limit=1)["subscriptionFilters"][0][
-                "distribution"
-            ],
-            distribution,
-        )
+            limit=1)["subscriptionFilters"][0]
+        self.assertEqual(subscription_filter["logGroupName"], log_group)
+        self.assertEqual(subscription_filter["filterName"], filter_name)
+        self.assertEqual(subscription_filter["destinationArn"], destination_arn)
+        self.assertEqual(subscription_filter["distribution"], distribution)
 
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")
