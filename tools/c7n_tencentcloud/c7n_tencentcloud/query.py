@@ -168,7 +168,7 @@ class DescribeSource:
         Get resource tag
         All resource tags need to be obtained separately
         """
-        resource_map = {r['qcs']:r for r in resources}
+        resource_map = {r['qcs']: r for r in resources}
 
         for batch in chunks(resource_map, self.tag_batch_size):
             # construct a separate id to qcs code map,since we're using unqualified qcs
