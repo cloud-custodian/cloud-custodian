@@ -258,7 +258,7 @@ class TerraformResource(dict):
 
     def get_source_lines(self):
         lines = (self.src_dir / self.filename).read_text().split("\n")
-        return lines[self.line_start-1:self.line_end]
+        return lines[self.line_start - 1:self.line_end]
 
 
 class ResourceGraph:
