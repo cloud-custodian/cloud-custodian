@@ -27,10 +27,8 @@ def run(format, policy_dir, directory, output):
     )
     policies = load_policies(policy_dir, config)
     reporter = get_reporter(config)
-    runner = CollectionRunner(policies, config)
-    for results in runner.run():
-        reporter.report(results)
-    reporter.flush()
+    runner = CollectionRunner(policies, config, reporter)
+    runner.run()
 
 
 if __name__ == "__main__":

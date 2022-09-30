@@ -32,13 +32,15 @@ class IAACSourceProvider(Provider):
 
 
 class CollectionRunner:
-    def __init__(self, policies, options):
+    def __init__(self, policies, options, reporter):
         self.policies = policies
         self.options = options
+        self.reporter = reporter
 
     def run(self):
         event = self.get_event()
         provider = self.get_provider()
+
         if not provider.match_dir(self.options.source_dir):
             raise NotImplementedError(
                 "no %s source files found" % provider.provider_name
@@ -50,11 +52,16 @@ class CollectionRunner:
             p.expand_variables(p.get_variables())
             p.validate()
 
+        self.reporter.on_execution_started(self.policies)
+        # consider inverting this order to allow for results grouped by policy
+        # at the moment, we're doing results grouped by resource.
         for rtype, resources in graph.get_resources_by_type():
             for p in self.policies:
                 if rtype != p.resource_type.split(".", 1)[-1]:
                     continue
-                yield self.run_policy(p, graph, resources, event)
+                result_set = self.run_policy(p, graph, resources, event)
+                self.reporter.on_results(result_set)
+        self.reporter.on_execution_ended()
 
     def run_policy(self, policy, graph, resources, event):
         event = dict(event)
@@ -115,18 +122,6 @@ class PolicyResourceResult:
     def __init__(self, resource, policy):
         self.resource = resource
         self.policy = policy
-
-    def source_file(self):
-        pass
-
-    def source_lines(self):
-        pass
-
-    def start_position(self):
-        pass
-
-    def end_posiition(self):
-        pass
 
 
 class IAACResourceManager(ResourceManager):
@@ -217,7 +212,7 @@ class TerraformProvider(IAACSourceProvider):
         return policies
 
     def parse(self, source_dir):
-        graph = TerraformGraph(load_from_path(source_dir))
+        graph = TerraformGraph(load_from_path(source_dir), source_dir)
         log.debug("Loaded %d resources", len(graph))
         return graph
 
@@ -237,15 +232,39 @@ class TerraformResource(dict):
 
     __slots__ = ("name", "data", "location")
 
+    # pygments lexer
+    format = "terraform"
+
     def __init__(self, name, data):
         self.name = name
         self.location = data["__tfmeta"]
         super().__init__(data)
 
+    @property
+    def filename(self):
+        return self.location["filename"]
+
+    @property
+    def line_start(self):
+        return self.location["line_start"]
+
+    @property
+    def line_end(self):
+        return self.location["line_end"]
+
+    @property
+    def src_dir(self):
+        return self.location["src_dir"]
+
+    def get_source_lines(self):
+        lines = (self.src_dir / self.filename).read_text().split("\n")
+        return lines[self.line_start:self.line_end]
+
 
 class ResourceGraph:
-    def __init__(self, resource_data):
+    def __init__(self, resource_data, src_dir):
         self.resource_data = resource_data
+        self.src_dir = src_dir
 
     def get_resource_by_type(self):
         raise NotImplementedError()
@@ -257,6 +276,8 @@ class TerraformGraph(ResourceGraph):
 
     def get_resources_by_type(self):
         for type_name, type_items in self.resource_data.items():
-            yield type_name, [
-                TerraformResource(name, data) for name, data in type_items.items()
-            ]
+            resources = []
+            for name, data in type_items.items():
+                data["__tfmeta"]["src_dir"] = self.src_dir
+                resources.append(TerraformResource(name, data))
+            yield type_name, resources
