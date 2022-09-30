@@ -9,7 +9,7 @@ import datetime
 from dateutil import tz
 import jmespath
 from mock import mock
-
+import pytest
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
@@ -17,6 +17,40 @@ from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 from tests.common import BaseTest
 from pytest_terraform import terraform
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.6', '1.25.8', '0.27.27']
+)
+def test_ec2_stop_protection_lower_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        with test.assertRaises(PolicyValidationError) as cm:
+            policy = test.load_policy(
+                {
+                    'name': 'ec2-imds-access',
+                    'resource': 'ec2',
+                    'filters': [{'type': 'set-metadata-access'}],
+                },
+            )
+            policy.validate()
+        test.assertIn('requires botocore version 1.26.7 or above', str(cm.exception))
+
+
+@pytest.mark.parametrize(
+    'botocore_version',
+    ['1.26.7', '1.26.8', '1.27.0', '2.0.0']
+)
+def test_ec2_stop_protection_above_botocore_version_validation(test, botocore_version):
+    with mock.patch('botocore.__version__', botocore_version):
+        policy = test.load_policy(
+            {
+                'name': 'ec2-imds-access',
+                'resource': 'ec2',
+                'filters': [{'type': 'set-metadata-access'}],
+            },
+        )
+        policy.validate()
 
 
 @terraform('ec2_metadata_tags_enabled')
