@@ -34,7 +34,15 @@ def load(options, path, format=None, validate=True, vars=None):
         raise IOError("Invalid path for config %r" % path)
 
     from c7n.schema import validate, StructureParser
-    data = utils.load_file(path, format=format, vars=vars)
+    if os.path.isdir(path):
+        from c7n.loader import DirectoryLoader
+        collection = DirectoryLoader(options).load_directory(path)
+        if validate:
+            [p.validate() for p in collection]
+        return collection
+
+    if os.path.isfile(path):
+        data = utils.load_file(path, format=format, vars=vars)
 
     structure = StructureParser()
     structure.validate(data)
@@ -857,7 +865,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
-        resource_id = self.policy.resource_manager.resource_type.id
+        resource_id = self.policy.resource_manager.resource_type.config_id or \
+            self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
         cfg_rule_name = event['configRuleName']

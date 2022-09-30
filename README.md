@@ -213,7 +213,8 @@ Get Involved
 ------------
 
 -   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
--   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - Real time chat if you're looking for help
+-   [Slack](https://communityinviter.com/apps/cloud-custodian/c7n-chat) - Real time chat if you're looking for help or interested in contributing to Custodian! 
+    - [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - (Older real time chat, we're likely migrating away from this)
 -   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
 -   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
 -   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag

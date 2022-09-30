@@ -1,0 +1,79 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAVD4IK2M7GWZXER5DZ:HarishAchappa",
+        "arn": "arn:aws:sts::012345678901:assumed-role/c7nbot/HarishAchappa",
+        "accountId": "012345678901",
+        "accessKeyId": "ASIAVD4IK2M7D7ELC4UU",
+        "sessionContext": {
+            "sessionIssuer": {
+                "type": "Role",
+                "principalId": "AROAVD4IK2M7GWZXER5DZ",
+                "arn": "arn:aws:iam::012345678901:role/c7nbot",
+                "accountId": "012345678901",
+                "userName": "c7nbot"
+            },
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2022-07-11T19:31:58Z",
+                "mfaAuthenticated": "false"
+            }
+        }
+    },
+    "eventTime": "2022-07-11T19:37:49Z",
+    "eventSource": "apigateway.amazonaws.com",
+    "eventName": "CreateStage",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "AWS Internal",
+    "userAgent": "AWS Internal",
+    "requestParameters": {
+        "restApiId": "abcdef74gh",
+        "createStageInput": {
+            "deploymentId": "49ijxa",
+            "description": "",
+            "cacheClusterEnabled": false,
+            "tracingEnabled": false,
+            "stageName": "latest"
+        },
+        "template": false
+    },
+    "responseElements": {
+        "stageUpdate": {
+            "restApiId": "abcdef74gh",
+            "stageName": "latest",
+            "template": false
+        },
+        "stageName": "latest",
+        "createdDate": "Jul 11, 2022 7:37:48 PM",
+        "cacheClusterStatus": "NOT_AVAILABLE",
+        "tracingEnabled": false,
+        "methodSettings": {},
+        "deploymentId": "r2pi2v",
+        "cacheClusterEnabled": false,
+        "lastUpdatedDate": "Jul 11, 2022 7:37:48 PM",
+        "stageFlushAuthorizerCache": {
+            "stageName": "latest",
+            "restApiId": "abcdef74gh",
+            "template": false
+        },
+        "stageDelete": {
+            "restApiId": "abcdef74gh",
+            "stageName": "latest",
+            "template": false
+        },
+        "self": {
+            "restApiId": "abcdef74gh",
+            "stageName": "latest",
+            "template": false
+        }
+    },
+    "requestID": "27cefd59-5d7c-4a52-98a5-f4f5ec72a72b",
+    "eventID": "62a841f9-7601-4345-9181-dd5f31ec75ab",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "012345678901",
+    "eventCategory": "Management",
+    "sessionCredentialFromConsole": "true"
+}

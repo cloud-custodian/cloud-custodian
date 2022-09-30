@@ -72,11 +72,13 @@ class Client:
 
         if paging_method == PageMethod.Offset:
             params[PageMethod.Offset.name] = 0
+            params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
         elif paging_method == PageMethod.PaginationToken:
             params[PageMethod.PaginationToken.name] = ""
             pagination_token_path = paging_def.get("pagination_token_path", "")
             if not pagination_token_path:
                 raise PolicyExecutionError("config to use pagination_token but not set token path")
+            params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
         else:
             raise PolicyExecutionError("unsupported paging method")
 
@@ -92,7 +94,8 @@ class Client:
             if len(items) > 0:
                 results.extend(items)
                 if paging_method == PageMethod.Offset:
-                    params[PageMethod.Offset.name] = params[PageMethod.Offset.name] + 1
+                    params[PageMethod.Offset.name] = params[PageMethod.Offset.name] +\
+                        paging_def["limit"]["value"]
                 else:
                     token = jmespath.search(pagination_token_path, result)
                     if token == "":
@@ -123,8 +126,15 @@ class Session:
                region: str) -> Client:
         """client"""
         http_profile = HttpProfile()
-        http_profile.endpoint = endpoint
 
+        # use regional endpoint, instead of roundtripping to centralized one.
+        # in practice this can greatly reduce latency on roundtrips
+        if region:
+            parts = endpoint.split('.')
+            parts.insert(1, region)
+            endpoint = '.'.join(parts)
+
+        http_profile.endpoint = endpoint
         client_profile = ClientProfile()
         client_profile.httpProfile = http_profile
 
