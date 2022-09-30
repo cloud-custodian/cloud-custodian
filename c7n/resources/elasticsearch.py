@@ -34,6 +34,7 @@ class DescribeDomain(DescribeSource):
                 DomainNames=resource_set)['DomainStatusList']
             for r in resources:
                 rarn = self.manager.generate_arn(r[model.id])
+                print('rarn', rarn)
                 r['Tags'] = self.manager.retry(
                     client.list_tags, ARN=rarn).get('TagList', [])
             return resources
