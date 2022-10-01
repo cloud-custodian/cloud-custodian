@@ -66,7 +66,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
+          key: venv-docs-${{ runner.os }}-3.9-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up doc cache
         uses: actions/cache@v2
@@ -78,7 +78,7 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-v2-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.9-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash
