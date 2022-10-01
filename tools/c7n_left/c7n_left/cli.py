@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from c7n.config import Config
 
-from .output import get_reporter
+from .output import get_reporter, report_outputs
 from .provider import CollectionRunner
 from .utils import load_policies
 
@@ -19,11 +19,15 @@ def cli():
 @click.option("--format", default="terraform")
 @click.option("-p", "--policy-dir", type=click.Path())
 @click.option("-d", "--directory", type=click.Path())
-@click.option("-o", "--output", type=click.Path())
-def run(format, policy_dir, directory, output):
+@click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
+@click.option("--output-file", type=click.File("w"), default="-")
+def run(format, policy_dir, directory, output, output_file):
     """evaluate policies against iaac sources"""
     config = Config.empty(
-        source_dir=Path(directory), policy_dir=Path(policy_dir), output=output
+        source_dir=Path(directory),
+        policy_dir=Path(policy_dir),
+        output=output,
+        output_file=output_file,
     )
     policies = load_policies(policy_dir, config)
     reporter = get_reporter(config)
@@ -31,7 +35,7 @@ def run(format, policy_dir, directory, output):
     runner.run()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     try:
         cli()
     except Exception:

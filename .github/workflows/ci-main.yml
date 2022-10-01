@@ -212,7 +212,9 @@ jobs:
             . test.env && poetry run pytest -n auto tests tools \
               --cov c7n --cov tools/c7n_azure/c7n_azure \
               --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
-              --cov tools/c7n_mailer/c7n_mailer --cov tools/c7n_tencentcloud/c7n_tencentcloud
+              --cov tools/c7n_tencentcloud/c7n_tencentcloud \
+              --cov tools/c7n_left/c7n_left \
+              --cov tools/c7n_mailer/c7n_mailer
             poetry run coverage xml
           else
             . test.env && poetry run pytest -n auto tests tools

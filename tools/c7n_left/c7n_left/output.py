@@ -1,3 +1,4 @@
+import json
 import time
 
 from c7n.output import OutputRegistry
@@ -7,11 +8,12 @@ from rich.syntax import Syntax
 
 
 report_outputs = OutputRegistry("left")
-report_outputs.default_protocol = "cli"
 
 
 def get_reporter(config):
-    return report_outputs.select(None, None)
+    for k, v in report_outputs.items():
+        if k == config.output:
+            return v(None, config)
 
 
 class PolicyMetadata:
@@ -28,7 +30,7 @@ class PolicyMetadata:
 
     @property
     def name(self):
-        return self.policy
+        return self.policy.name
 
     @property
     def description(self):
@@ -71,11 +73,10 @@ class Output:
 
 
 @report_outputs.register("cli")
-@report_outputs.register("default")
 class RichCli(Output):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        self.console = Console()
+        self.console = Console(file=config.output_file)
         self.started = None
 
     def on_execution_started(self, policies):
@@ -114,20 +115,57 @@ class RichResult:
         yield ""
 
 
+@report_outputs.register("github")
 class Github(Output):
 
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
     "::error file={name},line={line},endLine={endLine},title={title}::{message}"
 
-    def on_results(self):
-        resource = self.policy_resource.resource
+    def on_results(self, results):
+        for r in results:
+            print(self.format_result(r), file=self.config.output_file)
 
-        md = PolicyMetadata(self.policy)
+    def format_result(self, result):
+        resource = result.resource
+
+        md = PolicyMetadata(result.policy)
         filename = resource.src_dir / resource.filename
         title = md.title
-        message = md.description
+        message = md.description or ""
 
-        print(
-            f"::error file={filename} line={resource.line_start} lineEnd={resource.line_end} title={title}::{message}"  # noqa
+        return f"::error file={filename} line={resource.line_start} lineEnd={resource.line_end} title={title}::{message}"  # noqa
+
+
+@report_outputs.register("json")
+class Json(Output):
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.results = []
+
+    def on_results(self, results):
+        self.results.extend(results)
+
+    def on_execution_ended(self):
+        formatted_results = [self.format_result(r) for r in self.results]
+        self.config.output_file.write(
+            json.dumps({"results": formatted_results}, indent=2)
         )
+
+    def format_result(self, result):
+        resource = result.resource
+
+        lines = resource.get_source_lines()
+        line_pairs = []
+        index = resource.line_start
+        for l in lines:
+            line_pairs.append((index, l))
+            index += 1
+
+        return {
+            "policy": dict(result.policy.data),
+            "file_path": str(resource.src_dir / resource.filename),
+            "file_line_start": resource.line_start,
+            "file_line_end": resource.line_end,
+            "code_block": line_pairs,
+        }

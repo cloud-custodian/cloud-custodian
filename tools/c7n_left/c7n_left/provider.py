@@ -1,4 +1,3 @@
-import fnmatch
 import logging
 
 from c7n.actions import ActionRegistry
@@ -60,7 +59,8 @@ class CollectionRunner:
                 if rtype != p.resource_type.split(".", 1)[-1]:
                     continue
                 result_set = self.run_policy(p, graph, resources, event)
-                self.reporter.on_results(result_set)
+                if result_set:
+                    self.reporter.on_results(result_set)
         self.reporter.on_execution_ended()
 
     def run_policy(self, policy, graph, resources, event):
@@ -74,7 +74,7 @@ class CollectionRunner:
         return provider
 
     def get_event(self):
-        return {}
+        return {"config": self.options}
 
     @staticmethod
     def match_type(rtype, policies):
@@ -90,28 +90,14 @@ class IAACSourceMode(PolicyExecutionMode):
 
     def run(self, event, ctx):
         if not self.policy.is_runnable(event):
-            pass
+            return []
 
         resources = event["resources"]
         resources = self.manager.filter_resources(resources, event)
         return self.as_results(resources)
 
-    def resolve_event(self, event):
-        event = dict(self.policy.options)
-        return event
-
     def as_results(self, resources):
         return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
-
-    def get_resource_types(self, graph):
-        resource_type = self.manager.policy.resource_type
-        if isinstance(resource_type, list):
-            rtypes = resource_type
-        else:
-            rtypes = (resource_type,)
-        for r in rtypes:
-            rtypes += fnmatch.filter(graph.get_resource_types())
-        return sorted(set(rtypes))
 
 
 class ResultSet(list):
@@ -137,22 +123,6 @@ class IAACResourceManager(ResourceManager):
         self.session_factory = lambda: None
         self.filters = self.filter_registry.parse(self.data.get("filters", []), self)
         self.actions = self.action_registry.parse(self.data.get("actions", []), self)
-
-    @classmethod
-    def get_permissions(cls):
-        return ()
-
-    def get_resources(self, resource_ids):
-        return []
-
-    def resources(self):
-        return []
-
-    def validate(self):
-        pass
-
-    def get_deprecations(self):
-        return []
 
     def get_resource_manager(self, resource_type, data=None):
         return self.__class__(self.ctx, data or {})
@@ -274,8 +244,13 @@ class TerraformGraph(ResourceGraph):
     def __len__(self):
         return sum(map(len, self.resource_data.values()))
 
-    def get_resources_by_type(self):
+    def get_resources_by_type(self, types=()):
+        if isinstance(types, str):
+            types = (types,)
+
         for type_name, type_items in self.resource_data.items():
+            if types and type_name not in types:
+                continue
             resources = []
             for name, data in type_items.items():
                 data["__tfmeta"]["src_dir"] = self.src_dir
