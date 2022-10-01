@@ -30,6 +30,39 @@ def test_provider_parse():
     }
 
 
+def test_multi_resource_policy(tmp_path):
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-wild",
+                        "resource": "terraform.aws_*",
+                    }
+                ]
+            }
+        )
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_lambda_check_permissions"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    assert result.exit_code == 0
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 2
+
+
 def write_output_test_policy(tmp_path):
     (tmp_path / "policy.json").write_text(
         json.dumps(

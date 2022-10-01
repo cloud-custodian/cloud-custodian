@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+import fnmatch
 import logging
 
 from c7n.actions import ActionRegistry
@@ -59,7 +60,7 @@ class CollectionRunner:
         # at the moment, we're doing results grouped by resource.
         for rtype, resources in graph.get_resources_by_type():
             for p in self.policies:
-                if rtype != p.resource_type.split(".", 1)[-1]:
+                if not self.match_type(rtype, p):
                     continue
                 result_set = self.run_policy(p, graph, resources, event)
                 if result_set:
@@ -80,10 +81,12 @@ class CollectionRunner:
         return {"config": self.options}
 
     @staticmethod
-    def match_type(rtype, policies):
-        for p in policies:
-            if p.resource_type == rtype:
-                return True
+    def match_type(rtype, p):
+        if isinstance(p.resource_type, str):
+            return fnmatch.fnmatch(rtype, p.resource_type.split(".", 1)[-1])
+        if isinstance(p.resource_type, list):
+            for pr in p.resource_type:
+                return fnmatch.fnmatch(rtype, pr.split(".", 1)[-1])
 
 
 class IAACSourceMode(PolicyExecutionMode):
@@ -254,8 +257,20 @@ class TerraformGraph(ResourceGraph):
         for type_name, type_items in self.resource_data.items():
             if types and type_name not in types:
                 continue
-            resources = []
-            for name, data in type_items.items():
-                data["__tfmeta"]["src_dir"] = self.src_dir
-                resources.append(TerraformResource(name, data))
-            yield type_name, resources
+
+            if type_name == "data":
+                for data_type, data_items in type_items.items():
+                    resources = []
+                    for name, data in data_items.items():
+                        resources.append(self.as_resource(name, data))
+                    yield "%s.%s" % (type_name, data_type), resources
+
+            else:
+                resources = []
+                for name, data in type_items.items():
+                    resources.append(self.as_resource(name, data))
+                yield type_name, resources
+
+    def as_resource(self, name, data):
+        data["__tfmeta"]["src_dir"] = self.src_dir
+        return TerraformResource(name, data)

@@ -109,6 +109,8 @@ def resources(cloud_provider=None):
 
 
 def get_resource_class(resource_type):
+    if isinstance(resource_type, list):
+        resource_type = resource_type[0]
     if '.' in resource_type:
         provider_name, resource = resource_type.split('.', 1)
     else:
