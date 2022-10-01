@@ -502,7 +502,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "895f0f60748c6eef6268f2c59ae633dc3adb1c7b1877550c1539fc217440ea02"
+content-hash = "4ce0a33620924a59e61b371fe326efab08e25354018188202bf21b6337370194"
 
 [metadata.files]
 argcomplete = [
