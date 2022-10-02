@@ -118,7 +118,7 @@ class ConfigS3(query.ConfigSource):
             if method is None:
                 raise ValueError("unhandled supplementary config %s", k)
                 continue
-            v = cfg.get(k, missing):
+            v = cfg.get(k, missing)
             if v is missing:
                 continue
             if isinstance(cfg[k], str):
