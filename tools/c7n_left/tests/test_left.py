@@ -8,15 +8,38 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
+from c7n.config import Config
+from c7n.resources import load_resources
+
 try:
-    from c7n_left import provider, cli
+    from c7n_left import provider, cli, utils
+
+    LEFT_INSTALLED = True
 except ImportError:
     pytest.skip(reason="c7n_left not installed", allow_module_level=True)
-
+    LEFT_INSTALLED = False
+else:
+    load_resources(("terraform.*",))
 
 cur_dir = Path(os.curdir).absolute()
 terraform_dir = Path(__file__).parent.parent.parent.parent / "tests" / "terraform"
 terraform_dir = terraform_dir.relative_to(cur_dir)
+
+
+def test_load_policy(test):
+    test.load_policy(
+        {"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True
+    )
+    test.load_policy(
+        {"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True
+    )
+    test.load_policy({"name": "check3", "resource": ["terraform.aws_*"]}, validate=True)
+
+
+def test_load_policy_dir(tmp_path):
+    write_output_test_policy(tmp_path)
+    policies = utils.load_policies(tmp_path, Config.empty())
+    assert len(policies) == 1
 
 
 def test_provider_parse():
