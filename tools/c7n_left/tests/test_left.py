@@ -3,11 +3,15 @@
 #
 import json
 import os
+import pytest
 from pathlib import Path
 
 from click.testing import CliRunner
 
-from c7n_left import provider, cli
+try:
+    from c7n_left import provider, cli
+except ImportError:
+    pytest.skip(reason="c7n_left not installed")
 
 
 cur_dir = Path(os.curdir).absolute()
