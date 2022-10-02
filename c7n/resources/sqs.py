@@ -358,7 +358,9 @@ class SetEncryption(BaseAction):
     def process(self, queues):
         # get KeyId
         key = self.data.get('key', 'alias/aws/sqs')
-        if not key.startswith('alias') and not key.startswith('arn:') and not self.uuid_regex.search(key):
+        if (not key.startswith('alias')
+            and not key.startswith('arn:')
+                and not self.uuid_regex.search(key)):
             key = "alias/" + key
         session = local_session(self.manager.session_factory)
         key_id = session.client(
