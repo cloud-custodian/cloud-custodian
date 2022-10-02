@@ -110,6 +110,7 @@ class ConfigS3(query.ConfigSource):
         # owner is under acl per describe
         resource.pop('Owner', None)
 
+        missing = object()
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
             if cfg.get(k) == null_value:
                 continue
@@ -117,7 +118,9 @@ class ConfigS3(query.ConfigSource):
             if method is None:
                 raise ValueError("unhandled supplementary config %s", k)
                 continue
-            v = cfg[k]
+            v = cfg.get(k, missing):
+            if v is missing:
+                continue
             if isinstance(cfg[k], str):
                 v = json.loads(cfg[k])
             method(resource, v)
