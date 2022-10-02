@@ -151,6 +151,9 @@ class IAACResourceMap(object):
             return self.resource_class
         raise KeyError(k)
 
+    def __iter__(self):
+        return iter(())
+
     def notify(self, *args):
         pass
 
