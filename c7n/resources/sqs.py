@@ -3,6 +3,7 @@
 from botocore.exceptions import ClientError
 
 import json
+import re
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
@@ -346,13 +347,19 @@ class SetEncryption(BaseAction):
     """
     schema = type_schema(
         'set-encryption',
-        key={'type': 'string'}, required=('key',))
+        **{
+            "required": ('key',),
+            "reuse-period": {'type': 'integer'},
+            "key": {'type': 'string'}})
 
     permissions = ('sqs:SetQueueAttributes',)
+    uuid_regex = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
     def process(self, queues):
         # get KeyId
-        key = "alias/" + self.data.get('key')
+        key = self.data.get('key', 'alias/aws/sqs')
+        if not key.startswith('alias') and not key.startswith('arn:') and not self.uuid_regex.search(key):
+            key = "alias/" + key
         session = local_session(self.manager.session_factory)
         key_id = session.client(
             'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
