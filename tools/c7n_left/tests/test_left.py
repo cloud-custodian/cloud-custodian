@@ -11,7 +11,7 @@ from click.testing import CliRunner
 try:
     from c7n_left import provider, cli
 except ImportError:
-    pytest.skip(reason="c7n_left not installed")
+    pytest.skip(reason="c7n_left not installed", allow_module_level=True)
 
 
 cur_dir = Path(os.curdir).absolute()
