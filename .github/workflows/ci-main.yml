@@ -127,10 +127,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.9]
+        python-version: ["3.10"]
         include:
           - os: ubuntu-latest
-            python-version: "3.10"
+            python-version: 3.9
           - os: ubuntu-latest
             python-version: 3.8
           - os: ubuntu-latest
