@@ -157,6 +157,9 @@ class IAACResourceMap(object):
     def notify(self, *args):
         pass
 
+    def keys(self):
+        return ()
+
     def items(self):
         return ()
 
