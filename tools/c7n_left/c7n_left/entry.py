@@ -1,2 +1,3 @@
 def initialize_iaac():
-    from .provider import TerraformProvider
+    # import to get side effect registration into clouds
+    from .provider import TerraformProvider # noqa
