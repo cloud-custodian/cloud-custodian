@@ -8,7 +8,7 @@ PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.
 
 
 ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
-  ifneq "$(findstring $(PY_VERSION), 3.9 3.10)" ""
+  ifneq "$(findstring $(PY_VERSION), 3.10)" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
   endif
 endif
