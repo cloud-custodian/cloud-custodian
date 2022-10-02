@@ -204,7 +204,7 @@ jobs:
       - name: Test
         shell: bash
         env:
-          COV_RUN: ${{ contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu') }}
+          COV_RUN: ${{ contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu') }}
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
@@ -222,7 +222,7 @@ jobs:
 
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v2
-        if: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml
           name: codecov
