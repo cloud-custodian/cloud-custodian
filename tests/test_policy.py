@@ -189,7 +189,7 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template'})
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy', })
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -248,6 +248,24 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q3 2022
+            'AwsCloudFormationStack',
+            'AwsWafRegionalRule',
+            'AwsWafRule',
+            'AwsWafRuleGroup',
+            'AwsKinesisStream',
+            'AwsWafRegionalRuleGroup',
+            'AwsEc2VpcPeeringConnection',
+            'AwsWafRegionalWebAcl',
+            'AwsCloudWatchAlarm',
+            'AwsEfsAccessPoint',
+            'AwsEc2TransitGateway',
+            'AwsEcsContainer',
+            'AwsEcsTask',
+            'AwsBackupRecoveryPoint',
+            # https://github.com/cloud-custodian/cloud-custodian/issues/7775
+            'AwsBackupBackupPlan',
+            'AwsBackupBackupVault',
             # q2 2022
             'AwsRdsDbSecurityGroup',
             # q1 2022
@@ -365,7 +383,25 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
             'AWS::WAFv2::WebACL',
-            'AWS::XRay::EncryptionConfig'
+            'AWS::XRay::EncryptionConfig',
+            'AWS::ElasticLoadBalancingV2::Listener',
+            'AWS::AccessAnalyzer::Analyzer',
+            'AWS::WorkSpaces::ConnectionAlias',
+            'AWS::DMS::ReplicationSubnetGroup',
+            'AWS::StepFunctions::Activity',
+            'AWS::Route53Resolver::ResolverEndpoint',
+            'AWS::Route53Resolver::ResolverRule',
+            'AWS::Route53Resolver::ResolverRuleAssociation',
+            'AWS::DMS::EventSubscription',
+            'AWS::GlobalAccelerator::Accelerator',
+            'AWS::Athena::DataCatalog',
+            'AWS::EC2::TransitGatewayAttachment',
+            'AWS::Athena::WorkGroup',
+            'AWS::GlobalAccelerator::EndpointGroup',
+            'AWS::GlobalAccelerator::Listener',
+            'AWS::DMS::Certificate',
+            'AWS::Detective::Graph',
+            'AWS::EC2::TransitGatewayRouteTable',
         }
 
         resource_map = {}

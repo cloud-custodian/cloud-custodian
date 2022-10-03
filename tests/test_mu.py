@@ -889,6 +889,13 @@ class PolicyLambdaProvision(Publish):
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
         )
 
+    def test_different_lambda_handler(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {"handler": "custom.handler"}}}))
+        self.assertEqual(
+            p.get_config()["Handler"],
+            "custom.handler"
+        )
+
     def test_config_defaults(self):
         p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
         self.maxDiff = None

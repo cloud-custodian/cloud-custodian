@@ -175,6 +175,20 @@ class RestApiCrossAccount(CrossAccountAccessFilter):
     policy_attribute = 'policy'
     permissions = ('apigateway:GET',)
 
+    def get_resource_policy(self, r):
+        policy = super().get_resource_policy(r)
+        if policy:
+            policy = policy.replace('\\', '')
+        else:
+            # api gateway default iam policy is public
+            # authorizers and app code may mitigate but
+            # the iam policy intent here is clear.
+            policy = {'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Effect': 'Allow',
+                'Principal': '*'}]}
+        return policy
+
 
 @RestApi.action_registry.register('update')
 class UpdateApi(BaseAction):
@@ -252,6 +266,12 @@ class DeleteApi(BaseAction):
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+        self.query.capture_parent_id = True
+
     def get_query(self):
         query = super(DescribeRestStage, self).get_query()
         query.capture_parent_id = True
@@ -262,6 +282,13 @@ class DescribeRestStage(query.ChildDescribeSource):
         # Using capture parent, changes the protocol
         for parent_id, r in resources:
             r['restApiId'] = parent_id
+            r['stageArn'] = "arn:aws:{service}:{region}::" \
+                            "/restapis/{rest_api_id}/stages/" \
+                            "{stage_name}".format(
+                service="apigateway",
+                region=self.manager.config.region,
+                rest_api_id=parent_id,
+                stage_name=r['stageName'])
             tags = r.setdefault('Tags', [])
             for k, v in r.pop('tags', {}).items():
                 tags.append({
@@ -269,6 +296,27 @@ class DescribeRestStage(query.ChildDescribeSource):
                     'Value': v})
             results.append(r)
         return results
+
+    def get_resources(self, ids, cache=True):
+        deployment_ids = []
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for id in ids:
+            # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
+            if id.startswith('arn:'):
+                _, ident = id.rsplit(':', 1)
+                parts = ident.split('/', 4)
+                # if we get stage name in arn, use stage_name to get stage information
+                # from stage information, pick deploymentId
+                if len(parts) > 3:
+                    response = self.manager.retry(
+                        client.get_stage,
+                        restApiId=parts[2],
+                        stageName=parts[4])
+                    deployment_ids.append(response[self.manager.resource_type.id])
+            else:
+                deployment_ids.append(id)
+        return super(DescribeRestStage, self).get_resources(deployment_ids, cache)
 
 
 @resources.register('rest-stage')
@@ -280,11 +328,13 @@ class RestStage(query.ChildResourceManager):
         enum_spec = ('get_stages', 'item', None)
         name = 'stageName'
         id = 'deploymentId'
+        config_id = 'stageArn'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
+        supports_trailevents = True
 
     child_source = 'describe'
     source_mapping = {

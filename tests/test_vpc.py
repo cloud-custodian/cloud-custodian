@@ -1075,6 +1075,74 @@ class RouteTableTest(BaseTest):
             ],
         )
 
+    def test_cross_az_nat_gateway_route_filter(self):
+        factory = self.replay_flight_data("test_cross_az_nat_gateway_route_filter")
+        p = self.load_policy(
+            {
+                "name": "cross-az-nat-gw-route-filter",
+                "resource": "route-table",
+                "filters": [
+                    {
+                        "type": "cross-az-nat-gateway-route"
+                    }
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        assert resources[0]["c7n:nat-az-mismatch"] == {
+            'nat-06e9acaa9c0ab8799': {
+                'NatGatewayAz': 'us-west-2a',
+                'Subnets': {'subnet-01989283067fcc12f': 'us-west-2c'}
+            }
+        }
+        assert resources[1]['c7n:nat-az-mismatch'] == {
+            'nat-06e9acaa9c0ab8799': {
+                'NatGatewayAz': 'us-west-2a',
+                'Subnets': {'subnet-06b85e2b5aac87c58': 'us-west-2b'}
+            }
+        }
+
+
+def test_cross_az_nat_gateway_subnet_resolve(test):
+    factory = test.replay_flight_data('test_cross_az_nat_gateway_route_filter')
+    p = test.load_policy({
+        "name": "cross-az-nat-gw-route-filter",
+        "resource": "route-table",
+        "filters": [{"type": "cross-az-nat-gateway-route"}]},
+        session_factory=factory, config={'region': 'us-west-2'},
+    )
+    cross_nat = p.resource_manager.filters[0]
+    tables = p.resource_manager.source.resources({})
+    subnets = {
+        s['SubnetId']: s for s in
+        p.resource_manager.get_resource_manager('aws.subnet').resources()}
+
+    cross_nat.annotate_subnets_table(tables, subnets)
+
+    table_subnets = {}
+    for t in tables:
+        table_subnets[t['RouteTableId']] = list(
+            cross_nat.resolve_subnets(t, subnets.values()))
+
+    assert table_subnets == {
+        'rtb-006b59c15032dee2c': ['subnet-03f2787d0dd5a9094'],
+        'rtb-0123fa60166cf0a3b': ['subnet-084dae0d9c11bca66'],
+        'rtb-02dab232d4d3e7062': ['subnet-0b5bd0c426f2d2833'],
+        'rtb-02ddf9ac6ccafbd28': ['subnet-02c40a509d26f8d34'],
+        'rtb-036b56057df88bd48': ['subnet-0fba8806c8acb78c9'],
+        'rtb-046ba441cf1187b69': ['subnet-059f1e047a5ca7c1f'],
+        'rtb-0564036d8c3e1e117': ['subnet-0a57b9d3da96e4364'],
+        'rtb-0790946c364d31f08': ['subnet-01989283067fcc12f'],
+        'rtb-0ba85f9bc06635600': ['subnet-09e7dd01ed236e50c'],
+        'rtb-0c26eee79085b11b4': ['subnet-aabbccddee'],
+        'rtb-0da8d0fc8d7c46a45': ['subnet-06b85e2b5aac87c58'],
+        'rtb-0e40b5294fd751b38': ['subnet-0845061a295aef2b6'],
+        'rtb-0f13aebd1241f7141': ['subnet-0b8f90974afb1a016']
+    }
+
 
 class PeeringConnectionTest(BaseTest):
 
@@ -2431,6 +2499,52 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0].get("MatchedIpPermissions", [])), 1)
+
+    def test_cidr_ingress_list(self):
+        factory = self.replay_flight_data("test_security_group_cidr_ingress_list")
+        p = self.load_policy(
+            {
+                "name": "ingress-access-list",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "ingress",
+                        "Cidr": {
+                            "value": ["10.0.0.0/16", "172.0.0.0/16"],
+                            "op": "ni", "value_type": "cidr"
+                        },
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
+            ["CidrIp"], "192.0.0.0/32")
+
+        p = self.load_policy(
+            {
+                "name": "ingress-access-list",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "ingress",
+                        "Cidr": {
+                            "value": ["192.0.0.0/16", "172.0.0.0/16"],
+                            "op": "in", "value_type": "cidr"
+                        },
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
+                ["CidrIp"], "172.0.0.0/32")
+        self.assertEqual(resources[1]["MatchedIpPermissions"][0]['IpRanges'][0]
+                ["CidrIp"], "192.0.0.0/32")
 
     @functional
     def test_cidr_size_egress(self):

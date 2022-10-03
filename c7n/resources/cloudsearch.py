@@ -72,7 +72,9 @@ class EnableHttps(Action):
     """Enable HTTPs to cloudsearch
 
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: enable-https
                 resource: cloudsearch
