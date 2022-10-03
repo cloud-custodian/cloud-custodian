@@ -256,7 +256,9 @@ class WafEnabled(Filter):
 class WafV2Enabled(Filter):
     """Filter Application LoadBalancer by wafv2 web-acl
 
-    Supports regex expression for web-acl
+    Supports regex expression for web-acl.
+    Firewall Manager pushed WebACL's name varies by account and region.
+    Regex expression can support both local and Firewall Managed WebACL.
 
     :example:
 
@@ -324,17 +326,18 @@ class WafV2Enabled(Filter):
         for r in resources:
             arn = r[arn_key]
             # NLB & GLB doesn't support WAF. So, skip such resources
-            if r['Type'] == 'application':
-                if arn not in resource_map:
-                    state_map[arn] = False
-                    continue
-                if not target_acl:
-                    state_map[arn] = True
-                    continue
-                if resource_map[arn] in target_acl_ids:
-                    state_map[arn] = True
-                    continue
+            if r['Type'] != 'application':
+                continue
+            if arn not in resource_map:
                 state_map[arn] = False
+                continue
+            if not target_acl:
+                state_map[arn] = True
+                continue
+            if resource_map[arn] in target_acl_ids:
+                state_map[arn] = True
+                continue
+            state_map[arn] = False
         return [r for r in resources if state_map[r[arn_key]] == state]
 
 
