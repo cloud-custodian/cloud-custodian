@@ -292,6 +292,7 @@ class SourceIP(Filter):
                     source_ips.append(ips)
         return source_ips
 
+
 @ElasticSearchDomain.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """
@@ -551,12 +552,11 @@ class RemoveMatchedSourceIps(BaseAction):
                 ap = self.update_accpol(client, domain_name, accpol, good_cidrs)
                 self.log.info('updated AccessPolicy: {}'.format(json.dumps(ap)))
 
-
     def update_accpol(self, client, domain_name, accpol, good_cidrs):
         """Update access policy to only have good ip addresses
         """
         for i, cidr in enumerate(good_cidrs):
-            if not 'Condition' in accpol.get('Statement', [])[i] or \
+            if 'Condition' not in accpol.get('Statement', [])[i] or \
                     accpol.get('Statement', [])[i].get('Effect', '') != 'Allow':
                 continue
             accpol['Statement'][i]['Condition']['IpAddress']['aws:SourceIp'] = cidr
@@ -579,4 +579,3 @@ class ReservedInstances(QueryResourceManager):
         filter_type = 'list'
         arn_type = "reserved-instances"
         permissions_enum = ('es:DescribeReservedElasticsearchInstances',)
-
