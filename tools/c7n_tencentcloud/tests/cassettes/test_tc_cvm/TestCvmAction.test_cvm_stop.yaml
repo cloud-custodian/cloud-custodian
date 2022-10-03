@@ -66,48 +66,6 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"InstanceIds": ["ins-00lycyy6"], "Offset": 20, "Limit": 20}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '60'
-      Content-Type:
-      - application/json
-      Host:
-      - cvm.ap-singapore.tencentcloudapi.com
-      User-Agent:
-      - python-requests/2.28.1
-      X-TC-Action:
-      - DescribeInstances
-      X-TC-Region:
-      - ap-singapore
-      X-TC-Version:
-      - '2017-03-12'
-    method: POST
-    uri: https://cvm.ap-singapore.tencentcloudapi.com/
-  response:
-    body:
-      string: '{"Response": {"TotalCount": 1, "InstanceSet": [], "RequestId": "c8abd2aa-0451-4c27-84de-277e4de4d2db"}}'
-    headers:
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '103'
-      Content-Type:
-      - application/json
-      Date:
-      - Fri, 16 Sep 2022 08:33:15 GMT
-      Server:
-      - nginx
-    status:
-      code: 200
-      message: OK
-- request:
     body: '{"InstanceIds": ["ins-00lycyy6"], "StopType": "SOFT", "StoppedMode": "STOP_CHARGING"}'
     headers:
       Accept:
@@ -214,46 +172,3 @@ interactions:
     status:
       code: 200
       message: OK
-- request:
-    body: '{"InstanceIds": ["ins-00lycyy6"], "Offset": 20, "Limit": 20}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '60'
-      Content-Type:
-      - application/json
-      Host:
-      - cvm.ap-singapore.tencentcloudapi.com
-      User-Agent:
-      - python-requests/2.28.1
-      X-TC-Action:
-      - DescribeInstances
-      X-TC-Region:
-      - ap-singapore
-      X-TC-Version:
-      - '2017-03-12'
-    method: POST
-    uri: https://cvm.ap-singapore.tencentcloudapi.com/
-  response:
-    body:
-      string: '{"Response": {"TotalCount": 1, "InstanceSet": [], "RequestId": "052076dd-5d78-4df8-ad94-9212eb9392bc"}}'
-    headers:
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '103'
-      Content-Type:
-      - application/json
-      Date:
-      - Fri, 16 Sep 2022 08:33:27 GMT
-      Server:
-      - nginx
-    status:
-      code: 200
-      message: OK
-version: 1
