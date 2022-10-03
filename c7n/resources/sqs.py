@@ -397,7 +397,6 @@ class SetEncryption(BaseAction):
         except (client.exceptions.QueueDoesNotExist,) as e:
             self.log.exception(
                 "Exception modifying queue:\n %s" % e)
-            raise
 
 
 @SQS.action_registry.register('set-retention-period')
