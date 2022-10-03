@@ -164,11 +164,9 @@ class IAACResourceMap(object):
         return ()
 
     def get(self, k, default=None):
+        # that the resource is in the map has alerady been verified
+        # we get the unprefixed resource on get
         return self.resource_class
-        try:
-            return self[k]
-        except KeyError:
-            return default
 
 
 class TerraformResourceManager(IAACResourceManager):
