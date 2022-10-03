@@ -859,7 +859,7 @@ class SubscriptionFilter(BaseAction):
         filter_pattern={'type': 'string'},
         destination_arn={'type': 'string'},
         distribution={'enum': ['Random', 'ByLogStream']},
-        required=['filter_name', 'filter_pattern', 'destination_arn'])
+        required=['filter_name', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
 
     def process(self, resources):
@@ -867,7 +867,7 @@ class SubscriptionFilter(BaseAction):
         client = session.client('logs')
 
         filter_name = self.data.get('filter_name')
-        filter_pattern = self.data.get('filter_pattern')
+        filter_pattern = self.data.get('filter_pattern', '')
         destination_arn = self.data.get('destination_arn')
         distribution = self.data.get('distribution', 'ByLogStream')
 
