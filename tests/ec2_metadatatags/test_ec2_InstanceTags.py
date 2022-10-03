@@ -57,11 +57,15 @@ def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
             'filters': [
                 {
                     'type': 'value',
-                    'key': 'MetadataOptions.InstanceMetadataTags',
-                    'value': 'enabled',
-                    'op': 'eq'
-                }
-            ]
+                    'op': 'in',
+                    'key': 'InstanceId',
+                    'value': [
+                        ec2_metadata_tags_enabled['aws_instance.metadata_tags.id'],
+                    ],
+                },
+                {'State.Name': 'running'},
+                {'type': 'set-metadata-access'},
+            ],
         },
         session_factory=session_factory,
         config={'region': aws_region},
@@ -85,12 +89,16 @@ def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
             'name': 'ec2_metadata_tags_disabled',
             'resource': 'ec2',
             'filters': [
-                 {
+                  {
                     'type': 'value',
-                    'key': 'MetadataOptions.InstanceMetadataTags',
-                    'value': 'disabled',
-                    'op': 'eq'
-                }
+                    'op': 'in',
+                    'key': 'InstanceId',
+                    'value': [
+                        ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
+                    ],
+                },
+                {'State.Name': 'running'},
+                {'type': 'set-metadata-access'},
             ],
         },
         session_factory=session_factory,
