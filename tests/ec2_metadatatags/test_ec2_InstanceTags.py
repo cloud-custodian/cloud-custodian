@@ -77,7 +77,7 @@ def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
 
 @terraform('ec2_metadata_tags_disabled')
 def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
-    aws_region = 'us-east-1'
+    aws_region = 'us-west-1'
     session_factory = test.replay_flight_data('ec2_metadata_tags_disabled', region=aws_region)
 
     p = test.load_policy(
