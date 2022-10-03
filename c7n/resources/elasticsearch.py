@@ -34,7 +34,6 @@ class DescribeDomain(DescribeSource):
                 DomainNames=resource_set)['DomainStatusList']
             for r in resources:
                 rarn = self.manager.generate_arn(r[model.id])
-                print('rarn', rarn)
                 r['Tags'] = self.manager.retry(
                     client.list_tags, ARN=rarn).get('TagList', [])
             return resources
@@ -227,16 +226,20 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
 
 @ElasticSearchDomain.filter_registry.register('source-ip')
 class SourceIP(Filter):
-    """Filter for verifying ElasticSearch access policy source ip permissions
+    """ValueFilter-based filter for verifying allowed source ips in
+    an ElasticSearch domain's access policy. Useful for checking to see if
+    an ElasticSearch domain allows traffic from non approved IP addresses/CIDRs.
+
     :example:
-    exact match
+    Find ElasticSearch domains that allow traffic from IP addresses
+    not in the approved list (string matching)
     .. code-block: yaml
 
       - type: source-ip
         op: not-in
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
 
-    cidr type
+    Same  as above but using cidr matching instead of string matching
     .. code-block: yaml
       - type: source-ip
         op: not-in
@@ -245,14 +248,12 @@ class SourceIP(Filter):
     """
     schema = type_schema('source-ip', rinherit=ValueFilter.schema)
     permissions = ("es:DescribeElasticsearchDomainConfig",)
-    annotation = 'c7n:matched_source_ips'
+    annotation = 'c7n:MatchedSourceIps'
 
     def __call__(self, resource):
-        self.log.info("Checking resource: {}".format(resource))
-        self.log.info("Current AccessPolicy: {}".format(resource.get('AccessPolicies')))
         es_access_policy = resource.get('AccessPolicies')
         matched = []
-        source_ips = self.get_source_ips(json.loads(es_access_policy))
+        source_ips = self.get_source_ip_perms(json.loads(es_access_policy))
         if not self.data.get('key'):
             self.data['key'] = 'SourceIp'
         vf = ValueFilter(self.data, self.manager)
@@ -267,23 +268,29 @@ class SourceIP(Filter):
             return True
         return False
 
-    def get_source_ips(self, es_access_policy):
+    def get_source_ip_perms(self, es_access_policy):
         """Get SourceIps from the original access policy
         """
         ip_perms = []
         stmts = es_access_policy.get('Statement', [])
         for stmt in stmts:
-            if stmt.get('Effect', '') != 'Allow' or not 'IpAddress' in stmt.get('Condition', {}):
+            source_ips = self.source_ips_from_stmt(stmt)
+            if not source_ips:
                 continue
-            ips = stmt.get('Condition', {}).get('IpAddress', {}).get('aws:SourceIp')
-            if isinstance(ips, list):
-                for ip in ips:
-                    ip_perms.append({'SourceIp': ip})
-            else:
-                ip_perms.append({'SourceIp': ips})
-        self.log.info("SourceIps from the original access policy: {}".format(ip_perms))
+            ip_perms.extend([{'SourceIp': ip} for ip in source_ips])
         return ip_perms
 
+    @classmethod
+    def source_ips_from_stmt(cls, stmt):
+        source_ips = []
+        if stmt.get('Effect', '') == 'Allow':
+            ips = stmt.get('Condition', {}).get('IpAddress', {}).get('aws:SourceIp', [])
+            if len(ips) > 0:
+                if isinstance(ips, list):
+                    source_ips.extend(ips)
+                else:
+                    source_ips.append(ips)
+        return source_ips
 
 @ElasticSearchDomain.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
@@ -489,7 +496,11 @@ class ElasticSearchMarkForOp(TagDelayedAction):
 
 @ElasticSearchDomain.action_registry.register('remove-matched-source-ips')
 class RemoveMatchedSourceIps(BaseAction):
-    """Action to remove allowed source ips from a Access Policy
+    """Action to remove matched source ips from a Access Policy. This action
+    needs to be used in conjunction with the source-ip filter. It can be used
+    for removing non-approved IP addresses from the the access policy of a
+    ElasticSearch domain.
+
     :example:
     .. code-block:: yaml
             policies:
@@ -500,7 +511,7 @@ class RemoveMatchedSourceIps(BaseAction):
                     value_type: cidr
                     op: not-in
                     value_from:
-                       url: s3://pe-bucket/allowed_cidrs.csv
+                       url: s3://my-bucket/allowed_cidrs.csv
                 actions:
                   - type: remove-matched-source-ips
     """
@@ -513,8 +524,7 @@ class RemoveMatchedSourceIps(BaseAction):
 
         for r in resources:
             domain_name = r.get('DomainName', '')
-            self.log.info('Target elasticsearch domainname: {}'.format(domain_name))
-            # ES Access policy is defined as string
+            # ES Access policy is defined as json string
             accpol = json.loads(r.get('AccessPolicies', ''))
             good_cidrs = []
             bad_ips = []
@@ -522,31 +532,25 @@ class RemoveMatchedSourceIps(BaseAction):
             matched_key = SourceIP.annotation
             for matched_perm in r.get(matched_key, []):
                 bad_ips.append(matched_perm.get('SourceIp'))
-            for stmt in accpol.get('Statement', []):
-                good_ips = []
-                source_ips = self.extract(stmt)
-                if source_ips:
-                    good_ips = list(set(source_ips) - set(bad_ips))
-                good_cidrs.append(good_ips)
-            self.log.info('matched IPs that need to be removed: {}'.format(bad_ips))
 
-            if bad_ips:
+            if not bad_ips:
+                self.log.info('no matched IPs, no update needed')
+                return
+
+            update_needed = False
+            for stmt in accpol.get('Statement', []):
+                source_ips = SourceIP.source_ips_from_stmt(stmt)
+                if not source_ips:
+                    continue
+
+                update_needed = True
+                good_ips = list(set(source_ips) - set(bad_ips))
+                stmt['Condition']['IpAddress']['aws:SourceIp'] = good_ips
+
+            if update_needed:
                 ap = self.update_accpol(client, domain_name, accpol, good_cidrs)
                 self.log.info('updated AccessPolicy: {}'.format(json.dumps(ap)))
-            else:
-                self.log.info('no matched IPs, no update needed')
 
-    def extract(self, stmt):
-        source_ips = []
-        if stmt.get('Effect', '') == 'Allow':
-            ips = stmt.get('Condition', {}).get('IpAddress', {}).get('aws:SourceIp', [])
-            if len(ips) > 0:
-                if isinstance(ips, list):
-                    for ip in ips:
-                        source_ips.append(ip)
-                else:
-                    source_ips.append(ips)
-        return source_ips
 
     def update_accpol(self, client, domain_name, accpol, good_cidrs):
         """Update access policy to only have good ip addresses
