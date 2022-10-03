@@ -76,8 +76,7 @@ class MetricsFilter(Filter):
                'patternProperties': {
                    '^.*$': {'type': 'string'}}},
            # Type choices
-           'statistics': {'type': 'string', 'enum': [
-               'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount']},
+           'statistics': {'type': 'string'},
            'days': {'type': 'number'},
            'op': {'type': 'string', 'enum': list(OPERATORS.keys())},
            'value': {'type': 'number'},
@@ -125,11 +124,18 @@ class MetricsFilter(Filter):
         'workspaces': 'AWS/WorkSpaces',
     }
 
+    standard_stats = {'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount'}
+
     def __init__(self, data, manager=None):
         super(MetricsFilter, self).__init__(data, manager)
         self.days = self.data.get('days', 14)
 
     def validate(self):
+        stats = self.data.get('statistics', 'Average')
+        if stats not in self.standard_stats and stats not in {"p%s" % r for r in range(0, 101)}:
+            raise PolicyValidationError(
+                "metrics filter statistics method %s not supported" % stats)
+
         if self.days > 455:
             raise PolicyValidationError(
                 "metrics filter days value (%s) cannot exceed 455" % self.days)
@@ -230,15 +236,23 @@ class MetricsFilter(Filter):
             # means multiple filters within a policy using the same metric
             # across different periods or dimensions would be problematic.
             key = "%s.%s.%s.%s" % (self.namespace, self.metric, self.statistics, str(self.days))
+
+            params = dict(
+                Namespace=self.namespace,
+                MetricName=self.metric,
+                StartTime=self.start,
+                EndTime=self.end,
+                Period=self.period,
+                Dimensions=dimensions
+            )
+            if self.statistics in self.standard_stats:
+                params['Statistics'] = [self.statistics]
+            else:
+                params['ExtendedStatistics'] = [self.statistics]
+
             if key not in collected_metrics:
                 collected_metrics[key] = client.get_metric_statistics(
-                    Namespace=self.namespace,
-                    MetricName=self.metric,
-                    Statistics=[self.statistics],
-                    StartTime=self.start,
-                    EndTime=self.end,
-                    Period=self.period,
-                    Dimensions=dimensions)['Datapoints']
+                    **params)['Datapoints']
 
             # In certain cases CloudWatch reports no data for a metric.
             # If the policy specifies a fill value for missing data, add
