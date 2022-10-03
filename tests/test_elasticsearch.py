@@ -586,7 +586,7 @@ class ElasticSearch(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['c7n:matched_source_ips'], [{'SourceIp': '10.0.0.0/24'}])
+        self.assertEqual(resources[0]['c7n:MatchedSourceIps'], [{'SourceIp': '10.0.0.0/24'}])
 
         resp = client.describe_elasticsearch_domain(DomainName=resources[0]['DomainName'])
         self.assertNotIn('10.0.0.0/24', resp['DomainStatus']['AccessPolicies'])
