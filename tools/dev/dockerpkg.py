@@ -59,9 +59,11 @@ ADD tools/c7n_kube /src/tools/c7n_kube
 RUN rm -R tools/c7n_kube/tests
 ADD tools/c7n_openstack /src/tools/c7n_openstack
 RUN rm -R tools/c7n_openstack/tests
+ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
+RUN rm -R tools/c7n_tencentcloud/tests
 
 # Install requested providers
-ARG providers="gcp kube openstack azure"
+ARG providers="gcp kube openstack tencentcloud azure"
 RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
     poetry install && cd ../../; done
