@@ -45,7 +45,7 @@ def test_ec2_metadata_tags_above_botocore_version_validation(test, botocore_vers
         policy.validate()
 
 
-@terraform('ec2_metadata_tags_enabled')
+@terraform('ec2_metadata_tags_enabled', replay=False)
 def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
     aws_region = 'us-east-1'
     session_factory = test.replay_flight_data('ec2_metadata_tags_enabled', region=aws_region)
@@ -75,7 +75,7 @@ def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
 
     
 
-@terraform('ec2_metadata_tags_disabled')
+@terraform('ec2_metadata_tags_disabled', replay=False)
 def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
     aws_region = 'us-west-1'
     session_factory = test.replay_flight_data('ec2_metadata_tags_disabled', region=aws_region)
