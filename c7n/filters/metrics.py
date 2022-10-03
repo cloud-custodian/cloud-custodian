@@ -3,6 +3,8 @@
 """
 CloudWatch Metrics suppport for resources
 """
+import re
+
 from collections import namedtuple
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
@@ -125,6 +127,7 @@ class MetricsFilter(Filter):
     }
 
     standard_stats = {'Average', 'Sum', 'Maximum', 'Minimum', 'SampleCount'}
+    extended_stats_re = re.compile(r'^p\d{1,3}\.{0,1}\d{0,1}$')
 
     def __init__(self, data, manager=None):
         super(MetricsFilter, self).__init__(data, manager)
@@ -132,7 +135,7 @@ class MetricsFilter(Filter):
 
     def validate(self):
         stats = self.data.get('statistics', 'Average')
-        if stats not in self.standard_stats and stats not in {"p%s" % r for r in range(0, 101)}:
+        if stats not in self.standard_stats and not self.extended_stats_re.match(stats):
             raise PolicyValidationError(
                 "metrics filter statistics method %s not supported" % stats)
 
