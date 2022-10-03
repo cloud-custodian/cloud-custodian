@@ -328,7 +328,7 @@
                             "HttpTokens": "optional",
                             "HttpPutResponseHopLimit": 1,
                             "HttpEndpoint": "enabled",
-                            "InstanceMetadataTags": "disabled"
+                            "InstanceMetadataTags": "enabled"
                         }
                     }
                 ],

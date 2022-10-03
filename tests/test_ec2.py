@@ -252,7 +252,7 @@ class TestSetMetadata(BaseTest):
             'resource': 'aws.ec2',
             'actions': [
                 {'type': 'set-metadata-access',
-                 'metadata-tags': 'enabled',
+                 'metadatatags': 'enabled',
                  'tokens': 'required'},
             ]},
             session_factory=session_factory)
@@ -292,7 +292,7 @@ class TestSetMetadataTags(BaseTest):
             'resource': 'aws.ec2',
             'actions': [
                 {'type': 'set-metadata-access',
-                 'metadata-tags': 'enabled'},
+                 'metadatatags': 'enabled'},
             ]},
             session_factory=session_factory)
         resources = policy.run()

@@ -73,13 +73,7 @@ def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
         resources[0]['MetadataOptions.InstanceMetadataTags'],
         ec2_metadata_tags_enabled['aws_instance.metadata_tags'])
 
-    # set the aws_instance.metadata_tags to false to allow terraform to handle the teardown
-    client = session_factory().client('ec2')
-    client.modify_instance_attribute(
-        InstanceId=resources[0]['InstanceId'],
-        DisableApiStop={'Value': False}
-    )
-
+    
 
 @terraform('ec2_metadata_tags_disabled')
 def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
@@ -111,13 +105,6 @@ def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
         ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
         resource_ids)
 
-    # set the aws_instance.metadata_tags to false to allow terraform to handle the teardown
-    client = session_factory().client('ec2')
-    client.modify_instance_attribute(
-        InstanceId=resources[0]['InstanceId'],
-        DisableApiStop={'Value': False}
-    )
-
 
 class TestSetMetadata(BaseTest):
 
@@ -143,7 +130,7 @@ class TestSetMetadata(BaseTest):
             results,
             [{'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
-              'HttpTokens': 'required',
+              'HttpTokens': 'optional',
               'InstanceMetadataTags': 'disabled',
               'State': 'pending'},
              {'HttpEndpoint': 'enabled',
@@ -190,8 +177,9 @@ class TestSetMetadataTags(BaseTest):
               'HttpTokens': 'optional',
               'InstanceMetadataTags': 'disabled',
               'State': 'applied'}])
-        self.assertEqual(len(resources), 2)
-        self.assertEqual(
-            output.getvalue(),
-            ('set-metadata-access implicitly filtered 1 of 2 resources '
-             'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["InstanceMetadataTags"], "disabled")
+            ##output.getvalue(),
+            ##('set-metadata-access implicitly filtered 1 of 2 resources '
+            # 'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
+   
