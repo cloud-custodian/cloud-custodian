@@ -858,20 +858,9 @@ class SubscriptionFilter(BaseAction):
         filter_name={'type': 'string'},
         filter_pattern={'type': 'string'},
         destination_arn={'type': 'string'},
-        distribution={'enum': ['Random', 'ByLogStream']})
+        distribution={'enum': ['Random', 'ByLogStream']},
+        required=['filter_name', 'filter_pattern', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
-
-    def validate(self):
-        filter_name = self.data.get('filter_name', '')
-        filter_pattern = self.data.get('filter_pattern', '')
-        destination_arn = self.data.get('destination_arn', '')
-        if not filter_name:
-            raise ValueError('Must specify filter name')
-        if not filter_pattern:
-            raise ValueError('Must specify filter pattern')
-        if not destination_arn:
-            raise ValueError('Must specify destination arn')
-        return self
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
