@@ -1,5 +1,5 @@
 from c7n.varfmt import VarFormat
-from c7n.utils import FormatDate, parse_date
+from c7n.utils import parse_date
 
 
 def test_format_mixed():
@@ -15,7 +15,7 @@ def test_format_pass_str():
 
 
 def test_format_date_fmt():
-    d = FormatDate(parse_date("2018-02-02 12:00"))
+    d = parse_date("2018-02-02 12:00")
     assert VarFormat().format("{:%Y-%m-%d}", d, "2018-02-02")
     assert VarFormat().format("{}", d) == d
 
@@ -28,10 +28,13 @@ def test_load_policy_var_retain_type(test):
             'filters': [
                 {'type': 'value', 'key': 'why', 'op': 'in', 'value': "{my_list}"},
                 {'type': 'value', 'key': 'why_not', 'value': "{my_int}"},
+                {'key': "{my_date:%Y-%m-%d}"},
             ],
         }
     )
 
-    p.expand_variables(dict(my_list=[1, 2, 3], my_int=22))
+    p.expand_variables(dict(my_list=[1, 2, 3], my_int=22,
+                            my_date=parse_date('2022-02-01 12:00')))
     test.assertJmes('filters[0].value', p.data, [1, 2, 3])
     test.assertJmes('filters[1].value', p.data, 22)
+    test.assertJmes('filters[2].key', p.data, "2022-02-01")
