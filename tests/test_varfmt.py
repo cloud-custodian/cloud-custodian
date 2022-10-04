@@ -1,3 +1,5 @@
+import pytest
+
 from c7n.varfmt import VarFormat
 from c7n.utils import parse_date
 
@@ -12,6 +14,24 @@ def test_format_pass_list():
 
 def test_format_pass_str():
     assert VarFormat().format("{x}", x=2) == 2
+
+
+def test_format_manual_to_auto():
+    # coverage check for stdlib impl behavior
+    with pytest.raises(ValueError) as err:
+        VarFormat().format("{0} {}", 1, 2)
+    assert str(err.value) == (
+        'cannot switch from manual field specification to automatic field numbering'
+    )
+
+
+def test_format_auto_to_manual():
+    # coverage check for stdlib impl behavior
+    with pytest.raises(ValueError) as err:
+        VarFormat().format('{} {1}', 'a', 'b')
+    assert str(err.value) == (
+        'cannot switch from manual field specification to automatic field numbering'
+    )
 
 
 def test_format_date_fmt():
@@ -33,8 +53,9 @@ def test_load_policy_var_retain_type(test):
         }
     )
 
-    p.expand_variables(dict(my_list=[1, 2, 3], my_int=22,
-                            my_date=parse_date('2022-02-01 12:00')))
+    p.expand_variables(
+        dict(my_list=[1, 2, 3], my_int=22, my_date=parse_date('2022-02-01 12:00'))
+    )
     test.assertJmes('filters[0].value', p.data, [1, 2, 3])
     test.assertJmes('filters[1].value', p.data, 22)
     test.assertJmes('filters[2].key', p.data, "2022-02-01")

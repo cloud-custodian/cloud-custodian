@@ -4,7 +4,7 @@ from string import Formatter
 class VarFormat(Formatter):
     """Behaves exactly like the stdlib formatter, with one additional behavior.
 
-    when a string and has no format_spec and only contains a single expression,
+    when a string has no format_spec and only contains a single expression,
     retain the type of the source object.
 
     inspired by https://pypyr.io/docs/substitutions/format-string/
