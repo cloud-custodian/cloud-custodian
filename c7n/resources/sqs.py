@@ -3,6 +3,7 @@
 from botocore.exceptions import ClientError
 
 import json
+import re
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
@@ -32,6 +33,7 @@ class DescribeQueue(DescribeSource):
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
                 queue['QueueUrl'] = r
+                queue['QueueName'] = queue['QueueArn'].rsplit(':', 1)[-1]
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
@@ -331,6 +333,9 @@ class DeleteSqsQueue(BaseAction):
 class SetEncryption(BaseAction):
     """Action to set encryption key on SQS queue
 
+    you can also optionally set data key 'reuse-period', or use with
+    the service managed encryption by not specifying a key.
+
     :example:
 
     .. code-block:: yaml
@@ -346,26 +351,48 @@ class SetEncryption(BaseAction):
     """
     schema = type_schema(
         'set-encryption',
-        key={'type': 'string'}, required=('key',))
+        **{
+            "enabled": {'type': 'boolean'},
+            "reuse-period": {'type': 'integer', 'minimum': 60, 'maximum': 86400},
+            "key": {'type': 'string'}}
+    )
 
     permissions = ('sqs:SetQueueAttributes',)
+    uuid_regex = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
     def process(self, queues):
-        # get KeyId
-        key = "alias/" + self.data.get('key')
-        session = local_session(self.manager.session_factory)
-        key_id = session.client(
-            'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
+        # compatibility, if key is given and not arn/key id/ or prefixed with
+        # alias, add alias to it.
+        key = self.data.get('key', None)
+        if (key
+            and not key.startswith('alias')
+            and not key.startswith('arn:')
+                and not self.uuid_regex.search(key)):
+            key = "alias/" + key
+
         client = self.manager.get_client()
 
-        for q in queues:
-            self.process_queue(client, q, key_id)
+        reuse_period = self.data.get('reuse-period', 300)
+        params = {}
+        if not self.data.get('enabled', True):
+            params['SqsManagedSseEnabled'] = 'false'
+            params['KmsMasterKeyId'] = ''
+        elif self.data.get('enable', True) and not key:
+            params['SqsManagedSseEnabled'] = 'true'
+            params['KmsMasterKeyId'] = ''
+        elif self.data.get('enable', True) and key:
+            params['SqsManagedSseEnabled'] = 'false'
+            params['KmsMasterKeyId'] = key
+            params['KmsDataKeyReusePeriodSeconds'] = str(reuse_period)
 
-    def process_queue(self, client, queue, key_id):
+        for q in queues:
+            self.process_queue(client, q, params)
+
+    def process_queue(self, client, queue, params):
         try:
             client.set_queue_attributes(
                 QueueUrl=queue['QueueUrl'],
-                Attributes={'KmsMasterKeyId': key_id}
+                Attributes=params
             )
         except (client.exceptions.QueueDoesNotExist,) as e:
             self.log.exception(

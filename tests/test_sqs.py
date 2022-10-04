@@ -91,6 +91,49 @@ def test_sqs_delete(test, sqs_delete):
         time.sleep(2)
 
 
+def test_sqs_set_encryption_options(test):
+    p = test.load_policy({
+        'name': 'set-encryption-params',
+        'resource': 'sqs',
+        'actions': [{'type': 'set-encryption'}]
+    })
+
+    set_encrypt = p.resource_manager.actions[0]
+    collected = []
+
+    def collect_params(client, queue_url, params):
+        collected.append(params)
+    set_encrypt.process_queue = collect_params
+
+    set_encrypt.data = {'enabled': False}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'false',
+                               'KmsMasterKeyId': ''}
+
+    set_encrypt.data = {}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'true',
+                               'KmsMasterKeyId': ''}
+
+    set_encrypt.data = {'key': 'xyz'}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'false',
+                               'KmsDataKeyReusePeriodSeconds': '300',
+                               'KmsMasterKeyId': 'alias/xyz'}
+
+    set_encrypt.data = {'key': '40753d23-0bef-459d-870e-c0963b827b51'}
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'false',
+                               'KmsDataKeyReusePeriodSeconds': '300',
+                               'KmsMasterKeyId': '40753d23-0bef-459d-870e-c0963b827b51'}
+
+    set_encrypt.data = {'key': 'arn:aws:kms:us-east-1:1122334455:key/fb5bc39f-3cdb-438b-b959-3b812ae71628'}  # noqa
+    set_encrypt.process([{}])
+    assert collected.pop() == {'SqsManagedSseEnabled': 'false',
+                               'KmsDataKeyReusePeriodSeconds': '300',
+                               'KmsMasterKeyId': 'arn:aws:kms:us-east-1:1122334455:key/fb5bc39f-3cdb-438b-b959-3b812ae71628'}  # noqa
+
+
 @terraform('sqs_set_encryption')
 def test_sqs_set_encryption(test, sqs_set_encryption):
     session_factory = test.replay_flight_data("test_sqs_set_encryption", region='us-west-2')

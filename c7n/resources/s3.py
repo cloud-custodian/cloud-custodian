@@ -111,6 +111,8 @@ class ConfigS3(query.ConfigSource):
         resource.pop('Owner', None)
 
         for k, null_value in S3_CONFIG_SUPPLEMENT_NULL_MAP.items():
+            if k not in cfg:
+                continue
             if cfg.get(k) == null_value:
                 continue
             method = getattr(self, "handle_%s" % k, None)
