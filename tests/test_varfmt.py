@@ -1,7 +1,7 @@
 import pytest
 
 from c7n.varfmt import VarFormat
-from c7n.utils import parse_date
+from c7n.utils import parse_date, format_string_values
 
 
 def test_format_mixed():
@@ -12,8 +12,25 @@ def test_format_pass_list():
     assert VarFormat().format("{x}", x=[1, 2, 3]) == [1, 2, 3]
 
 
-def test_format_pass_str():
+def test_format_pass_int():
     assert VarFormat().format("{x}", x=2) == 2
+
+
+def test_format_pass_empty():
+    assert VarFormat().format("{x}", x=[]) == []
+    assert VarFormat().format("{x}", x=None) == None
+    assert VarFormat().format("{x}", x={}) == {}
+    assert VarFormat().format("{x}", x=0) == 0
+
+
+def test_format_string_values_empty():
+    formatter = VarFormat().format
+    assert format_string_values({'a': '{x}'}, x=None, formatter=formatter) == {
+        'a': None
+    }
+    assert format_string_values({'a': '{x}'}, x={}, formatter=formatter) == {'a': {}}
+    assert format_string_values({'a': '{x}'}, x=[], formatter=formatter) == {'a': []}
+    assert format_string_values({'a': '{x}'}, x=0, formatter=formatter) == {'a': 0}
 
 
 def test_format_manual_to_auto():

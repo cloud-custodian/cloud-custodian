@@ -597,7 +597,10 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=Non
         return new
     elif isinstance(obj, str):
         try:
-            return formatter and formatter(obj, *args, **kwargs) or obj.format(*args, **kwargs)
+            if formatter:
+                return formatter(obj, *args, **kwargs)
+            else:
+                return obj.format(*args, **kwargs)
         except err_fallback:
             return obj
     else:
