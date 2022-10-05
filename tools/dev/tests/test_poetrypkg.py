@@ -12,7 +12,7 @@ with open(cli, encoding='utf-8') as f:
     exec(f.read())
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 8))
+@pytest.mark.skipif(sys.version_info >= (3, 8), reason="Developer Python minimum is 3.8")
 def test_generate_frozen_deps():
     """
     Ensures that the gen-frozendeps command works and creates a git diff
