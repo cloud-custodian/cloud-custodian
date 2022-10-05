@@ -18,6 +18,7 @@ from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 from tests.common import BaseTest
 
+
 @pytest.mark.parametrize(
     'botocore_version',
     ['1.26.7', '1.26.8', '1.27.0', '2.0.0']
@@ -28,14 +29,12 @@ def test_ec2_metadata_tags_above_botocore_version_validation(test, botocore_vers
             {
                 'name': 'ec2-imds-access',
                 'resource': 'ec2',
-                'filters': [
-                {
+                'filters': [{
                     'type': 'value',
                     'key': 'MetadataOptions.InstanceMetadataTags',
                     'value': 'enabled',
                     'op': 'eq'
-                }
-            ]
+                }],
             },
         )
         policy.validate()

@@ -1,1 +1,1 @@
-..\..\..\tests\zpill.py
+../../../tests/zpill.py
