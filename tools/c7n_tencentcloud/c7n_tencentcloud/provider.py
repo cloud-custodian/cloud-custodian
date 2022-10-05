@@ -42,7 +42,7 @@ class TencentCloud(Provider):
             options.region = options.regions[0]
         if not options.account_id:
             session = self.get_session_factory(options)
-            options.account_id = session.client(
+            options.account_id = session().client(
                 endpoint='sts.tencentcloudapi.com',
                 service='sts',
                 version='2018-08-13',
