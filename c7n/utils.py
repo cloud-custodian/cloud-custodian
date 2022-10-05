@@ -474,7 +474,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
-    if isinstance(value, list):
+    if isinstance(value, list) or isinstance(value, set):
         return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
