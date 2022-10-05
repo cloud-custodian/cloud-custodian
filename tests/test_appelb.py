@@ -526,6 +526,110 @@ class AppELBTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_appelb_filter_wafv2_regex(self):
+        factory = self.replay_flight_data("test_appelb_wafv2_regex")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "state": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled",
+                     "web-acl": "FMManagedWebACLV2-FMS-.*",
+                     "state": True}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv3",
+                     "state": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_action_wafv2_not_found(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"state": False}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "web-acl": "FMManagedWebACLV2-FMS-T.*"}
+                ],
+            },
+        )
+
+    def test_appelb_action_wafv2_regex_multiple_webacl_match(self):
+        factory = self.replay_flight_data(
+            "test_appelb_wafv2_regex_multiple_webacl_match")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "state": True}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "web-acl": "FMManagedWebACLV2-FMS-T.*"}
+                ],
+            },
+            session_factory=factory,
+        )
+        with self.assertRaises(ValueError) as ctx:
+            p.run()
+            self.assertTrue('matching to none or multiple webacls' in str(
+                ctx.exception))
+
+    def test_appelb_action_wafv2_regex_disassociate_webacl(self):
+        factory = self.replay_flight_data(
+            "test_appelb_wafv2_regex")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled",
+                     "web-acl": "FMManagedWebACLV2-FMS-T.*", "state": True}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "state": False}
+                ],
+            },
+            session_factory=factory,
+        )
+        response = p.run()
+        self.assertEqual(response[0]['LoadBalancerName'], 'test')
+
     def test_set_wafv2_active_response(self):
         factory = self.replay_flight_data("test_appelb_wafv2")
         policy = self.load_policy(
