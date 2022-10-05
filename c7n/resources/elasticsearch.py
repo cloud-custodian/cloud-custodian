@@ -520,6 +520,15 @@ class RemoveMatchedSourceIps(BaseAction):
     schema = type_schema('remove-matched-source-ips')
     permissions = ('es:UpdateElasticsearchDomainConfig',)
 
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, SourceIP):
+                return self
+
+        raise PolicyValidationError(
+            '`remove-matched-source-ips` can only be used in conjunction with '
+            '`source-ip` filter on %s' % (self.manager.data,))
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('es')
 
