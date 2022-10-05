@@ -1,14 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from operator import eq
-import sys
-import os
-import logging
-import unittest
+
 import time
-import datetime
-from dateutil import tz
-import jmespath
 from mock import mock
 import pytest
 from c7n.testing import mock_datetime_now
