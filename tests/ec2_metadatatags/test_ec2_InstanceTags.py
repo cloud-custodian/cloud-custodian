@@ -17,10 +17,6 @@ from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 from tests.common import BaseTest
-from pytest_terraform import terraform
-
-
-
 
 @pytest.mark.parametrize(
     'botocore_version',
@@ -44,74 +40,6 @@ def test_ec2_metadata_tags_above_botocore_version_validation(test, botocore_vers
         )
         policy.validate()
 
-
-@terraform('ec2_metadata_tags_enabled', replay=False)
-def test_ec2_metadata_tags_enabled(test, ec2_metadata_tags_enabled):
-    aws_region = 'us-east-1'
-    session_factory = test.replay_flight_data('ec2_metadata_tags_enabled', region=aws_region)
-
-    p = test.load_policy(
-        {
-            'name': 'ec2_metadata_tags_enabled',
-            'resource': 'ec2',
-            'filters': [
-                {
-                    'type': 'value',
-                    'op': 'in',
-                    'key': 'InstanceId',
-                    'value': [
-                        ec2_metadata_tags_enabled['aws_instance.metadata_tags.id'],
-                    ],
-                },
-                {'State.Name': 'running'},
-                {'type': 'set-metadata-access'},
-            ],
-        },
-        session_factory=session_factory,
-        config={'region': aws_region},
-    )
-
-    resources = p.run()
-    test.assertEqual(len(resources), 1)
-    test.assertEqual(
-        resources[0]['MetadataOptions.InstanceMetadataTags'],
-        ec2_metadata_tags_enabled['aws_instance.metadata_tags'])
-
-    
-
-@terraform('ec2_metadata_tags_disabled', replay=False)
-def test_ec2_metadata_tags_disabled(test, ec2_metadata_tags_disabled):
-    aws_region = 'us-west-1'
-    session_factory = test.replay_flight_data('ec2_metadata_tags_disabled', region=aws_region)
-
-    p = test.load_policy(
-        {
-            'name': 'ec2_metadata_tags_disabled',
-            'resource': 'ec2',
-            'filters': [
-                  {
-                    'type': 'value',
-                    'op': 'in',
-                    'key': 'InstanceId',
-                    'value': [
-                        ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
-                    ],
-                },
-                {'State.Name': 'running'},
-                {'type': 'set-metadata-access'},
-            ],
-        },
-        session_factory=session_factory,
-        config={'region': aws_region},
-    )
-
-    resources = p.run()
-    test.assertEqual(len(resources), 2)
-
-    resource_ids = [i['InstanceId'] for i in resources]
-    test.assertIn(
-        ec2_metadata_tags_disabled['aws_instance.metadata_tags.id'],
-        resource_ids)
 
 class TestSetMetadataTags(BaseTest):
 
@@ -137,17 +65,16 @@ class TestSetMetadataTags(BaseTest):
             results,
             [{'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
-              'HttpTokens': 'optional',
-              'InstanceMetadataTags': 'disabled',
+              'HttpTokens': 'required',
+              'InstanceMetadataTags': 'enabled',
               'State': 'pending'},
              {'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'optional',
               'InstanceMetadataTags': 'disabled',
               'State': 'applied'}])
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
             output.getvalue(),
             ('set-metadata-access implicitly filtered 1 of 2 resources '
-             'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
-   
+             'key:MetadataOptions.InstanceMetadataTags on enabled\n'))
