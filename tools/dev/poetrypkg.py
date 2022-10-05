@@ -198,15 +198,19 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
 
     from poetry.core.packages.dependency import Dependency
 
-    dep_map = {d['name']: d for d in poetry.locker.lock_data['package']}
+    # normalize deps by lowercasing all the keys
+    dep_map = {d['name'].lower(): d for d in poetry.locker.lock_data['package']}
     seen = set(source_deps)
     seen.add('setuptools')
 
     prefix = '' if frozen else '^'
     while source_deps:
         dep = source_deps.pop()
+        dep = dep.lower()
         if dep not in dep_map:
             dep = dep.replace('_', '-')
+        if dep not in dep_map:
+            dep = dep.replace('-', '_')
         version = dep_map[dep]['version']
         reqs.append(Dependency(dep, '{}{}'.format(prefix, version)).to_pep_508())
         for cdep, cversion in dep_map[dep].get('dependencies', {}).items():
