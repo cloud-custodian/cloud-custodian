@@ -95,7 +95,7 @@ def load_providers(provider_types):
 
     if should_load_provider('terraform', provider_types, no_wild=True):
         from c7n_left.entry import initialize_iac
-        initialize_iaac()
+        initialize_iac()
 
     if should_load_provider('c7n', provider_types):
         from c7n import data  # noqa
