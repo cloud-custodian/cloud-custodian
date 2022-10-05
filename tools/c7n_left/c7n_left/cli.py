@@ -25,7 +25,7 @@ def cli():
 @click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
 @click.option("--output-file", type=click.File("w"), default="-")
 def run(format, policy_dir, directory, output, output_file):
-    """evaluate policies against iaac sources"""
+    """evaluate policies against IaC sources"""
     config = Config.empty(
         source_dir=Path(directory),
         policy_dir=Path(policy_dir),

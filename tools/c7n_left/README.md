@@ -25,7 +25,7 @@ $ c7n-left run --help
 
 Usage: c7n-left run [OPTIONS]
 
-  evaluate policies against iaac sources
+  evaluate policies against iac sources
 
 Options:
   --format TEXT
@@ -51,9 +51,9 @@ And now we can use it to evaluate a terraform root module
 
 ```shell
 $ c7n-left run --policy-dir policies -d root_module
-DEBUG:c7n.iaac:Loaded 3 resources
+DEBUG:c7n.iac:Loaded 3 resources
 Running 1 policies
-DEBUG:c7n.iaac:Filtered from 3 to 1 terraformresourcemanager
+DEBUG:c7n.iac:Filtered from 3 to 1 terraformresourcemanager
 test - terraform.aws_s3_bucket
   Failed
   File: main.tf:25-28

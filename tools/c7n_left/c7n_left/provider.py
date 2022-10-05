@@ -17,12 +17,12 @@ from c7n.utils import type_schema
 from tfparse import load_from_path
 
 
-log = logging.getLogger("c7n.iaac")
+log = logging.getLogger("c7n.iac")
 
 
-class IAACSourceProvider(Provider):
+class IACSourceProvider(Provider):
 
-    display_name = "IAAC"
+    display_name = "IAC"
 
     def get_session_factory(self, options):
         return lambda *args, **kw: None
@@ -89,7 +89,7 @@ class CollectionRunner:
                 return fnmatch.fnmatch(rtype, pr.split(".", 1)[-1])
 
 
-class IAACSourceMode(PolicyExecutionMode):
+class IACSourceMode(PolicyExecutionMode):
     @property
     def manager(self):
         return self.policy.resource_manager
@@ -116,10 +116,10 @@ class PolicyResourceResult:
         self.policy = policy
 
 
-class IAACResourceManager(ResourceManager):
+class IACResourceManager(ResourceManager):
 
-    filter_registry = FilterRegistry("iaac.filters")
-    action_registry = ActionRegistry("iaac.actions")
+    filter_registry = FilterRegistry("iac.filters")
+    action_registry = ActionRegistry("iac.actions")
     log = log
 
     def __init__(self, ctx, data):
@@ -134,7 +134,7 @@ class IAACResourceManager(ResourceManager):
         return self.__class__(self.ctx, data or {})
 
 
-class IAACResourceMap(object):
+class IACResourceMap(object):
 
     resource_class = None
 
@@ -169,17 +169,17 @@ class IAACResourceMap(object):
         return self.resource_class
 
 
-class TerraformResourceManager(IAACResourceManager):
+class TerraformResourceManager(IACResourceManager):
     pass
 
 
-class TerraformResourceMap(IAACResourceMap):
+class TerraformResourceMap(IACResourceMap):
 
     resource_class = TerraformResourceManager
 
 
 @clouds.register("terraform")
-class TerraformProvider(IAACSourceProvider):
+class TerraformProvider(IACSourceProvider):
 
     display_name = "Terraform"
     resource_prefix = "terraform"
@@ -203,7 +203,7 @@ class TerraformProvider(IAACSourceProvider):
 
 
 @execution.register("terraform-source")
-class TerraformSource(IAACSourceMode):
+class TerraformSource(IACSourceMode):
 
     schema = type_schema("terraform-source")
 
