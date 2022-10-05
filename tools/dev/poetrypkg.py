@@ -217,10 +217,14 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
 
 
 def locked_deps(package, poetry, exclude=(), remove=()):
+    from poetry_plugin_export.walker import get_project_dependency_packages
+
     reqs = []
-    deps = poetry.locker.get_project_dependency_packages(
+    deps = get_project_dependency_packages(
+        locker=poetry._locker,
         project_requires=package.all_requires,
-        dev=False, extras=[])
+        project_python_marker=package.python_marker,
+        extras=[])
 
     project_deps = {r.name: r for r in poetry.package.requires}
     for dep_pkg in deps:
