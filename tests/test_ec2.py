@@ -252,7 +252,6 @@ class TestSetMetadata(BaseTest):
             'resource': 'aws.ec2',
             'actions': [
                 {'type': 'set-metadata-access',
-                 'metadatatags': 'enabled',
                  'tokens': 'required'},
             ]},
             session_factory=session_factory)
@@ -268,57 +267,16 @@ class TestSetMetadata(BaseTest):
             [{'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
-              'InstanceMetadataTags': 'enabled',
               'State': 'pending'},
              {'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpTokens': 'required',
-              'InstanceMetadataTags': 'enabled',
               'State': 'applied'}])
         self.assertEqual(len(resources), 2)
         self.assertEqual(
             output.getvalue(),
             ('set-metadata-access implicitly filtered 1 of 2 resources '
              'key:MetadataOptions.HttpTokens on optional\n'))
-
-
-class TestSetMetadataTags(BaseTest):
-
-    def test_set_metadata_server(self):
-        output = self.capture_logging('custodian.actions')
-        session_factory = self.replay_flight_data('test_ec2_set_md_access')
-        policy = self.load_policy({
-            'name': 'ec2-imds-access',
-            'resource': 'aws.ec2',
-            'actions': [
-                {'type': 'set-metadata-access',
-                 'metadatatags': 'enabled'},
-            ]},
-            session_factory=session_factory)
-        resources = policy.run()
-        if self.recording:
-            time.sleep(2)
-        results = session_factory().client('ec2').describe_instances(
-            InstanceIds=[r['InstanceId'] for r in resources])
-        self.assertJmes('[0].MetadataOptions.InstanceMetadataTags', resources, 'disabled')
-        self.assertJmes(
-            'Reservations[].Instances[].MetadataOptions',
-            results,
-            [{'HttpEndpoint': 'enabled',
-              'HttpPutResponseHopLimit': 1,
-              'HttpTokens': 'optional',
-              'InstanceMetadataTags': 'enabled',
-              'State': 'pending'},
-             {'HttpEndpoint': 'enabled',
-              'HttpPutResponseHopLimit': 1,
-              'HttpTokens': 'optional',
-              'InstanceMetadataTags': 'enabled',
-              'State': 'applied'}])
-        self.assertEqual(len(resources), 2)
-        self.assertEqual(
-            output.getvalue(),
-            ('set-metadata-access implicitly filtered 1 of 2 resources '
-             'key:MetadataOptions.InstanceMetadataTags on disabled\n'))
 
 
 class TestMetricFilter(BaseTest):
