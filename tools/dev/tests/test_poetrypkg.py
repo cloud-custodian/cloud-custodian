@@ -11,9 +11,7 @@ with open(cli, encoding='utf-8') as f:
 
 def test_generate_frozen_deps():
     """
-    Ensures that the gen-frozendeps make command works, doesn't really
-    check for correctness currently. This test should only be run while
-    in the root of the directory
+    Ensures that the gen-frozendeps command works and creates a git diff
     """
 
     def _assert_pkg_ok(pkg):
