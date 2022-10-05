@@ -18,7 +18,7 @@ def test_format_pass_int():
 
 def test_format_pass_empty():
     assert VarFormat().format("{x}", x=[]) == []
-    assert VarFormat().format("{x}", x=None) == None
+    assert VarFormat().format("{x}", x=None) is None
     assert VarFormat().format("{x}", x={}) == {}
     assert VarFormat().format("{x}", x=0) == 0
 
