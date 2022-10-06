@@ -12,7 +12,7 @@ from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import entry, core, cli, utils
+    from c7n_left import cli, utils
     from c7n_left.providers.terraform import TerraformProvider
 
     LEFT_INSTALLED = True

@@ -8,7 +8,6 @@ from .resource import TerraformResource
 
 class TerraformGraph(ResourceGraph):
 
-
     def __len__(self):
         return sum(map(len, self.resource_data.values()))
 
@@ -43,33 +42,3 @@ class TerraformGraph(ResourceGraph):
         else:
             data["__tfmeta"]["src_dir"] = self.src_dir
         return TerraformResource(name, data)
-
-
-
-class NodeVisitor:
-
-    def __init__(self):
-        self.graph = {}
-        self._index = {}
-
-    @property
-    def id_node_map(self):
-        return self._index
-
-    def visit(self, block):
-        for k, v in list(block.items()):
-            if k == 'id' and isinstance(v, int):
-                self._index[v] = block
-            if isinstance(v, list) and v and len(v) == 1 and '__tfmeta' in v[0]:
-                block[k] = v[0]
-            if isinstance(v, dict):
-                self.visit(block)
-
-    def resolve_refs(self, block):
-        for k, v in list(block.items()):
-            if instance(v, int) and v in self.graph:
-                block[k] = self.graph[v]
-
-        
-        
-            
