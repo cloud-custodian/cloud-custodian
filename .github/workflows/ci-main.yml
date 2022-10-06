@@ -55,7 +55,7 @@ jobs:
       - name: Bootstrap poetry
         shell: bash
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION -y
+          curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/6161821b1d39fa30f92a677bba51abfc471f8aee/install-poetry.py | python3 - --version $POETRY_VERSION -y
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -147,7 +147,7 @@ jobs:
       - name: Bootstrap poetry
         shell: bash
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION -y
+          curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/6161821b1d39fa30f92a677bba51abfc471f8aee/install-poetry.py | python3 - --version $POETRY_VERSION -y
 
       - name: Set up cache
         uses: actions/cache@v2
