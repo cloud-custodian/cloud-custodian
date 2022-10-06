@@ -7,8 +7,9 @@ from pathlib import Path
 import click
 from c7n.config import Config
 
+from .entry import initialize_iac
 from .output import get_reporter, report_outputs
-from .provider import CollectionRunner
+from .core import CollectionRunner
 from .utils import load_policies
 
 
@@ -16,6 +17,7 @@ from .utils import load_policies
 def cli():
     """Shift Left Policy"""
     logging.basicConfig(level=logging.DEBUG)
+    initialize_iac()
 
 
 @cli.command()
