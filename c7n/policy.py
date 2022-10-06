@@ -1121,7 +1121,9 @@ class Policy:
 
     @property
     def provider_name(self) -> str:
-        if '.' in self.resource_type:
+        if isinstance(self.resource_type, list):
+            provider_name, _ = self.resource_type[0].split('.', 1)
+        elif '.' in self.resource_type:
             provider_name, resource_type = self.resource_type.split('.', 1)
         else:
             provider_name = 'aws'

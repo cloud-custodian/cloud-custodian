@@ -185,8 +185,9 @@ class DirectoryLoader(PolicyLoader):
                 log.error("Configuration invalid: {}".format(data))
                 log.error("%s" % e)
                 errors.append(e)
-            load_resources(structure.get_resource_types(data))
-            schm = schema.generate()
+            rtypes = structure.get_resource_types(data)
+            load_resources(rtypes)
+            schm = schema.generate(rtypes)
             errors += schema.validate(data, schm)
             return errors
 
