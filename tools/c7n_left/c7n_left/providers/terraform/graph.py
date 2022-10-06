@@ -7,7 +7,6 @@ from .resource import TerraformResource
 
 
 class TerraformGraph(ResourceGraph):
-
     def __len__(self):
         return sum(map(len, self.resource_data.values()))
 
