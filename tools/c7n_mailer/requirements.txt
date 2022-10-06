@@ -1,6 +1,6 @@
 attrs==22.1.0 ; python_version >= "3.7" and python_version < "4.0"
-boto3==1.24.87 ; python_version >= "3.7" and python_version < "4.0"
-botocore==1.27.87 ; python_version >= "3.7" and python_version < "4.0"
+boto3==1.24.88 ; python_version >= "3.7" and python_version < "4.0"
+botocore==1.27.88 ; python_version >= "3.7" and python_version < "4.0"
 cachetools==5.2.0 ; python_version >= "3.7" and python_version < "4.0"
 certifi==2022.9.24 ; python_version >= "3.7" and python_version < "4"
 charset-normalizer==2.1.1 ; python_version >= "3.7" and python_version < "4"
