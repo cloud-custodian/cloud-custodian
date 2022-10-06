@@ -726,13 +726,12 @@
                         "PrivateDnsName": "ip-172-31-69-131.ec2.internal",
                         "PrivateIpAddress": "172.31.69.131",
                         "ProductCodes": [],
-                        "PublicDnsName": "ec2-3-235-21-81.compute-1.amazonaws.com",
-                        "PublicIpAddress": "3.235.21.81",
+                        "PublicDnsName": "",
                         "State": {
-                            "Code": 16,
-                            "Name": "running"
+                            "Code": 80,
+                            "Name": "stopped"
                         },
-                        "StateTransitionReason": "",
+                        "StateTransitionReason": "User initiated (2022-10-06 05:52:38 GMT)",
                         "SubnetId": "subnet-02155f0d",
                         "VpcId": "vpc-af3f92d5",
                         "Architecture": "x86_64",
@@ -762,11 +761,6 @@
                         "Hypervisor": "xen",
                         "NetworkInterfaces": [
                             {
-                                "Association": {
-                                    "IpOwnerId": "amazon",
-                                    "PublicDnsName": "ec2-3-235-21-81.compute-1.amazonaws.com",
-                                    "PublicIp": "3.235.21.81"
-                                },
                                 "Attachment": {
                                     "AttachTime": {
                                         "__class__": "datetime",
@@ -799,11 +793,6 @@
                                 "PrivateIpAddress": "172.31.69.131",
                                 "PrivateIpAddresses": [
                                     {
-                                        "Association": {
-                                            "IpOwnerId": "amazon",
-                                            "PublicDnsName": "ec2-3-235-21-81.compute-1.amazonaws.com",
-                                            "PublicIp": "3.235.21.81"
-                                        },
                                         "Primary": true,
                                         "PrivateDnsName": "ip-172-31-69-131.ec2.internal",
                                         "PrivateIpAddress": "172.31.69.131"
@@ -825,6 +814,10 @@
                             }
                         ],
                         "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
                         "Tags": [
                             {
                                 "Key": "Environment",

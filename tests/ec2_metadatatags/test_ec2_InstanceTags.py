@@ -1,21 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import logging
-import unittest
 import time
-
-import datetime
-from unittest import result
-from dateutil import tz
-import jmespath
 from mock import mock
 import pytest
 from tests.common import BaseTest
-from c7n.testing import mock_datetime_now
-from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.resources import ec2
-from c7n.resources.ec2 import actions, QueryFilter
-from c7n import tags, utils
 
 
 @pytest.mark.parametrize(
@@ -42,7 +30,6 @@ def test_ec2_metadata_tags_above_botocore_version_validation(test, botocore_vers
 class TestSetMetadataTags(BaseTest):
 
     def test_set_metadata_server(self):
-        output = self.capture_logging('custodian.actions')
         session_factory = self.replay_flight_data('test_ec2_set_md_access')
         policy = self.load_policy({
             'name': 'ec2-imds-access',
@@ -63,15 +50,11 @@ class TestSetMetadataTags(BaseTest):
         results = session_factory().client('ec2').describe_instances(
             InstanceIds=[r['InstanceId'] for r in resources])
         self.assertJmes('[0].MetadataOptions.InstanceMetadataTags', resources, 'disabled')
-        self.assertJmes('Reservations[].Instances[].MetadataOptions', results, 
-            [{'State': 'applied', 
+        self.assertJmes('Reservations[].Instances[].MetadataOptions', results,
+            [{'State': 'applied',
               'HttpTokens': 'optional',
               'HttpEndpoint': 'enabled',
-              'HttpPutResponseHopLimit': 1,           
+              'HttpPutResponseHopLimit': 1,
               'HttpProtocolIpv6': 'disabled',
               'InstanceMetadataTags': 'enabled'}])
         self.assertEqual(len(resources), 1)
-
-
-        
-
