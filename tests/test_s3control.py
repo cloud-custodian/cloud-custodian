@@ -10,6 +10,8 @@ from pytest_terraform import terraform
 def test_s3_access_point(test, s3_access_point):
     factory = test.replay_flight_data('s3_access_point_query')
     client = factory().client('s3control')
+    sts_client = factory().client('sts')
+    account_id = sts_client.get_caller_identity()['Account']
     p = test.load_policy(
         {
             'name': 'ap',
@@ -18,7 +20,7 @@ def test_s3_access_point(test, s3_access_point):
             'actions': ['delete'],
         },
         session_factory=factory,
-        config={'account_id': '644160558196'},
+        config={'account_id': account_id}
     )
 
     resources = p.run()

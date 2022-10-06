@@ -30,20 +30,22 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
+ARG POETRY_VERSION="1.2.1"
+
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py \
-    | python3 - -y --version 1.1.9
-
+RUN curl -sSL https://install.python-poetry.org | python3 - -y --version {poetry_version}
+ARG PATH="/root/.local/bin:$PATH"
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
+RUN . /usr/local/bin/activate && pip install -U pip
+RUN . /usr/local/bin/activate && poetry install --no-dev
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
@@ -57,12 +59,14 @@ ADD tools/c7n_kube /src/tools/c7n_kube
 RUN rm -R tools/c7n_kube/tests
 ADD tools/c7n_openstack /src/tools/c7n_openstack
 RUN rm -R tools/c7n_openstack/tests
+ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
+RUN rm -R tools/c7n_tencentcloud/tests
 
 # Install requested providers
-ARG providers="azure gcp kube openstack"
+ARG providers="gcp kube openstack tencentcloud azure"
 RUN . /usr/local/bin/activate && \\
     for pkg in $providers; do cd tools/c7n_$pkg && \\
-    $HOME/.poetry/bin/poetry install && cd ../../; done
+    poetry install && cd ../../; done
 
 RUN mkdir /output
 """
@@ -77,7 +81,9 @@ COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
 COPY --from=build-env /output /output
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get --yes update \\
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get --yes update \\
         && apt-get --yes install python3 python3-venv --no-install-recommends \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
@@ -114,46 +120,58 @@ ENTRYPOINT ["{entrypoint}"]
 CMD ["--help"]
 """
 
+TARGET_CLI = """\
+LABEL "org.opencontainers.image.title"="cli"
+LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
 
 BUILD_ORG = """\
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN . /usr/local/bin/activate && cd tools/c7n_org && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_org && poetry install
+"""
+
+TARGET_ORG = """\
+LABEL "org.opencontainers.image.title"="org"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install
+
+"""
+
+TARGET_MAILER = """\
+LABEL "org.opencontainers.image.title"="mailer"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Notification Delivery"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 BUILD_POLICYSTREAM = """\
-# Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
-RUN mkdir build && \\
-    wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \\
-    cd build && \\
-    tar xzf ../libgit2-1.0.0.tar.gz && \\
-    cd libgit2-1.0.0 && \\
-    mkdir build && cd build && \\
-    cmake .. && \\
-    make install && \\
-    rm -Rf /src/build
-
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_policystream && poetry install
+"""
 
-# Verify the install
-#  - policystream is not in ci due to libgit2 compilation needed
-#  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest -n "no:terraform" tools/c7n_policystream
+TARGET_POLICYSTREAM = """\
+LABEL "org.opencontainers.image.title"="policystream"
+LABEL "org.opencontainers.image.description"="Custodian policy changes streamed from Git"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:20.04", base_target_image="ubuntu:20.04")
+    defaults = dict(
+        base_build_image="ubuntu:22.04",
+        base_target_image="ubuntu:22.04",
+        poetry_version="${POETRY_VERSION}"
+    )
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata
@@ -183,7 +201,7 @@ class Image:
 
 
 ImageMap = {
-    "docker/cli": Image(
+    "docker/c7n": Image(
         dict(
             name="cli",
             repo="c7n",
@@ -191,9 +209,9 @@ ImageMap = {
             entrypoint="/usr/local/bin/custodian",
         ),
         build=[BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
     ),
-    "docker/org": Image(
+    "docker/c7n-org": Image(
         dict(
             name="org",
             repo="c7n-org",
@@ -201,7 +219,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
     ),
     "docker/mailer": Image(
         dict(
@@ -210,7 +228,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
     ),
     "docker/policystream": Image(
         dict(
@@ -219,7 +237,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
     ),
 }
 

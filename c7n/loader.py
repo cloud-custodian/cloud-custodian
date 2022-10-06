@@ -22,6 +22,9 @@ from c7n.structure import StructureParser
 from c7n.utils import load_file
 
 
+log = logging.getLogger('custodian.loader')
+
+
 class SchemaValidator:
 
     def __init__(self):
@@ -167,3 +170,57 @@ class SourceLocator:
                 m = r.search(line)
                 if m:
                     self.policies[m.group(2)] = i
+
+
+class DirectoryLoader(PolicyLoader):
+    def load_directory(self, directory):
+
+        structure = StructureParser()
+
+        def _validate(data):
+            errors = []
+            try:
+                structure.validate(data)
+            except PolicyValidationError as e:
+                log.error("Configuration invalid: {}".format(data))
+                log.error("%s" % e)
+                errors.append(e)
+            rtypes = structure.get_resource_types(data)
+            load_resources(rtypes)
+            schm = schema.generate(rtypes)
+            errors += schema.validate(data, schm)
+            return errors
+
+        def _load(directory, raw_policies, errors):
+            raw_policies = []
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for name in files:
+                    fmt = name.rsplit('.', 1)[-1]
+                    if fmt in ('yaml', 'yml', 'json',):
+                        data = load_file(f"{root}/{name}")
+                        errors.extend(_validate(data))
+                        raw_policies.append(data)
+                for name in dirs:
+                    _load(os.path.abspath(name), raw_policies, errors)
+            return raw_policies, errors
+
+        loaded, errors = _load(directory, [], [])
+
+        if errors:
+            raise PolicyValidationError(errors)
+
+        policies = []
+        for p in loaded:
+            if not p.get('policies'):
+                continue
+            policies.extend(p['policies'])
+
+        names = []
+        for p in policies:
+            if p['name'] in names:
+                raise PolicyValidationError(
+                    f"Duplicate Key Error: policy:{p['name']} already exists")
+            else:
+                names.append(p['name'])
+
+        return self.load_data({'policies': policies}, directory)

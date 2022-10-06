@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:apigateway:us-east-1::/restapis/5xhc1cnb7h/stages/latest", 
+                "Tags": [
+                    {
+                        "Value": "DEV", 
+                        "Key": "ENV"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0316cd8c-e786-11e8-a9e4-4b1758f89030", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0316cd8c-e786-11e8-a9e4-4b1758f89030", 
+                "date": "Tue, 13 Nov 2018 20:52:19 GMT", 
+                "content-length": "169", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -226,7 +226,7 @@ class TagTrim(Action):
 class TagActionFilter(Filter):
     """Filter resources for tag specified future action
 
-    Filters resources by a 'custodian_status' tag which specifies a future
+    Filters resources by a 'maid_status' tag which specifies a future
     date for an action.
 
     The filter parses the tag values looking for an 'op@date'
@@ -251,7 +251,7 @@ class TagActionFilter(Filter):
           resource: ec2
           filters:
             - type: marked-for-op
-              # The default tag used is custodian_status
+              # The default tag used is maid_status
               # but that is configurable
               tag: custodian_status
               op: stop
@@ -314,6 +314,7 @@ class TagActionFilter(Filter):
         except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
+            return False
 
         if self.current_date is None:
             self.current_date = datetime.now()
@@ -424,13 +425,20 @@ class Tag(Action):
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 
-    def interpolate_values(self, tags):
+    def interpolate_single_value(self, tag):
+        """Interpolate in a single tag value.
+        """
         params = {
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
+        return tag.format(**params)
+
+    def interpolate_values(self, tags):
+        """Interpolate in a list of tags - 'old' ec2 format
+        """
         for t in tags:
-            t['Value'] = t['Value'].format(**params)
+            t['Value'] = self.interpolate_single_value(t['Value'])
 
     def get_client(self):
         return utils.local_session(self.manager.session_factory).client(
@@ -541,13 +549,11 @@ class RenameTag(Action):
 
     def filter_resources(self, resources):
         old_key = self.data.get('old_key', None)
-        res = 0
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if old_key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
+        filtered_resources = [
+            r for r in resources
+            if old_key in (t['Key'] for t in r.get('Tags', []))
+        ]
+        return filtered_resources
 
     def process(self, resources):
         count = len(resources)
@@ -780,13 +786,11 @@ class NormalizeTag(Action):
 
     def filter_resources(self, resources):
         key = self.data.get('key', None)
-        res = 0
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
+        filtered_resources = [
+            r for r in resources
+            if key in (t['Key'] for t in r.get('Tags', []))
+        ]
+        return filtered_resources
 
     def process(self, resources):
         count = len(resources)
@@ -863,6 +867,8 @@ class UniversalTag(Tag):
         if msg:
             tags[tag] = msg
 
+        self.interpolate_values(tags)
+
         batch_size = self.data.get('batch_size', self.batch_size)
         client = self.get_client()
 
@@ -875,9 +881,18 @@ class UniversalTag(Tag):
         return universal_retry(
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
+    def interpolate_values(self, tags):
+        """Interpolate in a list of tags - 'new' resourcegroupstaggingapi format
+        """
+        for key in list(tags.keys()):
+            tags[key] = self.interpolate_single_value(tags[key])
+
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
 
 class UniversalUntag(RemoveTag):
@@ -889,8 +904,11 @@ class UniversalUntag(RemoveTag):
     permissions = ('tag:UntagResources',)
 
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
     def process_resource_set(self, client, resource_set, tag_keys):
         arns = self.manager.get_arns(resource_set)
@@ -960,8 +978,11 @@ class UniversalTagDelayedAction(TagDelayedAction):
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
     def get_client(self):
-        return utils.local_session(
-            self.manager.session_factory).client('resourcegroupstaggingapi')
+        # For global resources, manage tags from us-east-1
+        region = (getattr(self.manager.resource_type, 'global_resource', None)
+            and 'us-east-1' or self.manager.region)
+        return utils.local_session(self.manager.session_factory).client(
+            'resourcegroupstaggingapi', region_name=region)
 
 
 class CopyRelatedResourceTag(Tag):
@@ -1185,13 +1206,13 @@ def coalesce_copy_user_tags(resource, copy_tags, user_tags):
 
     if isinstance(copy_tags, list):
         if '*' in copy_tags:
-            copy_keys = {t['Key'] for t in r_tags}
+            copy_keys = {t['Key'] for t in r_tags if not t['Key'].startswith('aws:')}
         else:
             copy_keys = set(copy_tags)
 
     if isinstance(copy_tags, bool):
         if copy_tags is True:
-            copy_keys = {t['Key'] for t in r_tags}
+            copy_keys = {t['Key'] for t in r_tags if not t['Key'].startswith('aws:')}
         else:
             copy_keys = set()
 

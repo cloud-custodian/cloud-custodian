@@ -21,6 +21,7 @@ class AccessPointDescribe(DescribeSource):
             arn = Arn.parse(r['AccessPointArn'])
             ap = client.get_access_point(AccountId=arn.account_id, Name=r['Name'])
             ap.pop('ResponseMetadata', None)
+            ap['AccessPointArn'] = arn.arn
             results.append(ap)
         return results
 
