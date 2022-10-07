@@ -1432,6 +1432,19 @@ class RemovePermissions(BaseAction):
     permissions = ('ec2:RevokeSecurityGroupIngress',
                    'ec2:RevokeSecurityGroupEgress')
 
+    @staticmethod
+    def get_ip_perms(groups):
+        ip_perms = []
+
+        for g in groups:
+            ip_ranges = g.get('IpRanges', [])
+            ipv6_ranges = g.get('Ipv6Ranges', [])
+            if ip_ranges:
+                ip_perms.append(ip_ranges[0].get('CidrIp', ''))
+            if ipv6_ranges:
+                ip_perms.append(ipv6_ranges[0].get('CidrIpv6', ''))
+        return ', '.join(ip_perms)
+
     def process(self, resources):
         i_perms = self.data.get('ingress', 'matched')
         e_perms = self.data.get('egress', 'matched')
@@ -1443,6 +1456,7 @@ class RemovePermissions(BaseAction):
                     key = 'MatchedIpPermissions%s' % (
                         label == 'egress' and 'Egress' or '')
                     groups = r.get(key, ())
+                    r['c7n:'+key] = self.get_ip_perms(groups)
                 elif perms == 'all':
                     key = 'IpPermissions%s' % (
                         label == 'egress' and 'Egress' or '')
