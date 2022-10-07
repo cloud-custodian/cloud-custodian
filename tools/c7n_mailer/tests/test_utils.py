@@ -253,13 +253,13 @@ class ProviderSelector(unittest.TestCase):
     def test_get_processor(self):
         logger = logging.getLogger()
         params = [
-            (utils.Providers.Azure, self.azure_config, MailerAzureQueueProcessor),
-            (utils.Providers.AWS, self.aws_config, MailerSqsQueueProcessor),
-            (utils.Providers.GCP, self.gcp_config, MailerGcpQueueProcessor),
+            (self.azure_config, MailerAzureQueueProcessor),
+            (self.aws_config, MailerSqsQueueProcessor),
+            (self.gcp_config, MailerGcpQueueProcessor),
         ]
-        for provider, mailer_config, processor in params:
+        for mailer_config, processor in params:
             self.assertIsInstance(
-                utils.get_processor(provider, mailer_config, logger),
+                utils.get_processor(mailer_config, logger),
                 processor
             )
 

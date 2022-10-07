@@ -32,13 +32,15 @@ def session_factory(mailer_config):
         profile_name=mailer_config.get('profile', None))
 
 
-def get_processor(provider, mailer_config, logger):
+def get_processor(mailer_config, logger):
     """Find the appropriate queue processor for a given provider
 
     Import provider-specific processor modules lazily. This way running or provisioning
     the mailer only requires additional provider packages if they're used in the
     mailer config.
     """
+    provider = get_provider(mailer_config)
+
     if provider == Providers.Azure:
         from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
         processor = MailerAzureQueueProcessor(mailer_config, logger)
@@ -405,10 +407,9 @@ def resource_format(resource, resource_type):
 def get_provider(mailer_config):
     if mailer_config.get('queue_url', '').startswith('asq://'):
         return Providers.Azure
-    elif mailer_config.get('queue_url', '').startswith('projects'):
+    if mailer_config.get('queue_url', '').startswith('projects'):
         return Providers.GCP
-    else:
-        return Providers.AWS
+    return Providers.AWS
 
 
 def kms_decrypt(config, logger, session, encrypted_field):
