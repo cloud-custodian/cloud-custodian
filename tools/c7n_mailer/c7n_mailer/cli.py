@@ -272,8 +272,9 @@ def main():
         max_num_processes = args_dict.get('max_num_processes')
 
         # Select correct processor
-        # Import provider-specific processor modules lazily to avoid hard
-        # dependencies.
+        # Import provider-specific processor modules lazily. Otherwise, all
+        # available providers must be installed to run or provision the
+        # mailer.
         if provider == Providers.Azure:
             from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
             processor = MailerAzureQueueProcessor(mailer_config, logger)
