@@ -1456,7 +1456,7 @@ class RemovePermissions(BaseAction):
                     key = 'MatchedIpPermissions%s' % (
                         label == 'egress' and 'Egress' or '')
                     groups = r.get(key, ())
-                    r['c7n:'+key] = self.get_ip_perms(groups)
+                    r['c7n:' + key] = self.get_ip_perms(groups)
                 elif perms == 'all':
                     key = 'IpPermissions%s' % (
                         label == 'egress' and 'Egress' or '')
