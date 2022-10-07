@@ -563,6 +563,34 @@ class ElasticSearch(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_source_ip(self):
+        factory = self.replay_flight_data("test_elasticsearch_source_ip")
+        client = factory().client("es")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-source-ip",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "source-ip",
+                        "op": "not-in",
+                        "value_type": "cidr",
+                        "value": ["103.15.250.0/24", "73.240.160.0/21", "106.108.40.0/21"]
+                    }
+                ],
+                "actions": [
+                    "remove-matched-source-ips"
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:MatchedSourceIps'], [{'SourceIp': '10.0.0.0/24'}])
+
+        resp = client.describe_elasticsearch_domain(DomainName=resources[0]['DomainName'])
+        self.assertNotIn('10.0.0.0/24', resp['DomainStatus']['AccessPolicies'])
+
 
 class TestReservedInstances(BaseTest):
 

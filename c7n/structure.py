@@ -81,11 +81,20 @@ class StructureParser:
                     'policy:%s action must be a mapping/dict found:%s' % (
                         p.get('name', 'unknown'), type(a).__name__)))
 
+        if isinstance(p.get('resource', ''), list):
+            if len({pr.split('.')[0] for pr in p['resource']}) > 1:
+                raise PolicyValidationError((
+                    "policy:%s multi resource is only allowed with a single provider" % (
+                        p.get('name', 'unknown'))))
+
     def get_resource_types(self, data):
         resources = set()
         for p in data.get('policies', []):
             rtype = p['resource']
-            if '.' not in rtype:
+            if isinstance(rtype, list):
+                resources.update(rtype)
+                continue
+            elif '.' not in rtype:
                 rtype = 'aws.%s' % rtype
             resources.add(rtype)
         return resources

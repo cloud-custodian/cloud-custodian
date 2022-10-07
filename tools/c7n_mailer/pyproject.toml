@@ -33,7 +33,7 @@ jsonpointer = "^2.0"
 jsonpatch = "^1.25"
 types-six = "^1.16.10"
 google-cloud-secret-manager = "^2.8.0"
-importlib-metadata = ">=4.11.1"
+importlib-metadata = ">=4.11.1, <5.0"
 
 [tool.poetry.dev-dependencies]
 fakeredis = "^1.2.0"
