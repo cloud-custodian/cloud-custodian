@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+import boto3
 from datetime import datetime, timedelta
 import functools
 import json
@@ -23,6 +24,33 @@ class Providers:
     AWS = 0
     Azure = 1
     GCP = 2
+
+
+def session_factory(mailer_config):
+    return boto3.Session(
+        region_name=mailer_config['region'],
+        profile_name=mailer_config.get('profile', None))
+
+
+def get_processor(provider, mailer_config, logger):
+    """Find the appropriate queue processor for a given provider
+
+    Import provider-specific processor modules lazily. This way running or provisioning
+    the mailer only requires additional provider packages if they're used in the
+    mailer config.
+    """
+    if provider == Providers.Azure:
+        from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+        processor = MailerAzureQueueProcessor(mailer_config, logger)
+    elif provider == Providers.GCP:
+        from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+        processor = MailerGcpQueueProcessor(mailer_config, logger)
+    elif provider == Providers.AWS:
+        from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+        aws_session = session_factory(mailer_config)
+        processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+
+    return processor
 
 
 def get_jinja_env(template_folders):

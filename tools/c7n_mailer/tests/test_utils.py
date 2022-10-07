@@ -11,6 +11,9 @@ import logging
 from mock import Mock, patch
 
 from c7n_mailer import utils
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from common import MAILER_CONFIG, SQS_MESSAGE_1, RESOURCE_1
 
 
@@ -238,10 +241,27 @@ class GetAwsUsernameFromEvent(unittest.TestCase):
 
 
 class ProviderSelector(unittest.TestCase):
+    azure_config = {"queue_url": "asq://"}
+    aws_config = {"queue_url": "sqs://", "region": "us-east-1"}
+    gcp_config = {"queue_url": "projects"}
+
     def test_get_providers(self):
-        self.assertEqual(utils.get_provider({"queue_url": "asq://"}), utils.Providers.Azure)
-        self.assertEqual(utils.get_provider({"queue_url": "sqs://"}), utils.Providers.AWS)
-        self.assertEqual(utils.get_provider({"queue_url": "projects"}), utils.Providers.GCP)
+        self.assertEqual(utils.get_provider(self.azure_config), utils.Providers.Azure)
+        self.assertEqual(utils.get_provider(self.aws_config), utils.Providers.AWS)
+        self.assertEqual(utils.get_provider(self.gcp_config), utils.Providers.GCP)
+
+    def test_get_processor(self):
+        logger = logging.getLogger()
+        params = [
+            (utils.Providers.Azure, self.azure_config, MailerAzureQueueProcessor),
+            (utils.Providers.AWS, self.aws_config, MailerSqsQueueProcessor),
+            (utils.Providers.GCP, self.gcp_config, MailerGcpQueueProcessor),
+        ]
+        for provider, mailer_config, processor in params:
+            self.assertIsInstance(
+                utils.get_processor(provider, mailer_config, logger),
+                processor
+            )
 
 
 class DecryptTests(unittest.TestCase):
