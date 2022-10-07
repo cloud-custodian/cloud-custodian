@@ -1935,3 +1935,16 @@ class EngineFilter(ValueFilter):
                 r['c7n:Engine'] = v
                 matched.append(r)
         return matched
+
+
+@resources.register('rds-proxy')
+class RDSProxy(QueryResourceManager):
+    """Resource Manager for RDS DB Proxies
+    """
+
+    class resource_type(TypeInfo):
+        service = 'rds'
+        name = id = 'DBProxyName'
+        date = 'CreatedDate'
+        enum_spec = ('describe_db_proxies', 'DBProxies', None)
+        cfn_type = config_type = 'AWS::RDS::DBInstance'
