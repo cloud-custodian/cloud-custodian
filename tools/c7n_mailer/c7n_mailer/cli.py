@@ -9,9 +9,6 @@ import boto3
 import jsonschema
 import yaml
 from c7n_mailer import deploy, utils
-from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
-from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
-from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
 from c7n_mailer.azure_mailer import deploy as azure_deploy
 # from c7n_mailer.gcp_mailer import deploy as gcp_deploy
 from c7n_mailer.utils import get_provider, Providers
@@ -275,11 +272,16 @@ def main():
         max_num_processes = args_dict.get('max_num_processes')
 
         # Select correct processor
+        # Import provider-specific processor modules lazily to avoid hard
+        # dependencies.
         if provider == Providers.Azure:
+            from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
             processor = MailerAzureQueueProcessor(mailer_config, logger)
         elif provider == Providers.GCP:
+            from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
             processor = MailerGcpQueueProcessor(mailer_config, logger)
         elif provider == Providers.AWS:
+            from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
             aws_session = session_factory(mailer_config)
             processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
 
