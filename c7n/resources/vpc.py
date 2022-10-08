@@ -894,8 +894,8 @@ class UsedSecurityGroup(SGUsage):
                 instance_owner_id = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                eni_list.append(
-                    {'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id, 'InterfaceType': interface_type})
+                eni_list.append({'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id,
+                                 'InterfaceType': interface_type})
 
         for r in resources:
             r['c7n:attachment-instance-owner-ids'] = []
