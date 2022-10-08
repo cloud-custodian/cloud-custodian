@@ -894,7 +894,8 @@ class UsedSecurityGroup(SGUsage):
                 instance_owner_id = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                eni_list.append({'GroupId':g['GroupId'],'InstanceOwnerId':instance_owner_id,'InterfaceType':interface_type})
+                eni_list.append(
+                    {'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id, 'InterfaceType': interface_type})
 
         for r in resources:
             r['c7n:attachment-instance-owner-ids'] = []
@@ -903,8 +904,10 @@ class UsedSecurityGroup(SGUsage):
                 if r['GroupId'] == eni_list[i]['GroupId']:
                     r['c7n:attachment-instance-owner-ids'].append(eni_list[i]['InstanceOwnerId'])
                     r['c7n:interface-types'].append(eni_list[i]['InterfaceType'])
-            r['c7n:attachment-instance-owner-ids'] = list(filter(None, set(r['c7n:attachment-instance-owner-ids'])))
-            r['c7n:interface-types'] = list(filter(None, set(r['c7n:interface-types'])))
+            r['c7n:attachment-instance-owner-ids'] = list(filter(None, set(
+                r['c7n:attachment-instance-owner-ids'])))
+            r['c7n:interface-types'] = list(filter(None, set(
+                r['c7n:interface-types'])))
 
         return [r for r in resources if r['GroupId'] not in unused]
 
