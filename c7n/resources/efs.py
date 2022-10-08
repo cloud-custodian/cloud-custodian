@@ -8,6 +8,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
 )
@@ -304,3 +305,35 @@ class CheckSecureTransport(Filter):
             "%d of %d EFS policies don't enforce secure transport",
             len(results), len(resources))
         return results
+
+
+@ElasticFileSystem.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'c7n:Policy'
+
+    def process(self, resources, event=None):
+        resources = [self.policy_annotate(r) for r in resources]
+        return super().process(resources, event)
+
+    def policy_annotate(self, resource):
+        client = local_session(self.manager.session_factory).client('efs')
+        if self.policy_attribute in resource:
+            return resource
+        try:
+            result = client.describe_file_system_policy(
+                FileSystemId=resource['FileSystemId'])
+            resource[self.policy_attribute] = result['Policy']
+        except client.exceptions.PolicyNotFound:
+            resource[self.policy_attribute] = None
+            return resource
+        return resource
+
+    def get_std_format_args(self, fs):
+        return {
+            'fs_arn': fs['FileSystemArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
