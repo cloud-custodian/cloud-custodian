@@ -59,19 +59,19 @@ ADD tools/c7n_gcp /src/tools/c7n_gcp
 RUN if [[ " ${providers[*]} " =~ " gcp " ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_gcp &&     poetry install --only-root; fi
 
 
-ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_azure /src/tools/c7n_azure
 RUN if [[ " ${providers[*]} " =~ " azure " ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_azure &&     poetry install --only-root; fi
 
 
-ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_kube /src/tools/c7n_kube
 RUN if [[ " ${providers[*]} " =~ " kube " ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_kube &&     poetry install --only-root; fi
 
 
-ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_openstack /src/tools/c7n_openstack
 RUN if [[ " ${providers[*]} " =~ " openstack " ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_openstack &&     poetry install --only-root; fi
 
 
-ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
 RUN if [[ " ${providers[*]} " =~ " tencentcloud " ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_tencentcloud &&     poetry install --only-root; fi
 
 

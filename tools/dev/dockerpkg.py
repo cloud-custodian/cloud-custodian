@@ -35,7 +35,7 @@ fi
 """
 
 PHASE_2_INSTALL_TMPL = """
-ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
 RUN if [[ " ${{providers[*]}} " =~ " {pkg} " ]]; then \
     . /usr/local/bin/activate && \
     cd tools/c7n_{pkg} && \
