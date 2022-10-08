@@ -25,12 +25,48 @@ import click
 
 log = logging.getLogger("dockerpkg")
 
+PHASE_1_INSTALL_TMPL = """
+ADD tools/c7n_{pkg}/pyproject.toml tools/c7n_{pkg}/poetry.lock /src/tools/c7n_{pkg}/
+RUN if [[ " ${{providers[*]}} " =~ " {pkg} " ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --without dev --no-root; \
+fi
+"""
+
+PHASE_2_INSTALL_TMPL = """
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+RUN if [[ " ${{providers[*]}} " =~ " {pkg} " ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --only-root; \
+fi
+"""
+
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+
+PHASE_1_PKG_INSTALL = """\
+# We include `pyproject.toml` and `poetry.lock` first to allow
+# cache of dependency installs.
+"""
+PHASE_2_PKG_INSTALL = """\
+# Now install the root of each provider
+"""
+PHASE_1_PKG_INSTALL += "\n".join(
+    [PHASE_1_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
+PHASE_2_PKG_INSTALL += "\n".join(
+    [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
 BUILD_STAGE = """\
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
 FROM {base_build_image} as build-env
 
 ARG POETRY_VERSION="1.2.1"
+SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
@@ -43,30 +79,30 @@ WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && pip install -U pip
-RUN . /usr/local/bin/activate && poetry install --no-dev
+
+# Ignore root first pass so if source changes we don't have to invalidate
+# dependency install
+RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
+ARG providers="{providers}"
 # Add provider packages
-ADD tools/c7n_gcp /src/tools/c7n_gcp
-RUN rm -R tools/c7n_gcp/tests
-ADD tools/c7n_azure /src/tools/c7n_azure
-RUN rm -R tools/c7n_azure/tests_azure
-ADD tools/c7n_kube /src/tools/c7n_kube
-RUN rm -R tools/c7n_kube/tests
-ADD tools/c7n_openstack /src/tools/c7n_openstack
-RUN rm -R tools/c7n_openstack/tests
-ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
-RUN rm -R tools/c7n_tencentcloud/tests
+{PHASE_1_PKG_INSTALL}
 
-# Install requested providers
-ARG providers="gcp kube openstack tencentcloud azure"
-RUN . /usr/local/bin/activate && \\
-    for pkg in $providers; do cd tools/c7n_$pkg && \\
-    poetry install && cd ../../; done
+# Now install the root package
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
+{PHASE_2_PKG_INSTALL}
+
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_azure /src/tools/c7n_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
+ADD tools/c7n_openstack /src/tools/c7n_openstack
+ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
 
 RUN mkdir /output
 """
@@ -170,7 +206,10 @@ class Image:
     defaults = dict(
         base_build_image="ubuntu:22.04",
         base_target_image="ubuntu:22.04",
-        poetry_version="${POETRY_VERSION}"
+        poetry_version="${POETRY_VERSION}",
+        providers=" ".join(default_providers),
+        PHASE_1_PKG_INSTALL=PHASE_1_PKG_INSTALL,
+        PHASE_2_PKG_INSTALL=PHASE_2_PKG_INSTALL,
     )
 
     def __init__(self, metadata, build, target):
