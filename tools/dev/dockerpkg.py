@@ -27,7 +27,7 @@ log = logging.getLogger("dockerpkg")
 
 PHASE_1_INSTALL_TMPL = """
 ADD tools/c7n_{pkg}/pyproject.toml tools/c7n_{pkg}/poetry.lock /src/tools/c7n_{pkg}/
-RUN if [[ " ${{providers[*]}} " =~ " {pkg} " ]]; then \
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
     . /usr/local/bin/activate && \
     cd tools/c7n_{pkg} && \
     poetry install --without dev --no-root; \
@@ -36,7 +36,7 @@ fi
 
 PHASE_2_INSTALL_TMPL = """
 ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
-RUN if [[ " ${{providers[*]}} " =~ " {pkg} " ]]; then \
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
     . /usr/local/bin/activate && \
     cd tools/c7n_{pkg} && \
     poetry install --only-root; \
