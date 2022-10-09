@@ -113,10 +113,6 @@ FROM {base_target_image}
 LABEL name="{name}" \\
       repository="http://github.com/cloud-custodian/cloud-custodian"
 
-COPY --from=build-env /src /src
-COPY --from=build-env /usr/local /usr/local
-COPY --from=build-env /output /output
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \\
@@ -124,6 +120,13 @@ RUN apt-get --yes update \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
         && rm -Rf /var/log/*
+
+# These should remain below any other commands because they will invalidate
+# the layer cache
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /output /output
+
 
 RUN adduser --disabled-login --gecos "" custodian
 USER custodian
