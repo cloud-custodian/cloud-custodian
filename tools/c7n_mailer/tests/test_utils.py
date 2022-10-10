@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 
+import builtins
 from datetime import datetime
+from importlib import reload
 import os
 from time import sleep
 import unittest
@@ -10,6 +12,7 @@ import jinja2
 import logging
 from mock import Mock, patch
 
+import c7n_mailer
 from c7n_mailer import utils
 from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
@@ -262,6 +265,22 @@ class ProviderSelector(unittest.TestCase):
                 utils.get_processor(mailer_config, logger),
                 processor
             )
+
+    def test_missing_deps_guidance(self):
+        """Make sure we catch failed imports and provide guidance around installing
+        missing dependencies."""
+        _real_import = builtins.__import__
+
+        def fake_import_missing_deps(name, *args, **kwargs):
+            if name.startswith('c7n_gcp') or name.startswith('c7n_azure'):
+                raise ImportError()
+            return _real_import(name, *args, **kwargs)
+
+        with patch.object(builtins, '__import__', side_effect=fake_import_missing_deps):
+            with self.assertRaisesRegex(Exception, r'pip install c7n-mailer\[azure\]'):
+                reload(c7n_mailer.azure_mailer.azure_queue_processor)
+            with self.assertRaisesRegex(Exception, r'pip install c7n-mailer\[gcp\]'):
+                reload(c7n_mailer.gcp_mailer.gcp_queue_processor)
 
 
 class DecryptTests(unittest.TestCase):
