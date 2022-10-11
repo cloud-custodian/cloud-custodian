@@ -45,18 +45,18 @@ fi
 
 default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
 
-PHASE_1_PKG_INSTALL = """\
+PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
 # cache of dependency installs.
 """
-PHASE_2_PKG_INSTALL = """\
+PHASE_2_PKG_INSTALL_ROOT = """\
 # Now install the root of each provider
 """
-PHASE_1_PKG_INSTALL += "\n".join(
+PHASE_1_PKG_INSTALL_DEP += "\n".join(
     [PHASE_1_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
 )
 
-PHASE_2_PKG_INSTALL += "\n".join(
+PHASE_2_PKG_INSTALL_ROOT += "\n".join(
     [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
 )
 
@@ -90,19 +90,13 @@ RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
 ARG providers="{providers}"
 # Add provider packages
-{PHASE_1_PKG_INSTALL}
+{PHASE_1_PKG_INSTALL_DEP}
 
 # Now install the root package
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && poetry install --only-root
 
-{PHASE_2_PKG_INSTALL}
-
-ADD tools/c7n_gcp /src/tools/c7n_gcp
-ADD tools/c7n_azure /src/tools/c7n_azure
-ADD tools/c7n_kube /src/tools/c7n_kube
-ADD tools/c7n_openstack /src/tools/c7n_openstack
-ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
+{PHASE_2_PKG_INSTALL_ROOT}
 
 RUN mkdir /output
 """
@@ -211,8 +205,8 @@ class Image:
         base_target_image="ubuntu:22.04",
         poetry_version="${POETRY_VERSION}",
         providers=" ".join(default_providers),
-        PHASE_1_PKG_INSTALL=PHASE_1_PKG_INSTALL,
-        PHASE_2_PKG_INSTALL=PHASE_2_PKG_INSTALL,
+        PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
+        PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
     )
 
     def __init__(self, metadata, build, target):
