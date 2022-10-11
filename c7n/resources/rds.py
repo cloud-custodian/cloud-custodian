@@ -1947,4 +1947,6 @@ class RDSProxy(QueryResourceManager):
         name = id = 'DBProxyName'
         date = 'CreatedDate'
         enum_spec = ('describe_db_proxies', 'DBProxies', None)
+        arn_type = 'rds-proxy'
         cfn_type = config_type = 'AWS::RDS::DBInstance'
+        permissions_enum = ('rds:DescribeDBProxies',)
