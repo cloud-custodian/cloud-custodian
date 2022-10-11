@@ -274,6 +274,7 @@ class TestSetMetadata(BaseTest):
               'InstanceMetadataTags': 'enabled'}])
         self.assertEqual(len(resources), 1)
 
+
 class TestMetricFilter(BaseTest):
 
     def test_metric_filter(self):
