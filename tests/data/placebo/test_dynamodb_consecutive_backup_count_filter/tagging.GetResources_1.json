@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:dynamodb:us-west-2:644160558196:table/Test-DDBTable-backup",
+                "ResourceARN": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
                 "Tags": []
             }
         ],

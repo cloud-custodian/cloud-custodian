@@ -33,7 +33,7 @@
             },
             "TableSizeBytes": 0,
             "ItemCount": 0,
-            "TableArn": "arn:aws:dynamodb:us-west-2:644160558196:table/Test-DDBTable-backup",
+            "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
             "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
             "BillingModeSummary": {
                 "BillingMode": "PAY_PER_REQUEST",

@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from typing_extensions import get_args
+from webbrowser import get
 from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
@@ -544,6 +546,13 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TotalNodes'], 1)
 
+    def comp_lists(self,a,b):
+        for x in b:
+            print(x)
+            if a == x:
+                return True
+        return False
+
     def test_dynamodb_consecutive_backup_count_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_consecutive_backup_count_filter")
         p = self.load_policy(
@@ -565,3 +574,6 @@ class DynamoDbAccelerator(BaseTest):
         with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.resources.dynamodb):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupStatus'], "AVAILABLE")
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupType'], "USER")
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupCreationDateTime'], datetime.datetime(2022, 8, 31, 19, 4, 52, 776000, tzinfo=datetime.timezone.utc))
