@@ -88,14 +88,21 @@ class Client:
             or len(results) > self.MAX_RESPONSE_DATA_COUNT):
                 raise PolicyExecutionError("get too many resources from cloud provider")
 
+            # some api Offset and Limit fields are string
+            if paging_method == PageMethod.Offset and isinstance(paging_def["limit"]["value"], str):
+                params[PageMethod.Offset.name] = str(params[PageMethod.Offset.name])
+
             result = self.execute_query(action, params)
             query_counter += 1
             items = jmespath.search(jsonpath, result)
             if len(items) > 0:
                 results.extend(items)
                 if paging_method == PageMethod.Offset:
-                    params[PageMethod.Offset.name] = params[PageMethod.Offset.name] +\
-                        paging_def["limit"]["value"]
+                    if len(items) < int(paging_def["limit"]["value"]):
+                        # no more data
+                        break
+                    params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) +\
+                        int(paging_def["limit"]["value"])
                 else:
                     token = jmespath.search(pagination_token_path, result)
                     if token == "":

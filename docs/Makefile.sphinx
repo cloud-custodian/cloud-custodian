@@ -83,7 +83,7 @@ html:
 	cp -p tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
 	cp -p tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
 	cp -p tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
-
+	cp -p tools/c7n_left/README.md $(SRCDIR)/tools/c7n-left.md
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/awscc/resources
