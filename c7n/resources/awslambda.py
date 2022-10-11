@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
+import os
 from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
