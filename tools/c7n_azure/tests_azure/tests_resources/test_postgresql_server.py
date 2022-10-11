@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import collections
+from unittest.mock import call, Mock
 from netaddr import IPSet
-from mock import Mock
 from ..azure_common import BaseTest, arm_template
-from c7n_azure.resources.postgresql_server import PostgresqlServerFirewallRulesFilter
+from c7n_azure.resources.postgresql_server import \
+    ConfigurationParametersFilter, \
+    PostgresqlServerFirewallRulesFilter
 
 IpRange = collections.namedtuple('IpRange', 'start_ip_address end_ip_address')
 
@@ -14,6 +16,12 @@ PORTAL_IPS = ['104.42.195.92',
               '52.169.50.45',
               '52.187.184.26']
 AZURE_CLOUD_IPS = ['0.0.0.0']
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
 
 class PostgresqlServerTest(BaseTest):
@@ -72,3 +80,131 @@ class PostgresqlServerFirewallFilterTest(BaseTest):
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules
         return filter
+
+
+class PostgresqlConfigurationParametersFilterTest(BaseTest):
+    # one parameter configured in the ARM template with log_connections = 'off'
+    @arm_template('postgresql.json')
+    def test_server_configuration_parameter(self):
+        p = self.load_policy({
+            'name': 'test-azure-postgresql-server-configurations',
+            'resource': 'azure.postgresql-server',
+            'filters': [
+                {
+                    'type': 'configuration-parameters',
+                    'key': 'log_connections.value',
+                    'op': 'ne',
+                    'value': 'on'
+                }
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_int_value_with_regex(self):
+        resources = self._get_test_resources()
+        data = self._gen_filter_data(123, value_regex='test-(\\d+)', value_type='integer')
+        mock_parameter = self._gen_configurations('test-123')
+
+        filter = self._get_filter(data, mock_parameter)
+        actual = filter.process(resources)
+
+        # ensure we call azure with the correct resource information
+        filter.manager.get_client().configurations.list_by_server.assert_called_once_with(
+            'test-group-1',
+            'test-name-1'
+        )
+        self.assertListEqual(resources, actual)
+
+    def test_azure_api_called_only_once_per_resource(self):
+        resources = self._get_test_resources(2)
+
+        data1 = self._gen_filter_data('123')
+        data2 = self._gen_filter_data('456')
+        mock_parameter = self._gen_configurations('test-123')
+
+        filter1 = self._get_filter(data1, mock_parameter)
+        filter2 = self._get_filter(data2, mock_parameter)
+
+        # result is unimportant for this test
+        # also values are cached on the resource instance so calling two filters on the same
+        # resources should not result in additional API calls
+        filter1.process(resources)
+        filter2.process(resources)
+
+        # ensure we call azure with the correct resource information - and only once per
+        # resource even if there are two filters (ensure the cached values are used)
+        filter1.manager.get_client().configurations.list_by_server.assert_has_calls([
+            call('test-group-1', 'test-name-1'),
+            call('test-group-2', 'test-name-2')
+        ])
+        filter2.manager.get_client().configurations.list_by_server.assert_not_called()
+
+    def test_date_value(self):
+        resources = self._get_test_resources()
+        data = self._gen_filter_data('1/1/2023', op='lt', value_type='date')
+        # note - str compare would be false
+        mock_parameter = self._gen_configurations('5/1/2022')
+
+        filter = self._get_filter(data, mock_parameter)
+        actual = filter.process(resources)
+
+        self.assertListEqual(resources, actual)
+
+    def test_all_resources_passing_with_float(self):
+        resources = self._get_test_resources()
+        data = self._gen_filter_data('2.5', op='gt', value_type='float')
+        mock_parameter = self._gen_configurations('1.5')
+
+        filter = self._get_filter(data, mock_parameter)
+        actual = filter.process(resources)
+
+        self.assertEqual(0, len(actual))
+
+    def test_list_op_no_match(self):
+        resources = self._get_test_resources()
+        data = self._gen_filter_data(['1', '2', '3', '4'], op='in')
+        mock_parameter = self._gen_configurations('5')
+
+        filter = self._get_filter(data, mock_parameter)
+        actual = filter.process(resources)
+
+        self.assertEqual(0, len(actual))
+
+    def test_list_op_matching(self):
+        resources = self._get_test_resources()
+        data = self._gen_filter_data(['1', '2', '3', '4'], op='in')
+        mock_parameter = self._gen_configurations('4')
+
+        filter = self._get_filter(data, mock_parameter)
+        actual = filter.process(resources)
+
+        self.assertListEqual(resources, actual)
+
+    def _get_test_resources(self, count=1):
+        return [
+            dict(name=f'test-name-{i+1}', resourceGroup=f'test-group-{i+1}', properties={})
+            for i in range(count)
+        ]
+
+    def _get_filter(self, data, configurations):
+        client = Mock()
+        client.configurations.list_by_server = Mock(return_value=configurations)
+
+        manager = Mock()
+        manager.get_client = Mock(return_value=client)
+
+        return ConfigurationParametersFilter(data, manager=manager)
+
+    def _gen_filter_data(self, value, op='eq', value_regex=None, value_type=None):
+        return dict(
+            type='configuration-parameters',
+            key='"test-param".value',
+            value=value,
+            op=op,
+            **(dict(value_regex=value_regex) if value_regex else {}),
+            **(dict(value_type=value_type) if value_type else {}),
+        )
+
+    def _gen_configurations(self, value, name='test-param'):
+        return [AttrDict(name=name, value=value)]
