@@ -258,7 +258,7 @@ class KmsFilter(KmsRelatedFilter):
 
 
 @AWSLambda.action_registry.register('inject-layer')
-class LambdaEnhancedMonitoring(Action):
+class InjectLambdaLayer(Action):
     """
         This action allows to inject lambda layer
        :example:
@@ -294,11 +294,18 @@ class LambdaEnhancedMonitoring(Action):
         client = local_session(self.manager.session_factory).client('lambda', config=config)
 
         input_arns_path = self.data.get('lambda-layer-arn')
+        if not os.path.file(input_arns_path):
+            self.log.info('File not present')
+            return
+
         with open(input_arns_path) as file:
             input_arns = [item['Arn'] for item in json.load(file)]
 
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
+        if not input_arns:
+            self.log.info('No arn provided in json')
+            return
         for resource in resources:
             lambda_layers = resource.get('Layers', [])
             list_of_lambda_layer = [layers['Arn'] for layers in lambda_layers]
