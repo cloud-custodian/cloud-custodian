@@ -293,16 +293,16 @@ class LambdaEnhancedMonitoring(Action):
 
         client = local_session(self.manager.session_factory).client('lambda', config=config)
 
-        lambda_insights_arn_path = self.data.get('lambda-layer-arn')
-        with open(lambda_insights_arn_path) as file:
-            lambda_insights_arn = [item['Arn'] for item in json.load(file)]
+        input_arns_path = self.data.get('lambda-layer-arn')
+        with open(input_arns_path) as file:
+            input_arns = [item['Arn'] for item in json.load(file)]
 
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
         for resource in resources:
             lambda_layers = resource.get('Layers', [])
             list_of_lambda_layer = [layers['Arn'] for layers in lambda_layers]
-            list_of_lambda_layer.extend(lambda_insights_arn)
+            list_of_lambda_layer.extend(input_arns)
             function_name = resource["FunctionName"]
             try:
                 self.log.info(f"inject layer for lambda")
