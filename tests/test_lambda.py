@@ -418,6 +418,8 @@ class LambdaTest(BaseTest):
     def test_inject_layer(self):
         factory = self.replay_flight_data("test_inject_layer")
 
+        path_to_arns = os.path.join(self.placebo_dir, "test_inject_layer", "inject_layers.json")
+
         p = self.load_policy(
             {
                 "name": "inject-layer",
@@ -425,7 +427,7 @@ class LambdaTest(BaseTest):
                 "actions": [
                     {
                         "type": "inject-layer",
-                        "lambda-layer-arn": ["arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21"]
+                        "lambda-layer-arn": path_to_arns
                     }
                 ]
             },
@@ -435,7 +437,7 @@ class LambdaTest(BaseTest):
         client = factory().client('lambda')
         response = client.get_function(
             FunctionName=resources[0]['FunctionName'])
-        self.assertIn("arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:21", response['Configuration']['Layers'][0]['Arn'])
+        self.assertIn("arn:aws:lambda:us-east-1:1234567:layer:LambdaInsightsExtension:21", response['Configuration']['Layers'][0]['Arn'])
 
     def test_set_xray_tracing_false(self):
         factory = self.replay_flight_data("test_set_xray_tracing_false")

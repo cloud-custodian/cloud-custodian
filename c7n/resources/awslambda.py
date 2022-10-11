@@ -271,9 +271,8 @@ class LambdaEnhancedMonitoring(Action):
         'inject-layer',
         required=['lambda-layer-arn'],
         **{'lambda-layer-arn': {
-            'type': 'array',
-            'items': {
-                'type': 'string'}}}
+            'type': 'string'
+            }}
     )
     permissions = ("lambda:UpdateFunctionConfiguration",)
 
@@ -294,7 +293,10 @@ class LambdaEnhancedMonitoring(Action):
 
         client = local_session(self.manager.session_factory).client('lambda', config=config)
 
-        lambda_insights_arn = self.data.get('lambda-layer-arn')
+        lambda_insights_arn_path = self.data.get('lambda-layer-arn')
+        with open(lambda_insights_arn_path) as file:
+            lambda_insights_arn = [item['Arn'] for item in json.load(file)]
+
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
 
         for resource in resources:

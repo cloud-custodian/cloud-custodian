@@ -1,0 +1,6 @@
+[
+  {
+    "Arn": "arn:aws:lambda:us-east-1:1234567:layer:LambdaInsightsExtension:21",
+    "CodeSize": 4197733
+  }
+]
