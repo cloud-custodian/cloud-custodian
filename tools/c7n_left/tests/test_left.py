@@ -12,7 +12,8 @@ from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import provider, cli, utils
+    from c7n_left import cli, utils
+    from c7n_left.providers.terraform import TerraformProvider
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -43,9 +44,7 @@ def test_load_policy_dir(tmp_path):
 
 
 def test_provider_parse():
-    graph = provider.TerraformProvider().parse(
-        terraform_dir / "ec2_stop_protection_disabled"
-    )
+    graph = TerraformProvider().parse(terraform_dir / "ec2_stop_protection_disabled")
     resource_types = list(graph.get_resources_by_type("aws_subnet"))
     rtype, resources = resource_types.pop()
     assert rtype == "aws_subnet"

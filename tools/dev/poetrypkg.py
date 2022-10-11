@@ -93,11 +93,14 @@ setup_kwargs = {{
     ],
     'long_description': {long_description!r},
     'long_description_content_type': 'text/markdown',
-    'author': {author!r},
-    'author_email': {author_email!r},
-    'maintainer': {maintainer!r},
-    'maintainer_email': {maintainer_email!r},
-    'url': {url!r},
+    'author': 'Cloud Custodian Project',
+    'author_email': 'cloud-custodian@googlegroups.com',
+    'project_urls': {{
+       'Homepage': {url!r},
+       'Documentation': 'https://cloudcustodian.io/docs/',
+       'Source': 'https://github.com/cloud-custodian/cloud-custodian',
+       'Issue Tracker': 'https://github.com/cloud-custodian/cloud-custodian/issues',
+    }},
     {extra}
 }}
 {after}

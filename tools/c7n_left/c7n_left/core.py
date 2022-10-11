@@ -8,13 +8,9 @@ from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
-from c7n.policy import execution
 
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
-from c7n.utils import type_schema
-
-from tfparse import load_from_path
 
 
 log = logging.getLogger("c7n.iac")
@@ -169,81 +165,6 @@ class IACResourceMap(object):
         return self.resource_class
 
 
-class TerraformResourceManager(IACResourceManager):
-    pass
-
-
-class TerraformResourceMap(IACResourceMap):
-
-    resource_class = TerraformResourceManager
-
-
-@clouds.register("terraform")
-class TerraformProvider(IACSourceProvider):
-
-    display_name = "Terraform"
-    resource_prefix = "terraform"
-    resource_map = TerraformResourceMap(resource_prefix)
-    resources = resource_map
-
-    def initialize_policies(self, policies, options):
-        for p in policies:
-            p.data["mode"] = {"type": "terraform-source"}
-        return policies
-
-    def parse(self, source_dir):
-        graph = TerraformGraph(load_from_path(source_dir), source_dir)
-        log.debug("Loaded %d resources", len(graph))
-        return graph
-
-    def match_dir(self, source_dir):
-        files = list(source_dir.glob("*.tf"))
-        files += list(source_dir.glob("*.tf.json"))
-        return files
-
-
-@execution.register("terraform-source")
-class TerraformSource(IACSourceMode):
-
-    schema = type_schema("terraform-source")
-
-
-class TerraformResource(dict):
-
-    __slots__ = ("name", "data", "location")
-
-    # pygments lexer
-    format = "terraform"
-
-    def __init__(self, name, data):
-        self.name = name
-        if isinstance(data["__tfmeta"], list):
-            self.location = data["__tfmeta"][0]
-        else:
-            self.location = data["__tfmeta"]
-        super().__init__(data)
-
-    @property
-    def filename(self):
-        return self.location["filename"]
-
-    @property
-    def line_start(self):
-        return self.location["line_start"]
-
-    @property
-    def line_end(self):
-        return self.location["line_end"]
-
-    @property
-    def src_dir(self):
-        return self.location["src_dir"]
-
-    def get_source_lines(self):
-        lines = (self.src_dir / self.filename).read_text().split("\n")
-        return lines[self.line_start - 1 : self.line_end]  # noqa
-
-
 class ResourceGraph:
     def __init__(self, resource_data, src_dir):
         self.resource_data = resource_data
@@ -251,40 +172,3 @@ class ResourceGraph:
 
     def get_resource_by_type(self):
         raise NotImplementedError()
-
-
-class TerraformGraph(ResourceGraph):
-    def __len__(self):
-        return sum(map(len, self.resource_data.values()))
-
-    def get_resources_by_type(self, types=()):
-        if isinstance(types, str):
-            types = (types,)
-        for type_name, type_items in self.resource_data.items():
-            if types and type_name not in types:
-                continue
-            if type_name == "data":
-                for data_type, data_items in type_items.items():
-                    resources = []
-                    for name, data in data_items.items():
-                        resources.append(self.as_resource(name, data))
-                    yield "%s.%s" % (type_name, data_type), resources
-            elif type_name == "moved":
-                yield type_name, self.as_resource(type_name, data)
-            elif type_name == "locals":
-                yield type_name, self.as_resource(type_name, data)
-            elif type_name == "terraform":
-                yield type_name, self.as_resource(type_name, data)
-            else:
-                resources = []
-                for name, data in type_items.items():
-                    resources.append(self.as_resource(name, data))
-                yield type_name, resources
-
-    def as_resource(self, name, data):
-        if isinstance(data["__tfmeta"], list):
-            for m in data["__tfmeta"]:
-                m["src_dir"] = self.src_dir
-        else:
-            data["__tfmeta"]["src_dir"] = self.src_dir
-        return TerraformResource(name, data)

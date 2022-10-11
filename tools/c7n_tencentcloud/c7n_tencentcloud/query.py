@@ -28,7 +28,7 @@ class TypeMeta(type):
 class ResourceTypeInfo(metaclass=TypeMeta):
     """ResourceTypeInfo"""
     # used to construct tencentcloud client
-    id: str = ""  # requried, the field name to get resource instance id
+    id: str = ""  # required, the field name to get resource instance id
     endpoint: str = ""
     service: str = ""
     version: str = ""
@@ -182,7 +182,7 @@ class DescribeSource:
         get_resource_qcs
         resource description https://cloud.tencent.com/document/product/598/10606
         """
-        # qcs::${ServiceType}:${Region}:${Account}:${ResourcePreifx}/${ResourceId}
+        # qcs::${ServiceType}:${Region}:${Account}:${ResourcePrefix}/${ResourceId}
         # qcs::cvm:ap-singapore::instance/ins-ibu7wp2a
         qcs_list = []
         for r in resources:
@@ -280,7 +280,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         params = self.get_resource_query_params()
         resources = self.source.resources(params)
 
-        # filter resoures
+        # filter resources
         resources = self.filter_resources(resources)
 
         self.check_resource_limit(resources)
