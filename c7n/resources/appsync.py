@@ -118,6 +118,7 @@ class SetWafv2(BaseAction):
                 actions:
                   - type: set-wafv2
                     state: true
+                    force: true
                     web-acl: FMManagedWebACLV2-?FMS-TestWebACL
     """
     permissions = ('appsync:UpdateGraphqlApi', 'wafv2:ListWebACLs')
