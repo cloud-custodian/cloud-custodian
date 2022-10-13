@@ -1937,6 +1937,11 @@ class EngineFilter(ValueFilter):
         return matched
 
 
+class DescribeDBProxy(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('rds-proxy')
 class RDSProxy(QueryResourceManager):
     """Resource Manager for RDS DB Proxies
@@ -1953,4 +1958,7 @@ class RDSProxy(QueryResourceManager):
         permissions_enum = ('rds:DescribeDBProxies',)
         universal_taggable = object()
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': DescribeDBProxy,
+        'config': ConfigSource
+    }
