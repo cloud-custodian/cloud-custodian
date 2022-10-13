@@ -288,7 +288,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         params = self.get_resource_query_params()
         resources = self.source.resources(params)
         resources = self.augment(resources)
-        # filter resoures
+        # filter resources
         resources = self.filter_resources(resources)
 
         self.check_resource_limit(resources)
