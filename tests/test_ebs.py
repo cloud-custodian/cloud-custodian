@@ -833,6 +833,29 @@ class EbsFaultToleranceTest(BaseTest):
 
 class PiopsMetricsFilterTest(BaseTest):
 
+    def test_metrics_validation(self):
+        policy = self.load_policy(
+            {
+                "name": "ebs-metrics-test",
+                "resource": "ebs",
+                "filters": [{
+                    "type": "metrics",
+                    "name": "VOlumeConsumedReadWriteOps",
+                    "value": 50,
+                    "op": "gt"}]})
+        metrics = policy.resource_manager.filters[0]
+        metrics.data['statistics'] = 'p99'
+        metrics.validate()
+        metrics.data['statistics'] = 'p99.5'
+        metrics.validate()
+        metrics.data['statistics'] = 'pabc'
+        try:
+            metrics.validate()
+        except PolicyValidationError:
+            pass
+        else:
+            self.fail()
+
     def test_ebs_metrics_percent_filter(self):
         session = self.replay_flight_data("test_ebs_metrics_percent_filter")
         policy = self.load_policy(
