@@ -1,11 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 
 from .common import BaseTest, event_data
-from c7n.resources.aws import shape_validate
-from c7n.utils import local_session
-from unittest.mock import MagicMock
 
 
 class AppSyncWafV2(BaseTest):
