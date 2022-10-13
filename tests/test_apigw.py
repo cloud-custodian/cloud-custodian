@@ -802,3 +802,32 @@ class TestResourcePolicy(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['id'], 'kjh6l7usy5')
         self.assertEqual(resources[0]['name'], 'bad-api-gw')
+
+class TestWebSocketApi(BaseTest):
+
+    def test_websocket_api_tag_untag_mark(self):
+        session_factory = self.replay_flight_data('test_websocket_api_tag_untag_mark')
+        client = session_factory().client("apigatewayv2")
+        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/6obdyc4f76')
+        self.assertEqual(tags.get('Tags', {}),
+            {'name': 'test-websocket'})
+        self.maxDiff = None
+        p = self.load_policy({
+            'name': 'tag-websocket-api',
+            'resource': 'websocket-api',
+            'filters': [{'type': 'value', 'key': 'ApiId', 'value': '6obdyc4f76'}],
+            "actions": [
+                {'type': 'tag',
+                'tags': {'Env': 'Dev'}
+                },
+                {'type': 'remove-tag',
+                'tags': ['name']},
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/6obdyc4f76')
+        self.assertEqual(tags.get('Tags', {}),
+            {'Env': 'Dev',
+            })
+

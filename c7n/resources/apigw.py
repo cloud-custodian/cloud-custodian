@@ -15,6 +15,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry
+from c7n import tags
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -1145,3 +1146,78 @@ class DomainNameRemediateTls(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     continue
+
+
+@resources.register('websocket-api')
+class WebSocketApi(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigatewayv2'
+        arn_type = '/apis'
+        enum_spec = ('get_apis', 'Items', None)
+        id = 'ApiId'
+        name = 'name'
+        date = 'createdDate'
+        dimension = 'ApiId'
+        cfn_type = config_type = "AWS::ApiGatewayV2::Api"
+        permissions_enum = ('apigateway:GET',)
+
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': ApiDescribeSource
+    }
+
+    @property 
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/apis/api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                "apigateway",
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type,
+                )
+
+        return self._generate_arn
+
+@WebSocketApi.action_registry.register('tag')
+class WebSocketApiTag(tags.Tag):
+
+    permissions = ('apigateway:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+            arn = self.manager.generate_arn(r['ApiId'])
+            try:
+                self.manager.retry(
+                    client.tag_resource,
+                    ResourceArn=arn,
+                    Tags={t['Key']: t['Value'] for t in tags})
+            except Exception as e:
+                print('error')
+                continue
+
+
+WebSocketApi.filter_registry.register('marked-for-op', tags.TagActionFilter)
+WebSocketApi.action_registry.register('mark-for-op', tags.TagDelayedAction)
+
+
+@WebSocketApi.action_registry.register('remove-tag')
+class WebSocketApiRemoveTag(tags.RemoveTag):
+
+    permissions = ('apigateway:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+            arn = self.manager.generate_arn(r['ApiId'])
+            try:
+                self.manager.retry(
+                    client.untag_resource,
+                    ResourceArn=arn,
+                    TagKeys=tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
