@@ -248,10 +248,10 @@ class MetricsFilter(Filter):
                 Period=self.period,
                 Dimensions=dimensions
             )
-            if self.statistics in self.standard_stats:
-                params['Statistics'] = [self.statistics]
-            else:
-                params['ExtendedStatistics'] = [self.statistics]
+
+            stats_key = (self.statistics in self.standard_stats
+                         and 'Statistics' or 'ExtendedStatistics')
+            params[stats_key] = [self.statistics]
 
             if key not in collected_metrics:
                 collected_metrics[key] = client.get_metric_statistics(
