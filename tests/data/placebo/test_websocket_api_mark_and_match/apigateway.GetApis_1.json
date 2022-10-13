@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "wss://6obdyc4f76.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "6obdyc4f76",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 4,
+                    "minute": 52,
+                    "second": 21,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "test-websocket",
+                "ProtocolType": "WEBSOCKET",
+                "RouteSelectionExpression": "$request.body.action",
+                "Tags": {}
+            }
+        ]
+    }
+}

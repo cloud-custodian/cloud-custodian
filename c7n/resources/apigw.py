@@ -15,7 +15,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry
-from c7n import tags
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -1162,12 +1162,16 @@ class WebSocketApi(query.QueryResourceManager):
         cfn_type = config_type = "AWS::ApiGatewayV2::Api"
         permissions_enum = ('apigateway:GET',)
 
-    source_mapping = {
-        'config': query.ConfigSource,
-        'describe': ApiDescribeSource
-    }
+    def augment(self, resources):
+        resources = super().augment(resources)
+        # tag normalize for value filter
+        for r in resources:
+            if 'Tags' not in r:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
 
-    @property 
+    @property
     def generate_arn(self):
         """
          Sample arn: arn:aws:apigateway:us-east-1::/apis/api-id
@@ -1180,12 +1184,13 @@ class WebSocketApi(query.QueryResourceManager):
                 "apigateway",
                 region=self.config.region,
                 resource_type=self.resource_type.arn_type,
-                )
+            )
 
         return self._generate_arn
 
+
 @WebSocketApi.action_registry.register('tag')
-class WebSocketApiTag(tags.Tag):
+class WebSocketApiTag(Tag):
 
     permissions = ('apigateway:TagResource',)
 
@@ -1197,17 +1202,17 @@ class WebSocketApiTag(tags.Tag):
                     client.tag_resource,
                     ResourceArn=arn,
                     Tags={t['Key']: t['Value'] for t in tags})
-            except Exception as e:
+            except client.exceptions.ResourceNotFoundException:
                 print('error')
                 continue
 
 
-WebSocketApi.filter_registry.register('marked-for-op', tags.TagActionFilter)
-WebSocketApi.action_registry.register('mark-for-op', tags.TagDelayedAction)
+WebSocketApi.filter_registry.register('marked-for-op', TagActionFilter)
+WebSocketApi.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @WebSocketApi.action_registry.register('remove-tag')
-class WebSocketApiRemoveTag(tags.RemoveTag):
+class WebSocketApiRemoveTag(RemoveTag):
 
     permissions = ('apigateway:UntagResource',)
 
