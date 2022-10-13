@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from .common import BaseTest, event_data
+from .common import BaseTest
 
 
 class AppSyncWafV2(BaseTest):
