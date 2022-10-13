@@ -556,11 +556,15 @@ class SetWafv2(BaseAction):
 
         client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)
+        print(f'cahn0: target_acl_id={target_acl_id}')
+        print(f'cahn1: force={force}')
 
         for r in resources:
             if r.get('WebACLId') and not force:
+                print(f'cahn2: WebACL attached and Not forced')
                 continue
             if r.get('WebACLId') == target_acl_id:
+                print(f'cahn3: WebACL == target_acl_id')
                 continue
             result = client.get_distribution_config(Id=r['Id'])
             config = result['DistributionConfig']

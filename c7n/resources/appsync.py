@@ -121,7 +121,10 @@ class SetWafv2(BaseAction):
                     force: true
                     web-acl: FMManagedWebACLV2-?FMS-TestWebACL
     """
-    permissions = ('appsync:UpdateGraphqlApi', 'wafv2:ListWebACLs')
+    permissions = ('wafv2:AssociateWebACL',
+                   'wafv2:DisassociateWebACL',
+                   'wafv2:ListWebACLs')
+
     schema = type_schema(
         'set-wafv2', **{
             'web-acl': {'type': 'string'},
