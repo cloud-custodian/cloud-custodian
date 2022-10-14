@@ -7,6 +7,13 @@ from c7n.ctx import ExecutionContext
 from c7n_tencentcloud.client import Session
 
 
+@pytest.fixture(autouse=True)
+def credential_env_vars(monkeypatch):
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", "xyz")
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", "abc123")
+    monkeypatch.setenv("TENCENTCLOUD_REGION", "na-ashburn")
+
+
 @pytest.fixture(scope="package")
 def vcr_config():
     return {
