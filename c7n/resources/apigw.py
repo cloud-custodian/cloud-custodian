@@ -1170,6 +1170,7 @@ class WebSocketApi(query.QueryResourceManager):
         date = 'createdDate'
         dimension = 'ApiId'
         cfn_type = config_type = "AWS::ApiGatewayV2::Api"
+        permission_prefix='apigateway'
         permissions_enum = ('apigateway:GET',)
 
     source_mapping = {
@@ -1198,8 +1199,6 @@ class WebSocketApi(query.QueryResourceManager):
 @WebSocketApi.action_registry.register('tag')
 class WebSocketApiTag(Tag):
 
-    permissions = ('apigateway:TagResource',)
-
     def process_resource_set(self, client, resource_set, tags):
         for r in resource_set:
             arn = self.manager.generate_arn(r['ApiId'])
@@ -1219,8 +1218,6 @@ WebSocketApi.action_registry.register('mark-for-op', TagDelayedAction)
 
 @WebSocketApi.action_registry.register('remove-tag')
 class WebSocketApiRemoveTag(RemoveTag):
-
-    permissions = ('apigateway:UntagResource',)
 
     def process_resource_set(self, client, resource_set, tags):
         for r in resource_set:
