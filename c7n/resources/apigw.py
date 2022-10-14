@@ -1148,6 +1148,16 @@ class DomainNameRemediateTls(BaseAction):
                     continue
 
 
+class WebSocketDescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            if 'Tags' not in r:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
 @resources.register('websocket-api')
 class WebSocketApi(query.QueryResourceManager):
 
@@ -1162,14 +1172,10 @@ class WebSocketApi(query.QueryResourceManager):
         cfn_type = config_type = "AWS::ApiGatewayV2::Api"
         permissions_enum = ('apigateway:GET',)
 
-    def augment(self, resources):
-        resources = super().augment(resources)
-        # tag normalize for value filter
-        for r in resources:
-            if 'Tags' not in r:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
-        return resources
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': WebSocketDescribeSource
+    }
 
     @property
     def generate_arn(self):
