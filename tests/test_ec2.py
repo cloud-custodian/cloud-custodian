@@ -245,7 +245,7 @@ class TestInstanceAttrFilter(BaseTest):
 class TestSetMetadata(BaseTest):
 
     def test_set_metadata_server(self):
-        session_factory = self.replay_flight_data('test_ec2_metadata_access')
+        session_factory = self.replay_flight_data('test_ec2_set_md_access')
         policy = self.load_policy({
             'name': 'ec2-imds-access',
             'resource': 'aws.ec2',
