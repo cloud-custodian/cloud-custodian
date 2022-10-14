@@ -582,6 +582,10 @@ class Retention(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         days = self.data['days']
+        try:
+            days = int(str(days).strip())
+        except ValueError:
+            raise PolicyValidationError("Invalid days for value on %s" % (self.data['days']))
         for r in resources:
             self.manager.retry(
                 client.put_retention_policy,
