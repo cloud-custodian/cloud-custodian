@@ -1170,7 +1170,7 @@ class WebSocketApi(query.QueryResourceManager):
         date = 'createdDate'
         dimension = 'ApiId'
         cfn_type = config_type = "AWS::ApiGatewayV2::Api"
-        permission_prefix='apigateway'
+        permission_prefix = 'apigateway'
         permissions_enum = ('apigateway:GET',)
 
     source_mapping = {
