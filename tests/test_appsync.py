@@ -114,5 +114,5 @@ class AppSyncWafV2(BaseTest):
         )
         with self.assertRaises(ValueError) as ctx:
             p.run()
-            self.assertTrue('matching to none or multiple webacls' in str(
-                ctx.exception))
+        self.assertIn('matching to none or multiple webacls', str(
+            ctx.exception))
