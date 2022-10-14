@@ -5,6 +5,7 @@ Application & Network Load Balancers
 """
 import json
 import logging
+import re
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
@@ -255,6 +256,10 @@ class WafEnabled(Filter):
 class WafV2Enabled(Filter):
     """Filter Application LoadBalancer by wafv2 web-acl
 
+    Supports regex expression for web-acl.
+    Firewall Manager pushed WebACL's name varies by account and region.
+    Regex expression can support both local and Firewall Managed WebACL.
+
     :example:
 
     .. code-block:: yaml
@@ -266,21 +271,35 @@ class WafV2Enabled(Filter):
                   - type: wafv2-enabled
                     state: false
                     web-acl: testv2
+
+              - name: filter-wafv2-elb-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
     schema = type_schema(
         'wafv2-enabled', **{
             'web-acl': {'type': 'string'},
             'state': {'type': 'boolean'}})
-
     permissions = ('wafv2:ListResourcesForWebACL', 'wafv2:ListWebACLs')
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
 
     # TODO verify name uniqueness within region/account
     # TODO consider associated resource fetch in augment
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('wafv2')
 
-        target_acl = self.data.get('web-acl')
+        target_acl = self.data.get('web-acl', '')
         state = self.data.get('state', False)
 
         name_arn_map = {}
@@ -290,34 +309,35 @@ class WafV2Enabled(Filter):
 
         for w in wafs:
             if 'c7n:AssociatedResources' not in w:
-                arns = client.list_resources_for_web_acl(
-                    WebACLArn=w['ARN']).get('ResourceArns', [])
+                arns = self.retry(
+                    client.list_resources_for_web_acl,
+                    WebACLArn=w.get('ARN', ''),
+                    ResourceType='APPLICATION_LOAD_BALANCER').get('ResourceArns', [])
                 w['c7n:AssociatedResources'] = arns
             name_arn_map[w['Name']] = w['ARN']
             for r in w['c7n:AssociatedResources']:
                 resource_map[r] = w['ARN']
 
-        target_acl_id = name_arn_map.get(target_acl, target_acl)
+        target_acl_ids = [v for k, v in name_arn_map.items() if
+                          re.match(target_acl, k)]
+
         arn_key = self.manager.resource_type.id
         state_map = {}
         for r in resources:
             arn = r[arn_key]
-            if arn in resource_map:
-                # NLB & GLB doesn't support WAF. So, skip such resources
-                if r['Type'] == 'application':
-                    r['c7n_webacl'] = resource_map[arn]
-                    if not target_acl:
-                        state_map[arn] = True
-                        continue
-                    r_acl = resource_map[arn]
-                    if r_acl == target_acl_id:
-                        state_map[arn] = True
-                        continue
-                    state_map[arn] = False
-            else:
-                # NLB & GLB doesn't support WAF. So, skip such resources
-                if r['Type'] == 'application':
-                    state_map[arn] = False
+            # NLB & GLB doesn't support WAF. So, skip such resources
+            if r['Type'] != 'application':
+                continue
+            if arn not in resource_map:
+                state_map[arn] = False
+                continue
+            if not target_acl:
+                state_map[arn] = True
+                continue
+            if resource_map[arn] in target_acl_ids:
+                state_map[arn] = True
+                continue
+            state_map[arn] = False
         return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
 
 
@@ -403,6 +423,8 @@ class SetWaf(BaseAction):
 class SetWafV2(BaseAction):
     """Enable wafv2 protection on Application LoadBalancer.
 
+    Supports regex expression for web-acl
+
     :example:
 
     .. code-block:: yaml
@@ -427,15 +449,36 @@ class SetWafV2(BaseAction):
                 actions:
                   - type: set-wafv2
                     state: true
-                    web-acl: testv2
+
+            policies:
+              - name: set-wafv2-for-elb-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
 
     """
-    permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
+    permissions = ('wafv2:AssociateWebACL',
+                   'wafv2:DisassociateWebACL',
+                   'wafv2:ListWebACLs')
 
     schema = type_schema(
-        'set-wafv2', required=['web-acl'], **{
+        'set-wafv2', **{
             'web-acl': {'type': 'string'},
             'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
 
     def validate(self):
         found = False
@@ -453,12 +496,17 @@ class SetWafV2(BaseAction):
     def process(self, resources):
         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        target_acl = self.data.get('web-acl')
-        target_acl_id = name_id_map.get(target_acl, target_acl)
         state = self.data.get('state', True)
 
-        if state and target_acl_id not in name_id_map.values():
-            raise ValueError("invalid web acl: %s" % (target_acl_id))
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
 
         client = local_session(
             self.manager.session_factory).client('wafv2')
@@ -469,11 +517,12 @@ class SetWafV2(BaseAction):
         # TODO investigate limits on waf association.
         for r in resources:
             if state:
-                client.associate_web_acl(
-                    WebACLArn=target_acl_id, ResourceArn=r[arn_key])
+                self.retry(client.associate_web_acl,
+                           WebACLArn=target_acl_id,
+                           ResourceArn=r[arn_key])
             else:
-                client.disassociate_web_acl(
-                    WebACLArn=target_acl_id, ResourceArn=r[arn_key])
+                self.retry(client.disassociate_web_acl,
+                           ResourceArn=r[arn_key])
 
 
 @AppELB.action_registry.register('set-s3-logging')

@@ -3,7 +3,7 @@
 import jmespath
 import json
 
-from c7n.actions import Action, ModifyVpcSecurityGroupsAction, RemovePolicyBase
+from c7n.actions import Action, BaseAction, ModifyVpcSecurityGroupsAction, RemovePolicyBase
 from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
@@ -224,6 +224,75 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
         }
 
 
+@ElasticSearchDomain.filter_registry.register('source-ip')
+class SourceIP(Filter):
+    """ValueFilter-based filter for verifying allowed source ips in
+    an ElasticSearch domain's access policy. Useful for checking to see if
+    an ElasticSearch domain allows traffic from non approved IP addresses/CIDRs.
+
+    :example:
+    Find ElasticSearch domains that allow traffic from IP addresses
+    not in the approved list (string matching)
+    .. code-block: yaml
+
+      - type: source-ip
+        op: not-in
+        value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
+
+    Same  as above but using cidr matching instead of string matching
+    .. code-block: yaml
+      - type: source-ip
+        op: not-in
+        value_type: cidr
+        value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
+    """
+    schema = type_schema('source-ip', rinherit=ValueFilter.schema)
+    permissions = ("es:DescribeElasticsearchDomainConfig",)
+    annotation = 'c7n:MatchedSourceIps'
+
+    def __call__(self, resource):
+        es_access_policy = resource.get('AccessPolicies')
+        matched = []
+        source_ips = self.get_source_ip_perms(json.loads(es_access_policy))
+        if not self.data.get('key'):
+            self.data['key'] = 'SourceIp'
+        vf = ValueFilter(self.data, self.manager)
+        vf.annotate = False
+        for source_ip in source_ips:
+            found = vf(source_ip)
+            if found:
+                matched.append(source_ip)
+
+        if matched:
+            resource[self.annotation] = matched
+            return True
+        return False
+
+    def get_source_ip_perms(self, es_access_policy):
+        """Get SourceIps from the original access policy
+        """
+        ip_perms = []
+        stmts = es_access_policy.get('Statement', [])
+        for stmt in stmts:
+            source_ips = self.source_ips_from_stmt(stmt)
+            if not source_ips:
+                continue
+            ip_perms.extend([{'SourceIp': ip} for ip in source_ips])
+        return ip_perms
+
+    @classmethod
+    def source_ips_from_stmt(cls, stmt):
+        source_ips = []
+        if stmt.get('Effect', '') == 'Allow':
+            ips = stmt.get('Condition', {}).get('IpAddress', {}).get('aws:SourceIp', [])
+            if len(ips) > 0:
+                if isinstance(ips, list):
+                    source_ips.extend(ips)
+                else:
+                    source_ips.append(ips)
+        return source_ips
+
+
 @ElasticSearchDomain.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """
@@ -424,6 +493,86 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
+
+
+@ElasticSearchDomain.action_registry.register('remove-matched-source-ips')
+class RemoveMatchedSourceIps(BaseAction):
+    """Action to remove matched source ips from a Access Policy. This action
+    needs to be used in conjunction with the source-ip filter. It can be used
+    for removing non-approved IP addresses from the the access policy of a
+    ElasticSearch domain.
+
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: es-access-revoke
+                resource: elasticsearch
+                filters:
+                  - type: source-ip
+                    value_type: cidr
+                    op: not-in
+                    value_from:
+                       url: s3://my-bucket/allowed_cidrs.csv
+                actions:
+                  - type: remove-matched-source-ips
+    """
+
+    schema = type_schema('remove-matched-source-ips')
+    permissions = ('es:UpdateElasticsearchDomainConfig',)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, SourceIP):
+                return self
+
+        raise PolicyValidationError(
+            '`remove-matched-source-ips` can only be used in conjunction with '
+            '`source-ip` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+
+        for r in resources:
+            domain_name = r.get('DomainName', '')
+            # ES Access policy is defined as json string
+            accpol = json.loads(r.get('AccessPolicies', ''))
+            good_cidrs = []
+            bad_ips = []
+
+            matched_key = SourceIP.annotation
+            for matched_perm in r.get(matched_key, []):
+                bad_ips.append(matched_perm.get('SourceIp'))
+
+            if not bad_ips:
+                self.log.info('no matched IPs, no update needed')
+                return
+
+            update_needed = False
+            for stmt in accpol.get('Statement', []):
+                source_ips = SourceIP.source_ips_from_stmt(stmt)
+                if not source_ips:
+                    continue
+
+                update_needed = True
+                good_ips = list(set(source_ips) - set(bad_ips))
+                stmt['Condition']['IpAddress']['aws:SourceIp'] = good_ips
+
+            if update_needed:
+                ap = self.update_accpol(client, domain_name, accpol, good_cidrs)
+                self.log.info('updated AccessPolicy: {}'.format(json.dumps(ap)))
+
+    def update_accpol(self, client, domain_name, accpol, good_cidrs):
+        """Update access policy to only have good ip addresses
+        """
+        for i, cidr in enumerate(good_cidrs):
+            if 'Condition' not in accpol.get('Statement', [])[i] or \
+                    accpol.get('Statement', [])[i].get('Effect', '') != 'Allow':
+                continue
+            accpol['Statement'][i]['Condition']['IpAddress']['aws:SourceIp'] = cidr
+        resp = client.update_elasticsearch_domain_config(
+            DomainName=domain_name,
+            AccessPolicies=json.dumps(accpol))
+        return json.loads(resp.get('DomainConfig', {}).get('AccessPolicies', {}).get('Options', ''))
 
 
 @resources.register('elasticsearch-reserved')
