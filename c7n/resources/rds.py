@@ -1945,6 +1945,18 @@ class DescribeDBProxy(DescribeSource):
 @resources.register('rds-proxy')
 class RDSProxy(QueryResourceManager):
     """Resource Manager for RDS DB Proxies
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-proxy-tls-check
+                resource: rds-proxy
+                filters:
+                  - type: value
+                    key: RequireTLS
+                    value: false
     """
 
     class resource_type(TypeInfo):
