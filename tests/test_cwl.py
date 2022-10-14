@@ -3,6 +3,7 @@
 import time
 
 from c7n.resources.cw import LogMetricAlarmFilter
+from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
@@ -238,6 +239,24 @@ class LogGroupTest(BaseTest):
             ],
             14,
         )
+
+    @functional
+    def test_retention_policy_validation_error(self):
+        log_group = "c7n-test-a"
+        factory = self.replay_flight_data("test_log_group_retention")
+        client = factory().client("logs")
+        client.create_log_group(logGroupName=log_group)
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+        p = self.load_policy(
+            {
+                "name": "set-retention",
+                "resource": "log-group",
+                "filters": [{"logGroupName": log_group}],
+                "actions": [{"type": "retention", "days": "14days"}],
+            },
+            session_factory=factory,
+        )
+        self.assertRaises(PolicyValidationError, p.run)
 
     def test_log_group_delete_error(self):
         factory = self.replay_flight_data("test_log_group_delete")
