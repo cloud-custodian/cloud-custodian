@@ -256,7 +256,7 @@ class TestSetMetadata(BaseTest):
                     'op': 'eq'}],
             'actions': [
                 {'type': 'set-metadata-access',
-                 'metadatatags': 'enabled'},
+                 'metadata-tags': 'enabled'},
             ]},
             session_factory=session_factory)
         resources = policy.run()
