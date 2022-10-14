@@ -124,14 +124,6 @@
             "required",
             "optional"
           ]
-        },
-        "InstanceMetadataTags": {
-          "description": "Enables access to Instance metadata tags ",
-          "type": "string",
-          "enum": [
-            "enabled",
-            "disabled"
-          ]
         }
       }
     },
