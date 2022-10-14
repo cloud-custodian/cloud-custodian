@@ -32,3 +32,4 @@ pip-selfcheck.json
 *~
 **/tests/
 **/tests_azure/
+/tools/c7n_kube/.skaffold

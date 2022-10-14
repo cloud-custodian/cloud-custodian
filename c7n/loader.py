@@ -174,7 +174,6 @@ class SourceLocator:
 
 class DirectoryLoader(PolicyLoader):
     def load_directory(self, directory):
-
         structure = StructureParser()
 
         def _validate(data):
@@ -193,7 +192,13 @@ class DirectoryLoader(PolicyLoader):
 
         def _load(directory, raw_policies, errors):
             raw_policies = []
-            for root, dirs, files in os.walk(directory, topdown=False):
+            for root, dirs, files in os.walk(directory):
+                if is_hidden(root):
+                    continue
+
+                files = [f for f in files if not is_hidden(f)]
+                dirs[:] = [d for d in dirs if not is_hidden(d)]
+
                 for name in files:
                     fmt = name.rsplit('.', 1)[-1]
                     if fmt in ('yaml', 'yml', 'json',):
@@ -224,3 +229,11 @@ class DirectoryLoader(PolicyLoader):
                 names.append(p['name'])
 
         return self.load_data({'policies': policies}, directory)
+
+
+def is_hidden(path):
+    for part in os.path.split(path):
+        if part != '.' and part.startswith('.'):
+            return True
+
+    return False
