@@ -147,7 +147,7 @@
                         },
                         "MetadataOptions": {
                             "State": "applied",
-                            "HttpTokens": "optional",
+                            "HttpTokens": "required",
                             "HttpPutResponseHopLimit": 1,
                             "HttpEndpoint": "enabled",
                             "HttpProtocolIpv6": "disabled",

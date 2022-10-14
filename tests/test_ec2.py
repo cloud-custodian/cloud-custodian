@@ -256,6 +256,7 @@ class TestSetMetadata(BaseTest):
                     'op': 'eq'}],
             'actions': [
                 {'type': 'set-metadata-access',
+                 'tokens': 'required',
                  'metadata-tags': 'enabled'},
             ]},
             session_factory=session_factory)
@@ -267,7 +268,7 @@ class TestSetMetadata(BaseTest):
         self.assertJmes('[0].MetadataOptions.InstanceMetadataTags', resources, 'disabled')
         self.assertJmes('Reservations[].Instances[].MetadataOptions', results,
             [{'State': 'applied',
-              'HttpTokens': 'optional',
+              'HttpTokens': 'required',
               'HttpEndpoint': 'enabled',
               'HttpPutResponseHopLimit': 1,
               'HttpProtocolIpv6': 'disabled',
