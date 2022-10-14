@@ -61,7 +61,7 @@ Examples:
          - name: ec2-disable-imds
            resource: ec2
            description: |
-           Finds all the instances with disables Instance Meta Data Tags and enbale them. 
+           Finds all the instances with disables Instance Meta Data Tags and enable them. 
            filters:
              - MetadataOptions.InstanceMetadataTags: disabled
            actions:
