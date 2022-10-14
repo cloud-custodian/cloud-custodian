@@ -255,6 +255,7 @@ class LogGroupTest(BaseTest):
                 "actions": [{"type": "retention", "days": "14days"}],
             },
             session_factory=factory,
+            validate=False,
         )
         self.assertRaises(PolicyValidationError, p.run)
 
