@@ -30,3 +30,5 @@ results.xml
 pip-selfcheck.json
 .coverage
 *~
+**/tests/
+**/tests_azure/

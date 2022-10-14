@@ -402,6 +402,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
+            'AWS::AppSync::GraphQLApi',
         }
 
         resource_map = {}
