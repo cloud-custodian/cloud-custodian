@@ -588,3 +588,41 @@ class ReservedInstances(QueryResourceManager):
         filter_type = 'list'
         arn_type = "reserved-instances"
         permissions_enum = ('es:DescribeReservedElasticsearchInstances',)
+
+
+@ElasticSearchDomain.action_registry.register('update-tls-config')
+class UpdateTlsConfig(Action):
+
+    """Action to update tls-config on a domain endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: update-tls-config
+                resource: elasticsearch
+                filters:
+                  - type: value
+                    key: 'DomainEndpointOptions.TLSSecurityPolicy'
+                    op: eq
+                    value: "Policy-Min-TLS-1-0-2019-07"
+                actions:
+                  - type: update-tls-config
+                    value: "Policy-Min-TLS-1-2-2019-07"
+    """
+
+    schema = type_schema('update-tls-config', value={'type': 'string',
+        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}, required=['value'])
+    permissions = ('es:UpdateElasticsearchDomainConfig', 'es:DescribeElasticsearchDomainConfig',
+        'es:DescribeElasticsearchDomains', 'es:ListDomainNames')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('es')
+        tls_value = self.data.get('value')
+        for r in resources:
+            if not r['DomainEndpointOptions']['EnforceHTTPS']:
+                client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+                    DomainEndpointOptions={'EnforceHTTPS': True})
+            client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+                DomainEndpointOptions={'TLSSecurityPolicy': tls_value})
