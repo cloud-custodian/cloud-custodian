@@ -1909,6 +1909,7 @@ class SNSCrossAccount(BaseTest):
                     {
                         "type": "cross-account",
                         "whitelist_endpoints": ["@whitelist.com"],
+                        "whitelist_conditions": ["aws:UserName"]
                     },
                 ],
             },
