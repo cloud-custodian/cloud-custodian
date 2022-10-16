@@ -282,6 +282,13 @@ class DescribeRestStage(query.ChildDescribeSource):
         # Using capture parent, changes the protocol
         for parent_id, r in resources:
             r['restApiId'] = parent_id
+            r['stageArn'] = "arn:aws:{service}:{region}::" \
+                            "/restapis/{rest_api_id}/stages/" \
+                            "{stage_name}".format(
+                service="apigateway",
+                region=self.manager.config.region,
+                rest_api_id=parent_id,
+                stage_name=r['stageName'])
             tags = r.setdefault('Tags', [])
             for k, v in r.pop('tags', {}).items():
                 tags.append({
@@ -321,6 +328,7 @@ class RestStage(query.ChildResourceManager):
         enum_spec = ('get_stages', 'item', None)
         name = 'stageName'
         id = 'deploymentId'
+        config_id = 'stageArn'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"

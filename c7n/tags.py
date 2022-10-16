@@ -549,13 +549,11 @@ class RenameTag(Action):
 
     def filter_resources(self, resources):
         old_key = self.data.get('old_key', None)
-        res = 0
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if old_key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
+        filtered_resources = [
+            r for r in resources
+            if old_key in (t['Key'] for t in r.get('Tags', []))
+        ]
+        return filtered_resources
 
     def process(self, resources):
         count = len(resources)
@@ -788,13 +786,11 @@ class NormalizeTag(Action):
 
     def filter_resources(self, resources):
         key = self.data.get('key', None)
-        res = 0
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            if key not in tags.keys():
-                resources.pop(res)
-            res += 1
-        return resources
+        filtered_resources = [
+            r for r in resources
+            if key in (t['Key'] for t in r.get('Tags', []))
+        ]
+        return filtered_resources
 
     def process(self, resources):
         count = len(resources)

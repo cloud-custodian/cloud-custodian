@@ -1040,6 +1040,16 @@ class S3ConfigSource(ConfigTest):
             },
         )
 
+    def test_config_handle_missing_attr(self):
+        # test for bug of
+        # https://github.com/cloud-custodian/cloud-custodian/issues/7808
+        event = event_data("s3-from-rule-sans-accelerator.json", "config")
+        p = self.load_policy({"name": "s3cfg", "resource": "s3"})
+        source = p.resource_manager.get_source("config")
+        resource_config = json.loads(event["invokingEvent"])["configurationItem"]
+        resource = source.load_resource(resource_config)
+        assert resource['Name'] == 'c7n-fire-logs'
+
     def test_config_normalize_lifecycle_null_predicate(self):
         event = event_data("s3-lifecycle-null-predicate.json", "config")
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
@@ -3919,9 +3929,11 @@ class TestBucketOwnership:
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
 
-    def test_s3_access_analyzer_filter_with_no_results(self, test):
-        factory = test.replay_flight_data("test_s3_iam_analyzers")
+    def test_s3_access_analyzer_filter_with_no_results(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
         test.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
         p = test.load_policy({
             'name': 'check-s3',
             'resource': 'aws.s3',

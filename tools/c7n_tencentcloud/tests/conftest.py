@@ -7,24 +7,46 @@ from c7n.ctx import ExecutionContext
 from c7n_tencentcloud.client import Session
 
 
-@pytest.fixture
-def mock_env_aksk(monkeypatch):
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", "xxx")
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", "yyy")
+@pytest.fixture(autouse=True)
+def credential_env_vars(monkeypatch):
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", "xyz")
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", "abc123")
+    monkeypatch.setenv("TENCENTCLOUD_REGION", "na-ashburn")
+
+
+@pytest.fixture(scope="package")
+def vcr_config():
+    return {
+        "filter_headers": ["authorization", "X-TC-Timestamp", "X-TC-RequestClient", "X-TC-Language"]
+    }
 
 
 @pytest.fixture
-def session(mock_env_aksk):
+def session():
     return Session()
+
+
+@pytest.fixture
+def client_cvm(session):
+    return session.client("cvm.tencentcloudapi.com", "cvm", "2017-03-12", "ap-singapore")
+
+
+@pytest.fixture
+def client_tag(session):
+    return session.client("tag.tencentcloudapi.com", "tag", "2018-08-13", "ap-singapore")
 
 
 @pytest.fixture
 def options():
     return Config.empty(**{
-        "region": "ap-singapore"  # just for init, ignore the value
+        "region": "ap-singapore",  # just for init, ignore the value
+        "account_id": "100000750436",
+        "output_dir": "null://",
+        "log_group": "null://",
+        "cache": False,
     })
 
 
 @pytest.fixture
 def ctx(session, options):
-    return ExecutionContext(session, {}, options)
+    return ExecutionContext(lambda: session, {}, options)
