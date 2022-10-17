@@ -40,6 +40,7 @@ class SecurityContacts(SecurityContactsResourceManager, metaclass=QueryMeta):
         filters:
             - name: default
             - properties.alertNotifications.state: "On"
+            - properties.alertNotifications.minimalSeverity: "High"
     """
 
     # interior class that defines the metadata for resource
