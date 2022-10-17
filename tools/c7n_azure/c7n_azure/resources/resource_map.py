@@ -65,5 +65,6 @@ ResourceMap = {
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
-    "azure.webapp": "c7n_azure.resources.web_app.WebApp"
+    "azure.webapp": "c7n_azure.resources.web_app.WebApp",
+     "azure.security-contacts": "c7n_azure.resources.security_contacts.SecurityContacts"
 }
