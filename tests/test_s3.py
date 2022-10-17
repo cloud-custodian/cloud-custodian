@@ -1040,6 +1040,16 @@ class S3ConfigSource(ConfigTest):
             },
         )
 
+    def test_config_handle_missing_attr(self):
+        # test for bug of
+        # https://github.com/cloud-custodian/cloud-custodian/issues/7808
+        event = event_data("s3-from-rule-sans-accelerator.json", "config")
+        p = self.load_policy({"name": "s3cfg", "resource": "s3"})
+        source = p.resource_manager.get_source("config")
+        resource_config = json.loads(event["invokingEvent"])["configurationItem"]
+        resource = source.load_resource(resource_config)
+        assert resource['Name'] == 'c7n-fire-logs'
+
     def test_config_normalize_lifecycle_null_predicate(self):
         event = event_data("s3-lifecycle-null-predicate.json", "config")
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
