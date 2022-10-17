@@ -24,6 +24,8 @@ from c7n_kube.resources.apps import (
 
 from c7n_kube.resources import crd
 
+import c7n_kube.policy  # noqa
+
 log = logging.getLogger('custodian.k8s')
 
 ALL = [

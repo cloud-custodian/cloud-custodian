@@ -338,7 +338,7 @@ class WafV2Enabled(Filter):
                 state_map[arn] = True
                 continue
             state_map[arn] = False
-        return [r for r in resources if state_map[r[arn_key]] == state]
+        return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
 
 
 @AppELB.action_registry.register('set-waf')

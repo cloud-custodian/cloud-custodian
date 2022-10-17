@@ -14,3 +14,4 @@ class StatefulSet(QueryResourceManager):
         patch = 'patch_namespaced_stateful_set'
         delete = 'delete_namespaced_stateful_set'
         enum_spec = ('list_stateful_set_for_all_namespaces', 'items', None)
+        plural = 'statefulsets'
