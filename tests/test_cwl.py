@@ -101,7 +101,8 @@ class LogGroupTest(BaseTest):
                 "actions": [{"type": "put-subscription-filter",
                 "filter_name": filter_name,
                 "filter_pattern": filter_pattern,
-                "destination_arn": destination_arn}],
+                "destination_arn": destination_arn,
+                "distribution": distribution}],
             },
             session_factory=factory,
         )
