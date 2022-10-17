@@ -905,6 +905,7 @@ class RDSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-1")
 
 
 class RDSSnapshotTest(BaseTest):

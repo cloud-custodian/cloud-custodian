@@ -150,10 +150,10 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 9,
-                    "day": 29,
-                    "hour": 8,
-                    "minute": 32,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 5,
+                    "minute": 18,
                     "second": 51,
                     "microsecond": 0
                 },
@@ -200,7 +200,17 @@
                 "DBInstanceIdentifier": "mysql-db1",
                 "DBInstanceClass": "db.m6i.large",
                 "Engine": "mysql",
-                "DBInstanceStatus": "available",
+                "DBInstanceStatus": "stopped",
+                "AutomaticRestartTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 19,
+                    "hour": 10,
+                    "minute": 9,
+                    "second": 57,
+                    "microsecond": 449000
+                },
                 "MasterUsername": "admin",
                 "Endpoint": {
                     "Address": "mysql-db1.c8b6qh6c9grf.us-west-2.rds.amazonaws.com",
@@ -343,10 +353,10 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 9,
-                    "day": 29,
-                    "hour": 8,
-                    "minute": 30,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 10,
+                    "minute": 0,
                     "second": 0,
                     "microsecond": 0
                 },
@@ -381,7 +391,12 @@
                 "DeletionProtection": true,
                 "AssociatedRoles": [],
                 "MaxAllocatedStorage": 1000,
-                "TagList": [],
+                "TagList": [
+                    {
+                        "Key": "pe_rds_unused_stopped",
+                        "Value": "Yes"
+                    }
+                ],
                 "CustomerOwnedIpEnabled": false,
                 "ActivityStreamStatus": "stopped",
                 "BackupTarget": "region",
