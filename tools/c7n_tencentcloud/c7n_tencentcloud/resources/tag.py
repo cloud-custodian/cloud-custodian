@@ -24,7 +24,7 @@ class TAG(QueryResourceManager):
             "method": PageMethod.PaginationToken,
             "pagination_token_path": "Response.PaginationToken",
             "limit": {
-                "Key": "MaxResults",
+                "key": "MaxResults",
                 "value": 200
             }
         }
@@ -44,12 +44,12 @@ class TAG(QueryResourceManager):
         return self.data.get("query", {})
 
     @staticmethod
-    def get_simple_call_params(resource6_name):
+    def get_simple_call_params(qcs_list):
         """
         get_simple_call_params
         """
         params = {
-            "ResourceList": [resource6_name]
+            "ResourceList": qcs_list
         }
         params.update()
         return params

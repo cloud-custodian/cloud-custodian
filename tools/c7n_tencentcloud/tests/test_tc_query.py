@@ -14,7 +14,7 @@ class RegionInfo(ResourceTypeInfo):
     version = "2017-03-12"
     enum_spec = ("DescribeRegions", "Response.RegionSet[]", {})
     metrics_instance_id_name = "InstanceId"
-    resource_preifx = "instance"
+    resource_prefix = "instance"
     taggable = True
 
 
@@ -27,19 +27,19 @@ class CVMInfo(ResourceTypeInfo):
     enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
     metrics_instance_id_name = "InstanceId"
     paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
-    resource_preifx = "instance"
+    resource_prefix = "instance"
     taggable = True
 
 
 class CVMInfoNoPagination(ResourceTypeInfo):
-    """CVMInfo"""
+    """CVMInfoNoPagination"""
     id = "InstanceId"
     endpoint = "cvm.tencentcloudapi.com"
     service = "cvm"
     version = "2017-03-12"
     enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
     metrics_instance_id_name = "InstanceId"
-    resource_preifx = "instance"
+    resource_prefix = "instance"
     taggable = True
 
 
@@ -53,19 +53,19 @@ class TestResourcetQuery:
     def test_filter(self, session):
         resource_query = ResourceQuery(session)
         res = resource_query.filter("ap-singapore", RegionInfo, {})
-        assert len(res) == 41
+        assert len(res) == 20
 
     @pytest.mark.vcr
     def test_paged_filter(self, session):
         resource_query = ResourceQuery(session)
         res = resource_query.paged_filter("ap-singapore", CVMInfo, {})
-        assert len(res) == 40
+        assert len(res) == 6
 
 
 # (data, expected_query_params)
 data_test_cases = [
     ({}, {}),
-    ({"query": [{"Key": "Value"}]}, {"Filters": [{"Key": "Value"}]})
+    ({"query": [{"Filters": [{"Key": "Value"}]}]}, {"Filters": [{"Key": "Value"}]})
 ]
 
 
@@ -89,11 +89,11 @@ class TestQueryResourceManager:
         monkeypatch.setattr(QueryResourceManager, "resource_type", CVMInfo)
         resource_manager = QueryResourceManager(ctx, {})
         res = resource_manager.resources()
-        assert len(res) == 40
+        assert len(res) == 6
 
     @pytest.mark.vcr
     def test_resources_no_pagination(self, ctx, monkeypatch):
         monkeypatch.setattr(QueryResourceManager, "resource_type", CVMInfoNoPagination)
         resource_manager = QueryResourceManager(ctx, {})
         res = resource_manager.resources()
-        assert len(res) == 20
+        assert len(res) == 6

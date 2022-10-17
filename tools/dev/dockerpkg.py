@@ -25,46 +25,78 @@ import click
 
 log = logging.getLogger("dockerpkg")
 
+PHASE_1_INSTALL_TMPL = """
+ADD tools/c7n_{pkg}/pyproject.toml tools/c7n_{pkg}/poetry.lock /src/tools/c7n_{pkg}/
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --without dev --no-root; \
+fi
+"""
+
+PHASE_2_INSTALL_TMPL = """
+ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --only-root; \
+fi
+"""
+
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+
+PHASE_1_PKG_INSTALL_DEP = """\
+# We include `pyproject.toml` and `poetry.lock` first to allow
+# cache of dependency installs.
+"""
+PHASE_2_PKG_INSTALL_ROOT = """\
+# Now install the root of each provider
+"""
+PHASE_1_PKG_INSTALL_DEP += "\n".join(
+    [PHASE_1_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
+PHASE_2_PKG_INSTALL_ROOT += "\n".join(
+    [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
 BUILD_STAGE = """\
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.1.15"
+ARG POETRY_VERSION="1.2.1"
+SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/main/install-poetry.py | python3 - -y --version {poetry_version}
+RUN curl -sSL https://install.python-poetry.org | python3 - -y --version {poetry_version}
 ARG PATH="/root/.local/bin:$PATH"
 WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && pip install -U pip
-RUN . /usr/local/bin/activate && poetry install --no-dev
+
+# Ignore root first pass so if source changes we don't have to invalidate
+# dependency install
+RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 RUN . /usr/local/bin/activate && pip install -q wheel && \
       pip install -U pip
 RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
+ARG providers="{providers}"
 # Add provider packages
-ADD tools/c7n_gcp /src/tools/c7n_gcp
-RUN rm -R tools/c7n_gcp/tests
-ADD tools/c7n_azure /src/tools/c7n_azure
-RUN rm -R tools/c7n_azure/tests_azure
-ADD tools/c7n_kube /src/tools/c7n_kube
-RUN rm -R tools/c7n_kube/tests
-ADD tools/c7n_openstack /src/tools/c7n_openstack
-RUN rm -R tools/c7n_openstack/tests
+{PHASE_1_PKG_INSTALL_DEP}
 
-# Install requested providers
-ARG providers="gcp kube openstack azure"
-RUN . /usr/local/bin/activate && \\
-    for pkg in $providers; do cd tools/c7n_$pkg && \\
-    poetry install && cd ../../; done
+# Now install the root package
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
+{PHASE_2_PKG_INSTALL_ROOT}
 
 RUN mkdir /output
 """
@@ -75,10 +107,6 @@ FROM {base_target_image}
 LABEL name="{name}" \\
       repository="http://github.com/cloud-custodian/cloud-custodian"
 
-COPY --from=build-env /src /src
-COPY --from=build-env /usr/local /usr/local
-COPY --from=build-env /output /output
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \\
@@ -86,6 +114,13 @@ RUN apt-get --yes update \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
         && rm -Rf /var/log/*
+
+# These should remain below any other commands because they will invalidate
+# the layer cache
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /output /output
+
 
 RUN adduser --disabled-login --gecos "" custodian
 USER custodian
@@ -168,7 +203,10 @@ class Image:
     defaults = dict(
         base_build_image="ubuntu:22.04",
         base_target_image="ubuntu:22.04",
-        poetry_version="${POETRY_VERSION}"
+        poetry_version="${POETRY_VERSION}",
+        providers=" ".join(default_providers),
+        PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
+        PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
     )
 
     def __init__(self, metadata, build, target):

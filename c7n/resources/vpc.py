@@ -2057,7 +2057,7 @@ class NetworkAddress(query.QueryResourceManager):
         id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
-        config_type = "AWS::EC2::EIP"
+        config_type = cfn_type = "AWS::EC2::EIP"
 
     source_mapping = {
         'describe': DescribeElasticIp,
