@@ -34,6 +34,7 @@ class SecurityContactsResourceManager(QueryResourceManager):
 class SecurityContacts(SecurityContactsResourceManager, metaclass=QueryMeta):
     """Get Default Security contact configurations for the subscription.
     .. code-block:: yaml
+    
     policies:
         - name: mck-azure-security-ensure-send-email-notification-for-high-severity-alerts-is-enabled
         resource: azure.security-contacts
