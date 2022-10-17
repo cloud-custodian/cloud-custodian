@@ -892,21 +892,10 @@ class RDSTest(BaseTest):
                 "resource": "rds",
                 "filters": [
                     {
-                        "type": "db-option-groups"
-                    },
-                    {
-                        "type": "value",
-                        "key": "Options",
-                        "value": "not-null"
-                    },
-                    {
-                        "type": "value",
-                        "key": "Options[].OptionName",
-                        "op": "intersect",
-                        "value": [
-                            "NATIVE_NETWORK_ENCRYPTION",
-                            "SSL"
-                        ]
+                        "type": "db-option-groups",
+                        "key": "OptionName",
+                        "op": "eq",
+                        "value": "NATIVE_NETWORK_ENCRYPTION"
                     }
                 ],
             },

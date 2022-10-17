@@ -1950,28 +1950,56 @@ class DbOptionGroups(ValueFilter):
             resource: aws.rds
             filters:
               - type: db-option-groups
-              - type: value
-                key: Options
-                value: not-null
-              - type: value
-                key: Options[].OptionName
-                op: intersect
-                value:
-                  - NATIVE_NETWORK_ENCRYPTION
-                  - SSL
+                key: OptionName
+                value: NATIVE_NETWORK_ENCRYPTION
+                op: eq
     """
 
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
+
+    def handle_optiongroup_cache(self, client, paginator, option_groups):
+        pgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for pg in option_groups:
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'rds-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    pgcache[pg] = pg_values
+                    continue
+                option_list = list(itertools.chain(*[p['OptionGroupsList']
+                    for p in paginator.paginate(OptionGroupName=pg)]))
+
+                pgcache[pg] = {}
+                for option in option_list:
+                    if option['Options']:
+                        for p in option['Options']:
+                            pgcache[pg].update({'OptionName': p['OptionName']})
+                cache.save(cache_key, pgcache[pg])
+
+        return pgcache
 
     def process(self, resources, event=None):
         results = []
         client = local_session(self.manager.session_factory).client('rds')
-        for r in resources:
-            option_group_name = r['OptionGroupMemberships'][0]['OptionGroupName']
-            paginator = client.get_paginator('describe_option_groups')
-            response = paginator.paginate(
-                OptionGroupName=option_group_name).build_full_result().get('OptionGroupsList', [])
-            for pg in response:
-                results.append(pg)
+        paginator = client.get_paginator('describe_option_groups')
+        option_groups = {db['OptionGroupMemberships'][0]['OptionGroupName']
+                        for db in resources}
+        optioncache = self.handle_optiongroup_cache(client, paginator, option_groups)
+
+        for resource in resources:
+            for pg in resource['OptionGroupMemberships']:
+                pg_values = optioncache[pg['OptionGroupName']]
+                if self.match(pg_values):
+                    resource.setdefault('c7n:MatchedOptionGroup', []).append(
+                        self.data.get('key'))
+                    results.append(resource)
+                    break
+
         return results
