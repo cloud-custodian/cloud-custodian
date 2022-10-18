@@ -1208,7 +1208,6 @@ class WebSocketApiTag(Tag):
                     ResourceArn=arn,
                     Tags={t['Key']: t['Value'] for t in tags})
             except client.exceptions.ResourceNotFoundException:
-                print('error')
                 continue
 
 
