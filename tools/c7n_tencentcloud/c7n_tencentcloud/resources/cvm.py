@@ -38,6 +38,22 @@ class CVM(QueryResourceManager):
         taggable = True
         batch_size = 10
 
+    def get_qcs_for_cbs(self, resources):
+        """
+        get cvm resource qcs
+        Get the qcs of the cvm to which the cbs belongs
+        """
+        # qcs::${ServiceType}:${Region}:${Account}:${ResourcePrefix}/${ResourceId}
+        qcs_list = []
+        for r in resources:
+            qcs = DescribeSource.get_qcs(r["InstanceType"].lower(),
+                                         self.config.region,
+                                         None,
+                                         "instance",
+                                         r["InstanceId"])
+            qcs_list.append(qcs)
+        return qcs_list
+
 
 class CvmAction(TencentCloudBaseAction):
     schema_alias = True

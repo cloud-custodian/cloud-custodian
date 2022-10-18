@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import calendar
 from collections import namedtuple
 from datetime import datetime, timedelta
@@ -17,7 +18,7 @@ from c7n.resources.elb import ELB
 from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
-from c7n.filters.core import ValueRegex, parse_date as core_parse_date
+from c7n.filters.core import AnnotationSweeper, ValueRegex, parse_date as core_parse_date
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -1501,6 +1502,43 @@ class TestReduceFilter(BaseFilterTest):
             [r['InstanceId'] for r in rs],
             ['D', 'B', 'C', 'A']
         )
+
+
+class AnnotationSweeperTest(unittest.TestCase):
+    def test_annotation_sweep_jmespath(self):
+        resources = [
+            {
+                "metadata": {"uid": "foo"}, "c7n:annotation": "bar"
+            },
+            {
+                "metadata": {"uid": "bar"}, "c7n:annotation": "bar"
+            },
+            {
+                "metadata": {"uid": "baz"},
+            }
+        ]
+        sweeper = AnnotationSweeper(
+            id_key="metadata.uid", resources=resources)
+        sweeper.sweep(resources=resources)
+        self.assertEqual(len(resources), 3)
+        for r in resources:
+            self.assertTrue("c7n:annotation" not in resources)
+
+    def test_annotation_sweep_jmespath_no_annotations(self):
+        resources = [
+            {
+                "metadata": {"uid": "foo"},
+            },
+            {
+                "metadata": {"uid": "bar"},
+            }
+        ]
+        swept = copy.deepcopy(resources)
+        sweeper = AnnotationSweeper(
+            id_key="metadata.uid", resources=swept)
+        sweeper.sweep(resources=swept)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources, swept)
 
 
 if __name__ == "__main__":

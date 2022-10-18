@@ -14,3 +14,4 @@ class Pod(QueryResourceManager):
         patch = 'patch_namespaced_pod'
         delete = 'delete_namespaced_pod'
         enum_spec = ('list_pod_for_all_namespaces', 'items', None)
+        plural = 'pods'
