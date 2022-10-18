@@ -681,7 +681,6 @@ class ClusterParameterFilter(ParameterFilter):
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
     policy_annotation = 'c7n:MatchedDBClusterParameter'
-    paramcache = {}
     param_group_attribute = 'DBClusterParameterGroup'
 
     def _get_param_list(self, pg):
@@ -694,9 +693,9 @@ class ClusterParameterFilter(ParameterFilter):
     def process(self, resources, event=None):
         results = []
         parameter_group_list = {db.get(self.param_group_attribute) for db in resources}
-        self.cache_param_groups(parameter_group_list)
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
         for resource in resources:
-            pg_values = self.paramcache[resource['DBClusterParameterGroup']]
+            pg_values = paramcache[resource['DBClusterParameterGroup']]
             if self.match(pg_values):
                 resource.setdefault(self.policy_annotation, []).append(
                     self.data.get('key'))
