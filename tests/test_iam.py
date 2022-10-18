@@ -997,6 +997,20 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
 
+    def test_iam_user_login_profile(self):
+        session_factory = self.replay_flight_data('test_iam_user_login_profile')
+        p = self.load_policy(
+            {
+                "name": "iam-users-with-console-access",
+                "resource": "iam-user",
+                "filters": [{"type": "login-profile"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "test-user-console-access")
+
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_user_disable_ssh_keys(test, iam_user):

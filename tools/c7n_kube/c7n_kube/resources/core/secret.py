@@ -14,3 +14,4 @@ class Secret(QueryResourceManager):
         patch = 'patch_namespaced_secret'
         delete = 'delete_namespaced_secret'
         enum_spec = ('list_secret_for_all_namespaces', 'items', None)
+        plural = 'secrets'
