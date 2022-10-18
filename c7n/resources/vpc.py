@@ -2877,7 +2877,7 @@ class AlbWafV2Enabled(Filter):
             target_albs.extend(arns)
         return set(target_albs)
 
-    def _process_elbv2(self):
+    def _get_target_sgs(self):
         elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
         target_albs = self._get_target_albs()
         allowed_sgs = []
@@ -2890,7 +2890,7 @@ class AlbWafV2Enabled(Filter):
         return set(allowed_sgs), set(disallowed_sgs)
 
     def process(self, resources, event=None):
-        allowed_sgs, disallowed_sgs = self._process_elbv2()
+        allowed_sgs, disallowed_sgs = self._get_target_sgs()
         results = [
             r for r in resources
             if r['GroupId'] in allowed_sgs and r['GroupId'] not in disallowed_sgs]
