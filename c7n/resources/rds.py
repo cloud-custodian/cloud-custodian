@@ -1641,7 +1641,7 @@ class ParameterFilter(ValueFilter):
             for p in paginator.paginate(DBParameterGroupName=pg)]))
         return param_list
 
-    def  handle_paramgroup_cache(self, param_groups):
+    def handle_paramgroup_cache(self, param_groups):
         pgcache = {}
         cache = self.manager._cache
 
