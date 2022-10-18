@@ -614,15 +614,14 @@ class UpdateTlsConfig(Action):
 
     schema = type_schema('update-tls-config', value={'type': 'string',
         'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}, required=['value'])
-    permissions = ('es:UpdateElasticsearchDomainConfig', 'es:DescribeElasticsearchDomainConfig',
-        'es:DescribeElasticsearchDomains', 'es:ListDomainNames')
+    permissions = ('es:UpdateElasticsearchDomainConfig')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('es')
         tls_value = self.data.get('value')
         for r in resources:
-            if not r['DomainEndpointOptions']['EnforceHTTPS']:
-                client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
-                    DomainEndpointOptions={'EnforceHTTPS': True})
+            # if not r['DomainEndpointOptions']['EnforceHTTPS']:
+            #     client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+            #         DomainEndpointOptions={'EnforceHTTPS': True})
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
-                DomainEndpointOptions={'TLSSecurityPolicy': tls_value})
+                DomainEndpointOptions={'EnforceHTTPS': True, 'TLSSecurityPolicy': tls_value})
