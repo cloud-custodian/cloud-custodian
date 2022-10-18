@@ -26,3 +26,6 @@ vcrpy = "^4.0.2"
 [build-system]
 requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+"c7n-kates" = "c7n_kube.cli:cli"

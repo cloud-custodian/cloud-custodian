@@ -55,3 +55,11 @@ pytest-recording = "^0.12.1"
 
 [tool.black]
 skip-string-normalization = true
+
+
+[tool.pytest.ini_options]
+junit_family = "xunit2"
+addopts = "--tb=native"
+markers = ["functional", "skiplive"]
+python_files = "test_*.py"
+norecursedirs = ["data", "cassettes", "templates", "terraform"]
