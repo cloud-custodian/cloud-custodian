@@ -5,7 +5,7 @@ from azure.mgmt.security import SecurityCenter
 
 from c7n.utils import local_session
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo, ResourceManager
+from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
 
 class SecurityContactsResourceManager(QueryResourceManager):
 
@@ -34,9 +34,8 @@ class SecurityContactsResourceManager(QueryResourceManager):
 class SecurityContacts(SecurityContactsResourceManager, metaclass=QueryMeta):
     """Get Default Security contact configurations for the subscription.
     .. code-block:: yaml
-    
     policies:
-        - name: mck-azure-security-ensure-send-email-notification-for-high-severity-alerts-is-enabled
+        - name: ensure-send-email-notification-for-high-severity-alerts-is-enabled
         resource: azure.security-contacts
         filters:
             - name: default
@@ -55,4 +54,3 @@ class SecurityContacts(SecurityContactsResourceManager, metaclass=QueryMeta):
         service = "security"
         enum_spec = ("security_contacts", "list", None)
         resource_type = "Microsoft.Security"
-
