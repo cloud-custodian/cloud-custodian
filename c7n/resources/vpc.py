@@ -2820,3 +2820,78 @@ class CrossAZRouteTable(Filter):
                 results.append(resource)
 
         return results
+
+
+@SecurityGroup.filter_registry.register('alb-wafv2-enabled')
+class AlbWafV2Enabled(Filter):
+    """Filter to find security groups that are ONLY attached to ALBs which have 
+    a specific web ACL associated to it. It supports a regular expression to find 
+    all web ACLs that match the pattern.
+    
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: security-groups-used-by-wafv2-enabled-alb
+                resource: security-group
+                filters:
+                  - type: alb-wafv2-enabled
+                    WebAclName: ^FMManagedWebACLV2-?FMS-.*
+    """
+    schema = type_schema(
+        'alb-wafv2-enabled',
+        WebAclName={'type': 'string'})
+
+    permissions = (
+        'elasticloadbalancing:DescribeLoadBalancers',
+        'wafv2:ListResourcesForWebACL',
+        'wafv2:ListWebACLs')
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
+
+    def _get_target_wafs(self):
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        web_acl_regex = self.data.get('WebAclName', '')
+        target_wafs = []
+        for i in range(len(wafs)):
+            if re.match(web_acl_regex, wafs[i]['Name']):
+                target_wafs.append(wafs[i])
+        return target_wafs
+    
+    def _get_target_albs(self):
+        client = local_session(self.manager.session_factory).client('wafv2')
+        target_wafs = self._get_target_wafs()
+        target_albs = []
+        for w in target_wafs:
+            arns = self.retry(
+                client.list_resources_for_web_acl,
+                WebACLArn=w.get('ARN', ''),
+                ResourceType='APPLICATION_LOAD_BALANCER').get('ResourceArns', [])
+            target_albs.extend(arns)
+        return set(target_albs)
+
+    def _process_elbv2(self):
+        elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
+        target_albs = self._get_target_albs()
+        allowed_sgs = []
+        disallowed_sgs = []
+        for e in elbv2s:
+            if e['LoadBalancerArn'] in target_albs:
+                allowed_sgs.extend(e['SecurityGroups'])
+            else:
+                disallowed_sgs.extend(e['SecurityGroups'])
+        return set(allowed_sgs), set(disallowed_sgs)
+
+    def process(self, resources, event=None):
+        allowed_sgs, disallowed_sgs = self._process_elbv2()
+        results = [
+            r for r in resources
+            if r['GroupId'] in allowed_sgs and r['GroupId'] not in disallowed_sgs]
+        return results
