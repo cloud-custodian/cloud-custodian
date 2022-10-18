@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": {
+            "copy_tag1": "value1",
+            "copy_tag2": "value2"
+        },
+        "ResponseMetadata": {}
+    }
+}

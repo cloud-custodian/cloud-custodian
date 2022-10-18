@@ -1,0 +1,138 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_log_group": {
+            "this": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/custodian_test_codebuild_project_name",
+                "id": "/aws/codebuild/custodian_test_codebuild_project_name",
+                "kms_key_id": "",
+                "name": "/aws/codebuild/custodian_test_codebuild_project_name",
+                "name_prefix": null,
+                "retention_in_days": 0,
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_codebuild_project": {
+            "this": {
+                "arn": "arn:aws:codebuild:us-east-1:644160558196:project/custodian_test_codebuild_project_name",
+                "artifacts": [
+                    {
+                        "artifact_identifier": "",
+                        "bucket_owner_access": "",
+                        "encryption_disabled": false,
+                        "location": "",
+                        "name": "",
+                        "namespace_type": "",
+                        "override_artifact_name": false,
+                        "packaging": "",
+                        "path": "",
+                        "type": "NO_ARTIFACTS"
+                    }
+                ],
+                "badge_enabled": false,
+                "badge_url": "",
+                "build_batch_config": [],
+                "build_timeout": 60,
+                "cache": [
+                    {
+                        "location": "",
+                        "modes": [],
+                        "type": "NO_CACHE"
+                    }
+                ],
+                "concurrent_build_limit": 0,
+                "description": "",
+                "encryption_key": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3",
+                "environment": [
+                    {
+                        "certificate": "",
+                        "compute_type": "BUILD_GENERAL1_SMALL",
+                        "environment_variable": [],
+                        "image": "aws/codebuild/standard:1.0",
+                        "image_pull_credentials_type": "CODEBUILD",
+                        "privileged_mode": false,
+                        "registry_credential": [],
+                        "type": "LINUX_CONTAINER"
+                    }
+                ],
+                "file_system_locations": [],
+                "id": "arn:aws:codebuild:us-east-1:644160558196:project/custodian_test_codebuild_project_name",
+                "logs_config": [
+                    {
+                        "cloudwatch_logs": [
+                            {
+                                "group_name": "",
+                                "status": "ENABLED",
+                                "stream_name": ""
+                            }
+                        ],
+                        "s3_logs": [
+                            {
+                                "bucket_owner_access": "",
+                                "encryption_disabled": false,
+                                "location": "",
+                                "status": "DISABLED"
+                            }
+                        ]
+                    }
+                ],
+                "name": "custodian_test_codebuild_project_name",
+                "project_visibility": "PRIVATE",
+                "public_project_alias": "",
+                "queued_timeout": 480,
+                "resource_access_role": "",
+                "secondary_artifacts": [],
+                "secondary_source_version": [],
+                "secondary_sources": [],
+                "service_role": "arn:aws:iam::644160558196:role/iam_for_custodian_test_codebuild_project_name",
+                "source": [
+                    {
+                        "auth": [],
+                        "build_status_config": [],
+                        "buildspec": "version: 0.2\n\nphases:\n  build:\n    commands:\n       - echo \"testing\"\n",
+                        "git_clone_depth": 0,
+                        "git_submodules_config": [],
+                        "insecure_ssl": false,
+                        "location": "",
+                        "report_build_status": false,
+                        "type": "NO_SOURCE"
+                    }
+                ],
+                "source_version": "",
+                "tags": {
+                    "copy_tag1": "value1",
+                    "copy_tag2": "value2",
+                    "not_copy_tag1": "value3"
+                },
+                "tags_all": {
+                    "copy_tag1": "value1",
+                    "copy_tag2": "value2",
+                    "not_copy_tag1": "value3"
+                },
+                "vpc_config": []
+            }
+        },
+        "aws_iam_role": {
+            "this": {
+                "arn": "arn:aws:iam::644160558196:role/iam_for_custodian_test_codebuild_project_name",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"codebuild.amazonaws.com\"},\"Sid\":\"\"}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2022-09-26T14:37:53Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "iam_for_custodian_test_codebuild_project_name",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "iam_for_custodian_test_codebuild_project_name",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAUY7BEYQVJ373OJSEW"
+            }
+        }
+    }
+}

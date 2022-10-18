@@ -1,0 +1,18 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_log_group": {
+            "this": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/no_related_lambda_function",
+                "id": "/aws/lambda/no_related_lambda_function",
+                "kms_key_id": "",
+                "name": "/aws/lambda/no_related_lambda_function",
+                "name_prefix": null,
+                "retention_in_days": 0,
+                "tags": null,
+                "tags_all": {}
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": {
+            "copy_tag1": "value1",
+            "existing_tag": "lambda_existing_tag"
+        },
+        "ResponseMetadata": {}
+    }
+}
