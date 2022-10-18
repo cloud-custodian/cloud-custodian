@@ -105,6 +105,87 @@ class CloudFrontWaf(BaseTest):
         resources = policy.push(event_data("event-cloud-trail-create-distribution.json"))
         self.assertEqual(len(resources), 1)
 
+    def test_set_wafv2_filter_regex(self):
+        factory = self.replay_flight_data("test_distribution_wafv2_regex")
+
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-update-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.id",
+                    "event": "UpdateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.push(event_data("event-cloud-trail-update-distribution.json"))
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-update-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.id",
+                    "event": "UpdateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "FMManagedWebACLV2-FMS-.*",
+                             "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.push(event_data("event-cloud-trail-update-distribution.json"))
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-update-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.id",
+                    "event": "UpdateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "FMManagedWebACLV2-FMS-.*",
+                             "state": True}],
+                "actions": [{"type": "set-wafv2", "state": True,
+                             "force": True, "web-acl": "FMManagedWebACLV2-FMS-T.*"}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.push(event_data("event-cloud-trail-update-distribution.json"))
+        self.assertEqual(len(resources), 1)
+
+    def test_set_wafv2_action_regex_multiple_webacl_match(self):
+        factory = self.replay_flight_data("test_distribution_wafv2_regex_multiple_webacl_match")
+
+        policy = self.load_policy(
+            {
+                "name": "waf-cloudfront-update-response",
+                "resource": "distribution",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudfront.amazonaws.com",
+                    "ids": "requestParameters.id",
+                    "event": "UpdateDistribution"
+                }]},
+                "filters": [{"type": "wafv2-enabled",
+                             "web-acl": "testv2",
+                             "state": False}],
+                "actions": [{"type": "set-wafv2", "state": True, "force": True,
+                             "web-acl": "FMManagedWebACLV2-FMS-T.*"}],
+            },
+            session_factory=factory,
+        )
+        with self.assertRaises(ValueError) as ctx:
+            policy.push(event_data("event-cloud-trail-update-distribution.json"))
+            self.assertTrue('matching to none or multiple webacls' in str(ctx))
+
     def test_set_wafv2_active_response_tag_resource(self):
         factory = self.replay_flight_data("test_distribution_wafv2")
         policy = self.load_policy(
