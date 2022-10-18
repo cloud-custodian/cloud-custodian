@@ -258,4 +258,4 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         print("PRINT-RESOURCES", len(resources))
         self.assertEqual(len(resources), 1)
-        # self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-0b3d3377"])
+        #### self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-0b3d3377"])
