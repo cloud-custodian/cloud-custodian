@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Credentials": {
+            "AccessKeyId": "ASIATDTX26RUNHVTXNVW",
+            "SecretAccessKey": "Y3QCjvnbXe6l/jc14kc+59QiyqjUzHuhfs5jhvOg",
+            "SessionToken": "FwoGZXIvYXdzEG0aDInM+zi78jg+yJ+uJyK8AfyuGjZiK+/exSt3ZjxHsYhgqGBcJo+X33fpwaehLaMtUlyCZZlUdfdIcZGsfiRyJ46J1MfpAU+A1CEWrakrvJMTJCIdW4Dc6F0Aw2uNrYxZ3iuMGJnwgWVsxyoz9IPYVuk6um5tLbRfwJBv0PMkXqb8ghJ79h9r2PZ/DZkXv/FQJCmU+2oB1J9ZLqKBgFnL9Ml/FJnP8VgTmYxTo5A2ZaCwTPjkPrn9Vl/OV4RYzKl5G1N61SB9fGniS9KgKOf4u5oGMi1eboWn85yDE2WAUNsKBtkI2LU1QHLOhvqtF9PIiUwQ1ReT59KQ4D/A15LR1O8=",
+            "Expiration": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 10,
+                "day": 18,
+                "hour": 20,
+                "minute": 20,
+                "second": 7,
+                "microsecond": 0
+            }
+        },
+        "AssumedRoleUser": {
+            "AssumedRoleId": "AROATDTX26RUP263DK4U2:LambdaAssumedRoleSession",
+            "Arn": "arn:aws:sts::644160558196:assumed-role/lanbda-invoke-c7n-role-py5l2hbi/LambdaAssumedRoleSession"
+        },
+        "ResponseMetadata": {}
+    }
+}

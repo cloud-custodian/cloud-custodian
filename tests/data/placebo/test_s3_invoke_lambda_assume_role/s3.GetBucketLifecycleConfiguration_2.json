@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "Expiration": {
+                    "Days": 30
+                },
+                "ID": "30-days-to-delete",
+                "Prefix": "",
+                "Status": "Enabled"
+            }
+        ]
+    }
+}

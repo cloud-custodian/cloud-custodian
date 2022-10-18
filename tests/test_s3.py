@@ -3678,6 +3678,21 @@ class S3Test(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
 
+    def test_s3_invoke_lambda_assume_role_action(self):
+        session_factory = self.replay_flight_data("test_s3_invoke_lambda_assume_role")
+        p = self.load_policy(
+            {
+                "name": "s3-invoke-lambda-assume-role",
+                "resource": "s3",
+                "actions": [{"type": "invoke-lambda",
+                             "function": "lambda-invoke-with-assume-role", "assume-role":
+                "arn:aws:iam::213925950568:role/service-role/lanbda-invoke-c7n-role-py5l2hbi"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
 
 class S3LifecycleTest(BaseTest):
 

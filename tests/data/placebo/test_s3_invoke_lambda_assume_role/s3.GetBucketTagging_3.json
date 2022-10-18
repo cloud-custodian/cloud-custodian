@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagSet": [
+            {
+                "Key": "intuit:asset_id",
+                "Value": "8290018606720055579"
+            }
+        ]
+    }
+}

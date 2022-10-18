@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "artifacts-644160558196-us-east-2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 6,
+                    "minute": 14,
+                    "second": 31,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "artifacts-644160558196-us-west-2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 6,
+                    "minute": 14,
+                    "second": 23,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "infra-logging-output-athena-644160558196-us-west-2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 6,
+                    "minute": 17,
+                    "second": 6,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "sgungi-learning-01-823266211",
+            "ID": "133b3a31c5f5126e89019583058d67d2d175f8a2882a1ba83c9858ac41f969d3"
+        }
+    }
+}

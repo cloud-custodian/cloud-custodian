@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "ReplicationConfigurationNotFoundError",
+            "Message": "The replication configuration was not found",
+            "BucketName": "artifacts-644160558196-us-east-2"
+        },
+        "ResponseMetadata": {}
+    }
+}
