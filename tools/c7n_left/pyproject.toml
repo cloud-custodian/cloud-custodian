@@ -17,10 +17,10 @@ classifiers = [
 c7n-left = 'c7n_left.cli:cli'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 click = ">=8.0"
 rich = "^12.5"
-tfparse = "^0.1"
+tfparse = "^0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"

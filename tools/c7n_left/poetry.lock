@@ -6,9 +6,6 @@ category = "dev"
 optional = false
 python-versions = ">=3.6"
 
-[package.dependencies]
-importlib-metadata = {version = ">=0.23,<5", markers = "python_version == \"3.7\""}
-
 [package.extras]
 test = ["coverage", "flake8", "pexpect", "wheel"]
 
@@ -102,7 +99,6 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
-importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "colorama"
@@ -146,12 +142,11 @@ testing = ["pre-commit"]
 name = "importlib-metadata"
 version = "4.12.0"
 description = "Read metadata from Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-typing-extensions = {version = ">=3.6.4", markers = "python_version < \"3.8\""}
 zipp = ">=0.5"
 
 [package.extras]
@@ -200,11 +195,9 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 attrs = ">=17.4.0"
-importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""}
 pkgutil-resolve-name = {version = ">=1.3.10", markers = "python_version < \"3.9\""}
 pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
-typing-extensions = {version = "*", markers = "python_version < \"3.8\""}
 
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
@@ -236,9 +229,6 @@ description = "plugin and hook calling mechanisms for python"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
-
-[package.dependencies]
-importlib-metadata = {version = ">=0.12", markers = "python_version < \"3.8\""}
 
 [package.extras]
 dev = ["pre-commit", "tox"]
@@ -317,7 +307,6 @@ python-versions = ">=3.7"
 [package.dependencies]
 attrs = ">=19.2.0"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
-importlib-metadata = {version = ">=0.12", markers = "python_version < \"3.8\""}
 iniconfig = "*"
 packaging = "*"
 pluggy = ">=0.12,<2.0"
@@ -449,11 +438,11 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tfparse"
-version = "0.1.3"
+version = "0.2.0"
 description = "Python HCL/Terraform parser via extension for AquaSecurity defsec"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
 cffi = ">=1.0.0"
@@ -491,7 +480,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 name = "zipp"
 version = "3.8.1"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -501,8 +490,8 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.7"
-content-hash = "4ce0a33620924a59e61b371fe326efab08e25354018188202bf21b6337370194"
+python-versions = "^3.8"
+content-hash = "d3bb5bedbf20d99d63a52bdae689ba60e4d543e786c632e368494b2d1ab7ae19"
 
 [metadata.files]
 argcomplete = [
@@ -778,10 +767,9 @@ tabulate = [
     {file = "tabulate-0.8.10.tar.gz", hash = "sha256:6c57f3f3dd7ac2782770155f3adb2db0b1a269637e42f27599925e64b114f519"},
 ]
 tfparse = [
-    {file = "tfparse-0.1.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:f6bd58cac7de1e07f02a9c0eb824b5e7d0963814d966c969fafdc1d1bd7c63d5"},
-    {file = "tfparse-0.1.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:90dd576bd1b5ac093b78b4041fa54352318b22c425f3ff7c565da8088de0dcbf"},
-    {file = "tfparse-0.1.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c6e5d9b01b807c96c70ed8b342a46686c0e477266e2479c4cf9b15fe0e58e1ea"},
-    {file = "tfparse-0.1.3-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:29d466c3dace725b2b5c7905e8a4f472b51c63abed5426b27b3e3a584fac7819"},
+    {file = "tfparse-0.2.0-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:1ebded6a2543f552a169fb45a4ab6ee6a1b11d4307748d79a1641123d5fdb9ec"},
+    {file = "tfparse-0.2.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:48a77f0f72ee95821a2431d4531e38ac0c1175b393b021000c350762257b1027"},
+    {file = "tfparse-0.2.0-cp310-cp310-manylinux_2_17_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4910a4667d5584b9bd9cf21f19c469d5c47d69ad2d92c9c71e09b87d669aed90"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
