@@ -5,7 +5,7 @@ import json
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import Filter
+from c7n.filters import Filter, FilterRegistry
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import (
@@ -14,8 +14,9 @@ from c7n.query import (
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 from .aws import shape_validate
+import c7n.filters.vpc as net_filters
 
-
+filters = FilterRegistry('efs.filters')
 class EFSDescribe(DescribeSource):
 
     def augment(self, resources):
@@ -34,6 +35,7 @@ class ElasticFileSystem(QueryResourceManager):
         dimension = 'FileSystemId'
         arn_type = 'file-system'
         permission_prefix = arn_service = 'elasticfilesystem'
+        filter_registry = filters
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
@@ -230,6 +232,18 @@ class LifecyclePolicy(Filter):
                 continue
         return resources
 
+
+@ElasticFileSystem.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = 'SubnetIds[]'
+    
+@ElasticFileSystem.filter_registry.register('security-group')
+class SecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[].SecurityGroupId"
+
+@ElasticFileSystem.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 @ElasticFileSystem.filter_registry.register('check-secure-transport')
 class CheckSecureTransport(Filter):

@@ -236,3 +236,26 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+
+    def test_fsx_security_group_not_matched(self):
+        factory = self.record_flight_data("test_efs_security_group_not_matched")
+        p = self.load_policy(
+            {
+                "name": "efs-subnet",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "network-location", 
+                        'resource': 'subnet',
+                        # 'compare': ['subnet'],
+                        "key": "tag:NetworkLocation",
+                        "op": "not-equal"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        print("PRINT-RESOURCES", len(resources))
+        self.assertEqual(len(resources), 1)
+        # self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-0b3d3377"])
