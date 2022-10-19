@@ -1144,5 +1144,8 @@ class DomainNameRemediateTls(BaseAction):
                       )
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
+                    # raise e
+                    # uncomment above if you want to fail closed in even of exceeded retry threshold
                     continue
-                raise e
+                    # comment above if you want to fail closed
+
