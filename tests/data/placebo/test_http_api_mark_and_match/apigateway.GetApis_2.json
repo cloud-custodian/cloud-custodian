@@ -21,9 +21,7 @@
                 "Name": "test-websocket",
                 "ProtocolType": "WEBSOCKET",
                 "RouteSelectionExpression": "$request.body.action",
-                "Tags": {
-                    "custodian_cleanup": "Resource does not meet policy: notify@2022/10/21"
-                }
+                "Tags": {}
             },
             {
                 "ApiEndpoint": "https://e8s82vm2m0.execute-api.us-east-1.amazonaws.com",
@@ -43,7 +41,9 @@
                 "Name": "test-http",
                 "ProtocolType": "HTTP",
                 "RouteSelectionExpression": "$request.method $request.path",
-                "Tags": {}
+                "Tags": {
+                    "custodian_cleanup": "Resource does not meet policy: notify@2022/10/21"
+                }
             }
         ]
     }

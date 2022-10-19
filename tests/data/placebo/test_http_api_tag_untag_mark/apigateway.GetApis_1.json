@@ -43,7 +43,9 @@
                 "Name": "test-http",
                 "ProtocolType": "HTTP",
                 "RouteSelectionExpression": "$request.method $request.path",
-                "Tags": {}
+                "Tags": {
+                    "name": "test-http"
+                }
             }
         ]
     }

@@ -1148,7 +1148,7 @@ class DomainNameRemediateTls(BaseAction):
                     continue
 
 
-class WebSocketDescribeSource(query.DescribeSource):
+class apigatewayv2DescribeSource(query.DescribeSource):
 
     def augment(self, resources):
         for r in resources:
@@ -1158,8 +1158,8 @@ class WebSocketDescribeSource(query.DescribeSource):
         return resources
 
 
-@resources.register('websocket-api')
-class WebSocketApi(query.QueryResourceManager):
+@resources.register('apigatewayv2-api')
+class apigatewayv2Api(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'apigatewayv2'
@@ -1175,7 +1175,7 @@ class WebSocketApi(query.QueryResourceManager):
 
     source_mapping = {
         'config': query.ConfigSource,
-        'describe': WebSocketDescribeSource
+        'describe': apigatewayv2DescribeSource
     }
 
     @property
@@ -1196,8 +1196,8 @@ class WebSocketApi(query.QueryResourceManager):
         return self._generate_arn
 
 
-@WebSocketApi.action_registry.register('tag')
-class WebSocketApiTag(Tag):
+@apigatewayv2Api.action_registry.register('tag')
+class apigatewayv2ApiTag(Tag):
 
     def process_resource_set(self, client, resource_set, tags):
         for r in resource_set:
@@ -1211,12 +1211,12 @@ class WebSocketApiTag(Tag):
                 continue
 
 
-WebSocketApi.filter_registry.register('marked-for-op', TagActionFilter)
-WebSocketApi.action_registry.register('mark-for-op', TagDelayedAction)
+apigatewayv2Api.filter_registry.register('marked-for-op', TagActionFilter)
+apigatewayv2Api.action_registry.register('mark-for-op', TagDelayedAction)
 
 
-@WebSocketApi.action_registry.register('remove-tag')
-class WebSocketApiRemoveTag(RemoveTag):
+@apigatewayv2Api.action_registry.register('remove-tag')
+class apigatewayv2ApiRemoveTag(RemoveTag):
 
     def process_resource_set(self, client, resource_set, tags):
         for r in resource_set:

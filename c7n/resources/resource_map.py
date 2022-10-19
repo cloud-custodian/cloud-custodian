@@ -217,7 +217,7 @@ ResourceMap = {
     "aws.waf": "c7n.resources.waf.WAF",
     "aws.wafv2": "c7n.resources.waf.WAFV2",
     "aws.waf-regional": "c7n.resources.waf.RegionalWAF",
-    "aws.websocket-api": "c7n.resources.apigw.WebSocketApi",
+    "aws.apigatewayv2-api": "c7n.resources.apigw.apigatewayv2Api",
     "aws.workspaces": "c7n.resources.workspaces.Workspace",
     "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
     "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage"

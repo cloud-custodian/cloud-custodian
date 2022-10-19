@@ -24,6 +24,29 @@
                 "Tags": {
                     "name": "test-websocket"
                 }
+            },
+            {
+                "ApiEndpoint": "https://e8s82vm2m0.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "e8s82vm2m0",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 20,
+                    "minute": 57,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "test-http",
+                "ProtocolType": "HTTP",
+                "RouteSelectionExpression": "$request.method $request.path",
+                "Tags": {
+                    "Env": "Dev",
+                    "custodian_cleanup": "Resource does not meet policy: notify@2022/10/21"
+                }
             }
         ]
     }
