@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "PortfolioDetail": {
+            "Id": "port-t24m4nifknphk",
+            "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-t24m4nifknphk",
+            "DisplayName": "c7n-test",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 10,
+                "day": 30,
+                "hour": 17,
+                "minute": 53,
+                "second": 44,
+                "microsecond": 22000
+            },
+            "ProviderName": "pratyush"
+        },
+        "Tags": [],
+        "TagOptions": [],
+        "Budgets": [],
+        "ResponseMetadata": {}
+    }
+}

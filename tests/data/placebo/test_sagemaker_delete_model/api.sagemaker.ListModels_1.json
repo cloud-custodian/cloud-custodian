@@ -1,47 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Models": [
             {
+                "ModelName": "sagemaker-model",
+                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/sagemaker-model",
                 "CreationTime": {
-                    "hour": 15, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 42, 
-                    "microsecond": 511000, 
-                    "year": 2018, 
-                    "day": 17, 
-                    "minute": 11
-                }, 
-                "ModelName": "tmp-123", 
-                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/tmp-123"
-            }, 
-            {
-                "CreationTime": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 46, 
-                    "microsecond": 835000, 
-                    "year": 2018, 
-                    "day": 17, 
-                    "minute": 54
-                }, 
-                "ModelName": "tmp-for-test-a", 
-                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/tmp-for-test-a"
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 6,
+                    "day": 21,
+                    "hour": 5,
+                    "minute": 1,
+                    "second": 28,
+                    "microsecond": 466000
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "4401e9e4-cc83-4e42-80ab-f369dad6e9c5", 
-            "HTTPHeaders": {
-                "date": "Wed, 17 Jan 2018 20:12:11 GMT", 
-                "x-amzn-requestid": "4401e9e4-cc83-4e42-80ab-f369dad6e9c5", 
-                "content-length": "274", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

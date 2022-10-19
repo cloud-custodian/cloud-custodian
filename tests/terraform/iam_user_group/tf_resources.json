@@ -1,0 +1,37 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_group": {
+            "sandbox_devs": {
+                "arn": "arn:aws:iam::644160558196:group/users/sandbox_developers",
+                "id": "sandbox_developers",
+                "name": "sandbox_developers",
+                "path": "/users/",
+                "unique_id": "AGPAZL6XWCR2B4C5XZHNP"
+            }
+        },
+        "aws_iam_group_membership": {
+            "sandbox_dev_members": {
+                "group": "sandbox_developers",
+                "id": "sandbox_dev_members",
+                "name": "sandbox_dev_members",
+                "users": [
+                    "sandbox_jill"
+                ]
+            }
+        },
+        "aws_iam_user": {
+            "sandbox_jill": {
+                "arn": "arn:aws:iam::644160558196:user/sandbox_jill",
+                "force_destroy": false,
+                "id": "sandbox_jill",
+                "name": "sandbox_jill",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "unique_id": "AIDAZL6XWCR2DRIS3EDYQ"
+            }
+        }
+    }
+}

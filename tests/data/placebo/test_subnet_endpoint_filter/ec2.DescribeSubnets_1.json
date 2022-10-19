@@ -1,0 +1,362 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 249,
+                "CidrBlock": "10.0.1.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-068dfbf3f275a6ae8",
+                "VpcId": "vpc-072f438c953672ace",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Private subnet1"
+                    },
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Customer"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/test",
+                        "Value": "shared"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/test2",
+                        "Value": "shared"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-068dfbf3f275a6ae8"
+            },
+            {
+                "AvailabilityZone": "us-east-1d",
+                "AvailabilityZoneId": "use1-az2",
+                "AvailableIpAddressCount": 4086,
+                "CidrBlock": "172.31.48.0/20",
+                "DefaultForAz": true,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-3a334610",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Customer"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Default-48"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-3a334610"
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailableIpAddressCount": 4088,
+                "CidrBlock": "172.31.16.0/20",
+                "DefaultForAz": true,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-efbcccb7",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Public"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": ""
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-efbcccb7"
+            },
+            {
+                "AvailabilityZone": "us-east-1c",
+                "AvailabilityZoneId": "use1-az1",
+                "AvailableIpAddressCount": 8186,
+                "CidrBlock": "192.168.0.0/19",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0b7a8f2c1d0f20592",
+                "VpcId": "vpc-01a1ffc078406ab62",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-sanjay-cluster"
+                    },
+                    {
+                        "Key": "kubernetes.io/role/elb",
+                        "Value": "1"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.18.0"
+                    },
+                    {
+                        "Key": "DontTurnOff",
+                        "Value": "CloudCustodian"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "SubnetPublicUSEAST1C"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-sanjay-cluster/SubnetPublicUSEAST1C"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-sanjay-cluster/ad933be0-88bf-11ea-8212-1208f0f76cbf"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0b7a8f2c1d0f20592"
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailableIpAddressCount": 251,
+                "CidrBlock": "10.0.0.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-05b58b4afe5124322",
+                "VpcId": "vpc-0a59f94e3fca9fbc0",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "implied"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-05b58b4afe5124322"
+            },
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 4090,
+                "CidrBlock": "10.205.0.0/20",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-07c118e47bb84cee7",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Public"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "testing-subnet"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "faizan.ahmed@capitalone.com"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-07c118e47bb84cee7"
+            },
+            {
+                "AvailabilityZone": "us-east-1e",
+                "AvailabilityZoneId": "use1-az3",
+                "AvailableIpAddressCount": 4090,
+                "CidrBlock": "172.31.32.0/20",
+                "DefaultForAz": true,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-e3b194de",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Public"
+                    },
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-e3b194de"
+            },
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 248,
+                "CidrBlock": "10.0.0.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-023db907202d61c00",
+                "VpcId": "vpc-072f438c953672ace",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "kubernetes.io/cluster/test",
+                        "Value": "shared"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Public subnet1"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/test2",
+                        "Value": "shared"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-023db907202d61c00"
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailableIpAddressCount": 247,
+                "CidrBlock": "10.0.2.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-03ec1a55eadb55221",
+                "VpcId": "vpc-072f438c953672ace",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Private Subnet2"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/test2",
+                        "Value": "shared"
+                    },
+                    {
+                        "Key": "kubernetes.io/cluster/test",
+                        "Value": "shared"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-03ec1a55eadb55221"
+            },
+            {
+                "AvailabilityZone": "us-east-1c",
+                "AvailabilityZoneId": "use1-az1",
+                "AvailableIpAddressCount": 8187,
+                "CidrBlock": "192.168.64.0/19",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-015ee3a07508b8409",
+                "VpcId": "vpc-01a1ffc078406ab62",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-sanjay-cluster/SubnetPrivateUSEAST1C"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "kubernetes.io/role/internal-elb",
+                        "Value": "1"
+                    },
+                    {
+                        "Key": "DontTurnOff",
+                        "Value": "CloudCustodian"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.18.0"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-sanjay-cluster"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-sanjay-cluster/ad933be0-88bf-11ea-8212-1208f0f76cbf"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "SubnetPrivateUSEAST1C"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-015ee3a07508b8409"
+            },
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 4088,
+                "CidrBlock": "172.31.0.0/20",
+                "DefaultForAz": true,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-914763e7",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Public"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-914763e7"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

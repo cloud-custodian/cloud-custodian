@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
@@ -39,15 +28,106 @@ class SecurityGroupFilter(MatchResourceValidator, RelatedResourceFilter):
 
 
 class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
-    """Filter a resource by its associated subnets."""
+    """Filter a resource by its associated subnets attributes.
+
+    This filter is generally available for network attached resources.
+
+    ie. to find lambda functions that are vpc attached to subnets with
+    a tag key Location and value Database.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: lambda
+          resource: aws.lambda
+          filters:
+            - type: subnet
+              key: tag:Location
+              value: Database
+
+    It also supports finding resources on public or private subnets
+    via route table introspection to determine if the subnet is
+    associated to an internet gateway.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+         - name: public-ec2
+           resource: aws.ec2
+           filters:
+             - type: subnet
+               igw: True
+               key: SubnetId
+               value: present
+
+    """
+
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
-    schema_alias = True
+           'operator': {'enum': ['and', 'or']},
+           'igw': {'enum': [True, False]},
+           })
 
+    schema_alias = True
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        if self.data.get('igw') in (True, False):
+            perms += self.manager.get_resource_manager(
+                'aws.route-table').get_permissions()
+        return perms
+
+    def validate(self):
+        super().validate()
+        self.check_igw = self.data.get('igw')
+
+    def match(self, related):
+        if self.check_igw in [True, False]:
+            if not self.match_igw(related):
+                return False
+        return super().match(related)
+
+    def process(self, resources, event=None):
+        related = self.get_related(resources)
+        if self.check_igw in [True, False]:
+            self.route_tables = self.get_route_tables(related)
+        return [r for r in resources if self.process_resource(r, related)]
+
+    def get_route_tables(self, subnets):
+        rmanager = self.manager.get_resource_manager('aws.route-table')
+        route_tables = {}
+        for r in rmanager.resources():
+            for a in r['Associations']:
+                if a['Main']:
+                    route_tables[r['VpcId']] = r
+                elif 'SubnetId' in a:
+                    route_tables[a['SubnetId']] = r
+        return route_tables
+
+    def match_igw(self, subnet):
+        rtable = self.route_tables.get(
+            subnet['SubnetId'],
+            self.route_tables.get(subnet['VpcId']))
+        if rtable is None:
+            self.log.debug('route table for %s not found', subnet['SubnetId'])
+            return
+        found_igw = False
+        for route in rtable['Routes']:
+            if route.get('GatewayId') and route['GatewayId'].startswith('igw-'):
+                found_igw = True
+                break
+        if self.check_igw and found_igw:
+            return True
+        elif not self.check_igw and not found_igw:
+            return True
+        return False
 
 
 class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
@@ -173,9 +253,10 @@ class NetworkLocation(Filter):
         results = []
         for r in resources:
             resource_sgs = self.filter_ignored(
-                [related_sg[sid] for sid in self.sg.get_related_ids([r])])
-            resource_subnets = self.filter_ignored([
-                related_subnet[sid] for sid in self.subnet.get_related_ids([r])])
+                [related_sg[sid] for sid in self.sg.get_related_ids([r]) if sid in related_sg])
+            resource_subnets = self.filter_ignored(
+                [related_subnet[sid] for sid in self.subnet.get_related_ids([r])
+                if sid in related_subnet])
             found = self.process_resource(r, resource_sgs, resource_subnets, key)
             if found:
                 results.append(found)

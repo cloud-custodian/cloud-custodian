@@ -59,6 +59,10 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf $(SRCDIR)/generated
+	rm -f $(SRCDIR)/aws/resources/*
+	rm -f $(SRCDIR)/gcp/resources/*
+	rm -f $(SRCDIR)/azure/resources/*
+	rm -f $(SRCDIR)/awscc/resources/*
 
 html:
 #	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
@@ -79,14 +83,17 @@ html:
 	cp -p tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
 	cp -p tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
 	cp -p tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
-
+	cp -p tools/c7n_left/README.md $(SRCDIR)/tools/c7n-left.md
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/awscc/resources
+	c7n-sphinxext --provider awscc --output-dir $(SRCDIR)/awscc/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/gcp/resources
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
-	$(SPHINXBUILD) -W -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+
+	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 #
 # Remove the copies so folks dont accidentally edit the copy

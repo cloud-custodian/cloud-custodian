@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompositeAlarms": [],
+        "MetricAlarms": [
+            {
+                "AlarmName": "c7n-test-alarm-tags-filter",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:012345678910:alarm:c7n-test-alarm-tags-filter",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 1,
+                    "second": 32,
+                    "microsecond": 583000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Unchecked: Initial alarm creation",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 1,
+                    "second": 32,
+                    "microsecond": 583000
+                },
+                "MetricName": "CPUUtilization",
+                "Namespace": "AWS/EC2",
+                "Statistic": "Average",
+                "Dimensions": [],
+                "Period": 3600,
+                "EvaluationPeriods": 5,
+                "Threshold": 10.0,
+                "ComparisonOperator": "GreaterThanThreshold"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

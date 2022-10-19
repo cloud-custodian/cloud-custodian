@@ -80,7 +80,13 @@
                     "us-east-2b", 
                     "us-east-2c"
                 ], 
-                "Port": 3306
+                "Port": 3306,
+                "TagList": [
+		    {
+			"Value": "Resource does not meet policy: delete@2017/07/19", 
+			"Key": "custodian_next"
+		    }
+                ]
             }
         ], 
         "ResponseMetadata": {

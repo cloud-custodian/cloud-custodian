@@ -1,21 +1,11 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -46,14 +36,15 @@ class SNS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sns'
-        arn_type = 'topic'
+        arn_type = ''
+        arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
         id = 'TopicArn'
         name = 'DisplayName'
         dimension = 'TopicName'
-        cfn_type = 'AWS::SNS::Topic'
+        cfn_type = config_type = 'AWS::SNS::Topic'
         default_report_fields = (
             'TopicArn',
             'DisplayName',
@@ -85,6 +76,16 @@ class SNSPostFinding(PostFinding):
                 'Owner': r['Owner'],
                 'TopicName': r['TopicArn'].rsplit(':', 1)[-1]}))
         return envelope
+
+
+@SNS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, topic):
+        return {
+            'topic_arn': topic['TopicArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SNS.action_registry.register('tag')
@@ -339,7 +340,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 new_policy = policy_statements
             new_policy, added = self.add_statements(new_policy)
 
-            if not removed or not added:
+            if not removed and not added:
                 continue
 
             results += {
@@ -358,22 +359,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filters SNS topic by kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sns-encrypt-key-check
-                  resource: sns
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: alias/aws/sns
-    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 

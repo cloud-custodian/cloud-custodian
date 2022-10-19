@@ -1,0 +1,154 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "custodian-test-asg-1a",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:e4dd0eb3-64f7-4ccf-8ac0-99bafa999844:autoScalingGroupName/custodian-test-asg-1a",
+                "LaunchConfigurationName": "custodian-test-lc-1",
+                "MinSize": 1,
+                "MaxSize": 2,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-234567890abcdef1",
+                        "InstanceType": "t2.micro",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchConfigurationName": "custodian-test-lc-1",
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 16,
+                    "hour": 21,
+                    "minute": 9,
+                    "second": 5,
+                    "microsecond": 301000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-c8ebd596",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::123456789012:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            {
+                "AutoScalingGroupName": "custodian-test-asg-2a",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:78e6fb87-1f6a-48a6-b62a-e5a2a2ddc28f:autoScalingGroupName/custodian-test-asg-2a",
+                "LaunchConfigurationName": "custodian-test-lc-2",
+                "MinSize": 1,
+                "MaxSize": 2,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-67890abcdef12345",
+                        "InstanceType": "t3a.micro",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchConfigurationName": "custodian-test-lc-2",
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 16,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 37,
+                    "microsecond": 471000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-c8ebd596",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::123456789012:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            {
+                "AutoScalingGroupName": "custodian-test-asg-4a",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:8c9cdbe1-7c17-40a8-a4e6-6467d7796469:autoScalingGroupName/custodian-test-asg-4a",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-234567890abcdef11",
+                    "LaunchTemplateName": "custodian-test-lt-2",
+                    "Version": "1"
+                },
+                "MinSize": 1,
+                "MaxSize": 2,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-bcdef1234567890a1",
+                        "InstanceType": "t2.micro",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-234567890abcdef11",
+                            "LaunchTemplateName": "custodian-test-lt-2",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 16,
+                    "hour": 21,
+                    "minute": 47,
+                    "second": 10,
+                    "microsecond": 574000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-c8ebd596",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::123456789012:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,23 +1,12 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from botocore.exceptions import ClientError
 import boto3
 import click
 import json
 from c7n.credentials import assumed_session
-from c7n.utils import get_retry, dumps, chunks
+from c7n.utils import get_retry, dumps, chunks, get_human_size
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc, tzlocal
@@ -73,6 +62,7 @@ CONFIG_SCHEMA = {
             'required': ['role', 'groups'],
             'properties': {
                 'name': {'type': 'string'},
+                'subscription-role': {'type': 'string'},
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string'}]},
@@ -141,7 +131,7 @@ def validate(config):
     return data
 
 
-def _process_subscribe_group(client, group_name, subscription, distribution):
+def _process_subscribe_group(client, group_name, subscription, distribution, role_arn):
     sub_name = subscription.get('name', 'FlowLogStream')
     filters = client.describe_subscription_filters(
         logGroupName=group_name).get('subscriptionFilters', ())
@@ -151,14 +141,18 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
                 f['destinationArn'] == subscription['destination-arn'] and
                 f['distribution'] == distribution):
             return
-    client.delete_subscription_filter(
-        logGroupName=group_name, filterName=sub_name)
-    client.put_subscription_filter(
-        logGroupName=group_name,
-        destinationArn=subscription['destination-arn'],
-        filterName=sub_name,
-        filterPattern="",
-        distribution=distribution)
+        else:
+            client.delete_subscription_filter(
+                logGroupName=group_name, filterName=sub_name)
+    kwargs = {
+        'logGroupName': group_name,
+        'destinationArn': subscription['destination-arn'],
+        'filterName': sub_name,
+        'filterPattern': "",
+        'distribution': distribution,
+        'roleArn': role_arn
+    }
+    client.put_subscription_filter(**{k: v for k, v in kwargs.items() if v is not None})
 
 
 @cli.command()
@@ -214,17 +208,18 @@ def subscribe(config, accounts, region, merge, debug):
         session = get_session(t_account['role'], region)
         client = session.client('logs')
         distribution = subscription.get('distribution', 'ByLogStream')
+        role_arn = account.get('subscription-role')
 
         for g in account.get('groups'):
             if (g.endswith('*')):
                 g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
                 allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
-                for l in allLogGroups:
+                for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
-                        client, l['logGroupName'], subscription, distribution)
+                        client, l['logGroupName'], subscription, distribution, role_arn)
             else:
-                _process_subscribe_group(client, g, subscription, distribution)
+                _process_subscribe_group(client, g, subscription, distribution, role_arn)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
@@ -491,18 +486,6 @@ def access(config, region, accounts=()):
     print(tabulate(accounts_report, headers='keys'))
 
 
-def GetHumanSize(size, precision=2):
-    # interesting discussion on 1024 vs 1000 as base
-    # https://en.wikipedia.org/wiki/Binary_prefix
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-    suffixIndex = 0
-    while size > 1024:
-        suffixIndex += 1
-        size = size / 1024.0
-
-    return "%.*f %s" % (precision, size, suffixes[suffixIndex])
-
-
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
@@ -551,7 +534,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
             account.pop('groups')
             total_size += size
             if human:
-                account['size'] = GetHumanSize(size)
+                account['size'] = get_human_size(size)
             else:
                 account['size'] = size
             account['count'] = count
@@ -559,7 +542,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
 
     accounts_report.sort(key=operator.itemgetter('count'), reverse=True)
     print(tabulate(accounts_report, headers='keys'))
-    log.info("total size:%s", GetHumanSize(total_size))
+    log.info("total size:%s", get_human_size(total_size))
 
 
 @cli.command()
@@ -787,19 +770,20 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
 
     client = session.client('logs')
 
-    paginator = client.get_paginator('describe_log_groups')
-    for p in paginator.paginate():
-        found = False
-        for _group in p['logGroups']:
-            if _group['logGroupName'] == group:
-                group = _group
-                found = True
+    if isinstance(group, str):
+        paginator = client.get_paginator('describe_log_groups')
+        for p in paginator.paginate():
+            found = False
+            for _group in p['logGroups']:
+                if _group['logGroupName'] == group:
+                    group = _group
+                    found = True
+                    break
+            if found:
                 break
-        if found:
-            break
 
-    if not found:
-        raise ValueError("Log group %s not found." % group)
+        if not found:
+            raise ValueError("Log group %s not found." % group)
 
     if prefix:
         prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))

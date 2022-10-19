@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
@@ -222,7 +211,7 @@ class SSLPolicyTest(BaseTest):
                 "filters": [
                     {
                         "type": "ssl-policy",
-                        "whitelist": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "blacklist": ["Protocol-SSLv3", "Protocol-TLSv1"],
                     },
                     {
                         "type": "value",
@@ -235,7 +224,7 @@ class SSLPolicyTest(BaseTest):
                     {
                         "type": "set-ssl-listener-policy",
                         "name": "testpolicy",
-                        "attributes": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "attributes": ["Protocol-TLSv1.2", "AES128-SHA256"],
                     }
                 ],
             },
@@ -263,11 +252,79 @@ class SSLPolicyTest(BaseTest):
         self.assertEqual(
             curr_pol,
             [
-                "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333",
                 "testpolicy-1493768308000",
             ],
         )
-        self.assertEqual(active_ciphers, ["Protocol-TLSv1", "AES128-SHA256"])
+        self.assertEqual(active_ciphers, ["Protocol-TLSv1.2", "AES128-SHA256"])
+
+    def test_set_ssl_listener_policy_predefined(self):
+        session_factory = self.replay_flight_data("test_set_ssl_listener_predefined")
+        client = session_factory().client("elb")
+        policy = self.load_policy(
+            {
+                "name": "test-set-ssl-listerner",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "ssl-policy",
+                        "blacklist": ["Protocol-SSLv3", "Protocol-TLSv1", "Protocol-TLSv1.1"],
+                    },
+                    {
+                        "type": "value",
+                        "key": "LoadBalancerName",
+                        "value": "test-elb",
+                        "op": "eq",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-ssl-listener-policy",
+                        "name": "testpolicy",
+                        "attributes": {
+                            "Reference-Security-Policy": "ELBSecurityPolicy-TLS-1-2-2017-01"
+                        },
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        response_pol = client.describe_load_balancers(LoadBalancerNames=["test-elb"])
+
+        response_ciphers = client.describe_load_balancer_policies(
+            LoadBalancerName="test-elb", PolicyNames=["testpolicy-1493768308000"]
+        )
+        curr_pol = response_pol["LoadBalancerDescriptions"][0]["ListenerDescriptions"][
+            0
+        ][
+            "PolicyNames"
+        ]
+
+        curr_ciphers = []
+        for x in response_ciphers["PolicyDescriptions"][0][
+            "PolicyAttributeDescriptions"
+        ]:
+            curr_ciphers.append({str(k): str(v) for k, v in x.items()})
+        active_ciphers = [
+            x["AttributeName"] for x in curr_ciphers if x["AttributeValue"] == "true"
+        ]
+        self.assertEqual(
+            curr_pol,
+            [
+                "testpolicy-1493768308000",
+            ],
+        )
+        self.assertEqual(
+            active_ciphers,
+            [
+                'Protocol-TLSv1.2', 'Server-Defined-Cipher-Order',
+                'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256',
+                'ECDHE-ECDSA-AES128-SHA256', 'ECDHE-RSA-AES128-SHA256',
+                'ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384',
+                'ECDHE-ECDSA-AES256-SHA384', 'ECDHE-RSA-AES256-SHA384', 'AES128-GCM-SHA256',
+                'AES128-SHA256', 'AES256-GCM-SHA384', 'AES256-SHA256'
+            ]
+        )
 
     def test_ssl_matching(self):
         session_factory = self.replay_flight_data("test_ssl_ciphers")

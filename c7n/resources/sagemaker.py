@@ -1,25 +1,15 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.offhours import OffHour, OnHour
 
 
 @resources.register('sagemaker-notebook')
@@ -54,6 +44,8 @@ class NotebookInstance(QueryResourceManager):
 
 
 NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
+NotebookInstance.filter_registry.register('offhour', OffHour)
+NotebookInstance.filter_registry.register('onhour', OnHour)
 
 
 @resources.register('sagemaker-job')
@@ -110,7 +102,8 @@ class SagemakerTransformJob(QueryResourceManager):
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
-        filter_name = 'TransformJobArn'
+        filter_name = 'NameContains'
+        filter_type = 'scalar'
         permission_augment = ('sagemaker:DescribeTransformJob', 'sagemaker:ListTags')
 
     def __init__(self, ctx, data):
@@ -266,6 +259,21 @@ class SagemakerEndpointConfig(QueryResourceManager):
 SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+class DescribeModel(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _augment(r):
+            tags = self.manager.retry(client.list_tags,
+                ResourceArn=r['ModelArn'])['Tags']
+            r.setdefault('Tags', []).extend(tags)
+            return r
+
+        resources = super(DescribeModel, self).augment(resources)
+        return list(map(_augment, resources))
+
+
 @resources.register('sagemaker-model')
 class Model(QueryResourceManager):
 
@@ -278,20 +286,14 @@ class Model(QueryResourceManager):
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::Model'
+        cfn_type = config_type = 'AWS::SageMaker::Model'
+
+    source_mapping = {
+        'describe': DescribeModel,
+        'config': ConfigSource
+    }
 
     permissions = ('sagemaker:ListTags',)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(r):
-            tags = self.retry(client.list_tags,
-                ResourceArn=r['ModelArn'])['Tags']
-            r.setdefault('Tags', []).extend(tags)
-            return r
-
-        return list(map(_augment, resources))
 
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)
@@ -576,30 +578,7 @@ class NotebookSubnetFilter(SubnetFilter):
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: sagemaker-kms-key-filters
-            resource: aws.sagemaker-notebook
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/sagemaker)"
-                op: regex
-
-          - name: sagemaker-endpoint-kms-key-filters
-            resource: aws.sagemaker-endpoint-config
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "alias/aws/sagemaker"
-    """
     RelatedIdsExpression = "KmsKeyId"
 
 

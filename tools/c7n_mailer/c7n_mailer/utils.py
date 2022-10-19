@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import base64
 from datetime import datetime, timedelta
 import functools
@@ -21,18 +10,23 @@ import yaml
 
 import jinja2
 import jmespath
-from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
+
+try:
+    from botocore.exceptions import ClientError
+except ImportError:  # pragma: no cover
+    pass  # Azure provider
 
 
 class Providers:
     AWS = 0
     Azure = 1
+    GCP = 2
 
 
 def get_jinja_env(template_folders):
-    env = jinja2.Environment(trim_blocks=True, autoescape=False)
+    env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
     env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
@@ -75,6 +69,7 @@ def get_rendered_jinja(
         resources=resources,
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -87,12 +82,11 @@ def get_rendered_jinja(
 # and this function would go through the resource and look for any tag keys
 # that match Owners or SupportTeam, and return those values as targets
 def get_resource_tag_targets(resource, target_tag_keys):
-    if 'Tags' not in resource:
+    if 'Tags' not in resource and 'labels' not in resource:
         return []
-    if isinstance(resource['Tags'], dict):
-        tags = resource['Tags']
-    else:
-        tags = {tag['Key']: tag['Value'] for tag in resource['Tags']}
+    tags = resource.get('Tags', []) or resource.get('labels', [])
+    if isinstance(tags, list):
+        tags = {tag['Key']: tag['Value'] for tag in tags}
     targets = []
     for target_tag_key in target_tag_keys:
         if target_tag_key in tags:
@@ -107,6 +101,7 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        partition=sqs_message.get('partition', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -142,8 +137,11 @@ def get_date_time_delta(delta):
     return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
 
-def get_date_age(date):
-    return (datetime.now(tz=tzutc()) - parser.parse(date)).days
+def get_date_age(date, unit="days"):
+    delta = datetime.now(tz=tzutc()) - parser.parse(date)
+    if unit == "seconds":
+        return delta.seconds
+    return delta.days
 
 
 def format_struct(evt):
@@ -194,6 +192,12 @@ def resource_format(resource, resource_type):
             "%s-%s" % (
                 resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
+            resource['AllocatedStorage'])
+    elif resource_type == 'rds-cluster':
+        return "%s %s %s" % (
+            resource['DBClusterIdentifier'],
+            "%s-%s" % (
+                resource['Engine'], resource['EngineVersion']),
             resource['AllocatedStorage'])
     elif resource_type == 'asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
@@ -320,7 +324,7 @@ def resource_format(resource, resource_type):
             resource['QueueArn'])
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
-            resource['Name'],
+            resource.get('Name', ''),
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
@@ -353,6 +357,19 @@ def resource_format(resource, resource_type):
         return "Name: %s  RunTime: %s  \n" % (
             resource['FunctionName'],
             resource['Runtime'])
+    elif resource_type == 'service-quota':
+        try:
+            return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+                resource['c7n:UsageMetric']['quota'],
+                resource['c7n:UsageMetric']['metric']
+            )
+        except KeyError:
+            return "ServiceName: %s QuotaName: %s\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+            )
     else:
         return "%s" % format_struct(resource)
 
@@ -360,8 +377,10 @@ def resource_format(resource, resource_type):
 def get_provider(mailer_config):
     if mailer_config.get('queue_url', '').startswith('asq://'):
         return Providers.Azure
-
-    return Providers.AWS
+    elif mailer_config.get('queue_url', '').startswith('projects'):
+        return Providers.GCP
+    else:
+        return Providers.AWS
 
 
 def kms_decrypt(config, logger, session, encrypted_field):
@@ -393,6 +412,9 @@ def decrypt(config, logger, session, encrypted_field):
         if provider == Providers.Azure:
             from c7n_mailer.azure_mailer.utils import azure_decrypt
             return azure_decrypt(config, logger, session, encrypted_field)
+        elif provider == Providers.GCP:
+            from c7n_mailer.gcp_mailer.utils import gcp_decrypt
+            return gcp_decrypt(config, logger, encrypted_field)
         elif provider == Providers.AWS:
             return kms_decrypt(config, logger, session, encrypted_field)
         else:

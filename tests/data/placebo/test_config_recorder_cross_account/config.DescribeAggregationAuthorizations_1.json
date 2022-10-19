@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "AggregationAuthorizations": [
+            {
+                "AggregationAuthorizationArn": "arn:aws:config:us-east-2:644160558196:aggregation-authorization/644160558196/us-east-1",
+                "AuthorizedAccountId": "123456890123",
+                "AuthorizedAwsRegion": "us-east-1",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 13,
+                    "minute": 33,
+                    "second": 8,
+                    "microsecond": 815000
+                }
+            },
+            {
+                "AggregationAuthorizationArn": "arn:aws:config:us-east-2:644160558196:aggregation-authorization/644160558196/us-east-2",
+                "AuthorizedAccountId": "123456890123",
+                "AuthorizedAwsRegion": "us-east-2",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 13,
+                    "minute": 33,
+                    "second": 8,
+                    "microsecond": 992000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, event_data
@@ -624,3 +613,44 @@ class SecurityHubTest(BaseTest):
                 "Tags": {
                     "workload-type": "other"}
             })
+
+    def test_larger_batch_s3(self):
+        factory = self.replay_flight_data("test_larger_batch")
+
+        policy = self.load_policy(
+            {
+                "name": "ebs-finding",
+                "resource": "ebs-snapshot",
+                "filters": [],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "batch_size": 2,
+                        "title": "EBS Testing",
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "Title": [
+                    {
+                        "Value": "EBS Testing",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+
+        self.assertEqual(len(findings), 2)

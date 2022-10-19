@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import threading
@@ -19,11 +8,14 @@ from mock import Mock
 
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError
-from c7n.resources import aws
+from c7n.resources import aws, load_resources
 from c7n import output
 
-from .common import BaseTest
+# resolver test needs to patch out thread usage
+from c7n.resources.sqs import SQS
+from c7n.executor import MainThreadExecutor
 
+from .common import BaseTest
 
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
@@ -47,7 +39,7 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
-class ArnResolverTest(BaseTest):
+class TestArnResolver:
 
     table = [
         ('arn:aws:waf::123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf'),
@@ -72,21 +64,112 @@ class ArnResolverTest(BaseTest):
         ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
     ]
 
+    def test_arn_resolve_resources(self, test):
+        arns = [
+            'arn:aws:sqs:us-east-1:644160558196:origin-dev',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified',
+            'arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-tag-creator:$LATEST',
+        ]
+
+        factory = test.replay_flight_data('test_arn_resolve_resources')
+        p = test.load_policy(
+            {'name': 'resolve', 'resource': 'aws.ec2'},
+            session_factory=factory)
+        resolver = aws.ArnResolver(p.resource_manager)
+        load_resources(('aws.sqs', 'aws.lambda'))
+        test.patch(SQS, 'executor_factory', MainThreadExecutor)
+        arn_map = resolver.resolve(arns)
+        assert len(arn_map) == 3
+        assert None not in arn_map.values()
+
     def test_arn_meta(self):
 
         legacy = set()
         for k, v in aws.AWS.resources.items():
             if getattr(v.resource_type, 'type', None) is not None:
                 legacy.add(k)
-        self.assertFalse(legacy)
+        assert not legacy
 
-    def test_arn_resolver(self):
+    def test_arn_resolve_type(self):
         for value, expected in self.table:
             # load the resource types to enable resolution.
             aws.AWS.get_resource_types(("aws.%s" % expected,))
             arn = aws.Arn.parse(value)
             result = aws.ArnResolver.resolve_type(arn)
-            self.assertEqual(result, expected)
+            assert result == expected
+
+    def test_arn_cwe_resolver(self):
+
+        evars = dict(
+            Partition='aws',
+            Region='us-east-1',
+            Account='662108712480',
+            FunctionName='func',
+            Version='1.1',
+            VersionId='1.1',
+            ClusterName='abc',
+            AutomationDefinitionName='adf',
+            TaskDefinitionFamilyName='abc',
+            TaskDefinitionRevisionNumber='yz',
+            StreamName='kstream',
+            AutomationDefinition='abc',
+            LogGroupName='loggroup',
+            JobQueueName='batchq',
+            JobDefinitionName='jobdef',
+            Revision='1.1',
+            QueueName='inboundq',
+            TopicName='outboundt',
+            ProjectName="buildstuff",
+            PipelineName='pushit',
+            StateMachineName='sfxorch'
+        )
+
+        event_targets = dict(
+            sqs=("arn:{Partition}:sqs:{Region}:{Account}:{QueueName}", 'sqs'),
+            function=("arn:{Partition}:lambda:{Region}:{Account}:function:{FunctionName}",
+                      'lambda'),
+            function_qual=(
+                "arn:{Partition}:lambda:{Region}:{Account}:function:{FunctionName}:{Version}",
+                "lambda"),
+            ecs_cluster=(
+                "arn:{Partition}:ecs:{Region}:{Account}:cluster/{ClusterName}",
+                "ecs"),
+            ecs_task=(
+                ("arn:{Partition}:ecs:{Region}:{Account}:task-definition/"
+                "{TaskDefinitionFamilyName}:{TaskDefinitionRevisionNumber}"),
+                "ecs-task-definition"),
+            kinesis=("arn:{Partition}:kinesis:{Region}:{Account}:stream/{StreamName}",
+                     "kinesis"),
+            log=("arn:{Partition}:logs:{Region}:{Account}:log-group:{LogGroupName}",
+                 "log-group"),
+            # ssm_adoc=(("arn:{Partition}:ssm:{Region}:{Account}:automation-definition"
+            #           "/{AutomationDefinitionName}:{VersionId}"),
+            batch_job_def=(
+                ("arn:{Partition}:batch:{Region}:{Account}:job-definition"
+                 "/{JobDefinitionName}:{Revision}"),
+                "batch-definition"),
+            batch_queue=("arn:{Partition}:batch:{Region}:{Account}:job-queue/{JobQueueName}",
+                         "batch-queue"),
+            step_func=(
+                "arn:{Partition}:states:{Region}:{Account}:stateMachine:{StateMachineName}",
+                "step-machine"),
+            code_pipe=(
+                "arn:{Partition}:codepipeline:{Region}:{Account}:{PipelineName}",
+                "codepipeline"),
+            code_build=(
+                "arn:{Partition}:codebuild:{Region}:{Account}:project/{ProjectName}",
+                "codebuild"),
+            sns_topics=(
+                "arn:{Partition}:sns:{Region}:{Account}:{TopicName}",
+                "sns"),
+            sqs_queue=(
+                "arn:{Partition}:sqs:{Region}:{Account}:{QueueName}",
+                "sqs")
+        )
+        load_resources(('aws.*',))
+        for k, (arn_template, rtype) in event_targets.items():
+            rarn = arn_template.format(**evars)
+            assert aws.ArnResolver.resolve_type(rarn) == rtype
 
 
 class ArnTest(BaseTest):

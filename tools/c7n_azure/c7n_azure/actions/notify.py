@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from azure.common import AzureHttpError
 
@@ -19,6 +8,7 @@ from c7n_azure.storage_utils import StorageUtilities
 from c7n import utils
 from c7n.actions import BaseNotify
 from c7n.resolver import ValuesFrom
+from c7n.version import version
 
 
 class Notify(BaseNotify):
@@ -85,6 +75,9 @@ class Notify(BaseNotify):
         subscription_id = session.get_subscription_id()
         message = {
             'event': event,
+            'execution_id': self.manager.ctx.execution_id,
+            'execution_start': self.manager.ctx.start_time,
+            'version': version,
             'account_id': subscription_id,
             'account': subscription_id,
             'region': 'all',

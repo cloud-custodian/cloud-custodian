@@ -1,22 +1,11 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import logging
 import os
 
 
-from c7n.query import ResourceQuery, RetryPageIterator
+from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo
 from c7n.resources.vpc import InternetGateway
 
 from botocore.config import Config
@@ -106,6 +95,9 @@ class ResourceQueryTest(BaseTest):
         resources = q.get(p.resource_manager, ["igw-3d9e3d56"])
         self.assertEqual(len(resources), 1)
 
+    def test_type_info(self):
+        assert repr(TypeInfo) == "<TypeInfo TypeInfo>"
+
 
 class ConfigSourceTest(BaseTest):
 
@@ -131,7 +123,7 @@ class ConfigSourceTest(BaseTest):
         # default query construction
         self.assertTrue(
             source.get_query_params(None)['expr'].startswith(
-                'select configuration, supplementaryConfiguration where resourceType'))
+                'select resourceId, configuration, supplementaryConfiguration where resourceType'))
 
         p.data['query'] = [{'clause': "configuration.imageId = 'xyz'"}]
         self.assertIn("imageId = 'xyz'", source.get_query_params(None)['expr'])

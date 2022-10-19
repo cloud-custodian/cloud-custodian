@@ -1,19 +1,7 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters.kms import KmsRelatedFilter
@@ -24,19 +12,16 @@ from c7n.tags import (
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from datetime import datetime, timedelta
+from c7n.filters import Filter
 from c7n.filters import ValueFilter
+from c7n.query import RetryPageIterator
 
 
 class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
-        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
-        if 'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
-            resource['BillingModeSummary'][
-                'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
-                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
-
         sse_info = resource.pop('Ssedescription', None)
         if sse_info is None:
             return resource
@@ -79,23 +64,7 @@ class Table(query.QueryResourceManager):
 
 @Table.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-kms-key-filters
-                resource: dynamodb-table
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/dynamodb)"
-                    op: regex
-    """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
@@ -455,8 +424,8 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         service = 'dax'
         arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
+        arn = 'ClusterArn'
+        id = name = 'ClusterName'
         cfn_type = 'AWS::DAX::Cluster'
 
     permissions = ('dax:ListTags',)
@@ -517,10 +486,9 @@ class DaxTagging(Tag):
     permissions = ('dax:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-        mid = self.manager.resource_type.id
         for r in resources:
             try:
-                client.tag_resource(ResourceName=r[mid], Tags=tags)
+                client.tag_resource(ResourceName=r['ClusterArn'], Tags=tags)
             except (client.exceptions.ClusterNotFoundFault,
                     client.exceptions.InvalidARNFault,
                     client.exceptions.InvalidClusterStateFault) as e:
@@ -701,3 +669,61 @@ class DaxSubnetFilter(SubnetFilter):
         subnet_groups = client.describe_subnet_groups()['SubnetGroups']
         self.groups = {s['SubnetGroupName']: s for s in subnet_groups}
         return super(DaxSubnetFilter, self).process(resources)
+
+
+@Table.filter_registry.register('consecutive-backups')
+class TableConsecutiveBackups(Filter):
+    """Returns tables where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-daily-backup-count
+                resource: dynamodb-table
+                filters:
+                  - type: consecutive-backups
+                    days: 7
+    """
+    schema = type_schema('consecutive-backups', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable', )
+    annotation = 'c7n:DynamodbBackups'
+
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('list_backups')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ddb_backups = paginator.paginate(
+            BackupType='ALL', TimeRangeLowerBound=lbdate).build_full_result().get(
+                'BackupSummaries', [])
+
+        table_map = {}
+        for backup in ddb_backups:
+            table_map.setdefault(backup['TableName'], []).append(backup)
+        for r in resources:
+            r[self.annotation] = table_map.get(r['TableName'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        lbdate = utcnow - timedelta(days=retention)
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set, lbdate)
+
+        for r in resources:
+            backup_dates = set()
+            for backup in r[self.annotation]:
+                if backup['BackupStatus'] == 'AVAILABLE':
+                    backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(backup_dates):
+                results.append(r)
+        return results

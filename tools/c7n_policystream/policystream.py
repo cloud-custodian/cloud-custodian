@@ -1,18 +1,7 @@
 #!/usr/bin/env python3
 #
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import click
 import contextlib
@@ -254,9 +243,11 @@ def commit_date(commit):
     return datetime.fromtimestamp(float(commit.author.time), tzinfo)
 
 
-def policy_path_matcher(path):
-    if (path.endswith('.yaml') or path.endswith('.yml')) and not path.startswith('.'):
-        return True
+def policy_path_matcher(path, patterns=('*.yaml', '*.yml')):
+    for p in patterns:
+        if fnmatch(path, p):
+            return True
+    return False
 
 
 class PolicyRepo:
@@ -410,11 +401,7 @@ class PolicyRepo:
                     current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 if f in self.policy_files:
-                    # if the policies were moved, only add in policies
-                    # that are not already accounted for.
-                    current_policies += self.policy_files[f].select(
-                        set(current_policies.keys()).difference(
-                            self.policy_files[f].keys()))
+                    current_policies += self.policy_files[f]
                     removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)
@@ -793,7 +780,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
         else:
             repo = pygit2.Repository(repo_path)
             if repo.status():
-                log.warning('repo %s not clean skipping update')
+                log.warning('repo %s not clean skipping update', r['name'])
                 continue
             log.debug("Syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
@@ -894,10 +881,12 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
+@click.option('--policy-pattern', multiple=True, default=[],
+              help="Only look at policy files matching the giving glob pattern (including dir)")
 @click.option('--sort', multiple=True, default=["reverse", "time"],
               type=click.Choice(SORT_TYPE.keys()),
               help="Git sort ordering")
-def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None):
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_pattern=()):
     """Stream git history policy changes to destination.
 
 
@@ -923,6 +912,9 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         after = parse(after)
     if sort:
         sort = reduce(operator.or_, [SORT_TYPE[s] for s in sort])
+    matcher = None
+    if policy_pattern:
+        matcher = partial(policy_path_matcher, patterns=policy_pattern)
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
@@ -934,7 +926,7 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         else:
             repo = pygit2.Repository(repo_uri)
         load_available()
-        policy_repo = PolicyRepo(repo_uri, repo)
+        policy_repo = PolicyRepo(repo_uri, repo, matcher)
         change_count = 0
 
         with contextlib.closing(transport(stream_uri, assume)) as t:

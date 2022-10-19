@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import itertools
 import jmespath
@@ -313,23 +302,7 @@ class Parameter(ValueFilter):
 
 @Redshift.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: redshift-kms-key-filters
-                  resource: redshift
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/)"
-                      op: regex
-    """
     RelatedIdsExpression = 'KmsKeyId'
 
 
@@ -808,13 +781,15 @@ class RedshiftSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'redshift'
-        arn_type = 'redshift-subnet-group'
+        arn_type = 'subnetgroup'
+        arn_separator = ':'
         id = name = 'ClusterSubnetGroupName'
         enum_spec = (
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
         cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
+        universal_taggable = object()
 
 
 @resources.register('redshift-snapshot')
@@ -829,7 +804,7 @@ class RedshiftSnapshot(QueryResourceManager):
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = "AWS::Redshift::ClusterSnapshot"
+        config_type = cfn_type = "AWS::Redshift::ClusterSnapshot"
         universal_taggable = True
 
     def get_arns(self, resources):

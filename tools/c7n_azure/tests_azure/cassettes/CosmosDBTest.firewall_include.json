@@ -1,0 +1,153 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://checkip.amazonaws.com/",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sat, 31 Oct 2020 04:39:17 GMT"
+                    ],
+                    "content-length": [
+                        "13"
+                    ],
+                    "content-type": [
+                        "text/plain"
+                    ],
+                    "via": [
+                        "1.1 vegur"
+                    ]
+                },
+                "body": {
+                    "string": "67.185.99.110\n"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2019-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "Ok"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "date": [
+                        "Sat, 31 Oct 2020 04:39:16 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "2336"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdbc129bfa71a47",
+                                "name": "cctestcosmosdbc129bfa71a47",
+                                "location": "South Central US",
+                                "type": "Microsoft.DocumentDB/databaseAccounts",
+                                "kind": "GlobalDocumentDB",
+                                "tags": {
+                                    "test-store-throughput": "JZ07ANKIMdw=:4",
+                                    "test-restore-throughput": "JZ07ANKIMdw=:4"
+                                },
+                                "systemData": {
+                                    "createdAt": "2020-10-31T03:48:04.4977476Z"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "documentEndpoint": "https://cctestcosmosdbc129bfa71a47.documents.azure.com:443/",
+                                    "enableAutomaticFailover": false,
+                                    "enableMultipleWriteLocations": false,
+                                    "enablePartitionKeyMonitor": false,
+                                    "isVirtualNetworkFilterEnabled": false,
+                                    "virtualNetworkRules": [],
+                                    "EnabledApiTypes": "Sql",
+                                    "disableKeyBasedMetadataWriteAccess": false,
+                                    "enableFreeTier": false,
+                                    "enableAnalyticalStorage": false,
+                                    "instanceId": "4649d200-f0d6-460e-8fd7-eac29464b96a",
+                                    "createMode": "Default",
+                                    "databaseAccountOfferType": "Standard",
+                                    "ipRangeFilter": "67.185.99.110,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
+                                    "consistencyPolicy": {
+                                        "defaultConsistencyLevel": "Session",
+                                        "maxIntervalInSeconds": 5,
+                                        "maxStalenessPrefix": 100
+                                    },
+                                    "configurationOverrides": {},
+                                    "writeLocations": [
+                                        {
+                                            "id": "cctestcosmosdbc129bfa71a47-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdbc129bfa71a47-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "readLocations": [
+                                        {
+                                            "id": "cctestcosmosdbc129bfa71a47-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdbc129bfa71a47-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "locations": [
+                                        {
+                                            "id": "cctestcosmosdbc129bfa71a47-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdbc129bfa71a47-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "failoverPolicies": [
+                                        {
+                                            "id": "cctestcosmosdbc129bfa71a47-southcentralus",
+                                            "locationName": "South Central US",
+                                            "failoverPriority": 0
+                                        }
+                                    ],
+                                    "cors": [],
+                                    "capabilities": [],
+                                    "backupPolicy": {
+                                        "type": "Periodic",
+                                        "periodicModeProperties": {
+                                            "backupIntervalInMinutes": 240,
+                                            "backupRetentionIntervalInHours": 8
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

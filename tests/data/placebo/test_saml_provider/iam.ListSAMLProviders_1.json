@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "SAMLProviderList": [
+            {
+                "Arn": "arn:aws:iam::644160558196:saml-provider/AWSSSO_9d732cba867ef2b9_DO_NOT_DELETE",
+                "ValidUntil": {
+                    "__class__": "datetime",
+                    "year": 2120,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 27,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

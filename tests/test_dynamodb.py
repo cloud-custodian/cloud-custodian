@@ -1,21 +1,13 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
 from unittest.mock import MagicMock
+from c7n.testing import mock_datetime_now
+from dateutil import parser
 
+import c7n.resources.dynamodb
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
 
@@ -551,3 +543,22 @@ class DynamoDbAccelerator(BaseTest):
             ["c7n-test-cluster"])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TotalNodes'], 1)
+
+    def test_dynamodb_consecutive_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_consecutive_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_backup_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-backups",
+                        "days": 2
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.resources.dynamodb):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)

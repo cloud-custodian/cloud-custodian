@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "domain": {
+            "name": "pizzaspace",
+            "owner": "644160558196",
+            "arn": "arn:aws:codeartifact:us-east-1:644160558196:domain/pizzaspace",
+            "status": "Deleted",
+            "createdTime": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 9,
+                "day": 11,
+                "hour": 7,
+                "minute": 13,
+                "second": 29,
+                "microsecond": 126000
+            },
+            "encryptionKey": "arn:aws:kms:us-east-1:644160558196:key/a46cfc7a-5490-42d3-95b4-4e1b2f2de3c8",
+            "repositoryCount": 0,
+            "assetSizeBytes": 0
+        }
+    }
+}

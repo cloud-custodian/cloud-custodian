@@ -1,0 +1,213 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ami": {
+            "ubuntu": {
+                "architecture": "x86_64",
+                "arn": "arn:aws:ec2:us-west-2::image/ami-0a62a78cfedc09d76",
+                "block_device_mappings": [
+                    {
+                        "device_name": "/dev/sda1",
+                        "ebs": {
+                            "delete_on_termination": "true",
+                            "encrypted": "false",
+                            "iops": "0",
+                            "snapshot_id": "snap-0eaef1b981c163e61",
+                            "throughput": "0",
+                            "volume_size": "8",
+                            "volume_type": "gp2"
+                        },
+                        "no_device": "",
+                        "virtual_name": ""
+                    },
+                    {
+                        "device_name": "/dev/sdb",
+                        "ebs": {},
+                        "no_device": "",
+                        "virtual_name": "ephemeral0"
+                    },
+                    {
+                        "device_name": "/dev/sdc",
+                        "ebs": {},
+                        "no_device": "",
+                        "virtual_name": "ephemeral1"
+                    }
+                ],
+                "creation_date": "2021-03-25T23:31:16.000Z",
+                "description": "Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on 2021-03-25",
+                "ena_support": true,
+                "executable_users": null,
+                "filter": [
+                    {
+                        "name": "name",
+                        "values": [
+                            "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
+                        ]
+                    },
+                    {
+                        "name": "virtualization-type",
+                        "values": [
+                            "hvm"
+                        ]
+                    }
+                ],
+                "hypervisor": "xen",
+                "id": "ami-0a62a78cfedc09d76",
+                "image_id": "ami-0a62a78cfedc09d76",
+                "image_location": "644160558196/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210325",
+                "image_owner_alias": null,
+                "image_type": "machine",
+                "kernel_id": null,
+                "most_recent": true,
+                "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210325",
+                "name_regex": null,
+                "owner_id": "644160558196",
+                "owners": [
+                    "644160558196"
+                ],
+                "platform": null,
+                "platform_details": "Linux/UNIX",
+                "product_codes": [],
+                "public": true,
+                "ramdisk_id": null,
+                "root_device_name": "/dev/sda1",
+                "root_device_type": "ebs",
+                "root_snapshot_id": "snap-0eaef1b981c163e61",
+                "sriov_net_support": "simple",
+                "state": "available",
+                "state_reason": {
+                    "code": "UNSET",
+                    "message": "UNSET"
+                },
+                "tags": {},
+                "usage_operation": "RunInstances",
+                "virtualization_type": "hvm"
+            }
+        },
+        "aws_availability_zones": {
+            "available": {
+                "all_availability_zones": null,
+                "exclude_names": null,
+                "exclude_zone_ids": null,
+                "filter": null,
+                "group_names": [
+                    "us-west-2"
+                ],
+                "id": "us-west-2",
+                "names": [
+                    "us-west-2a",
+                    "us-west-2b",
+                    "us-west-2c",
+                    "us-west-2d"
+                ],
+                "state": "available",
+                "zone_ids": [
+                    "usw2-az1",
+                    "usw2-az2",
+                    "usw2-az3",
+                    "usw2-az4"
+                ]
+            }
+        },
+        "aws_autoscaling_group": {
+            "bar": {
+                "arn": "arn:aws:autoscaling:us-west-2:644160558196:autoScalingGroup:f92d4ea4-ba11-42ab-8c34-696ed8047010:autoScalingGroupName/tf-asg-20210406161729306300000003",
+                "availability_zones": [
+                    "us-west-2a"
+                ],
+                "capacity_rebalance": false,
+                "default_cooldown": 300,
+                "desired_capacity": 1,
+                "enabled_metrics": null,
+                "force_delete": false,
+                "health_check_grace_period": 300,
+                "health_check_type": "EC2",
+                "id": "tf-asg-20210406161729306300000003",
+                "initial_lifecycle_hook": [],
+                "instance_refresh": [],
+                "launch_configuration": "",
+                "launch_template": [
+                    {
+                        "id": "lt-007e80764a20763ae",
+                        "name": "foobar20210406161728176600000001",
+                        "version": "$Latest"
+                    }
+                ],
+                "load_balancers": null,
+                "max_instance_lifetime": 0,
+                "max_size": 1,
+                "metrics_granularity": "1Minute",
+                "min_elb_capacity": null,
+                "min_size": 1,
+                "mixed_instances_policy": [],
+                "name": "tf-asg-20210406161729306300000003",
+                "name_prefix": null,
+                "placement_group": "",
+                "protect_from_scale_in": false,
+                "service_linked_role_arn": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "suspended_processes": null,
+                "tag": [
+                    {
+                        "key": "App",
+                        "propagate_at_launch": true,
+                        "value": "Testing"
+                    }
+                ],
+                "tags": null,
+                "target_group_arns": null,
+                "termination_policies": null,
+                "timeouts": null,
+                "vpc_zone_identifier": [],
+                "wait_for_capacity_timeout": "10m",
+                "wait_for_elb_capacity": null
+            }
+        },
+        "aws_launch_template": {
+            "foobar": {
+                "arn": "arn:aws:ec2:us-west-2:644160558196:launch-template/lt-007e80764a20763ae",
+                "block_device_mappings": [],
+                "capacity_reservation_specification": [],
+                "cpu_options": [],
+                "credit_specification": [],
+                "default_version": 1,
+                "description": "",
+                "disable_api_termination": false,
+                "ebs_optimized": "",
+                "elastic_gpu_specifications": [],
+                "elastic_inference_accelerator": [],
+                "enclave_options": [],
+                "hibernation_options": [],
+                "iam_instance_profile": [],
+                "id": "lt-007e80764a20763ae",
+                "image_id": "ami-0a62a78cfedc09d76",
+                "instance_initiated_shutdown_behavior": "",
+                "instance_market_options": [],
+                "instance_type": "t3.micro",
+                "kernel_id": "",
+                "key_name": "",
+                "latest_version": 1,
+                "license_specification": [],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 0,
+                        "http_tokens": "required"
+                    }
+                ],
+                "monitoring": [],
+                "name": "foobar20210406161728176600000001",
+                "name_prefix": "foobar",
+                "network_interfaces": [],
+                "placement": [],
+                "ram_disk_id": "",
+                "security_group_names": null,
+                "tag_specifications": [],
+                "tags": null,
+                "update_default_version": null,
+                "user_data": "",
+                "vpc_security_group_ids": null
+            }
+        }
+    }
+}

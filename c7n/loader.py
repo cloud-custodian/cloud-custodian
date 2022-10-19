@@ -1,16 +1,5 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 try:
     from functools import lru_cache
@@ -18,6 +7,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 import logging
+import re
 import os
 
 from c7n.exceptions import PolicyValidationError
@@ -30,6 +20,9 @@ except ImportError:
     schema = None
 from c7n.structure import StructureParser
 from c7n.utils import load_file
+
+
+log = logging.getLogger('custodian.loader')
 
 
 class SchemaValidator:
@@ -152,3 +145,82 @@ class PolicyLoader:
         # ie we should defer this to callers
         # [p.validate() for p in collection]
         return collection
+
+
+class SourceLocator:
+    def __init__(self, filename):
+        self.filename = filename
+        self.policies = None
+
+    def find(self, name):
+        """Find returns the file and line number for the policy."""
+        if self.policies is None:
+            self.load_file()
+        line = self.policies.get(name, None)
+        if line is None:
+            return ""
+        filename = os.path.basename(self.filename)
+        return f"{filename}:{line}"
+
+    def load_file(self):
+        self.policies = {}
+        r = re.compile(r'^\s+(-\s+)?name: ([\w-]+)\s*$')
+        with open(self.filename) as f:
+            for i, line in enumerate(f, 1):
+                m = r.search(line)
+                if m:
+                    self.policies[m.group(2)] = i
+
+
+class DirectoryLoader(PolicyLoader):
+    def load_directory(self, directory):
+
+        structure = StructureParser()
+
+        def _validate(data):
+            errors = []
+            try:
+                structure.validate(data)
+            except PolicyValidationError as e:
+                log.error("Configuration invalid: {}".format(data))
+                log.error("%s" % e)
+                errors.append(e)
+            rtypes = structure.get_resource_types(data)
+            load_resources(rtypes)
+            schm = schema.generate(rtypes)
+            errors += schema.validate(data, schm)
+            return errors
+
+        def _load(directory, raw_policies, errors):
+            raw_policies = []
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for name in files:
+                    fmt = name.rsplit('.', 1)[-1]
+                    if fmt in ('yaml', 'yml', 'json',):
+                        data = load_file(f"{root}/{name}")
+                        errors.extend(_validate(data))
+                        raw_policies.append(data)
+                for name in dirs:
+                    _load(os.path.abspath(name), raw_policies, errors)
+            return raw_policies, errors
+
+        loaded, errors = _load(directory, [], [])
+
+        if errors:
+            raise PolicyValidationError(errors)
+
+        policies = []
+        for p in loaded:
+            if not p.get('policies'):
+                continue
+            policies.extend(p['policies'])
+
+        names = []
+        for p in policies:
+            if p['name'] in names:
+                raise PolicyValidationError(
+                    f"Duplicate Key Error: policy:{p['name']} already exists")
+            else:
+                names.append(p['name'])
+
+        return self.load_data({'policies': policies}, directory)

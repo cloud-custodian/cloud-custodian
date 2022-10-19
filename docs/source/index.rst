@@ -50,6 +50,7 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    aws/usage
    aws/lambda
    aws/topics/index
+   aws/contribute
    aws/resources/index
 
 .. toctree::
@@ -71,6 +72,14 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    gcp/policy/index
    gcp/contribute
    gcp/resources/index
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: AWS Cloud Control
+
+   awscc/gettingstarted
+   awscc/resources/index
 
 
 .. toctree::

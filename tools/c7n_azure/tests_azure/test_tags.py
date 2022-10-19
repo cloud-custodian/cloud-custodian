@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest
 from mock import patch, Mock
 
@@ -75,8 +64,8 @@ class TagsTest(BaseTest):
 
         action.manager.type = 'vm'
         TagHelper.update_resource_tags(action, resource, self.existing_tags)
-        client_mock.resources.update_by_id.assert_called_once()
-        args = client_mock.resources.update_by_id.call_args[0]
+        client_mock.resources.begin_update_by_id.assert_called_once()
+        args = client_mock.resources.begin_update_by_id.call_args[0]
         self.assertEqual(args[0], resource['id'])
         self.assertEqual(args[2].tags, self.existing_tags)
         # Only PATCH tags

@@ -1,0 +1,26 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_sqs_queue": {
+            "test_sqs": {
+                "arn": "arn:aws:sqs:us-east-2:644160558196:add59a4d-ea1e-2f39-34ca-6cb94b9c25bb",
+                "content_based_deduplication": false,
+                "delay_seconds": 0,
+                "fifo_queue": false,
+                "id": "https://sqs.us-east-2.amazonaws.com/644160558196/add59a4d-ea1e-2f39-34ca-6cb94b9c25bb",
+                "kms_data_key_reuse_period_seconds": 300,
+                "kms_master_key_id": "",
+                "max_message_size": 262144,
+                "message_retention_seconds": 345600,
+                "name": "add59a4d-ea1e-2f39-34ca-6cb94b9c25bb",
+                "name_prefix": null,
+                "policy": "",
+                "receive_wait_time_seconds": 0,
+                "redrive_policy": "",
+                "tags": null,
+                "visibility_timeout_seconds": 30
+            }
+        }
+    }
+}

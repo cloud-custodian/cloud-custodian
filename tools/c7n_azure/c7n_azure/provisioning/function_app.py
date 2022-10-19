@@ -1,24 +1,12 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from azure.mgmt.web.models import (
     Site,
     SiteConfig,
-    ManagedServiceIdentity,
-    ManagedServiceIdentityUserAssignedIdentitiesValue as UserAssignedIdentity)
+    ManagedServiceIdentity)
 
-from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
+from c7n_azure.constants import (AUTH_TYPE_EMBED, FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.utils import azure_name_value_pair
 
@@ -36,11 +24,13 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
 
     def _get_identity(self, params):
         if 'identity' not in params:
-            return None
+            return
+        if params['identity']['type'] == AUTH_TYPE_EMBED:
+            return
         identity = ManagedServiceIdentity(type=params['identity']['type'])
         if 'id' in params['identity']:
             identity.user_assigned_identities = {
-                params['identity']['id']: UserAssignedIdentity()}
+                params['identity']['id']: {}}
         return identity
 
     def _provision(self, params):
@@ -59,6 +49,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         # consumption app plan
         if params['is_consumption_plan']:
             functionapp_def.kind = 'functionapp,linux'
+            site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
         # dedicated app plan
         else:
             functionapp_def.kind = 'functionapp,linux,container'
@@ -90,6 +81,6 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
                                                               FUNCTION_EXT_VERSION))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
 
-        return self.client.web_apps.create_or_update(params['resource_group_name'],
-                                                     params['name'],
-                                                     functionapp_def).result()
+        return self.client.web_apps.begin_create_or_update(params['resource_group_name'],
+                                                           params['name'],
+                                                           functionapp_def).result()

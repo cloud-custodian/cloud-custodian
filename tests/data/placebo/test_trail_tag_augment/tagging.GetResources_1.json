@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Devlopers"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

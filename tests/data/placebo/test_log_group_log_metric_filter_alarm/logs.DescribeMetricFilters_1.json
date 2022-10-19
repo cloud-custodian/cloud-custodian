@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "metricFilters": [
+            {
+                "filterName": "EventCount2",
+                "filterPattern": " ",
+                "metricTransformations": [
+                    {
+                        "metricName": "TestCount2",
+                        "metricNamespace": "TestNamespace",
+                        "metricValue": "1",
+                        "defaultValue": 0.0
+                    }
+                ],
+                "creationTime": 1621396399529,
+                "logGroupName": "metric-filter-test3"
+            },
+            {
+                "filterName": "EventCount",
+                "filterPattern": " ",
+                "metricTransformations": [
+                    {
+                        "metricName": "TestCount",
+                        "metricNamespace": "TestNamespace",
+                        "metricValue": "1",
+                        "defaultValue": 0.0
+                    }
+                ],
+                "creationTime": 1621396262051,
+                "logGroupName": "metric-filter-test3"
+            },
+            {
+                "filterName": "EventCount",
+                "filterPattern": " ",
+                "metricTransformations": [
+                    {
+                        "metricName": "TestCount",
+                        "metricNamespace": "TestNamespace",
+                        "metricValue": "1",
+                        "defaultValue": 0.0
+                    }
+                ],
+                "creationTime": 1621396224713,
+                "logGroupName": "metric-filter-test1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

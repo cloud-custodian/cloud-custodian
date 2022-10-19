@@ -1,21 +1,9 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "QueueUrls": [
-            "https://queue.amazonaws.com/123456789012/test-sqs-remove-matched-1"
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "110e2bca-5c5f-5084-93bb-79fd38a315fe", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "110e2bca-5c5f-5084-93bb-79fd38a315fe", 
-                "content-length": "405", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sat, 16 Sep 2017 17:43:24 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+            "https://us-east-2.queue.amazonaws.com/644160558196/c09b0bc7-7270-4b71-2427-a044030a51f2"
+        ],
+        "ResponseMetadata": {}
     }
 }

@@ -1,0 +1,96 @@
+{
+  "headers": {
+    "etag": "t8dh0W4iMABoA0vAjFQjvP_i96M=/SwE_SyutwHmAwOzwnYfadrwvBz8=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Nov 2019 10:16:32 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5092",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances?filter=name+%3D+test-ingwar&alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/zones/us-central1-c/instances",
+    "items": [
+      {
+        "id": "8759471929923434140",
+        "creationTimestamp": "2019-10-31T04:41:40.541-07:00",
+        "name": "test-ingwar",
+        "description": "ansible",
+        "tags": {
+          "items": [
+          ],
+          "fingerprint": "-WSiILlLEok="
+        },
+        "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/f1-micro",
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+        "canIpForward": false,
+        "networkInterfaces": [
+          {
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/test",
+            "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/test",
+            "networkIP": "10.10.10.13",
+            "name": "nic0",
+            "fingerprint": "Shr9TaIBDBE=",
+            "kind": "compute#networkInterface"
+          }
+        ],
+        "disks": [
+          {
+            "type": "PERSISTENT",
+            "mode": "READ_WRITE",
+            "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/disks/test-ingwar",
+            "deviceName": "test-ingwar",
+            "index": 0,
+            "boot": true,
+            "autoDelete": true,
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/centos-cloud/global/licenses/centos-7"
+            ],
+            "interface": "SCSI",
+            "kind": "compute#attachedDisk"
+          }
+        ],
+        "metadata": {
+          "fingerprint": "1wRjLI5jciU=",
+          "items": [
+            {
+            }
+          ],
+          "kind": "compute#metadata"
+        },
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/test-ingwar",
+        "scheduling": {
+          "onHostMaintenance": "MIGRATE",
+          "automaticRestart": true,
+          "preemptible": false
+        },
+        "cpuPlatform": "Unknown CPU Platform",
+        "labels": {
+          "test_label": "test_value",
+          "custodian_status": "resource_policy-start-2019_10_12__0_0"
+        },
+        "labelFingerprint": "8tCkIt89i4I=",
+        "startRestricted": false,
+        "deletionProtection": false,
+        "reservationAffinity": {
+          "consumeReservationType": "ANY_RESERVATION"
+        },
+        "displayDevice": {
+          "enableDisplay": false
+        },
+        "kind": "compute#instance"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances",
+    "kind": "compute#instanceList"
+  }
+}

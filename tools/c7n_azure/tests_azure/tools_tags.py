@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.compute.models import VirtualMachineUpdate
 from azure.mgmt.resource.resources.models import GenericResource
 
@@ -58,14 +47,14 @@ def get_resource_group_resource(existing_tags):
 
 
 def get_tags_parameter(update_tags_mock):
-    assert(len(update_tags_mock.call_args_list) == 1)
-    assert(len(update_tags_mock.call_args_list[0][0]) == 3)
+    assert len(update_tags_mock.call_args_list) == 1
+    assert len(update_tags_mock.call_args_list[0][0]) == 3
     return update_tags_mock.call_args_list[0][0][2]
 
 
 def get_tags(client, rg_name, vm_name):
-    return client.virtual_machines.get(rg_name, vm_name).tags
+    return client.virtual_machines.get(rg_name, vm_name, expand=None).tags
 
 
 def set_tags(client, rg_name, vm_name, tags):
-    client.virtual_machines.update(rg_name, vm_name, VirtualMachineUpdate(tags=tags))
+    client.virtual_machines.begin_update(rg_name, vm_name, VirtualMachineUpdate(tags=tags))

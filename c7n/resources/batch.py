@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
@@ -31,19 +20,19 @@ class ComputeEnvironment(QueryResourceManager):
         arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
-        cfn_type = 'AWS::Batch::ComputeEnvironment'
+        cfn_type = config_type = 'AWS::Batch::ComputeEnvironment'
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
 class ComputeSGFilter(SecurityGroupFilter):
 
-    RelatedIdsExpression = "computeResources.securityGroupIds"
+    RelatedIdsExpression = "computeResources.securityGroupIds[]"
 
 
 @ComputeEnvironment.filter_registry.register('subnet')
 class ComputeSubnetFilter(SubnetFilter):
 
-    RelatedIdsExpression = "computeResources.subnets"
+    RelatedIdsExpression = "computeResources.subnets[]"
 
 
 @resources.register('batch-definition')
@@ -177,3 +166,18 @@ class DefinitionDeregister(BaseAction):
             self.manager.session_factory).client('batch')
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.deregister_definition, resources))
+
+
+@resources.register('batch-queue')
+class BatchJobQueue(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'batch'
+        filter_name = 'jobQueues'
+        filter_type = 'list'
+        id = name = 'jobQueueName'
+        arn = 'jobQueueArn'
+        arn_type = 'job-queue'
+        enum_spec = (
+            'describe_job_queues', 'jobQueues', None)
+        cfn_type = config_type = 'AWS::Batch::JobQueue'

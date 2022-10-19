@@ -1,36 +1,27 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
+
 try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
 
-from c7n_azure import constants
-from c7n_azure.actions.logic_app import LogicAppAction
 from azure.mgmt.resourcegraph.models import QueryRequest
-from c7n_azure.actions.notify import Notify
-from c7n_azure.filters import ParentFilter
-from c7n_azure.provider import resources
-
 from c7n.actions import ActionRegistry
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
-from c7n.query import sources, MaxResourceLimit
+from c7n.query import MaxResourceLimit, sources
 from c7n.utils import local_session
+
+from c7n_azure.actions.logic_app import LogicAppAction
+from c7n_azure.actions.notify import Notify
+from c7n_azure.constants import DEFAULT_RESOURCE_AUTH_ENDPOINT
+from c7n_azure.filters import ParentFilter
+from c7n_azure.provider import resources
+from c7n_azure.utils import generate_key_vault_url, serialize
 
 log = logging.getLogger('custodian.azure.query')
 
@@ -109,9 +100,6 @@ class ResourceGraphSource:
                 % self.manager.data['resource'])
 
     def get_resources(self, _):
-        log.warning('The Azure Resource Graph source '
-                    'should not be used in production scenarios at this time.')
-
         session = self.manager.get_session()
         client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
 
@@ -152,7 +140,11 @@ class ChildResourceQuery(ResourceQuery):
         results = []
         for parent in parents.resources():
             try:
-                subset = resource_manager.enumerate_resources(parent, m, **params)
+                vault_url = None
+                if m.keyvault_child:
+                    vault_url = generate_key_vault_url(parent['name'])
+                subset = resource_manager.enumerate_resources(
+                    parent, m, vault_url=vault_url, **params)
 
                 if subset:
                     # If required, append parent resource ID to all child resources
@@ -167,7 +159,6 @@ class ChildResourceQuery(ResourceQuery):
                             .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
-
         return results
 
 
@@ -191,10 +182,9 @@ class TypeInfo(metaclass=TypeMeta):
     service = ''
     client = ''
 
+    resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
     # Default id field, resources should override if different (used for meta filters, report etc)
     id = 'id'
-
-    resource = constants.RESOURCE_ACTIVE_DIRECTORY
 
     @classmethod
     def extra_args(cls, resource_manager):
@@ -207,6 +197,7 @@ class ChildTypeInfo(TypeInfo, metaclass=TypeMeta):
     annotate_parent = True
     raise_on_exception = True
     parent_key = 'c7n:parent-id'
+    keyvault_child = False
 
     @classmethod
     def extra_args(cls, parent_resource):
@@ -250,11 +241,12 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             self._session = local_session(self.session_factory)
         return self._session
 
-    def get_client(self, service=None):
+    def get_client(self, service=None, vault_url=None):
         if not service:
             return self.get_session().client(
-                "%s.%s" % (self.resource_type.service, self.resource_type.client))
-        return self.get_session().client(service)
+                "%s.%s" % (self.resource_type.service, self.resource_type.client),
+                vault_url=vault_url)
+        return self.get_session().client(service, vault_url=vault_url)
 
     def get_cache_key(self, query):
         return {'source_type': self.source_type,
@@ -269,7 +261,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def source_type(self):
         return self.data.get('source', 'describe-azure')
 
-    def resources(self, query=None):
+    def resources(self, query=None, augment=True):
         cache_key = self.get_cache_key(query)
 
         resources = None
@@ -282,11 +274,18 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                     len(resources)))
 
         if resources is None:
-            resources = self.augment(self.source.get_resources(query))
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.get_resources(query)
+            if augment:
+                with self.ctx.tracer.subsegment('resource-augment'):
+                    resources = self.augment(resources)
             self._cache.save(cache_key, resources)
 
-        resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        self._cache.close()
+
+        with self.ctx.tracer.subsegment('filter'):
+            resource_count = len(resources)
+            resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
         if self.data == self.ctx.policy.data:
@@ -345,14 +344,14 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     def get_session(self):
         if self._session is None:
             session = super(ChildResourceManager, self).get_session()
-            if self.resource_type.resource != constants.RESOURCE_ACTIVE_DIRECTORY:
+            if self.resource_type.resource != DEFAULT_RESOURCE_AUTH_ENDPOINT:
                 session = session.get_session_for_resource(self.resource_type.resource)
             self._session = session
 
         return self._session
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
-        client = self.get_client()
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
+        client = self.get_client(vault_url=vault_url)
 
         enum_op, list_op, extra_args = self.resource_type.enum_spec
 
@@ -373,7 +372,9 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
         result = op(**params)
 
         if isinstance(result, Iterable):
-            return [r.serialize(True) for r in result]
+            # KeyVault items don't have `serialize` method now
+            return [(r.serialize(True) if hasattr(r, 'serialize') else serialize(r))
+                    for r in result]
         elif hasattr(result, 'value'):
             return [r.serialize(True) for r in result.value]
 

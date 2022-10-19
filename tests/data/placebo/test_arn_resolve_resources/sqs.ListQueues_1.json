@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://queue.amazonaws.com/644160558196/origin-dev",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test-2",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test-3"
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,149 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 02 Dec 2020 14:32:14 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "230339",
+    "-content-encoding": "gzip",
+    "content-location": "https://serviceusage.googleapis.com/v1/projects/cloud-custodian/services?alt=json&pageToken=EkkKR3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmFwaS5zZXJ2aWNlbWFuYWdlbWVudC52MS5MaXN0U2VydmljZXNSZXF1ZXN0GqwBQ244S1hadWVpNTZaaW95V2tKSFJtSkNRbUpPYW5vLVdqTkdja0pMX0FQN19fdmZIa1dyX19fOGJnWXlhalltV25KcVNucEdlbUpxU21wR0wwWXlhalltV25KcU14WnVlaTU2WmlveVdrSkhSbUpDUW1KT2Fuby1Xak5HY2tKTF9faEJrSVhuclhGVVZDbm1uVUFCYUN3bGoyRnlNUnI5RDBoQURZSWF6NU9rSA%3D%3D"
+  },
+  "body": {
+    "services": [
+      {
+        "name": "projects/cloud-custodian/services/deploymentmanager.googleapis.com",
+        "config": {
+          "name": "deploymentmanager.googleapis.com",
+          "title": "Cloud Deployment Manager V2 API",
+          "documentation": {
+            "summary": "The Google Cloud Deployment Manager v2 API provides services for configuring, deploying, and\nviewing Google Cloud services and APIs via templates which specify deployments of Cloud\nresources."
+          },
+          "quota": {},
+          "authentication": {},
+          "usage": {
+            "requirements": [
+              "serviceusage.googleapis.com/tos/cloud"
+            ]
+          },
+          "monitoredResources": [
+            {
+              "type": "serviceruntime.googleapis.com/api",
+              "labels": [
+                {
+                  "key": "cloud.googleapis.com/location"
+                },
+                {
+                  "key": "cloud.googleapis.com/uid"
+                },
+                {
+                  "key": "serviceruntime.googleapis.com/api_version"
+                },
+                {
+                  "key": "serviceruntime.googleapis.com/api_method"
+                },
+                {
+                  "key": "serviceruntime.googleapis.com/consumer_project"
+                },
+                {
+                  "key": "cloud.googleapis.com/project"
+                },
+                {
+                  "key": "cloud.googleapis.com/service"
+                }
+              ]
+            },
+            {
+              "type": "serviceruntime.googleapis.com/consumer_quota",
+              "labels": [
+                {
+                  "key": "cloud.googleapis.com/location"
+                },
+                {
+                  "key": "cloud.googleapis.com/uid"
+                },
+                {
+                  "key": "cloud.googleapis.com/service"
+                },
+                {
+                  "key": "cloud.googleapis.com/resource_id"
+                },
+                {
+                  "key": "cloud.googleapis.com/resource_node"
+                },
+                {
+                  "key": "cloud.googleapis.com/quota_metric"
+                },
+                {
+                  "key": "cloud.googleapis.com/quota_location"
+                }
+              ]
+            },
+            {
+              "type": "serviceruntime.googleapis.com/producer_quota",
+              "labels": [
+                {
+                  "key": "cloud.googleapis.com/location"
+                },
+                {
+                  "key": "cloud.googleapis.com/uid"
+                },
+                {
+                  "key": "cloud.googleapis.com/service"
+                },
+                {
+                  "key": "cloud.googleapis.com/resource_id"
+                },
+                {
+                  "key": "cloud.googleapis.com/resource_node"
+                },
+                {
+                  "key": "cloud.googleapis.com/consumer_resource_node"
+                },
+                {
+                  "key": "cloud.googleapis.com/quota_metric"
+                },
+                {
+                  "key": "cloud.googleapis.com/quota_location"
+                }
+              ]
+            }
+          ],
+          "monitoring": {
+            "consumerDestinations": [
+              {
+                "monitoredResource": "serviceruntime.googleapis.com/api",
+                "metrics": [
+                  "serviceruntime.googleapis.com/api/consumer/quota_used_count",
+                  "serviceruntime.googleapis.com/api/consumer/quota_refund_count",
+                  "serviceruntime.googleapis.com/quota/used",
+                  "serviceruntime.googleapis.com/quota/limit",
+                  "serviceruntime.googleapis.com/quota/exceeded",
+                  "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
+                ]
+              },
+              {
+                "monitoredResource": "serviceruntime.googleapis.com/consumer_quota",
+                "metrics": [
+                  "serviceruntime.googleapis.com/quota/rate/consumer/used_count",
+                  "serviceruntime.googleapis.com/quota/rate/consumer/refund_count",
+                  "serviceruntime.googleapis.com/quota/allocation/consumer/usage",
+                  "serviceruntime.googleapis.com/quota/consumer/limit",
+                  "serviceruntime.googleapis.com/quota/consumer/exceeded"
+                ]
+              }
+            ]
+          }
+        },
+        "state": "ENABLED",
+        "parent": "projects/926761696986"
+      }
+    ]
+  }
+}
