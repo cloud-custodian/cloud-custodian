@@ -879,14 +879,11 @@ class UsedSecurityGroup(SGUsage):
     """
     schema = type_schema('used')
 
-    def process(self, resources, event=None):
-        used = self.scan_groups()
-        unused = [
-            r for r in resources
-            if r['GroupId'] not in used and 'VpcId' in r]
-        unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+    instance_owner_id_key = 'c7n:InstanceOwnerIds'
+    interface_type_key = 'c7n:InterfaceTypes'
 
-        eni_list = []
+    def _set_eni_attributes(self):
+        enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
                 instance_owner_id = nic['Attachment']['InstanceOwnerId']
@@ -894,21 +891,28 @@ class UsedSecurityGroup(SGUsage):
                 instance_owner_id = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                eni_list.append({'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id,
-                                 'InterfaceType': interface_type})
+                enis.append({'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id,
+                                'InterfaceType': interface_type})
+        return enis
 
+    def process(self, resources, event=None):
+        used = self.scan_groups()
+        unused = [
+            r for r in resources
+            if r['GroupId'] not in used and 'VpcId' in r]
+        unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+        enis = self._set_eni_attributes()
         for r in resources:
-            r['c7n:attachment-instance-owner-ids'] = []
-            r['c7n:interface-types'] = []
-            for i in range(1, len(eni_list)):
-                if r['GroupId'] == eni_list[i]['GroupId']:
-                    r['c7n:attachment-instance-owner-ids'].append(eni_list[i]['InstanceOwnerId'])
-                    r['c7n:interface-types'].append(eni_list[i]['InterfaceType'])
-            r['c7n:attachment-instance-owner-ids'] = list(filter(None, set(
-                r['c7n:attachment-instance-owner-ids'])))
-            r['c7n:interface-types'] = list(filter(None, set(
-                r['c7n:interface-types'])))
-
+            r[self.instance_owner_id_key] = []
+            r[self.interface_type_key] = []
+            for i in range(1, len(enis)):
+                if r['GroupId'] == enis[i]['GroupId']:
+                    r[self.instance_owner_id_key].append(enis[i]['InstanceOwnerId'])
+                    r[self.interface_type_key].append(enis[i]['InterfaceType'])
+            r[self.instance_owner_id_key] = list(filter(None, set(
+                r[self.instance_owner_id_key])))
+            r[self.interface_type_key] = list(filter(None, set(
+                r[self.interface_type_key])))
         return [r for r in resources if r['GroupId'] not in unused]
 
 
