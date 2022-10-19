@@ -891,8 +891,9 @@ class UsedSecurityGroup(SGUsage):
                 instance_owner_id = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                enis.append({'GroupId': g['GroupId'], 'InstanceOwnerId': instance_owner_id,
-                                'InterfaceType': interface_type})
+                enis.append({'GroupId': g['GroupId'],
+                             'InstanceOwnerId': instance_owner_id,
+                             'InterfaceType': interface_type})
         return enis
 
     def process(self, resources, event=None):
