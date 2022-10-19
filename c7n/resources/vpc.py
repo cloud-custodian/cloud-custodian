@@ -2857,8 +2857,8 @@ class AlbWafV2Enabled(Filter):
         'Client.RequestLimitExceeded')))
 
     def _get_target_wafs(self):
-        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         web_acl_regex = self.data.get('WebAclName', '')
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         target_wafs = []
         for i in range(len(wafs)):
             if re.match(web_acl_regex, wafs[i]['Name']):
@@ -2866,8 +2866,8 @@ class AlbWafV2Enabled(Filter):
         return target_wafs
     
     def _get_target_albs(self):
-        client = local_session(self.manager.session_factory).client('wafv2')
         target_wafs = self._get_target_wafs()
+        client = local_session(self.manager.session_factory).client('wafv2')
         target_albs = []
         for w in target_wafs:
             arns = self.retry(
@@ -2878,8 +2878,8 @@ class AlbWafV2Enabled(Filter):
         return set(target_albs)
 
     def _get_target_sgs(self):
-        elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
         target_albs = self._get_target_albs()
+        elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
         allowed_sgs = []
         disallowed_sgs = []
         for lb in elbv2s:
