@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import os.path
 from os import path, mkdir
 import json
 import tempfile
 from textwrap import dedent
+
+import pytest
 
 from c7n import loader
 from c7n.exceptions import PolicyValidationError
@@ -105,3 +108,83 @@ class TestDirectoryLoader(BaseTest):
 
             with self.assertRaises(PolicyValidationError):
                 dir_loader.load_directory(temp_dir)
+
+
+@pytest.fixture(name='write_policy')
+def _write_policy(tmp_path):
+    def write_policy(filename, data):
+        full_path = os.path.join(tmp_path, filename)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        with open(full_path, "w") as f:
+            json.dump(data, f)
+
+    return write_policy
+
+
+def test_dir_loader_should_skip_hidden_files(tmp_path, write_policy):
+    dir_loader = loader.DirectoryLoader(Config.empty())
+
+    write_policy(
+        "policy1.yaml",
+        {"policies": [{"name": "good", "resource": "s3"}]},
+    )
+
+    # hidden files should be ignored
+    write_policy(
+        ".hidden.yaml",
+        {"policies": [{"name": "bad", "resource": "s3"}]},
+    )
+
+    policies = dir_loader.load_directory(tmp_path)
+
+    assert len(policies.policies) == 1
+    policy, = policies.policies
+    assert policy.name == "good"
+
+
+def test_dir_loader_should_skip_hidden_folders(tmp_path, write_policy):
+    dir_loader = loader.DirectoryLoader(Config.empty())
+
+    write_policy(
+        "policy1.yaml",
+        {"policies": [{"name": "good", "resource": "s3"}]},
+    )
+
+    # hidden folders should not be traversed
+    write_policy(
+        os.path.join(".hidden-dir", "policy2.yaml"),
+        {'policies': [{"name": "three", "resource": "s3"}]},
+    )
+
+    # hidden sub folders should not be traversed
+    write_policy(
+        os.path.join(".hidden-dir", "policy2.yaml"),
+        {'policies': [{"name": "three", "resource": "s3"}]},
+    )
+
+    policies = dir_loader.load_directory(tmp_path)
+
+    assert len(policies.policies) == 1
+    policy, = policies.policies
+    assert policy.name == "good"
+
+
+def test_dir_loader_should_skip_hidden_subfolders(tmp_path, write_policy):
+    dir_loader = loader.DirectoryLoader(Config.empty())
+
+    write_policy(
+        os.path.join("good-dir", "policy1.yaml"),
+        {"policies": [{"name": "good", "resource": "s3"}]},
+    )
+
+    # hidden sub folders should not be traversed
+    write_policy(
+        os.path.join("good-dir", ".hidden-dir", "policy2.yaml"),
+        {'policies': [{"name": "three", "resource": "s3"}]},
+    )
+
+    policies = dir_loader.load_directory(tmp_path)
+
+    assert len(policies.policies) == 1
+    policy, = policies.policies
+    assert policy.name == "good"
