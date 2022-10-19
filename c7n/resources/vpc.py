@@ -2837,7 +2837,7 @@ class AlbWafV2Enabled(Filter):
                 resource: security-group
                 filters:
                   - type: alb-wafv2-enabled
-                    WebAclName: ^FMManagedWebACLV2-?FMS-.*
+                    WebAclName: ^FMManagedWebACLV2-?FMS-
     """
     schema = type_schema(
         'alb-wafv2-enabled',
