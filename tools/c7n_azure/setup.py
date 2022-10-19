@@ -73,9 +73,9 @@ install_requires = \
  'azure-storage-file-share>=12.4.1,<13.0.0',
  'azure-storage-file>=2.1.0,<3.0.0',
  'azure-storage-queue>=12.1.5,<13.0.0',
- 'boto3 (>=1.24.87,<2.0.0)',
- 'botocore (>=1.27.87,<2.0.0)',
- 'c7n (>=0.9.19,<0.10.0)',
+ 'boto3 (>=1.24.88,<2.0.0)',
+ 'botocore (>=1.27.88,<2.0.0)',
+ 'c7n (>=0.9.20,<0.10.0)',
  'click>=8.0,<9.0',
  'cryptography>=3.4.6',
  'distlib>=0.3.0,<0.4.0',
@@ -103,7 +103,7 @@ extras_require = \
 
 setup_kwargs = {
     'name': 'c7n-azure',
-    'version': '0.7.18',
+    'version': '0.7.19',
     'description': 'Cloud Custodian - Azure Support',
     'license': 'Apache-2.0',
     'classifiers': [
