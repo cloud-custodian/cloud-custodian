@@ -265,7 +265,7 @@ def main():
         max_num_processes = args_dict.get('max_num_processes')
 
         # Select correct processor
-        processor = get_processor(provider, mailer_config, logger)
+        processor = get_processor(mailer_config, logger)
 
         # Execute
         if max_num_processes:
