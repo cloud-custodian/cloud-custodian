@@ -92,10 +92,11 @@ class PolicyCollection:
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_patterns=[], resource_types=[]):
+    def filter(self, policy_patterns=(), resource_types=(), modes=()):
         results = self.policies
         results = self._filter_by_patterns(results, policy_patterns)
         results = self._filter_by_resource_types(results, resource_types)
+        results = self._filter_by_modes(results, modes)
         # next line brings the result set in the original order of self.policies
         results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
@@ -160,6 +161,32 @@ class PolicyCollection:
                 'Resource type "{}" '
                 'did not match any policies.').format(resource_type))
 
+        return results
+
+    def _filter_by_modes(self, policies, modes):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        if not modes:
+            return policies
+        results = []
+        for mode in modes:
+            result = self._filter_by_mode(policies, mode)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_mode(self, policies, mode):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        results = []
+        for policy in policies:
+            if policy.get_execution_mode().type == mode:
+                results.append(policy)
+        if not results:
+            self.log.warning((
+                'Filter by modes type "{}" '
+                'did not match any policies.').format(mode))
         return results
 
     def __iter__(self):

@@ -52,6 +52,12 @@ class KubeTest(TestUtils):
     KubeConfigPath = init_kube_config()
     recording = False
 
+    def get_event(self, name):
+        event_dir = self._get_cassette_library_dir('events')
+        with open(os.path.join(event_dir, f'{name}.json')) as f:
+            event = json.load(f)
+        return event
+
     def replay_flight_data(self, name=None):
         kw = self._get_vcr_kwargs()
         kw['record_mode'] = 'none'
@@ -90,10 +96,10 @@ class KubeTest(TestUtils):
         myvcr.match_on = ['kubematcher', 'method']
         return myvcr
 
-    def _get_cassette_library_dir(self):
+    def _get_cassette_library_dir(self, name='flights'):
         return os.path.join(
             os.path.dirname(__file__),
-            'data', 'flights')
+            'data', name)
 
     def _get_cassette_name(self):
         return '{0}.{1}.yaml'.format(self.__class__.__name__,

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import BaseAction
+from c7n.utils import local_session
 
 
 class TencentCloudBaseAction(BaseAction):
@@ -13,6 +14,10 @@ class TencentCloudBaseAction(BaseAction):
 
     def get_client(self):
         return self.manager.get_client()
+
+    def get_tag_client(self):
+        return local_session(self.manager.session_factory).client(
+            "tag.tencentcloudapi.com", "tag", "2018-08-13", self.manager.config.region)
 
     def process(self, resources):
         pass
