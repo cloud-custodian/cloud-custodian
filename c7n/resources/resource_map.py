@@ -6,6 +6,7 @@ ResourceMap = {
     "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
     "aws.alarm": "c7n.resources.cw.Alarm",
     "aws.ami": "c7n.resources.ami.AMI",
+    "aws.apigwv2": "c7n.resources.apigw.ApiGwV2",
     "aws.apigw-domain-name": "c7n.resources.apigw.CustomDomainName",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
     "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
