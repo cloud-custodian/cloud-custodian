@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "test-acl",
+        "WebACLs": [
+            {
+                "Name": "FMManagedWebACLV2-FMS-AWS-CloudFront-Compliance-US-EAST-1-1666026239990",
+                "Id": "b4825bee-6c92-47a4-8155-a1953edf0527",
+                "Description": "",
+                "LockToken": "f02b1b20-f395-417f-a080-bbb2a341050e",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/FMManagedWebACLV2-FMS-AWS-CloudFront-Compliance-US-EAST-1-1666026239990/b4825bee-6c92-47a4-8155-a1953edf0527"
+            },
+            {
+                "Name": "FMManagedWebACLV2-FMS-ECB-Compliance-US-EAST-1-1666026239334",
+                "Id": "ed7fb0ee-c062-4bc2-b1e6-cffb72fa95ee",
+                "Description": "",
+                "LockToken": "65740f21-557d-4072-9adb-dfcb6ebb01fa",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/FMManagedWebACLV2-FMS-ECB-Compliance-US-EAST-1-1666026239334/ed7fb0ee-c062-4bc2-b1e6-cffb72fa95ee"
+            },
+            {
+                "Name": "test-acl",
+                "Id": "e70b4f6f-78b8-47a4-aa03-37f95e59dc79",
+                "Description": "",
+                "LockToken": "b51ad106-589c-4dad-97e3-a647712f5b59",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/test-acl/e70b4f6f-78b8-47a4-aa03-37f95e59dc79"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -2735,6 +2735,55 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
 
+    def test_alb_wafv2_enabled_filter(self):
+        factory = self.replay_flight_data("test_alb_wafv2_enabled_filter")
+
+        p = self.load_policy(
+            {
+                "name": "alb-wafv2-enabled-any",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "alb-wafv2-enabled"
+                    }
+                ]
+            }
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "alb-wafv2-enabled-string",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "alb-wafv2-enabled",
+                        "web-acl": "test-acl"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "alb-wafv2-enabled-regex",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "alb-wafv2-enabled",
+                        "web-acl": "^FMManagedWebACLV2"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class EndpointTest(BaseTest):
 

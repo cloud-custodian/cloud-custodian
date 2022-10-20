@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/alb-unpermitted-acl/8fff4889679d1278"
+        ],
+        "ResponseMetadata": {}
+    }
+}
