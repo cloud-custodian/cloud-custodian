@@ -1144,8 +1144,6 @@ class DomainNameRemediateTls(BaseAction):
                       )
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
-                    # raise e
-                    # uncomment above if you want to fail closed in even of exceeded retry threshold
+                    # If APIGateway exceeds 12 retries, it will continue and never enforce securityPolicy due to the
+                    # "Updating" condition. Depending on requirement customer may want to raise the exception.
                     continue
-                    # comment above if you want to fail closed
-
