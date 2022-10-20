@@ -14,7 +14,10 @@ from c7n_mailer.target import MessageTargetMixin
 try:
     from c7n_gcp.client import Session
 except ImportError:
-    raise Exception("Using GCP Pub/Sub with c7n_mailer requires package c7n_gcp to be installed.")
+    raise ImportError(
+        "c7n-mailer is configured for GCP Pub/Sub, which requires additional packages. "
+        "Run 'pip install c7n-mailer[gcp]' to install them."
+    )
 
 MAX_MESSAGES = 1000
 
