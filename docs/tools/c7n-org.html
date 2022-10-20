@@ -5605,6 +5605,13 @@ addition to the default runtime variables custodian provides like
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;tag:CostCenter&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;{charge_code}&quot;</span><span class="w"></span>
 </pre></div>
 </div>
+<p>Another enhancement for <code class="docutils literal notranslate"><span class="pre">c7n-org</span> <span class="pre">run-script</span></code> is to support a few vars in the script arg.
+The available vars are <code class="docutils literal notranslate"><span class="pre">account</span></code>, <code class="docutils literal notranslate"><span class="pre">account_id</span></code>, <code class="docutils literal notranslate"><span class="pre">region</span></code> and <code class="docutils literal notranslate"><span class="pre">output_dir</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>c7n-org run-script -s . -c my-projects.yml gcp_check_<span class="o">{</span>region<span class="o">}</span>.sh
+<span class="c1"># or</span>
+c7n-org run-script -s . -c my-projects.yml use_another_policy_result.sh <span class="o">{</span>output_dir<span class="o">}</span>
+</pre></div>
+</div>
 <p><strong>Note</strong> Variable interpolation is sensitive to proper quoting and spacing,
 i.e., <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">charge_code</span> <span class="pre">}</span></code> would be invalid due to the extra white space. Additionally,
 yaml parsing can transform a value like <code class="docutils literal notranslate"><span class="pre">{charge_code}</span></code> to null, unless it’s quoted
