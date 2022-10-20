@@ -6,6 +6,7 @@ ResourceMap = {
     "aws.airflow": "c7n.resources.airflow.ApacheAirflow",
     "aws.alarm": "c7n.resources.cw.Alarm",
     "aws.ami": "c7n.resources.ami.AMI",
+    "aws.apigwv2": "c7n.resources.apigw.ApiGwV2",
     "aws.apigw-domain-name": "c7n.resources.apigw.CustomDomainName",
     "aws.app-elb": "c7n.resources.appelb.AppELB",
     "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
@@ -217,7 +218,6 @@ ResourceMap = {
     "aws.waf": "c7n.resources.waf.WAF",
     "aws.wafv2": "c7n.resources.waf.WAFV2",
     "aws.waf-regional": "c7n.resources.waf.RegionalWAF",
-    "aws.apigatewayv2-api": "c7n.resources.apigw.apigatewayv2Api",
     "aws.workspaces": "c7n.resources.workspaces.Workspace",
     "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
     "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage"

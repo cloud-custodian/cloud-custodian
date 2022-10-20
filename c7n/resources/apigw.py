@@ -1148,18 +1148,18 @@ class DomainNameRemediateTls(BaseAction):
                     continue
 
 
-class apigatewayv2DescribeSource(query.DescribeSource):
+class ApiGwV2DescribeSource(query.DescribeSource):
 
     def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
         for r in resources:
-            if 'Tags' not in r:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
         return resources
 
 
-@resources.register('apigatewayv2-api')
-class apigatewayv2Api(query.QueryResourceManager):
+@resources.register('apigwv2')
+class ApiGwV2(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'apigatewayv2'
@@ -1172,10 +1172,11 @@ class apigatewayv2Api(query.QueryResourceManager):
         cfn_type = config_type = "AWS::ApiGatewayV2::Api"
         permission_prefix = 'apigateway'
         permissions_enum = ('apigateway:GET',)
+        universal_taggable = object()
 
     source_mapping = {
         'config': query.ConfigSource,
-        'describe': apigatewayv2DescribeSource
+        'describe': ApiGwV2DescribeSource
     }
 
     @property
@@ -1194,37 +1195,3 @@ class apigatewayv2Api(query.QueryResourceManager):
             )
 
         return self._generate_arn
-
-
-@apigatewayv2Api.action_registry.register('tag')
-class apigatewayv2ApiTag(Tag):
-
-    def process_resource_set(self, client, resource_set, tags):
-        for r in resource_set:
-            arn = self.manager.generate_arn(r['ApiId'])
-            try:
-                self.manager.retry(
-                    client.tag_resource,
-                    ResourceArn=arn,
-                    Tags={t['Key']: t['Value'] for t in tags})
-            except client.exceptions.ResourceNotFoundException:
-                continue
-
-
-apigatewayv2Api.filter_registry.register('marked-for-op', TagActionFilter)
-apigatewayv2Api.action_registry.register('mark-for-op', TagDelayedAction)
-
-
-@apigatewayv2Api.action_registry.register('remove-tag')
-class apigatewayv2ApiRemoveTag(RemoveTag):
-
-    def process_resource_set(self, client, resource_set, tags):
-        for r in resource_set:
-            arn = self.manager.generate_arn(r['ApiId'])
-            try:
-                self.manager.retry(
-                    client.untag_resource,
-                    ResourceArn=arn,
-                    TagKeys=tags)
-            except client.exceptions.ResourceNotFoundException:
-                continue

@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "Tags": {
-            "name": "test-http"
+            "Env": "Dev"
         }
     }
 }

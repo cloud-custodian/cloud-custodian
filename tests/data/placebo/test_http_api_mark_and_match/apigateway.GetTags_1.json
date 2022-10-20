@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "Tags": {
-            "custodian_cleanup": "Resource does not meet policy: notify@2022/10/21"
+            "custodian_cleanup": "Resource does not meet policy: notify@2022/10/22"
         }
     }
 }

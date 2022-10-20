@@ -806,17 +806,15 @@ class TestResourcePolicy(BaseTest):
 
 class TestApiGatewayV2Api(BaseTest):
 
-    def test_http_api_tag_untag_mark(self):
+    def test_apigwv2_tag_untag(self):
         session_factory = self.replay_flight_data('test_http_api_tag_untag_mark')
         client = session_factory().client("apigatewayv2")
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/e8s82vm2m0')
-        self.assertEqual(tags.get('Tags', {}),
-            {'name': 'test-http'})
-        self.maxDiff = None
         p = self.load_policy({
             'name': 'tag-http-api',
-            'resource': 'apigatewayv2-api',
-            'filters': [{'type': 'value', 'key': 'ApiId', 'value': 'e8s82vm2m0'}],
+            'resource': 'apigwv2',
+            'filters': [
+                {'tag:name': 'test-http'},
+            ],
             "actions": [
                 {'type': 'tag',
                 'tags': {'Env': 'Dev'}},
@@ -826,17 +824,18 @@ class TestApiGatewayV2Api(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/e8s82vm2m0')
+        tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
         self.assertEqual(tags.get('Tags', {}), {'Env': 'Dev'})
 
-    def test_http_api_mark_and_match(self):
+    def test_apigwv2_mark(self):
         session_factory = self.replay_flight_data('test_http_api_mark_and_match')
         client = session_factory().client("apigatewayv2")
-        self.maxDiff = None
         p = self.load_policy({
             'name': 'mark-http-api',
-            'resource': 'apigatewayv2-api',
-            'filters': [{'type': 'value', 'key': 'ApiId', 'value': 'e8s82vm2m0'}],
+            'resource': 'apigwv2',
+            'filters': [
+                {'ProtocolType': 'WEBSOCKET'},
+                {'tag:custodian_cleanup': 'absent'}],
             "actions": [
                 {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
                 'op': 'notify',
@@ -845,89 +844,5 @@ class TestApiGatewayV2Api(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/e8s82vm2m0')
-        self.assertEqual(tags.get('Tags', {}),
-            {'custodian_cleanup': 'Resource does not meet policy: notify@2022/10/21'})
-        policy = self.load_policy(
-            {
-                "name": "match-mark-filter",
-                "resource": "apigatewayv2-api",
-                "filters": [
-                    {
-                        "type": "marked-for-op",
-                        "tag": "custodian_cleanup",
-                        "op": "notify",
-                        "skew": 2
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Tags'][0],
-                {'Key': 'custodian_cleanup',
-                    'Value': 'Resource does not meet policy: notify@2022/10/21'})
-
-    def test_websocket_api_tag_untag_mark(self):
-        session_factory = self.replay_flight_data('test_websocket_api_tag_untag_mark')
-        client = session_factory().client("apigatewayv2")
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/6obdyc4f76')
-        self.assertEqual(tags.get('Tags', {}),
-            {'name': 'test-websocket'})
-        self.maxDiff = None
-        p = self.load_policy({
-            'name': 'tag-websocket-api',
-            'resource': 'apigatewayv2-api',
-            'filters': [{'type': 'value', 'key': 'ApiId', 'value': '6obdyc4f76'}],
-            "actions": [
-                {'type': 'tag',
-                'tags': {'Env': 'Dev'}},
-                {'type': 'remove-tag',
-                'tags': ['name']},
-            ]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/6obdyc4f76')
-        self.assertEqual(tags.get('Tags', {}), {'Env': 'Dev'})
-
-    def test_websocket_api_mark_and_match(self):
-        session_factory = self.replay_flight_data('test_websocket_api_mark_and_match')
-        client = session_factory().client("apigatewayv2")
-        self.maxDiff = None
-        p = self.load_policy({
-            'name': 'mark-websocket-api',
-            'resource': 'apigatewayv2-api',
-            'filters': [{'type': 'value', 'key': 'ApiId', 'value': '6obdyc4f76'}],
-            "actions": [
-                {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
-                'op': 'notify',
-                'days': 2}
-            ]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        tags = client.get_tags(ResourceArn='arn:aws:apigateway:us-east-1::/apis/6obdyc4f76')
-        self.assertEqual(tags.get('Tags', {}),
-            {'custodian_cleanup': 'Resource does not meet policy: notify@2022/10/21'})
-        policy = self.load_policy(
-            {
-                "name": "match-mark-filter",
-                "resource": "apigatewayv2-api",
-                "filters": [
-                    {
-                        "type": "marked-for-op",
-                        "tag": "custodian_cleanup",
-                        "op": "notify",
-                        "skew": 2
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Tags'][0],
-                {'Key': 'custodian_cleanup',
-                    'Value': 'Resource does not meet policy: notify@2022/10/21'})
+        tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
+        assert 'custodian_cleanup' in tags['Tags']
