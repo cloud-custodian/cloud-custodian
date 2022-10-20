@@ -12,7 +12,7 @@ class HealthResource(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 0) #test
+        self.assertEqual(len(resources), 0)
 
     def test_health_resource_query(self):
         session_factory = self.replay_flight_data("test_health_resource_query")
