@@ -26,6 +26,8 @@ be applies for all resources.
 
    group-apigateway.rst
 
+   group-apigatewayv2.rst
+
    group-appflow.rst
 
    group-appsync.rst
