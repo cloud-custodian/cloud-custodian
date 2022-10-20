@@ -3679,14 +3679,17 @@ class S3Test(BaseTest):
             client.get_bucket_encryption(Bucket=bname)
 
     def test_s3_invoke_lambda_assume_role_action(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
         session_factory = self.replay_flight_data("test_s3_invoke_lambda_assume_role")
+
         p = self.load_policy(
             {
                 "name": "s3-invoke-lambda-assume-role",
                 "resource": "s3",
                 "actions": [{"type": "invoke-lambda",
                              "function": "lambda-invoke-with-assume-role", "assume-role":
-                "arn:aws:iam::213925950568:role/service-role/lanbda-invoke-c7n-role-py5l2hbi"}],
+                "arn:aws:iam::0123456789:role/service-role/lanbda-invoke-c7n-role-py5l2hbi"}],
             },
             session_factory=session_factory,
         )
