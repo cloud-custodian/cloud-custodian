@@ -2837,11 +2837,11 @@ class AlbWafV2Enabled(Filter):
                 resource: security-group
                 filters:
                   - type: alb-wafv2-enabled
-                    WebAclName: ^FMManagedWebACLV2-?FMS-
+                    web-acl: ^FMManagedWebACLV2-?FMS-
     """
     schema = type_schema(
-        'alb-wafv2-enabled',
-        WebAclName={'type': 'string'})
+        'alb-wafv2-enabled', **{
+            'web-acl': {'type': 'string'}})
 
     permissions = (
         'elasticloadbalancing:DescribeLoadBalancers',
@@ -2857,7 +2857,7 @@ class AlbWafV2Enabled(Filter):
         'Client.RequestLimitExceeded')))
 
     def _get_target_wafs(self):
-        web_acl_regex = self.data.get('WebAclName', '')
+        web_acl_regex = self.data.get('web-acl', '')
         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
         target_wafs = []
         for i in range(len(wafs)):
@@ -2865,25 +2865,25 @@ class AlbWafV2Enabled(Filter):
                 target_wafs.append(wafs[i])
         return target_wafs
     
-    def _get_target_albs(self):
+    def _get_target_arns(self):
         target_wafs = self._get_target_wafs()
         client = local_session(self.manager.session_factory).client('wafv2')
-        target_albs = []
+        target_arns = []
         for w in target_wafs:
             arns = self.retry(
                 client.list_resources_for_web_acl,
                 WebACLArn=w.get('ARN', ''),
                 ResourceType='APPLICATION_LOAD_BALANCER').get('ResourceArns', [])
-            target_albs.extend(arns)
-        return set(target_albs)
+            target_arns.extend(arns)
+        return set(target_arns)
 
     def _get_target_sgs(self):
-        target_albs = self._get_target_albs()
+        target_arns = self._get_target_arns()
         elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
         allowed_sgs = []
         denied_sgs = []
         for lb in elbv2s:
-            if lb['LoadBalancerArn'] in target_albs:
+            if lb['LoadBalancerArn'] in target_arns:
                 allowed_sgs.extend(lb['SecurityGroups'])
             else:
                 denied_sgs.extend(lb['SecurityGroups'])
