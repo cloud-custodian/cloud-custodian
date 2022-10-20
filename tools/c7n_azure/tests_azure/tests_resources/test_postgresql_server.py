@@ -82,7 +82,7 @@ class PostgresqlServerFirewallFilterTest(BaseTest):
         return filter
 
 
-class PostgresqlConfigurationParametersFilterTest(BaseTest):
+class PostgresqlConfigurationParameterFilterTest(BaseTest):
     # one parameter configured in the ARM template with log_connections = 'off'
     @arm_template('postgresql.json')
     def test_server_configuration_parameter(self):
@@ -91,9 +91,11 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
             'resource': 'azure.postgresql-server',
             'filters': [
                 {
-                    'type': 'configuration-parameters',
-                    'key': 'log_connections.value',
+                    'type': 'configuration-parameter',
+                    'name': 'log_connections',
+                    'key': 'value',
                     'op': 'ne',
+                    # 'key': "log_connections.value != 'on' or log_disconnections.value != 'on'",
                     'value': 'on'
                 }
             ],
@@ -104,15 +106,16 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
     def test_int_value_with_regex(self):
         resources = self._get_test_resources()
         data = self._gen_filter_data(123, value_regex='test-(\\d+)', value_type='integer')
-        mock_parameter = self._gen_configurations('test-123')
+        mock_parameter = dict(properties=dict(value='test-123'))
 
         filter = self._get_filter(data, mock_parameter)
         actual = filter.process(resources)
 
         # ensure we call azure with the correct resource information
-        filter.manager.get_client().configurations.list_by_server.assert_called_once_with(
+        filter.manager.get_client().configurations.get.assert_called_once_with(
             'test-group-1',
-            'test-name-1'
+            'test-name-1',
+            'test-param'
         )
         self.assertListEqual(resources, actual)
 
@@ -121,7 +124,7 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
 
         data1 = self._gen_filter_data('123')
         data2 = self._gen_filter_data('456')
-        mock_parameter = self._gen_configurations('test-123')
+        mock_parameter = dict(properties=dict(value='test-123'))
 
         filter1 = self._get_filter(data1, mock_parameter)
         filter2 = self._get_filter(data2, mock_parameter)
@@ -134,17 +137,17 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
 
         # ensure we call azure with the correct resource information - and only once per
         # resource even if there are two filters (ensure the cached values are used)
-        filter1.manager.get_client().configurations.list_by_server.assert_has_calls([
-            call('test-group-1', 'test-name-1'),
-            call('test-group-2', 'test-name-2')
+        filter1.manager.get_client().configurations.get.assert_has_calls([
+            call('test-group-1', 'test-name-1', 'test-param'),
+            call('test-group-2', 'test-name-2', 'test-param')
         ])
-        filter2.manager.get_client().configurations.list_by_server.assert_not_called()
+        filter2.manager.get_client().configurations.get.assert_not_called()
 
     def test_date_value(self):
         resources = self._get_test_resources()
         data = self._gen_filter_data('1/1/2023', op='lt', value_type='date')
         # note - str compare would be false
-        mock_parameter = self._gen_configurations('5/1/2022')
+        mock_parameter = dict(properties=dict(value='5/1/2022'))
 
         filter = self._get_filter(data, mock_parameter)
         actual = filter.process(resources)
@@ -154,7 +157,7 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
     def test_all_resources_passing_with_float(self):
         resources = self._get_test_resources()
         data = self._gen_filter_data('2.5', op='gt', value_type='float')
-        mock_parameter = self._gen_configurations('1.5')
+        mock_parameter = dict(properties=dict(value='1.5'))
 
         filter = self._get_filter(data, mock_parameter)
         actual = filter.process(resources)
@@ -164,7 +167,7 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
     def test_list_op_no_match(self):
         resources = self._get_test_resources()
         data = self._gen_filter_data(['1', '2', '3', '4'], op='in')
-        mock_parameter = self._gen_configurations('5')
+        mock_parameter = dict(properties=dict(value='5'))
 
         filter = self._get_filter(data, mock_parameter)
         actual = filter.process(resources)
@@ -174,7 +177,7 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
     def test_list_op_matching(self):
         resources = self._get_test_resources()
         data = self._gen_filter_data(['1', '2', '3', '4'], op='in')
-        mock_parameter = self._gen_configurations('4')
+        mock_parameter = dict(properties=dict(value='4'))
 
         filter = self._get_filter(data, mock_parameter)
         actual = filter.process(resources)
@@ -189,22 +192,25 @@ class PostgresqlConfigurationParametersFilterTest(BaseTest):
 
     def _get_filter(self, data, configurations):
         client = Mock()
-        client.configurations.list_by_server = Mock(return_value=configurations)
+        client.configurations.get = Mock(
+            return_value=Mock(
+                serialize=Mock(return_value=configurations)
+            )
+        )
 
         manager = Mock()
         manager.get_client = Mock(return_value=client)
 
         return ConfigurationParametersFilter(data, manager=manager)
 
-    def _gen_filter_data(self, value, op='eq', value_regex=None, value_type=None):
+    def _gen_filter_data(self, value, op='eq', value_regex=None, value_type=None,
+            name='test-param'):
         return dict(
-            type='configuration-parameters',
-            key='"test-param".value',
+            type='configuration-parameter',
+            key='value',
+            name=name,
             value=value,
             op=op,
             **(dict(value_regex=value_regex) if value_regex else {}),
             **(dict(value_type=value_type) if value_type else {}),
         )
-
-    def _gen_configurations(self, value, name='test-param'):
-        return [AttrDict(name=name, value=value)]

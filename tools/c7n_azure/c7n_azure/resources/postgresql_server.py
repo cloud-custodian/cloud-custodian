@@ -73,7 +73,7 @@ class PostgresqlServerFirewallRulesFilter(FirewallRulesFilter):
         return resource_rules
 
 
-@PostgresqlServer.filter_registry.register('configuration-parameters')
+@PostgresqlServer.filter_registry.register('configuration-parameter')
 class ConfigurationParametersFilter(ValueFilter):
     """Filter by configuration parameter for this postresql server
 
@@ -89,28 +89,14 @@ class ConfigurationParametersFilter(ValueFilter):
     .. code-block:: json
 
       {
-        log_connections: {
-          "id": "<example-id>",
-          "name": "log_connections",
-          "type": "Microsoft.DBforPostgreSQL/servers/configurations",
-          "value": "off",
-          "description": "Logs each successful connection.",
-          "default_value": "on",
-          "data_type": "Boolean",
-          "allowed_values": "on,off",
-          "source": "user-override"
-        },
-        {
-          "id": "<example-id>",
-          "name": "log_min_duration_statement",
-          "type": "Microsoft.DBforPostgreSQL/servers/configurations",
-          "value": "-1",
-          "description": "example description",
-          "default_value": "-1",
-          "data_type": "Integer",
-          "allowed_values": "-1-2147483647",
-          "source": "system-default"
-        }
+        "value": "off",
+        "description": "Logs each successful connection.",
+        "defaultValue": "on",
+        "dataType": "Boolean",
+        "allowedValues": "on,off",
+        "source": "user-override",
+        "isConfigPendingRestart": "False",
+        "isDynamicConfig": "True"
       }
 
     :example:
@@ -123,25 +109,31 @@ class ConfigurationParametersFilter(ValueFilter):
           - name: sql-database-no-log-connections
             resource: azure.postgresql-server
             filters:
-              - type: configuration-parameters
-                key: log_connections.value
+              - type: configuration-parameter
+                name: log_connections
+                key: value
                 op: ne
                 value: 'on'
 
     """
-    schema = type_schema('configuration-parameters', rinherit=ValueFilter.schema)
+
+    schema = type_schema(
+        'configuration-parameter',
+        required=['type', 'name'],
+        rinherit=ValueFilter.schema,
+        name=dict(type='string')
+    )
 
     def __call__(self, resource):
-        key = 'configurations'
+        key = f'c7n:config-params:{self.data["name"]}'
         if key not in resource['properties']:
             client = self.manager.get_client()
-            query = client.configurations.list_by_server(
+            query = client.configurations.get(
                 resource['resourceGroup'],
-                resource['name']
+                resource['name'],
+                self.data["name"]
             )
 
-            # map the config parameters to an dict to make validating individual values easier
-            configurations = {item.name: vars(item) for item in query or []}
-            resource['properties'][key] = configurations
+            resource['properties'][key] = query.serialize(True).get('properties')
 
-        return super(ConfigurationParametersFilter, self).__call__(resource['properties'][key])
+        return super().__call__(resource['properties'][key])
