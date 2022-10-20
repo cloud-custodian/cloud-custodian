@@ -2881,17 +2881,17 @@ class AlbWafV2Enabled(Filter):
         target_albs = self._get_target_albs()
         elbv2s = self.manager.get_resource_manager('app-elb').resources(augment=False)
         allowed_sgs = []
-        disallowed_sgs = []
+        denied_sgs = []
         for lb in elbv2s:
             if lb['LoadBalancerArn'] in target_albs:
                 allowed_sgs.extend(lb['SecurityGroups'])
             else:
-                disallowed_sgs.extend(lb['SecurityGroups'])
-        return set(allowed_sgs), set(disallowed_sgs)
+                denied_sgs.extend(lb['SecurityGroups'])
+        return set(allowed_sgs), set(denied_sgs)
 
     def process(self, resources, event=None):
-        allowed_sgs, disallowed_sgs = self._get_target_sgs()
+        allowed_sgs, denied_sgs = self._get_target_sgs()
         results = [
             r for r in resources
-            if r['GroupId'] in allowed_sgs and r['GroupId'] not in disallowed_sgs]
+            if r['GroupId'] in allowed_sgs and r['GroupId'] not in denied_sgs]
         return results
