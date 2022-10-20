@@ -15,7 +15,6 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry
-from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
