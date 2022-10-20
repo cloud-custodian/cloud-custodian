@@ -2824,9 +2824,9 @@ class CrossAZRouteTable(Filter):
 
 @SecurityGroup.filter_registry.register('alb-wafv2-enabled')
 class AlbWafV2Enabled(Filter):
-    """Filter to find security groups that are ONLY attached to ALBs which have
-    a specific web ACL associated to it. It supports a regular expression to find
-    all web ACLs that match the pattern.
+    """Filter to find security groups that are attached to ALBs with Web ACL association
+    and not attached to ALBs without Web ACL association. It supports a regular expression
+    to specify the name of web ACLs that you want to filter.
 
     :example:
 

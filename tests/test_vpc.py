@@ -2747,7 +2747,8 @@ class SecurityGroupTest(BaseTest):
                         "type": "alb-wafv2-enabled"
                     }
                 ]
-            }
+            },
+            session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
