@@ -25,7 +25,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources))
+        self.assertTrue(len(resources)) 
 
     def test_fsx_tag_resource(self):
         session_factory = self.replay_flight_data('test_fsx_tag_resource')
