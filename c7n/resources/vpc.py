@@ -2824,10 +2824,10 @@ class CrossAZRouteTable(Filter):
 
 @SecurityGroup.filter_registry.register('alb-wafv2-enabled')
 class AlbWafV2Enabled(Filter):
-    """Filter to find security groups that are ONLY attached to ALBs which have 
-    a specific web ACL associated to it. It supports a regular expression to find 
+    """Filter to find security groups that are ONLY attached to ALBs which have
+    a specific web ACL associated to it. It supports a regular expression to find
     all web ACLs that match the pattern.
-    
+
     :example:
 
     .. code-block:: yaml
@@ -2864,7 +2864,7 @@ class AlbWafV2Enabled(Filter):
             if re.match(web_acl_regex, wafs[i]['Name']):
                 target_wafs.append(wafs[i])
         return target_wafs
-    
+
     def _get_target_arns(self):
         target_wafs = self._get_target_wafs()
         client = local_session(self.manager.session_factory).client('wafv2')
