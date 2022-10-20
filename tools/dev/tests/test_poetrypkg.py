@@ -53,6 +53,9 @@ def _assert_pkg_ok(
     # we should get a git diff as a result of running the command
     assert diff
 
+    # the diff should not have any dev dependencies like pytest in it
+    assert 'pytest' not in diff.decode('utf-8')
+
     if cached == ' --cached':
         # clean up the git diff
         subprocess.run(f'git rm --cached {check_file}'.split(' '))
