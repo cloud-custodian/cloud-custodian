@@ -862,12 +862,6 @@ class SubscriptionFilter(BaseAction):
         required=['filter_name', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
 
-    def validate(self):
-        distribution = self.data.get('distribution', '')
-        if not distribution:
-            raise ValueError('Must specify distribution')
-        return self
-
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('logs')
