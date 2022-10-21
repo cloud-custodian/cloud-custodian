@@ -32,8 +32,6 @@ policies:
               - metadata.labels."app.kubernetes.io/managed-by": absent
 
 webhook:
-  caBundle: blahblahblah
-
   namespaceSelector:
     matchExpressions:
       - key: c7n-monitor
