@@ -78,6 +78,9 @@ def _parser():
     parser.add_argument(
         '--generate', default=False, action="store_true",
         help='Generate a k8s manifest for ValidatingWebhookConfiguration')
+    parser.add_argument('--cert', help='Path to TLS certifciate')
+    parser.add_argument('--ca-cert', help='Path to the CA certificate')
+    parser.add_argument('--cert-key', help='Path to the certificate\'s private key')
     return parser
 
 
@@ -122,7 +125,12 @@ def cli():
 
         print(yaml.dump(TEMPLATE))
     else:
-        init(args.port, args.policy_dir, args.on_exception)
+        init(
+            args.port, args.policy_dir, args.on_exception,
+            cert_path=args.cert,
+            cert_key_path=args.cert_key,
+            ca_cert_path=args.ca_cert,
+        )
 
 
 if __name__ == '__main__':
