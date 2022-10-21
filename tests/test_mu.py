@@ -910,6 +910,7 @@ class PolicyLambdaProvision(Publish):
                 "MemorySize": 512,
                 "Role": "",
                 "Runtime": "python3.9",
+                "Architectures": ["x86_64"],
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},

@@ -489,7 +489,7 @@ class LambdaManager:
                 changed = True
 
             if self._update_architecture(func, existing,
-                    new_config.pop('Architectures', []), code_ref):
+                    new_config.pop('Architectures', ["x86_64"]), code_ref):
                 changed = True
 
             config_changed = self.delta_function(old_config, new_config)
@@ -531,7 +531,7 @@ class LambdaManager:
 
     def _update_architecture(self, func, existing, new_architecture, code_ref):
         existing_config = existing.get('Configuration', {})
-        existing_architecture = existing_config.get('Architecture', ['x86_64'])
+        existing_architecture = existing_config.get('Architectures', ['x86_64'])
         diff = existing_architecture != new_architecture
         changed = False
         if diff:
