@@ -15,6 +15,7 @@ import unittest
 import zipfile
 
 import mock
+from mock import patch
 
 from c7n.config import Config
 from c7n.mu import (
@@ -917,6 +918,47 @@ class PolicyLambdaProvision(Publish):
                 "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
             },
         )
+
+    def test_lambda_architecture(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
+        with patch('platform.machine', return_value='arm64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["arm64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
+        with patch('platform.machine', return_value='x86_64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["x86_64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
 
     def test_remove_permissions_from_event_cloudtrail(self):
         session_factory = self.replay_flight_data("test_remove_permissions_event")
