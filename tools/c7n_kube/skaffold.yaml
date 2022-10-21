@@ -32,13 +32,16 @@ deploy:
       - .skaffold/templates/*.yaml
 
   helm:
+    flags:
+      global:
+        - "--debug"
     releases:
       - artifactOverrides:
-          image: c7n-kube
-        chartPath: ../../../c7n-helm-charts/c7n_kube/
+          controller.image: c7n-kube
+        name: c7n-kube
+        remoteChart: https://github.com/cloud-custodian/helm-charts/releases/download/c7n-kube-0.1.1/c7n-kube-0.1.1.tgz
         imageStrategy:
           fqn: {}
-        name: c7n-kube
         namespace: c7n-system
         valuesFiles:
           - .skaffold/values.yaml
