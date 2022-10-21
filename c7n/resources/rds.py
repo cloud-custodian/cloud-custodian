@@ -1935,3 +1935,42 @@ class EngineFilter(ValueFilter):
                 r['c7n:Engine'] = v
                 matched.append(r)
         return matched
+
+
+class DescribeDBProxy(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('rds-proxy')
+class RDSProxy(QueryResourceManager):
+    """Resource Manager for RDS DB Proxies
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-proxy-tls-check
+                resource: rds-proxy
+                filters:
+                  - type: value
+                    key: RequireTLS
+                    value: false
+    """
+
+    class resource_type(TypeInfo):
+        service = 'rds'
+        name = id = 'DBProxyName'
+        date = 'CreatedDate'
+        enum_spec = ('describe_db_proxies', 'DBProxies', None)
+        arn = 'DBProxyArn'
+        arn_type = 'db-proxy'
+        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        permissions_enum = ('rds:DescribeDBProxies',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeDBProxy,
+        'config': ConfigSource
+    }
