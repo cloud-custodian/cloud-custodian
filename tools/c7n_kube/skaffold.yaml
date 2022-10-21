@@ -1,7 +1,3 @@
-
-
----
-
 apiVersion: skaffold/v2beta29
 kind: Config
 metadata:
@@ -10,7 +6,6 @@ deploy:
   kubectl:
     manifests:
       - .skaffold/namespace.yaml
-
 ---
 apiVersion: skaffold/v2beta29
 kind: Config
