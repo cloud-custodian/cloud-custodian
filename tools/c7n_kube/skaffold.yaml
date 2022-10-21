@@ -38,10 +38,11 @@ deploy:
     releases:
       - artifactOverrides:
           controller.image: c7n-kube
-        name: c7n-kube
-        remoteChart: https://github.com/cloud-custodian/helm-charts/releases/download/c7n-kube-0.1.1/c7n-kube-0.1.1.tgz
         imageStrategy:
           fqn: {}
+        name: c7n-kube
         namespace: c7n-system
+        remoteChart: c7n-kube
+        repo: https://cloud-custodian.github.io/helm-charts/
         valuesFiles:
           - .skaffold/values.yaml
