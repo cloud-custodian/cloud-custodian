@@ -18,6 +18,8 @@ rds resources
 
    rds-param-group.rst
 
+   rds-proxy.rst
+
    rds-reserved.rst
 
    rds-snapshot.rst
