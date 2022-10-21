@@ -5,7 +5,7 @@ resources that violate those policies, or blocking them altogether.
 
 # Running the server 
 
-c7n-kube can be run and installed via poetry. `poetry install && poetry run c7n-kates`.  
+c7n-kates can be run and installed via poetry. `poetry install && poetry run c7n-kates`.  
 
 | name           | default   | description                                                  |
 |----------------|-----------|--------------------------------------------------------------|
