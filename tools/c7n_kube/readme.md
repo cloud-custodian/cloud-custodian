@@ -1,6 +1,6 @@
 # Custodian Kubernetes Support
 
-Cloud custodian can run policies directly inside your cluster, reporting on 
+Cloud Custodian can run policies directly inside your cluster, reporting on 
 resources that violate those policies, or blocking them altogether.
 
 # Running the server 
