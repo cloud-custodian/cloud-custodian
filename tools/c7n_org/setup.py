@@ -12,10 +12,10 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.24.87,<2.0.0)',
- 'botocore (>=1.27.87,<2.0.0)',
- 'c7n (>=0.9.19,<0.10.0)',
- 'click>=8.0,<9.0',
+ 'boto3 (>=1.24.88,<2.0.0)',
+ 'botocore (>=1.27.88,<2.0.0)',
+ 'c7n (>=0.9.20,<0.10.0)',
+ 'click>=8.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
  'importlib-resources (>=5.9.0,<6.0.0)',
@@ -37,7 +37,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-org',
-    'version': '0.6.18',
+    'version': '0.6.19',
     'description': 'Cloud Custodian - Parallel Execution',
     'license': 'Apache-2.0',
     'classifiers': [

@@ -12,7 +12,7 @@ from tencentcloud.common.exception import TencentCloudSDKException
 
 from c7n.filters import FilterValidationError, Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.utils import type_schema, chunks, local_session
+from c7n.utils import type_schema, chunks
 from c7n_tencentcloud.actions.core import TencentCloudBaseAction
 
 DEFAULT_TAG = "maid_status"
@@ -58,14 +58,10 @@ class TagAction(TencentCloudBaseAction):
         else:
             return {"ResourceList": qcs_list, "Tags": tags}
 
-    def get_client(self):
-        return local_session(self.manager.session_factory).client(
-            "tag.tencentcloudapi.com", "tag", "2018-08-13", self.manager.config.region)
-
     def process_tag_op(self, resources):
         """process_tag"""
         try:
-            client = self.get_client()
+            client = self.get_tag_client()
             for batch in chunks(resources, self.batch_size):
                 params = self._get_request_params(batch, self.tag_request_params)
                 client.execute_query(self.t_api_method_name, params)
@@ -146,7 +142,7 @@ class RenameTagAction(TagAction):
         process rename tag
         """
         try:
-            client = self.get_client()
+            client = self.get_tag_client()
             for resource in resources:
                 params = self._get_rename_request_params(resource)
                 resp = client.execute_query(self.t_api_method_name, params)
