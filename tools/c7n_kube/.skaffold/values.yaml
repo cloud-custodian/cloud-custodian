@@ -1,0 +1,24 @@
+caBundle: blahblahblah
+
+certManager:
+  enabled: true
+
+namespaceSelector:
+  matchExpressions:
+    - key: c7n-monitor
+      operator: NotIn
+      values: ["false"]
+
+policies:
+  volume:
+    configMap:
+      name: policies
+  volumeMount:
+    readOnly: true
+
+rules:
+  - apiGroups: [""]
+    apiVersions: ["v1"]
+    operations: ["CREATE"]
+    resources: ["pods"]
+    scope: Namespaced

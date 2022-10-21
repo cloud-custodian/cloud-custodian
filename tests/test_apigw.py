@@ -802,3 +802,47 @@ class TestResourcePolicy(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['id'], 'kjh6l7usy5')
         self.assertEqual(resources[0]['name'], 'bad-api-gw')
+
+
+class TestApiGatewayV2Api(BaseTest):
+
+    def test_apigwv2_tag_untag(self):
+        session_factory = self.replay_flight_data('test_http_api_tag_untag_mark')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy({
+            'name': 'tag-http-api',
+            'resource': 'apigwv2',
+            'filters': [
+                {'tag:name': 'test-http'},
+            ],
+            "actions": [
+                {'type': 'tag',
+                'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                'tags': ['name']},
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
+        self.assertEqual(tags.get('Tags', {}), {'Env': 'Dev'})
+
+    def test_apigwv2_mark(self):
+        session_factory = self.replay_flight_data('test_http_api_mark_and_match')
+        client = session_factory().client("apigatewayv2")
+        p = self.load_policy({
+            'name': 'mark-http-api',
+            'resource': 'apigwv2',
+            'filters': [
+                {'ProtocolType': 'WEBSOCKET'},
+                {'tag:custodian_cleanup': 'absent'}],
+            "actions": [
+                {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
+                'op': 'notify',
+                'days': 2}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.get_tags(ResourceArn=p.resource_manager.get_arns(resources)[0])
+        assert 'custodian_cleanup' in tags['Tags']
