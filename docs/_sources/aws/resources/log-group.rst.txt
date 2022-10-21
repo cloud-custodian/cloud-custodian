@@ -293,6 +293,8 @@ Actions
   
   - :ref:`put-metric <aws.common.actions.put-metric>`
   
+  - :ref:`put-subscription-filter <aws.log-group.actions.put-subscription-filter>`
+
   - :ref:`remove-tag <aws.common.actions.remove-tag>`
   
   - :ref:`retention <aws.log-group.actions.retention>`
@@ -344,6 +346,61 @@ delete
 
 
 Permissions - logs:DeleteLogGroup
+
+
+.. _aws.log-group.actions.put-subscription-filter:
+
+put-subscription-filter
++++++++++++++++++++++++
+Create/Update a subscription filter and associate with a log group
+
+:example:
+
+.. code-block:: yaml
+
+    policies:
+      - name: cloudwatch-put-subscription-filter
+        resource: log-group
+        actions:
+          - type: put-subscription-filter
+            filter_name: AllLambda
+            filter_pattern: ip
+            destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
+            distribution: Random
+
+.. container:: toggle
+
+  
+
+  .. raw:: html
+     
+    <div class="header docutils container" style=""></div>
+
+  .. code-block:: yaml
+
+    properties:
+      destination_arn:
+        type: string
+      distribution:
+        enum:
+        - Random
+        - ByLogStream
+      filter_name:
+        type: string
+      filter_pattern:
+        type: string
+      type:
+        enum:
+        - put-subscription-filter
+    required:
+    - filter_name
+    - destination_arn
+    - type
+
+
+
+
+Permissions - logs:PutSubscriptionFilter
 
 
 .. _aws.log-group.actions.retention:

@@ -5670,6 +5670,7 @@ keys. The above policy can also be written as:</p>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-post-finding"><span class="std std-ref">post-finding</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-post-item"><span class="std std-ref">post-item</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-put-metric"><span class="std std-ref">put-metric</span></a></p></li>
+<li><p><a class="reference internal" href="#aws-log-group-actions-put-subscription-filter"><span class="std std-ref">put-subscription-filter</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-remove-tag"><span class="std std-ref">remove-tag</span></a></p></li>
 <li><p><a class="reference internal" href="#aws-log-group-actions-retention"><span class="std std-ref">retention</span></a></p></li>
 <li><p><a class="reference internal" href="#aws-log-group-actions-set-encryption"><span class="std std-ref">set-encryption</span></a></p></li>
@@ -5704,6 +5705,48 @@ keys. The above policy can also be written as:</p>
 </div>
 </div>
 <p>Permissions - logs:DeleteLogGroup</p>
+</section>
+<section id="put-subscription-filter">
+<span id="aws-log-group-actions-put-subscription-filter"></span><h3>put-subscription-filter<a class="headerlink" href="#put-subscription-filter" title="Permalink to this headline">¶</a></h3>
+<p>Create/Update a subscription filter and associate with a log group</p>
+<dl class="field-list simple">
+<dt class="field-odd">example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">policies</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cloudwatch-put-subscription-filter</span><span class="w"></span>
+<span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log-group</span><span class="w"></span>
+<span class="w">    </span><span class="nt">actions</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">put-subscription-filter</span><span class="w"></span>
+<span class="w">        </span><span class="nt">filter_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AllLambda</span><span class="w"></span>
+<span class="w">        </span><span class="nt">filter_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ip</span><span class="w"></span>
+<span class="w">        </span><span class="nt">destination_arn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arn:aws:logs:us-east-1:1234567890:destination:lambda</span><span class="w"></span>
+<span class="w">        </span><span class="nt">distribution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Random</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="toggle docutils container">
+<div class="header docutils container" style=""></div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">properties</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">destination_arn</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w"></span>
+<span class="w">  </span><span class="nt">distribution</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">enum</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Random</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ByLogStream</span><span class="w"></span>
+<span class="w">  </span><span class="nt">filter_name</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w"></span>
+<span class="w">  </span><span class="nt">filter_pattern</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w"></span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">enum</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">put-subscription-filter</span><span class="w"></span>
+<span class="nt">required</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">filter_name</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">destination_arn</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>Permissions - logs:PutSubscriptionFilter</p>
 </section>
 <section id="retention">
 <span id="aws-log-group-actions-retention"></span><h3>retention<a class="headerlink" href="#retention" title="Permalink to this headline">¶</a></h3>
