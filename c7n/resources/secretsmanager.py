@@ -6,6 +6,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
+import c7n.filters.policystatement as polstmt_filter
 
 
 @resources.register('secrets-manager')
@@ -46,6 +47,26 @@ class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
 @SecretsManager.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
+
+
+@SecretsManager.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+
+    def get_std_format_args(self, secret):
+        return {
+            'secret_arn': secret['ARN'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+    def process(self, resources, event=None):
+        self.client = local_session(self.manager.session_factory).client('secretsmanager')
+        for r in resources:
+            policy = self.client.get_resource_policy(SecretId=r['Name'])
+            if policy.get('ResourcePolicy'):
+                r['Policy'] = policy['ResourcePolicy']
+
+        return list(filter(None, map(self.process_resource, resources)))
 
 
 @SecretsManager.action_registry.register('tag')
