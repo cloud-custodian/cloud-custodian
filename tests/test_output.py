@@ -257,13 +257,11 @@ def test_get_bucket_location_api(test, request, output_url, expected_region, exp
 
 
 def test_get_bucket_region_cache(test, request):
-    factory = test.replay_flight_data(request.node.name)
-
     with mock.patch(
         'c7n.resources.aws.get_bucket_region_clientless', return_value='us-west-2'
     ) as mocked_method:
         ctx = ExecutionContext(
-            factory,
+            mock.Mock(),
             Bag(name="test", provider_name="aws"),
             Config.empty(cache='memory', cache_period=15)
         )
