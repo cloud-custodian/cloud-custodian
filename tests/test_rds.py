@@ -1842,3 +1842,26 @@ class RDSEventSubscription(BaseTest):
         client = session_factory().client("rds")
         response = client.describe_event_subscriptions()
         self.assertEqual(len(response.get('EventSubscriptionsList')), 0)
+
+
+class RDSProxy(BaseTest):
+    def test_rds_proxy_resource(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-rds-proxy',
+                'resource': 'rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'RequireTLS',
+                        'value': False
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBProxyName'], 'test-us-east-1-db-proxy')
+        self.assertEqual(resources[0]['RequireTLS'], False)
