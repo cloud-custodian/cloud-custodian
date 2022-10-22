@@ -4,6 +4,7 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
+from functools import lru_cache
 from urllib.request import urlopen, urlparse, Request
 from urllib.error import HTTPError
 import contextlib
@@ -23,6 +24,7 @@ import boto3
 from botocore.validate import ParamValidator
 from boto3.s3.transfer import S3Transfer
 
+from c7n import cache
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import ClientError, InvalidOutputConfig, PolicyValidationError
@@ -168,11 +170,13 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
         # Permission errors or redirects for valid buckets should still contain a
         # header we can use to determine the bucket region.
         region = err.headers.get('x-amz-bucket-region')
+        if not region:
+            log.warning('unable to determine output bucket region with HTTP HEAD request: %s' % err)
 
     return region
 
 
-def get_bucket_region(bucket, client):
+def get_bucket_region_api(bucket, client):
     """Determine a bucket's region using the GetBucketLocation API action
 
     Look up a bucket's location constraint and map it to a region name as described in
@@ -596,22 +600,52 @@ class S3Output(BlobOutput):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        # can't use a local session as we dont want an unassumed session cached.
+        self.cache = cache.factory(self.ctx.options)
+        self._bucket_region = None
+
+        self.transfer = S3Transfer(
+            self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
+
+    @property
+    @lru_cache()
+    def bucket_region(self):
+        """Return the output bucket's region
+
+        Find a bucket region by checking, in order:
+
+        - The local cache file
+        - Response headers from an HTTP HEAD request
+        - The response from a GetBucketLocation API call
+
+        Once any of those options is successful, stop looking and cache
+        the result to minimize HTTP traffic or API call volume.
+        """
         s3_client = self.ctx.session_factory(assume=False).client('s3')
+        cache_key = ('output-bucket-region', self.bucket)
+
+        with self.cache:
+            cached_bucket_region = self.cache.get(cache_key)
+
+        if cached_bucket_region:
+            self._bucket_region = cached_bucket_region
+            return self._bucket_region
 
         # Try determining the output bucket region via HTTP requests since
         # that works more consistently in cross-region scenarios. Fall back
         # the GetBucketLocation API if necessary.
         try:
-            self.bucket_region = (
+            self._bucket_region = (
                 get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
-                get_bucket_region(self.bucket, s3_client)
+                get_bucket_region_api(self.bucket, s3_client)
             )
         except ClientError as err:
             raise InvalidOutputConfig(
                 f'unable to determine a region for output bucket {self.bucket}: {err}') from None
-        self.transfer = S3Transfer(
-            self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
+
+        with self.cache:
+            self.cache.save(cache_key, self._bucket_region)
+
+        return self._bucket_region
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
