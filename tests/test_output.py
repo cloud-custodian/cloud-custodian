@@ -254,3 +254,28 @@ def test_get_bucket_location_api(test, request, output_url, expected_region, exp
         )
         output = S3Output(ctx, {'url': output_url, 'test': True})
         assert output.bucket_region == expected_region
+
+
+def test_get_bucket_region_cache(test, request):
+    factory = test.replay_flight_data(request.node.name)
+
+    with mock.patch(
+        'c7n.resources.aws.get_bucket_region_clientless', return_value='us-west-2'
+    ) as mocked_method:
+        ctx = ExecutionContext(
+            factory,
+            Bag(name="test", provider_name="aws"),
+            Config.empty(cache='memory', cache_period=15)
+        )
+        # Create outputs for multiple URLs across two different buckets. Caching should ensure
+        # only one HTTP HEAD request per bucket.
+        for output_url in (
+            's3://c7n-test-1/',
+            's3://c7n-test-1/logs',
+            's3://c7n-test-1/bogs',
+            's3://c7n-test-2/',
+            's3://c7n-test-2/logs',
+            's3://c7n-test-2/bogs',
+        ):
+            S3Output(ctx, {'url': output_url, 'test': True})
+        assert mocked_method.call_count == 2
