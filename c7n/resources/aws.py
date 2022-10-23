@@ -624,17 +624,16 @@ class S3Output(BlobOutput):
         cache_key = ('output-bucket-region', self.bucket)
 
         with self.cache:
-            cached_bucket_region = self.cache.get(cache_key)
+            bucket_region = self.cache.get(cache_key)
 
-        if cached_bucket_region:
-            self._bucket_region = cached_bucket_region
-            return self._bucket_region
+        if bucket_region:
+            return bucket_region
 
         # Try determining the output bucket region via HTTP requests since
         # that works more consistently in cross-region scenarios. Fall back
         # the GetBucketLocation API if necessary.
         try:
-            self._bucket_region = (
+            bucket_region = (
                 get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
                 get_bucket_region_api(self.bucket, s3_client)
             )
@@ -643,9 +642,9 @@ class S3Output(BlobOutput):
                 f'unable to determine a region for output bucket {self.bucket}: {err}') from None
 
         with self.cache:
-            self.cache.save(cache_key, self._bucket_region)
+            self.cache.save(cache_key, bucket_region)
 
-        return self._bucket_region
+        return bucket_region
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
