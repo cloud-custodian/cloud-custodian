@@ -5240,6 +5240,11 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Kubernetes Controller Mode</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-the-server">Install the Server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#option-1-manual-installation">Option 1: Manual installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#option-2-helm-chart">Option 2: Helm chart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authoring-policies">Authoring Policies</a></li>
 </ul>
 </li>
@@ -5456,6 +5461,10 @@ more info, see the <a class="reference external" href="https://kubernetes.io/doc
 <h2>Install the Server<a class="headerlink" href="#install-the-server" title="Permalink to this headline">¶</a></h2>
 <p>Dynamic Admission Controllers can only operate against HTTPS webhooks. To get started, you can either
 create a service inside of your Kubernetes Cluster or use a cloud provider to run a web server.</p>
+</section>
+</section>
+<section id="option-1-manual-installation">
+<h1>Option 1: Manual installation<a class="headerlink" href="#option-1-manual-installation" title="Permalink to this headline">¶</a></h1>
 <p>To get started, create a new directory of policies:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir policies
 </pre></div>
@@ -5486,7 +5495,47 @@ that are applicable to your policies. Next, apply the manifest to your Kubernete
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>c7n-kates --policy-dir policies
 </pre></div>
 </div>
-<p>Next, we can apply a pod manifest to see the warning, create a new file <code class="docutils literal notranslate"><span class="pre">pod.yaml</span></code> and add the following:</p>
+</section>
+<section id="option-2-helm-chart">
+<h1>Option 2: Helm chart<a class="headerlink" href="#option-2-helm-chart" title="Permalink to this headline">¶</a></h1>
+<p>First configure the chart. The following  will configure a sample policy, use
+cert-manager to sign your webhook, and operate against all pods when they are
+created or updated. Adjust values.yaml as needed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt; EOF &gt; values.yaml</span>
+<span class="s">certManager:</span>
+<span class="s">  enabled: true</span>
+
+<span class="s">policies:</span>
+<span class="s">  source: configMap</span>
+<span class="s">  configMap:</span>
+<span class="s">    policies:</span>
+<span class="s">      # insert your policies here</span>
+
+<span class="s">      - name: &#39;example-warn-policy&#39;</span>
+<span class="s">        resource: &#39;k8s.pod&#39;</span>
+<span class="s">        description: &#39;This is a sample policy&#39;</span>
+<span class="s">        mode:</span>
+<span class="s">          type: k8s-admission</span>
+<span class="s">          on-match: warn</span>
+<span class="s">          operations:</span>
+<span class="s">            - CREATE</span>
+
+<span class="s"># These will need to be modified to match your policies.</span>
+<span class="s">rules:</span>
+<span class="s">  - apiGroups: [&quot;&quot;]</span>
+<span class="s">    apiVersions: [v1]</span>
+<span class="s">    operations: [CREATE, UPDATE]</span>
+<span class="s">    resources: [pods]</span>
+<span class="s">    scope: Namespaced</span>
+<span class="s">EOF</span>
+
+helm repo add c7n https://cloud-custodian.github.io/helm-charts/<span class="sb">`</span>
+helm install c7n-kube c7n/c7n-kube --values values.yaml
+</pre></div>
+</div>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>We can apply a pod manifest to see the warning, create a new file <code class="docutils literal notranslate"><span class="pre">pod.yaml</span></code> and add the following:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pod</span><span class="w"></span>
 <span class="nt">metadata</span><span class="p">:</span><span class="w"></span>
