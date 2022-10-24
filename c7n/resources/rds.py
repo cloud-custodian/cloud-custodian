@@ -1426,6 +1426,10 @@ class RDSSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBSnapshot',)
 
     def process(self, snapshots):
+        skipped = len([s for s in snapshots if s['SnapshotType'] == 'automated'])
+        snapshots = [s for s in snapshots if s['SnapshotType'] != 'automated']
+        if skipped:
+            self.log.info("Automated snapshots cannot be deleted, skipping %d snapshot(s)", skipped)
         log.info("Deleting %d rds snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
