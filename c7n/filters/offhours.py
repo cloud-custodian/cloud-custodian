@@ -280,7 +280,7 @@ class Time(Filter):
         'properties': {
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
-            'fallback_schedule': {'type': 'string'},
+            'fallback-schedule': {'type': 'string'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
