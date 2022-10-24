@@ -879,10 +879,10 @@ class UsedSecurityGroup(SGUsage):
                 filters:
                   - used
                   - type: value
-                      key: c7n:InstanceOwnerIds
-                      op: intersect
-                      value:
-                        - amazon-rds
+                    key: c7n:InstanceOwnerIds
+                    op: intersect
+                    value:
+                      - amazon-rds
 
             policies:
               - name: security-groups-used-by-natgw
@@ -890,10 +890,10 @@ class UsedSecurityGroup(SGUsage):
                 filters:
                   - used
                   - type: value
-                      key: c7n:InterfaceTypes
-                      op: intersect
-                      value:
-                        - nat_gateway
+                    key: c7n:InterfaceTypes
+                    op: intersect
+                    value:
+                      - nat_gateway
     """
     schema = type_schema('used')
 
