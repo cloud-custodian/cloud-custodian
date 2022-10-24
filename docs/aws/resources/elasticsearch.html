@@ -6184,6 +6184,7 @@ value: [“103.15.250.0/24”, “173.240.160.0/21”, “206.108.40.0/21”]</p
 <li><p><a class="reference internal" href="#aws-elasticsearch-actions-remove-statements"><span class="std std-ref">remove-statements</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-remove-tag"><span class="std std-ref">remove-tag</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-tag"><span class="std std-ref">tag</span></a></p></li>
+<li><p><a class="reference internal" href="#aws-elasticsearch-actions-update-tls-config"><span class="std std-ref">update-tls-config</span></a></p></li>
 <li><p><a class="reference internal" href="aws-common-actions.html#aws-common-actions-webhook"><span class="std std-ref">webhook</span></a></p></li>
 </ul>
 </div></blockquote>
@@ -6261,6 +6262,44 @@ ElasticSearch domain.</p>
 </div>
 </div>
 <p>Permissions - es:DescribeElasticsearchDomainConfig, es:UpdateElasticsearchDomainConfig</p>
+</section>
+<section id="update-tls-config">
+<span id="aws-elasticsearch-actions-update-tls-config"></span><h3>update-tls-config<a class="headerlink" href="#update-tls-config" title="Permalink to this headline">¶</a></h3>
+<p>Action to update tls-config on a domain endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">policies</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">update-tls-config</span><span class="w"></span>
+<span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elasticsearch</span><span class="w"></span>
+<span class="w">    </span><span class="nt">filters</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value</span><span class="w"></span>
+<span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;DomainEndpointOptions.TLSSecurityPolicy&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eq</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Policy-Min-TLS-1-0-2019-07&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">actions</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">update-tls-config</span><span class="w"></span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Policy-Min-TLS-1-2-2019-07&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="toggle docutils container">
+<div class="header docutils container" style=""></div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">properties</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">enum</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">update-tls-config</span><span class="w"></span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">enum</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Policy-Min-TLS-1-0-2019-07</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Policy-Min-TLS-1-2-2019-07</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w"></span>
+<span class="nt">required</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">value</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>Permissions - es:UpdateElasticsearchDomainConfig, es:ListDomainNames</p>
 </section>
 </section>
 </section>

@@ -812,6 +812,8 @@ Actions
   
   - :ref:`tag <aws.common.actions.tag>`
   
+  - :ref:`update-tls-config <aws.elasticsearch.actions.update-tls-config>`
+
   - :ref:`webhook <aws.common.actions.webhook>`
   
 
@@ -942,4 +944,55 @@ Action to remove policy statements from elasticsearch
 
 
 Permissions - es:DescribeElasticsearchDomainConfig, es:UpdateElasticsearchDomainConfig
+
+
+.. _aws.elasticsearch.actions.update-tls-config:
+
+update-tls-config
++++++++++++++++++
+Action to update tls-config on a domain endpoint
+
+:example:
+
+.. code-block:: yaml
+
+        policies:
+          - name: update-tls-config
+            resource: elasticsearch
+            filters:
+              - type: value
+                key: 'DomainEndpointOptions.TLSSecurityPolicy'
+                op: eq
+                value: "Policy-Min-TLS-1-0-2019-07"
+            actions:
+              - type: update-tls-config
+                value: "Policy-Min-TLS-1-2-2019-07"
+
+.. container:: toggle
+
+  
+
+  .. raw:: html
+     
+    <div class="header docutils container" style=""></div>
+
+  .. code-block:: yaml
+
+    properties:
+      type:
+        enum:
+        - update-tls-config
+      value:
+        enum:
+        - Policy-Min-TLS-1-0-2019-07
+        - Policy-Min-TLS-1-2-2019-07
+        type: string
+    required:
+    - value
+    - type
+
+
+
+
+Permissions - es:UpdateElasticsearchDomainConfig, es:ListDomainNames
 
