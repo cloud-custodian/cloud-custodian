@@ -863,26 +863,44 @@ class UnusedSecurityGroup(SGUsage):
 @SecurityGroup.filter_registry.register('used')
 class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
-
     This operates as a complement to the unused filter for multi-step
     workflows.
-
     :example:
-
     .. code-block:: yaml
-
             policies:
               - name: security-groups-in-use
                 resource: security-group
                 filters:
                   - used
+
+            policies:
+              - name: security-groups-used-by-rds
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                      key: c7n:InstanceOwnerIds
+                      op: intersect
+                      value:
+                        - amazon-rds
+
+            policies:
+              - name: security-groups-used-by-natgw
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                      key: c7n:InterfaceTypes
+                      op: intersect
+                      value:
+                        - nat_gateway
     """
     schema = type_schema('used')
 
     instance_owner_id_key = 'c7n:InstanceOwnerIds'
     interface_type_key = 'c7n:InterfaceTypes'
 
-    def _set_eni_attributes(self):
+    def _get_eni_attributes(self):
         enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
@@ -902,18 +920,16 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
-        enis = self._set_eni_attributes()
+        enis = self._get_eni_attributes()
         for r in resources:
-            r[self.instance_owner_id_key] = []
-            r[self.interface_type_key] = []
-            for i in range(1, len(enis)):
-                if r['GroupId'] == enis[i]['GroupId']:
-                    r[self.instance_owner_id_key].append(enis[i]['InstanceOwnerId'])
-                    r[self.interface_type_key].append(enis[i]['InterfaceType'])
-            r[self.instance_owner_id_key] = list(filter(None, set(
-                r[self.instance_owner_id_key])))
-            r[self.interface_type_key] = list(filter(None, set(
-                r[self.interface_type_key])))
+            owner_ids = set()
+            interface_types = set()
+            for eni in enis:
+                if r['GroupId'] == eni['GroupId']:
+                    owner_ids.add(eni['InstanceOwnerId'])
+                    interface_types.add(eni['InterfaceType'])
+            r[self.instance_owner_id_key] = list(owner_ids)
+            r[self.interface_type_key] = list(interface_types)
         return [r for r in resources if r['GroupId'] not in unused]
 
 
