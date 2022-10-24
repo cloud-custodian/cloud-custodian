@@ -45,8 +45,9 @@ if sys.platform == 'darwin' and (
 
 
 WORKER_COUNT = int(
-    cpu_multiplier = os.environ.get('C7N_ORG_PARALLEL_MULTIPLIER', 4)
-    os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * cpu_multiplier))
+    os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() \
+        * os.environ.get('C7N_ORG_PARALLEL_MULTIPLIER', 4))
+    )
 
 
 CONFIG_SCHEMA = {
