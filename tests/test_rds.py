@@ -1183,6 +1183,37 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_snapshot_trim_skip_automated(self):
+        factory = self.replay_flight_data("test_rds_snapshot_delete_skip_automated",
+            region="us-east-2")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-trim-skip-automated",
+                "resource": "rds-snapshot",
+                "filters": [
+                    {
+                        "DBInstanceIdentifier": "c7n-test"
+                    },
+                    {
+                        "type": "reduce",
+                        "group-by": "SnapshotType",
+                        "sort-by": "SnapshotCreateTime",
+                        "limit": 1
+                    }
+                ],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        assert (
+            'Automated snapshots cannot be deleted, skipping 1 snapshot(s)'
+            in log_output.getvalue().strip()
+        )
+
     def test_rds_snapshot_tag(self):
         factory = self.replay_flight_data("test_rds_snapshot_mark")
         client = factory().client("rds")
