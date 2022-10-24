@@ -281,6 +281,7 @@ class Time(Filter):
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
             'fallback-schedule': {'type': 'string'},
+            'fallback_schedule': {'type': 'string'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
@@ -344,7 +345,7 @@ class Time(Filter):
         self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
         self.tag_key = self.data.get('tag', self.DEFAULT_TAG).lower()
-        self.fallback_schedule = self.data.get('fallback-schedule', None)
+        self.fallback_schedule = self.data.get('fallback-schedule', None) or self.data.get('fallback_schedule', None)
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 
