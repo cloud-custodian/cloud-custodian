@@ -170,7 +170,7 @@ def test_cli_output_json_query(tmp_path):
     write_output_test_policy(tmp_path)
 
     runner = CliRunner()
-    result = runner.invoke(
+    runner.invoke(
         cli.cli,
         [
             "run",
