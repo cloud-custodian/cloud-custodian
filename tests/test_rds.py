@@ -1210,7 +1210,7 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         assert (
-            'Automated snapshots cannot be deleted, skipping 1 snapshot(s)'
+            'delete implicitly filtered 1 of 2 resources'
             in log_output.getvalue().strip()
         )
 
