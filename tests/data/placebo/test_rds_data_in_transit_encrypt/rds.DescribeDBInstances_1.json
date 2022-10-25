@@ -151,10 +151,10 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 10,
-                    "day": 18,
-                    "hour": 5,
+                    "day": 25,
+                    "hour": 7,
                     "minute": 18,
-                    "second": 51,
+                    "second": 54,
                     "microsecond": 0
                 },
                 "MultiAZ": false,
@@ -205,11 +205,11 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 10,
-                    "day": 19,
-                    "hour": 10,
+                    "day": 26,
+                    "hour": 11,
                     "minute": 9,
-                    "second": 57,
-                    "microsecond": 449000
+                    "second": 28,
+                    "microsecond": 444000
                 },
                 "MasterUsername": "admin",
                 "Endpoint": {
@@ -354,8 +354,8 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 10,
-                    "day": 12,
-                    "hour": 10,
+                    "day": 19,
+                    "hour": 11,
                     "minute": 0,
                     "second": 0,
                     "microsecond": 0
