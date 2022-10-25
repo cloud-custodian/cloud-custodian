@@ -344,7 +344,7 @@ class TestResolverQueryLogConfig(BaseTest):
             'filters': [
                 {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
             'actions': [{
-                'type': 'associate-vpc', 'vpcid': 'vpc-011516c43259533d324'}]},
+                'type': 'associate-vpc', 'vpcid': 'vpc-011516c4325953'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
