@@ -110,6 +110,21 @@ def write_output_test_policy(tmp_path):
     )
 
 
+def test_cli_no_policies(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+        ],
+    )
+    assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
+
+
 def test_cli_output_rich(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
