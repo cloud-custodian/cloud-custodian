@@ -3,6 +3,8 @@
 #
 import json
 import os
+from unittest.mock import ANY
+
 import pytest
 from pathlib import Path
 
@@ -49,6 +51,9 @@ def test_provider_parse():
     rtype, resources = resource_types.pop()
     assert rtype == "aws_subnet"
     assert resources[0]["__tfmeta"] == {
+        "type": "resource",
+        "label": "aws_subnet",
+        "path": "aws_subnet.example",
         "filename": "network.tf",
         "line_start": 5,
         "line_end": 8,
@@ -105,6 +110,21 @@ def write_output_test_policy(tmp_path):
     )
 
 
+def test_cli_no_policies(tmp_path, caplog):
+    runner = CliRunner()
+    runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+        ],
+    )
+    assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
+
+
 def test_cli_output_rich(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
@@ -146,6 +166,35 @@ def test_cli_output_github(tmp_path):
     )
 
 
+def test_cli_output_json_query(tmp_path):
+    write_output_test_policy(tmp_path)
+
+    runner = CliRunner()
+    runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+            "--output-query",
+            "[].file_path",
+        ],
+    )
+
+    results = json.loads((tmp_path / "output.json").read_text())
+    assert results == {
+        "results": [
+            "tests/terraform/aws_s3_encryption_audit/main.tf",
+        ]
+    }
+
+
 def test_cli_output_json(tmp_path):
     write_output_test_policy(tmp_path)
 
@@ -184,6 +233,21 @@ def test_cli_output_json(tmp_path):
                 "mode": {"type": "terraform-source"},
                 "name": "check-bucket",
                 "resource": "terraform.aws_s3_bucket",
+            },
+            "resource": {
+                "__tfmeta": {
+                    "filename": "main.tf",
+                    "label": "aws_s3_bucket",
+                    "line_end": 28,
+                    "line_start": 25,
+                    "path": "aws_s3_bucket.example_c",
+                    "src_dir": "tests/terraform/aws_s3_encryption_audit",
+                    "type": "resource",
+                },
+                "acl": "private",
+                "bucket": "c7n-aws-s3-encryption-audit-test-c",
+                "c7n:MatchedFilters": ["server_side_encryption_configuration"],
+                "id": ANY,
             },
         }
     ]
