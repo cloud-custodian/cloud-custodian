@@ -165,8 +165,6 @@ class TestAdmissionControllerMode(KubeTest):
         self.assertEqual(result, 'deny')
 
     def test_sub_resource_pod_exec(self):
-        # the double not in this policy is here to ensure that the core not
-        # filters work in this provider
         factory = self.replay_flight_data()
         policy = self.load_policy(
             {
