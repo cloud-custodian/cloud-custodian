@@ -6024,20 +6024,71 @@ targets.</p>
 </section>
 <section id="used">
 <span id="aws-security-group-filters-used"></span><h3>used<a class="headerlink" href="#used" title="Permalink to this headline">¶</a></h3>
-<p>Filter to security groups that are used.</p>
-<p>This operates as a complement to the unused filter for multi-step
-workflows.</p>
-<dl class="field-list simple">
-<dt class="field-odd">example</dt>
-<dd class="field-odd"><p></p></dd>
+<p>Filter to security groups that are used.
+This operates as a complement to the unused filter for multi-step
+workflows.
+:example:
+.. code-block:: yaml</p>
+<blockquote>
+<div><dl>
+<dt>policies:</dt><dd><ul>
+<li><p>name: security-groups-in-use
+resource: security-group
+filters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>used</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+<dt>policies:</dt><dd><ul>
+<li><p>name: security-groups-used-by-rds
+resource: security-group
+filters:</p>
+<blockquote>
+<div><ul>
+<li><p>used</p></li>
+<li><p>type: value
+key: c7n:InstanceOwnerIds
+op: intersect
+value:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>amazon-rds</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+<dt>policies:</dt><dd><ul>
+<li><p>name: security-groups-used-by-natgw
+resource: security-group
+filters:</p>
+<blockquote>
+<div><ul>
+<li><p>used</p></li>
+<li><p>type: value
+key: c7n:InterfaceTypes
+op: intersect
+value:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>nat_gateway</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
 </dl>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">policies</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security-groups-in-use</span><span class="w"></span>
-<span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security-group</span><span class="w"></span>
-<span class="w">    </span><span class="nt">filters</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">used</span><span class="w"></span>
-</pre></div>
-</div>
+</div></blockquote>
 <div class="toggle docutils container">
 <div class="header docutils container" style=""></div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">properties</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"></span>

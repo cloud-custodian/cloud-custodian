@@ -746,19 +746,37 @@ Permissions - lambda:ListFunctions, ec2:DescribeNetworkInterfaces, autoscaling:D
 used
 ++++
 Filter to security groups that are used.
-
 This operates as a complement to the unused filter for multi-step
 workflows.
-
 :example:
-
 .. code-block:: yaml
-
         policies:
           - name: security-groups-in-use
             resource: security-group
             filters:
               - used
+
+        policies:
+          - name: security-groups-used-by-rds
+            resource: security-group
+            filters:
+              - used
+              - type: value
+                key: c7n:InstanceOwnerIds
+                op: intersect
+                value:
+                  - amazon-rds
+
+        policies:
+          - name: security-groups-used-by-natgw
+            resource: security-group
+            filters:
+              - used
+              - type: value
+                key: c7n:InterfaceTypes
+                op: intersect
+                value:
+                  - nat_gateway
 
 .. container:: toggle
 
