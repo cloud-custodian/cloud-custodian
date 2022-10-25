@@ -1297,9 +1297,9 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 5)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"},
+            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
 
