@@ -335,7 +335,7 @@ class TestResolverQueryLogConfig(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_resolver_query_log_config_associate(self):
+    def test_resolver_query_log_config_associate_1(self):
         session_factory = self.replay_flight_data(
             'test_resolver_query_log_config_associate')
         p = self.load_policy({
@@ -345,6 +345,21 @@ class TestResolverQueryLogConfig(BaseTest):
                 {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
             'actions': [{
                 'type': 'associate-vpc', 'vpcid': 'all'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], "rqlc-fb017689395648d1")
+
+    def test_resolver_query_log_config_associate_2(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associate')
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config',
+            'resource': 'resolver-qlc',
+            'filters': [
+                {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
+            'actions': [{
+                'type': 'associate-vpc', 'vpcid': 'vpc-d2d616b5'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
