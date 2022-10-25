@@ -166,6 +166,35 @@ def test_cli_output_github(tmp_path):
     )
 
 
+def test_cli_output_json_query(tmp_path):
+    write_output_test_policy(tmp_path)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+            "--output-query",
+            "[].file_path",
+        ],
+    )
+
+    results = json.loads((tmp_path / "output.json").read_text())
+    assert results == {
+        "results": [
+            "tests/terraform/aws_s3_encryption_audit/main.tf",
+        ]
+    }
+
+
 def test_cli_output_json(tmp_path):
     write_output_test_policy(tmp_path)
 
