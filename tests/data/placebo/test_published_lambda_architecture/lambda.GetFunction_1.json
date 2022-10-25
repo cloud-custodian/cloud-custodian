@@ -1,12 +1,42 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
-            "Code": "ResourceNotFoundException"
-        },
         "ResponseMetadata": {},
-        "Type": "User",
-        "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar"
+        "Configuration": {
+            "FunctionName": "custodian-ec2-foo-bar",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
+            "Runtime": "python3.9",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "custodian_policy.run",
+            "CodeSize": 530080,
+            "Description": "cloud-custodian lambda policy",
+            "Timeout": 900,
+            "MemorySize": 512,
+            "LastModified": "2022-10-25T18:40:44.273+0000",
+            "CodeSha256": "w/2LuI41TjR+c4a8nRpbL3TvCofA8FVvLMGG0QbJmcY=",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": ""
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "082619d5-c5d4-41b2-998b-14bf375b18d3",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "arm64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-ec2-foo-bar-2306394d-99d8-4bde-a778-6f66b684056b?versionId=38_Kl2haR5LpxBg3mlInIbj1f60VYXPr&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEAMaCXVzLWVhc3QtMSJGMEQCIHVyeYh3z4WqLLdmr8X9fmmWdcus37ocUN%2FscBz2EW61AiAydDQDNI%2BqpOwTXEs%2BvvRrP%2B1CrjS3wNNq59rwOMfHYCrVBAjb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDc0OTY3ODkwMjgzOSIMqi2QO%2FtdicSSnu1LKqkETJ%2Br92vm13Wkx7ZxPs2YOD7IcrrHCkkfqaSvJsEk9ax5BDYZuDiM%2Bl8VJcXNDkE0uGtYsZqjIGbCMgD4OxL3Da6dDY1qo6LHPc7sNbJI9con3PA5OZ3ENMgycfYheptI074Q%2FP2tMn7KSh8q7wTeD1EBr%2B7YcQqEVmtYrQfdFSQSdf8LSKEgjlyRTsprSr9WHyUoIdNO%2FkgHkAaWOFJyIYWxtoWztHC0Tc2zsoEA1N%2FtKpPDoeEafw8ZPKl2lg%2Bog3ZNdK92I9CMiTi7Y%2FtgS31wSrJSAJDUQiATXV411%2BeHUNUOTXr06LKwMbj0oHR2eQIIB2W4F3gEDMI18iTjH4j%2F2S1uJuzpTKm%2B%2FJehVWykd%2FwJ9XMGrqfiNVOInn0jaQwvSR6kk2OHCypz3UNex9a7yLe2AMwOtebw5aL8Drbn8dfJOY%2BG%2BXiQh4asW3DLMjMFvxjsYHDZHgd6BguLJsuCXXqUfm9BD9uqQXHUMFVkEaWXQChEkLdBQNa5d0XV%2FxMGaLFK49M%2FSx0jNozjZEMp1vNdul%2B6pXvIPm4%2F%2Ff5R68wTzpVhhOSIy1zqkLZbvZuwLZKP7JcmeGAGosno9%2FJySTn9b9QG81QFC9ZCl7o5Xz%2BGUp6Iog3g5Cws0AAF5GfcuDY2ffO8HeVZFCGA9TulPKKbcXgeCOO7vcEZyjEzdYQR3NFYjHleMy4lyleF6H3mQEUwTVrxZ5q65xgS5mZ8ZO%2BkYG9R7zCk1eCaBjqqAVb7sM8vHWxMAOXoPA6XwCsPKC0JRY9bw2BMxrwBdnZHMC8WSNQ14%2F3RpTJ70BGBk2J9kC6eaRGbHUz%2Bf4YKfUoCol4isVB4cW31imH6dG64Cm%2BGWgSmQVSTkCPSgGGsUjqJymoEwQqmCA5kKVL8iv%2BVYzeRIYhVsBHUeLJissJs8vPoA90SPiXKmT1G7%2BYP9hOACJlZOrUJLR69dXB%2FFQhziae1y%2BtLWvOy&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20221025T184139Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3R6BFQ2PH%2F20221025%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=710856a3a9a71bfde5277e8a825df89dbd5f83084363f596fe7bd49ce6aa8167"
+        }
     }
 }

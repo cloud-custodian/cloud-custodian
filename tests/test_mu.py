@@ -155,7 +155,8 @@ class PolicyLambdaProvision(Publish):
 
     def test_published_lambda_architecture(self):
         session_factory = self.replay_flight_data("test_published_lambda_architecture")
-        with patch('platform.machine', return_value='arm64'):
+        lambda_client = session_factory().client("lambda")
+        with patch('platform.machine', return_value="arm64"):
             p = self.load_policy({
                 'name': 'ec2-foo-bar',
                 'resource': 'aws.ec2',
@@ -166,8 +167,28 @@ class PolicyLambdaProvision(Publish):
             pl = PolicyLambda(p)
             mgr = LambdaManager(session_factory)
             result = mgr.publish(pl)
-            self.addCleanup(mgr.remove, pl)
             self.assertEqual(result["Architectures"], ["arm64"])
+
+        with patch('platform.machine', return_value="x86_64"):
+            p = self.load_policy({
+                'name': 'ec2-foo-bar',
+                'resource': 'aws.ec2',
+                'mode': {
+                    'type': 'cloudtrail',
+                    'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'events': ['RunInstances']}})
+            pl = PolicyLambda(p)
+            mgr = LambdaManager(session_factory)
+            output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
+            result = mgr.publish(pl)
+            if self.recording:
+                time.sleep(60)
+            lines = output.getvalue().strip().split("\n")
+            self.assertTrue(
+                "Updating function architecture: custodian-ec2-foo-bar" in lines)
+            updated_function = lambda_client.get_function(FunctionName="custodian-ec2-foo-bar")
+            self.assertEqual(updated_function.get('Configuration').get('Architectures'), ["x86_64"])
+            self.addCleanup(mgr.remove, pl)
 
     def test_config_poll_rule_evaluation(self):
         session_factory = self.record_flight_data("test_config_poll_rule_provision")

@@ -1,0 +1,12 @@
+{
+    "status_code": 409,
+    "data": {
+        "Error": {
+            "Message": "The statement id (custodian-ec2-foo-bar) provided already exists. Please provide a new statement id, or remove the existing statement.",
+            "Code": "ResourceConflictException"
+        },
+        "ResponseMetadata": {},
+        "Type": "User",
+        "message": "The statement id (custodian-ec2-foo-bar) provided already exists. Please provide a new statement id, or remove the existing statement."
+    }
+}
