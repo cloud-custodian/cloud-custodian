@@ -3,6 +3,8 @@
 #
 import json
 import os
+from unittest.mock import ANY
+
 import pytest
 from pathlib import Path
 
@@ -49,6 +51,9 @@ def test_provider_parse():
     rtype, resources = resource_types.pop()
     assert rtype == "aws_subnet"
     assert resources[0]["__tfmeta"] == {
+        "type": "resource",
+        "label": "aws_subnet",
+        "path": "aws_subnet.example",
         "filename": "network.tf",
         "line_start": 5,
         "line_end": 8,
@@ -184,6 +189,21 @@ def test_cli_output_json(tmp_path):
                 "mode": {"type": "terraform-source"},
                 "name": "check-bucket",
                 "resource": "terraform.aws_s3_bucket",
+            },
+            "resource": {
+                "__tfmeta": {
+                    "filename": "main.tf",
+                    "label": "aws_s3_bucket",
+                    "line_end": 28,
+                    "line_start": 25,
+                    "path": "aws_s3_bucket.example_c",
+                    "src_dir": "tests/terraform/aws_s3_encryption_audit",
+                    "type": "resource",
+                },
+                "acl": "private",
+                "bucket": "c7n-aws-s3-encryption-audit-test-c",
+                "c7n:MatchedFilters": ["server_side_encryption_configuration"],
+                "id": ANY,
             },
         }
     ]
