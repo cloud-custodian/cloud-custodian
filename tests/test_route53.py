@@ -319,3 +319,33 @@ class Route53EnableDNSQueryLoggingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Id'], "/hostedzone/Z20H1474487I0O")
+
+
+class TestResolverQueryLogConfig(BaseTest):
+
+    def test_resolver_query_log_config(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config')
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config',
+            'resource': 'resolver-qlc',
+            'filters': [
+                {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_resolver_query_log_config_associate(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associate')
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config',
+            'resource': 'resolver-qlc',
+            'filters': [
+                {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
+            'actions': [{
+                'type': 'associate-vpc', 'vpcid': 'vpc-011516c43259533d324'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], "rqlc-fb017689395648d1")

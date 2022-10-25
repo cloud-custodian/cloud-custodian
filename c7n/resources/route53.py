@@ -16,6 +16,7 @@ from c7n.filters import Filter
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
+from c7n.filters.related import RelatedResourceFilter
 
 
 class Route53Base:
@@ -485,3 +486,76 @@ class IsQueryLoggingEnabled(Filter):
             elif not logging and not state:
                 results.append(r)
         return results
+
+
+@resources.register('resolver-qlc')
+class ResolverQueryLogConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'query_log_config'
+        enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
+        name = 'Name'
+        id = 'Id'
+        cfn_type = 'AWS::Route53Resolver::ResolverQueryLoggingConfig'
+
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+
+    def augment(self, rqlcs):
+        client = local_session(self.session_factory).client('route53resolver')
+        for rqlc in rqlcs:
+            rqlc['Tags'] = self.retry(
+                client.list_tags_for_resource,
+                ResourceArn=rqlc['Arn'])['Tags']
+        return rqlcs
+
+
+@ResolverQueryLogConfig.action_registry.register('associate-vpc')
+class ResolverQueryLogConfigAssociate(BaseAction):
+    """Associates ResolverQueryLogConfig to a VPC
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: r53-resolver-query-log-config-associate
+            resource: resolver-qlc
+            filters:
+              - type: value
+                key: 'Name'
+                op: eq
+                value: "Test-rqlc"
+            actions:
+              - type: associate-vpc
+                vpcid: all
+
+    """
+    permissions = (
+        'route53resolver:AssociateResolverQueryLogConfig',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+    schema = type_schema('associate-vpc', vpcid={'type': 'string',
+        'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'}, required=['vpcid'])
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def get_vpc_id(self):
+        vpcs = RelatedResourceFilter.get_resource_manager(self).resources()
+        if self.data.get('vpcid') == 'all':
+            vpc_ids = [v['VpcId'] for v in vpcs]
+        else:
+            vpc_ids = [self.data.get('vpcid')]
+        return vpc_ids
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        vpc_ids = self.get_vpc_id()
+
+        for r in resources:
+            for vpc_id in vpc_ids:
+                if not client.list_resolver_query_log_config_associations(Filters=[{'Name':
+                        'ResourceId', 'Values': [vpc_id]}])['ResolverQueryLogConfigAssociations']:
+                    client.associate_resolver_query_log_config(ResolverQueryLogConfigId=r['Id'],
+                        ResourceId=vpc_id)

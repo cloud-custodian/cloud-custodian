@@ -153,6 +153,7 @@ ResourceMap = {
     "aws.peering-connection": "c7n.resources.vpc.PeeringConnection",
     'aws.qldb': 'c7n.resources.qldb.QLDB',
     "aws.r53domain": "c7n.resources.route53.Route53Domain",
+    "aws.resolver-qlc": "c7n.resources.route53.ResolverQueryLogConfig",
     "aws.rds": "c7n.resources.rds.RDS",
     "aws.rds-cluster": "c7n.resources.rdscluster.RDSCluster",
     "aws.rds-cluster-param-group": "c7n.resources.rdsparamgroup.RDSClusterParamGroup",
