@@ -9,6 +9,7 @@ from concurrent.futures import as_completed
 import functools
 import itertools
 import json
+from typing import List
 
 import jmespath
 import os
@@ -67,8 +68,11 @@ class ResourceQuery:
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
-        client = local_session(self.session_factory).client(
-            m.service, resource_manager.config.region)
+        if resource_manager.get_client:
+            client = resource_manager.get_client()
+        else:
+            client = local_session(self.session_factory).client(
+                m.service, resource_manager.config.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
@@ -99,6 +103,9 @@ class ResourceQuery:
             # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, str), resources)):
                 resources = [r for r in resources if r in identities]
+            # This logic should fix https://github.com/cloud-custodian/cloud-custodian/issues/7573
+            elif all(map(lambda r: isinstance(r, tuple), resources)):
+                resources = [(p, r) for p, r in resources if r[m.id] in identities]
             else:
                 resources = [r for r in resources if r[m.id] in identities]
 
@@ -439,8 +446,11 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     _generate_arn = None
 
+    get_client = None
+
     retry = staticmethod(
         get_retry((
+            'TooManyRequestsException',
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
@@ -502,29 +512,28 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             'q': query
         }
 
-    def resources(self, query=None, augment=True):
+    def resources(self, query=None, augment=True) -> List[dict]:
         query = self.source.get_query_params(query)
         cache_key = self.get_cache_key(query)
         resources = None
 
-        if self._cache.load():
+        with self._cache:
             resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
-                    "%s.%s" % (self.__class__.__module__,
-                               self.__class__.__name__),
+                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
                     len(resources)))
 
-        if resources is None:
-            if query is None:
-                query = {}
-            with self.ctx.tracer.subsegment('resource-fetch'):
-                resources = self.source.resources(query)
-            if augment:
-                with self.ctx.tracer.subsegment('resource-augment'):
-                    resources = self.augment(resources)
-                # Don't pollute cache with unaugmented resources.
-                self._cache.save(cache_key, resources)
+            if resources is None:
+                if query is None:
+                    query = {}
+                with self.ctx.tracer.subsegment('resource-fetch'):
+                    resources = self.source.resources(query)
+                if augment:
+                    with self.ctx.tracer.subsegment('resource-augment'):
+                        resources = self.augment(resources)
+                    # Don't pollute cache with unaugmented resources.
+                    self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):
@@ -547,7 +556,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
-        if self._cache.load():
+        with self._cache:
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached results for get_resources")
@@ -815,6 +824,9 @@ class TypeInfo(metaclass=TypeMeta):
         passed as this value. Further customizations of dimensions require subclass metrics filter
     :param cfn_type: AWS Cloudformation type
     :param config_type: AWS Config Service resource type name
+    :param config_id: Resource attribute that maps to the resourceId field in AWS Config. Intended
+        for resources which use one ID attribute for service API calls and a different one for
+        AWS Config (example: IAM resources).
     :param universal_taggable: Whether or not resource group tagging api can be used, in which case
         we'll automatically register tag actions/filters. Note: values of True will register legacy
         tag filters/actions, values of object() will just register current standard
@@ -856,6 +868,7 @@ class TypeInfo(metaclass=TypeMeta):
     dimension = None
     cfn_type = None
     config_type = None
+    config_id = None
     universal_taggable = False
     global_resource = False
     metrics_namespace = None

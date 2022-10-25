@@ -8,13 +8,19 @@ from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
-from c7n.exceptions import PolicyValidationError
-from c7n.utils import local_session, type_schema, chunks
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.utils import get_retry, local_session, type_schema, chunks
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
+
+
+class DescribeWorkspace(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('workspaces')
@@ -26,10 +32,12 @@ class Workspace(QueryResourceManager):
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
-        cfn_type = 'AWS::WorkSpaces::Workspace'
+        cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
 
-    def augment(self, resources):
-        return universal_augment(self, resources)
+    source_mapping = {
+        'describe': DescribeWorkspace,
+        'config': ConfigSource
+    }
 
 
 @Workspace.filter_registry.register('connection-status')
@@ -77,15 +85,23 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('workspaces')
-        annotate_map = {r['WorkspaceId']: r for r in resources if self.annotation_key not in r}
+        unannotated = {r['WorkspaceId']: r for r in resources if self.annotation_key not in r}
+        status_map = {}
         with self.executor_factory(max_workers=2) as w:
             self.log.debug(
-                'Querying connection status for %d workspaces' % len(annotate_map))
+                'Querying connection status for %d workspaces' % len(unannotated))
             for status in itertools.chain(*w.map(
                 functools.partial(self.get_connection_status, client),
-                chunks(annotate_map.keys(), 25)
+                chunks(unannotated.keys(), 25)
             )):
-                annotate_map[status['WorkspaceId']][self.annotation_key] = status
+                status_map[status['WorkspaceId']] = status
+
+        # Note: In some cases (e.g. workspaces that just launched or reached ERROR state during
+        # initialization) there will be no connection status information. Here we'll make
+        # sure that every workspace gets _some_ status annotation, even if it's empty.
+        for ws_id, r in unannotated.items():
+            r[self.annotation_key] = status_map.get(ws_id, {})
+
         return list(filter(self, resources))
 
     def get_resource_value(self, k, i):
@@ -267,6 +283,45 @@ class WorkSpacesDirectorySg(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetIds[]"
 
 
+@WorkspaceDirectory.filter_registry.register('connection-aliases')
+class WorkspacesDirectoryConnectionAliases(ValueFilter):
+    """Filter workspace directories based on connection aliases
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: workspace-connection-alias
+           resource: aws.workspaces-directory
+           filters:
+            - type: connection-aliases
+              key: 'ConnectionAliases'
+              value: 'empty'
+
+    """
+
+    permissions = ('workspaces:DescribeConnectionAliases',)
+
+    schema = type_schema('connection-aliases', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ConnectionAliases'
+
+    def process(self, directories, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        results = []
+
+        for directory in directories:
+            if self.annotation_key not in directory:
+                connection_aliases = client.describe_connection_aliases(
+                    ResourceId=directory['DirectoryId'])
+                directory[self.annotation_key] = connection_aliases
+
+            if self.match(directory[self.annotation_key]):
+                results.append(directory)
+
+        return results
+
+
 @WorkspaceDirectory.filter_registry.register('client-properties')
 class WorkspacesDirectoryClientProperties(ValueFilter):
     """Filter workspace directories based off workspace client properties.
@@ -364,3 +419,43 @@ class ModifyClientProperties(BaseAction):
                     ResourceId=directory['DirectoryId'], **self.data['attributes'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@WorkspaceDirectory.action_registry.register('deregister')
+class DeregisterWorkspaceDirectory(BaseAction):
+    """
+    Deregisters a workspace
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: deregister-workspace
+          resource: aws.workspaces-directory
+          filters:
+            - "tag:Deregister": present
+          actions:
+            - deregister
+    """
+
+    schema = type_schema('deregister')
+    permissions = ('workspaces:DeregisterWorkspaceDirectory',)
+
+    def process(self, directories):
+        exceptions = []
+        retry = get_retry(('InvalidResourceStateException',))
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for d in directories:
+            try:
+                retry(client.deregister_workspace_directory, DirectoryId=d['DirectoryId'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+            except client.exceptions.OperationNotSupportedException as e:
+                self.log.error(f"Error deregistering workspace: {d['DirectoryId']} error: {e}")
+                exceptions.append(d['DirectoryId'])
+
+        if exceptions:
+            raise PolicyExecutionError(
+                'The following directories must be removed from WorkSpaces'
+                'and cannot be deregistered: %s ' % ''.join(map(str, exceptions))
+            )

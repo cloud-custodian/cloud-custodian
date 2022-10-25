@@ -23,7 +23,8 @@ in your Azure subscription:
 Successive policy deployments will only create a new Function App for the policy, 
 because the rest of the infrastructure can be shared.
 
-Note: Python 3.6 or higher is required to deploy a policy to an Azure Function.
+Note: Ensure you are using at least the minimum `actively supported
+<https://devguide.python.org/#status-of-python-branches>`_ version of Python.
 
 Azure Modes
 ###########

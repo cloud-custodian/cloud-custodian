@@ -89,7 +89,8 @@ class ConfigRuleTest(BaseTest):
                 "name": "rule",
                 "resource": "config-rule",
                 "filters": [
-                    {"type": "status", "key": "FirstEvaluationStarted", "value": True}
+                    {"type": "status", "key": "FirstEvaluationStarted", "value": True},
+                    {"tag:Environment": "sandbox"}
                 ],
             },
             session_factory=session_factory,
@@ -111,7 +112,11 @@ class ConfigRuleTest(BaseTest):
             {
                 "name": "rule",
                 "resource": "config-rule",
-                "filters": [{"ConfigRuleName": "custodian-db-tags"}],
+                "filters": [
+                    {"type": "value", "key": "ConfigRuleName",
+                     "value": "^custodian-db-", "op": "regex"},
+                    {"tag:Environment": "sandbox"}
+                ],
                 "actions": ["delete"],
             },
             session_factory=session_factory,

@@ -30,7 +30,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
 
 from c7n_org.utils import environ, account_tags
 
@@ -198,9 +198,18 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
 def resolve_regions(regions, account):
     if 'all' in regions:
-        session = get_session(account, 'c7n-org', "us-east-1")
-        client = session.client('ec2')
-        return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        try:
+            session = get_session(account, 'c7n-org', 'us-east-1')
+            client = session.client('ec2')
+            return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        except ClientError as e:
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
 
@@ -334,6 +343,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
+                    if k in r:
+                        k = 'tag:' + k
                     r[k] = v
         records.extend(policy_records)
     return records
@@ -413,7 +424,7 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
@@ -462,6 +473,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
     output_dir = os.path.join(output_dir, account['name'], region)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+    vars = {"account": account["name"], "account_id": account["account_id"],
+        "region": region, "output_dir": output_dir}
+    script_args = format_string_values(script_args, **vars)
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:

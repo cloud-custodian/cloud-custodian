@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
-from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -10,14 +9,18 @@ import time
 import uuid
 from collections import OrderedDict
 
-from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest, event_data
-
+import c7n.resources.rds
+from botocore.exceptions import ClientError
+from c7n import tags
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import rds
-from c7n import tags
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+from dateutil import tz as tzutil
+
+from .common import BaseTest, event_data
 
 logger = logging.getLogger(name="c7n.tests")
 
@@ -867,6 +870,20 @@ class RDSTest(BaseTest):
         db_info = client.describe_db_instances(DBInstanceIdentifier="database-4")
         self.assertTrue(db_info["DBInstances"][0]["PerformanceInsightsEnabled"])
 
+    def test_rds_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rds_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-count-filter",
+                "resource": "rds",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RDSSnapshotTest(BaseTest):
 
@@ -1379,6 +1396,26 @@ class RDSSnapshotTest(BaseTest):
             )
         self.assertIn("requires cross-account filter", str(err.exception))
 
+    def test_rds_engine_filter(self):
+        session_factory = self.replay_flight_data("test_rds_engine_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-engine-filter",
+                "resource": "aws.rds",
+                "filters": [
+                    {
+                        "type": "engine",
+                        "key": "Status",
+                        "value": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Engine" in resources[0].keys())
+
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
 
@@ -1596,6 +1633,32 @@ class TestRDSParameterGroupFilter(BaseTest):
                 print(len(f_resources), fdata, assertion)
                 self.fail(err_msg)
 
+    def test_rds_param_value(self):
+        session_factory = self.replay_flight_data("test_rds_param_value")
+        p = self.load_policy(
+            {
+                "name": "rds-param-value",
+                "resource": "aws.rds",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "rds.force_admin_logging_level",
+                        "value": "info",
+                        "value_type": "normalize",
+                        "op": "eq",
+                    },
+                ],
+            },
+            session_factory=session_factory, cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
+        self.assertEqual(resources[0].get(
+            'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
+        self.assertIn(('DBParameterGroupName', 'test'), resources[0].get(
+            'DBParameterGroups')[0].items())
+
 
 class Resize(BaseTest):
 
@@ -1779,3 +1842,26 @@ class RDSEventSubscription(BaseTest):
         client = session_factory().client("rds")
         response = client.describe_event_subscriptions()
         self.assertEqual(len(response.get('EventSubscriptionsList')), 0)
+
+
+class RDSProxy(BaseTest):
+    def test_rds_proxy_resource(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-rds-proxy',
+                'resource': 'rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'RequireTLS',
+                        'value': False
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBProxyName'], 'test-us-east-1-db-proxy')
+        self.assertEqual(resources[0]['RequireTLS'], False)

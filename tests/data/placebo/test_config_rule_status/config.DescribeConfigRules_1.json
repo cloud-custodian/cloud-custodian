@@ -47,13 +47,35 @@
                 "ConfigRuleId": "config-rule-emfxvp"
             }, 
             {
+                "ConfigRuleState": "ACTIVE",
+                "Description": "cloud-custodian lambda policy",
+                "ConfigRuleName": "custodian-db-tags",
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-whifsj",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-db-tags",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                },
+                "ConfigRuleId": "config-rule-whifsj"
+            },
+            {
                 "ConfigRuleState": "ACTIVE", 
                 "Description": "cloud-custodian lambda policy", 
-                "ConfigRuleName": "custodian-db-tags", 
-                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-whifsj", 
+                "ConfigRuleName": "custodian-db-test", 
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-zxcvbn", 
                 "Source": {
                     "Owner": "CUSTOM_LAMBDA", 
-                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-db-tags", 
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-db-test", 
                     "SourceDetails": [
                         {
                             "EventSource": "aws.config", 
@@ -66,7 +88,7 @@
                         "AWS::RDS::DBInstance"
                     ]
                 }, 
-                "ConfigRuleId": "config-rule-whifsj"
+                "ConfigRuleId": "config-rule-zxcvbn"
             }
         ], 
         "ResponseMetadata": {

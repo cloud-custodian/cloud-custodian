@@ -194,6 +194,19 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     )
 
     permissions = ('events:ListTargetsByRule',)
+    supported_resources = (
+        "aws.sqs",
+        "aws.event-bus",
+        "aws.lambda",
+        "aws.ecs",
+        "aws.ecs-task",
+        "aws.kinesis",
+        "aws.sns",
+        "aws.ssm-parameter",
+        "aws.batch-compute",
+        "aws.codepipeline",
+        "aws.step-machine",
+    )
 
     def validate(self):
         """
@@ -223,21 +236,11 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     def process(self, resources, event=None):
         # Due to lazy loading of resources, we need to explicilty load the following
         # potential targets for a event rule target:
-        load_resources(
-            [
-                "aws.sqs",
-                "aws.lambda",
-                "aws.ecs-cluster",
-                "aws.ecs-task",
-                "aws.kinesis",
-                "aws.sns",
-                "aws.ssm-parameter",
-                "aws.batch-compute",
-                "aws.codepipeline",
-            ]
-        )
+
+        load_resources(list(self.supported_resources))
         arn_resolver = ArnResolver(self.manager)
         resources = self.get_rules_with_children(resources)
+        resources = [r for r in resources if self.filter_unsupported_resources(r)]
         results = []
 
         if self.data.get('all'):
@@ -253,6 +256,14 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
                         r.setdefault('c7n:InvalidTargets', []).append(i)
                 results.append(r)
         return results
+
+    def filter_unsupported_resources(self, r):
+        for carn in r.get('c7n:ChildArns'):
+            if 'aws.' + str(ArnResolver.resolve_type(carn)) not in self.supported_resources:
+                self.log.info(
+                    f"Skipping resource {r.get('Arn')}, target type {carn} is not supported")
+                return False
+            return True
 
 
 @EventRule.action_registry.register('delete')
@@ -822,3 +833,48 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('put-subscription-filter')
+class SubscriptionFilter(BaseAction):
+    """Create/Update a subscription filter and associate with a log group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-put-subscription-filter
+            resource: log-group
+            actions:
+              - type: put-subscription-filter
+                filter_name: AllLambda
+                filter_pattern: ip
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
+                distribution: Random
+    """
+    schema = type_schema(
+        'put-subscription-filter',
+        filter_name={'type': 'string'},
+        filter_pattern={'type': 'string'},
+        destination_arn={'type': 'string'},
+        distribution={'enum': ['Random', 'ByLogStream']},
+        required=['filter_name', 'destination_arn'])
+    permissions = ('logs:PutSubscriptionFilter',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        filter_name = self.data.get('filter_name')
+        filter_pattern = self.data.get('filter_pattern', '')
+        destination_arn = self.data.get('destination_arn')
+        distribution = self.data.get('distribution', 'ByLogStream')
+
+        for r in resources:
+            client.put_subscription_filter(
+                logGroupName=r['logGroupName'],
+                filterName=filter_name,
+                filterPattern=filter_pattern,
+                destinationArn=destination_arn,
+                distribution=distribution)

@@ -3,6 +3,7 @@
 from c7n.manager import resources
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
 
@@ -40,6 +41,11 @@ class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
         r[self.policy_annotation] = p = self.client.get_resource_policy(
             SecretId=r['Name']).get('ResourcePolicy', None)
         return p
+
+
+@SecretsManager.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @SecretsManager.action_registry.register('tag')

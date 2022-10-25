@@ -265,7 +265,7 @@ class SplunkHecDelivery:
         """
         indices = set()
         if msg and msg.get('action', False) and msg['action'].get('to', False):
-            for to in msg['action']['to']:
+            for to in msg['action'].get('to', []):
                 if not to.startswith('splunkhec://'):
                     continue
                 parsed = urlparse(to)

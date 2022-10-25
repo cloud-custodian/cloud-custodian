@@ -6,7 +6,10 @@ import operator
 import random
 import re
 import zlib
+from typing import List
+from distutils.version import LooseVersion
 
+import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -293,6 +296,62 @@ class AttachedVolume(ValueFilter):
                     if a['Device'] in self.skip:
                         volumes.remove(v)
         return self.operator(map(self.match, volumes))
+
+
+@filters.register('stop-protected')
+class DisableApiStop(Filter):
+    """EC2 instances with ``disableApiStop`` attribute set
+
+    Filters EC2 instances with ``disableApiStop`` attribute set to true.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-enabled
+            resource: ec2
+            filters:
+              - type: stop-protected
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-NOT-enabled
+            resource: ec2
+            filters:
+              - not:
+                - type: stop-protected
+    """
+
+    schema = type_schema('stop-protected')
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources: List[dict], event=None) -> List[dict]:
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self._is_stop_protection_enabled(client, r)]
+
+    def _is_stop_protection_enabled(self, client, instance: dict) -> bool:
+        attr_val = self.manager.retry(
+            client.describe_instance_attribute,
+            Attribute='disableApiStop',
+            InstanceId=instance['InstanceId']
+        )
+        return attr_val['DisableApiStop']['Value']
+
+    def validate(self) -> None:
+        botocore_min_version = '1.26.7'
+
+        if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
+            raise PolicyValidationError(
+                "'stop-protected' filter requires botocore version "
+                f'{botocore_min_version} or above. '
+                f'Installed version is {botocore.__version__}.'
+            )
 
 
 @filters.register('termination-protected')
@@ -1060,7 +1119,7 @@ class SetMetadataServerAccess(BaseAction):
          - name: ec2-require-imdsv2
            resource: ec2
            filters:
-             - MetadataOptions.HttpToken: optional
+             - MetadataOptions.HttpTokens: optional
            actions:
              - type: set-metadata-access
                tokens: required
@@ -1080,12 +1139,22 @@ class SetMetadataServerAccess(BaseAction):
              - type: set-metadata-access
                endpoint: disabled
 
+       policies:
+         - name: ec2-enable-metadata-tags
+           resource: ec2
+           filters:
+             - MetadataOptions.InstanceMetadataTags: disabled
+           actions:
+             - type: set-metadata-access
+               metadata-tags: enabled
+
     Reference: https://amzn.to/2XOuxpQ
     """
 
     AllowedValues = {
         'HttpEndpoint': ['enabled', 'disabled'],
         'HttpTokens': ['required', 'optional'],
+        'InstanceMetadataTags': ['enabled', 'disabled'],
         'HttpPutResponseHopLimit': list(range(1, 65))
     }
 
@@ -1093,9 +1162,11 @@ class SetMetadataServerAccess(BaseAction):
         'set-metadata-access',
         anyOf=[{'required': ['endpoint']},
                {'required': ['tokens']},
+               {'required': ['metadatatags']},
                {'required': ['hop-limit']}],
         **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
            'tokens': {'enum': AllowedValues['HttpTokens']},
+           'metadata-tags': {'enum': AllowedValues['InstanceMetadataTags']},
            'hop-limit': {'type': 'integer', 'minimum': 1, 'maximum': 64}}
     )
     permissions = ('ec2:ModifyInstanceMetadataOptions',)
@@ -1104,6 +1175,7 @@ class SetMetadataServerAccess(BaseAction):
         return filter_empty({
             'HttpEndpoint': self.data.get('endpoint'),
             'HttpTokens': self.data.get('tokens'),
+            'InstanceMetadataTags': self.data.get('metadata-tags'),
             'HttpPutResponseHopLimit': self.data.get('hop-limit')})
 
     def process(self, resources):
@@ -1502,7 +1574,7 @@ class Terminate(BaseAction):
     with api deletion termination protection, so we can't use the bulk call
     reliabily, we need to process the instances individually. Additionally
     If we're configured with 'force' then we'll turn off instance termination
-    protection.
+    and stop protection.
 
     :Example:
 
@@ -1528,36 +1600,53 @@ class Terminate(BaseAction):
             permissions += ('ec2:ModifyInstanceAttribute',)
         return permissions
 
-    def process(self, instances):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
-        if not len(instances):
-            return
+    def process_terminate(self, instances):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        if self.data.get('force'):
-            self.log.info("Disabling termination protection on instances")
+        try:
+            self.manager.retry(
+                client.terminate_instances,
+                InstanceIds=[i['InstanceId'] for i in instances])
+            return
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OperationNotPermitted':
+                raise
+            if not self.data.get('force'):
+                raise
+
+            self.log.info("Disabling stop and termination protection on instances")
             self.disable_deletion_protection(
                 client,
                 [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
-        # limit batch sizes to avoid api limits
-        for batch in utils.chunks(instances, 100):
             self.manager.retry(
                 client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in instances])
 
+    def process(self, instances):
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
+        if not len(instances):
+            return
+        # limit batch sizes to avoid api limits
+        for batch in utils.chunks(instances, 100):
+            self.process_terminate(batch)
+
     def disable_deletion_protection(self, client, instances):
 
-        def process_instance(i):
+        def modify_instance(i, attribute):
             try:
                 self.manager.retry(
                     client.modify_instance_attribute,
                     InstanceId=i['InstanceId'],
-                    Attribute='disableApiTermination',
+                    Attribute=attribute,
                     Value='false')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     return
                 raise
+
+        def process_instance(i):
+            modify_instance(i, 'disableApiTermination')
+            modify_instance(i, 'disableApiStop')
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))

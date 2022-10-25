@@ -257,6 +257,7 @@ class User(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        config_id = 'UserId'
 
     source_mapping = {
         'describe': DescribeUser,
@@ -1081,12 +1082,32 @@ class SetPolicy(BaseAction):
         arn={'type': 'string'},
         required=['state', 'arn'])
 
-    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy', "iam:ListAttachedRolePolicies",)
 
     def validate(self):
         if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
             raise PolicyValidationError(
                 '* operator is not supported for state: attached on %s' % (self.manager.data))
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_role_policy(
+            RoleName=resource['RoleName'],
+            PolicyArn=policy_arn
+        )
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_role_policy(
+                RoleName=resource['RoleName'],
+                PolicyArn=policy_arn
+            )
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
+        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        return policy_arns
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1098,16 +1119,9 @@ class SetPolicy(BaseAction):
         state = self.data['state']
         for r in resources:
             if state == 'attached':
-                client.attach_role_policy(
-                    RoleName=r['RoleName'],
-                    PolicyArn=policy_arn)
+                self.attach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn != "*":
-                try:
-                    client.detach_role_policy(
-                        RoleName=r['RoleName'],
-                        PolicyArn=policy_arn)
-                except client.exceptions.NoSuchEntityException:
-                    continue
+                self.detach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn == "*":
                 try:
                     self.detach_all_policies(client, r)
@@ -1115,10 +1129,58 @@ class SetPolicy(BaseAction):
                     continue
 
     def detach_all_policies(self, client, resource):
-        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
-        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        policy_arns = self.list_attached_policies(client, resource)
         for parn in policy_arns:
-            client.detach_role_policy(RoleName=resource['RoleName'], PolicyArn=parn)
+            self.detach_policy(client, resource, parn)
+
+
+@Group.action_registry.register("set-policy")
+class SetGroupPolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on a group.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-group-policy
+          resource: iam-group
+          actions:
+            - type: set-policy
+              state: detached
+              arn: "*"
+            - type: set-policy
+              state: attached
+              arn: arn:aws:iam::{account_id}:policy/my-iam-policy
+
+    """
+
+    permissions = (
+        "iam:AttachGroupPolicy", "iam:DetachGroupPolicy", "iam:ListAttachedGroupPolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_group_policy(
+            GroupName=resource["GroupName"], PolicyArn=policy_arn)
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_group_policy(
+                GroupName=resource["GroupName"], PolicyArn=policy_arn)
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_group_policies(
+            GroupName=resource["GroupName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
 
 
 @Role.action_registry.register('delete')
@@ -1544,20 +1606,25 @@ class CredentialReport(Filter):
         return self.schema['properties'][k]['default']
 
     def get_credential_report(self):
-        report = self.manager._cache.get('iam-credential-report')
-        if report:
-            return report
-        data = self.fetch_credential_report()
-        report = {}
-        if isinstance(data, bytes):
-            reader = csv.reader(io.StringIO(data.decode('utf-8')))
-        else:
-            reader = csv.reader(io.StringIO(data))
-        headers = next(reader)
-        for line in reader:
-            info = dict(zip(headers, line))
-            report[info['user']] = self.process_user_record(info)
-        self.manager._cache.save('iam-credential-report', report)
+        cache = self.manager._cache
+        with cache:
+            cache_key = {'account': self.manager.config.account_id, 'iam-credential-report': True}
+            report = cache.get(cache_key)
+
+            if report:
+                return report
+            data = self.fetch_credential_report()
+            report = {}
+            if isinstance(data, bytes):
+                reader = csv.reader(io.StringIO(data.decode('utf-8')))
+            else:
+                reader = csv.reader(io.StringIO(data))
+            headers = next(reader)
+            for line in reader:
+                info = dict(zip(headers, line))
+                report[info['user']] = self.process_user_record(info)
+            cache.save(cache_key, report)
+
         return report
 
     @classmethod
@@ -1905,6 +1972,57 @@ class UserSSHKeyFilter(ValueFilter):
             matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
             self.merge_annotation(r, self.matched_annotation_key, matched_keys)
             if matched_keys:
+                matched.append(r)
+        return matched
+
+
+@User.filter_registry.register('login-profile')
+class UserLoginProfile(ValueFilter):
+    """Filter IAM users that have an associated login-profile
+
+    For quicker evaluation and reduced API traffic, it is recommended to
+    instead use the 'credential' filter with 'password_enabled': true when
+    a delay of up to four hours for credential report syncing is acceptable.
+
+    (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: iam-users-with-console-access
+            resource: iam-user
+            filters:
+              - type: login-profile
+    """
+
+    schema = type_schema('login-profile', rinherit=ValueFilter.schema)
+    permissions = ('iam:GetLoginProfile',)
+    annotation_key = 'c7n:LoginProfile'
+
+    def user_login_profiles(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u[self.annotation_key] = False
+            try:
+                login_profile_resp = client.get_login_profile(UserName=u['UserName'])
+                if u['UserName'] == login_profile_resp['LoginProfile']['UserName']:
+                    u[self.annotation_key] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                    raise
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users for login profile" % len(resources))
+            list(w.map(self.user_login_profiles, user_set))
+
+        matched = []
+        for r in resources:
+            if r[self.annotation_key]:
                 matched.append(r)
         return matched
 

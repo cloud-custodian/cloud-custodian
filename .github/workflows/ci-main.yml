@@ -1,5 +1,6 @@
 name: "CI"
-
+env:
+  POETRY_VERSION: "1.2.1"
 on:
   push:
     branches:
@@ -21,10 +22,13 @@ jobs:
       - name: Install Linter
         run: |
           python -m pip install --upgrade pip
-          pip install flake8
+          pip install flake8 black
       - name: Lint Check
         run: |
           make lint
+      - name: Format Check
+        run: |
+          black --check tools/c7n_left
 
   Analyzer:
     runs-on: ubuntu-latest
@@ -50,19 +54,18 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Bootstrap poetry
         shell: bash
         run: |
-          curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.9
+          curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/6161821b1d39fa30f92a677bba51abfc471f8aee/install-poetry.py | python3 - --version $POETRY_VERSION -y
 
       - name: Set up cache
         uses: actions/cache@v2
         id: cache
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-3.9-${{ hashFiles('**/poetry.lock') }}
+          key: venv-docs-${{ runner.os }}-3.9-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Set up doc cache
         uses: actions/cache@v2
@@ -74,7 +77,7 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-          key: sphinx-docs-${{ runner.os }}-3.9-${{ hashFiles('**/*.rst') }}-${{ hashFiles('**/*.md') }}-1
+          key: sphinx-docs-${{ runner.os }}-3.9-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Update PATH
         shell: bash
@@ -109,16 +112,24 @@ jobs:
         run: |
           make sphinx
 
+      - name: Deploy Docs
+        if: ${{ github.event_name == 'push' }}
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: docs/build/html
+          target-folder: docs
+
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.9]
+        python-version: ["3.10"]
         include:
           - os: ubuntu-latest
-            python-version: "3.10"
+            python-version: 3.9
           - os: ubuntu-latest
             python-version: 3.8
           - os: ubuntu-latest
@@ -139,8 +150,7 @@ jobs:
       - name: Bootstrap poetry
         shell: bash
         run: |
-          curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
-            | python - -y --version 1.1.13
+          curl -sSL https://raw.githubusercontent.com/python-poetry/install.python-poetry.org/6161821b1d39fa30f92a677bba51abfc471f8aee/install-poetry.py | python3 - --version $POETRY_VERSION -y
 
       - name: Set up cache
         uses: actions/cache@v2
@@ -192,7 +202,7 @@ jobs:
       - name: Test
         shell: bash
         env:
-          COV_RUN: ${{ contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu') }}
+          COV_RUN: ${{ contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu') }}
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
@@ -200,6 +210,8 @@ jobs:
             . test.env && poetry run pytest -n auto tests tools \
               --cov c7n --cov tools/c7n_azure/c7n_azure \
               --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
+              --cov tools/c7n_tencentcloud/c7n_tencentcloud \
+              --cov tools/c7n_left/c7n_left \
               --cov tools/c7n_mailer/c7n_mailer
             poetry run coverage xml
           else
@@ -207,8 +219,8 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v2
-        if: contains(matrix.python-version, '3.8') && contains(matrix.os, 'ubuntu')
+        uses: codecov/codecov-action@v3
+        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml
           name: codecov
