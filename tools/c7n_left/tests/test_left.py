@@ -112,7 +112,7 @@ def write_output_test_policy(tmp_path):
 
 def test_cli_no_policies(tmp_path, caplog):
     runner = CliRunner()
-    result = runner.invoke(
+    runner.invoke(
         cli.cli,
         [
             "run",
