@@ -56,7 +56,10 @@ equal to/or greater than n days.
             resource: dynamodb-table
             filters:
               - type: consecutive-backups
-                days: 7
+                count: 7
+                period: days
+                backuptype: SYSTEM
+                status: AVAILABLE
 
 .. container:: toggle
 
@@ -69,14 +72,33 @@ equal to/or greater than n days.
   .. code-block:: yaml
 
     properties:
-      days:
+      backuptype:
+        enum:
+        - SYSTEM
+        - USER
+        - AWS_BACKUP
+        - ALL
+      count:
         minimum: 1
         type: number
+      period:
+        enum:
+        - hours
+        - days
+        - weeks
+      status:
+        enum:
+        - AVAILABLE
+        - CREATING
+        - DELETED
       type:
         enum:
         - consecutive-backups
     required:
-    - days
+    - count
+    - period
+    - status
+    - backuptype
     - type
 
 
