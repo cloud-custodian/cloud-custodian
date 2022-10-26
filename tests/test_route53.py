@@ -364,9 +364,8 @@ class TestResolverQueryLogConfig(BaseTest):
         resources = p.run()
 
         client = session_factory().client("route53resolver")
-        vpc_id = p.data['actions'][0]['vpcid']
-        rqlca = client.associate_resolver_query_log_config(
-            ResolverQueryLogConfigId=resources[0]['Id'], ResourceId=vpc_id)
-        self.assertEqual(rqlca['ResolverQueryLogConfigAssociation']['ResourceId'], "vpc-d2d616b5")
+        rqlca = client.list_resolver_query_log_config_associations()
+        self.assertEqual(rqlca[
+            'ResolverQueryLogConfigAssociations'][1]['ResourceId'], "vpc-d2d616b5")
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Id'], "rqlc-fb017689395648d1")
