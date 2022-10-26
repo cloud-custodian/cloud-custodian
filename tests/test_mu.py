@@ -183,10 +183,11 @@ class PolicyLambdaProvision(Publish):
                     'events': ['RunInstances']}})
             pl1 = PolicyLambda(p1)
             mgr = LambdaManager(session_factory)
-            result1 = mgr.publish(pl1)
+            mgr.publish(pl1)
             if self.recording:
                 time.sleep(30)
-            updated_config = lambda_client.get_function_configuration(FunctionName="custodian-ec2-foo-bar")
+            updated_config = lambda_client.get_function_configuration(
+                FunctionName="custodian-ec2-foo-bar")
             self.assertEqual(updated_config.get('Architectures'), ["x86_64"])
             self.addCleanup(mgr.remove, pl1)
 
