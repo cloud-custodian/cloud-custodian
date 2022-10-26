@@ -531,7 +531,7 @@ class LambdaManager:
 
     def _update_architecture(self, func, existing, new_architecture, code_ref):
         existing_config = existing.get('Configuration', {})
-        existing_architecture = existing_config.get('Architectures', ['x86_64'])
+        existing_architecture = existing_config.get('Architectures', ["x86_64"])
         diff = existing_architecture != new_architecture
         changed = False
         if diff:
