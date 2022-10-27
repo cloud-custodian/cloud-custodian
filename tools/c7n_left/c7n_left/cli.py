@@ -3,6 +3,7 @@
 #
 import logging
 from pathlib import Path
+import sys
 
 import click
 from c7n.config import Config
@@ -45,17 +46,17 @@ def run(format, policy_dir, directory, output, output_file, output_query):
     policies = load_policies(policy_dir, config)
     if not policies:
         log.warning("no policies found")
-        return
+        sys.exit(1)
     reporter = get_reporter(config)
     runner = CollectionRunner(policies, config, reporter)
-    runner.run()
+    sys.exit(int(runner.run()))
 
 
 if __name__ == "__main__":  # pragma: no cover
     try:
         cli()
     except Exception:
-        import pdb, sys, traceback
+        import pdb, traceback
 
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
