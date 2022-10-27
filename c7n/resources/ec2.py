@@ -2395,7 +2395,8 @@ class ManagedPolicy(Filter):
         return matched
 
     def _get_managed_policies(self, client, role_name):
-        attached_policies = client.list_attached_role_policies(RoleName=role_name)['AttachedPolicies']
+        attached_policies = client.list_attached_role_policies(
+            RoleName=role_name)['AttachedPolicies']
         return [p['PolicyName'] for p in attached_policies]
 
     def _get_iam_profiles(self):
