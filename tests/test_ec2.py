@@ -2205,3 +2205,43 @@ class TestSpotFleetRequest(BaseTest):
         sfrs = client.describe_spot_fleet_requests(
         )["SpotFleetRequestConfigs"]
         self.assertEqual(len(sfrs), 3)
+
+class TestManagedPolicyFilter(BaseTest):
+
+    def test_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_managed_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "my-test-policy-present",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "managed-policy",
+                        "present": False,
+                        "policy": "my-test-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "my-test-policy-present",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "managed-policy",
+                        "present": True,
+                        "policy": "^test-ssm-",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
