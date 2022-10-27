@@ -30,7 +30,8 @@ class TerraformGraph(ResourceGraph):
                 yield type_name, self.as_resource(type_name, data)
             else:
                 resources = []
-                for name, data in type_items.items():
+                for data in type_items:
+                    name = data["__tfmeta"]["path"]
                     resources.append(self.as_resource(name, data))
                 yield type_name, resources
 
