@@ -2213,7 +2213,7 @@ class TestManagedPolicyFilter(BaseTest):
         factory = self.replay_flight_data("test_managed_policy_filter")
         p = self.load_policy(
             {
-                "name": "my-test-policy-present",
+                "name": "my-test-policy-string",
                 "resource": "ec2",
                 "filters": [
                     {
@@ -2231,7 +2231,7 @@ class TestManagedPolicyFilter(BaseTest):
 
         p = self.load_policy(
             {
-                "name": "my-test-policy-present",
+                "name": "my-test-policy-regex",
                 "resource": "ec2",
                 "filters": [
                     {
