@@ -2345,3 +2345,81 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+@filters.register('managed-policy')
+class ManagedPolicy(Filter):
+    """Filter to find if an EC2 instance has an instance profile that has a role that has a specific
+       managed IAM policy. If an EC2 instance does not have a profile or an associated IAM role, then
+       just treat it as not having the policy. It supports a regular expression to match a name of a
+       managed policy that you want to filter.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: my-test-policy-present
+            resource: ec2
+            filters:
+              - type: managed-policy
+                present: true
+                policy: my-test-policy
+
+        policies:
+          - name: my-managed-policy-not-present
+            resource: ec2
+            filters:
+              - type: managed-policy
+                present: false
+                policy: ^my-managed-policy-
+    """
+
+    schema = type_schema(
+        'managed-policy',
+        present={'type': 'boolean'},
+        policy={'type': 'string'})
+
+    permissions = (
+        'iam:GetInstanceProfile',
+        'iam:ListInstanceProfiles',
+        'iam:ListAttachedRolePolicies')
+
+    def _search_policy(self, managed_policies):
+        policy_regex = self.data.get('policy', '')
+        matched = False
+        for p in managed_policies:
+            if re.match(policy_regex, p):
+                matched = True
+                break
+        return matched
+
+    def _get_managed_policies(self, client, role_name):
+        attached_policies = client.list_attached_role_policies(RoleName=role_name)['AttachedPolicies']
+        return [p['PolicyName'] for p in attached_policies]
+
+    def _get_iam_profiles(self):
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        return iam_profiles
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+        iam_profiles = self._get_iam_profiles()
+        role_map = {}
+        results = []
+        for r in resources:
+            if r['State']['Name'] == 'terminated':
+                continue
+            found = False
+            present = self.data.get('present', False)
+            profile_arn = r.get('IamInstanceProfile', {}).get('Arn')
+            if profile_arn:
+                for p in iam_profiles:
+                    if profile_arn == p['Arn'] and p.get('Roles'):
+                        role_name = p.get('Roles', {})[0].get('RoleName')
+                        if role_name not in role_map:
+                            managed_policies = self._get_managed_policies(client, role_name)
+                            role_map[role_name] = {'RoleNames': managed_policies}
+                        found = self._search_policy(role_map[role_name]['RoleNames'])
+            if found == present:
+                results.append(r)
+        return results
