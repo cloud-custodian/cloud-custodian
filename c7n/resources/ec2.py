@@ -2346,12 +2346,13 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             TargetCapacity=desired,
         )
 
+
 @filters.register('managed-policy')
 class ManagedPolicy(Filter):
-    """Filter to find if an EC2 instance has an IAM instance profile that contain an IAM role that has
-       a specific managed IAM policy. If an EC2 instance does not have a profile or the profile does not
-       contain an IAM role, then it will be treated as not having the policy. It supports a regular
-       expression to match a name of a managed policy that you want to filter.
+    """Filter to find if an EC2 instance has an IAM instance profile that contain an IAM role that
+       has a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
+       does not contain an IAM role, then it will be treated as not having the policy. It supports
+       a regular expression to match a name of a managed policy that you want to filter.
 
     :Example:
 

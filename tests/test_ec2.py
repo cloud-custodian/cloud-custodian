@@ -2206,6 +2206,7 @@ class TestSpotFleetRequest(BaseTest):
         )["SpotFleetRequestConfigs"]
         self.assertEqual(len(sfrs), 3)
 
+
 class TestManagedPolicyFilter(BaseTest):
 
     def test_managed_policy_filter(self):
