@@ -328,9 +328,21 @@ class TestResolverQueryLogConfig(BaseTest):
             'test_resolver_query_log_config')
         p = self.load_policy({
             'name': 'r53-resolver-query-log-config',
-            'resource': 'resolver-qlc',
+            'resource': 'resolver-logs',
             'filters': [
                 {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_resolver_query_log_config_vpc_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_vpc_filter')
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config-vpc-filter',
+            'resource': 'resolver-logs',
+            'filters': [
+                {'type': 'is-associated', 'vpcid': 'vpc-011516c4325953'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -339,8 +351,8 @@ class TestResolverQueryLogConfig(BaseTest):
         session_factory = self.replay_flight_data(
             'test_resolver_query_log_config_associate')
         p = self.load_policy({
-            'name': 'r53-resolver-query-log-config',
-            'resource': 'resolver-qlc',
+            'name': 'r53-resolver-query-log-config-associate-1',
+            'resource': 'resolver-logs',
             'filters': [
                 {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
             'actions': [{
@@ -354,8 +366,8 @@ class TestResolverQueryLogConfig(BaseTest):
         session_factory = self.replay_flight_data(
             'test_resolver_query_log_config_associate')
         p = self.load_policy({
-            'name': 'r53-resolver-query-log-config',
-            'resource': 'resolver-qlc',
+            'name': 'r53-resolver-query-log-config-associate-2',
+            'resource': 'resolver-logs',
             'filters': [
                 {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
             'actions': [{

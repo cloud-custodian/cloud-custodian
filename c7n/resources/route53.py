@@ -488,7 +488,7 @@ class IsQueryLoggingEnabled(Filter):
         return results
 
 
-@resources.register('resolver-qlc')
+@resources.register('resolver-logs')
 class ResolverQueryLogConfig(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -522,7 +522,7 @@ class ResolverQueryLogConfigAssociate(BaseAction):
 
         policies:
           - name: r53-resolver-query-log-config-associate
-            resource: resolver-qlc
+            resource: resolver-logs
             filters:
               - type: value
                 key: 'Name'
@@ -559,3 +559,53 @@ class ResolverQueryLogConfigAssociate(BaseAction):
                         'ResourceId', 'Values': [vpc_id]}])['ResolverQueryLogConfigAssociations']:
                     client.associate_resolver_query_log_config(ResolverQueryLogConfigId=r['Id'],
                         ResourceId=vpc_id)
+
+
+@ResolverQueryLogConfig.filter_registry.register('is-associated')
+class LogConfigAssociationsFilter(Filter):
+    """ Checks LogConfig Associations for VPCs.
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+                - name: r53-resolver-query-log-config-associations
+                  resource: resolver-logs
+                  filters:
+                   - type: is-associated
+                     vpcid: "vpc-12345678"
+
+    """
+    permissions = ('route53resolver:ListResolverQueryLogConfigAssociations',)
+    schema = type_schema('is-associated',
+        vpcid={'type': 'string', 'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'},)
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def is_associated(self, client, lc_id, vpc_id):
+        status = False
+        lcas = client.list_resolver_query_log_config_associations(Filters=[{
+            'Name': 'ResolverQueryLogConfigId',
+            'Values': [lc_id]}])['ResolverQueryLogConfigAssociations']
+        for lca in lcas:
+            if vpc_id == lca['ResourceId']:
+                status = True
+                break
+
+        return status
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        results = []
+        vpc_ids = ResolverQueryLogConfigAssociate.get_vpc_id(self)
+        for log_config in resources:
+            status = True
+            for vpc_id in vpc_ids:
+                if not self.is_associated(client, log_config['Id'], vpc_id):
+                    status = False
+                    break
+
+            if status:
+                results.append(log_config)
+
+        return results
