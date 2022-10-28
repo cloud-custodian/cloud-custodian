@@ -55,6 +55,7 @@ class CollectionRunner:
         self.reporter.on_execution_started(self.policies)
         # consider inverting this order to allow for results grouped by policy
         # at the moment, we're doing results grouped by resource.
+        found = False
         for rtype, resources in graph.get_resources_by_type():
             for p in self.policies:
                 if not self.match_type(rtype, p):
@@ -62,7 +63,9 @@ class CollectionRunner:
                 result_set = self.run_policy(p, graph, resources, event)
                 if result_set:
                     self.reporter.on_results(result_set)
+                    found = True
         self.reporter.on_execution_ended()
+        return found
 
     def run_policy(self, policy, graph, resources, event):
         event = dict(event)

@@ -254,7 +254,7 @@ def test_multi_resource_policy(tmp_path):
             str(tmp_path / "output.json"),
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     data = json.loads((tmp_path / "output.json").read_text())
     assert len(data["results"]) == 2
 
@@ -305,7 +305,7 @@ def test_cli_output_rich(tmp_path):
             "cli",
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 1
 
 
 def test_cli_output_github(tmp_path):
@@ -324,7 +324,7 @@ def test_cli_output_github(tmp_path):
             "github",
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     assert result.output == (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf line=25 lineEnd=28"
         " title=terraform.aws_s3_bucket - policy:check-bucket::\n"
@@ -378,7 +378,7 @@ def test_cli_output_json(tmp_path):
             str(tmp_path / "output.json"),
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 1
 
     results = json.loads((tmp_path / "output.json").read_text())
     assert "results" in results
