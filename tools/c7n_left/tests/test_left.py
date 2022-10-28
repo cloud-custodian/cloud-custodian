@@ -127,6 +127,20 @@ def test_link_filter(tmp_path):
     assert len(resources) == 1
 
 
+def test_boolean(tmp_path):
+    resources = run_policy(
+        {
+            "name": "check-link",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [{"not": [{"server_side_encryption_configuration": "present"}]}],
+        },
+        terraform_dir / "aws_s3_encryption_audit",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert resources[0].resource["bucket"] == "c7n-aws-s3-encryption-audit-test-c"
+
+
 def test_provider_parse():
     graph = TerraformProvider().parse(terraform_dir / "ec2_stop_protection_disabled")
     resource_types = list(graph.get_resources_by_type("aws_subnet"))
