@@ -38,10 +38,14 @@ class Traverse(Filter):
           description: ensure app runner instances are only connected to the dev vpc
           resource: terraform.aws_app_runner
           filters:
+            - network_configuration: present
             - type: traverse
               resource: [aws_apprunner_vpc_connector, aws_subnet, vpc]
               attrs:
-               - tag:Env: Dev
+               - type: value
+                 key: tag:Env
+                 value: Dev
+                 op: not-equal
     """
 
     schema = type_schema(
