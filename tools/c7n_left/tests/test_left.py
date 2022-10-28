@@ -131,6 +131,10 @@ def test_traverse_multi_resource_multi_set(tmp_path):
         tmp_path,
     )
     assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
 
 
 def test_traverse_filter_not_found(tmp_path):
