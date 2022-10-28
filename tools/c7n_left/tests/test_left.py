@@ -107,7 +107,72 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
-def test_link_filter(tmp_path):
+def test_traverse_multi_resource_multi_set(tmp_path):
+    resources = run_policy(
+        {
+            "name": "check-link",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "aws_s3_bucket_ownership_controls",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "rule.object_ownership",
+                            "value": ["BucketOwnerPreferred", "BucketOwnerEnforced"],
+                            "op": "in",
+                        }
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+
+
+def test_traverse_filter_not_found(tmp_path):
+    resources = run_policy(
+        {
+            "name": "check-link",
+            "resource": "terraform.aws_codebuild_project",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": ["aws_security_group", "aws_vpc"],
+                    "attrs": [{"tag:Env": "Prod"}],
+                }
+            ],
+        },
+        terraform_dir / "aws_code_build_vpc",
+        tmp_path,
+    )
+    assert len(resources) == 0
+
+
+def test_traverse_filter_not_found_matches(tmp_path):
+    resources = run_policy(
+        {
+            "name": "check-link",
+            "resource": "terraform.aws_codebuild_project",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": ["aws_security_group", "aws_vpc"],
+                    "count": 0,
+                    "attrs": [{"tag:Env": "Prod"}],
+                }
+            ],
+        },
+        terraform_dir / "aws_code_build_vpc",
+        tmp_path,
+    )
+    assert len(resources) == 1
+
+
+def test_traverse_filter_multi_hop(tmp_path):
     resources = run_policy(
         {
             "name": "check-link",
