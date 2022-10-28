@@ -7,10 +7,10 @@ from c7n.filters import Filter, ValueFilter, OPERATORS
 from c7n.utils import type_schema
 
 
-class Link(Filter):
+class Traverse(Filter):
 
     schema = type_schema(
-        "link",
+        "traverse",
         resources={
             "oneOf": [
                 {"type": "array", "items": {"type": "string"}},

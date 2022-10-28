@@ -12,7 +12,7 @@ from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
-from .filters import Link
+from .filters import Traverse
 
 log = logging.getLogger("c7n.iac")
 
@@ -131,7 +131,7 @@ class IACResourceManager(ResourceManager):
         return self.__class__(self.ctx, data or {})
 
 
-IACResourceManager.filter_registry.register("link", Link)
+IACResourceManager.filter_registry.register("traverse", Traverse)
 
 
 class IACResourceMap(object):

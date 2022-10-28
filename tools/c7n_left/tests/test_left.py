@@ -114,7 +114,7 @@ def test_link_filter(tmp_path):
             "resource": "terraform.aws_codebuild_project",
             "filters": [
                 {
-                    "type": "link",
+                    "type": "traverse",
                     "resources": ["aws_security_group", "aws_vpc"],
                     "count": 1,
                     "attrs": [{"tag:Env": "Dev"}],
