@@ -151,10 +151,10 @@
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 10,
-                    "day": 25,
-                    "hour": 7,
-                    "minute": 18,
-                    "second": 54,
+                    "day": 28,
+                    "hour": 9,
+                    "minute": 53,
+                    "second": 37,
                     "microsecond": 0
                 },
                 "MultiAZ": false,
@@ -197,38 +197,28 @@
                 "NetworkType": "IPV4"
             },
             {
-                "DBInstanceIdentifier": "mysql-db1",
+                "DBInstanceIdentifier": "database-2",
                 "DBInstanceClass": "db.m6i.large",
-                "Engine": "mysql",
-                "DBInstanceStatus": "stopped",
-                "AutomaticRestartTime": {
-                    "__class__": "datetime",
-                    "year": 2022,
-                    "month": 10,
-                    "day": 26,
-                    "hour": 11,
-                    "minute": 9,
-                    "second": 28,
-                    "microsecond": 444000
-                },
-                "MasterUsername": "admin",
+                "Engine": "postgres",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
                 "Endpoint": {
-                    "Address": "mysql-db1.c8b6qh6c9grf.us-west-2.rds.amazonaws.com",
-                    "Port": 3306,
+                    "Address": "database-2.c8b6qh6c9grf.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
                     "HostedZoneId": "Z1PVIF0B656C1W"
                 },
-                "AllocatedStorage": 20,
+                "AllocatedStorage": 400,
                 "InstanceCreateTime": {
                     "__class__": "datetime",
                     "year": 2022,
-                    "month": 9,
-                    "day": 27,
-                    "hour": 10,
-                    "minute": 49,
-                    "second": 51,
-                    "microsecond": 348000
+                    "month": 10,
+                    "day": 28,
+                    "hour": 9,
+                    "minute": 34,
+                    "second": 13,
+                    "microsecond": 532000
                 },
-                "PreferredBackupWindow": "10:12-10:42",
+                "PreferredBackupWindow": "08:05-08:35",
                 "BackupRetentionPeriod": 7,
                 "DBSecurityGroups": [],
                 "VpcSecurityGroups": [
@@ -239,7 +229,7 @@
                 ],
                 "DBParameterGroups": [
                     {
-                        "DBParameterGroupName": "default.mysql8.0",
+                        "DBParameterGroupName": "default.postgres13",
                         "ParameterApplyStatus": "in-sync"
                     }
                 ],
@@ -348,42 +338,44 @@
                         }
                     ]
                 },
-                "PreferredMaintenanceWindow": "sat:08:36-sat:09:06",
+                "PreferredMaintenanceWindow": "fri:09:25-fri:09:55",
                 "PendingModifiedValues": {},
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2022,
                     "month": 10,
-                    "day": 19,
-                    "hour": 11,
-                    "minute": 0,
-                    "second": 0,
+                    "day": 28,
+                    "hour": 9,
+                    "minute": 49,
+                    "second": 30,
                     "microsecond": 0
                 },
-                "MultiAZ": false,
-                "EngineVersion": "8.0.28",
+                "MultiAZ": true,
+                "EngineVersion": "13.7",
                 "AutoMinorVersionUpgrade": true,
                 "ReadReplicaDBInstanceIdentifiers": [],
-                "LicenseModel": "general-public-license",
+                "LicenseModel": "postgresql-license",
+                "Iops": 3000,
                 "OptionGroupMemberships": [
                     {
-                        "OptionGroupName": "default:mysql-8-0",
+                        "OptionGroupName": "default:postgres-13",
                         "Status": "in-sync"
                     }
                 ],
+                "SecondaryAvailabilityZone": "us-west-2a",
                 "PubliclyAccessible": false,
-                "StorageType": "gp2",
+                "StorageType": "io1",
                 "DbInstancePort": 0,
                 "StorageEncrypted": true,
                 "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/14a87889-9683-4713-96ce-ed99c0d8100e",
-                "DbiResourceId": "db-SCON3A33GKMJTTWNHEB6GXVCO4",
+                "DbiResourceId": "db-5MI3OCOS4VR7VR7JTNQPL6FYWA",
                 "CACertificateIdentifier": "rds-ca-2019",
                 "DomainMemberships": [],
                 "CopyTagsToSnapshot": true,
                 "MonitoringInterval": 60,
-                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-SCON3A33GKMJTTWNHEB6GXVCO4",
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-5MI3OCOS4VR7VR7JTNQPL6FYWA",
                 "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
-                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:mysql-db1",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:database-2",
                 "IAMDatabaseAuthenticationEnabled": false,
                 "PerformanceInsightsEnabled": true,
                 "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/14a87889-9683-4713-96ce-ed99c0d8100e",
@@ -391,12 +383,7 @@
                 "DeletionProtection": true,
                 "AssociatedRoles": [],
                 "MaxAllocatedStorage": 1000,
-                "TagList": [
-                    {
-                        "Key": "pe_rds_unused_stopped",
-                        "Value": "Yes"
-                    }
-                ],
+                "TagList": [],
                 "CustomerOwnedIpEnabled": false,
                 "ActivityStreamStatus": "stopped",
                 "BackupTarget": "region",
