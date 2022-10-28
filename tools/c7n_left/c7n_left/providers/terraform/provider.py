@@ -19,7 +19,11 @@ from .graph import TerraformGraph
 
 
 class TerraformResourceManager(IACResourceManager):
-    pass
+    class resource_type:
+        id = "id"
+
+    def get_model(self):
+        return self.resource_type
 
 
 class TerraformResourceMap(IACResourceMap):

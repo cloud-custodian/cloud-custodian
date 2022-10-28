@@ -15,7 +15,10 @@ from c7n.resources import load_resources
 
 try:
     from c7n_left import cli, utils, core
-    from c7n_left.providers.terraform import TerraformProvider
+    from c7n_left.providers.terraform.provider import (
+        TerraformProvider,
+        TerraformResourceManager,
+    )
     from c7n_left.providers.terraform.graph import Resolver
 
     LEFT_INSTALLED = True
@@ -82,6 +85,11 @@ def test_graph_resolver():
     assert {r["__tfmeta"]["label"] for r in resolver.resolve_refs(log)} == set(
         ("aws_vpc", "aws_cloudwatch_log_group", "aws_iam_role")
     )
+
+
+def test_resource_type_interface():
+    rtype = TerraformResourceManager(None, {}).get_model()
+    assert rtype.id == "id"
 
 
 def test_graph_resolver_inner_block_ref():
