@@ -108,7 +108,7 @@ class RichResult:
 
         yield f"[bold]{policy.name}[/bold] - {policy.resource_type}"
         yield "  [red]Failed[/red]"
-        if policy.data.get('description'):
+        if policy.data.get("description"):
             yield f"  [red]Reason: {policy.data['description']}[/red]"
         yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
 
