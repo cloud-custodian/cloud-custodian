@@ -8,7 +8,41 @@ from c7n.utils import type_schema
 
 
 class Traverse(Filter):
+    """Traverse the resource graph.
 
+    This filter allows going from a source node across multiple hops
+    to a set of related nodes with multi attributes matching at
+    destination.
+
+
+    .. code-block:: yaml
+
+      policies:
+        - name: s3-encryption
+          description: ensure buckets are using kms encryption
+          resource: terraform.aws_s3_bucket
+          filters:
+            - not:
+               - type: traverse
+                 resource: aws_s3_bucket_server_side_encryption_configuration
+                 attrs:
+                  - rule.apply_server_side_encryption_by_default.sse_algorithm: aws:kms
+
+
+    This example will traverse multiple hops from and verify attributes at the destination.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: app-runner-check-vpc
+          description: ensure app runner instances are only connected to the dev vpc
+          resource: terraform.aws_app_runner
+          filters:
+            - type: traverse
+              resource: [aws_apprunner_vpc_connector, aws_subnet, vpc]
+              attrs:
+               - tag:Env: Dev
+    """
     schema = type_schema(
         "traverse",
         resources={
