@@ -43,6 +43,7 @@ class Traverse(Filter):
               attrs:
                - tag:Env: Dev
     """
+
     schema = type_schema(
         "traverse",
         resources={
