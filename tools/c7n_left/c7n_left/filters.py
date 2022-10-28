@@ -40,7 +40,7 @@ class Traverse(Filter):
           filters:
             - network_configuration: present
             - type: traverse
-              resource: [aws_apprunner_vpc_connector, aws_subnet, vpc]
+              resource: [aws_apprunner_vpc_connector, aws_subnet, aws_vpc]
               attrs:
                - type: value
                  key: tag:Env
