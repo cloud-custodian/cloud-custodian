@@ -19,7 +19,11 @@ from .graph import TerraformGraph
 
 
 class TerraformResourceManager(IACResourceManager):
-    pass
+    class resource_type:
+        id = "id"
+
+    def get_model(self):
+        return self.resource_type
 
 
 class TerraformResourceMap(IACResourceMap):
@@ -42,6 +46,7 @@ class TerraformProvider(IACSourceProvider):
 
     def parse(self, source_dir):
         graph = TerraformGraph(load_from_path(source_dir), source_dir)
+        graph.build()
         log.debug("Loaded %d resources", len(graph))
         return graph
 

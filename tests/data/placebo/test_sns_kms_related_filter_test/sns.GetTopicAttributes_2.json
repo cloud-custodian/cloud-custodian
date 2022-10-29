@@ -2,13 +2,14 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__console_sub_0\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:unencrypted\",\"Condition\":{\"StringLike\":{\"SNS:Endpoint\":\"alfredmarc.gamulo@capitalone.com\"}}}]}",
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__console_sub_0\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:encrypted-by-alias\",\"Condition\":{\"StringLike\":{\"SNS:Endpoint\":\"alfredmarc.gamulo@capitalone.com\"}}}]}",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",
-            "TopicArn": "arn:aws:sns:us-east-1:644160558196:unencrypted",
+            "KmsMasterKeyId": "alias/skunk/trails",
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:encrypted-by-alias",
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
             "SubscriptionsConfirmed": "0",
-            "DisplayName": "unencrypted",
+            "DisplayName": "encrypted-by-alias",
             "SubscriptionsDeleted": "0"
         },
         "ResponseMetadata": {

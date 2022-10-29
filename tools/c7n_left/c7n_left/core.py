@@ -12,6 +12,7 @@ from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
+from .filters import Traverse
 
 log = logging.getLogger("c7n.iac")
 
@@ -133,6 +134,9 @@ class IACResourceManager(ResourceManager):
         return self.__class__(self.ctx, data or {})
 
 
+IACResourceManager.filter_registry.register("traverse", Traverse)
+
+
 class IACResourceMap(object):
 
     resource_class = None
@@ -174,4 +178,7 @@ class ResourceGraph:
         self.src_dir = src_dir
 
     def get_resource_by_type(self):
+        raise NotImplementedError()
+
+    def resolve_refs(self, resource, target_type):
         raise NotImplementedError()
