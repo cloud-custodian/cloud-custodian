@@ -913,7 +913,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "mydbinstance")
 
         self.assertTrue(
@@ -957,7 +957,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "mydbinstance")
 
         self.assertFalse(
