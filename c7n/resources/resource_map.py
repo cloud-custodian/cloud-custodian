@@ -36,6 +36,7 @@ ResourceMap = {
     "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
     "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
     "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
+    "aws.composite-alarm": "c7n.resources.cw.CompositeAlarm",
     "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
     "aws.config-rule": "c7n.resources.config.ConfigRule",
     "aws.customer-gateway": "c7n.resources.vpc.CustomerGateway",

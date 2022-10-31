@@ -88,6 +88,59 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
+@resources.register('composite-alarm')
+class CompositeAlarm(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudwatch'
+        arn_type = 'alarm'
+        enum_spec = ('describe_alarms', 'CompositeAlarms', {'AlarmTypes':['CompositeAlarm']})
+        id = name = 'AlarmName'
+        arn = 'AlarmArn'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        cfn_type = 'AWS::CloudWatch::CompositeAlarm'
+        universal_taggable = object()
+
+    augment = universal_augment
+
+    retry = staticmethod(get_retry(('Throttled',)))
+
+
+@CompositeAlarm.action_registry.register('delete')
+class CompositeAlarmDelete(BaseAction):
+    """Delete a cloudwatch composite alarm.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-composite-alarms
+                resource: aws.composite-alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
 @resources.register('event-bus')
 class EventBus(QueryResourceManager):
 
