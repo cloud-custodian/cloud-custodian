@@ -116,9 +116,10 @@ class TestK8sCli(KubeTest):
         patched_args.cert = None
         patched_args.cert_key = None
         patched_args.ca_cert = None
+        patched_args.host = 'localhost'
         patched_parser.return_value.parse_args.return_value = patched_args
         cli()
         patched_init.assert_called_once_with(
-            9000, 'policies', 'warn',
+            'localhost', 9000, 'policies', 'warn',
             cert_path=None, cert_key_path=None, ca_cert_path=None,
         )

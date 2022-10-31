@@ -1426,6 +1426,9 @@ class RDSSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBSnapshot',)
 
     def process(self, snapshots):
+        snapshots = self.filter_resources(snapshots, 'SnapshotType', ('manual',))
+        if not snapshots:
+            return []
         log.info("Deleting %d rds snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
