@@ -75,7 +75,7 @@ class TestPatchAction(KubeTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = factory().client('Apps', 'V1')
         deployments = client.list_deployment_for_all_namespaces().to_dict()['items']
         hello_node_deployment = [d for d in deployments if d['metadata']['name'] == 'hello-node'][0]
