@@ -100,5 +100,5 @@ class TestServiceCatalog(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['Name'], 'testProduct')

@@ -886,3 +886,48 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('put-subscription-filter')
+class SubscriptionFilter(BaseAction):
+    """Create/Update a subscription filter and associate with a log group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-put-subscription-filter
+            resource: log-group
+            actions:
+              - type: put-subscription-filter
+                filter_name: AllLambda
+                filter_pattern: ip
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
+                distribution: Random
+    """
+    schema = type_schema(
+        'put-subscription-filter',
+        filter_name={'type': 'string'},
+        filter_pattern={'type': 'string'},
+        destination_arn={'type': 'string'},
+        distribution={'enum': ['Random', 'ByLogStream']},
+        required=['filter_name', 'destination_arn'])
+    permissions = ('logs:PutSubscriptionFilter',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        filter_name = self.data.get('filter_name')
+        filter_pattern = self.data.get('filter_pattern', '')
+        destination_arn = self.data.get('destination_arn')
+        distribution = self.data.get('distribution', 'ByLogStream')
+
+        for r in resources:
+            client.put_subscription_filter(
+                logGroupName=r['logGroupName'],
+                filterName=filter_name,
+                filterPattern=filter_pattern,
+                destinationArn=destination_arn,
+                distribution=distribution)
