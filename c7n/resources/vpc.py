@@ -790,7 +790,8 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        for nic in self.manager.get_resource_manager('eni').resources():
+        self.nics = self.manager.get_resource_manager('eni').resources()
+        for nic in self.nics:
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
         return sg_ids
@@ -862,21 +863,56 @@ class UnusedSecurityGroup(SGUsage):
 @SecurityGroup.filter_registry.register('used')
 class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
-
     This operates as a complement to the unused filter for multi-step
     workflows.
-
     :example:
-
     .. code-block:: yaml
-
             policies:
               - name: security-groups-in-use
                 resource: security-group
                 filters:
                   - used
+
+            policies:
+              - name: security-groups-used-by-rds
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InstanceOwnerIds
+                    op: intersect
+                    value:
+                      - amazon-rds
+
+            policies:
+              - name: security-groups-used-by-natgw
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceTypes
+                    op: intersect
+                    value:
+                      - nat_gateway
     """
     schema = type_schema('used')
+
+    instance_owner_id_key = 'c7n:InstanceOwnerIds'
+    interface_type_key = 'c7n:InterfaceTypes'
+
+    def _get_eni_attributes(self):
+        enis = []
+        for nic in self.nics:
+            if nic['Status'] == 'in-use':
+                instance_owner_id = nic['Attachment']['InstanceOwnerId']
+            else:
+                instance_owner_id = ''
+            interface_type = nic.get('InterfaceType')
+            for g in nic['Groups']:
+                enis.append({'GroupId': g['GroupId'],
+                             'InstanceOwnerId': instance_owner_id,
+                             'InterfaceType': interface_type})
+        return enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -884,6 +920,16 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+        enis = self._get_eni_attributes()
+        for r in resources:
+            owner_ids = set()
+            interface_types = set()
+            for eni in enis:
+                if r['GroupId'] == eni['GroupId']:
+                    owner_ids.add(eni['InstanceOwnerId'])
+                    interface_types.add(eni['InterfaceType'])
+            r[self.instance_owner_id_key] = list(owner_ids)
+            r[self.interface_type_key] = list(interface_types)
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -1027,6 +1073,28 @@ class SGPermission(Filter):
           value_type: cidr
           op: in
           value: x.y.z
+
+    `value_type: cidr` can also filter if cidr is a subset of cidr
+    value range. In this example we are allowing any smaller cidrs within
+    allowed_cidrs.csv.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value_from:
+            url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
+            format: csv
+
+    or value can be specified as a list:
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value: ["10.0.0.0/8", "192.168.0.0/16"]
 
     `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
     this example we are blocking global inbound connections to SSH or
@@ -2035,7 +2103,7 @@ class NetworkAddress(query.QueryResourceManager):
         id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
-        config_type = "AWS::EC2::EIP"
+        config_type = cfn_type = "AWS::EC2::EIP"
 
     source_mapping = {
         'describe': DescribeElasticIp,

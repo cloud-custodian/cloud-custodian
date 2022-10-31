@@ -266,6 +266,12 @@ class DeleteApi(BaseAction):
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+        self.query.capture_parent_id = True
+
     def get_query(self):
         query = super(DescribeRestStage, self).get_query()
         query.capture_parent_id = True
@@ -276,6 +282,13 @@ class DescribeRestStage(query.ChildDescribeSource):
         # Using capture parent, changes the protocol
         for parent_id, r in resources:
             r['restApiId'] = parent_id
+            r['stageArn'] = "arn:aws:{service}:{region}::" \
+                            "/restapis/{rest_api_id}/stages/" \
+                            "{stage_name}".format(
+                service="apigateway",
+                region=self.manager.config.region,
+                rest_api_id=parent_id,
+                stage_name=r['stageName'])
             tags = r.setdefault('Tags', [])
             for k, v in r.pop('tags', {}).items():
                 tags.append({
@@ -283,6 +296,27 @@ class DescribeRestStage(query.ChildDescribeSource):
                     'Value': v})
             results.append(r)
         return results
+
+    def get_resources(self, ids, cache=True):
+        deployment_ids = []
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for id in ids:
+            # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
+            if id.startswith('arn:'):
+                _, ident = id.rsplit(':', 1)
+                parts = ident.split('/', 4)
+                # if we get stage name in arn, use stage_name to get stage information
+                # from stage information, pick deploymentId
+                if len(parts) > 3:
+                    response = self.manager.retry(
+                        client.get_stage,
+                        restApiId=parts[2],
+                        stageName=parts[4])
+                    deployment_ids.append(response[self.manager.resource_type.id])
+            else:
+                deployment_ids.append(id)
+        return super(DescribeRestStage, self).get_resources(deployment_ids, cache)
 
 
 @resources.register('rest-stage')
@@ -294,11 +328,13 @@ class RestStage(query.ChildResourceManager):
         enum_spec = ('get_stages', 'item', None)
         name = 'stageName'
         id = 'deploymentId'
+        config_id = 'stageArn'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
+        supports_trailevents = True
 
     child_source = 'describe'
     source_mapping = {
@@ -1109,3 +1145,52 @@ class DomainNameRemediateTls(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     continue
+
+
+class ApiGwV2DescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
+@resources.register('apigwv2')
+class ApiGwV2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigatewayv2'
+        arn_type = '/apis'
+        enum_spec = ('get_apis', 'Items', None)
+        id = 'ApiId'
+        name = 'name'
+        date = 'createdDate'
+        dimension = 'ApiId'
+        cfn_type = config_type = "AWS::ApiGatewayV2::Api"
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': ApiGwV2DescribeSource
+    }
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/apis/api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                "apigateway",
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type,
+            )
+
+        return self._generate_arn

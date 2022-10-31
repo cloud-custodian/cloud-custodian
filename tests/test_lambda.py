@@ -385,6 +385,66 @@ class LambdaTest(BaseTest):
         self.assertEqual(resources[0]["FunctionName"], "mys3")
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-f9cc4d9f"])
 
+    def test_set_xray_tracing_true(self):
+        factory = self.replay_flight_data("test_set_xray_tracing_true")
+
+        p = self.load_policy(
+            {
+                "name": "xray-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "TracingConfig.Mode",
+                        "value": "PassThrough",
+                        "op": "equal"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-xray-tracing",
+                        "state": True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        client = factory().client('lambda')
+        response = client.get_function(
+            FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'Active')
+
+    def test_set_xray_tracing_false(self):
+        factory = self.replay_flight_data("test_set_xray_tracing_false")
+
+        p = self.load_policy(
+            {
+                "name": "xray-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "TracingConfig.Mode",
+                        "value": "Active",
+                        "op": "equal"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-xray-tracing",
+                        "state": False
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        client = factory().client('lambda')
+        response = client.get_function(
+            FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'PassThrough')
+
 
 class LambdaTagTest(BaseTest):
 
@@ -612,7 +672,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 

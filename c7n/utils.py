@@ -474,6 +474,8 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
+    if isinstance(value, list) or isinstance(value, set):
+        return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
         klass = ipaddress.ip_address
@@ -510,6 +512,20 @@ class IPv4Network(ipaddress.IPv4Network):
         def supernet_of(self, other):
             """Return True if this network is a supernet of other."""
             return self._is_subnet_of(other, self)
+
+
+class IPv4List:
+    def __init__(self, ipv4_list):
+        self.ipv4_list = ipv4_list
+
+    def __contains__(self, other):
+        if other is None:
+            return False
+        in_networks = any([other in y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, IPv4Network)])
+        in_addresses = any([other == y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, ipaddress.IPv4Address)])
+        return any([in_networks, in_addresses])
 
 
 def reformat_schema(model):
@@ -564,7 +580,7 @@ def set_value_from_jmespath(source, expression, value, is_first=True):
     source[current_key] = value
 
 
-def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=None, *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -572,16 +588,19 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], *args, **kwargs)
+            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, *args, **kwargs))
+            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
-            return obj.format(*args, **kwargs)
+            if formatter:
+                return formatter(obj, *args, **kwargs)
+            else:
+                return obj.format(*args, **kwargs)
         except err_fallback:
             return obj
     else:

@@ -30,7 +30,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
 
 from c7n_org.utils import environ, account_tags
 
@@ -203,11 +203,13 @@ def resolve_regions(regions, account):
             client = session.client('ec2')
             return [region['RegionName'] for region in client.describe_regions()['Regions']]
         except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                log.warning('access denied listing available regions for account:%s',
-                    account['name'])
-                return []
-            raise
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
 
@@ -471,6 +473,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
     output_dir = os.path.join(output_dir, account['name'], region)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+    vars = {"account": account["name"], "account_id": account["account_id"],
+        "region": region, "output_dir": output_dir}
+    script_args = format_string_values(script_args, **vars)
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:

@@ -115,7 +115,7 @@ class SqlKvCache(Cache):
         self.cache_path = resolve_path(config.cache)
         self.conn = None
 
-    def load(self):
+    def init(self):
         # migration from pickle cache file
         if os.path.exists(self.cache_path):
             with open(self.cache_path, 'rb') as fh:
@@ -133,6 +133,10 @@ class SqlKvCache(Cache):
             cursor.execute(
                 'delete from c7n_cache where create_date < ?',
                 [datetime.utcnow() - timedelta(minutes=self.cache_period)])
+
+    def load(self):
+        if not self.conn:
+            self.init()
         return True
 
     def get(self, key):

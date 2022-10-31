@@ -1297,9 +1297,9 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 5)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"},
+            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
 
@@ -2499,6 +2499,52 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0].get("MatchedIpPermissions", [])), 1)
+
+    def test_cidr_ingress_list(self):
+        factory = self.replay_flight_data("test_security_group_cidr_ingress_list")
+        p = self.load_policy(
+            {
+                "name": "ingress-access-list",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "ingress",
+                        "Cidr": {
+                            "value": ["10.0.0.0/16", "172.0.0.0/16"],
+                            "op": "ni", "value_type": "cidr"
+                        },
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
+            ["CidrIp"], "192.0.0.0/32")
+
+        p = self.load_policy(
+            {
+                "name": "ingress-access-list",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "ingress",
+                        "Cidr": {
+                            "value": ["192.0.0.0/16", "172.0.0.0/16"],
+                            "op": "in", "value_type": "cidr"
+                        },
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["MatchedIpPermissions"][0]['IpRanges'][0]
+                ["CidrIp"], "172.0.0.0/32")
+        self.assertEqual(resources[1]["MatchedIpPermissions"][0]['IpRanges'][0]
+                ["CidrIp"], "192.0.0.0/32")
 
     @functional
     def test_cidr_size_egress(self):
