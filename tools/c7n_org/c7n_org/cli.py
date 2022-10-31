@@ -564,7 +564,7 @@ def accounts_iterator(config):
         yield d
 
 
-def run_account(account, region, policies_config, output_path,
+def run_account(account, region, policies_config, output_path, global_lock, global_state,
                 cache_period, cache_path, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
@@ -580,7 +580,7 @@ def run_account(account, region, policies_config, output_path,
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
     config = Config.empty(
-        region=region, cache=cache_path,
+        region=region, cache=cache_path, global_lock=global_lock, global_state=global_state,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         log_group=None, profile=None, external_id=None)
@@ -690,6 +690,12 @@ def run(config, use, output_dir, accounts, tags, region,
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
 
+    # Set up a state dict and lock that can be shared across
+    # worker processes
+    manager = multiprocessing.Manager()
+    global_state = manager.dict()
+    global_lock = manager.Lock()
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
@@ -699,6 +705,8 @@ def run(config, use, output_dir, accounts, tags, region,
                     a, r,
                     custodian_config,
                     output_dir,
+                    global_lock,
+                    global_state,
                     cache_period,
                     cache_path,
                     metrics,

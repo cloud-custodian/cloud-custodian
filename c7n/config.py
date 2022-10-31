@@ -42,6 +42,8 @@ class Config(Bag):
             'metrics': None,
             'output_dir': '',
             'cache_period': 0,
+            'global_lock': None,
+            'global_state': None,
             'dryrun': False,
             'authorization_file': None})
         d.update(kw)

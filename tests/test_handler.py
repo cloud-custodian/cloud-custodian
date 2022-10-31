@@ -51,6 +51,8 @@ class HandleTest(BaseTest):
              'cache': '',
              'regions': (),
              'cache_period': 0,
+             'global_state': None,
+             'global_lock': None,
              'log_group': None,
              'metrics': None})
 

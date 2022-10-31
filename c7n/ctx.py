@@ -25,6 +25,8 @@ class ExecutionContext:
         self.policy = policy
         self.options = options
         self.session_factory = session_factory
+        self.global_state = options.global_state
+        self.global_lock = options.global_lock
 
         # Runtime initialized during policy execution
         # We treat policies as a fly weight pre-execution.
@@ -114,6 +116,10 @@ class ExecutionContext:
 
     def get_metadata(self, include=('sys-stats', 'api-stats', 'metrics')):
         t = time.time()
+        config = dict(self.options)
+        config.pop('global_lock')
+        config.pop('global_state')
+
         md = {
             'policy': self.policy.data,
             'version': version,
@@ -123,7 +129,7 @@ class ExecutionContext:
                 'end_time': t,
                 'duration': t - self.start_time,
             },
-            'config': dict(self.options),
+            'config': config,
         }
 
         if 'sys-stats' in include and self.sys_stats:

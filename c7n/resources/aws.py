@@ -4,6 +4,7 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
+from contextlib import nullcontext
 from functools import lru_cache
 from urllib.request import urlopen, urlparse, Request
 from urllib.error import HTTPError
@@ -613,38 +614,51 @@ class S3Output(BlobOutput):
 
         Find a bucket region by checking, in order:
 
-        - The local cache file
+        - Global state shared among c7n-org worker processes
+        - The custodian cache
         - Response headers from an HTTP HEAD request
         - The response from a GetBucketLocation API call
 
         Once any of those options is successful, stop looking and cache
         the result to minimize HTTP traffic or API call volume.
         """
-        s3_client = self.ctx.session_factory(assume=False).client('s3')
-        cache_key = ('output-bucket-region', self.bucket)
+        # When running in a multiprocessing context via c7n-org, use
+        # a shared lock to avoid creating a thundering herd of parallel
+        # bucket region checks across accounts.
+        lock = self.ctx.global_lock or nullcontext()
 
-        with self.cache:
-            bucket_region = self.cache.get(cache_key)
+        with lock:
+            s3_client = self.ctx.session_factory(assume=False).client('s3')
+            cache_key = ('output-bucket-region', self.bucket)
 
-        if bucket_region:
+            bucket_region = self.ctx.global_state and self.ctx.global_state.get(cache_key)
+            if bucket_region:
+                return bucket_region
+
+            with self.cache:
+                bucket_region = self.cache.get(cache_key)
+            if bucket_region:
+                return bucket_region
+
+            # Try determining the output bucket region via HTTP requests since
+            # that works more consistently in cross-region scenarios. Fall back to
+            # the GetBucketLocation API if necessary.
+            try:
+                bucket_region = (
+                    get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
+                    get_bucket_region_api(self.bucket, s3_client)
+                )
+            except ClientError as err:
+                raise InvalidOutputConfig(
+                    f'unable to determine a region for output bucket {self.bucket}: {err}'
+                ) from None
+
+            with self.cache:
+                self.cache.save(cache_key, bucket_region)
+            if self.ctx.global_state is not None:
+                self.ctx.global_state[cache_key] = bucket_region
+
             return bucket_region
-
-        # Try determining the output bucket region via HTTP requests since
-        # that works more consistently in cross-region scenarios. Fall back
-        # the GetBucketLocation API if necessary.
-        try:
-            bucket_region = (
-                get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
-                get_bucket_region_api(self.bucket, s3_client)
-            )
-        except ClientError as err:
-            raise InvalidOutputConfig(
-                f'unable to determine a region for output bucket {self.bucket}: {err}') from None
-
-        with self.cache:
-            self.cache.save(cache_key, bucket_region)
-
-        return bucket_region
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
