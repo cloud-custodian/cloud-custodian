@@ -94,7 +94,7 @@ class CompositeAlarm(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'alarm'
-        enum_spec = ('describe_alarms', 'CompositeAlarms', {'AlarmTypes':['CompositeAlarm']})
+        enum_spec = ('describe_alarms', 'CompositeAlarms', {'AlarmTypes': ['CompositeAlarm']})
         id = name = 'AlarmName'
         arn = 'AlarmArn'
         date = 'AlarmConfigurationUpdatedTimestamp'

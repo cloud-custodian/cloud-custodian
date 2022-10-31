@@ -88,7 +88,7 @@ class CompositeAlarmTest(BaseTest):
             {
                 "name": "add-composite-alarm-tags",
                 "resource": "composite-alarm",
-                "filters":[{"AlarmArn": alarm_arn}],
+                "filters": [{"AlarmArn": alarm_arn}],
                 "actions": [{
                     "type": "tag",
                     "key": "OwnerName",
@@ -111,7 +111,7 @@ class CompositeAlarmTest(BaseTest):
             {
                 "name": "delete-composite-alarms",
                 "resource": "composite-alarm",
-                "filters":[{"AlarmName": "c7n-composite-alarm"}],
+                "filters": [{"AlarmName": "c7n-composite-alarm"}],
                 "actions": ["delete"]
             },
             session_factory=factory,
