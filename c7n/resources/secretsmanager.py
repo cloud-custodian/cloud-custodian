@@ -63,7 +63,7 @@ class HasStatementFilter(HasStatementFilter):
         self.client = local_session(self.manager.session_factory).client('secretsmanager')
         for r in resources:
             try:
-                policy = self.client.get_resource_policy(SecretId=str(r['Name']) + '13')
+                policy = self.client.get_resource_policy(SecretId=r['Name'])
                 if policy.get('ResourcePolicy'):
                     r['Policy'] = policy['ResourcePolicy']
             except self.client.exceptions.ResourceNotFoundException:
