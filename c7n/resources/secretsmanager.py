@@ -6,7 +6,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
-import c7n.filters.policystatement as polstmt_filter
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('secrets-manager')
@@ -50,7 +50,7 @@ class KmsFilter(KmsRelatedFilter):
 
 
 @SecretsManager.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter):
+class HasStatementFilter(HasStatementFilter):
 
     def get_std_format_args(self, secret):
         return {
@@ -62,9 +62,12 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
     def process(self, resources, event=None):
         self.client = local_session(self.manager.session_factory).client('secretsmanager')
         for r in resources:
-            policy = self.client.get_resource_policy(SecretId=r['Name'])
-            if policy.get('ResourcePolicy'):
-                r['Policy'] = policy['ResourcePolicy']
+            try:
+                policy = self.client.get_resource_policy(SecretId=str(r['Name']) + '13')
+                if policy.get('ResourcePolicy'):
+                    r['Policy'] = policy['ResourcePolicy']
+            except self.client.exceptions.ResourceNotFoundException:
+                continue
 
         return list(filter(None, map(self.process_resource, resources)))
 
