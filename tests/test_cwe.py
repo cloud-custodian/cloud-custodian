@@ -51,6 +51,60 @@ class CloudWatchEventTest(BaseTest):
                         'Tags')}
         self.assertEqual(tags, {'App': 'Custodian'})
 
+    def test_event_rule_enable(self):
+        factory = self.replay_flight_data('test_cwe_enable_rule')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'action': 'enable'
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_event_rule_disable(self):
+        factory = self.replay_flight_data('test_cwe_disable_rule')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'action': 'disable'
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_event_rule_invalid_state(self):
+        factory = self.replay_flight_data('test_cwe_disable_rule')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'action': 'invalid'
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        with self.assertRaises(Exception) as context:
+            policy.run()
+
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")
         client = session_factory().client("events")
