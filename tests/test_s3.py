@@ -8,6 +8,7 @@ import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
+import mock
 
 from unittest import TestCase
 
@@ -22,7 +23,6 @@ from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 from c7n.utils import get_account_alias_from_sts
-from unittest.mock import MagicMock
 
 from .common import (
     BaseTest,
@@ -3679,23 +3679,10 @@ class S3Test(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
 
-    def test_s3_invoke_lambda_assume_role_action(self):
+    @mock.patch('c7n.actions.invoke.assumed_session')
+    def test_s3_invoke_lambda_assume_role_action(self, mock_assumed_session):
 
-        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(s3, "S3_AUGMENT_TABLE", [])
         session_factory = self.replay_flight_data("test_s3_invoke_lambda_assume_role")
-
-        client = session_factory().client("sts")
-        mock_factory = MagicMock()
-        mock_factory.region = 'us-west-2'
-        mock_factory().client(
-            'sts').exceptions.InvalidIdentityTokenException = (
-            client.exceptions.InvalidIdentityTokenException)
-
-        mock_factory().client('sts').assume_role.side_effect = (
-            client.exceptions.InvalidIdentityTokenException(
-                {'Error': {'Code': 'xyz'}},
-                operation_name='assume_role'))
 
         p = self.load_policy(
             {
@@ -3703,24 +3690,15 @@ class S3Test(BaseTest):
                 "resource": "s3",
                 "actions": [{"type": "invoke-lambda",
                              "function": "lambda-invoke-with-assume-role", "assume-role":
-                "arn:aws:iam::0123456789:role/service-role/lanbda-invoke-c7n-role-py5l2hbi"}],
+                                 "arn:aws:iam::0123456789:role/service-role/lambda-assumed-role"}],
             },
             session_factory=session_factory,
         )
-        # resources = p.run()
-        # print(resources)
-        # self.assertEqual(len(resources), 3)
 
-        print(p.resource_manager.actions[0].process)
-
-        try:
-            p.resource_manager.actions[0].process([{
+        p.resource_manager.actions[0].process([{
             "FunctionName": "abc",
             "payload": {},
-            }])
-        except client.exceptions.InvalidIdentityTokenException:
-            self.fail('should not raise')
-        mock_factory().client('sts').assume_role.assert_called_once()
+        }])
 
 
 class S3LifecycleTest(BaseTest):
