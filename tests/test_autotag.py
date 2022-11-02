@@ -213,6 +213,25 @@ class AutoTagCreator(BaseTest):
         result = auto_tag_user.process(resources, event)
         self.assertEqual(result["CreatorName"], "arn:aws:iam::644160558196:user/c7nbot")
 
+        policy = self.load_policy(
+            {
+                "name": "ec2-auto-tag",
+                "resource": "ec2",
+                "mode": {"type": "cloudtrail", "events": ["RunInstances"]},
+                "actions": [
+                    {
+                        "type": "auto-tag-user",
+                        "tag": "CreatorName",
+                        "value": "userName",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        auto_tag_user.data = {"tag": "CreatorName", "value": "userName"}
+        result = auto_tag_user.process(resources, event)
+        self.assertEqual(result, {"CreatorName": "c7nbot"})
+
         # check that it works with assumeRole creator
         session_factory = self.replay_flight_data("test_ec2_autotag_assumed")
         policy = self.load_policy(
@@ -239,4 +258,30 @@ class AutoTagCreator(BaseTest):
         result = auto_tag_user.process(resources, event)
         self.assertEqual(
             result, {"Owner": "GR_Dev_Developer"}
+        )
+
+        policy = self.load_policy(
+            {
+                "name": "ec2-auto-tag",
+                "resource": "ec2",
+                "mode": {"type": "cloudtrail", "events": ["RunInstances"]},
+                "actions": [
+                    {
+                        "type": "auto-tag-user",
+                        "tag": "IP",
+                        "value": "sourceIPAddress",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        event = {
+            "detail": event_data("event-cloud-trail-run-instance-creator-assumed.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        auto_tag_user.data = {"tag": "IP", "value": "sourceIPAddress"}
+        result = auto_tag_user.process(resources, event)
+        self.assertEqual(
+            result, {"IP": "204.63.44.142"}
         )
