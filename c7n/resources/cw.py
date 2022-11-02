@@ -353,7 +353,8 @@ class SetRuleState(BaseAction):
                         client.disable_rule,
                         Name=resource['Name']
                     )
-            except (client.exceptions.ResourceNotFoundException, client.exceptions.ManagedRuleException):
+            except (client.exceptions.ResourceNotFoundException,
+                    client.exceptions.ManagedRuleException):
                 continue
 
 
