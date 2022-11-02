@@ -66,8 +66,8 @@ class AutoTagUser(EventAction):
                          'userName',
                          'arn',
                          'sourceIPAddress'
-            ]}
-        }
+                     ]},
+           }
     )
 
     def get_permissions(self):
@@ -97,7 +97,8 @@ class AutoTagUser(EventAction):
             if utype == "IAMUser":
                 value = event['userIdentity'].get('userName', '')
             elif utype == "AssumedRole" or utype == "FederatedUser":
-                value = event['userIdentity'].get('sessionContext', {}).get('sessionIssuer', {}).get('userName', '')
+                value = event['userIdentity'].get('sessionContext', {}).get(
+                    'sessionIssuer', {}).get('userName', '')
         elif vtype == "arn":
             value = event['userIdentity'].get('arn', '')
         elif vtype == "sourceIPAddress":
