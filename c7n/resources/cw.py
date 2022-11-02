@@ -321,7 +321,7 @@ class SetRuleState(BaseAction):
 
     schema = type_schema(
         'set-rule-state',
-        **{'action': {'type': 'string'}}
+        **{'enabled': {'default': True, 'type': 'boolean'}}
     )
     permissions = ('events:EnableRule', 'events:DisableRule',)
 
@@ -334,12 +334,10 @@ class SetRuleState(BaseAction):
         )
         client = local_session(self.manager.session_factory).client('events', config=config)
         retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
-        action = self.data.get('action').lower()
-        if action not in ['enable', 'disable']:
-            raise Exception('InvalidParameterException')
+        enabled = self.data.get('enabled')
         for resource in resources:
             try:
-                if action == 'enable':
+                if enabled:
                     retry(
                         client.enable_rule,
                         Name=resource['Name']

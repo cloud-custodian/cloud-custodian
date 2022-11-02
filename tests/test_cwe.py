@@ -60,7 +60,7 @@ class CloudWatchEventTest(BaseTest):
                 'actions': [
                     {
                         'type': 'set-rule-state',
-                        'action': 'enable'
+                        'enabled': True
                     }
                 ]
             },
@@ -78,7 +78,7 @@ class CloudWatchEventTest(BaseTest):
                 'actions': [
                     {
                         'type': 'set-rule-state',
-                        'action': 'disable'
+                        'enabled': False
                     }
                 ]
             },
@@ -86,24 +86,6 @@ class CloudWatchEventTest(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-
-    def test_event_rule_invalid_state(self):
-        factory = self.replay_flight_data('test_cwe_disable_rule')
-        policy = self.load_policy(
-            {
-                'name': 'cwe-enable-rule',
-                'resource': 'aws.event-rule',
-                'actions': [
-                    {
-                        'type': 'set-rule-state',
-                        'action': 'invalid'
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-        with self.assertRaises(Exception) as context:
-            policy.run()
 
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")
