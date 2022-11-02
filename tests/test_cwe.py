@@ -53,6 +53,7 @@ class CloudWatchEventTest(BaseTest):
 
     def test_event_rule_enable(self):
         factory = self.replay_flight_data('test_cwe_enable_rule')
+        client = factory().client('events')
         policy = self.load_policy(
             {
                 'name': 'cwe-enable-rule',
@@ -67,10 +68,13 @@ class CloudWatchEventTest(BaseTest):
             session_factory=factory,
         )
         resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'ENABLED')
 
     def test_event_rule_disable(self):
         factory = self.replay_flight_data('test_cwe_disable_rule')
+        client = factory().client('events')
         policy = self.load_policy(
             {
                 'name': 'cwe-enable-rule',
@@ -85,7 +89,9 @@ class CloudWatchEventTest(BaseTest):
             session_factory=factory,
         )
         resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'DISABLED')
 
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")

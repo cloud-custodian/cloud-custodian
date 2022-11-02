@@ -4,8 +4,8 @@
         "Rules": [
             {
                 "Name": "test",
-                "Arn": "arn:aws:events:us-east-1:<ACCOUNT_ID>:rule/backupdb",
-                "State": "DISABLED",
+                "Arn": "arn:aws:events:us-east-1:<ACCOUNT_ID>:rule/test",
+                "State": "ENABLED",
                 "Description": "test",
                 "ScheduleExpression": "rate(1 minute)",
                 "EventBusName": "default"

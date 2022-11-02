@@ -315,8 +315,14 @@ class SetRuleState(BaseAction):
 
     :example:
     .. code-block:: yaml
-        actions:
-          - type: set-rule-state
+        policies:
+            - name: test-rule
+              resource: aws.event-rule
+              filters:
+                - Name: my-event-rule
+              actions:
+                - type: set-rule-state
+                  enabled: true
     """
 
     schema = type_schema(
