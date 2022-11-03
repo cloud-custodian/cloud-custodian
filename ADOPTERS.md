@@ -7,7 +7,7 @@ There are many additional adopters of Cloud Custodian in the evaluating phase th
 - Avalara
 - Capital One
 - Code 42
-CyberArk
+- CyberArk
 - Databricks
 - Grupo
 - HBO Max
