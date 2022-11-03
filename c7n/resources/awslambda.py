@@ -252,7 +252,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 @AWSLambda.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 
-    RelatedIdsExpression = 'KMSKeyArn'
+    RelatedIdsExpression = 'KmsKeyArn'
 
 
 @AWSLambda.action_registry.register('set-xray-tracing')
@@ -326,7 +326,7 @@ class LambdaPostFinding(PostFinding):
              'DeadLetterConfig',
              'Environment',
              'Handler',
-             'KMSKeyArn',
+             'KmsKeyArn',
              'LastModified',
              'MemorySize',
              'MasterArn',
