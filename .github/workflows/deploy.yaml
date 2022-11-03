@@ -1,0 +1,17 @@
+name: website-deploy
+
+on:
+  push:
+    branches:
+      - gh-pages
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+      - uses: abatilo/actions-poetry@v2
+      - run: poetry install
+      - run: mkdocs gh-deploy --dirty

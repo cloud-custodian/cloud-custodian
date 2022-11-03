@@ -1,0 +1,107 @@
+site_name: Cloud Custodian
+copyright: "Copyright &copy; 2022 The Cloud Custodian Community"
+docs_dir: "docs"
+repo_url: https://github.com/cloud-custodian/cloud-custodian
+repo_name: cloud-custodian
+
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/git-alt
+  logo: "assets/cloud-custodian.png"
+  custom_dir: overrides
+  features:
+    - announce.dismiss
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tracking
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.top
+    - navigation.sections
+    - navigation.expand
+    - tabs
+    - instant
+    - search.suggest
+    - search.highlight
+    - search.share
+    - toc.follow
+    - toc.integrate
+  palette:
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+extra_css:
+  - _static/css/extra.css
+  - assets/home.css
+extra:
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cloud-custodian
+    - icon: fontawesome/brands/slack
+      link: https://communityinviter.com/apps/cloud-custodian/c7n-chat
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/cloudcustodian
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/c7n
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/castrojo
+plugins:
+  - minify:
+      minify_html: false
+  - search
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+      type: iso_datetime
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+# Page tree
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/index.md
+      - getting-started/filters.md
+      - getting-started/actions.md
+      - getting-started/advanced.md
+      - getting-started/policyStructure.md
+  - Documentation: "https://cloudcustodian.io/docs/index.html"
+  #- API Reference:
+  #  - reference/index.md
+  - Community:
+      - community/index.md
+  - Calendar:
+      - calendar/index.md
+  - Discussions:
+      - https://github.com/orgs/cloud-custodian/discussions

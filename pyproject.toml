@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "docs-tng"
+version = "0.1.0"
+description = "Cloud Custodian mkdocs instance"
+authors = ["The Cloud Custodian Community"]
+license = "Apache 2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+mkdocs = "^1.4.0"
+mkdocs-material = "^8.5.6"
+mkdocs-minify-plugin = "^0.5.0"
+mkdocs-git-revision-date-localized-plugin = "^1.1.0"
+mkdocs-material-extensions = "^1.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,16 @@
+.cards ul,
+.md-typeset .cards ul:not([hidden]) {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1.6rem;
+    padding: 0;
+}
+
+
+.md-typeset .cards ul>li {
+    display: flex-row;
+    flex: 1 0 48%;
+    gap: 0.6rem;
+    margin: 0;
+    transition: transform .75s cubic-bezier(.075, .85, .175, 1), opacity .75s;
+}
