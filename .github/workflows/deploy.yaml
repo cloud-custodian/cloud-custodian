@@ -3,7 +3,7 @@ name: website-deploy
 on:
   push:
     branches:
-      - gh-pages
+      - gh-pages-source
 jobs:
   deploy:
     runs-on: ubuntu-latest
