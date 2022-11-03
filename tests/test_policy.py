@@ -189,7 +189,8 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy', })
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
+             'apigwv2', })
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -335,7 +336,6 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            'AWS::ApiGatewayV2::Api',
             'AWS::ApiGatewayV2::Stage',
             'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
@@ -402,6 +402,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
+            'AWS::AppSync::GraphQLApi',
         }
 
         resource_map = {}
@@ -774,6 +775,34 @@ class TestPolicyCollection(BaseTest):
         self.assertEqual(iam[0].options.region, "eu-west-1")
         self.assertEqual(iam[0].options.output_dir, "/test/output/eu-west-1")
         self.assertEqual(len(collection), 3)
+
+    def test_policy_filter_mode(self):
+        cfg = Config.empty(regions=['us-east-1'])
+        original = policy.PolicyCollection.from_data(
+            {"policies": [
+                {
+                    "name": "bar",
+                    "resource": "lambda",
+                    "mode": {
+                        "type": "cloudtrail",
+                        "events": ["CreateFunction"],
+                        "role": "custodian"
+                    }
+                },
+                {
+                    "name": "two",
+                    "resource": "ec2",
+                    "mode": {
+                        "type": "periodic",
+                        "role": "cutodian",
+                        "schedule": "rate(1 day)"
+                    }
+                }
+            ]}, cfg)
+        collection = AWS().initialize_policies(original, cfg)
+        result = collection.filter(modes=['cloudtrail'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result.policies[0].name, 'bar')
 
 
 class TestPolicy(BaseTest):

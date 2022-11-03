@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_org"
-version = "0.6.18"
+version = "0.6.19"
 description = "Cloud Custodian - Parallel Execution"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
@@ -19,7 +19,7 @@ c7n-org = 'c7n_org.cli:cli'
 
 [tool.poetry.dependencies]
 python = "^3.7"
-click = "^8.0"
+click = ">=8.0"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}

@@ -3,4 +3,14 @@
 
 ResourceMap = {
     "tencentcloud.cvm": "c7n_tencentcloud.resources.cvm.CVM",
+    "tencentcloud.cbs-snapshot": "c7n_tencentcloud.resources.cbs_snapshot.CBSSnapshot",
+    "tencentcloud.ami": "c7n_tencentcloud.resources.ami.AMI",
+    "tencentcloud.nat-gateway": "c7n_tencentcloud.resources.nat_gateway.NatGateway",
+    "tencentcloud.clb": "c7n_tencentcloud.resources.clb.CLB",
+    "tencentcloud.cbs": "c7n_tencentcloud.resources.cbs.CBS",
+    "tencentcloud.vpc": "c7n_tencentcloud.resources.vpc.VPC",
+    "tencentcloud.elasticsearch": "c7n_tencentcloud.resources.elasticsearch.Elasticsearch",
+    "tencentcloud.cls": "c7n_tencentcloud.resources.cls.LogTopic",
+    "tencentcloud.tcr": "c7n_tencentcloud.resources.tcr.TCR",
+    "tencentcloud.security-group": "c7n_tencentcloud.resources.security_group.SecurityGroup"
 }

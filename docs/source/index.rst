@@ -83,6 +83,14 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Kubernetes
+
+   kubernetes/gettingstarted
+   kubernetes/controllermode
+   kubernetes/examples/index
+
+.. toctree::
    :maxdepth: 2
    :caption: Tools
 
@@ -107,4 +115,3 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    developer/tests.rst
    developer/documentation.rst
    developer/packaging.rst
-

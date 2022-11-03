@@ -174,7 +174,6 @@ class SourceLocator:
 
 class DirectoryLoader(PolicyLoader):
     def load_directory(self, directory):
-
         structure = StructureParser()
 
         def _validate(data):
@@ -185,31 +184,34 @@ class DirectoryLoader(PolicyLoader):
                 log.error("Configuration invalid: {}".format(data))
                 log.error("%s" % e)
                 errors.append(e)
-            load_resources(structure.get_resource_types(data))
-            schm = schema.generate()
+            rtypes = structure.get_resource_types(data)
+            load_resources(rtypes)
+            schm = schema.generate(rtypes)
             errors += schema.validate(data, schm)
             return errors
 
-        def _load(directory, raw_policies, errors):
-            raw_policies = []
-            for root, dirs, files in os.walk(directory, topdown=False):
+        def _load(path, raw_policies, errors):
+            for root, dirs, files in os.walk(path):
+                files = [f for f in files if not is_hidden(f)]
+                dirs[:] = [d for d in dirs if not is_hidden(d)]
+
                 for name in files:
                     fmt = name.rsplit('.', 1)[-1]
                     if fmt in ('yaml', 'yml', 'json',):
-                        data = load_file(f"{root}/{name}")
-                        errors.extend(_validate(data))
+                        data = load_file(os.path.join(root, name))
+                        errors += _validate(data)
                         raw_policies.append(data)
                 for name in dirs:
                     _load(os.path.abspath(name), raw_policies, errors)
-            return raw_policies, errors
 
-        loaded, errors = _load(directory, [], [])
+        policy_collections, all_errors = [], []
+        _load(directory, policy_collections, all_errors)
 
-        if errors:
-            raise PolicyValidationError(errors)
+        if all_errors:
+            raise PolicyValidationError(all_errors)
 
         policies = []
-        for p in loaded:
+        for p in policy_collections:
             if not p.get('policies'):
                 continue
             policies.extend(p['policies'])
@@ -223,3 +225,11 @@ class DirectoryLoader(PolicyLoader):
                 names.append(p['name'])
 
         return self.load_data({'policies': policies}, directory)
+
+
+def is_hidden(path):
+    for part in os.path.split(path):
+        if part != '.' and part.startswith('.'):
+            return True
+
+    return False
