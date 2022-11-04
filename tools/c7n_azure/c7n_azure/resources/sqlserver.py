@@ -165,7 +165,7 @@ class VulnerabilityAssessmentFilter(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: sql-server-no-va
+          - name: sql-server-no-email
             resource: azure.sql-server
             filters:
               - type: vulnerability-assessment
