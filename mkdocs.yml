@@ -3,6 +3,7 @@ copyright: "Copyright &copy; 2022 The Cloud Custodian Community"
 docs_dir: "docs"
 repo_url: https://github.com/cloud-custodian/cloud-custodian
 repo_name: cloud-custodian
+edit_uri_template: 'edit/gh-pages-source/docs/{path}'
 
 theme:
   name: material
