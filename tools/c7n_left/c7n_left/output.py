@@ -2,12 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
+from pathlib import Path
 import time
 
-from c7n.output import OutputRegistry
-
+import jmespath
 from rich.console import Console
 from rich.syntax import Syntax
+
+from c7n.output import OutputRegistry
 
 
 report_outputs = OutputRegistry("left")
@@ -106,6 +108,8 @@ class RichResult:
 
         yield f"[bold]{policy.name}[/bold] - {policy.resource_type}"
         yield "  [red]Failed[/red]"
+        if policy.data.get("description"):
+            yield f"  [red]Reason: {policy.data['description']}[/red]"
         yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
 
         lines = resource.get_source_lines()
@@ -140,6 +144,14 @@ class Github(Output):
         return f"::error file={filename} line={resource.line_start} lineEnd={resource.line_end} title={title}::{message}"  # noqa
 
 
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Match all the types you want to handle in your converter
+        if isinstance(obj, Path):
+            return str(obj)
+        return super().default(obj)
+
+
 @report_outputs.register("json")
 class Json(Output):
     def __init__(self, ctx, config):
@@ -151,8 +163,12 @@ class Json(Output):
 
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
+        if self.config.output_query:
+            formatted_results = jmespath.search(
+                self.config.output_query, formatted_results
+            )
         self.config.output_file.write(
-            json.dumps({"results": formatted_results}, indent=2)
+            json.dumps({"results": formatted_results}, cls=JSONEncoder, indent=2)
         )
 
     def format_result(self, result):
@@ -167,6 +183,7 @@ class Json(Output):
 
         return {
             "policy": dict(result.policy.data),
+            "resource": dict(resource),
             "file_path": str(resource.src_dir / resource.filename),
             "file_line_start": resource.line_start,
             "file_line_end": resource.line_end,
