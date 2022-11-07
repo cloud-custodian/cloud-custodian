@@ -180,16 +180,14 @@ class SetDeprecation(BaseAction):
                         "policy:%s filter:%s has invalid date format" % (
                             self.manager.ctx.policy.name, self.type))
             elif 'days' in self.data:
-                self.dep_date = (
-                    datetime.datetime.now(tz=tzutc()) +
-                        timedelta(days=int(self.data.get('days')))
-                )
+                self.dep_date = (datetime.datetime.now(tz=tzutc()) +
+                    timedelta(days=int(self.data.get('days'))))
             elif 'age' in self.data:
                 self.dep_age = (int(self.data.get('age')))
         except ValueError:
             raise PolicyValidationError(
                 "policy:%s filter:%s has invalid time interval" % (
-                    self.manager.ctx.policy.name, self.type ) )
+                    self.manager.ctx.policy.name, self.type))
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
