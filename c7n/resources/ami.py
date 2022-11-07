@@ -159,7 +159,7 @@ class SetDeprecation(BaseAction):
                     #days: 90
                     #Specific date/time
                     #date: "{now}"
-                    
+
     """
 
     schema = type_schema(
@@ -167,26 +167,29 @@ class SetDeprecation(BaseAction):
         date={'type': 'string'},
         days={'type': 'integer'},
         age={'type': 'integer'})
-    permissions = ('ec2:EnableImageDeprecation','ec2:DisableImageDeprecation')
+    permissions = ('ec2:EnableImageDeprecation', 'ec2:DisableImageDeprecation')
     dep_date = None
     dep_age = None
 
     def validate(self):
         try:
             if 'date' in self.data:
-                self.dep_date=parse_date(self.data.get('date'))
+                self.dep_date = parse_date(self.data.get('date'))
                 if not self.dep_date:
                     raise PolicyValidationError(
                         "policy:%s filter:%s has invalid date format" % (
                             self.manager.ctx.policy.name, self.type))
             elif 'days' in self.data:
-                self.dep_date=datetime.datetime.now(tz=tzutc()) + timedelta(days=int(self.data.get('days')))
+                self.dep_date = (
+                    datetime.datetime.now(tz=tzutc()) +
+                        timedelta(days=int(self.data.get('days')))
+                )
             elif 'age' in self.data:
-                self.dep_age=(int(self.data.get('age')))
+                self.dep_age = (int(self.data.get('age')))
         except ValueError:
             raise PolicyValidationError(
                 "policy:%s filter:%s has invalid time interval" % (
-                self.manager.ctx.policy.name, self.type))
+                    self.manager.ctx.policy.name, self.type ) )
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -282,6 +285,7 @@ class RemoveLaunchPermissions(BaseAction):
             LaunchPermission={'Remove': remove},
             OperationType='remove')
 
+
 @AMI.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):
     """Set or remove AMI launch permissions
@@ -375,13 +379,13 @@ class SetPermissions(BaseAction):
             if to_remove == 'matched':
                 to_remove = image.get(AmiCrossAccountFilter.annotation_key)
             if to_remove:
-                principals = [v for v in to_remove if account_regex.match( v )]
+                principals = [v for v in to_remove if account_regex.match(v)]
                 if principals:
                     remove.extend([{'UserId': a} for a in principals])
-                principals = [v for v in to_remove if org_regex.match( v )]
+                principals = [v for v in to_remove if org_regex.match(v)]
                 if principals:
                     remove.extend([{'OrganizationArn': a} for a in principals])
-                principals = [v for v in to_remove if ou_regex.match( v )]
+                principals = [v for v in to_remove if ou_regex.match(v)]
                 if principals:
                     remove.extend([{'OrganizationalUnitArn': a} for a in principals])
 
@@ -390,13 +394,13 @@ class SetPermissions(BaseAction):
                 add.append({'Group': 'all'})
                 to_add.remove('all')
             if to_add:
-                principals = [v for v in to_add if account_regex.match( v )]
+                principals = [v for v in to_add if account_regex.match(v)]
                 if principals:
                     add.extend([{'UserId': a} for a in principals])
-                principals = [v for v in to_add if org_regex.match( v )]
+                principals = [v for v in to_add if org_regex.match(v)]
                 if principals:
                     add.extend([{'OrganizationArn': a} for a in principals])
-                principals = [v for v in to_add if ou_regex.match( v )]
+                principals = [v for v in to_add if ou_regex.match(v)]
                 if principals:
                     add.extend([{'OrganizationalUnitArn': a} for a in principals])
 
@@ -565,7 +569,11 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
                 ImageId=r['ImageId'],
                 Attribute='launchPermission')['LaunchPermissions']
             r['c7n:LaunchPermissions'] = attrs
-            image_accounts = {a.get('Group') or a.get('UserId') or a.get('OrganizationArn') or a.get('OrganizationalUnitArn' ) for a in attrs}
+            image_accounts = {
+                a.get('Group') or a.get('UserId') or
+                a.get('OrganizationArn') or a.get('OrganizationalUnitArn')
+                for a in attrs
+            }
             delta_accounts = image_accounts.difference(accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
