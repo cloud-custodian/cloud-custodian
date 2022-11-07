@@ -2031,8 +2031,8 @@ class DbOptionGroups(ValueFilter):
         results = []
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_option_groups')
-        option_groups = {db['OptionGroupMemberships'][0]['OptionGroupName']
-                        for db in resources}
+        option_groups = [db['OptionGroupMemberships'][0]['OptionGroupName']
+                        for db in resources]
         optioncache = self.handle_optiongroup_cache(client, paginator, option_groups)
 
         for resource in resources:

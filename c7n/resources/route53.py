@@ -7,6 +7,7 @@ import itertools
 import os
 
 from botocore.paginate import Paginator
+from botocore.exceptions import ClientError
 
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator
 from c7n.manager import resources
@@ -484,4 +485,43 @@ class IsQueryLoggingEnabled(Filter):
                 results.append(r)
             elif not logging and not state:
                 results.append(r)
+        return results
+
+
+@HostedZone.filter_registry.register('enhance-hostedzone-attributes')
+class HostedZoneLogGroupAttributes(Filter):
+    """This filter type adds log group subscriptions related data to hostedzone resource output.
+    :example:
+    .. code-block:: yaml
+
+            policies:
+              - name: hostedzone-loggroup-attribute-addition
+                resource: hostedzone
+                filters:
+                  - type: query-logging-enabled
+                    state: true
+                  - type: enhance-hostedzone-attributes
+                actions:
+                  - notify
+    """
+
+    permissions = ('route53:GetHostedZone')
+    schema = type_schema('enhance-hostedzone-attributes', )
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
+        results = []
+        for resource in resources:
+            print(resource)
+            if 'c7n:log-config' in resource:
+                try:
+                    logg_name = resource['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")
+                    response = client.describe_subscription_filters(logGroupName=logg_name[-1])
+                    resource.update({'loggroup_subscription': response['subscriptionFilters']})
+                    results.append(resource)
+                except ClientError as e:
+                    if e.response['Error']['Code'] == "ResourceNotFoundException":
+                        continue
+                    raise
+
         return results
