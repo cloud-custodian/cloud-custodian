@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/pe-v2-cf-waf-shield-advanced-remediate-daily",
+                "Tags": [
+                    {
+                        "Key": "i1:asset_id",
+                        "Value": "7857673042471054453"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
