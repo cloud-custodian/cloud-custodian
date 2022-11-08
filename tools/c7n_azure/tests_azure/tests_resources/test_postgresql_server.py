@@ -18,12 +18,6 @@ PORTAL_IPS = ['104.42.195.92',
 AZURE_CLOUD_IPS = ['0.0.0.0']
 
 
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
-
-
 class PostgresqlServerTest(BaseTest):
 
     def test_postgresql_server_schema_validate(self):
