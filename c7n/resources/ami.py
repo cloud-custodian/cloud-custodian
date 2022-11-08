@@ -19,6 +19,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema, chunks, merge_dict_list, parse_date
+from c7n import deprecated
 
 
 log = logging.getLogger('custodian.ami')
@@ -116,7 +117,7 @@ class Deregister(BaseAction):
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
         image_count = len(images)
-        images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
+        images = self.filter_resources(images, 'OwnerId', self.manager.ctx.options.account_id)
         if len(images) != image_count:
             self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
 
@@ -192,7 +193,7 @@ class SetDeprecation(BaseAction):
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
         image_count = len(images)
-        images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
+        images = self.filter_resources(images, 'OwnerId', self.manager.ctx.options.account_id)
         if len(images) != image_count:
             self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
         for i in images:
@@ -236,7 +237,9 @@ class RemoveLaunchPermissions(BaseAction):
                   - remove-launch-permissions
 
     """
-
+    deprecations = (
+        deprecated.action("use set-permissions instead with 'remove' attribute"),
+    )
     schema = type_schema(
         'remove-launch-permissions',
         accounts={'oneOf': [
