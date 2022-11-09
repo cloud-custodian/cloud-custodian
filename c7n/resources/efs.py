@@ -8,7 +8,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-import c7n.filters.policystatement as polstmt_filter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
 )
@@ -308,7 +308,7 @@ class CheckSecureTransport(Filter):
 
 
 @ElasticFileSystem.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter):
+class EFSHasStatementFilter(HasStatementFilter):
 
     def __init__(self, data, manager=None):
         super().__init__(data, manager)
