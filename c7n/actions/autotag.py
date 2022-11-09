@@ -109,6 +109,8 @@ class AutoTagUser(EventAction):
             return
 
         user_info = self.get_tag_value(event)
+        if user_info is None:
+            return
 
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
