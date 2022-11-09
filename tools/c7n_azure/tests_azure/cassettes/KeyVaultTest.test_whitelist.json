@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,37 +14,125 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "date": [
-                        "Thu, 02 May 2019 19:32:46 GMT"
-                    ],
-                    "content-length": [
-                        "539"
+                        "Wed, 12 Oct 2022 14:55:07 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1597"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
-                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1yghq6zt4ewg2e",
+                                "name": "cckeyvault1yghq6zt4ewg2e",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
-                                "tags": {}
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
-                                "name": "cckeyvault2kme24fgeaqvqk",
-                                "type": "Microsoft.KeyVault/vaults",
-                                "location": "southcentralus",
-                                "tags": {}
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [
+                                            {
+                                                "value": "0.0.0.0/2"
+                                            },
+                                            {
+                                                "value": "64.0.0.0/3"
+                                            },
+                                            {
+                                                "value": "96.0.0.0/4"
+                                            },
+                                            {
+                                                "value": "112.0.0.0/5"
+                                            },
+                                            {
+                                                "value": "120.0.0.0/6"
+                                            },
+                                            {
+                                                "value": "124.0.0.0/7"
+                                            },
+                                            {
+                                                "value": "126.0.0.0/8"
+                                            },
+                                            {
+                                                "value": "128.0.0.0/1"
+                                            }
+                                        ],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "cfb71ed8-fcd0-4fe2-8384-7076080a219b",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers"
+                                                ],
+                                                "storage": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "regeneratekey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "vaultUri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
                             }
-                        ]
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdHxjY2tleXZhdWx0MXlnaHE2enQ0ZXdnMmU="
                     }
                 }
             }
@@ -52,7 +140,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo?api-version=2018-02-14",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdHxjY2tleXZhdWx0MXlnaHE2enQ0ZXdnMmU=",
                 "body": null,
                 "headers": {}
             },
@@ -62,39 +150,102 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "date": [
-                        "Thu, 02 May 2019 19:32:46 GMT"
-                    ],
-                    "x-ms-keyvault-service-version": [
-                        "1.1.0.244"
+                        "Wed, 12 Oct 2022 14:55:07 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "content-length": [
-                        "1013"
+                        "12"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
-                        "name": "cckeyvault1c6ra5qqpkhceo",
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1yghq6zt4ewg2e?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 12 Oct 2022 14:55:08 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1369"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1yghq6zt4ewg2e",
+                        "name": "cckeyvault1yghq6zt4ewg2e",
                         "type": "Microsoft.KeyVault/vaults",
                         "location": "southcentralus",
-                        "tags": {},
+                        "tags": {
+                            "product_id": "13742"
+                        },
                         "properties": {
                             "sku": {
                                 "family": "A",
                                 "name": "Standard"
                             },
-                            "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                            "networkAcls": {
+                                "bypass": "AzureServices",
+                                "defaultAction": "Deny",
+                                "ipRules": [
+                                    {
+                                        "value": "0.0.0.0/2"
+                                    },
+                                    {
+                                        "value": "64.0.0.0/3"
+                                    },
+                                    {
+                                        "value": "96.0.0.0/4"
+                                    },
+                                    {
+                                        "value": "112.0.0.0/5"
+                                    },
+                                    {
+                                        "value": "120.0.0.0/6"
+                                    },
+                                    {
+                                        "value": "124.0.0.0/7"
+                                    },
+                                    {
+                                        "value": "126.0.0.0/8"
+                                    },
+                                    {
+                                        "value": "128.0.0.0/1"
+                                    }
+                                ],
+                                "virtualNetworkRules": []
+                            },
                             "accessPolicies": [
                                 {
-                                    "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                                    "objectId": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "objectId": "cfb71ed8-fcd0-4fe2-8384-7076080a219b",
                                     "permissions": {
                                         "keys": [
                                             "Get",
@@ -130,6 +281,12 @@
                                             "ListIssuers",
                                             "SetIssuers",
                                             "DeleteIssuers"
+                                        ],
+                                        "storage": [
+                                            "Get",
+                                            "List",
+                                            "Set",
+                                            "regeneratekey"
                                         ]
                                     }
                                 }
@@ -137,7 +294,7 @@
                             "enabledForDeployment": false,
                             "enabledForDiskEncryption": false,
                             "enabledForTemplateDeployment": false,
-                            "vaultUri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/",
+                            "vaultUri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/",
                             "provisioningState": "Succeeded"
                         }
                     }
@@ -157,32 +314,35 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    "dataserviceversion": [
+                        "3.0;"
                     ],
-                    "date": [
-                        "Thu, 02 May 2019 19:32:47 GMT"
-                    ],
-                    "content-length": [
-                        "19142"
+                    "x-ms-resource-unit": [
+                        "3"
                     ],
                     "access-control-allow-origin": [
                         "*"
                     ],
-                    "request-id": [
-                        "694f7ead-afb2-448c-ab6f-7883cd310c3c"
+                    "date": [
+                        "Wed, 12 Oct 2022 14:55:09 GMT"
                     ],
-                    "dataserviceversion": [
-                        "3.0;"
+                    "duration": [
+                        "336478"
+                    ],
+                    "request-id": [
+                        "b2831f7f-f692-4215-96e7-f04ad3494902"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
                     ],
                     "x-ms-dirapi-data-contract-version": [
                         "1.6"
                     ],
-                    "duration": [
-                        "1263224"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "content-length": [
+                        "1712"
                     ]
                 },
                 "body": {
