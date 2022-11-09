@@ -40,13 +40,64 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             sorted(resources[0]['c7n:CrossAccountViolations']),
-            ['112233445566', '665544332211'])
+            ['112233445566', '665544332211',
+            'arn:aws:organizations:112233445566:organization/o-xyz123abc',
+            'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
 
         client = factory().client('ec2')
         perms = client.describe_image_attribute(
             ImageId=resources[0]['ImageId'],
             Attribute='launchPermission')['LaunchPermissions']
         assert perms == []
+
+    def test_ami_set_permissions(self):
+        factory = self.replay_flight_data('test_ami_set_perms')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': ['cross-account'],
+            'actions': [{
+                'type': 'set-permissions',
+                'remove': 'matched',
+                'add': ['arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['112233445566', '665544332211',
+                'arn:aws:organizations:112233445566:organization/o-xyz123abc',
+                'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
+
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == [{
+            'OrganizationalUnitArn':
+                'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234'}]
+
+    def test_ami_set_deprecation(self):
+        factory = self.replay_flight_data('test_ami_set_deprecation')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': [{
+                'type': 'value',
+                'key': 'DeprecationTime',
+                'value': 'absent'}],
+            'actions': [{
+                'type': 'set-deprecation',
+                'age': 45}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert 'DeprecationTime' not in resources[0]
+
+        client = factory().client('ec2')
+        dtime = client.describe_images(
+            ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
+        assert dtime == '2020-09-24T13:31:456.000Z'
 
     def test_ami_sse(self):
         factory = self.replay_flight_data('test_ami_sse')

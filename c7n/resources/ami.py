@@ -153,7 +153,7 @@ class SetDeprecation(BaseAction):
                   - type: image-age
                     days: 30
                 actions:
-                  - set-deprecation
+                  - type: set-deprecation
                     #Number of days from AMI creation
                     age: 90
                     #Number of days from now
@@ -234,7 +234,7 @@ class RemoveLaunchPermissions(BaseAction):
                   - type: image-age
                     days: 60
                 actions:
-                  - remove-launch-permissions
+                  - type: remove-launch-permissions
 
     """
     deprecations = (
@@ -315,7 +315,7 @@ class SetPermissions(BaseAction):
                     whitelist:
                       - '112233445566'
                       - 'arn:aws:organizations::112233445566:organization/o-xxyyzzaabb'
-                      - 'arn:aws:organizations::112233445566:ou/o-xxyyzzaabb/ou-xxyy-aabbccdd''
+                      - 'arn:aws:organizations::112233445566:ou/o-xxyyzzaabb/ou-xxyy-aabbccdd'
                 actions:
                   - type: set-permissions
                     remove: matched
