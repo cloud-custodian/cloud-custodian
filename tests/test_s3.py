@@ -3700,6 +3700,8 @@ class S3Test(BaseTest):
             "payload": {},
         }])
 
+        assert mock_assumed_session.call_count == 1
+
 
 class S3LifecycleTest(BaseTest):
 
