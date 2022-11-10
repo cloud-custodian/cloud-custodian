@@ -99,6 +99,48 @@ class TestAMI(BaseTest):
             ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
         assert dtime == '2020-09-24T13:31:456.000Z'
 
+        factory = self.replay_flight_data('test_ami_set_deprecation')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': [{
+                'type': 'value',
+                'key': 'DeprecationTime',
+                'value': 'absent'}],
+            'actions': [{
+                'type': 'set-deprecation',
+                'date': '2020-09-24T13:31'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert 'DeprecationTime' not in resources[0]
+
+        client = factory().client('ec2')
+        dtime = client.describe_images(
+            ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
+        assert dtime == '2020-09-24T13:31:456.000Z'
+
+        factory = self.replay_flight_data('test_ami_set_deprecation')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': [{
+                'type': 'value',
+                'key': 'DeprecationTime',
+                'value': 'absent'}],
+            'actions': [{
+                'type': 'set-deprecation',
+                'days': 90}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert 'DeprecationTime' not in resources[0]
+
+        client = factory().client('ec2')
+        dtime = client.describe_images(
+            ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
+        assert dtime == '2020-09-24T13:31:456.000Z'
+
     def test_ami_sse(self):
         factory = self.replay_flight_data('test_ami_sse')
         p = self.load_policy({
