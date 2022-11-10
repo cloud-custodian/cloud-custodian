@@ -185,7 +185,7 @@ class SetDeprecation(BaseAction):
                     timedelta(days=int(self.data.get('days'))))
             elif 'age' in self.data:
                 self.dep_age = (int(self.data.get('age')))
-        except ( ValueError, OverflowError ):
+        except (ValueError, OverflowError):
             raise PolicyValidationError(
                 "policy:%s filter:%s has invalid time interval" % (
                     self.manager.ctx.policy.name, self.type))
