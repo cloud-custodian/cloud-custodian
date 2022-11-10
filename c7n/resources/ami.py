@@ -297,7 +297,7 @@ class SetPermissions(BaseAction):
     Use the 'add' and 'remove' parameters to control which principals
     to add or remove, respectively.  The default is to remove any permissions
     granted to other AWS accounts.  Principals can be an AWS account id,
-    an Organization ARN, or an organizational unit ARN
+    an organization ARN, or an organizational unit ARN
 
     Use 'remove: matched' in combination with the 'cross-account' filter
     for more flexible removal options such as preserving access for a set of
