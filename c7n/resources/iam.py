@@ -441,6 +441,7 @@ class InstanceProfile(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        cfn_type = 'AWS::IAM::InstanceProfile'
 
 
 @resources.register('iam-certificate')
@@ -1502,6 +1503,38 @@ class UnusedInstanceProfiles(IamRoleUsage):
             "%d of %d instance profiles currently not in use." % (
                 len(results), len(resources)))
         return results
+
+
+@InstanceProfile.action_registry.register('add-role')
+class InstanceProfile(BaseAction):
+    """Adds role to IAM instance profile
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profiles-have-admin
+            resource: iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('add-role')
+    permissions = ('iam:AddRoleToInstanceProfile',)
+
+    # def addRole(self, resource):
+    #     try:
+    #         self.add_role(
+    #             RoleName=self.data.get('value', ''))
+    #     except client.exceptions.NoSuchEntityException:
+    #         return
+
+    def process(self, resources):
+        for r in resources:
+            print(r)
+        return None
 
 
 ###################
