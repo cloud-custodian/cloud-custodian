@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.ami import ErrorHandler
 from c7n.query import DescribeSource
 from .common import BaseTest
@@ -66,6 +66,7 @@ class TestAMI(BaseTest):
         self.assertEqual(
             sorted(resources[0]['c7n:CrossAccountViolations']),
             ['112233445566', '665544332211',
+                'all',
                 'arn:aws:organizations:112233445566:organization/o-xyz123abc',
                 'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
 
@@ -77,7 +78,7 @@ class TestAMI(BaseTest):
             'OrganizationalUnitArn':
                 'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234'}]
 
-    def test_ami_set_deprecation(self):
+    def test_ami_set_deprecation_age(self):
         factory = self.replay_flight_data('test_ami_set_deprecation')
         p = self.load_policy({
             'name': 'ami-check',
@@ -91,7 +92,7 @@ class TestAMI(BaseTest):
                 'age': 45}]},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         assert 'DeprecationTime' not in resources[0]
 
         client = factory().client('ec2')
@@ -99,6 +100,7 @@ class TestAMI(BaseTest):
             ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
         assert dtime == '2020-09-24T13:31:456.000Z'
 
+    def test_ami_set_deprecation_date(self):
         factory = self.replay_flight_data('test_ami_set_deprecation')
         p = self.load_policy({
             'name': 'ami-check',
@@ -112,7 +114,7 @@ class TestAMI(BaseTest):
                 'date': '2020-09-24T13:31'}]},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         assert 'DeprecationTime' not in resources[0]
 
         client = factory().client('ec2')
@@ -120,6 +122,7 @@ class TestAMI(BaseTest):
             ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
         assert dtime == '2020-09-24T13:31:456.000Z'
 
+    def test_ami_set_deprecation_disable(self):
         factory = self.replay_flight_data('test_ami_set_deprecation')
         p = self.load_policy({
             'name': 'ami-check',
@@ -129,17 +132,40 @@ class TestAMI(BaseTest):
                 'key': 'DeprecationTime',
                 'value': 'absent'}],
             'actions': [{
-                'type': 'set-deprecation',
-                'days': 90}]},
+                'type': 'set-deprecation'}]},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         assert 'DeprecationTime' not in resources[0]
 
-        client = factory().client('ec2')
-        dtime = client.describe_images(
-            ImageIds=[resources[0]['ImageId']])['Images'][0]['DeprecationTime']
-        assert dtime == '2020-09-24T13:31:456.000Z'
+    def test_ami_set_deprecation_validation(self):
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'ami-check',
+                'resource': 'aws.ami',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DeprecationTime',
+                    'value': 'absent'}],
+                'actions': [{
+                    'type': 'set-deprecation',
+                    'date': "notright"}]})
+        self.assertIn(
+            "has invalid date format", str(e.exception))
+
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'ami-check',
+                'resource': 'aws.ami',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DeprecationTime',
+                    'value': 'absent'}],
+                'actions': [{
+                    'type': 'set-deprecation',
+                    'days': -327678902}]})
+        self.assertIn(
+            "has invalid time interval", str(e.exception))
 
     def test_ami_sse(self):
         factory = self.replay_flight_data('test_ami_sse')
@@ -235,7 +261,7 @@ class TestAMI(BaseTest):
                 'delete-snapshots': True}]},
             session_factory=factory, config={'account_id': '644160558196'})
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         client = factory().client('ec2')
         snap_ids = jmespath.search(
             'BlockDeviceMappings[].Ebs.SnapshotId', resources[0])
