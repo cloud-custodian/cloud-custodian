@@ -55,3 +55,27 @@ class WebAppTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('webapp.json')
+    def test_find_by_auth_disabled(self):
+        # webapp.json deploys a webapp without authentication
+        p = self.load_policy({
+            'name': 'test-azure-webapp',
+            'resource': 'azure.webapp',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctestwebapp*'},
+                {
+                    'type': 'authentication',
+                    'key': 'enabled',
+                    'value': False,
+                    'op': 'eq'
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
