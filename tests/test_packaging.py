@@ -25,7 +25,7 @@ def test_package_metadata(package):
         if c.exists():
             found = True
             p = c
-    assert found, "could not find pyproject.toml"
+    assert found, "could not find %s pyproject.toml" % package
     data = tomli.loads(p.read_text())
     md = data['tool']['poetry']
     assert md.get('homepage') == 'https://cloudcustodian.io'
