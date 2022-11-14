@@ -37,7 +37,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-policystream',
-    'version': '0.4.19',
+    'version': '0.4.20',
     'description': 'Cloud Custodian - Git Commits as Logical Policy Changes',
     'license': 'Apache-2.0',
     'classifiers': [

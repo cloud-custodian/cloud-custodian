@@ -5,6 +5,8 @@ import tomli
 from pathlib import Path
 import pytest
 
+from c7n.version import version
+
 
 @pytest.mark.parametrize("package", [
     "c7n", "c7n_azure", "c7n_gcp", "c7n_kube", "c7n_org",
@@ -38,3 +40,15 @@ def test_package_metadata(package):
     assert md.get('readme', '').endswith('md')
     assert (p.parent / md['readme']).exists()
     assert 'description' in md
+
+
+def test_version_match():
+    """
+    Ensures that the version in c7n.version matches the pyproject.toml version
+    """
+    m = __import__('c7n')
+    pyproject = Path(m.__file__).parent.parent / 'pyproject.toml'
+    with open(pyproject, 'r') as f:
+        loaded = tomli.loads(f.read())
+        pyproject_version = loaded['tool']['poetry']['version']
+        assert pyproject_version == version

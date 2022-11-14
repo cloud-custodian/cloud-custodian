@@ -40,7 +40,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-trailcreator',
-    'version': '0.2.19',
+    'version': '0.2.20',
     'description': 'Cloud Custodian - Retroactive Tag Resource Creators from CloudTrail',
     'license': 'Apache-2.0',
     'classifiers': [

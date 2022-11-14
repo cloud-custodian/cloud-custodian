@@ -103,7 +103,7 @@ extras_require = \
 
 setup_kwargs = {
     'name': 'c7n-azure',
-    'version': '0.7.19',
+    'version': '0.7.20',
     'description': 'Cloud Custodian - Azure Support',
     'license': 'Apache-2.0',
     'classifiers': [

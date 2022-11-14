@@ -8,7 +8,8 @@ packages = \
  'c7n_kube.actions',
  'c7n_kube.resources',
  'c7n_kube.resources.apps',
- 'c7n_kube.resources.core']
+ 'c7n_kube.resources.core',
+ 'c7n_kube.resources.rbac']
 
 package_data = \
 {'': ['*']}
@@ -32,13 +33,16 @@ install_requires = \
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
- 'typing-extensions (>=4.3.0,<5.0.0)',
+ 'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.12,<2.0.0)',
  'zipp (>=3.8.1,<4.0.0)']
 
+entry_points = \
+{'console_scripts': ['c7n-kates = c7n_kube.cli:cli']}
+
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.19',
+    'version': '0.2.20',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'license': 'Apache-2.0',
     'classifiers': [
@@ -46,7 +50,7 @@ setup_kwargs = {
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing'
     ],
-    'long_description': '# Custodian Kubernetes Support\n\n\nWork in Progress - Not Ready For Use.\n\n',
+    'long_description': "# Custodian Kubernetes Support\n\nCloud Custodian can run policies directly inside your cluster, reporting on \nresources that violate those policies, or blocking them altogether.\n\n# Running the server \n\nc7n-kates can be run and installed via poetry. `poetry install && poetry run c7n-kates`.  \n\n| name           | default   | description                                                  |\n|----------------|-----------|--------------------------------------------------------------|\n| --host         | 127.0.0.1 | (optional) The host that the server should listen on.        |\n| --port         | 8800      | (optional) The port the server will listen on.               |\n| --policy-dir   |           | Path to the policy directory.                                |\n| --on-exception | warn      | Action to take on an internal exception. One of: warn, deny. |\n| --cert         |           | Path to the certificate.                                     | \n| --ca-cert      |           | Path to the CA's certificate.                                |\n| --cert-key     |           | Path to the certificate's key.                               |\n\n# Generate a MutatingWebhookConfiguration\n\nAfter the server is running, you'll need to configure and install the \nMutatingWebhookConfiguration manually. To generate a webhook configuration, you\ncan run `poetry run c7n-kates --generate --endpoint $ENDPOINT_URL --policy-dir $DIR`, and \nit will generate an appropriate configuration for you, based on your policies.\n\nNote: some modification of the webhook configuration may be required. See the \n[documentation](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) \non webhooks for more configuration.\n\n# Development\n\nYou can use [skaffold](https://github.com/GoogleContainerTools/skaffold/) to \nassist with testing and debugging this controller. Run `skaffold dev` in this\nfolder to deploy the local container into a local kubernetes cluster. It will \nautomatically redeploy it as files change.\n",
     'long_description_content_type': 'text/markdown',
     'author': 'Cloud Custodian Project',
     'author_email': 'cloud-custodian@googlegroups.com',
@@ -59,6 +63,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
+    'entry_points': entry_points,
     'python_requires': '>=3.7,<4.0',
 }
 

@@ -39,7 +39,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-tencentcloud',
-    'version': '0.1.2',
+    'version': '0.1.3',
     'description': 'Cloud Custodian - Tencent Cloud Provider',
     'license': 'Apache-2.0',
     'classifiers': [

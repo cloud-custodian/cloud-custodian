@@ -35,7 +35,7 @@ install_requires = \
 
 setup_kwargs = {
     'name': 'c7n-awscc',
-    'version': '0.1.5',
+    'version': '0.1.6',
     'description': 'Cloud Custodian - AWS Cloud Control Provider',
     'license': 'Apache-2.0',
     'classifiers': [

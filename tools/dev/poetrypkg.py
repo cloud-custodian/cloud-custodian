@@ -113,7 +113,8 @@ setup(**setup_kwargs)
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-f', '--version-file', type=click.Path())
 def gen_version_file(package_dir, version_file):
-    data = toml.load(Path(str(package_dir)) / 'pyproject.toml')
+    with open(Path(str(package_dir)) / 'pyproject.toml', 'rb') as f:
+        data = toml.load(f)
     version = data['tool']['poetry']['version']
     with open(version_file, 'w') as fh:
         fh.write('# Generated via tools/dev/poetrypkg.py\n')
