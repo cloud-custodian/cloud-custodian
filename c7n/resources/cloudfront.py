@@ -204,12 +204,8 @@ class IsWafV2Enabled(Filter):
 
         target_acl = self.data.get('web-acl', '')
         state = self.data.get('state', False)
-        if state:
-            target_acl_ids = [v for k, v in waf_name_id_map.items() if
+        target_acl_ids = [v for k, v in waf_name_id_map.items() if
                           re.match(target_acl, k)]
-        else:
-            target_acl_ids = [v for k, v in waf_name_id_map.items()]
-
         results = []
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
