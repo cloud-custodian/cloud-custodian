@@ -3,7 +3,6 @@
 from c7n.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.tags import universal_augment
 import c7n.filters.vpc as net_filters
 from c7n.actions import BaseAction
 from c7n.utils import local_session, type_schema
