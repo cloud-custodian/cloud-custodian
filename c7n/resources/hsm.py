@@ -32,8 +32,6 @@ class CloudHSMCluster(QueryResourceManager):
         permission_prefix = arn_service = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
-        filter_name = None
-        filter_type = None
         universal_taggable = object()
 
     source_mapping = {
