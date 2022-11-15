@@ -7,9 +7,10 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, StringUtils
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
 from c7n.filters.core import ValueFilter, Filter
 
@@ -138,14 +139,14 @@ class AzureADAdministratorsFilter(ValueFilter):
 
 
 @SqlServer.filter_registry.register('vulnerability-assessment')
-class VulnerabilityAssessmentFilter(Filter):
+class VulnerabilityAssessmentFilter(ValueFilter):
     """
     Filter sql servers by whether they have recurring vulnerability scans
     enabled.
 
     :example:
 
-    Find SQL servers without vulnerability assessments enabled.
+    Find SQL servers without vulnerability assessments enabled (legacy)
 
     .. code-block:: yaml
 
@@ -156,56 +157,107 @@ class VulnerabilityAssessmentFilter(Filter):
               - type: vulnerability-assessment
                 enabled: false
 
+    :example:
+
+    Find SQL Servers where vulnerability assessments are not being sent to a
+    required email
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-no-email
+            resource: azure.sql-server
+            filters:
+              - type: vulnerability-assessment
+                key: recurringScans.emails[?@ == `required@ops.domain`]
+                value: empty
+
+    When using the above value filter form, the data takes the following shape:
+
+    .. code-block:: json
+
+        "storageContainerPath": "https://testznubm7c1.blob.core.windows.net/testznubm7c1/",
+        "recurringScans": {
+            "isEnabled": true,
+            "emailSubscriptionAdmins": false,
+            "emails": [
+                "ops@fake.email",
+                "admins@fake.email"
+            ]
+        }
+
     """
 
     schema = type_schema(
         'vulnerability-assessment',
-        required=['type', 'enabled'],
-        **{
-            'enabled': {"type": "boolean"},
-        }
+        rinherit=ValueFilter.schema,
+        enabled=dict(type='boolean')
     )
 
     log = logging.getLogger('custodian.azure.sqldatabase.vulnerability-assessment-filter')
 
+    def validate(self):
+        # only allow legacy behavior or new ValueFilter behavior, not both
+        # when in "legacy" mode the only entries should be "type" (required by schema) and
+        # "enabled" (required by is_legacy)
+        if self.is_legacy:
+            if len(self.data) > 2:
+                raise PolicyValidationError(
+                    "When using 'enabled', ValueFilter properties are not allowed")
+        # only validate value filter when not in "legacy" mode
+        else:
+            super(VulnerabilityAssessmentFilter, self).validate()
+
     def __init__(self, data, manager=None):
         super(VulnerabilityAssessmentFilter, self).__init__(data, manager)
-        self.enabled = self.data['enabled']
+
+        self.enabled = self.data.get('enabled')
+        # track if we are using the legacy behavior
+        self.is_legacy = 'enabled' in self.data
+        # location on the resource object to store the VA properties
+        self.key = 'c7n:vulnerability_assessment'
 
     def process(self, resources, event=None):
-        resources, exceptions = ThreadHelper.execute_in_parallel(
+        # process the servers in parallel, updating them in place
+        # with the VA assesment properties
+        _, exceptions = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self._process_resource_set,
             executor_factory=self.executor_factory,
             log=log
         )
+
         if exceptions:
             raise exceptions[0]
-        return resources
+
+        return super(VulnerabilityAssessmentFilter, self).process(resources, event)
 
     def _process_resource_set(self, resources, event=None):
         client = self.manager.get_client()
-        result = []
         for resource in resources:
-            if 'c7n:vulnerability_assessment' not in resource['properties']:
+            if self.key not in resource['properties']:
                 va = list(client.server_vulnerability_assessments.list_by_server(
                     resource['resourceGroup'],
                     resource['name']))
 
-                # there can only be a single instance named "Default".
                 if va:
-                    resource['c7n:vulnerability_assessment'] = \
-                        va[0].serialize(True).get('properties', {})
+                    # there can only be a single instance
+                    resource[self.key] = va[0].serialize(True).get('properties', {})
                 else:
-                    resource['c7n:vulnerability_assessment'] = {}
+                    resource[self.key] = {}
 
-            if resource['c7n:vulnerability_assessment']\
-                    .get('recurringScans', {})\
-                    .get('isEnabled', False) == self.enabled:
-                result.append(resource)
+    def __call__(self, resource):
+        recurring_scan_enabled = resource[self.key] \
+            .get('recurringScans', {}) \
+            .get('isEnabled', False)
 
-        return result
+        # Apply filter based on legacy behavior which only verifies recurringScans.isEnabled
+        if self.is_legacy:
+            return recurring_scan_enabled == self.enabled
+        # otherwise process the VA info using ValueFilter logic for full flexibility
+        else:
+            return super(VulnerabilityAssessmentFilter, self).__call__(resource[self.key])
 
 
 @SqlServer.filter_registry.register('firewall-rules')
@@ -260,6 +312,75 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
             if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':  # nosec
                 return ['AzureServices']
         return []
+
+
+@SqlServer.filter_registry.register('auditing')
+class AuditingFilter(Filter):
+    """
+    Filter by the current auditing
+    policy for this sql server.
+
+    :example:
+
+    Find SQL servers with auditing disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-database-no-auditing
+            resource: azure.sql-server
+            filters:
+              - type: auditing
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'auditing',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqlserver.auditing-filter')
+
+    def __init__(self, data, manager=None):
+        super(AuditingFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'auditingSettings' not in resource['properties']:
+                auditing_settings = client.server_blob_auditing_policies.get(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['auditingSettings'] = \
+                    auditing_settings.serialize(True).get('properties', {})
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['properties']['auditingSettings'].get('state'),
+                    required_status):
+                result.append(resource)
+
+        return result
 
 
 @SqlServer.action_registry.register('set-firewall-rules')
