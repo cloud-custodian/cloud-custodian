@@ -186,7 +186,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
 
 """
 
