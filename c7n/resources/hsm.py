@@ -2,11 +2,26 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import ClientError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
 import c7n.filters.vpc as net_filters
 from c7n.actions import BaseAction
 from c7n.utils import local_session, type_schema
+
+
+class DescribeCloudHSMCluster(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('cloudhsmv2')
+        return self.manager.retry(
+            client.describe_clusters,
+            Filters={
+                'clusterIds': resource_ids}).get('Clusters', ())
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
 
 
 @resources.register('cloudhsm-cluster')
@@ -18,11 +33,13 @@ class CloudHSMCluster(QueryResourceManager):
         permission_prefix = arn_service = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
-        filter_name = 'Filters'
-        filter_type = 'scalar'
+        filter_name = None
+        filter_type = None
         universal_taggable = object()
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': DescribeCloudHSMCluster
+    }
 
 
 @CloudHSMCluster.filter_registry.register('subnet')
