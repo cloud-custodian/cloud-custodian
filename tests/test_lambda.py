@@ -246,6 +246,11 @@ class LambdaTest(BaseTest):
                 'Timeout': 900,
                 'TracingConfig': {'Mode': 'PassThrough'},
                 'Version': '$LATEST',
+                'KmsKeyArn': 'arn:aws:kms:us-west-2:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0',
+                'Environment': {'Variables': {
+                    'DISABLE_ACTIONS': 'true',
+                    'VERBOSE': 'false',
+                    'DISABLE_OUTPUT_PARAMETERS': 'true'}},
                 'VpcConfig': {'SecurityGroupIds': [],
                               'SubnetIds': []}}},
              'Id': 'arn:aws:lambda:us-west-2:644160558196:function:custodian-ec2-ssm-query',
