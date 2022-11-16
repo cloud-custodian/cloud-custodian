@@ -110,6 +110,7 @@ class AutoTagUser(EventAction):
 
         user_info = self.get_tag_value(event)
         if user_info is None:
+            self.log.warning("user info not found in event")
             return
 
         # will skip writing their UserName tag and not overwrite pre-existing values
