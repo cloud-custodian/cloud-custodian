@@ -1507,7 +1507,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
 
 @InstanceProfile.action_registry.register('add-role')
 class InstanceProfileAddRole(BaseAction):
-    """Adds specified role to IAM instance profile when no role exists
+    """Adds specified role to IAM instance profile
 
     :example:
 
