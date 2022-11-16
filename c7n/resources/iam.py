@@ -1507,7 +1507,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
 
 @InstanceProfile.action_registry.register('add-role')
 class InstanceProfileAddRole(BaseAction):
-    """Adds role to IAM instance profiles
+    """Adds specified role to IAM instance profile when no role exists
 
     :example:
 
@@ -1518,7 +1518,7 @@ class InstanceProfileAddRole(BaseAction):
             resource: iam-profile
             actions:
                 - type: add-role
-                  value: my-test-role        
+                  value: my-test-role
     """
 
     schema = type_schema('add-role',
@@ -1527,27 +1527,22 @@ class InstanceProfileAddRole(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-        print('RESOURCES: ', len(resources))
         role_name = self.data.get('value', '')
         for r in resources:
             try:
-                # res = client.add_role_to_instance_profile(
-                #     InstanceProfileName=r['InstanceProfileName'],
-                #     RoleName=role_name
-                # )
                 self.manager.retry(
                     client.add_role_to_instance_profile,
                     InstanceProfileName=r['InstanceProfileName'],
                     RoleName=role_name
                 )
             except client.exceptions.LimitExceededException:
-                self.log.warning('"{}" has existing role "{}"'.format(r['InstanceProfileName'], role_name))
+                self.log.warning('''
+                "{}" has existing role "{}"'''
+                .format(r['InstanceProfileName'], role_name))
                 continue
             except client.exceptions.NoSuchEntityException:
                 self.log.warning('role "{}" does not exist'.format(role_name))
                 continue
-            else:
-                raise
 
 
 ###################

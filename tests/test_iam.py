@@ -1104,21 +1104,13 @@ class IamInstanceProfileFilterUsage(BaseTest):
 
 class IamInstanceProfileActions(BaseTest):
 
-    def test_iam_instance_profile_unused(self):
+    def test_iam_instance_profile_add_role(self):
         session_factory = self.replay_flight_data("test_iam_instance_profile_add_role")
         self.patch(UnusedInstanceProfiles, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
             {
                 "name": "iam-instance-profile-add-role",
                 "resource": "iam-profile",
-                # "filters": [
-                #     {
-                #         "type": "value",
-                #         "key": "Roles",
-                #         "value_type": "size",
-                #         "value": 0
-                #     }
-                # ],
                 "actions": [
                     {"type": "add-role", "value": "my-test-role"}
                 ],
@@ -1126,7 +1118,8 @@ class IamInstanceProfileActions(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceProfileName'], 'test-instance-profile-1')
 
 
 class IamPolicyFilterUsage(BaseTest):
