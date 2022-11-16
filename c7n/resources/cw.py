@@ -88,6 +88,59 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
+@resources.register('composite-alarm')
+class CompositeAlarm(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudwatch'
+        arn_type = 'alarm'
+        enum_spec = ('describe_alarms', 'CompositeAlarms', {'AlarmTypes': ['CompositeAlarm']})
+        id = name = 'AlarmName'
+        arn = 'AlarmArn'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        cfn_type = 'AWS::CloudWatch::CompositeAlarm'
+        universal_taggable = object()
+
+    augment = universal_augment
+
+    retry = staticmethod(get_retry(('Throttled',)))
+
+
+@CompositeAlarm.action_registry.register('delete')
+class CompositeAlarmDelete(BaseAction):
+    """Delete a cloudwatch composite alarm.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-composite-alarms
+                resource: aws.composite-alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
 @resources.register('event-bus')
 class EventBus(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -873,3 +926,48 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('put-subscription-filter')
+class SubscriptionFilter(BaseAction):
+    """Create/Update a subscription filter and associate with a log group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-put-subscription-filter
+            resource: log-group
+            actions:
+              - type: put-subscription-filter
+                filter_name: AllLambda
+                filter_pattern: ip
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
+                distribution: Random
+    """
+    schema = type_schema(
+        'put-subscription-filter',
+        filter_name={'type': 'string'},
+        filter_pattern={'type': 'string'},
+        destination_arn={'type': 'string'},
+        distribution={'enum': ['Random', 'ByLogStream']},
+        required=['filter_name', 'destination_arn'])
+    permissions = ('logs:PutSubscriptionFilter',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        filter_name = self.data.get('filter_name')
+        filter_pattern = self.data.get('filter_pattern', '')
+        destination_arn = self.data.get('destination_arn')
+        distribution = self.data.get('distribution', 'ByLogStream')
+
+        for r in resources:
+            client.put_subscription_filter(
+                logGroupName=r['logGroupName'],
+                filterName=filter_name,
+                filterPattern=filter_pattern,
+                destinationArn=destination_arn,
+                distribution=distribution)
