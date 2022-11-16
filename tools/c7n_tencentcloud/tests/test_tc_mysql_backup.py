@@ -16,7 +16,7 @@ class TestMySQLBackUp(BaseTest):
                     {
                         "type": "value",
                         "key": "Date",
-                        "value": 1,
+                        "value": 0,
                         "value_type": "age",
                         "op": "greater-than"
                     }
