@@ -1540,9 +1540,6 @@ class InstanceProfileAddRole(BaseAction):
                 "{}" has existing role "{}"'''
                 .format(r['InstanceProfileName'], role_name))
                 continue
-            except client.exceptions.NoSuchEntityException:
-                self.log.warning('role "{}" does not exist'.format(role_name))
-                continue
 
 
 ###################
