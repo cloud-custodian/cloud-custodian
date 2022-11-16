@@ -1,6 +1,11 @@
 {
-    "status_code": 200,
+    "status_code": 409,
     "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "LimitExceeded",
+            "Message": "Cannot exceed quota for InstanceSessionsPerInstanceProfile: 1"
+        },
         "ResponseMetadata": {}
     }
 }

@@ -1118,8 +1118,8 @@ class IamInstanceProfileActions(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceProfileName'], 'test-instance-profile-1')
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[1]['InstanceProfileName'], 'test-instance-profile-1')
 
 
 class IamPolicyFilterUsage(BaseTest):
