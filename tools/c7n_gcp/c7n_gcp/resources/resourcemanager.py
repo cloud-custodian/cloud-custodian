@@ -10,6 +10,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
+from c7n.filters.core import ValueFilter
 
 
 @resources.register('organization')
@@ -132,6 +133,49 @@ class ProjectIamPolicyFilter(IamPolicyFilter):
         verb_arguments = SetIamPolicy._verb_arguments(self, resource)
         verb_arguments['body'] = {}
         return verb_arguments
+
+
+@Project.filter_registry.register('compute-meta')
+class ProjectComputeMetaFilter(ValueFilter):
+    """
+    Allows filtering on project-level compute metadata including common instance metadata
+    and quotas.
+
+    :example:
+
+    Find Projects that have not enabled OS Login for compute instances
+
+    .. code-block:: yaml
+
+        policies:
+          - name: project-compute-os-login-not-enabled
+            resource: gcp.project
+            filters:
+              - type: compute-meta
+                key: "commonInstanceMetadata.items[?key==`enable-oslogin`].value | [0]"
+                op: ne
+                value_type: normalize
+                value: true
+
+    """
+
+    key = 'c7n:projectComputeMeta'
+    permissions = ('compute.projects.get',)
+    schema = type_schema('compute-meta', rinherit=ValueFilter.schema)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+
+    def __call__(self, resource):
+        if self.key in resource:
+            return resource[self.key]
+
+        session = local_session(self.manager.session_factory)
+        self.client = session.client('compute', 'v1', 'projects')
+
+        resource[self.key] = self.client.execute_command('get', {"project": resource['projectId']})
+
+        return super().__call__(resource[self.key])
 
 
 @Project.action_registry.register('delete')
