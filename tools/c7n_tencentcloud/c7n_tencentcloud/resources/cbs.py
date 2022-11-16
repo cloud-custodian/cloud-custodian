@@ -24,10 +24,13 @@ class CBS(QueryResourceManager):
         service = "cbs"
         version = "2017-03-12"
         enum_spec = ("DescribeDisks", "Response.DiskSet[]", {})
-        metrics_instance_id_name = "DiskId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instance"
         taggable = True
+        metrics_enabled = True
+        metrics_dimension_def = [("diskId", "DiskId")]
+        metrics_instance_id_name = "diskId"
+        metrics_namespace = "QCE/BLOCK_STORAGE"
 
 
 @CBS.action_registry.register('copy-instance-tags')

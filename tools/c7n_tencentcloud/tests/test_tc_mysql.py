@@ -70,3 +70,33 @@ class TestMySQL(BaseTest):
             })
         resources = policy.run()
         assert len(resources) == 1
+
+    @pytest.mark.vcr
+    def test_metrics_filter(self):
+        policy = self.load_policy(
+            {
+                "name": "test_metrics_filter",
+                "resource": "tencentcloud.mysql",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateTime",
+                        "value": 1,
+                        "value_type": "age",
+                        "op": "gte"
+                    },
+                    {
+                        "type": "metrics",
+                        "name": "MaxConnections",
+                        "statistics": "Sum",
+                        "missing-value": 0,
+                        "period": 3600,
+                        "days": 3,
+                        "value": 0,
+                        "op": "equal"
+                    }]
+            },
+            region="ap-guangzhou")
+        resources = policy.run()
+        assert len(resources) == 1
+        assert resources[0]["InstanceId"] == 'cdb-o6tjxap7'

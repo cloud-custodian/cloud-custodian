@@ -23,7 +23,6 @@ class VPC(QueryResourceManager):
         service = "vpc"
         version = "2017-03-12"
         enum_spec = ("DescribeVpcs", "Response.VpcSet[]", {})
-        metrics_instance_id_name = "natId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": "20"}}
         resource_prefix = "vpc"
         taggable = True

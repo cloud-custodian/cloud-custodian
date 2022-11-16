@@ -232,9 +232,11 @@ def locked_deps(package, poetry, exclude=(), remove=()):
         locker=poetry._locker,
         project_requires=package.requires,
         project_python_marker=package.python_marker,
-        extras=[])
+        extras=package.extras)
 
     project_deps = {r.name: r for r in poetry.package.requires}
+    extra_reqs = defaultdict(list)
+
     for dep_pkg in deps:
         p = dep_pkg.package
         d = dep_pkg.dependency
@@ -249,8 +251,12 @@ def locked_deps(package, poetry, exclude=(), remove=()):
         requirement = d.to_pep_508(with_extras=False)
         if ';' in requirement:
             line += "; {}".format(requirement.split(";")[1].strip())
-        reqs.append(line)
-    return reqs, defaultdict(list)
+        if not p.optional:
+            reqs.append(line)
+        for extra in (p.name in project_deps and project_deps[p.name].in_extras or []):
+            extra_reqs[extra].append(line)
+
+    return reqs, dict(extra_reqs)
 
 
 if __name__ == '__main__':

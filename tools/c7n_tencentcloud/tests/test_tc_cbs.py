@@ -101,3 +101,24 @@ class TestCbs(BaseTest):
                     new_tag_exist = True
                     break
             assert new_tag_exist
+
+    @pytest.mark.vcr
+    def test_metrics(self):
+        policy = self.load_policy(
+            {
+                "name": "filter-metrics",
+                "resource": "tencentcloud.cbs",
+                "filters": [{
+                    "type": "metrics",
+                    "name": "DiskReadTraffic",
+                    "statistics": "Average",
+                    "days": 3,
+                    "op": "less-than",
+                    "value": 1,
+                    "missing-value": 0,
+                    "period": 3600
+                }]
+            }
+        )
+        resources = policy.run()
+        assert len(resources) == 14
