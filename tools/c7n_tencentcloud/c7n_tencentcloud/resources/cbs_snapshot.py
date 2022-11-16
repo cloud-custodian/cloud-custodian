@@ -17,7 +17,6 @@ class CBSSnapshot(QueryResourceManager):
         service = "cvm"
         version = "2017-03-12"
         enum_spec = ("DescribeSnapshots", "Response.SnapshotSet[]", {})
-        metrics_instance_id_name = "SnapshotId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "volume"
         taggable = True

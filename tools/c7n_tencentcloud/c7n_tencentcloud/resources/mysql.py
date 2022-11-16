@@ -22,7 +22,11 @@ class MySQL(QueryResourceManager):
         service = "cdb"
         version = "2017-03-20"
         enum_spec = ("DescribeDBInstances", "Response.Items[]", {})
+        metrics_enabled = True
+        metrics_namespace = "QCE/CDB"
+        metrics_dimension_def = [("InstanceId", "InstanceId"), ("InstanceType", "InstanceType")]
         metrics_instance_id_name = "InstanceId"
+
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instanceId"
         taggable = True
