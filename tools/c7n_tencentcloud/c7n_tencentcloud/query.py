@@ -127,9 +127,17 @@ class DescribeSource:
         self.resource_manager = resource_manager
         self.resource_type = resource_manager.resource_type
         self.region = resource_manager.config.region
-        self.query_helper = ResourceQuery(local_session(resource_manager.session_factory))
         self._session = None
         self.tag_batch_size: int = 9
+
+    _query_helper = None
+
+    def query_helper(self):
+        if self._query_helper is None:
+            self._query_helper = ResourceQuery(
+                local_session(
+                    resource_manager.session_factory))
+        return self._query_helper
 
     def resources(self, params=None):
         """
