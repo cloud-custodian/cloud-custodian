@@ -273,10 +273,12 @@ class CloudWatchEventsFacadeTest(TestCase):
             self.assertFalse(CloudWatchEvents.match(event_data(event)))
 
     def test_cloud_trail_resource(self):
-        self.assertEqual(
-            CloudWatchEvents.match(event_data("event-cloud-trail-s3.json")),
-            {
-                "source": "s3.amazonaws.com",
-                "ids": jmespath.compile("detail.requestParameters.bucketName"),
-            },
-        )
+        matched_event = CloudWatchEvents.match(event_data("event-cloud-trail-s3.json"))
+        expected_event = {
+            "source": "s3.amazonaws.com",
+            "ids": jmespath.compile("detail.requestParameters.bucketName"),
+        }
+
+        self.assertEqual(set(matched_event), set(expected_event))
+        self.assertEqual(matched_event['source'], expected_event['source'])
+        self.assertEqual(matched_event['ids'], expected_event['ids'])
