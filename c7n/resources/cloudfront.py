@@ -176,6 +176,16 @@ class IsWafV2Enabled(Filter):
 
             policies:
               - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
@@ -183,6 +193,9 @@ class IsWafV2Enabled(Filter):
                     web-acl: testv2
 
               - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
