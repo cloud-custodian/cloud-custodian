@@ -134,8 +134,7 @@ def data_path(*parts):
 
 def event_data(name, event_type="cwe"):
     with open(os.path.join(os.path.dirname(__file__), "data", event_type, name)) as fh:
-        data = json.load(fh)
-    return data
+        return json.load(fh)
 
 
 def load_data(file_name, state=None, **kw):
