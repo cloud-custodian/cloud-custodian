@@ -319,27 +319,18 @@ class SetPermissions(BaseAction):
                 actions:
                   - type: set-permissions
                     remove: matched
+                    #To remove public permissions
+                    #remove:
+                    #  - all
     """
 
     schema = type_schema(
         'set-permissions',
         remove={'oneOf': [
             {'enum': ['matched']},
-            {'type': 'array', 'items': {
-                'oneOf': [
-                    {'type': 'string'},
-                    {'enum': ['all']},
-                ],
-            }}
+            {'type': 'array', 'items': {'type': 'string'}}
         ]},
-        add={
-            'type': 'array', 'items': {
-                'oneOf': [
-                    {'type': 'string'},
-                    {'enum': ['all']},
-                ],
-            }
-        }
+        add={'type': 'array', 'items': {'type': 'string'}}
     )
 
     permissions = ('ec2:ResetImageAttribute', 'ec2:ModifyImageAttribute',)

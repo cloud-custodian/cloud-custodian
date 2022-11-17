@@ -33,6 +33,29 @@ class TestAMI(BaseTest):
             'resource': 'aws.ami',
             'filters': ['cross-account'],
             'actions': [{
+                'type': 'remove-launch-permissions'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['112233445566', '665544332211',
+            'arn:aws:organizations:112233445566:organization/o-xyz123abc',
+            'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
+
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == []
+
+    def test_ami_remove_launch_permissions_matched(self):
+        factory = self.replay_flight_data('test_ami_remove_perms')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': ['cross-account'],
+            'actions': [{
                 'type': 'remove-launch-permissions',
                 'accounts': 'matched'}]},
             session_factory=factory)
@@ -50,7 +73,7 @@ class TestAMI(BaseTest):
             Attribute='launchPermission')['LaunchPermissions']
         assert perms == []
 
-    def test_ami_set_permissions(self):
+    def test_ami_set_permissions_remove_matched(self):
         factory = self.replay_flight_data('test_ami_set_perms')
         p = self.load_policy({
             'name': 'ami-check',
@@ -77,6 +100,57 @@ class TestAMI(BaseTest):
         assert perms == [{
             'OrganizationalUnitArn':
                 'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234'}]
+
+    def test_ami_set_permissions_remove_public(self):
+        factory = self.replay_flight_data('test_ami_set_perms')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': ['cross-account'],
+            'actions': [{
+                'type': 'set-permissions',
+                'remove': ['all'],
+                'add': ['arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['112233445566', '665544332211',
+                'all',
+                'arn:aws:organizations:112233445566:organization/o-xyz123abc',
+                'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
+
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == [{
+            'OrganizationalUnitArn':
+                'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab234'}]
+
+    def test_ami_set_permissions_reset_all(self):
+        factory = self.replay_flight_data('test_ami_remove_perms')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': ['cross-account'],
+            'actions': [{
+                'type': 'set-permissions'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted(resources[0]['c7n:CrossAccountViolations']),
+            ['112233445566', '665544332211',
+            'arn:aws:organizations:112233445566:organization/o-xyz123abc',
+            'arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123'])
+
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == []
 
     def test_ami_set_deprecation_age(self):
         factory = self.replay_flight_data('test_ami_set_deprecation')
