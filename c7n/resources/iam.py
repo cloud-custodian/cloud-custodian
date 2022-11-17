@@ -2757,3 +2757,41 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@InstanceProfile.filter_registry.register('has-specific-managed-policy')
+class SpecificIamProfileManagedPolicy(Filter):
+    """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
+       policy. If an IAM instance profile does not contains an IAM role, then it will be treated
+       as not having the policy.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profiles-have-admin-policy
+            resource: iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, role_name):
+        attached_policies = client.list_attached_role_policies(
+            RoleName=role_name)['AttachedPolicies']
+        return [p['PolicyName'] for p in attached_policies]
+
+    def has_managed_policy(self, client, resource):
+        for role in resource.get('Roles', []):
+            managed_policies = self._managed_policies(client, role.get('RoleName'))
+            if self.data.get('value') in managed_policies:
+                return True
+        return False
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        return [r for r in resources if self.has_managed_policy(c, r)]

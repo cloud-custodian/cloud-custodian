@@ -31,7 +31,7 @@ from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
-from c7n.resources.iam import CheckPermissions
+from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
@@ -2345,3 +2345,49 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+
+@EC2.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
+    """Filter an EC2 instance that has an IAM instance profile that contains an IAM role that has
+       a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
+       does not contain an IAM role, then it will be treated as not having the policy.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instances-have-admin-policy
+            resource: ec2
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    permissions = (
+        'iam:GetInstanceProfile',
+        'iam:ListInstanceProfiles',
+        'iam:ListAttachedRolePolicies')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        iam_profiles_mapping = {profile['Arn']: profile for profile in iam_profiles}
+
+        results = []
+        for r in resources:
+            if r['State']['Name'] == 'terminated':
+                continue
+            instanceProfileArn = r.get('IamInstanceProfile', {}).get('Arn')
+            if not instanceProfileArn:
+                continue
+
+            profile = iam_profiles_mapping.get(instanceProfileArn)
+            if not profile:
+                continue
+
+            if self.has_managed_policy(client, profile):
+                results.append(r)
+
+        return results
