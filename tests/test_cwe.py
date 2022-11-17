@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import jmespath
+import jmespath.parser
 from pytest_terraform import terraform
 from unittest import TestCase
 
@@ -8,6 +10,13 @@ from .common import event_data, BaseTest
 
 from c7n.cwe import CloudWatchEvents
 from c7n.resources import cw
+
+
+class JmespathEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, jmespath.parser.ParsedResult):
+            return obj.parsed
+        return json.JSONEncoder.default(self, obj)
 
 
 @terraform('event_bridge_bus')
@@ -273,10 +282,13 @@ class CloudWatchEventsFacadeTest(TestCase):
             self.assertFalse(CloudWatchEvents.match(event_data(event)))
 
     def test_cloud_trail_resource(self):
+        matched_event = CloudWatchEvents.match(event_data("event-cloud-trail-s3.json"))
+        expected_event = {
+            "source": "s3.amazonaws.com",
+            "ids": jmespath.compile("detail.requestParameters.bucketName"),
+        }
+
         self.assertEqual(
-            CloudWatchEvents.match(event_data("event-cloud-trail-s3.json")),
-            {
-                "source": "s3.amazonaws.com",
-                "ids": jmespath.compile("detail.requestParameters.bucketName"),
-            },
+            json.dumps(matched_event, sort_keys=True, cls=JmespathEncoder),
+            json.dumps(expected_event, sort_keys=True, cls=JmespathEncoder),
         )
