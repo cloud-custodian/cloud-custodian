@@ -2379,11 +2379,11 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
         for r in resources:
             if r['State']['Name'] == 'terminated':
                 continue
-            instanceProfileArn = r.get('IamInstanceProfile', {}).get('Arn')
-            if not instanceProfileArn:
+            instance_profile_arn = r.get('IamInstanceProfile', {}).get('Arn')
+            if not instance_profile_arn:
                 continue
 
-            profile = iam_profiles_mapping.get(instanceProfileArn)
+            profile = iam_profiles_mapping.get(instance_profile_arn)
             if not profile:
                 continue
 
