@@ -159,7 +159,7 @@ class SetDeprecation(BaseAction):
                     #Number of days from now
                     #days: 90
                     #Specific date/time
-                    #date: "{now}"
+                    #date: "2023-11-30"
 
     """
 
@@ -319,9 +319,25 @@ class SetPermissions(BaseAction):
                 actions:
                   - type: set-permissions
                     remove: matched
-                    #To remove public permissions
-                    #remove:
-                    #  - all
+                # To remove all permissions
+                # - type: set-permissions
+                # To remove public permissions
+                # - type: set-permissions
+                #   remove:
+                #     - all
+                # To remove specific permissions
+                # - type: set-permissions
+                #   remove:
+                #     - '223344556677'
+                #     - 'arn:aws:organizations::112233445566:organization/o-zzyyxxbbaa'
+                #     - 'arn:aws:organizations::112233445566:ou/o-zzyyxxbbaa/ou-xxyy-ddccbbaa'
+                # To set specific permissions
+                # - type: set-permissions
+                #   remove: matched
+                #   add:
+                #     - '223344556677'
+                #     - 'arn:aws:organizations::112233445566:organization/o-zzyyxxbbaa'
+                #     - 'arn:aws:organizations::112233445566:ou/o-zzyyxxbbaa/ou-xxyy-ddccbbaa'
     """
 
     schema = type_schema(
