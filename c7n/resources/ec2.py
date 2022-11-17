@@ -1538,7 +1538,7 @@ class Stop(BaseAction):
                     op,
                     [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
                 )
-                self.manager.retry(
+                return self.manager.retry(
                     client_op, InstanceIds=[i['InstanceId'] for i in instances]
                 )
 
