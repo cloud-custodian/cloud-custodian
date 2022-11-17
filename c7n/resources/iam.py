@@ -2770,7 +2770,7 @@ class SpecificIamProfileManagedPolicy(Filter):
     .. code-block:: yaml
 
         policies:
-          - name: iam-profiles-have-admin-policy
+          - name: iam-profile-has-admin-policy
             resource: iam-profile
             filters:
               - type: has-specific-managed-policy

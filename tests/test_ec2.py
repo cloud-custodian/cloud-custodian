@@ -2207,14 +2207,13 @@ class TestSpotFleetRequest(BaseTest):
         self.assertEqual(len(sfrs), 3)
 
 
-class TestHasSpecificManagedPolicyFilter(BaseTest):
+class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
 
-    def test_has_specific_managed_policy_filter(self):
-        factory = self.replay_flight_data("test_has_specific_managed_policy_filter")
-        #factory = self.record_flight_data("test_has_specific_managed_policy_filter")
+    def test_ec2_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_ec2_has_specific_managed_policy")
         p = self.load_policy(
             {
-                "name": "ec2-instances-have-admin-policy",
+                "name": "ec2-instance-has-admin-policy",
                 "resource": "ec2",
                 "filters": [
                     {

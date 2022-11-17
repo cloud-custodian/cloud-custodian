@@ -2358,7 +2358,7 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
     .. code-block:: yaml
 
         policies:
-          - name: ec2-instances-have-admin-policy
+          - name: ec2-instance-has-admin-policy
             resource: ec2
             filters:
               - type: has-specific-managed-policy
