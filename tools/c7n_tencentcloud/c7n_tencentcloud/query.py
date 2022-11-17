@@ -140,11 +140,12 @@ class DescribeSource:
 
     _query_helper = None
 
+    @property
     def query_helper(self):
         if self._query_helper is None:
             self._query_helper = ResourceQuery(
                 local_session(
-                    resource_manager.session_factory))
+                    self.resource_manager.session_factory))
         return self._query_helper
 
     def resources(self, params=None):
