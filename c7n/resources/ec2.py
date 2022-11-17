@@ -1526,7 +1526,10 @@ class Stop(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
-                if e.response['Error']['Code'] == 'OperationNotPermitted' and self.data.get('force'):
+                if (
+                    e.response['Error']['Code'] == 'OperationNotPermitted' and
+                    self.data.get('force')
+                ):
                     self.log.info("Disabling stop and termination protection on instances")
                     self.disable_protection(
                         client,
