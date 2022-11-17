@@ -1514,33 +1514,27 @@ class Stop(BaseAction):
             list(w.map(process_instance, instances, op))
 
     def _run_instances_op(self, client, op, instances, **kwargs):
+        client_op = client.stop_instances
+        if op == 'terminate':
+            client_op = client.terminate_instances
+
+        instance_ids = [i['InstanceId'] for i in instances]
+
         while instances:
-
-            client_op = client.stop_instances
-            if op == 'terminate':
-                client_op = client.terminate_instances
-
-            instance_ids = [i['InstanceId'] for i in instances]
-
             try:
                 return self.manager.retry(client_op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
-                if e.response['Error']['Code'] != 'OperationNotPermitted':
-                    raise
-                if not self.data.get('force'):
-                    raise
-
-                self.log.info("Disabling stop and termination protection on instances")
-                self.disable_protection(
-                    client,
-                    op,
-                    [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
-                )
-                return self.manager.retry(
-                    client_op, InstanceIds=[i['InstanceId'] for i in instances]
-                )
+                if e.response['Error']['Code'] == 'OperationNotPermitted' and self.data.get('force'):
+                    self.log.info("Disabling stop and termination protection on instances")
+                    self.disable_protection(
+                        client,
+                        op,
+                        [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
+                    )
+                    continue
+                raise
 
 
 @actions.register('reboot')
