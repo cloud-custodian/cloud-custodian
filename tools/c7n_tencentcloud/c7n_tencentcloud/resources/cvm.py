@@ -32,11 +32,14 @@ class CVM(QueryResourceManager):
         service = "cvm"
         version = "2017-03-12"
         enum_spec = ("DescribeInstances", "Response.InstanceSet[]", {})
-        metrics_instance_id_name = "InstanceId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instance"
         taggable = True
         batch_size = 10
+        metrics_enabled = True
+        metrics_dimension_def = [("InstanceId", "InstanceId")]
+        metrics_instance_id_name = "InstanceId"
+        metrics_namespace = "QCE/CVM"
 
     def get_qcs_for_cbs(self, resources):
         """
