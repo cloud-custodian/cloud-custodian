@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Rule custodian-ec2-foo-bar does not exist on EventBus default.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {}
+    }
+}
