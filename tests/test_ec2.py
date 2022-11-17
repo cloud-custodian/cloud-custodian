@@ -1078,6 +1078,26 @@ class TestStop(BaseTest):
         self.assertEqual(len(stopped), 1)
         self.assertEqual(len(hibernated), 1)
 
+    def test_ec2_stop_with_protection_enabled(self):
+        # Test conditions: single running instance, with stop protection
+        session_factory = self.replay_flight_data("test_ec2_stop_with_protection_enabled")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-000b2f5125402eb55"}],
+                "actions": [{"type": "stop", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-000b2f5125402eb55"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "stopped")
+
 
 class TestReboot(BaseTest):
 
