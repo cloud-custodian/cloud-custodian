@@ -2762,7 +2762,7 @@ class OpenIdProvider(QueryResourceManager):
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')
 class SpecificIamProfileManagedPolicy(Filter):
     """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
-       policy. If an IAM instance profile does not contains an IAM role, then it will be treated
+       policy. If an IAM instance profile does not contain an IAM role, then it will be treated
        as not having the policy.
 
     :Example:
