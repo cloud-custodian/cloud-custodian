@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import jmespath
 from pytest_terraform import terraform
 from unittest import TestCase
@@ -281,4 +282,9 @@ class CloudWatchEventsFacadeTest(TestCase):
 
         self.assertEqual(set(matched_event), set(expected_event))
         self.assertEqual(matched_event['source'], expected_event['source'])
+        self.assertEqual(
+            json.dumps(matched_event['ids'].parsed, sort_keys=True),
+            json.dumps(expected_event['ids'].parsed, sort_keys=True),
+        )
+        self.assertEqual(matched_event['ids'].parsed, expected_event['ids'].parsed)
         self.assertEqual(matched_event['ids'], expected_event['ids'])
