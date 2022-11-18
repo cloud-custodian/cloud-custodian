@@ -1104,22 +1104,43 @@ class IamInstanceProfileFilterUsage(BaseTest):
 
 class IamInstanceProfileActions(BaseTest):
 
-    def test_iam_instance_profile_add_role(self):
-        session_factory = self.replay_flight_data("test_iam_instance_profile_add_role")
-        self.patch(UnusedInstanceProfiles, "executor_factory", MainThreadExecutor)
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
+        client = session_factory().client("iam")
         p = self.load_policy(
             {
-                "name": "iam-instance-profile-add-role",
+                "name": "iam-instance-profile-set-role",
                 "resource": "iam-profile",
                 "actions": [
-                    {"type": "add-role", "value": "my-test-role"}
+                    {"type": "set-role", "role": "my-test-role"}
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
-        self.assertEqual(resources[1]['InstanceProfileName'], 'test-instance-profile-1')
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
+
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role-remove",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": ""}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(len(profile['Roles']), 0)
 
 
 class IamPolicyFilterUsage(BaseTest):

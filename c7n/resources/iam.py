@@ -1505,41 +1505,60 @@ class UnusedInstanceProfiles(IamRoleUsage):
         return results
 
 
-@InstanceProfile.action_registry.register('add-role')
+@InstanceProfile.action_registry.register('set-role')
 class InstanceProfileAddRole(BaseAction):
-    """Adds specified role to IAM instance profiles that do not have a role
+    """Updates IAM instance profiles to have specified role name.
+       Instance profile roles are removed when empty role name is specified.
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-          - name: iam-instance-profile-add-role
+          - name: iam-instance-profile-set-role
             resource: iam-profile
             actions:
-                - type: add-role
-                  value: my-test-role
+                - type: set-role
+                  role: my-test-role
     """
 
-    schema = type_schema('add-role',
-    value={'type': 'string'})
-    permissions = ('iam:AddRoleToInstanceProfile',)
+    schema = type_schema('set-role',
+    role={'type': 'string'})
+    permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
+
+    def add_role(self, client, resource, role):
+        self.manager.retry(
+            client.add_role_to_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=role
+        )
+        return
+
+    def remove_role(self, client, resource):
+        self.manager.retry(
+            client.remove_role_from_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=resource['Roles'][0]['RoleName']
+        )
+        return
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-        role_name = self.data.get('value', '')
+        role = self.data.get('role', '')
         for r in resources:
-            try:
-                self.manager.retry(
-                    client.add_role_to_instance_profile,
-                    InstanceProfileName=r['InstanceProfileName'],
-                    RoleName=role_name
-                )
-            except client.exceptions.LimitExceededException:
-                self.log.warning('''
-                "{}" has existing role "{}"'''
-                .format(r['InstanceProfileName'], role_name))
-                continue
+            if not role:
+                if len(r['Roles']) == 0:
+                    continue
+                else:
+                    self.remove_role(client, r)
+            else:
+                if len(r['Roles']) == 0:
+                    self.add_role(client, r, role)
+                elif role == r['Roles'][0]['RoleName']:
+                    continue
+                else:
+                    self.remove_role(client, r)
+                    self.add_role(client, r, role)
 
 
 ###################
