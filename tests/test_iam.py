@@ -1104,15 +1104,15 @@ class IamInstanceProfileFilterUsage(BaseTest):
 
 class IamInstanceProfileActions(BaseTest):
 
-    def test_iam_instance_profile_upsert_role(self):
-        session_factory = self.replay_flight_data("test_iam_instance_profile_upsert_role")
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
         client = session_factory().client("iam")
         p = self.load_policy(
             {
-                "name": "iam-instance-profile-upsert-role",
+                "name": "iam-instance-profile-set-role",
                 "resource": "iam-profile",
                 "actions": [
-                    {"type": "upsert-role", "role": "my-test-role"}
+                    {"type": "set-role", "role": "my-test-role"}
                 ],
             },
             session_factory=session_factory,
@@ -1123,15 +1123,15 @@ class IamInstanceProfileActions(BaseTest):
         for profile in instance_profiles['InstanceProfiles']:
             self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
 
-    def test_iam_instance_profile_upsert_role_remove(self):
-        session_factory = self.replay_flight_data("test_iam_instance_profile_upsert_role_remove")
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
         client = session_factory().client("iam")
         p = self.load_policy(
             {
-                "name": "iam-instance-profile-upsert-role-remove",
+                "name": "iam-instance-profile-set-role-remove",
                 "resource": "iam-profile",
                 "actions": [
-                    {"type": "upsert-role", "role": ""}
+                    {"type": "set-role", "role": ""}
                 ],
             },
             session_factory=session_factory,
