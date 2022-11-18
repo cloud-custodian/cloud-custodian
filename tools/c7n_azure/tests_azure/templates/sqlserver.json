@@ -18,7 +18,21 @@
             "administratorLogin": "custodian",
             "administratorLoginPassword": "[guid(resourceGroup().id)]",
             "version": "12.0"
-         }
+         },
+         "resources": [
+            {
+               "type": "auditingSettings",
+               "apiVersion": "2022-02-01-preview",
+               "name": "default",
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+               ],
+               "properties": {
+                  "isAzureMonitorTargetEnabled": true,
+                  "state": "Enabled"
+               }
+            }
+         ]
       },
       {
          "type": "Microsoft.Sql/servers/databases",

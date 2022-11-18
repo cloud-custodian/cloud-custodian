@@ -2337,3 +2337,25 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
