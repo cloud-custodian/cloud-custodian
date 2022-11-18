@@ -364,20 +364,34 @@ class TestResolverQueryLogConfig(BaseTest):
 
     def test_resolver_query_log_config_associate_2(self):
         session_factory = self.replay_flight_data(
-            'test_resolver_query_log_config_associate')
+            'test_resolver_query_log_config_associate_2')
         p = self.load_policy({
             'name': 'r53-resolver-query-log-config-associate-2',
             'resource': 'resolver-logs',
             'filters': [
-                {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc'}],
+                {'type': 'value', 'key': 'Name', 'op': 'eq', 'value': 'Test-rqlc-2'}],
             'actions': [{
-                'type': 'associate-vpc', 'vpcid': 'vpc-d2d616b5'}]},
+                'type': 'associate-vpc', 'vpcid': 'vpc-01234567891234'}]},
             session_factory=session_factory)
         resources = p.run()
 
         client = session_factory().client("route53resolver")
         rqlca = client.list_resolver_query_log_config_associations()
         self.assertEqual(rqlca[
-            'ResolverQueryLogConfigAssociations'][1]['ResourceId'], "vpc-d2d616b5")
+            'ResolverQueryLogConfigAssociations'][0]['ResourceId'], "vpc-01234567891234")
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Id'], "rqlc-fb017689395648d1")
+        self.assertEqual(resources[0]['Id'], "rqlc-01234567891234")
+
+    def test_resolver_query_log_config_not_associated(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associate_2')
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config-not-associated',
+            'resource': 'resolver-logs',
+            'filters': [{
+                'not': [{'type': 'is-associated', 'vpcid': 'vpc-0123456789123'}]}]},
+            session_factory=session_factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], "rqlc-01234567891234")
