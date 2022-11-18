@@ -7,12 +7,12 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, StringUtils
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ValueFilter, Filter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
@@ -312,6 +312,75 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
             if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':  # nosec
                 return ['AzureServices']
         return []
+
+
+@SqlServer.filter_registry.register('auditing')
+class AuditingFilter(Filter):
+    """
+    Filter by the current auditing
+    policy for this sql server.
+
+    :example:
+
+    Find SQL servers with auditing disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-database-no-auditing
+            resource: azure.sql-server
+            filters:
+              - type: auditing
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'auditing',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqlserver.auditing-filter')
+
+    def __init__(self, data, manager=None):
+        super(AuditingFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'auditingSettings' not in resource['properties']:
+                auditing_settings = client.server_blob_auditing_policies.get(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['auditingSettings'] = \
+                    auditing_settings.serialize(True).get('properties', {})
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['properties']['auditingSettings'].get('state'),
+                    required_status):
+                result.append(resource)
+
+        return result
 
 
 @SqlServer.action_registry.register('set-firewall-rules')

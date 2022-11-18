@@ -17,6 +17,7 @@ import shutil
 import time
 import tempfile
 import zipfile
+import platform
 
 
 # We use this for freezing dependencies for serverless environments
@@ -487,6 +488,10 @@ class LambdaManager:
             if self._update_tags(existing, new_config.pop('Tags', {})):
                 changed = True
 
+            if self._update_architecture(func, existing,
+                    new_config.pop('Architectures', ["x86_64"]), code_ref):
+                changed = True
+
             config_changed = self.delta_function(old_config, new_config)
             if config_changed:
                 log.debug("Updating function: %s config %s",
@@ -523,6 +528,20 @@ class LambdaManager:
         self.client.put_function_concurrency(
             FunctionName=func.name,
             ReservedConcurrentExecutions=func.concurrency)
+
+    def _update_architecture(self, func, existing, new_architecture, code_ref):
+        existing_config = existing.get('Configuration', {})
+        existing_architecture = existing_config.get('Architectures', ["x86_64"])
+        diff = existing_architecture != new_architecture
+        changed = False
+        if diff:
+            log.debug("Updating function architecture: %s" % func.name)
+            params = dict(FunctionName=func.name, Publish=True,
+                          Architectures=new_architecture)
+            params.update(code_ref)
+            self.client.update_function_code(**params)
+            changed = True
+        return changed
 
     def _update_tags(self, existing, new_tags):
         # tag dance
@@ -686,6 +705,10 @@ class AbstractLambdaFunction:
     def get_archive(self):
         """Return the lambda distribution archive object."""
 
+    @abc.abstractproperty
+    def architectures(self):
+        """ """
+
     def get_config(self):
 
         conf = {
@@ -712,6 +735,8 @@ class AbstractLambdaFunction:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
                 'SecurityGroupIds': self.security_groups}
+        if self.architectures:
+            conf['Architectures'] = self.architectures
         return conf
 
 
@@ -906,6 +931,16 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def packages(self):
         return self.policy.data['mode'].get('packages')
+
+    @property
+    def architectures(self):
+        architecture = []
+        arm64_arch = ('aarch64', 'arm64')
+        if platform.machine().lower() in arm64_arch:
+            architecture.append('arm64')
+        else:
+            architecture.append('x86_64')
+        return architecture
 
     def get_events(self, session_factory):
         events = []

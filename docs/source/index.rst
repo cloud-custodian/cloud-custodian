@@ -73,6 +73,12 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    gcp/contribute
    gcp/resources/index
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Tencent Cloud
+
+   tencentcloud/gettingstarted
+   tencentcloud/resources/index
 
 .. toctree::
    :maxdepth: 1

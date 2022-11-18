@@ -11,6 +11,8 @@ class LogGroupDescribe(DescribeSource):
         """
         Resource comes with tags, no need to re-query
         """
+        for res in resources:
+            res["c7n:uin"] = self.resource_manager.config.account_id
         return resources
 
 
@@ -30,7 +32,10 @@ class LogTopic(QueryResourceManager):
         enum_spec = ("DescribeTopics", "Response.Topics[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "topic"
-        metrics_instance_id_name = "uin"  # Namespace=QCE/CLS
         taggable = True
+        metrics_enabled = True
+        metrics_dimension_def = [("uin", "c7n:uin"), ("TopicId", "TopicId")]
+        metrics_instance_id_name = "TopicId"
+        metrics_namespace = "QCE/CLS"
 
     source_mapping = {'describe': LogGroupDescribe}
