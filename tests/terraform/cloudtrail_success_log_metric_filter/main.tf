@@ -6,15 +6,15 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "success-1" {
-  bucket        = "trail-test-bucket-3bf19dec-127e-11ed-861d-0242ac12000"
+  bucket_prefix = "trail-test-bucket"
   force_destroy = true
-      tags = {
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_s3_bucket_public_access_block" "block-access-bucket" {
-  bucket = aws_s3_bucket.success-1.id
+  bucket                  = aws_s3_bucket.success-1.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -24,7 +24,7 @@ resource "aws_s3_bucket_public_access_block" "block-access-bucket" {
 resource "aws_s3_bucket_policy" "success-1-policy" {
   bucket = aws_s3_bucket.success-1.id
 
-     policy = <<POLICY
+  policy = <<POLICY
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -38,7 +38,7 @@ resource "aws_s3_bucket_policy" "success-1-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.success-1.bucket}",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-${random_integer.trail.id}"
                 }
             }
         },
@@ -52,7 +52,7 @@ resource "aws_s3_bucket_policy" "success-1-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.success-1.bucket}/*",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-${random_integer.trail.id}",
                     "s3:x-amz-acl": "bucket-owner-full-control"
                 }
             }
@@ -64,7 +64,7 @@ POLICY
 
 
 resource "aws_iam_policy" "testing-policy" {
-  name        = "testing-trailtest_policy"
+  name_prefix = "testing-trailtest_policy"
   path        = "/"
   description = "cloudtrail role policy"
 
@@ -84,26 +84,26 @@ resource "aws_iam_policy" "testing-policy" {
     ]
   })
   depends_on = [aws_cloudwatch_log_stream.success-log-stream]
-      tags = {
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_iam_role" "testing-cloudtrail-cloudwatch-role" {
-  name = "testing-cloudtrail_cloudwatch_role"
+  name_prefix = "testing-cloudtrail_cloudwatch_role"
   assume_role_policy = jsonencode({
-  Version = "2012-10-17",
-  Statement = [
-    {
-      Effect= "Allow",
-      Principal= {
-        Service = "cloudtrail.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }
-  ]
-})
-    tags = {
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = {
     c7n = true
   }
   depends_on = [aws_iam_policy.testing-policy]
@@ -117,25 +117,30 @@ resource "aws_iam_role_policy_attachment" "testing_cloudtrail_cloudwatch_role_po
 }
 
 resource "aws_cloudwatch_log_group" "success-5" {
-  name = "cloudtrail-test-group"
-      tags = {
+  name_prefix = "cloudtrail-test-group"
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_cloudwatch_log_stream" "success-log-stream" {
-  name  = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.current.name}"
+  name           = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.current.name}"
   log_group_name = aws_cloudwatch_log_group.success-5.name
 }
 
+resource "random_integer" "trail" {
+  min = 1
+  max = 50000
+}
+
 resource "aws_cloudtrail" "success-2" {
-  name                          = "tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+  name                          = "tf-trail-${random_integer.trail.id}"
   s3_bucket_name                = aws_s3_bucket.success-1.bucket
   s3_key_prefix                 = "prefix"
   include_global_service_events = true
-  is_multi_region_trail = true
-  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.success-5.arn}:*"
-  cloud_watch_logs_role_arn =  aws_iam_role.testing-cloudtrail-cloudwatch-role.arn
+  is_multi_region_trail         = true
+  cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.success-5.arn}:*"
+  cloud_watch_logs_role_arn     = aws_iam_role.testing-cloudtrail-cloudwatch-role.arn
 
   event_selector {
     read_write_type           = "All"
@@ -152,12 +157,12 @@ resource "aws_cloudtrail" "success-2" {
   tags = {
     c7n = true
   }
-  depends_on = [ aws_s3_bucket_policy.success-1-policy ]
+  depends_on = [aws_s3_bucket_policy.success-1-policy]
 }
 
 #filter for alarm
-resource "aws_cloudwatch_log_metric_filter" "success-3"{
-  name           = "test-filter-name"
+resource "aws_cloudwatch_log_metric_filter" "success-3" {
+  name           = "test-filter-name-${random_integer.trail.id}"
   log_group_name = aws_cloudwatch_log_group.success-5.name
   pattern        = "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }"
   metric_transformation {
@@ -168,9 +173,8 @@ resource "aws_cloudwatch_log_metric_filter" "success-3"{
 }
 
 #alarm
-#check hwo to refer to metric transformation name from filter
 resource "aws_cloudwatch_metric_alarm" "success-4" {
-  alarm_name = "NoMFAConsoleLoginAlarm"
+  alarm_name          = "NoMFAConsoleLoginAlarm_${random_integer.trail.id}"
   metric_name         = aws_cloudwatch_log_metric_filter.success-3.metric_transformation[0].name
   threshold           = "0"
   statistic           = "Sum"
@@ -180,21 +184,21 @@ resource "aws_cloudwatch_metric_alarm" "success-4" {
   period              = "60"
   namespace           = "ImportantMetrics"
   alarm_actions       = [aws_sns_topic.success-sns-topic.arn]
-    tags = {
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_sns_topic" "success-sns-topic" {
-  name = "mfa-notification-topic"
-      tags = {
+  name_prefix = "mfa-notification-topic"
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_sqs_queue" "success_sqs_queue" {
-  name = "mfa-sqs-topic"
-      tags = {
+  name_prefix = "mfa-sqs-topic"
+  tags = {
     c7n = true
   }
 }

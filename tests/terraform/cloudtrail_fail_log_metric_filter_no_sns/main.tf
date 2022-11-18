@@ -7,16 +7,21 @@ provider "aws" {
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
+resource "random_integer" "trail" {
+  min = 1
+  max = 50000
+}
+
 resource "aws_s3_bucket" "fail-bucket" {
-  bucket        = "fail-trail-test-bucket-testing"
+  bucket_prefix = "fail-trail-test-bucket-testing"
   force_destroy = true
-      tags = {
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_s3_bucket_public_access_block" "fail-bucket-block" {
-  bucket = aws_s3_bucket.fail-bucket.id
+  bucket                  = aws_s3_bucket.fail-bucket.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -26,7 +31,7 @@ resource "aws_s3_bucket_public_access_block" "fail-bucket-block" {
 resource "aws_s3_bucket_policy" "fail-policy" {
   bucket = aws_s3_bucket.fail-bucket.id
 
-     policy = <<POLICY
+  policy = <<POLICY
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -40,7 +45,7 @@ resource "aws_s3_bucket_policy" "fail-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.fail-bucket.bucket}",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/fail-tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/fail-tf-trail-${random_integer.trail.id}"
                 }
             }
         },
@@ -54,7 +59,7 @@ resource "aws_s3_bucket_policy" "fail-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.fail-bucket.bucket}/*",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/fail-tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/fail-tf-trail-${random_integer.trail.id}",
                     "s3:x-amz-acl": "bucket-owner-full-control"
                 }
             }
@@ -66,7 +71,7 @@ POLICY
 
 
 resource "aws_iam_policy" "testing-policy-fail" {
-  name        = "fail-testing-trailtest_policy"
+  name_prefix = "fail-testing-trailtest_policy"
   path        = "/"
   description = "cloudtrail role policy"
 
@@ -86,26 +91,26 @@ resource "aws_iam_policy" "testing-policy-fail" {
     ]
   })
   depends_on = [aws_cloudwatch_log_stream.fail-log-stream]
-      tags = {
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_iam_role" "fail-cloudtrail-cloudwatch-role" {
-  name = "testing-cloudtrail_cloudwatch_role-fail"
+  name_prefix = "cloudtrail_cloudwatch_role-fail"
   assume_role_policy = jsonencode({
-  Version = "2012-10-17",
-  Statement = [
-    {
-      Effect= "Allow",
-      Principal= {
-        Service = "cloudtrail.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }
-  ]
-})
-    tags = {
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = {
     c7n = true
   }
   depends_on = [aws_iam_policy.testing-policy-fail]
@@ -119,25 +124,25 @@ resource "aws_iam_role_policy_attachment" "fail-cloudtrail-cloudwatch-role-polic
 }
 
 resource "aws_cloudwatch_log_group" "log-group-fail" {
-  name = "fail-cloudtrail-test-group"
-      tags = {
+  name_prefix = "fail-cloudtrail-test-group"
+  tags = {
     c7n = true
   }
 }
 
 resource "aws_cloudwatch_log_stream" "fail-log-stream" {
-  name  = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.current.name}"
+  name           = "${data.aws_caller_identity.current.account_id}_CloudTrail_${data.aws_region.current.name}"
   log_group_name = aws_cloudwatch_log_group.log-group-fail.name
 }
 
 resource "aws_cloudtrail" "fail-cloudtrail" {
-  name                          = "fail-tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+  name                          = "fail-tf-trail-${random_integer.trail.id}"
   s3_bucket_name                = aws_s3_bucket.fail-bucket.bucket
   s3_key_prefix                 = ""
   include_global_service_events = true
-  is_multi_region_trail = true
-  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.log-group-fail.arn}:*"
-  cloud_watch_logs_role_arn =  aws_iam_role.fail-cloudtrail-cloudwatch-role.arn
+  is_multi_region_trail         = true
+  cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.log-group-fail.arn}:*"
+  cloud_watch_logs_role_arn     = aws_iam_role.fail-cloudtrail-cloudwatch-role.arn
 
   event_selector {
     read_write_type           = "All"
@@ -160,7 +165,7 @@ resource "aws_cloudtrail" "fail-cloudtrail" {
 }
 
 #filter for alarm
-resource "aws_cloudwatch_log_metric_filter" "fail-metric-filter"{
+resource "aws_cloudwatch_log_metric_filter" "fail-metric-filter" {
   name           = "test-filter-name-fail"
   log_group_name = aws_cloudwatch_log_group.log-group-fail.name
   pattern        = "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }"
@@ -174,7 +179,7 @@ resource "aws_cloudwatch_log_metric_filter" "fail-metric-filter"{
 #alarm
 #check hwo to refer to metric transformation name from filter
 resource "aws_cloudwatch_metric_alarm" "metric-alarm-fail" {
-  alarm_name = "NoMFAConsoleLoginAlarm_fail"
+  alarm_name          = "NoMFAConsoleLoginAlarm_fail_${random_integer.trail.id}"
   metric_name         = aws_cloudwatch_log_metric_filter.fail-metric-filter.metric_transformation[0].name
   threshold           = "0"
   statistic           = "Sum"
@@ -183,7 +188,7 @@ resource "aws_cloudwatch_metric_alarm" "metric-alarm-fail" {
   evaluation_periods  = "1"
   period              = "60"
   namespace           = "ImportantMetrics"
-    tags = {
+  tags = {
     c7n = true
   }
 }

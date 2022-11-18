@@ -5,8 +5,13 @@ provider "aws" {
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
+resource "random_integer" "trail" {
+  min = 1
+  max = 50000
+}
+
 resource "aws_s3_bucket" "fail-1" {
-  bucket        = "trail-test-bucket-3bf19dec-127e-11ed-861d-0242ac12000"
+  bucket_prefix = "trail-test-bucket"
   force_destroy = true
   tags = {
     c7n = true
@@ -14,7 +19,7 @@ resource "aws_s3_bucket" "fail-1" {
 }
 
 resource "aws_s3_bucket_public_access_block" "block-access-bucket" {
-  bucket = aws_s3_bucket.fail-1.id
+  bucket                  = aws_s3_bucket.fail-1.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -38,7 +43,7 @@ resource "aws_s3_bucket_policy" "fail-1-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.fail-1.bucket}",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-${random_integer.trail.id}"
                 }
             }
         },
@@ -52,7 +57,7 @@ resource "aws_s3_bucket_policy" "fail-1-policy" {
             "Resource": "arn:aws:s3:::${aws_s3_bucket.fail-1.bucket}/*",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                    "AWS:SourceArn": "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/tf-trail-${random_integer.trail.id}",
                     "s3:x-amz-acl": "bucket-owner-full-control"
                 }
             }
@@ -63,11 +68,11 @@ POLICY
 }
 
 resource "aws_cloudtrail" "fail-2" {
-  name                          = "tf-trail-3bf19dec-127e-11ed-861d-0242ac12000"
+  name                          = "tf-trail-${random_integer.trail.id}"
   s3_bucket_name                = aws_s3_bucket.fail-1.bucket
   s3_key_prefix                 = "prefix"
   include_global_service_events = true
-  is_multi_region_trail = true
+  is_multi_region_trail         = true
 
   event_selector {
     read_write_type           = "ReadOnly"
@@ -84,5 +89,5 @@ resource "aws_cloudtrail" "fail-2" {
   tags = {
     c7n = true
   }
-  depends_on = [ aws_s3_bucket_policy.fail-1-policy ]
+  depends_on = [aws_s3_bucket_policy.fail-1-policy]
 }

@@ -186,7 +186,7 @@ class CloudTrailEnabled(Filter):
            'log-metric-filter-pattern': {'type': 'string'}})
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
-                   'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarms',
+                   'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
                    'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
 
     def process(self, resources, event=None):
@@ -239,9 +239,13 @@ class CloudTrailEnabled(Filter):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
                     continue
                 log_group_name = t['CloudWatchLogsLogGroupArn'].split(':')[6]
-                metric_filters_log_group = \
-                    client_logs.describe_metric_filters(
-                        logGroupName=log_group_name)['metricFilters']
+                try:
+                    metric_filters_log_group = \
+                        client_logs.describe_metric_filters(
+                            logGroupName=log_group_name)['metricFilters']
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                        continue
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
@@ -256,14 +260,14 @@ class CloudTrailEnabled(Filter):
                 )['MetricAlarms']
                 alarm_actions = []
                 for a in alarms:
-                    alarm_actions += a['AlarmActions']
+                    alarm_actions.extend(a['AlarmActions'])
                 if not alarm_actions:
                     continue
+                alarm_actions = set(alarm_actions)
                 sns_subscriptions = sns_manager.resources()
                 for s in sns_subscriptions:
-                    for a in alarm_actions:
-                        if s['TopicArn'] == a:
-                            matched.append(t)
+                    if s['TopicArn'] in alarm_actions:
+                        matched.append(t)
             trails = matched
         if trails:
             return []
