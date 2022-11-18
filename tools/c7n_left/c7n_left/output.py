@@ -139,9 +139,9 @@ class Github(Output):
         md = PolicyMetadata(result.policy)
         filename = resource.src_dir / resource.filename
         title = md.title
-        message = md.description or ""
+        message = md.description or md.title
 
-        return f"::error file={filename} line={resource.line_start} lineEnd={resource.line_end} title={title}::{message}"  # noqa
+        return f"::error file={filename},line={resource.line_start},lineEnd={resource.line_end}::{message}"  # noqa
 
 
 class JSONEncoder(json.JSONEncoder):
