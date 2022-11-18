@@ -565,7 +565,6 @@ class ResolverQueryLogConfigAssociate(BaseAction):
         vpc_ids = self.get_vpc_id()
 
         for resource in resources:
-            print(resource)
             for vpc_id in vpc_ids:
                 if not self.is_associated(resource, vpc_id):
                     client.associate_resolver_query_log_config(
