@@ -1505,9 +1505,9 @@ class UnusedInstanceProfiles(IamRoleUsage):
         return results
 
 
-@InstanceProfile.action_registry.register('set-role')
-class InstanceProfileAddRole(BaseAction):
-    """Updates IAM instance profiles to have specified role name.
+@InstanceProfile.action_registry.register('upsert-role')
+class InstanceProfileUpsertRole(BaseAction):
+    """Upserts specified role name for IAM instance profiles.
        Instance profile roles are removed when empty role name is specified.
 
     :example:
@@ -1515,14 +1515,14 @@ class InstanceProfileAddRole(BaseAction):
     .. code-block:: yaml
 
         policies:
-          - name: iam-instance-profile-set-role
+          - name: iam-instance-profile-upsert-role
             resource: iam-profile
             actions:
-                - type: set-role
+                - type: upsert-role
                   role: my-test-role
     """
 
-    schema = type_schema('set-role',
+    schema = type_schema('upsert-role',
     role={'type': 'string'})
     permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
 
