@@ -122,8 +122,24 @@ class RichResult:
         yield ""
 
 
-@report_outputs.register("github")
-class Github(Output):
+class MultiOutput:
+    def __init__(self, outputs):
+        self.outputs = outputs
+
+    def on_execution_started(self, policies):
+        for o in self.outputs:
+            o.on_execution_started(policies)
+
+    def on_execution_ended(self):
+        for o in self.outputs:
+            o.on_execution_ended()
+
+    def on_results(self, results):
+        for o in self.outputs:
+            o.on_results(results)
+
+
+class GithubFormat(Output):
 
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
@@ -141,7 +157,15 @@ class Github(Output):
         title = md.title
         message = md.description or md.title
 
-        return f"::error file={filename},line={resource.line_start},lineEnd={resource.line_end}::{message}"  # noqa
+        return f"::error file={filename},line={resource.line_start},lineEnd={resource.line_end},title={title}::{message}"  # noqa
+
+
+@report_outputs.register("github")
+class GithubOutput(MultiOutput):
+    "For github action execution we want both line annotation and cli outputs"
+
+    def __init__(self, ctx, config):
+        super().__init__([GithubFormat(ctx, config), RichCli(ctx, config)])
 
 
 class JSONEncoder(json.JSONEncoder):
