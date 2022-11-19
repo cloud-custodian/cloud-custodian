@@ -729,6 +729,24 @@ class TransitGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
 
+    def test_tgw_attachment_cloudtrail(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query_cwe')
+        p = self.load_policy(
+            {
+                "name": "test-tgw-att-cwe",
+                "resource": "transit-attachment",
+                "mode": {
+                    "type": "cloudtrail",
+                    "events": [{
+                        "event": "DeleteTransitGatewayVpcAttachment",
+                        "ids": "requestParameters.DelTGwVpcAttachReq.TransitGatewayAttachmentId",
+                        "source": "ec2.amazonaws.com"
+                    }]},
+            },
+            config={'region': 'us-west-2'}, session_factory=factory)
+        resources = p.push(event_data("event-transit-gateway-delete-vpc-attachment.json"))
+        self.assertEqual(len(resources), 1)
+
 
 class NetworkInterfaceTest(BaseTest):
 

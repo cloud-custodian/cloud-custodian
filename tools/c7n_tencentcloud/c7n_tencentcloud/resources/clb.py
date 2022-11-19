@@ -22,10 +22,10 @@ class CLB(QueryResourceManager):
         service = "clb"
         version = "2018-03-17"
         enum_spec = ("DescribeLoadBalancers", "Response.LoadBalancerSet[]", {})
-        metrics_instance_id_name = "LoadBalancerId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "clb"
         taggable = True
+
         datetime_fields_format = {
             "CreateTime": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai"))
         }
@@ -143,7 +143,6 @@ class CLBMetricsFilter(MetricsFilter):
 
     def process(self, resources, event=None):
         """process"""
-        print(f"start to process: {len(resources)}, batch_size: {self.batch_size}")
         # separate resources by LoadBalancerType
         open_clbs = {}
         internal_clbs = {}

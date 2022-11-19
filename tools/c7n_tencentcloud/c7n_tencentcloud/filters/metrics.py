@@ -35,7 +35,6 @@ class MetricsFilter(Filter):
         name,
         **{
             "name": {"type": "string"},
-            "namespace": {"type": "string"},
             "statistics": {"type": "string", "enum": list(STATISTICS_OPERATORS.keys())},
             "days": {"type": "number"},
             "op": {"type": "string", "enum": list(OPERATORS.keys())},  # TODO, remove unsupported op
@@ -47,11 +46,6 @@ class MetricsFilter(Filter):
     )
     schema_alias = True
     permissions = ()
-
-    DEFAULT_NAMESPACE = {
-        "cvm:instance": "QCE/CVM",
-        "vpc:nat": "QCE/NAT_GATEWAY",
-    }
 
     def __init__(self, data, manager=None):
         super().__init__(data, manager)
@@ -65,13 +59,6 @@ class MetricsFilter(Filter):
         self.missing_value = self.data.get("missing-value")
         self.value = self.data["value"]
         self.resource_metadata: ResourceTypeInfo = self.manager.get_model()
-        ns = self.data.get("namespace")
-        if not ns:
-            ns = self.resource_metadata.metrics_namespace
-            if not ns:
-                key = f"{self.resource_metadata.service}:{self.resource_metadata.resource_prefix}"
-                ns = self.DEFAULT_NAMESPACE[key]
-        self.namespace = ns
 
     def get_metric_window(self):
         """get_metric_window"""
@@ -91,22 +78,14 @@ class MetricsFilter(Filter):
         return math.floor(1440 / data_points_per_resource)
 
     def _get_request_params(self, resources):
-        ids = [res[self.resource_metadata.id] for res in resources]
-        dimensions = []
-        for iter_id in ids:
-            dimensions.append({
-                "Dimensions": [{
-                    "Name": self.resource_metadata.metrics_instance_id_name,
-                    "Value": iter_id
-                }]
-            })
+        namespace, instances = self.manager.get_metrics_req_params(resources)
         return {
-            "Namespace": self.namespace,
+            "Namespace": namespace,
             "MetricName": self.metric_name,
             "Period": self.period,
             "StartTime": self.start_time,
             "EndTime": self.end_time,
-            "Instances": dimensions
+            "Instances": instances
         }
 
     def validate(self):
@@ -136,10 +115,13 @@ class MetricsFilter(Filter):
 
         matched_resource_ids = []
         for data_point in self.get_metrics_data_point(resources):
+            resource_id = self.manager.get_resource_id_from_dimensions(data_point["Dimensions"])
+            if resource_id is None:
+                raise PolicyExecutionError("get resource id from metrics response data error")
             if self.match(data_point):
-                matched_resource_ids.append(data_point["Dimensions"][0]["Value"])
+                matched_resource_ids.append(resource_id)
             else:
-                log.debug("[metrics filter]drop resource=%s", data_point["Dimensions"][0]["Value"])
+                log.debug(f"[metrics filter]drop resource={resource_id}")
 
         matched_resources = []
         if len(matched_resource_ids) > 0:
@@ -188,7 +170,9 @@ class MetricsFilter(Filter):
         if cls.name in resource_class.filter_registry:
             # to support resource to define its own metrics filter
             return
-        resource_class.filter_registry.register(cls.name, cls)
+        if resource_class.resource_type.metrics_enabled:
+            # register metrics filter only for those supported by cloud
+            resource_class.filter_registry.register(cls.name, cls)
 
 
 # finish to register metrics filter to resources
