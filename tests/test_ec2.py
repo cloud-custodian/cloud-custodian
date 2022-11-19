@@ -1102,7 +1102,7 @@ class TestStop(BaseTest):
         self.assertEqual(instances[0]["State"]["Name"], "stopped")
 
     def test_ec2_stop_with_protection_enabled_handle_error(self):
-        policy = self.load_policy(            
+        policy = self.load_policy(
             {
                 "name": "ec2-test-stop-with-protection-enabled",
                 "resource": "ec2",
@@ -1124,7 +1124,7 @@ class TestStop(BaseTest):
 
         self.assertEqual(
             None,
-            stop_action.disable_protection(client, 'stop', [{'InstanceId': 'i-foo'}]),       
+            stop_action.disable_protection(client, 'stop', [{'InstanceId': 'i-foo'}]),
         )
 
         client2 = mock.MagicMock()
@@ -1137,7 +1137,7 @@ class TestStop(BaseTest):
         self.assertRaises(
             ClientError,
             stop_action.disable_protection,
-            client2, 'stop', [{'InstanceId': 'i-foo'}],       
+            client2, 'stop', [{'InstanceId': 'i-foo'}],
         )
 
     def test_ec2_stop_with_protection_enabled_ephemeral(self):
