@@ -1511,7 +1511,7 @@ class Stop(BaseAction):
                 modify_instance(i, 'disableApiTermination')
 
         with self.executor_factory(max_workers=2) as w:
-            list(w.map(process_instance, instances, op))
+            list(w.map(process_instance, instances, [op] * len(instances)))
 
     def _run_instances_op(self, client, op, instances, **kwargs):
         client_op = client.stop_instances
