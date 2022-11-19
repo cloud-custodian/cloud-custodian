@@ -5,7 +5,7 @@
         "ResourceTagSets": [
             {
                 "ResourceType": "hostedzone",
-                "ResourceId": "Z00154261H70J1Z1UX9PX",
+                "ResourceId": "Z10481101M6AKWLAEHU70",
                 "Tags": [
                     {
                         "Key": "DomainName",
@@ -19,7 +19,7 @@
             },
             {
                 "ResourceType": "hostedzone",
-                "ResourceId": "Z01795171I7KZ51EP7P7Z",
+                "ResourceId": "Z0423603VKO3K9HA5YQD",
                 "Tags": []
             }
         ]

@@ -4,9 +4,9 @@
         "ResponseMetadata": {},
         "QueryLoggingConfigs": [
             {
-                "Id": "a0ef9b1e-731a-42ee-837f-de607b788155",
-                "HostedZoneId": "Z01795171I7KZ51EP7P7Z",
-                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/test123.com"
+                "Id": "72c989f8-8be5-434e-b213-7a30ea34d482",
+                "HostedZoneId": "Z0423603VKO3K9HA5YQD",
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/custodian.io"
             }
         ]
     }
