@@ -42,9 +42,8 @@ class CollectionRunner:
         provider = self.get_provider()
 
         if not provider.match_dir(self.options.source_dir):
-            raise NotImplementedError(
-                "no %s source files found" % provider.provider_name
-            )
+            log.warning("no %s source files found" % provider.type)
+            return 1
 
         graph = provider.parse(self.options.source_dir)
 
