@@ -2039,8 +2039,6 @@ class DbOptionGroups(ValueFilter):
             for pg in resource['OptionGroupMemberships']:
                 pg_values = optioncache[pg['OptionGroupName']]
                 if self.match(pg_values):
-                    resource.setdefault('c7n:MatchedOptionGroup', []).append(
-                        self.data.get('key'))
                     results.append(resource)
                     break
 

@@ -885,8 +885,8 @@ class RDSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_rds_data_in_transit_encrypt(self):
-        session_factory = self.replay_flight_data("test_rds_data_in_transit_encrypt")
+    def test_rds_db_option_groups(self):
+        session_factory = self.replay_flight_data("test_rds_db_option_groups")
         p = self.load_policy(
             {
                 "name": "rds-data-in-transit-encrypt",
@@ -906,7 +906,7 @@ class RDSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-1")
+        self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
 
 class RDSSnapshotTest(BaseTest):
