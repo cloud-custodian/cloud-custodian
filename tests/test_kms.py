@@ -324,7 +324,7 @@ class KMSTagging(BaseTest):
         )
 
         resources = policy.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_id)
         tags = client.list_resource_tags(KeyId=key_id)["Tags"]
         self.assertEqual(len(tags), 0)

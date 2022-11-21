@@ -7,6 +7,9 @@ from .resource import TerraformResource
 
 
 class TerraformGraph(ResourceGraph):
+
+    resolver = None
+
     def __len__(self):
         return sum(map(len, self.resource_data.values()))
 
@@ -36,9 +39,65 @@ class TerraformGraph(ResourceGraph):
                 yield type_name, resources
 
     def as_resource(self, name, data):
-        if isinstance(data["__tfmeta"], list):
-            for m in data["__tfmeta"]:
-                m["src_dir"] = self.src_dir
-        else:
-            data["__tfmeta"]["src_dir"] = self.src_dir
+        data["__tfmeta"]["src_dir"] = self.src_dir
         return TerraformResource(name, data)
+
+    def build(self):
+        self.resolver = Resolver()
+        self.resolver.build(self.resource_data)
+        return self.resolver
+
+    def get_refs(self, resource, target_type):
+        return self.resolver.resolve_refs(resource, (target_type,))
+
+
+class Resolver:
+    def __init__(self):
+        self._id_map = {}
+        self._ref_map = {}
+
+    @staticmethod
+    def is_id_ref(v):
+        if len(v) != 36:
+            return False
+        if v.count("-") != 4:
+            return False
+        return True
+
+    def resolve_refs(self, block, types=None):
+        refs = self._ref_map.get(block["id"], ())
+        for rid in refs:
+            r = self._id_map[rid]
+            rtype = r["__tfmeta"]["label"]
+            if types and rtype not in types:
+                continue
+            yield r
+
+    def visit(self, block, root=False):
+        if not isinstance(block, dict):
+            return ()
+
+        bid = None
+        refs = set()
+
+        for k, v in list(block.items()):
+            if k == "id":
+                bid = v
+                self._id_map[v] = block
+            elif isinstance(v, str) and self.is_id_ref(v):
+                refs.add(v)
+            if isinstance(v, (str, int, float, bool)):
+                continue
+            if isinstance(v, dict) and k != "__tfmeta":
+                refs.update(self.visit(v))
+            if isinstance(v, list):
+                list(map(self.visit, v))
+
+        if refs and block.get("__tfmeta", {}).get("label"):
+            self._ref_map.setdefault(bid, []).extend(refs)
+            for r in refs:
+                self._ref_map.setdefault(r, []).append(bid)
+
+        return refs
+
+    build = visit
