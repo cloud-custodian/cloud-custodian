@@ -51,7 +51,7 @@ class CollectionRunner:
             p.expand_variables(p.get_variables())
             p.validate()
 
-        self.reporter.on_execution_started(self.policies)
+        self.reporter.on_execution_started(self.policies, graph)
         # consider inverting this order to allow for results grouped by policy
         # at the moment, we're doing results grouped by resource.
         found = False
@@ -175,6 +175,9 @@ class ResourceGraph:
     def __init__(self, resource_data, src_dir):
         self.resource_data = resource_data
         self.src_dir = src_dir
+
+    def __len__(self):
+        raise NotImplementedError()
 
     def get_resource_by_type(self):
         raise NotImplementedError()

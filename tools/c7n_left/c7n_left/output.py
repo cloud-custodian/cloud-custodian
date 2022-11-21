@@ -67,7 +67,7 @@ class Output:
         self.ctx = ctx
         self.config = config
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         pass
 
     def on_execution_ended(self):
@@ -83,19 +83,31 @@ class RichCli(Output):
         super().__init__(ctx, config)
         self.console = Console(file=config.output_file)
         self.started = None
+        self.matches = 0
 
-    def on_execution_started(self, policies):
-        self.console.print("Running %d policies" % (len(policies),))
+    def on_execution_started(self, policies, graph):
+        self.console.print(
+            "Running %d policies on %d resources" % (len(policies), len(graph))
+        )
         self.started = time.time()
 
     def on_execution_ended(self):
         self.console.print(
-            "Execution complete %0.2f seconds" % (time.time() - self.started)
+            "Evaluation complete %0.2f seconds -> %s"
+            % (
+                time.time() - self.started,
+                (
+                    not self.matches
+                    and "[green]Success[green]"
+                    or "[red]%d Failures[/red]" % len(self.matches)
+                ),
+            )
         )
 
     def on_results(self, results):
         for r in results:
             self.console.print(RichResult(r))
+        self.matches += len(results)
 
 
 class RichResult:
@@ -126,9 +138,9 @@ class MultiOutput:
     def __init__(self, outputs):
         self.outputs = outputs
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         for o in self.outputs:
-            o.on_execution_started(policies)
+            o.on_execution_started(policies, graph)
 
     def on_execution_ended(self):
         for o in self.outputs:
@@ -142,8 +154,6 @@ class MultiOutput:
 class GithubFormat(Output):
 
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
-
-    "::error file={name},line={line},endLine={endLine},title={title}::{message}"
 
     def on_results(self, results):
         for r in results:

@@ -37,7 +37,7 @@ class ResultsReporter:
     def __init__(self):
         self.results = []
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         pass
 
     def on_execution_ended(self):
