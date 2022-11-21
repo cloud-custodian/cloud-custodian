@@ -1910,6 +1910,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
+        supports_trailevents = True
 
 
 @resources.register('peering-connection')

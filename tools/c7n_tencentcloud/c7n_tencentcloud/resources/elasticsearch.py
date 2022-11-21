@@ -22,5 +22,8 @@ class Elasticsearch(QueryResourceManager):
         enum_spec = ("DescribeInstances", "Response.InstanceList[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instance"
-        metrics_instance_id_name = "uInstanceId"
         taggable = True
+        metrics_enabled = True
+        metrics_dimension_def = [("InstanceId", "InstanceId")]
+        metrics_instance_id_name = "InstanceId"
+        metrics_namespace = "QCE/CES"
