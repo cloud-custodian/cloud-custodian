@@ -224,6 +224,10 @@ class UtilTest(BaseTest):
 
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
+        self.assertEqual(json.dumps(utils.FormatDate(d),
+                                    cls=utils.DateTimeEncoder, indent=2),
+                         '"2018-02-02T12:00:00"')
+
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(list(utils.group_by(items, "Type").keys()), [None, "a", "b"])

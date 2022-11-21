@@ -181,7 +181,7 @@ class EKS(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         kmsKeyId = resources[0]['encryptionConfig'][0]['provider']['keyArn']
         aliases = kms.list_aliases(KeyId=kmsKeyId)
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')

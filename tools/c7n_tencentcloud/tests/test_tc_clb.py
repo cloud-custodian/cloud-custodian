@@ -46,3 +46,33 @@ class TestClb(BaseTest):
         )
         resources = policy.run()
         assert len(resources) == 1 and len(resources[0]["Instances"]) == 0
+
+    @pytest.mark.vcr
+    def test_metrics_filter(self):
+        policy = self.load_policy(
+            {
+                "name": "test_clb_metrics_filter",
+                "resource": "tencentcloud.clb",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateTime",
+                        "value_type": "age",
+                        "value": 20,
+                        "op": "gte"
+                    },
+                    {
+                        "type": "metrics",
+                        "name": "TotalReq",
+                        "statistics": "Sum",
+                        "period": 3600,
+                        "days": 30,
+                        "value": 0,
+                        "missing-value": 0,
+                        "op": "eq"
+                    }
+                ]
+            }
+        )
+        resources = policy.run()
+        assert len(resources) == 9

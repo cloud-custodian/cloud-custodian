@@ -790,7 +790,8 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        for nic in self.manager.get_resource_manager('eni').resources():
+        self.nics = self.manager.get_resource_manager('eni').resources()
+        for nic in self.nics:
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
         return sg_ids
@@ -862,21 +863,56 @@ class UnusedSecurityGroup(SGUsage):
 @SecurityGroup.filter_registry.register('used')
 class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
-
     This operates as a complement to the unused filter for multi-step
     workflows.
-
     :example:
-
     .. code-block:: yaml
-
             policies:
               - name: security-groups-in-use
                 resource: security-group
                 filters:
                   - used
+
+            policies:
+              - name: security-groups-used-by-rds
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InstanceOwnerIds
+                    op: intersect
+                    value:
+                      - amazon-rds
+
+            policies:
+              - name: security-groups-used-by-natgw
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceTypes
+                    op: intersect
+                    value:
+                      - nat_gateway
     """
     schema = type_schema('used')
+
+    instance_owner_id_key = 'c7n:InstanceOwnerIds'
+    interface_type_key = 'c7n:InterfaceTypes'
+
+    def _get_eni_attributes(self):
+        enis = []
+        for nic in self.nics:
+            if nic['Status'] == 'in-use':
+                instance_owner_id = nic['Attachment']['InstanceOwnerId']
+            else:
+                instance_owner_id = ''
+            interface_type = nic.get('InterfaceType')
+            for g in nic['Groups']:
+                enis.append({'GroupId': g['GroupId'],
+                             'InstanceOwnerId': instance_owner_id,
+                             'InterfaceType': interface_type})
+        return enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -884,6 +920,16 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+        enis = self._get_eni_attributes()
+        for r in resources:
+            owner_ids = set()
+            interface_types = set()
+            for eni in enis:
+                if r['GroupId'] == eni['GroupId']:
+                    owner_ids.add(eni['InstanceOwnerId'])
+                    interface_types.add(eni['InterfaceType'])
+            r[self.instance_owner_id_key] = list(owner_ids)
+            r[self.interface_type_key] = list(interface_types)
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -1864,6 +1910,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
+        supports_trailevents = True
 
 
 @resources.register('peering-connection')
