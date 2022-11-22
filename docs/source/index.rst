@@ -101,8 +101,8 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    :caption: Tools
 
    tools/c7n-org
-   tools/cask
-   tools/c7n-mailer   
+   tools/c7n-mailer
+   tools/c7n-left
    tools/c7n-logexporter
    tools/c7n-trailcreator
    tools/c7n-policystream   
