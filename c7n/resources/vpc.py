@@ -953,7 +953,7 @@ class UsedSecurityGroup(SGUsage):
         if description.startswith('Interface for NAT Gateway'):
             return 'nat'
         if (description == 'RDSNetworkInterface' or
-            description.startswith('Network interface for DBProxy')):
+                description.startswith('Network interface for DBProxy')):
             return 'rds'
         if description == 'RedshiftNetworkInterface':
             return 'redshift'
