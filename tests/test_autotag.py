@@ -183,3 +183,30 @@ class AutoTagCreator(BaseTest):
         auto_tag_user.data = {"tag": "Owner"}
         result = auto_tag_user.process(resources, event)
         self.assertEqual(result, {"Owner": "Radiant"})
+
+    def test_auto_tag_creator_with_none_userinfo(self):
+        event = {
+            "detail": event_data("event-cloud-trail-run-instances.json"),
+            "debug": True,
+        }
+        session_factory = self.replay_flight_data("test_ec2_autotag_creator")
+        policy = self.load_policy(
+            {
+                "name": "ec2-auto-tag",
+                "resource": "ec2",
+                "mode": {"type": "cloudtrail", "events": ["RunInstances"]},
+                "actions": [
+                    {
+                        "type": "auto-tag-user",
+                        "tag": "CreatorName",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.push(event, None)
+        auto_tag_user = AutoTagUser()
+        auto_tag_user.data = {"tag": "CreatorName"}
+        auto_tag_user.manager = MagicMock()
+        result = auto_tag_user.process(resources, event)
+        self.assertEqual(result, None)

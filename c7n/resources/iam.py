@@ -441,6 +441,7 @@ class InstanceProfile(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        cfn_type = 'AWS::IAM::InstanceProfile'
 
 
 @resources.register('iam-certificate')
@@ -1502,6 +1503,62 @@ class UnusedInstanceProfiles(IamRoleUsage):
             "%d of %d instance profiles currently not in use." % (
                 len(results), len(resources)))
         return results
+
+
+@InstanceProfile.action_registry.register('set-role')
+class InstanceProfileSetRole(BaseAction):
+    """Upserts specified role name for IAM instance profiles.
+       Instance profile roles are removed when empty role name is specified.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profile-set-role
+            resource: iam-profile
+            actions:
+                - type: set-role
+                  role: my-test-role
+    """
+
+    schema = type_schema('set-role',
+    role={'type': 'string'})
+    permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
+
+    def add_role(self, client, resource, role):
+        self.manager.retry(
+            client.add_role_to_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=role
+        )
+        return
+
+    def remove_role(self, client, resource):
+        self.manager.retry(
+            client.remove_role_from_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=resource['Roles'][0]['RoleName']
+        )
+        return
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        role = self.data.get('role', '')
+        for r in resources:
+            if not role:
+                if len(r['Roles']) == 0:
+                    continue
+                else:
+                    self.remove_role(client, r)
+            else:
+                if len(r['Roles']) == 0:
+                    self.add_role(client, r, role)
+                elif role == r['Roles'][0]['RoleName']:
+                    continue
+                else:
+                    self.remove_role(client, r)
+                    self.add_role(client, r, role)
 
 
 ###################

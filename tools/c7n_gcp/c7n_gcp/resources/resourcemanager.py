@@ -163,9 +163,6 @@ class ProjectComputeMetaFilter(ValueFilter):
     permissions = ('compute.projects.get',)
     schema = type_schema('compute-meta', rinherit=ValueFilter.schema)
 
-    def __init__(self, data, manager=None):
-        super().__init__(data, manager)
-
     def __call__(self, resource):
         if self.key in resource:
             return resource[self.key]
