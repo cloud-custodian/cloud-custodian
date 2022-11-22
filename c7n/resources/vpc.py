@@ -950,15 +950,11 @@ class UsedSecurityGroup(SGUsage):
             return 'hsmv2'
         if description.startswith('AWS Lambda VPC ENI'):
             return 'lambda'
-        if description.startswith('Interface for NAT Gateway'):
-            return 'nat'
         if (description == 'RDSNetworkInterface' or
                 description.startswith('Network interface for DBProxy')):
             return 'rds'
         if description == 'RedshiftNetworkInterface':
             return 'redshift'
-        if description.startswith('Network Interface for Transit Gateway Attachment'):
-            return 'tgw'
         if description.startswith('VPC Endpoint Interface'):
             return 'vpce'
         return 'unknown'
