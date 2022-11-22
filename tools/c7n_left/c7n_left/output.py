@@ -92,16 +92,12 @@ class RichCli(Output):
         self.started = time.time()
 
     def on_execution_ended(self):
+        message = "[green]Success[green]"
+        if self.matches:
+            message = "[red]%d Failures[/red]" % len(self.matches)
         self.console.print(
             "Evaluation complete %0.2f seconds -> %s"
-            % (
-                time.time() - self.started,
-                (
-                    not self.matches
-                    and "[green]Success[green]"
-                    or "[red]%d Failures[/red]" % len(self.matches)
-                ),
-            )
+            % (time.time() - self.started, message)
         )
 
     def on_results(self, results):

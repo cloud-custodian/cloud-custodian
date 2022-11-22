@@ -37,13 +37,14 @@ class CollectionRunner:
         self.options = options
         self.reporter = reporter
 
-    def run(self):
+    def run(self) -> bool:
+        # return value is used to signal process exit code.
         event = self.get_event()
         provider = self.get_provider()
 
         if not provider.match_dir(self.options.source_dir):
             log.warning("no %s source files found" % provider.type)
-            return 1
+            return True
 
         graph = provider.parse(self.options.source_dir)
 
