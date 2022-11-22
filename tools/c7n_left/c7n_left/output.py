@@ -67,7 +67,7 @@ class Output:
         self.ctx = ctx
         self.config = config
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         pass
 
     def on_execution_ended(self):
@@ -83,19 +83,27 @@ class RichCli(Output):
         super().__init__(ctx, config)
         self.console = Console(file=config.output_file)
         self.started = None
+        self.matches = 0
 
-    def on_execution_started(self, policies):
-        self.console.print("Running %d policies" % (len(policies),))
+    def on_execution_started(self, policies, graph):
+        self.console.print(
+            "Running %d policies on %d resources" % (len(policies), len(graph))
+        )
         self.started = time.time()
 
     def on_execution_ended(self):
+        message = "[green]Success[green]"
+        if self.matches:
+            message = "[red]%d Failures[/red]" % len(self.matches)
         self.console.print(
-            "Execution complete %0.2f seconds" % (time.time() - self.started)
+            "Evaluation complete %0.2f seconds -> %s"
+            % (time.time() - self.started, message)
         )
 
     def on_results(self, results):
         for r in results:
             self.console.print(RichResult(r))
+        self.matches += len(results)
 
 
 class RichResult:
@@ -108,6 +116,8 @@ class RichResult:
 
         yield f"[bold]{policy.name}[/bold] - {policy.resource_type}"
         yield "  [red]Failed[/red]"
+        if policy.data.get("description"):
+            yield f"  [red]Reason: {policy.data['description']}[/red]"
         yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
 
         lines = resource.get_source_lines()
@@ -120,12 +130,26 @@ class RichResult:
         yield ""
 
 
-@report_outputs.register("github")
-class Github(Output):
+class MultiOutput:
+    def __init__(self, outputs):
+        self.outputs = outputs
+
+    def on_execution_started(self, policies, graph):
+        for o in self.outputs:
+            o.on_execution_started(policies, graph)
+
+    def on_execution_ended(self):
+        for o in self.outputs:
+            o.on_execution_ended()
+
+    def on_results(self, results):
+        for o in self.outputs:
+            o.on_results(results)
+
+
+class GithubFormat(Output):
 
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
-
-    "::error file={name},line={line},endLine={endLine},title={title}::{message}"
 
     def on_results(self, results):
         for r in results:
@@ -137,9 +161,17 @@ class Github(Output):
         md = PolicyMetadata(result.policy)
         filename = resource.src_dir / resource.filename
         title = md.title
-        message = md.description or ""
+        message = md.description or md.title
 
-        return f"::error file={filename} line={resource.line_start} lineEnd={resource.line_end} title={title}::{message}"  # noqa
+        return f"::error file={filename},line={resource.line_start},lineEnd={resource.line_end},title={title}::{message}"  # noqa
+
+
+@report_outputs.register("github")
+class GithubOutput(MultiOutput):
+    "For github action execution we want both line annotation and cli outputs"
+
+    def __init__(self, ctx, config):
+        super().__init__([GithubFormat(ctx, config), RichCli(ctx, config)])
 
 
 class JSONEncoder(json.JSONEncoder):

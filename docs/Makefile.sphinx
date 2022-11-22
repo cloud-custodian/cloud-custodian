@@ -94,6 +94,9 @@ html:
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
+	mkdir -p $(SRCDIR)/tencentcloud/resources
+	cp -p tools/c7n_tencentcloud/readme.md $(SRCDIR)/tencentcloud/gettingstarted.md
+	c7n-sphinxext --provider tencentcloud --output-dir $(SRCDIR)/tencentcloud/resources --group-by=resource_type.service
 
 	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 

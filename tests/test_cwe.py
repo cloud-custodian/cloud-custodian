@@ -51,6 +51,48 @@ class CloudWatchEventTest(BaseTest):
                         'Tags')}
         self.assertEqual(tags, {'App': 'Custodian'})
 
+    def test_event_rule_enable(self):
+        factory = self.replay_flight_data('test_cwe_enable_rule')
+        client = factory().client('events')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'enabled': True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'ENABLED')
+
+    def test_event_rule_disable(self):
+        factory = self.replay_flight_data('test_cwe_disable_rule')
+        client = factory().client('events')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'enabled': False
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'DISABLED')
+
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")
         client = session_factory().client("events")
