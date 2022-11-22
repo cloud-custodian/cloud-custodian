@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "pk",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "cc-testing-table",
+            "KeySchema": [
+                {
+                    "AttributeName": "pk",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "UPDATING",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 11,
+                "day": 22,
+                "hour": 14,
+                "minute": 45,
+                "second": 26,
+                "microsecond": 730000
+            },
+            "ProvisionedThroughput": {
+                "LastDecreaseDateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 22,
+                    "hour": 14,
+                    "minute": 58,
+                    "second": 33,
+                    "microsecond": 905000
+                },
+                "NumberOfDecreasesToday": 2,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/cc-testing-table",
+            "TableId": "5fbade66-71e0-482c-8883-6d8b923e20de",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -155,6 +156,48 @@ class TableContinuousBackupAction(BaseAction):
                     PointInTimeRecoverySpecification={
                         'PointInTimeRecoveryEnabled': self.data.get('state', True)
                     })
+            except client.exceptions.TableNotFoundException:
+                continue
+
+
+@Table.action_registry.register('update')
+class UpdateTable(BaseAction):
+    """Modifies the provisioned throughput settings, global secondary indexes,
+    or DynamoDB Streams settings for a given table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-change-billing-mode
+                resource: aws.dynamodb-table
+                actions:
+                  - type: update
+                    BillingMode: PAY_PER_REQUEST
+
+    """
+    valid_status = ('ACTIVE',)
+    schema = type_schema(
+        'update',
+        BillingMode={'enum': ['PROVISIONED', 'PAY_PER_REQUEST']},
+        ProvisionedThroughput={'type': 'object',
+            'properties': {
+                'ReadCapacityUnits': {'type': 'integer'},
+                'WriteCapacityUnits': {'type': 'integer'}}})
+    permissions = ('dynamodb:UpdateTable',)
+
+    def process(self, resources):
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
+        if not len(resources):
+            return
+        params = copy.deepcopy(self.data)
+        params.pop("type")
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                client.update_table(TableName=r['TableName'], **params)
             except client.exceptions.TableNotFoundException:
                 continue
 
