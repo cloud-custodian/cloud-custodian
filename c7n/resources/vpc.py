@@ -894,24 +894,89 @@ class UsedSecurityGroup(SGUsage):
                     op: intersect
                     value:
                       - nat_gateway
+
+            policies:
+              - name: security-groups-used-by-alb
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceResourceTypes
+                    op: intersect
+                    value:
+                      - elb-app
     """
     schema = type_schema('used')
 
     instance_owner_id_key = 'c7n:InstanceOwnerIds'
     interface_type_key = 'c7n:InterfaceTypes'
+    interface_resource_type_key = 'c7n:InterfaceResourceTypes'
+
+    def _set_resource_type(self, nic):
+        description = nic.get('Description')
+        instance_id = nic['Attachment'].get('InstanceId')
+        # EC2
+        if instance_id:
+            return 'ec2'
+        # ELB/ELBv2
+        if description.startswith('ELB app/'):
+            return 'elb-app'
+        if description.startswith('ELB gwy/'):
+            return 'elb-gwy'
+        if description.startswith('ELB'):
+            return 'elb'
+        # Other Resources
+        if description == 'ENI managed by APIGateway':
+            return 'apigw'
+        if description.startswith('AWS CodeStar Connections'):
+            return 'codestar'
+        if description.startswith('DAX'):
+            return 'dax'
+        if description.startswith('AWS created network interface for directory'):
+            return 'dir'
+        if description == 'DMSNetworkInterface':
+            return 'dms'
+        if description.startswith('arn:aws:ecs:'):
+            return 'ecs'
+        if description.startswith('EFS mount target for'):
+            return 'fsmt'
+        if description.startswith('ElastiCache'):
+            return 'elasticache'
+        if description.startswith('AWS ElasticMapReduce'):
+            return 'emr'
+        if description.startswith('CloudHSM Managed Interface'):
+            return 'hsm'
+        if description.startswith('CloudHsm ENI'):
+            return 'hsmv2'
+        if description.startswith('AWS Lambda VPC ENI'):
+            return 'lambda'
+        if description.startswith('Interface for NAT Gateway'):
+            return 'nat'
+        if description == 'RDSNetworkInterface' or description.startswith('Network interface for DBProxy'):
+            return 'rds'
+        if description == 'RedshiftNetworkInterface':
+            return 'redshift'
+        if description.startswith('Network Interface for Transit Gateway Attachment'):
+            return 'tgw'
+        if description.startswith('VPC Endpoint Interface'):
+            return 'vpce'
+        return 'unknown'
 
     def _get_eni_attributes(self):
         enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
                 instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                interface_resource_type = self._set_resource_type(nic)
             else:
                 instance_owner_id = ''
+                interface_resource_type = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
                 enis.append({'GroupId': g['GroupId'],
                              'InstanceOwnerId': instance_owner_id,
-                             'InterfaceType': interface_type})
+                             'InterfaceType': interface_type,
+                             'InterfaceResourceType': interface_resource_type})
         return enis
 
     def process(self, resources, event=None):
@@ -924,12 +989,15 @@ class UsedSecurityGroup(SGUsage):
         for r in resources:
             owner_ids = set()
             interface_types = set()
+            interface_resource_types = set()
             for eni in enis:
                 if r['GroupId'] == eni['GroupId']:
                     owner_ids.add(eni['InstanceOwnerId'])
                     interface_types.add(eni['InterfaceType'])
-            r[self.instance_owner_id_key] = list(owner_ids)
-            r[self.interface_type_key] = list(interface_types)
+                    interface_resource_types.add(eni['InterfaceResourceType'])
+            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
+            r[self.interface_type_key] = list(filter(None, interface_types))
+            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
         return [r for r in resources if r['GroupId'] not in unused]
 
 
