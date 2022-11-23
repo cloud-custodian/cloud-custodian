@@ -734,7 +734,7 @@ class TableConsecutiveBackups(Filter):
                         backup_dates.add(backup['CreationDate'].strftime('%Y-%m-%d-%H'))
                     else:
                         backup_dates.add(backup['CreationDate'].strftime('%Y-%m-%d'))
-            print(expected_dates, backup_dates)
+
             if expected_dates.issubset(backup_dates):
                 results.append(r)
         return results
