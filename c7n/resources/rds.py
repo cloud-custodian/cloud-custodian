@@ -2000,6 +2000,7 @@ class DbOptionGroups(ValueFilter):
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
+    policy_annotation = 'c7n:MatchedDBOptionGroups'
 
     def handle_optiongroup_cache(self, client, paginator, option_groups):
         pgcache = {}
@@ -2039,6 +2040,8 @@ class DbOptionGroups(ValueFilter):
             for pg in resource['OptionGroupMemberships']:
                 pg_values = optioncache[pg['OptionGroupName']]
                 if self.match(pg_values):
+                    resource.setdefault(self.policy_annotation, []).append({
+                        self.data.get('key'): self.data.get('value')})
                     results.append(resource)
                     break
 
