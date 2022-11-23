@@ -17,7 +17,7 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -912,61 +912,12 @@ class UsedSecurityGroup(SGUsage):
     interface_type_key = 'c7n:InterfaceTypes'
     interface_resource_type_key = 'c7n:InterfaceResourceTypes'
 
-    def _set_resource_type(self, nic):
-        description = nic.get('Description')
-        instance_id = nic['Attachment'].get('InstanceId')
-        # EC2
-        if instance_id:
-            rtype = 'ec2'
-        # ELB/ELBv2
-        elif description.startswith('ELB app/'):
-            rtype = 'elb-app'
-        elif description.startswith('ELB gwy/'):
-            rtype = 'elb-gwy'
-        elif description.startswith('ELB'):
-            rtype = 'elb'
-        # Other Resources
-        elif description == 'ENI managed by APIGateway':
-            rtype = 'apigw'
-        elif description.startswith('AWS CodeStar Connections'):
-            rtype = 'codestar'
-        elif description.startswith('DAX'):
-            rtype = 'dax'
-        elif description.startswith('AWS created network interface for directory'):
-            rtype = 'dir'
-        elif description == 'DMSNetworkInterface':
-            rtype = 'dms'
-        elif description.startswith('arn:aws:ecs:'):
-            rtype = 'ecs'
-        elif description.startswith('EFS mount target for'):
-            rtype = 'fsmt'
-        elif description.startswith('ElastiCache'):
-            rtype = 'elasticache'
-        elif description.startswith('AWS ElasticMapReduce'):
-            rtype = 'emr'
-        elif description.startswith('CloudHSM Managed Interface'):
-            rtype = 'hsm'
-        elif description.startswith('CloudHsm ENI'):
-            rtype = 'hsmv2'
-        elif description.startswith('AWS Lambda VPC ENI'):
-            rtype = 'lambda'
-        elif (description == 'RDSNetworkInterface' or
-                description.startswith('Network interface for DBProxy')):
-            rtype = 'rds'
-        elif description == 'RedshiftNetworkInterface':
-            rtype = 'redshift'
-        elif description.startswith('VPC Endpoint Interface'):
-            rtype = 'vpce'
-        else:
-            rtype = 'unknown'
-        return rtype
-
     def _get_eni_attributes(self):
         enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
                 instance_owner_id = nic['Attachment']['InstanceOwnerId']
-                interface_resource_type = self._set_resource_type(nic)
+                interface_resource_type = get_eni_resource_type(nic)
             else:
                 instance_owner_id = ''
                 interface_resource_type = ''
