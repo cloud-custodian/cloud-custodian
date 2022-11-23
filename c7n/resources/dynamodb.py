@@ -190,7 +190,7 @@ class UpdateTable(BaseAction):
     def process(self, resources):
         resources = self.filter_resources(
             resources, 'TableStatus', self.valid_status)
-        if not len(resources):
+        if not resources:
             return
         params = copy.deepcopy(self.data)
         params.pop("type")
