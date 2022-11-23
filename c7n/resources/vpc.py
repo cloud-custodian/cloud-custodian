@@ -917,47 +917,49 @@ class UsedSecurityGroup(SGUsage):
         instance_id = nic['Attachment'].get('InstanceId')
         # EC2
         if instance_id:
-            return 'ec2'
+            rtype = 'ec2'
         # ELB/ELBv2
-        if description.startswith('ELB app/'):
-            return 'elb-app'
-        if description.startswith('ELB gwy/'):
-            return 'elb-gwy'
-        if description.startswith('ELB'):
-            return 'elb'
+        elif description.startswith('ELB app/'):
+            rtype = 'elb-app'
+        elif description.startswith('ELB gwy/'):
+            rtype = 'elb-gwy'
+        elif description.startswith('ELB'):
+            rtype = 'elb'
         # Other Resources
-        if description == 'ENI managed by APIGateway':
-            return 'apigw'
-        if description.startswith('AWS CodeStar Connections'):
-            return 'codestar'
-        if description.startswith('DAX'):
-            return 'dax'
-        if description.startswith('AWS created network interface for directory'):
-            return 'dir'
-        if description == 'DMSNetworkInterface':
-            return 'dms'
-        if description.startswith('arn:aws:ecs:'):
-            return 'ecs'
-        if description.startswith('EFS mount target for'):
-            return 'fsmt'
-        if description.startswith('ElastiCache'):
-            return 'elasticache'
-        if description.startswith('AWS ElasticMapReduce'):
-            return 'emr'
-        if description.startswith('CloudHSM Managed Interface'):
-            return 'hsm'
-        if description.startswith('CloudHsm ENI'):
-            return 'hsmv2'
-        if description.startswith('AWS Lambda VPC ENI'):
-            return 'lambda'
-        if (description == 'RDSNetworkInterface' or
+        elif description == 'ENI managed by APIGateway':
+            rtype = 'apigw'
+        elif description.startswith('AWS CodeStar Connections'):
+            rtype = 'codestar'
+        elif description.startswith('DAX'):
+            rtype = 'dax'
+        elif description.startswith('AWS created network interface for directory'):
+            rtype = 'dir'
+        elif description == 'DMSNetworkInterface':
+            rtype = 'dms'
+        elif description.startswith('arn:aws:ecs:'):
+            rtype = 'ecs'
+        elif description.startswith('EFS mount target for'):
+            rtype = 'fsmt'
+        elif description.startswith('ElastiCache'):
+            rtype = 'elasticache'
+        elif description.startswith('AWS ElasticMapReduce'):
+            rtype = 'emr'
+        elif description.startswith('CloudHSM Managed Interface'):
+            rtype = 'hsm'
+        elif description.startswith('CloudHsm ENI'):
+            rtype = 'hsmv2'
+        elif description.startswith('AWS Lambda VPC ENI'):
+            rtype = 'lambda'
+        elif (description == 'RDSNetworkInterface' or
                 description.startswith('Network interface for DBProxy')):
-            return 'rds'
-        if description == 'RedshiftNetworkInterface':
-            return 'redshift'
-        if description.startswith('VPC Endpoint Interface'):
-            return 'vpce'
-        return 'unknown'
+            rtype = 'rds'
+        elif description == 'RedshiftNetworkInterface':
+            rtype = 'redshift'
+        elif description.startswith('VPC Endpoint Interface'):
+            rtype = 'vpce'
+        else:
+            rtype = 'unknown'
+        return rtype
 
     def _get_eni_attributes(self):
         enis = []
