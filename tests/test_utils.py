@@ -602,7 +602,7 @@ class UtilTest(BaseTest):
             'dir')
         self.assertEqual(
             utils.get_eni_resource_type(
-                {"Description":"DMSNetworkInterface"}),
+                {"Description": "DMSNetworkInterface"}),
             'dms')
         self.assertEqual(
             utils.get_eni_resource_type(
