@@ -20,7 +20,7 @@ log = logging.getLogger("c7n.iac")
 @click.group()
 def cli():
     """Shift Left Policy"""
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     initialize_iac()
 
 
