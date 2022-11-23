@@ -876,6 +876,8 @@ def get_eni_resource_type(eni):
         rtype = 'rds'
     elif description == 'RedshiftNetworkInterface':
         rtype = 'redshift'
+    elif description == 'Network Interface for Transit Gateway Attachment':
+        rtype = 'tgw'
     elif description.startswith('VPC Endpoint Interface'):
         rtype = 'vpce'
     else:

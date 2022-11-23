@@ -566,7 +566,7 @@ class UtilTest(BaseTest):
     def test_get_eni_resource_type(self):
         self.assertEqual(
             utils.get_eni_resource_type(
-                {"Attachment": {"InstanceId": "i-0e040de7dfabbcc8c"},"Description": ""}),
+                {"Attachment": {"InstanceId": "i-0e040de7dfabbcc8c"}, "Description": ""}),
             'ec2')
         self.assertEqual(
             utils.get_eni_resource_type(
@@ -610,7 +610,7 @@ class UtilTest(BaseTest):
             'ecs')
         self.assertEqual(
             utils.get_eni_resource_type(
-                {"Description": "EFS mount target for"}),
+                {"Description": "EFS mount target for fs-f9b8d350 (fsmt-b716661e)"}),
             'fsmt')
         self.assertEqual(
             utils.get_eni_resource_type(
@@ -650,12 +650,17 @@ class UtilTest(BaseTest):
             'redshift')
         self.assertEqual(
             utils.get_eni_resource_type(
+                {"Description": "Network Interface for Transit Gateway Attachment tgw-attach-XXX"}),
+            'tgw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
                 {"Description": "VPC Endpoint Interface vpce-0472c5d3fc4ce1de4"}),
             'vpce')
         self.assertEqual(
             utils.get_eni_resource_type(
                 {"Description": ""}),
             'unknown')
+
 
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters
