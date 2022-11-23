@@ -827,8 +827,11 @@ def get_support_region(manager):
 
 
 def get_eni_resource_type(eni):
+    if eni.get('Attachment'):
+        instance_id = eni['Attachment'].get('InstanceId')
+    else:
+        instance_id = None
     description = eni.get('Description')
-    instance_id = eni['Attachment'].get('InstanceId')
     # EC2
     if instance_id:
         rtype = 'ec2'

@@ -564,9 +564,106 @@ class UtilTest(BaseTest):
         self.assertEqual("cn-north-1", res)
 
 
+    def test_get_eni_resource_type(self):
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Attachment":{"InstanceId":"i-0e040de7dfabbcc8c"},"Description":""}),
+            'ec2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ELB app/"}),
+            'elb-app')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ELB net/"}),
+            'elb-net')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ELB gwy/"}),
+            'elb-gwy')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ELB"}),
+            'elb')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ENI managed by APIGateway"}),
+            'apigw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"AWS CodeStar Connections"}),
+            'codestar')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"DAX"}),
+            'dax')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"AWS created network interface for directory"}),
+            'dir')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"DMSNetworkInterface"}),
+            'dms')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"arn:aws:ecs:"}),
+            'ecs')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"EFS mount target for"}),
+            'fsmt')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"ElastiCache"}),
+            'elasticache')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"AWS ElasticMapReduce"}),
+            'emr')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"CloudHSM Managed Interface"}),
+            'hsm')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"CloudHsm ENI"}),
+            'hsmv2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"AWS Lambda VPC ENI"}),
+            'lambda')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"Interface for NAT Gateway"}),
+            'nat')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"RDSNetworkInterface"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"Network interface for DBProxy"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"RedshiftNetworkInterface"}),
+            'redshift')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":"VPC Endpoint Interface"}),
+            'vpce')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description":""}),
+            'unknown')
+
+
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters
     assert utils.parse_date(30) is None
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
