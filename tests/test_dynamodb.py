@@ -555,8 +555,7 @@ class DynamoDbAccelerator(BaseTest):
                         "type": "consecutive-backups",
                         "count": 2,
                         "period": "days",
-                        "backuptype": "ALL",
-                        "status": "AVAILABLE"
+                        "status": "COMPLETED"
                     }
                 ]
             },
@@ -565,9 +564,8 @@ class DynamoDbAccelerator(BaseTest):
         with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.resources.dynamodb):
             resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupStatus'], "AVAILABLE")
-        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupType'], "USER")
-        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupCreationDateTime'],
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['Status'], "COMPLETED")
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['CreationDate'],
             datetime.datetime(2022, 8, 31, 19, 4, 52, 776000, tzinfo=datetime.timezone.utc))
 
     def test_dynamodb_consecutive_backup_hourly_count_filter(self):
@@ -582,8 +580,7 @@ class DynamoDbAccelerator(BaseTest):
                         "type": "consecutive-backups",
                         "count": 2,
                         "period": "hours",
-                        "backuptype": "ALL",
-                        "status": "AVAILABLE"
+                        "status": "COMPLETED"
                     }
                 ]
             },
@@ -605,8 +602,7 @@ class DynamoDbAccelerator(BaseTest):
                         "type": "consecutive-backups",
                         "count": 1,
                         "period": "weeks",
-                        "backuptype": "ALL",
-                        "status": "AVAILABLE"
+                        "status": "COMPLETED"
                     }
                 ]
             },
