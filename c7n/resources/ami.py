@@ -207,7 +207,10 @@ class SetDeprecation(BaseAction):
                 # Hack because AWS won't let you set a deprecation time in the
                 # past - set to now + 1 minute if the time is in the past
                 if date < datetime.datetime.now(tz=tzutc()):
+                    odate = str(date)
                     date = datetime.datetime.now(tz=tzutc()) + timedelta(minutes=1)
+                    log.warning("Deprecation time %s is in the past for Image %s.  Setting to %s.",
+                        odate, i['ImageId'], date)
                 self.manager.retry(client.enable_image_deprecation,
                     ImageId=i['ImageId'], DeprecateAt=date)
 
@@ -378,8 +381,8 @@ class SetPermissions(BaseAction):
         remove = []
         add = []
         account_regex = re.compile('\\d{12}')
-        org_regex = re.compile('arn:[a-zA-Z]+:organizations::\\d{12}:organization/o-.*')
-        ou_regex = re.compile('arn:[a-zA-Z]+:organizations::\\d{12}:ou/o-.*/ou-.*')
+        org_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:organization/o-.*')
+        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:ou/o-.*/ou-.*')
         if to_remove:
             if 'all' in to_remove:
                 remove.append({'Group': 'all'})
