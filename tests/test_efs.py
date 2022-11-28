@@ -236,3 +236,49 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+
+    def test_efs_has_statement(self):
+        factory = self.replay_flight_data("test_efs_has_statement")
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Condition":
+                                    {"Bool": {"elasticfilesystem:AccessedViaMountTarget": "true"}},
+                                "Resource": "{fs_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement")
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

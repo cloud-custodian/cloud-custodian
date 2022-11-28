@@ -37,7 +37,7 @@ class ResultsReporter:
     def __init__(self):
         self.results = []
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         pass
 
     def on_execution_ended(self):
@@ -327,10 +327,11 @@ def test_cli_output_github(tmp_path):
         ],
     )
     assert result.exit_code == 1
-    assert result.output == (
-        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf line=25 lineEnd=28"
-        " title=terraform.aws_s3_bucket - policy:check-bucket::a description\n"
+    expected = (
+        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
+        "title=terraform.aws_s3_bucket - policy:check-bucket::a description"
     )
+    assert expected in result.output
 
 
 def test_cli_output_json_query(tmp_path):

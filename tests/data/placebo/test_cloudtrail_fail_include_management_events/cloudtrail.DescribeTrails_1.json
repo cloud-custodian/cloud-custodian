@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                "S3BucketName": "trail-test-bucket-3bf19dec-127e-11ed-861d-0242ac12000",
+                "S3KeyPrefix": "prefix",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
