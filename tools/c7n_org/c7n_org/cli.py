@@ -566,11 +566,10 @@ def accounts_iterator(config):
         yield d
 
 
-def _update(origin, new):
+def _update(old, new):
     for k in new:
-        if k not in origin:
-            origin[k] = new[k]
-    return origin
+        old.setdefault(k, new[k])
+    return old
 
 
 def run_account(account, region, policies_config, output_path,
