@@ -540,11 +540,13 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 
 def accounts_iterator(config):
+    org_vars = config.get("vars", {})
     for a in config.get('accounts', ()):
         if 'role' in a:
             if isinstance(a['role'], str) and not a['role'].startswith('arn'):
                 a['role'] = "arn:aws:iam::{}:role/{}".format(
                     a['account_id'], a['role'])
+        a['vars'] = _update(a.get('vars', {}), org_vars)
         yield {**a, **{'provider': 'aws'}}
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
@@ -552,7 +554,7 @@ def accounts_iterator(config):
              'regions': [a.get('region', 'global')],
              'provider': 'azure',
              'tags': a.get('tags', ()),
-             'vars': a.get('vars', {})}
+             'vars': _update(a.get('vars', {}), org_vars)}
         yield d
     for a in config.get('projects', ()):
         d = {'account_id': a['project_id'],
@@ -560,8 +562,15 @@ def accounts_iterator(config):
              'regions': ['global'],
              'provider': 'gcp',
              'tags': a.get('tags', ()),
-             'vars': a.get('vars', {})}
+             'vars': _update(a.get('vars', {}), org_vars)}
         yield d
+
+
+def _update(origin, new):
+    for k in new:
+        if k not in origin:
+            origin[k] = new[k]
+    return origin
 
 
 def run_account(account, region, policies_config, output_path,
