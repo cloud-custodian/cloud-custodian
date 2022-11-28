@@ -1320,6 +1320,9 @@ class SecurityGroupTest(BaseTest):
             {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
+        self.assertIn("amazon-aws", resources[2]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[2]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[2]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
