@@ -153,7 +153,8 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=(), not_accounts=None):
+def init(config, use, debug, verbose, accounts, tags, policies,
+        resource=None, policy_tags=(), not_accounts=None):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
