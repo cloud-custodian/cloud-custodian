@@ -153,7 +153,7 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
+def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=(), not_accounts=None):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -188,7 +188,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-    filter_accounts(accounts_config, tags, accounts)
+    filter_accounts(accounts_config, tags, accounts, not_accounts)
 
     load_available()
     MainThreadExecutor.c7n_async = False
@@ -261,9 +261,9 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     accounts = comma_expand(accounts)
     not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
-        if not_accounts and a['name'] in not_accounts:
-            continue
         account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        if not_accounts and (a['name'] in not_accounts or account_id in not_accounts):
+            continue
         if accounts and a['name'] not in accounts and account_id not in accounts:
             continue
         if tags:
@@ -656,6 +656,7 @@ def run_account(account, region, policies_config, output_path,
 @click.option("-u", "--use", required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
+@click.option('--not-accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
@@ -673,12 +674,13 @@ def run_account(account, region, policies_config, output_path,
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region,
+def run(config, use, output_dir, accounts, not_accounts, tags, region,
         policy, policy_tags, cache_period, cache_path, metrics,
         dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
+        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
+        not_accounts=not_accounts)
     policy_counts = Counter()
     success = True
 
