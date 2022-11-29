@@ -39,6 +39,7 @@ ResourceMap = {
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
+    "azure.mysql-flexibleservers": "c7n_azure.resources.mysql_flexibleservers.MySQLFlexibleServers",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
     "azure.networksecuritygroup": "c7n_azure.resources.network_security_group.NetworkSecurityGroup",
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
