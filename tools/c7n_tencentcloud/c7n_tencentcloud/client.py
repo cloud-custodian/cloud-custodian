@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import jmespath
 import socket
 from retrying import retry
@@ -8,6 +10,7 @@ from .utils import PageMethod
 from c7n.exceptions import PolicyExecutionError
 from requests.exceptions import ConnectionError
 from tencentcloud.common import credential
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.common_client import CommonClient
@@ -124,7 +127,28 @@ class Session:
         # just using default get_credentials() method
         # steps: Environment Variable -> profile file -> CVM role
         # for reference: https://github.com/TencentCloud/tencentcloud-sdk-python
-        self._cred = credential.DefaultCredentialProvider().get_credentials()
+
+        cred_provider = credential.DefaultCredentialProvider()
+
+        # the DefaultCredentialProvider does not handle sts assumed role sessions
+        # so we need to check for the token first
+        if 'TENCENTCLOUD_TOKEN' in os.environ:
+            if (
+                'TENCENTCLOUD_SECRET_ID' not in os.environ or
+                'TENCENTCLOUD_SECRET_KEY' not in os.environ
+            ):
+                raise TencentCloudSDKException(
+                    'TENCENTCLOUD_TOKEN provided, but one of TENCENTCLOUD_SECRET_ID'
+                    'or TENCENTCLOUD_SECRET_KEY missing'
+                )
+            cred = credential.Credential(
+                secret_id=os.environ['TENCENTCLOUD_SECRET_ID'],
+                secret_key=os.environ['TENCENTCLOUD_SECRET_KEY'],
+                token=os.environ['TENCENTCLOUD_TOKEN']
+            )
+            cred_provider.cred = cred
+
+        self._cred = cred_provider.get_credentials()
 
     def client(self,
                endpoint: str,
