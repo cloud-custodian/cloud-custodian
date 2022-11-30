@@ -56,6 +56,7 @@ class Table(query.QueryResourceManager):
         dimension = 'TableName'
         cfn_type = config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
+        arn = 'TableArn'
 
     source_mapping = {
         'describe': DescribeTable,
