@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from c7n.filters import Filter
 from c7n.filters import ValueFilter
 from c7n.query import RetryPageIterator
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class ConfigTable(query.ConfigSource):
@@ -687,23 +688,28 @@ class TableConsecutiveBackups(Filter):
                   - type: consecutive-backups
                     count: 7
                     period: days
-                    status: 'COMPLETED'
+                    backuptype: SYSTEM
+                    status: AVAILABLE
     """
     schema = type_schema('consecutive-backups', count={'type': 'number', 'minimum': 1},
         period={'enum': ['hours', 'days', 'weeks']},
-        status={'enum': ['COMPLETED', 'PARTIAL', 'DELETING', 'EXPIRED']},
-        required=['count', 'period', 'status'])
+        backuptype={'enum': ['SYSTEM', 'USER', 'AWS_BACKUP', 'ALL']},
+        status={'enum': ['AVAILABLE', 'CREATING', 'DELETED']},
+        required=['count', 'period', 'status', 'backuptype'])
     permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable', )
     annotation = 'c7n:DynamodbBackups'
 
-    def process_resource_set(self, resources):
-        client = local_session(self.manager.session_factory).client('backup')
-        paginator = client.get_paginator('list_recovery_points_by_resource')
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('list_backups')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ddb_backups = paginator.paginate(BackupType=self.data.get('backuptype'),
+            TimeRangeLowerBound=lbdate).build_full_result().get('BackupSummaries', [])
+
+        table_map = {}
+        for backup in ddb_backups:
+            table_map.setdefault(backup['TableName'], []).append(backup)
         for r in resources:
-            r[self.annotation] = paginator.paginate(
-                ResourceArn=r['TableArn']).build_full_result().get('RecoveryPoints', [])
-            print(r)
+            r[self.annotation] = table_map.get(r['TableName'], [])
 
     def get_date(self, time):
         period = self.data.get('period')
@@ -716,25 +722,29 @@ class TableConsecutiveBackups(Filter):
         return date
 
     def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
         results = []
         retention = self.data.get('count')
+        lbdate = self.get_date(retention)
         expected_dates = set()
         for time in range(1, retention + 1):
             expected_dates.add(self.get_date(time))
 
         for resource_set in chunks(
                 [r for r in resources if self.annotation not in r], 50):
-            self.process_resource_set(resource_set)
+            self.process_resource_set(client, resource_set, lbdate)
 
         for r in resources:
             backup_dates = set()
             for backup in r[self.annotation]:
-                if backup['Status'] == self.data.get('status'):
+                if backup['BackupStatus'] == self.data.get('status'):
                     if self.data.get('period') == 'hours':
-                        backup_dates.add(backup['CreationDate'].strftime('%Y-%m-%d-%H'))
+                        backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d-%H'))
                     else:
-                        backup_dates.add(backup['CreationDate'].strftime('%Y-%m-%d'))
-
+                        backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(backup_dates):
                 results.append(r)
         return results
+
+
+Table.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
