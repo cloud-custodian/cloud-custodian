@@ -182,9 +182,8 @@ class CloudFrontWaf(BaseTest):
             },
             session_factory=factory,
         )
-        with self.assertRaises(ValueError) as ctx:
-            policy.push(event_data("event-cloud-trail-update-distribution.json"))
-            self.assertTrue('matching to none or multiple webacls' in str(ctx))
+        resources = policy.push(event_data("event-cloud-trail-tag-distribution.json"))
+        self.assertEqual(len(resources), 0)
 
     def test_set_wafv2_active_response_tag_resource(self):
         factory = self.replay_flight_data("test_distribution_wafv2")
