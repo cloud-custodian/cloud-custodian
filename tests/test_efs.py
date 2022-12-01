@@ -240,7 +240,7 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
-        
+
     def test_efs_has_statement(self):
         factory = self.replay_flight_data("test_efs_has_statement")
         p = self.load_policy(
