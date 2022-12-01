@@ -4,10 +4,10 @@
         "ResponseMetadata": {},
         "FileSystems": [
             {
-                "OwnerId": "513921733657", 
+                "OwnerId": "123456789012", 
                 "CreationToken": "console-528254b5-181c-4dd5-965b-776c733573e1", 
                 "FileSystemId": "fs-03594190a64502ffd", 
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-2:513921733657:file-system/fs-03594190a64502ffd", 
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-03594190a64502ffd", 
                 "CreationTime": {
                     "hour": 19,
                     "__class__": "datetime",
@@ -38,7 +38,7 @@
                 }, 
                 "PerformanceMode": "generalPurpose", 
                 "Encrypted": true, 
-                "KmsKeyId": "arn:aws:kms:us-west-2:513921733657:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
                 "ThroughputMode": "bursting", 
                 "Tags": [
                     {
@@ -52,10 +52,10 @@
                 ]
             },
             {
-                "OwnerId": "513921733657", 
+                "OwnerId": "123456789012", 
                 "CreationToken": "console-528254b5-181c-4dd5-965b-776c733573e1", 
                 "FileSystemId": "fs-03594190a64502ffe", 
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-2:513921733657:file-system/fs-03594190a64502ffe", 
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-03594190a64502ffe", 
                 "CreationTime": {
                     "hour": 19,
                     "__class__": "datetime",
@@ -86,7 +86,7 @@
                 }, 
                 "PerformanceMode": "generalPurpose", 
                 "Encrypted": true, 
-                "KmsKeyId": "arn:aws:kms:us-west-2:513921733657:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
                 "ThroughputMode": "bursting", 
                 "Tags": [
                     {

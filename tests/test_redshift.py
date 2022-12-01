@@ -3,6 +3,7 @@
 from .common import BaseTest
 from unittest.mock import MagicMock
 import time
+import datetime
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 import c7n.resources.redshift
@@ -420,7 +421,56 @@ class TestRedshift(BaseTest):
                 "filters": [
                     {
                         "type": "consecutive-snapshots",
-                        "days": 2
+                        "count": 2,
+                        "period": "days",
+                        "status": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.resources.redshift):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:RedshiftSnapshots'][0]['Status'], "available")
+        self.assertEqual(resources[0]['c7n:RedshiftSnapshots'][0]['SnapshotCreateTime'],
+            datetime.datetime(2022, 9, 9, 22, 4, 52, 776000, tzinfo=datetime.timezone.utc))
+
+    def test_redshift_consecutive_snapshot_hourly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_redshift_consecutive_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_snapshot_hourly_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-snapshots",
+                        "count": 2,
+                        "period": "hours",
+                        "status": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-08T21:00:00+00:00"), c7n.resources.redshift):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_redshift_consecutive_snapshot_weekly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_redshift_consecutive_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_snapshot_weekly_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-snapshots",
+                        "count": 1,
+                        "period": "weeks",
+                        "status": "available"
                     }
                 ]
             },

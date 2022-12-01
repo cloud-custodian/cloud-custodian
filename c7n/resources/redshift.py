@@ -995,10 +995,14 @@ class ClusterConsecutiveSnapshots(Filter):
                 resource: redshift
                 filters:
                   - type: consecutive-snapshots
-                    days: 7
+                    count: 7
+                    period: days
+                    status: available
     """
-    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
-        required=['days'])
+    schema = type_schema('consecutive-snapshots', count={'type': 'number', 'minimum': 1},
+        period={'enum': ['hours', 'days', 'weeks']},
+        status={'enum': ['available', 'creating', 'final snapshot', 'failed']},
+        required=['count', 'period', 'status'])
     permissions = ('redshift:DescribeClusterSnapshots', 'redshift:DescribeClusters', )
     annotation = 'c7n:RedshiftSnapshots'
 
@@ -1014,15 +1018,24 @@ class ClusterConsecutiveSnapshots(Filter):
         for r in resources:
             r[self.annotation] = cluster_map.get(r['ClusterIdentifier'], [])
 
+    def get_date(self, time):
+        period = self.data.get('period')
+        if period == 'weeks':
+            date = (datetime.utcnow() - timedelta(weeks=time)).strftime('%Y-%m-%d')
+        elif period == 'hours':
+            date = (datetime.utcnow() - timedelta(hours=time)).strftime('%Y-%m-%d-%H')
+        else:
+            date = (datetime.utcnow() - timedelta(days=time)).strftime('%Y-%m-%d')
+        return date
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('redshift')
         results = []
-        retention = self.data.get('days')
-        utcnow = datetime.utcnow()
-        lbdate = utcnow - timedelta(days=retention)
+        retention = self.data.get('count')
+        lbdate = self.get_date(retention)
         expected_dates = set()
-        for days in range(1, retention + 1):
-            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+        for time in range(1, retention + 1):
+            expected_dates.add(self.get_date(time))
 
         for resource_set in chunks(
                 [r for r in resources if self.annotation not in r], 50):
@@ -1031,8 +1044,11 @@ class ClusterConsecutiveSnapshots(Filter):
         for r in resources:
             snapshot_dates = set()
             for snapshot in r[self.annotation]:
-                if snapshot['Status'] == 'available':
-                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+                if snapshot['Status'] == self.data.get('status'):
+                    if self.data.get('period') == 'hours':
+                        snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d-%H'))
+                    else:
+                        snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
         return results

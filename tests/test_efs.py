@@ -11,6 +11,7 @@ from operator import itemgetter
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 import c7n.resources.efs
+import c7n.filters.backup
 
 
 class ElasticFileSystem(BaseTest):
@@ -240,21 +241,23 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
 
-    def test_efs_consecutive_snapshot_count_filter(self):
-        session_factory = self.replay_flight_data("test_efs_consecutive_snapshot_count_filter")
+    def test_efs_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_efs_consecutive_aws_backups_count_filter")
         p = self.load_policy(
             {
-                "name": "efs_consecutive_snapshot_count_filter",
+                "name": "efs_consecutive_aws_backups_count_filter",
                 "resource": "efs",
                 "filters": [
                     {
-                        "type": "consecutive-snapshots",
-                        "days": 2
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
                     }
                 ]
             },
             session_factory=session_factory,
         )
-        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.resources.efs):
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
         self.assertEqual(len(resources), 1)
