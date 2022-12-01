@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Tags": {
+            "custodian_cleanup": "Resource does not meet policy: notify@2022/10/22"
+        }
+    }
+}

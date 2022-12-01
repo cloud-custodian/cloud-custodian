@@ -474,7 +474,10 @@ class TestSNS(BaseTest):
                 'resource': 'sns',
                 'filters': [
                     {
-                        'TopicArn': 'arn:aws:sns:us-east-1:644160558196:test'
+                        'type': 'value',
+                        'key': 'TopicArn',
+                        'op': 'glob',
+                        'value': '*encrypted*'
                     },
                     {
                         'type': 'kms-key',
@@ -486,7 +489,7 @@ class TestSNS(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsMasterKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 

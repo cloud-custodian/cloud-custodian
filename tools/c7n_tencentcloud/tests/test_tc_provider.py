@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+
 import pytest
 from c7n.config import Config
 from c7n_tencentcloud.client import Session
-from c7n_tencentcloud.provider import TencentCloud, DEFAULT_REGION
+from c7n_tencentcloud.provider import TencentCloud
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 
 
@@ -14,7 +15,8 @@ def tc_provider():
 
 
 def test_get_session_factory(tc_provider):
-    session = tc_provider.get_session_factory(None)
+    session_factory = tc_provider.get_session_factory(None)
+    session = session_factory()
     assert isinstance(session, Session)
 
     endpoint = "cvm.tencentcloudapi.com"
@@ -28,7 +30,8 @@ def test_get_session_factory(tc_provider):
 
 
 test_cases = [
-    ([], DEFAULT_REGION),
+    # Default region matches the TENCENTCLOUD_REGION configured in conftest.py
+    ([], "na-ashburn"),
     (["ap-shanghai"], "ap-shanghai"),
     (["ap-shanghai", "others"], "ap-shanghai")
 ]
@@ -41,6 +44,7 @@ def option_case(request):
 
 def test_provider_initialize(tc_provider, option_case):
     config = Config.empty(**{
+        "account_id": "1122",
         "regions": option_case[0]
     })
     tc_provider.initialize(config)

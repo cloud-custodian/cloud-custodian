@@ -72,7 +72,7 @@ class PolicyChecker:
 
     @property
     def whitelist_conditions(self):
-        return self.checker_config.get('whitelist_conditions', ())
+        return set(v.lower() for v in self.checker_config.get('whitelist_conditions', ()))
 
     @property
     def allowed_vpce(self):

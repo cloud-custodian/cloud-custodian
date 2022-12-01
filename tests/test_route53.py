@@ -318,4 +318,6 @@ class Route53EnableDNSQueryLoggingTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Id'], "/hostedzone/Z20H1474487I0O")
+        self.assertEqual(resources[0]['Id'], "/hostedzone/Z0423603VKO3K9HA5YQD")
+        self.assertEqual(resources[0]['c7n:log-config']['loggroup_subscription'][0]['logGroupName'],
+                         '/aws/route53/custodian.io')

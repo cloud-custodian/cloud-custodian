@@ -30,3 +30,6 @@ results.xml
 pip-selfcheck.json
 .coverage
 *~
+**/tests/
+**/tests_azure/
+tools/c7n_kube/.skaffold
