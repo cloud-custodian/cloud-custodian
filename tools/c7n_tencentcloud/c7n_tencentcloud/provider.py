@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import logging
 from .client import Session
 
@@ -36,9 +37,17 @@ class TencentCloud(Provider):
         # support --region option
         # when set multi regions, only the first one will be used
         if len(options.regions) == 0:
-            options.region = DEFAULT_REGION
+            options.region = os.environ.get("TENCENTCLOUD_REGION", DEFAULT_REGION)
         else:
             options.region = options.regions[0]
+        if not options.account_id:
+            session = self.get_session_factory(options)
+            options.account_id = session().client(
+                endpoint='sts.tencentcloudapi.com',
+                service='sts',
+                version='2018-08-13',
+                region=options.region
+            ).execute_query("GetCallerIdentity", {}).get('AccountId')
         return options
 
     def initialize_policies(self, policy_collection: PolicyCollection, options: dict):
@@ -58,9 +67,9 @@ class TencentCloud(Provider):
         The function returns a session factory
 
         :param options: A dictionary of options that are passed to the session factory
-        :return: A session object.
+        :return: A session factory
         """
-        return Session()
+        return Session
 
 
 resources = TencentCloud.resources

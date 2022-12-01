@@ -61,6 +61,24 @@ class TestEC2Report(BaseTest):
         rows = [self.rows["minimal_custom"]]
         self.assertEqual(formatter.to_csv(recs), rows)
 
+    def test_formatter_jmespath_key(self):
+        # models a k8s resource, or any that has a jmespath expression for
+        # their id and name
+        class FakeResource:
+            class TypeInfo:
+                id = 'metadata.uid'
+                name = 'metadata.name'
+
+        formatter = Formatter(
+            resource_type=FakeResource.TypeInfo
+        )
+        records = [
+            {'metadata': {'uid': 'foo', 'name': 'bar'}},
+            {'metadata': {'uid': 'foo', 'name': 'bar'}}
+        ]
+        result = formatter.uniq_by_id(records=records)
+        self.assertEqual(len(result), 1)
+
 
 class TestASGReport(BaseTest):
 

@@ -8,6 +8,7 @@ import re
 import time
 import uuid
 from collections import OrderedDict
+from unittest import mock
 
 import boto3
 import c7n.resources.rds
@@ -912,7 +913,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "mydbinstance")
 
         self.assertTrue(
@@ -956,7 +957,7 @@ class RDSSnapshotTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "mydbinstance")
 
         self.assertFalse(
@@ -1182,6 +1183,75 @@ class RDSSnapshotTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @mock.patch("c7n.resources.rds.RDSSnapshotDelete.process_snapshot_set")
+    def test_rds_snapshot_trim_skip_automated(self, process_snapshot_set):
+        factory = self.replay_flight_data("test_rds_snapshot_delete_skip_automated",
+            region="us-east-2")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-trim-skip-automated",
+                "resource": "rds-snapshot",
+                "filters": [
+                    {
+                        "DBInstanceIdentifier": "c7n-test"
+                    },
+                    {
+                        "type": "reduce",
+                        "group-by": "SnapshotType",
+                        "sort-by": "SnapshotCreateTime",
+                        "limit": 1
+                    }
+                ],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        assert (
+            'delete implicitly filtered 1 of 2 resources'
+            in log_output.getvalue().strip()
+        )
+        assert process_snapshot_set.call_count == 1
+
+    @mock.patch("c7n.resources.rds.RDSSnapshotDelete.process_snapshot_set")
+    def test_rds_snapshot_trim_skip_automated_noop(self, process_snapshot_set):
+        factory = self.replay_flight_data("test_rds_snapshot_delete_skip_automated",
+            region="us-east-2")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-trim-skip-automated-noop",
+                "resource": "rds-snapshot",
+                "filters": [
+                    {
+                        "DBInstanceIdentifier": "c7n-test"
+                    },
+                    {
+                        "SnapshotType": "automated"
+                    },
+                    {
+                        "type": "reduce",
+                        "sort-by": "SnapshotCreateTime",
+                        "limit": 1
+                    }
+                ],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        assert (
+            'delete implicitly filtered 0 of 1 resources'
+            in log_output.getvalue().strip()
+        )
+        assert process_snapshot_set.call_count == 0
 
     def test_rds_snapshot_tag(self):
         factory = self.replay_flight_data("test_rds_snapshot_mark")
@@ -1633,6 +1703,32 @@ class TestRDSParameterGroupFilter(BaseTest):
                 print(len(f_resources), fdata, assertion)
                 self.fail(err_msg)
 
+    def test_rds_param_value(self):
+        session_factory = self.replay_flight_data("test_rds_param_value")
+        p = self.load_policy(
+            {
+                "name": "rds-param-value",
+                "resource": "aws.rds",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "rds.force_admin_logging_level",
+                        "value": "info",
+                        "value_type": "normalize",
+                        "op": "eq",
+                    },
+                ],
+            },
+            session_factory=session_factory, cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('DBInstanceIdentifier'), 'c7n-test')
+        self.assertEqual(resources[0].get(
+            'c7n:MatchedDBParameter')[0], 'rds.force_admin_logging_level')
+        self.assertIn(('DBParameterGroupName', 'test'), resources[0].get(
+            'DBParameterGroups')[0].items())
+
 
 class Resize(BaseTest):
 
@@ -1816,3 +1912,26 @@ class RDSEventSubscription(BaseTest):
         client = session_factory().client("rds")
         response = client.describe_event_subscriptions()
         self.assertEqual(len(response.get('EventSubscriptionsList')), 0)
+
+
+class RDSProxy(BaseTest):
+    def test_rds_proxy_resource(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-rds-proxy',
+                'resource': 'rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'RequireTLS',
+                        'value': False
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBProxyName'], 'test-us-east-1-db-proxy')
+        self.assertEqual(resources[0]['RequireTLS'], False)

@@ -9,7 +9,7 @@ from collections import defaultdict
 import click
 import os
 import sys
-import toml
+import tomli as toml
 from pathlib import Path
 
 
@@ -93,11 +93,14 @@ setup_kwargs = {{
     ],
     'long_description': {long_description!r},
     'long_description_content_type': 'text/markdown',
-    'author': {author!r},
-    'author_email': {author_email!r},
-    'maintainer': {maintainer!r},
-    'maintainer_email': {maintainer_email!r},
-    'url': {url!r},
+    'author': 'Cloud Custodian Project',
+    'author_email': 'cloud-custodian@googlegroups.com',
+    'project_urls': {{
+       'Homepage': {url!r},
+       'Documentation': 'https://cloudcustodian.io/docs/',
+       'Source': 'https://github.com/cloud-custodian/cloud-custodian',
+       'Issue Tracker': 'https://github.com/cloud-custodian/cloud-custodian/issues',
+    }},
     {extra}
 }}
 {after}
@@ -110,7 +113,8 @@ setup(**setup_kwargs)
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-f', '--version-file', type=click.Path())
 def gen_version_file(package_dir, version_file):
-    data = toml.load(Path(str(package_dir)) / 'pyproject.toml')
+    with open(Path(str(package_dir)) / 'pyproject.toml', 'rb') as f:
+        data = toml.load(f)
     version = data['tool']['poetry']['version']
     with open(version_file, 'w') as fh:
         fh.write('# Generated via tools/dev/poetrypkg.py\n')
@@ -198,15 +202,19 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
 
     from poetry.core.packages.dependency import Dependency
 
-    dep_map = {d['name']: d for d in poetry.locker.lock_data['package']}
+    # normalize deps by lowercasing all the keys
+    dep_map = {d['name'].lower(): d for d in poetry.locker.lock_data['package']}
     seen = set(source_deps)
     seen.add('setuptools')
 
     prefix = '' if frozen else '^'
     while source_deps:
         dep = source_deps.pop()
+        dep = dep.lower()
         if dep not in dep_map:
             dep = dep.replace('_', '-')
+        if dep not in dep_map:
+            dep = dep.replace('-', '_')
         version = dep_map[dep]['version']
         reqs.append(Dependency(dep, '{}{}'.format(prefix, version)).to_pep_508())
         for cdep, cversion in dep_map[dep].get('dependencies', {}).items():
@@ -217,12 +225,18 @@ def resolve_source_deps(poetry, package, reqs, frozen=False):
 
 
 def locked_deps(package, poetry, exclude=(), remove=()):
+    from poetry_plugin_export.walker import get_project_dependency_packages
+
     reqs = []
-    deps = poetry.locker.get_project_dependency_packages(
-        project_requires=package.all_requires,
-        dev=False, extras=[])
+    deps = get_project_dependency_packages(
+        locker=poetry._locker,
+        project_requires=package.requires,
+        project_python_marker=package.python_marker,
+        extras=package.extras)
 
     project_deps = {r.name: r for r in poetry.package.requires}
+    extra_reqs = defaultdict(list)
+
     for dep_pkg in deps:
         p = dep_pkg.package
         d = dep_pkg.dependency
@@ -237,8 +251,12 @@ def locked_deps(package, poetry, exclude=(), remove=()):
         requirement = d.to_pep_508(with_extras=False)
         if ';' in requirement:
             line += "; {}".format(requirement.split(";")[1].strip())
-        reqs.append(line)
-    return reqs, defaultdict(list)
+        if not p.optional:
+            reqs.append(line)
+        for extra in (p.name in project_deps and project_deps[p.name].in_extras or []):
+            extra_reqs[extra].append(line)
+
+    return reqs, dict(extra_reqs)
 
 
 if __name__ == '__main__':

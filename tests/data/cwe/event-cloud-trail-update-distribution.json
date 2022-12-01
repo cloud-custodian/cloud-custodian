@@ -1,0 +1,264 @@
+{
+    "version": "0",
+    "id": "93a7a030-e28a-6aa0-a35c-7bdbca54b7f6",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.cloudfront",
+    "account": "012345678912",
+    "time": "2022-07-13T18:09:19Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.08",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAVD4IK2M7GWZXER5DZ:HarishAchappa",
+            "arn": "arn:aws:sts::012345678912:assumed-role/c7nbot/HarishAchappa",
+            "accountId": "012345678912",
+            "accessKeyId": "ASIAVD4IK2M7C6RULHH3",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "AROAVD4IK2M7GWZXER5DZ",
+                    "arn": "arn:aws:iam::012345678912:role/c7nbot",
+                    "accountId": "012345678912",
+                    "userName": "c7nbot"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "creationDate": "2022-07-13T17:55:21Z",
+                    "mfaAuthenticated": "false"
+                }
+            }
+        },
+        "eventTime": "2022-07-13T18:09:19Z",
+        "eventSource": "cloudfront.amazonaws.com",
+        "eventName": "UpdateDistribution",
+        "awsRegion": "us-east-1",
+        "sourceIPAddress": "AWS Internal",
+        "userAgent": "AWS Internal",
+        "requestParameters": {
+            "id": "E53370FUHBNLK",
+            "distributionConfig": {
+                "origins": {
+                    "quantity": 1,
+                    "items": [
+                        {
+                            "connectionAttempts": 3,
+                            "customHeaders": {
+                                "items": [],
+                                "quantity": 0
+                            },
+                            "domainName": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com",
+                            "connectionTimeout": 10,
+                            "s3OriginConfig": {
+                                "originAccessIdentity": ""
+                            },
+                            "originShield": {
+                                "enabled": false
+                            },
+                            "originPath": "",
+                            "id": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com"
+                        }
+                    ]
+                },
+                "aliases": {
+                    "items": [],
+                    "quantity": 0
+                },
+                "defaultCacheBehavior": {
+                    "functionAssociations": {
+                        "quantity": 0,
+                        "items": []
+                    },
+                    "lambdaFunctionAssociations": {
+                        "items": [],
+                        "quantity": 0
+                    },
+                    "fieldLevelEncryptionId": "",
+                    "trustedSigners": {
+                        "items": [],
+                        "enabled": false,
+                        "quantity": 0
+                    },
+                    "trustedKeyGroups": {
+                        "enabled": false,
+                        "quantity": 0,
+                        "items": []
+                    },
+                    "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+                    "allowedMethods": {
+                        "items": [
+                            "GET",
+                            "HEAD"
+                        ],
+                        "quantity": 2,
+                        "cachedMethods": {
+                            "items": [
+                                "GET",
+                                "HEAD"
+                            ],
+                            "quantity": 2
+                        }
+                    },
+                    "smoothStreaming": false,
+                    "targetOriginId": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com",
+                    "viewerProtocolPolicy": "allow-all",
+                    "compress": true
+                },
+                "callerReference": "9c8970c1-b26e-4131-b3cf-985880574e96",
+                "webACLId": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/96494e83-ee49-4505-9f68-9103c6cd9406",
+                "defaultRootObject": "",
+                "enabled": true,
+                "httpVersion": "http2",
+                "comment": "HIDDEN_DUE_TO_SECURITY_REASONS",
+                "logging": {
+                    "includeCookies": false,
+                    "prefix": "",
+                    "bucket": "",
+                    "enabled": false
+                },
+                "isIPV6Enabled": true,
+                "viewerCertificate": {
+                    "cloudFrontDefaultCertificate": true,
+                    "minimumProtocolVersion": "TLSv1"
+                },
+                "priceClass": "PriceClass_All",
+                "originGroups": {
+                    "quantity": 0,
+                    "items": []
+                }
+            }
+        },
+        "responseElements": {
+            "location": "https://cloudfront.amazonaws.com/2020-05-31/distribution/E53370FUHBNLK",
+            "eTag": "E3DFGD1PHNLYY3",
+            "distribution": {
+                "aRN": "arn:aws:cloudfront::012345678912:distribution/E53370FUHBNLK",
+                "id": "E53370FUHBNLK",
+                "lastModifiedTime": "Jul 13, 2022 6:09:18 PM",
+                "activeTrustedSigners": {
+                    "quantity": 0,
+                    "enabled": false
+                },
+                "domainName": "d1bftvz1j2jyjs.cloudfront.net",
+                "activeTrustedKeyGroups": {
+                    "quantity": 0,
+                    "enabled": false
+                },
+                "inProgressInvalidationBatches": 0,
+                "status": "InProgress",
+                "distributionConfig": {
+                    "origins": {
+                        "quantity": 1,
+                        "items": [
+                            {
+                                "connectionAttempts": 3,
+                                "customHeaders": {
+                                    "quantity": 0
+                                },
+                                "oacSigningBehavior": "never",
+                                "domainName": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com",
+                                "connectionTimeout": 10,
+                                "s3OriginConfig": {
+                                    "originAccessIdentity": ""
+                                },
+                                "originShield": {
+                                    "enabled": false
+                                },
+                                "originAccessControlId": "",
+                                "originPath": "",
+                                "id": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com"
+                            }
+                        ]
+                    },
+                    "aliases": {
+                        "quantity": 0
+                    },
+                    "defaultCacheBehavior": {
+                        "functionAssociations": {
+                            "quantity": 0
+                        },
+                        "lambdaFunctionAssociations": {
+                            "quantity": 0
+                        },
+                        "fieldLevelEncryptionId": "",
+                        "trustedSigners": {
+                            "enabled": false,
+                            "quantity": 0
+                        },
+                        "trustedKeyGroups": {
+                            "enabled": false,
+                            "quantity": 0
+                        },
+                        "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+                        "allowedMethods": {
+                            "items": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "quantity": 2,
+                            "cachedMethods": {
+                                "items": [
+                                    "HEAD",
+                                    "GET"
+                                ],
+                                "quantity": 2
+                            }
+                        },
+                        "smoothStreaming": false,
+                        "targetOriginId": "c7n-activeresponse-test-to-be-deleted.s3.us-east-1.amazonaws.com",
+                        "viewerProtocolPolicy": "allow-all",
+                        "compress": true
+                    },
+                    "callerReference": "9c8970c1-b26e-4131-b3cf-985880574e96",
+                    "staging": false,
+                    "webACLId": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/96494e83-ee49-4505-9f68-9103c6cd9406",
+                    "defaultRootObject": "",
+                    "customErrorResponses": {
+                        "quantity": 0
+                    },
+                    "enabled": true,
+                    "cacheBehaviors": {
+                        "quantity": 0
+                    },
+                    "continuousDeploymentPolicyId": "",
+                    "httpVersion": "http2",
+                    "comment": "HIDDEN_DUE_TO_SECURITY_REASONS",
+                    "restrictions": {
+                        "geoRestriction": {
+                            "restrictionType": "none",
+                            "quantity": 0
+                        }
+                    },
+                    "logging": {
+                        "includeCookies": false,
+                        "prefix": "",
+                        "bucket": "",
+                        "enabled": false
+                    },
+                    "isIPV6Enabled": true,
+                    "viewerCertificate": {
+                        "cloudFrontDefaultCertificate": true,
+                        "certificateSource": "cloudfront",
+                        "sSLSupportMethod": "vip",
+                        "minimumProtocolVersion": "TLSv1"
+                    },
+                    "priceClass": "PriceClass_All",
+                    "originGroups": {
+                        "quantity": 0
+                    }
+                }
+            }
+        },
+        "requestID": "5e3a89ec-4fb3-4407-a7a1-26e52122ca46",
+        "eventID": "a1474634-7457-45e1-bc0f-d47e7ad72f79",
+        "readOnly": false,
+        "eventType": "AwsApiCall",
+        "apiVersion": "2020_05_31",
+        "managementEvent": true,
+        "recipientAccountId": "012345678912",
+        "eventCategory": "Management",
+        "sessionCredentialFromConsole": "true"
+    },
+    "debug": true
+}

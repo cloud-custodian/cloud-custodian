@@ -82,3 +82,23 @@ class TestServiceCatalog(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_catalog_product_resource(self):
+        session_factory = self.replay_flight_data('test_catalog_product_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-product',
+                'resource': 'catalog-product',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'ProductId',
+                        'value': 'test-6orqs3iobd7om'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['Name'], 'testProduct')

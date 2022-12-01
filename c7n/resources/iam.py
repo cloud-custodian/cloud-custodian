@@ -257,6 +257,7 @@ class User(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        config_id = 'UserId'
 
     source_mapping = {
         'describe': DescribeUser,
@@ -440,6 +441,7 @@ class InstanceProfile(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        cfn_type = 'AWS::IAM::InstanceProfile'
 
 
 @resources.register('iam-certificate')
@@ -1503,6 +1505,62 @@ class UnusedInstanceProfiles(IamRoleUsage):
         return results
 
 
+@InstanceProfile.action_registry.register('set-role')
+class InstanceProfileSetRole(BaseAction):
+    """Upserts specified role name for IAM instance profiles.
+       Instance profile roles are removed when empty role name is specified.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profile-set-role
+            resource: iam-profile
+            actions:
+                - type: set-role
+                  role: my-test-role
+    """
+
+    schema = type_schema('set-role',
+    role={'type': 'string'})
+    permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
+
+    def add_role(self, client, resource, role):
+        self.manager.retry(
+            client.add_role_to_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=role
+        )
+        return
+
+    def remove_role(self, client, resource):
+        self.manager.retry(
+            client.remove_role_from_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=resource['Roles'][0]['RoleName']
+        )
+        return
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        role = self.data.get('role', '')
+        for r in resources:
+            if not role:
+                if len(r['Roles']) == 0:
+                    continue
+                else:
+                    self.remove_role(client, r)
+            else:
+                if len(r['Roles']) == 0:
+                    self.add_role(client, r, role)
+                elif role == r['Roles'][0]['RoleName']:
+                    continue
+                else:
+                    self.remove_role(client, r)
+                    self.add_role(client, r, role)
+
+
 ###################
 #    IAM Users    #
 ###################
@@ -1971,6 +2029,57 @@ class UserSSHKeyFilter(ValueFilter):
             matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
             self.merge_annotation(r, self.matched_annotation_key, matched_keys)
             if matched_keys:
+                matched.append(r)
+        return matched
+
+
+@User.filter_registry.register('login-profile')
+class UserLoginProfile(ValueFilter):
+    """Filter IAM users that have an associated login-profile
+
+    For quicker evaluation and reduced API traffic, it is recommended to
+    instead use the 'credential' filter with 'password_enabled': true when
+    a delay of up to four hours for credential report syncing is acceptable.
+
+    (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: iam-users-with-console-access
+            resource: iam-user
+            filters:
+              - type: login-profile
+    """
+
+    schema = type_schema('login-profile', rinherit=ValueFilter.schema)
+    permissions = ('iam:GetLoginProfile',)
+    annotation_key = 'c7n:LoginProfile'
+
+    def user_login_profiles(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u[self.annotation_key] = False
+            try:
+                login_profile_resp = client.get_login_profile(UserName=u['UserName'])
+                if u['UserName'] == login_profile_resp['LoginProfile']['UserName']:
+                    u[self.annotation_key] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                    raise
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users for login profile" % len(resources))
+            list(w.map(self.user_login_profiles, user_set))
+
+        matched = []
+        for r in resources:
+            if r[self.annotation_key]:
                 matched.append(r)
         return matched
 
@@ -2705,3 +2814,41 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@InstanceProfile.filter_registry.register('has-specific-managed-policy')
+class SpecificIamProfileManagedPolicy(Filter):
+    """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
+       policy. If an IAM instance profile does not contain an IAM role, then it will be treated
+       as not having the policy.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profile-has-admin-policy
+            resource: iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, role_name):
+        attached_policies = client.list_attached_role_policies(
+            RoleName=role_name)['AttachedPolicies']
+        return [p['PolicyName'] for p in attached_policies]
+
+    def has_managed_policy(self, client, resource):
+        for role in resource.get('Roles', []):
+            managed_policies = self._managed_policies(client, role.get('RoleName'))
+            if self.data.get('value') in managed_policies:
+                return True
+        return False
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        return [r for r in resources if self.has_managed_policy(c, r)]
