@@ -47,12 +47,12 @@ class Snapshot(QueryResourceManager):
         arn_type = 'snapshot'
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
-        id = 'SnapshotId'
+        name = id = 'SnapshotId'
         id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
-        name = 'SnapshotId'
         date = 'StartTime'
+        cfn_type = 'AWS::EC2::Snapshot'
 
         default_report_fields = (
             'SnapshotId',

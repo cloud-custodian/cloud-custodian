@@ -31,13 +31,22 @@ class AccessAnalyzer(ValueFilter):
         analyzer={'type': 'string'}, rinherit=ValueFilter.schema)
     schema_alias = True
     permissions = ('access-analyzer:ListFindings', 'access-analyzer:ListAnalyzers')
+
+    # List of supported resource types: https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-resources.html
     supported_types = (
+        'AWS::S3::Bucket',
         'AWS::IAM::Role',
         'AWS::KMS::Key',
         'AWS::Lambda::Function',
         'AWS::Lambda::LayerVersion',
-        'AWS::S3::Bucket',
         'AWS::SQS::Queue',
+        'AWS::SecretsManager::Secret',
+        'AWS::SNS::Topic',
+        'AWS::EC2::Snapshot',
+        'AWS::RDS::DBSnapshot',
+        'AWS::RDS::DBClusterSnapshot',
+        'AWS::ECR::Repository',
+        'AWS::EFS::FileSystem'
     )
 
     analysis_annotation = 'c7n:AccessAnalysis'
