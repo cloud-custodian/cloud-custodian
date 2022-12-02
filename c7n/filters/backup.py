@@ -7,13 +7,14 @@ from c7n.query import RetryPageIterator
 
 
 class ConsecutiveAwsBackupsFilter(Filter):
-    """Returns resources where number of consective daily backups is
-    equal to/or greater than n days.
+    """Returns resources where number of consective backups (based on the
+    periodicity defined in the filter) is equal to/or greater than n units.
+    This filter supports the resources that use AWS Backup service for backups.
     :example:
     .. code-block:: yaml
             policies:
-              - name: efs-consecutive-aws-backup-count
-                resource: efs
+              - name: dynamodb-consecutive-aws-backup-count
+                resource: dynamodb-table
                 filters:
                   - type: consecutive-aws-backups
                     count: 7
@@ -69,5 +70,4 @@ class ConsecutiveAwsBackupsFilter(Filter):
 
             if expected_dates.issubset(backup_dates):
                 results.append(r)
-            print(backup_dates, expected_dates)
         return results
