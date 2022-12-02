@@ -4,6 +4,9 @@
         "ImageId": "ami-03f9a84f3963d5028",
         "LaunchPermissions": [
             {
+                "Group": "all"
+            },
+            {
                 "UserId": "112233445566"
             },
             {
