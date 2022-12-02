@@ -7,8 +7,9 @@ from c7n.query import RetryPageIterator
 
 
 class ConsecutiveAwsBackupsFilter(Filter):
-    """Returns resources where number of consective daily backups is
-    equal to/or greater than n days.
+    """Returns resources where number of consective backups (based on the 
+    periodicity defined in the filter) is equal to/or greater than n units.
+    This filter supports the resources that use AWS Backup service for backups.
     :example:
     .. code-block:: yaml
             policies:
