@@ -21,5 +21,11 @@ darwin:
 	GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION)" -o release/darwin-$(VERSION)/custodian-cask
 
 
+.PHONY: darwin-arm
+darwin-arm:
+	mkdir -p release
+	GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION)" -o release/darwin-$(VERSION)/custodian-cask
+
+
 .PHONY: release
-release: windows linux darwin
+release: windows linux darwin darwin-arm

@@ -275,7 +275,7 @@ func generateEnvs() []string {
 	var envs []string
 
 	// Bulk include matching variables
-	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^GOOGLE|CLOUDSDK`)
+	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^TENCENTCLOUD_|^GOOGLE|CLOUDSDK`)
 	for _, s := range os.Environ() {
 		if re.MatchString(s) {
 			envs = append(envs, s)
