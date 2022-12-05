@@ -84,6 +84,7 @@ class NotifyTest(BaseTest):
             },
         )
 
+    # TODO refactor - extract method
     def test_resource_prep(self):
         session_factory = self.record_flight_data("test_notify_resource_prep")
         policy = self.load_policy(
@@ -120,6 +121,18 @@ class NotifyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.actions[0].prepare_resources(
                 [{'c7n:user-data': 'xyz', 'Id': 'a-123'}]),
+            [{'Id': 'a-123'}])
+
+        policy = self.load_policy(
+            {"name": "notify-sns",
+             "resource": "iam-saml-provider",
+             "actions": [
+                 {"type": "notify", "to": ["noone@example.com"],
+                  "transport": {"type": "sns", "topic": "zebra"}}]},
+            session_factory=session_factory)
+        self.assertEqual(
+            policy.resource_manager.actions[0].prepare_resources(
+                [{'SAMLMetadataDocument': 'xyz', 'IDPSSODescriptor': 'abc', 'Id': 'a-123'}]),
             [{'Id': 'a-123'}])
 
     def test_sns_notify(self):
