@@ -44,7 +44,7 @@ import (
 const containerHome string = "/home/custodian/"
 const defaultImageName string = "cloudcustodian/c7n:latest"
 const imageOverrideEnv = "CUSTODIAN_IMAGE"
-const updateInterval = time.Hour
+const updateInterval = time.Hour * 12
 
 var version string
 
@@ -358,7 +358,19 @@ func updateMarkerFilename(image string) string {
 	sha := sha1.New()
 	sha.Write([]byte(image))
 	hash := hex.EncodeToString(sha.Sum(nil))
-	return filepath.Join(os.TempDir(), "custodian-cask-update-"+hash[0:5])
+
+	userCacheDir, err := os.UserCacheDir()
+	if err != nil {
+		log.Fatalf("Unable to get user cache directory. %v", err)
+	}
+
+	cacheDir := filepath.Join(userCacheDir, "custodian-cask")
+
+	err = os.Mkdir(cacheDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		log.Fatalf("Unable to create user cache directory. %v", err)
+	}
+	return filepath.Join(cacheDir, "cask-update-"+hash[0:5])
 }
 
 func handleSignals(ctx context.Context, id string, dockerClient *client.Client) {
