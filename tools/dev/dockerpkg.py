@@ -65,7 +65,7 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.2.1"
+ARG POETRY_VERSION="1.2.2"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
