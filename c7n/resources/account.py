@@ -153,6 +153,9 @@ class CloudTrailEnabled(Filter):
     Of particular note, the current-region option will evaluate whether cloudtrail is available
     in the current region, either as a multi region trail or as a trail with it as the home region.
 
+    The log-metric-filter-pattern option checks for the existence of a cloudwatch alarm and a
+    corresponding SNS subscription for a specific filter pattern
+
     :example:
 
     .. code-block:: yaml
@@ -166,6 +169,8 @@ class CloudTrailEnabled(Filter):
                     global-events: true
                     multi-region: true
                     running: true
+                    include-management-events: true
+                    log-metric-filter-pattern: "{ ($.eventName = \\"ConsoleLogin\\") }"
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -176,9 +181,13 @@ class CloudTrailEnabled(Filter):
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
            'kms': {'type': 'boolean'},
-           'kms-key': {'type': 'string'}})
+           'kms-key': {'type': 'string'},
+           'include-management-events': {'type': 'boolean'},
+           'log-metric-filter-pattern': {'type': 'string'}})
 
-    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
+    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
+                   'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
+                   'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -212,6 +221,54 @@ class CloudTrailEnabled(Filter):
                         'LatestDeliveryError'):
                     running.append(t)
             trails = running
+        if self.data.get('include-management-events'):
+            matched = []
+            for t in list(trails):
+                selectors = client.get_event_selectors(TrailName=t['TrailARN'])
+                if 'EventSelectors' in selectors.keys():
+                    for s in selectors['EventSelectors']:
+                        if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
+                            matched.append(t)
+            trails = matched
+        if self.data.get('log-metric-filter-pattern'):
+            client_logs = session.client('logs')
+            client_cw = session.client('cloudwatch')
+            sns_manager = self.manager.get_resource_manager('sns-subscription')
+            matched = []
+            for t in list(trails):
+                if 'CloudWatchLogsLogGroupArn' not in t.keys():
+                    continue
+                log_group_name = t['CloudWatchLogsLogGroupArn'].split(':')[6]
+                try:
+                    metric_filters_log_group = \
+                        client_logs.describe_metric_filters(
+                            logGroupName=log_group_name)['metricFilters']
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                        continue
+                filter_matched = None
+                if metric_filters_log_group:
+                    for f in metric_filters_log_group:
+                        if f['filterPattern'] == self.data.get('log-metric-filter-pattern'):
+                            filter_matched = f
+                            break
+                if not filter_matched:
+                    continue
+                alarms = client_cw.describe_alarms_for_metric(
+                    MetricName=filter_matched["metricTransformations"][0]["metricName"],
+                    Namespace=filter_matched["metricTransformations"][0]["metricNamespace"]
+                )['MetricAlarms']
+                alarm_actions = []
+                for a in alarms:
+                    alarm_actions.extend(a['AlarmActions'])
+                if not alarm_actions:
+                    continue
+                alarm_actions = set(alarm_actions)
+                sns_subscriptions = sns_manager.resources()
+                for s in sns_subscriptions:
+                    if s['TopicArn'] in alarm_actions:
+                        matched.append(t)
+            trails = matched
         if trails:
             return []
         return resources

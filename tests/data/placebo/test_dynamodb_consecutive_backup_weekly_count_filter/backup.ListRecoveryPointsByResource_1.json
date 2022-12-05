@@ -1,0 +1,185 @@
+{
+    "status_code": 200,
+    "data": {
+        "RecoveryPoints": [
+            {
+                "RecoveryPointArn": "arn:aws:backup:us-east-1:123456789012:recovery-point:b2f7c59b-2a92-4dbd-814f-ed35e175c259",
+                "StatusMessage": "Done",
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:123456789012:key/4dee567f-437f-4c94-9aac-5aa1259678e1",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 31,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupVaultName": "Default",
+                "BackupSizeBytes": 11910
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01668707493227-3cb44027",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 30,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 11910
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11691469",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 29,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11697711",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 28,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11690723",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 27,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11691888",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 26,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11692244",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 25,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11699088",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 24,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669066647509-11691469",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 23,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/01669332747509-11690087",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 22,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            },
+            {
+                "RecoveryPointArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Test-DDBTable-backup/backup/016690662345889-11691469",
+                "StatusMessage": "Done",
+                "CreationDate": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 21,
+                    "minute": 4
+                },
+                "Status": "COMPLETED",
+                "BackupSizeBytes": 512
+            }
+        ]
+    }
+}

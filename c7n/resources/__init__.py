@@ -28,16 +28,16 @@ def load_resources(resource_types=('*',)):
     return missing
 
 
-def should_load_provider(name, provider_types):
+def should_load_provider(name, provider_types, no_wild=False):
     global LOADED
     if (name not in LOADED and
-        ('*' in provider_types or
-         name in provider_types)):
+        (('*' in provider_types and not no_wild)
+         or name in provider_types)):
         return True
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'terraform')
 
 
 def load_available(resources=True):
@@ -92,6 +92,10 @@ def load_providers(provider_types):
     if should_load_provider('tencentcloud', provider_types):
         from c7n_tencentcloud.entry import initialize_tencentcloud
         initialize_tencentcloud()
+
+    if should_load_provider('terraform', provider_types, no_wild=True):
+        from c7n_left.entry import initialize_iac
+        initialize_iac()
 
     if should_load_provider('c7n', provider_types):
         from c7n import data  # noqa

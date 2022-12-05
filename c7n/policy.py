@@ -24,6 +24,7 @@ from c7n.provider import clouds, get_resource_class
 from c7n import deprecated, utils
 from c7n.version import version
 from c7n.query import RetryPageIterator
+from c7n.varfmt import VarFormat
 
 log = logging.getLogger('c7n.policy')
 
@@ -91,10 +92,11 @@ class PolicyCollection:
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_patterns=[], resource_types=[]):
+    def filter(self, policy_patterns=(), resource_types=(), modes=()):
         results = self.policies
         results = self._filter_by_patterns(results, policy_patterns)
         results = self._filter_by_resource_types(results, resource_types)
+        results = self._filter_by_modes(results, modes)
         # next line brings the result set in the original order of self.policies
         results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
@@ -159,6 +161,32 @@ class PolicyCollection:
                 'Resource type "{}" '
                 'did not match any policies.').format(resource_type))
 
+        return results
+
+    def _filter_by_modes(self, policies, modes):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        if not modes:
+            return policies
+        results = []
+        for mode in modes:
+            result = self._filter_by_mode(policies, mode)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_mode(self, policies, mode):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        results = []
+        for policy in policies:
+            if policy.get_execution_mode().type == mode:
+                results.append(policy)
+        if not results:
+            self.log.warning((
+                'Filter by modes type "{}" '
+                'did not match any policies.').format(mode))
         return results
 
     def __iter__(self):
@@ -865,7 +893,8 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
-        resource_id = self.policy.resource_manager.resource_type.id
+        resource_id = self.policy.resource_manager.resource_type.config_id or \
+            self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
         cfg_rule_name = event['configRuleName']
@@ -1119,7 +1148,9 @@ class Policy:
 
     @property
     def provider_name(self) -> str:
-        if '.' in self.resource_type:
+        if isinstance(self.resource_type, list):
+            provider_name, _ = self.resource_type[0].split('.', 1)
+        elif '.' in self.resource_type:
             provider_name, resource_type = self.resource_type.split('.', 1)
         else:
             provider_name = 'aws'
@@ -1230,7 +1261,9 @@ class Policy:
         Updates the policy data in-place.
         """
         # format string values returns a copy
-        updated = utils.format_string_values(self.data, **variables)
+        var_fmt = VarFormat()
+        updated = utils.format_string_values(
+            self.data, formatter=var_fmt.format, **variables)
 
         # Several keys should only be expanded at runtime, perserve them.
         if 'member-role' in updated.get('mode', {}):

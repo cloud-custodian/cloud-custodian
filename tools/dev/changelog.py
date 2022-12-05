@@ -26,6 +26,11 @@ aliases = {
     'c7n': 'core',
     'cli': 'core',
     'c7n_mailer': 'tools',
+    'c7n_tencentcloud': 'tencentcloud',
+    'c7n_kube': 'kubernetes',
+    'tools/c7n_kube': 'kubernetes',
+    'tools/c7n-left': 'shift-left',
+    'c7n-left': 'shift-left',
     'mailer': 'tools',
     'utils': 'core',
     'cask': 'tools',
@@ -197,13 +202,15 @@ def main(path, output, since, end, user):
         if user and commit.author.name not in user:
             continue
 
-        parts = commit.message.strip().split('-', 1)
+        parts = commit.message.strip().split(' ', 1)
         if not len(parts) > 1:
             print("bad commit %s %s" % (cdate, commit.message))
             category = 'other'
         else:
             category = parts[0]
         category = category.strip().lower()
+        # try to aliases before we match on prefix (like tools)
+        category = aliases.get(category, category)
         if '.' in category:
             category = category.split('.', 1)[0]
         if '/' in category:

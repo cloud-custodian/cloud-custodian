@@ -997,6 +997,20 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
 
+    def test_iam_user_login_profile(self):
+        session_factory = self.replay_flight_data('test_iam_user_login_profile')
+        p = self.load_policy(
+            {
+                "name": "iam-users-with-console-access",
+                "resource": "iam-user",
+                "filters": [{"type": "login-profile"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "test-user-console-access")
+
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_user_disable_ssh_keys(test, iam_user):
@@ -1086,6 +1100,47 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
         self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileActions(BaseTest):
+
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": "my-test-role"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
+
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role-remove",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": ""}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(len(profile['Roles']), 0)
 
 
 class IamPolicyFilterUsage(BaseTest):
@@ -1895,6 +1950,7 @@ class SNSCrossAccount(BaseTest):
                     {
                         "type": "cross-account",
                         "whitelist_endpoints": ["@whitelist.com"],
+                        "whitelist_conditions": ["aws:UserName"]
                     },
                 ],
             },
@@ -2282,3 +2338,25 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

@@ -213,6 +213,8 @@ class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, FormatDate):
+            return obj.datetime.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 
@@ -474,7 +476,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
-    if isinstance(value, list):
+    if isinstance(value, list) or isinstance(value, set):
         return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
@@ -580,7 +582,7 @@ def set_value_from_jmespath(source, expression, value, is_first=True):
     source[current_key] = value
 
 
-def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=None, *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -588,16 +590,19 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], *args, **kwargs)
+            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, *args, **kwargs))
+            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
-            return obj.format(*args, **kwargs)
+            if formatter:
+                return formatter(obj, *args, **kwargs)
+            else:
+                return obj.format(*args, **kwargs)
         except err_fallback:
             return obj
     else:
@@ -819,3 +824,62 @@ def get_support_region(manager):
     elif partition == "aws-cn":
         support_region = "cn-north-1"
     return support_region
+
+
+def get_eni_resource_type(eni):
+    if eni.get('Attachment'):
+        instance_id = eni['Attachment'].get('InstanceId')
+    else:
+        instance_id = None
+    description = eni.get('Description')
+    # EC2
+    if instance_id:
+        rtype = 'ec2'
+    # ELB/ELBv2
+    elif description.startswith('ELB app/'):
+        rtype = 'elb-app'
+    elif description.startswith('ELB net/'):
+        rtype = 'elb-net'
+    elif description.startswith('ELB gwy/'):
+        rtype = 'elb-gwy'
+    elif description.startswith('ELB'):
+        rtype = 'elb'
+    # Other Resources
+    elif description == 'ENI managed by APIGateway':
+        rtype = 'apigw'
+    elif description.startswith('AWS CodeStar Connections'):
+        rtype = 'codestar'
+    elif description.startswith('DAX'):
+        rtype = 'dax'
+    elif description.startswith('AWS created network interface for directory'):
+        rtype = 'dir'
+    elif description == 'DMSNetworkInterface':
+        rtype = 'dms'
+    elif description.startswith('arn:aws:ecs:'):
+        rtype = 'ecs'
+    elif description.startswith('EFS mount target for'):
+        rtype = 'fsmt'
+    elif description.startswith('ElastiCache'):
+        rtype = 'elasticache'
+    elif description.startswith('AWS ElasticMapReduce'):
+        rtype = 'emr'
+    elif description.startswith('CloudHSM Managed Interface'):
+        rtype = 'hsm'
+    elif description.startswith('CloudHsm ENI'):
+        rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('Interface for NAT Gateway'):
+        return 'nat'
+    elif (description == 'RDSNetworkInterface' or
+            description.startswith('Network interface for DBProxy')):
+        rtype = 'rds'
+    elif description == 'RedshiftNetworkInterface':
+        rtype = 'redshift'
+    elif description.startswith('Network Interface for Transit Gateway Attachment'):
+        rtype = 'tgw'
+    elif description.startswith('VPC Endpoint Interface'):
+        rtype = 'vpce'
+    else:
+        rtype = 'unknown'
+    return rtype

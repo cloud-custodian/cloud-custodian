@@ -176,11 +176,31 @@ class IsWafV2Enabled(Filter):
 
             policies:
               - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
                     state: false
                     web-acl: testv2
+
+              - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
     schema = type_schema(
@@ -194,24 +214,19 @@ class IsWafV2Enabled(Filter):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        state = self.data.get('state', False)
-        target_acl = self.data.get('web-acl')
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
 
+        target_acl = self.data.get('web-acl', '')
+        state = self.data.get('state', False)
+        target_acl_ids = [v for k, v in waf_name_id_map.items() if
+                          re.match(target_acl, k)]
         results = []
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
             if state:
-                if target_acl_id is None and r_web_acl_id \
-                        and r_web_acl_id in waf_name_id_map.values():
-                    results.append(r)
-                elif target_acl_id and r_web_acl_id == target_acl_id:
+                if r_web_acl_id and r_web_acl_id in target_acl_ids:
                     results.append(r)
             else:
-                if target_acl_id is None and (not r_web_acl_id or r_web_acl_id and
-                                              r_web_acl_id not in waf_name_id_map.values()):
-                    results.append(r)
-                elif target_acl_id and r_web_acl_id != target_acl_id:
+                if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
                     results.append(r)
         return results
 
@@ -319,8 +334,8 @@ class MismatchS3Origin(Filter):
                     check_custom_origins: true
    """
 
-    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?\.amazonaws.com)')
-    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?(\..*-\d)?\.amazonaws.com)')
+    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?(\..*-\d)?\.amazonaws.com')
 
     schema = type_schema(
         'mismatch-s3-origin',
@@ -510,10 +525,21 @@ class SetWafv2(BaseAction):
                     force: true
                     web-acl: test
 
+            policies:
+              - name: set-wafv2-for-cloudfront-regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
     """
     permissions = ('cloudfront:UpdateDistribution', 'wafv2:ListWebACLs')
     schema = type_schema(
-        'set-wafv2', required=['web-acl'], **{
+        'set-wafv2', **{
             'web-acl': {'type': 'string'},
             'force': {'type': 'boolean'},
             'state': {'type': 'boolean'}})
@@ -524,10 +550,17 @@ class SetWafv2(BaseAction):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-        target_acl = self.data.get('web-acl')
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
-        if target_acl_id not in waf_name_id_map.values():
-            raise ValueError("invalid web acl: %s" % (target_acl_id))
+        state = self.data.get('state', True)
+
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in waf_name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
 
         client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)

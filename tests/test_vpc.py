@@ -729,6 +729,24 @@ class TransitGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
 
+    def test_tgw_attachment_cloudtrail(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query_cwe')
+        p = self.load_policy(
+            {
+                "name": "test-tgw-att-cwe",
+                "resource": "transit-attachment",
+                "mode": {
+                    "type": "cloudtrail",
+                    "events": [{
+                        "event": "DeleteTransitGatewayVpcAttachment",
+                        "ids": "requestParameters.DelTGwVpcAttachReq.TransitGatewayAttachmentId",
+                        "source": "ec2.amazonaws.com"
+                    }]},
+            },
+            config={'region': 'us-west-2'}, session_factory=factory)
+        resources = p.push(event_data("event-transit-gateway-delete-vpc-attachment.json"))
+        self.assertEqual(len(resources), 1)
+
 
 class NetworkInterfaceTest(BaseTest):
 
@@ -1297,11 +1315,14 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 5)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"},
+            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
+        self.assertIn("amazon-aws", resources[2]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[2]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[2]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
