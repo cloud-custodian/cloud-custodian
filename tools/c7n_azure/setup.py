@@ -73,37 +73,37 @@ install_requires = \
  'azure-storage-file-share>=12.4.1,<13.0.0',
  'azure-storage-file>=2.1.0,<3.0.0',
  'azure-storage-queue>=12.1.5,<13.0.0',
- 'boto3 (>=1.24.88,<2.0.0)',
- 'botocore (>=1.27.88,<2.0.0)',
- 'c7n (>=0.9.20,<0.10.0)',
+ 'boto3 (>=1.26.9,<2.0.0)',
+ 'botocore (>=1.29.9,<2.0.0)',
+ 'c7n (>=0.9.21,<0.10.0)',
  'click>=8.0,<9.0',
  'cryptography>=3.4.6',
  'distlib>=0.3.0,<0.4.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
- 'importlib-resources (>=5.9.0,<6.0.0)',
+ 'importlib-resources (>=5.10.0,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
  'jmespath>=1.0.0,<2.0.0',
- 'jsonschema (>=4.16.0,<5.0.0)',
+ 'jsonschema (>=4.17.0,<5.0.0)',
  'netaddr>=0.7.19,<0.8.0',
  'pkgutil_resolve_name (>=1.3.10,<2.0.0)',
- 'pyrsistent (>=0.18.1,<0.19.0)',
+ 'pyrsistent (>=0.19.2,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
  'requests>=2.22.0,<3.0.0',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
- 'typing-extensions (>=4.3.0,<5.0.0)',
+ 'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.12,<2.0.0)',
- 'zipp (>=3.8.1,<4.0.0)']
+ 'zipp (>=3.10.0,<4.0.0)']
 
 extras_require = \
 {':python_version >= "3" and python_version < "4"': ['azure-functions>=1.0.8,<2.0.0']}
 
 setup_kwargs = {
     'name': 'c7n-azure',
-    'version': '0.7.19',
+    'version': '0.7.20',
     'description': 'Cloud Custodian - Azure Support',
     'license': 'Apache-2.0',
     'classifiers': [
