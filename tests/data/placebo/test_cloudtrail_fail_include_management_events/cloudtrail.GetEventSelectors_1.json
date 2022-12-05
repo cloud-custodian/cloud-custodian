@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+        "EventSelectors": [
+            {
+                "ReadWriteType": "ReadOnly",
+                "IncludeManagementEvents": true,
+                "DataResources": [
+                    {
+                        "Type": "AWS::S3::Object",
+                        "Values": [
+                            "arn:aws:s3:::trail-test-bucket-3bf19dec-127e-11ed-861d-0242ac12000/"
+                        ]
+                    }
+                ],
+                "ExcludeManagementEventSources": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -13,7 +13,6 @@ install_requires = \
 ['Jinja2>=3.0,<4.0',
  'boto3>=1.11.12',
  'datadog>=0.34.0,<0.35.0',
- 'google-cloud-secret-manager>=2.8.0,<3.0.0',
  'importlib-metadata>=4.11.1,<5.0',
  'jsonpatch>=1.25,<2.0',
  'jsonpointer>=2.0,<3.0',
@@ -25,13 +24,17 @@ install_requires = \
  'sendgrid>=6.1.1,<7.0.0',
  'types-six>=1.16.10,<2.0.0']
 
+extras_require = \
+{'azure': ['c7n-azure'],
+ 'gcp': ['c7n-gcp', 'google-cloud-secret-manager>=2.8.0,<3.0.0']}
+
 entry_points = \
 {'console_scripts': ['c7n-mailer = c7n_mailer.cli:main',
                      'c7n-mailer-replay = c7n_mailer.replay:main']}
 
 setup_kwargs = {
     'name': 'c7n-mailer',
-    'version': '0.6.18',
+    'version': '0.6.20',
     'description': 'Cloud Custodian - Reference Mailer',
     'license': 'Apache-2.0',
     'classifiers': [
@@ -52,6 +55,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
+    'extras_require': extras_require,
     'entry_points': entry_points,
     'python_requires': '>=3.7,<4.0',
 }

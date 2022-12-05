@@ -189,7 +189,8 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy', })
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
+             'apigwv2', })
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -335,7 +336,6 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            'AWS::ApiGatewayV2::Api',
             'AWS::ApiGatewayV2::Stage',
             'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
@@ -403,6 +403,25 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
             'AWS::AppSync::GraphQLApi',
+            'AWS::DataSync::Task',
+            'AWS::Glue::Job',
+            'AWS::SageMaker::NotebookInstanceLifecycleConfig',
+            'AWS::SES::ContactList',
+            'AWS::SageMaker::Workteam',
+            'AWS::EKS::FargateProfile',
+            'AWS::DataSync::LocationFSxLustre',
+            'AWS::AppConfig::Application',
+            'AWS::DataSync::LocationS3',
+            'AWS::ServiceDiscovery::PublicDnsNamespace',
+            'AWS::EC2::NetworkInsightsAccessScopeAnalysis',
+            'AWS::Route53::HostedZone',
+            'AWS::GuardDuty::IPSet',
+            'AWS::SES::ConfigurationSet',
+            'AWS::GuardDuty::ThreatIntelSet',
+            'AWS::DataSync::LocationNFS',
+            'AWS::DataSync::LocationEFS',
+            'AWS::ServiceDiscovery::Service',
+            'AWS::DataSync::LocationSMB',
         }
 
         resource_map = {}

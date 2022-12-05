@@ -10,6 +10,9 @@ def load_policies(policy_dir, options):
 
     loader = DirectoryLoader(config=options)
     policies = loader.load_directory(policy_dir)
+    if not policies:
+        return ()
+
     providers = {p.provider_name for p in policies}
     assert len(providers), "only a single provider per policy dir"
     provider_name = providers.pop()
