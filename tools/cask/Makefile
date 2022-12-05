@@ -3,7 +3,7 @@ test:
 	go test .
 
 BINARY := cask
-VERSION ?= vlatest
+VERSION ?= latest
 
 .PHONY: windows
 windows:
@@ -15,6 +15,11 @@ linux:
 	mkdir -p release
 	GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION)" -o release/linux-$(VERSION)/custodian-cask
 
+.PHONY: linux-arm
+linux-arm:
+	mkdir -p release
+	GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=$(VERSION)" -o release/linux-arm64-$(VERSION)/custodian-cask
+
 .PHONY: darwin
 darwin:
 	mkdir -p release
@@ -24,8 +29,8 @@ darwin:
 .PHONY: darwin-arm
 darwin-arm:
 	mkdir -p release
-	GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$(VERSION)" -o release/darwin-$(VERSION)/custodian-cask
+	GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=$(VERSION)" -o release/darwin-arm64-$(VERSION)/custodian-cask
 
 
 .PHONY: release
-release: windows linux darwin darwin-arm
+release: windows linux linux-arm darwin darwin-arm

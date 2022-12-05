@@ -110,8 +110,6 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 
 		// Skip image pull if we have an image already
 		if len(images) > 0 {
-			fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n",
-				uint(now.Sub(info.ModTime()).Minutes()))
 			return
 		}
 	}
