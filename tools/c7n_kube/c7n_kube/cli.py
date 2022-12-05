@@ -19,9 +19,6 @@ logging.basicConfig(
     format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
 
-PORT = '8800'
-HOST = '0.0.0.0'
-
 TEMPLATE = {
     "apiVersion": "admissionregistration.k8s.io/v1",
     "kind": "MutatingWebhookConfiguration",
@@ -64,7 +61,8 @@ TEMPLATE = {
 
 def _parser():
     parser = argparse.ArgumentParser(description='Cloud Custodian Admission Controller')
-    parser.add_argument('--port', type=int, help='Server port', nargs='?', default=PORT)
+    parser.add_argument('--host', type=str, help='Listen host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, help='Listen port', nargs='?', default='8800')
     parser.add_argument('--policy-dir', type=str, required=True, help='policy directory')
     parser.add_argument(
         '--on-exception', type=str.lower, required=False, default='warn',
@@ -78,6 +76,9 @@ def _parser():
     parser.add_argument(
         '--generate', default=False, action="store_true",
         help='Generate a k8s manifest for ValidatingWebhookConfiguration')
+    parser.add_argument('--cert', help='Path to TLS certifciate')
+    parser.add_argument('--ca-cert', help='Path to the CA certificate')
+    parser.add_argument('--cert-key', help='Path to the certificate\'s private key')
     return parser
 
 
@@ -122,7 +123,12 @@ def cli():
 
         print(yaml.dump(TEMPLATE))
     else:
-        init(args.port, args.policy_dir, args.on_exception)
+        init(
+            args.host, args.port, args.policy_dir, args.on_exception,
+            cert_path=args.cert,
+            cert_key_path=args.cert_key,
+            ca_cert_path=args.ca_cert,
+        )
 
 
 if __name__ == '__main__':

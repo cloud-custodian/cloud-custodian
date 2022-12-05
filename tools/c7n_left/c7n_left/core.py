@@ -12,6 +12,7 @@ from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
+from .filters import Traverse
 
 log = logging.getLogger("c7n.iac")
 
@@ -36,14 +37,14 @@ class CollectionRunner:
         self.options = options
         self.reporter = reporter
 
-    def run(self):
+    def run(self) -> bool:
+        # return value is used to signal process exit code.
         event = self.get_event()
         provider = self.get_provider()
 
         if not provider.match_dir(self.options.source_dir):
-            raise NotImplementedError(
-                "no %s source files found" % provider.provider_name
-            )
+            log.warning("no %s source files found" % provider.type)
+            return True
 
         graph = provider.parse(self.options.source_dir)
 
@@ -51,9 +52,10 @@ class CollectionRunner:
             p.expand_variables(p.get_variables())
             p.validate()
 
-        self.reporter.on_execution_started(self.policies)
+        self.reporter.on_execution_started(self.policies, graph)
         # consider inverting this order to allow for results grouped by policy
         # at the moment, we're doing results grouped by resource.
+        found = False
         for rtype, resources in graph.get_resources_by_type():
             for p in self.policies:
                 if not self.match_type(rtype, p):
@@ -61,7 +63,9 @@ class CollectionRunner:
                 result_set = self.run_policy(p, graph, resources, event)
                 if result_set:
                     self.reporter.on_results(result_set)
+                    found = True
         self.reporter.on_execution_ended()
+        return found
 
     def run_policy(self, policy, graph, resources, event):
         event = dict(event)
@@ -130,6 +134,9 @@ class IACResourceManager(ResourceManager):
         return self.__class__(self.ctx, data or {})
 
 
+IACResourceManager.filter_registry.register("traverse", Traverse)
+
+
 class IACResourceMap(object):
 
     resource_class = None
@@ -170,5 +177,11 @@ class ResourceGraph:
         self.resource_data = resource_data
         self.src_dir = src_dir
 
+    def __len__(self):
+        raise NotImplementedError()
+
     def get_resource_by_type(self):
+        raise NotImplementedError()
+
+    def resolve_refs(self, resource, target_type):
         raise NotImplementedError()

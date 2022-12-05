@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "aws-controltower-BaselineCloudTrail",
+                "S3BucketName": "aws-controltower-logs-644160558196-us-east-1",
+                "S3KeyPrefix": "o-yhmwqptd52",
+                "SnsTopicName": "arn:aws:sns:us-east-1:644160558196:aws-controltower-AllConfigNotifications",
+                "SnsTopicARN": "arn:aws:sns:us-east-1:644160558196:aws-controltower-AllConfigNotifications",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/aws-controltower-BaselineCloudTrail",
+                "LogFileValidationEnabled": true,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:aws-controltower/CloudTrailLogs:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/aws-controltower-CloudWatchLogsRole",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/c1b14bc1-16aa-4311-a49b-8c94c2614427",
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "fail-tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                "S3BucketName": "fail-trail-test-bucket-testing",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/fail-tf-trail-3bf19dec-127e-11ed-861d-0242ac12000",
+                "LogFileValidationEnabled": false,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:fail-cloudtrail-test-group:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role-fail",
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

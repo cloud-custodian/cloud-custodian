@@ -1,6 +1,6 @@
 name: "CI"
 env:
-  POETRY_VERSION: "1.2.1"
+  POETRY_VERSION: "1.2.2"
 on:
   push:
     branches:
@@ -10,7 +10,9 @@ on:
     branches:
       - master
       - main
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   Lint:
     runs-on: ubuntu-latest
@@ -219,7 +221,7 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml

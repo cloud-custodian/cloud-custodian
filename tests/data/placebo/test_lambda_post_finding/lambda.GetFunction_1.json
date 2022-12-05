@@ -15,6 +15,14 @@
             "LastModified": "2019-07-29T22:37:20.844+0000",
             "CodeSha256": "Pq32lM46RbVovW/Abh14XfrFHIeUM/cAEC51fwkf+tk=",
             "Version": "$LATEST",
+            "Environment": {
+                "Variables": {
+                    "DISABLE_ACTIONS": "true",
+                    "VERBOSE": "false",
+                    "DISABLE_OUTPUT_PARAMETERS": "true"
+                }
+            },
+            "KMSKeyArn": "arn:aws:kms:us-west-2:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0",
             "VpcConfig": {
                 "SubnetIds": [],
                 "SecurityGroupIds": [],

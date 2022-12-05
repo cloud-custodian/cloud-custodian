@@ -3,28 +3,16 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify"
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:unencrypted"
             },
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify"
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:encrypted-by-alias"
             },
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:config-topic"
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:encrypted-by-keyid"
             },
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-test-data-22"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:dynamodb"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-lock-notifications"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-revert-notifications"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:encrypted-by-different-key"
             }
         ],
         "ResponseMetadata": {

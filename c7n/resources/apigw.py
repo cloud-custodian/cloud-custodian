@@ -1145,3 +1145,52 @@ class DomainNameRemediateTls(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     continue
+
+
+class ApiGwV2DescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
+@resources.register('apigwv2')
+class ApiGwV2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigatewayv2'
+        arn_type = '/apis'
+        enum_spec = ('get_apis', 'Items', None)
+        id = 'ApiId'
+        name = 'name'
+        date = 'createdDate'
+        dimension = 'ApiId'
+        cfn_type = config_type = "AWS::ApiGatewayV2::Api"
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': ApiGwV2DescribeSource
+    }
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/apis/api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                "apigateway",
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type,
+            )
+
+        return self._generate_arn

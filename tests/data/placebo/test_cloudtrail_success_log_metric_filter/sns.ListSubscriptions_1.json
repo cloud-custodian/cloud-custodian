@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subscriptions": [
+            {
+                "SubscriptionArn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic:35d3185a-bc53-4c7b-a49a-63f49162dbc9",
+                "Owner": "644160558196",
+                "Protocol": "sqs",
+                "Endpoint": "arn:aws:sqs:us-east-1:644160558196:mfa-sqs-topic",
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
