@@ -1303,6 +1303,7 @@ class AccountDataEvents(BaseTest):
         )
         self.assertEqual(len(resp['RemediationConfigurations']), 1)
 
+
 @terraform('cloudtrail_success_log_metric_filter')
 def test_cloudtrail_success_log_metric_filter(test, cloudtrail_success_log_metric_filter):
     session_factory = test.replay_flight_data('test_cloudtrail_success_log_metric_filter')
