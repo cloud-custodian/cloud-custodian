@@ -220,6 +220,14 @@ class Notify(BaseNotify):
                 r.pop('c7n:user-data')
         return resources
 
+    def prepare_iam_saml_provider(self, resources):
+        for r in resources:
+            if 'SAMLMetadataDocument' in r:
+                r.pop('SAMLMetadataDocument')
+            if 'IDPSSODescriptor' in r:
+                r.pop('IDPSSODescriptor')
+        return resources
+
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)

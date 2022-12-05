@@ -11,6 +11,7 @@ from urllib.request import urlopen
 from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
+from c7n.cache import SqlKvCache
 from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
@@ -29,6 +30,18 @@ class FakeCache:
     def save(self, key, data):
         self.saves += 1
         self.state[pickle.dumps(key)] = data
+
+    def load(self):
+        return True
+
+    def close(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kw):
+        return
 
 
 class FakeResolver:
@@ -88,6 +101,18 @@ class ResolverTest(BaseTest):
             fh.write(content)
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
+
+
+def test_value_from_sqlkv(tmp_path):
+
+    kv = SqlKvCache(Bag(cache=tmp_path / "cache.db", cache_period=60))
+    config = Config.empty(account_id=ACCOUNT_ID)
+    mgr = Bag({"session_factory": None, "_cache": kv, "config": config})
+    values = ValuesFrom(
+        {"url": "moon", "expr": "[].bean", "format": "json"}, mgr)
+    values.resolver = FakeResolver(json.dumps([{"bean": "magic"}]))
+    assert values.get_values() == {"magic"}
+    assert values.get_values() == {"magic"}
 
 
 class UrlValueTest(BaseTest):

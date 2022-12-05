@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import datetime
 import os
 import mock
 import tempfile
@@ -9,8 +8,8 @@ import time
 
 from unittest import TestCase
 from .common import load_data, BaseTest, functional
-from .test_offhours import mock_datetime_now
 
+import freezegun
 import pytest
 from pytest_terraform import terraform
 from dateutil import parser
@@ -120,7 +119,7 @@ class UserCredentialReportTest(BaseTest):
                  'matched': True}]},
             session_factory=factory)
 
-        with mock_datetime_now(parser.parse("2020-01-01"), datetime):
+        with freezegun.freeze_time('2020-01-01'):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
@@ -240,7 +239,7 @@ class UserCredentialReportTest(BaseTest):
             session_factory=session_factory,
             cache=True,
         )
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27"):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted([r["UserName"] for r in resources]), ["kapil"])
@@ -271,7 +270,7 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
 
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27:00+00:00"):
             resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
@@ -561,7 +560,7 @@ class IamRoleTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             p.resource_manager.get_arns(resources),
-            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369'])  # NOQA
 
         self.assertDeprecation(p, """
             policy 'iam-inuse-role'
@@ -998,6 +997,20 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
 
+    def test_iam_user_login_profile(self):
+        session_factory = self.replay_flight_data('test_iam_user_login_profile')
+        p = self.load_policy(
+            {
+                "name": "iam-users-with-console-access",
+                "resource": "iam-user",
+                "filters": [{"type": "login-profile"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "test-user-console-access")
+
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_user_disable_ssh_keys(test, iam_user):
@@ -1087,6 +1100,47 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
         self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileActions(BaseTest):
+
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": "my-test-role"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
+
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role-remove",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": ""}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(len(profile['Roles']), 0)
 
 
 class IamPolicyFilterUsage(BaseTest):
@@ -1625,60 +1679,6 @@ class IamInlinePolicyUsage(BaseTest):
         self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
 
 
-class KMSCrossAccount(BaseTest):
-
-    def test_kms_cross_account(self):
-        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_cross_account_kms")
-        client = session_factory().client("kms")
-
-        policy = {
-            "Id": "Lulu",
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "Enable IAM User Permissions",
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
-                    "Action": "kms:*",
-                    "Resource": "*",
-                },
-                {
-                    "Sid": "Enable Cross Account",
-                    "Effect": "Allow",
-                    "Principal": "*",
-                    "Action": "kms:Encrypt",
-                    "Resource": "*",
-                },
-            ],
-        }
-
-        key_info = client.create_key(
-            Policy=json.dumps(policy), Description="test-cross-account-3"
-        )[
-            "KeyMetadata"
-        ]
-
-        # disable and schedule deletion
-        self.addCleanup(
-            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
-        )
-        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
-
-        p = self.load_policy(
-            {
-                "name": "kms-cross",
-                "resource": "kms-key",
-                "filters": [{"KeyState": "Enabled"}, "cross-account"],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
-
-
 class GlacierCrossAccount(BaseTest):
 
     def test_glacier_cross_account(self):
@@ -1950,6 +1950,7 @@ class SNSCrossAccount(BaseTest):
                     {
                         "type": "cross-account",
                         "whitelist_endpoints": ["@whitelist.com"],
+                        "whitelist_conditions": ["aws:UserName"]
                     },
                 ],
             },
@@ -2000,7 +2001,7 @@ class CrossAccountChecker(TestCase):
             ]
         })
         for p, expected in zip(
-            policies, [False, True, True, False]
+            policies, [False, True, True, False, False, True]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
@@ -2337,3 +2338,25 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

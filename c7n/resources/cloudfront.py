@@ -12,6 +12,7 @@ from c7n.filters import ValueFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
+from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.resources.securityhub import PostFinding
 
@@ -20,6 +21,19 @@ class DescribeDistribution(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
+    def get_resources(self, ids, cache=True):
+        results = []
+        distribution_ids = []
+        for i in ids:
+            # if we get cloudfront distribution arn, we pick distribution id
+            if i.startswith('arn:'):
+                distribution_ids.append(Arn.parse(i).resource)
+            else:
+                distribution_ids.append(i)
+        if distribution_ids:
+            results = super().get_resources(distribution_ids, cache)
+        return results
 
 
 @resources.register('distribution')
@@ -106,9 +120,20 @@ class DistributionMetrics(MetricsFilter):
 
 @Distribution.filter_registry.register('waf-enabled')
 class IsWafEnabled(Filter):
-    # useful primarily to use the same name across accounts, else webaclid
-    # attribute works as well
+    """Filter CloudFront distribution by waf-regional web-acl
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-waf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
     schema = type_schema(
         'waf-enabled', **{
             'web-acl': {'type': 'string'},
@@ -131,7 +156,8 @@ class IsWafEnabled(Filter):
         for r in resources:
             if state and target_acl_id is None and r.get('WebACLId'):
                 results.append(r)
-            elif not state and target_acl_id is None and not r.get('WebACLId'):
+            elif not state and target_acl_id is None and (not r.get('WebACLId') or
+                    r.get('WebACLId') not in waf_name_id_map.values()):
                 results.append(r)
             elif state and target_acl_id and r['WebACLId'] == target_acl_id:
                 results.append(r)
@@ -142,8 +168,40 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('wafv2-enabled')
 class IsWafV2Enabled(Filter):
-    # useful primarily to use the same name across accounts, else webaclid
-    # attribute works as well
+    """Filter CloudFront distribution by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+
+              - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
 
     schema = type_schema(
         'wafv2-enabled', **{
@@ -155,25 +213,20 @@ class IsWafV2Enabled(Filter):
     def process(self, resources, event=None):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
-        state = self.data.get('state', False)
-        target_acl = self.data.get('web-acl')
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
 
+        target_acl = self.data.get('web-acl', '')
+        state = self.data.get('state', False)
+        target_acl_ids = [v for k, v in waf_name_id_map.items() if
+                          re.match(target_acl, k)]
         results = []
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
             if state:
-                if target_acl_id is None and r_web_acl_id \
-                        and r_web_acl_id in waf_name_id_map.values():
-                    results.append(r)
-                elif target_acl_id and r_web_acl_id == target_acl_id:
+                if r_web_acl_id and r_web_acl_id in target_acl_ids:
                     results.append(r)
             else:
-                if target_acl_id is None and (not r_web_acl_id or r_web_acl_id and
-                                              r_web_acl_id not in waf_name_id_map.values()):
-                    results.append(r)
-                elif target_acl_id and r_web_acl_id != target_acl_id:
+                if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
                     results.append(r)
         return results
 
@@ -281,8 +334,8 @@ class MismatchS3Origin(Filter):
                     check_custom_origins: true
    """
 
-    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?\.amazonaws.com)')
-    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?(\..*-\d)?\.amazonaws.com)')
+    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?(\..*-\d)?\.amazonaws.com')
 
     schema = type_schema(
         'mismatch-s3-origin',
@@ -347,7 +400,7 @@ class DistributionPostFinding(PostFinding):
 
         payload.update(self.filter_empty({
             'DomainName': r['DomainName'],
-            'WebACLId': r.get('WebACLId'),
+            "WebAclId": r.get('WebACLId'),
             'LastModifiedTime': r['LastModifiedTime'].isoformat(),
             'Status': r['Status'],
             'Logging': self.filter_empty(r.get('Logging', {})),
@@ -374,6 +427,37 @@ class DistributionPostFinding(PostFinding):
 
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
+    """Enable waf protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+              - name: disassociate-waf-associate-wafv2-cf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+    """
     permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
     schema = type_schema(
         'set-waf', required=['web-acl'], **{
@@ -411,9 +495,51 @@ class SetWaf(BaseAction):
 
 @Distribution.action_registry.register('set-wafv2')
 class SetWafv2(BaseAction):
+    """Enable wafv2 protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+              - name: disassociate-wafv2-associate-waf-cf
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+            policies:
+              - name: set-wafv2-for-cloudfront-regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
+    """
     permissions = ('cloudfront:UpdateDistribution', 'wafv2:ListWebACLs')
     schema = type_schema(
-        'set-wafv2', required=['web-acl'], **{
+        'set-wafv2', **{
             'web-acl': {'type': 'string'},
             'force': {'type': 'boolean'},
             'state': {'type': 'boolean'}})
@@ -423,11 +549,18 @@ class SetWafv2(BaseAction):
     def process(self, resources):
         query = {'Scope': 'CLOUDFRONT'}
         wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['Id'] for w in wafs}
-        target_acl = self.data.get('web-acl')
-        target_acl_id = waf_name_id_map.get(target_acl, target_acl)
-        if target_acl_id not in waf_name_id_map.values():
-            raise ValueError("invalid web acl: %s" % (target_acl_id))
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        state = self.data.get('state', True)
+
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in waf_name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
 
         client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)

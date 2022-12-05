@@ -3,7 +3,7 @@
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import Tag, RemoveTag
+from c7n.tags import Tag, RemoveTag, TagDelayedAction, TagActionFilter
 from c7n.utils import type_schema, local_session, get_partition
 
 
@@ -45,6 +45,23 @@ class TagExperiment(Tag):
         ptags = {t['Key']: t['Value'] for t in tags}
         for arn in self.manager.get_arns(resource_set):
             self.manager.retry(client.tag_resource, resourceArn=arn, tags=ptags)
+
+
+@ExperimentTemplate.action_registry.register('mark-for-op', TagDelayedAction)
+@ExperimentTemplate.filter_registry.register('marked-for-op', TagActionFilter)
+class MarkForOp(TagDelayedAction):
+    """Action to create a delayed action on fis-template to start at a later date
+
+    .. code-block:: yaml
+
+        policies:
+            - name: mark-for-delete
+              resource: "aws.fis-template"
+              actions:
+                - type: mark-for-op
+                  op: tag
+                  days: 1
+    """
 
 
 @ExperimentTemplate.action_registry.register('remove-tag')

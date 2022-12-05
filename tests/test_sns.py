@@ -474,7 +474,10 @@ class TestSNS(BaseTest):
                 'resource': 'sns',
                 'filters': [
                     {
-                        'TopicArn': 'arn:aws:sns:us-east-1:644160558196:test'
+                        'type': 'value',
+                        'key': 'TopicArn',
+                        'op': 'glob',
+                        'value': '*encrypted*'
                     },
                     {
                         'type': 'kms-key',
@@ -486,7 +489,7 @@ class TestSNS(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsMasterKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
@@ -710,6 +713,90 @@ class TestSNS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'false')
+
+    def test_sns_has_statement_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_definition",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "SNS:Publish",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{topic_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+
+    def test_sns_has_statement_star_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_star_definition",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{topic_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement-star")
+
+    def test_sns_has_statement_id(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_id",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statement_ids": ["BlockNonSSL"]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["TopicArn"],
+        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
 
 
 class TestSubscription(BaseTest):

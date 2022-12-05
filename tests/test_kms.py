@@ -7,6 +7,9 @@ import time
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
 
+from c7n.executor import MainThreadExecutor
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+
 
 class KMSTest(BaseTest):
 
@@ -321,7 +324,7 @@ class KMSTagging(BaseTest):
         )
 
         resources = policy.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_id)
         tags = client.list_resource_tags(KeyId=key_id)["Tags"]
         self.assertEqual(len(tags), 0)
@@ -388,3 +391,249 @@ class KMSTagging(BaseTest):
 
         shape_validate(
             rfinding['Details']['AwsKmsKey'], 'AwsKmsKeyDetails', 'securityhub')
+
+
+class KMSCrossAccount(BaseTest):
+
+    def test_kms_cross_account(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_cross_account_kms")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Enable Cross Account",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-1"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
+    def test_kms_cross_account_condition_keys_1(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_1", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Good condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:CreateGrant",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:CallerAccount": "644160558196"
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-2"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_kms_cross_account_condition_keys_2(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_2", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Good condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "644160558196"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "s3.af-south-1.amazonaws.com",
+                        },
+                        "ForAllValues:StringEquals": {
+                            "kms:GrantOperations": [
+                                "Encrypt",
+                                "ReEncryptTo"
+                            ]
+                        }
+
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-3"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_kms_cross_account_condition_keys_3(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_3", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Bad condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "s3.af-south-1.amazonaws.com",
+                            "kms:CallerAccount": "*",
+                        },
+                        "ForAllValues:StringEquals": {
+                            "kms:GrantOperations": [
+                                "Encrypt"
+                            ]
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-4"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
