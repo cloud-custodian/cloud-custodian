@@ -1,6 +1,6 @@
 name: "CI"
 env:
-  POETRY_VERSION: "1.2.1"
+  POETRY_VERSION: "1.2.2"
 on:
   push:
     branches:
@@ -10,7 +10,9 @@ on:
     branches:
       - master
       - main
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   Lint:
     runs-on: ubuntu-latest

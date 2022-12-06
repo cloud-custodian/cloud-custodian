@@ -22,6 +22,7 @@ from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
+from botocore.config import Config
 
 
 class DescribeAlarm(DescribeSource):
@@ -31,7 +32,6 @@ class DescribeAlarm(DescribeSource):
 
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'alarm'
@@ -143,7 +143,6 @@ class CompositeAlarmDelete(BaseAction):
 
 @resources.register('event-bus')
 class EventBus(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'event-bus'
@@ -157,14 +156,12 @@ class EventBus(QueryResourceManager):
 
 @EventBus.filter_registry.register('cross-account')
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
-
     # dummy permission
     permissions = ('events:ListEventBuses',)
 
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'rule'
@@ -364,9 +361,58 @@ class EventRuleDelete(BaseAction):
                 client.delete_rule(Name=r['Name'])
 
 
+@EventRule.action_registry.register('set-rule-state')
+class SetRuleState(BaseAction):
+    """
+    This action allows to enable/disable a rule
+
+    :example:
+    .. code-block:: yaml
+        policies:
+            - name: test-rule
+              resource: aws.event-rule
+              filters:
+                - Name: my-event-rule
+              actions:
+                - type: set-rule-state
+                  enabled: true
+    """
+
+    schema = type_schema(
+        'set-rule-state',
+        **{'enabled': {'default': True, 'type': 'boolean'}}
+    )
+    permissions = ('events:EnableRule', 'events:DisableRule',)
+
+    def process(self, resources):
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('events', config=config)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+        enabled = self.data.get('enabled')
+        for resource in resources:
+            try:
+                if enabled:
+                    retry(
+                        client.enable_rule,
+                        Name=resource['Name']
+                    )
+                else:
+                    retry(
+                        client.disable_rule,
+                        Name=resource['Name']
+                    )
+            except (client.exceptions.ResourceNotFoundException,
+                    client.exceptions.ManagedRuleException):
+                continue
+
+
 @resources.register('event-rule-target')
 class EventRuleTarget(ChildResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn = False
@@ -378,7 +424,6 @@ class EventRuleTarget(ChildResourceManager):
 
 @EventRuleTarget.filter_registry.register('cross-account')
 class CrossAccountFilter(CrossAccountAccessFilter):
-
     schema = type_schema(
         'cross-account',
         # white list accounts
@@ -395,7 +440,6 @@ class CrossAccountFilter(CrossAccountAccessFilter):
 
 @EventRuleTarget.action_registry.register('delete')
 class DeleteTarget(BaseAction):
-
     schema = type_schema('delete')
     permissions = ('events:RemoveTargets',)
 
@@ -413,7 +457,6 @@ class DeleteTarget(BaseAction):
 
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'logs'
         arn_type = 'log-group'
@@ -437,7 +480,6 @@ class LogGroup(QueryResourceManager):
 
 @resources.register('insight-rule')
 class InsightRule(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'insight-rule'
@@ -721,7 +763,6 @@ class LastWriteDays(Filter):
 
 @LogGroup.filter_registry.register('cross-account')
 class LogCrossAccountFilter(CrossAccountAccessFilter):
-
     schema = type_schema(
         'cross-account',
         # white list accounts
@@ -807,7 +848,6 @@ class LogSubscriptionFilter(ValueFilter):
 
 @LogGroup.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-
     RelatedIdsExpression = 'kmsKeyId'
 
 
