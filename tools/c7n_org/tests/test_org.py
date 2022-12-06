@@ -230,8 +230,10 @@ class OrgTest(TestUtils):
 
         d = {'accounts': [
             {'name': 'dev',
+             'account_id': '123456789012',
              'tags': ['blue', 'red']},
             {'name': 'prod',
+             'account_id': '123456789013',
              'tags': ['green', 'red']}]}
 
         t1 = copy.deepcopy(d)
@@ -257,3 +259,15 @@ class OrgTest(TestUtils):
         self.assertEqual(
             [a['name'] for a in t4['accounts']],
             ['dev'])
+
+        t5 = copy.deepcopy(d)
+        org.filter_accounts(t5, [], [], ['123456789013'])
+        self.assertEqual(
+            [a['name'] for a in t5['accounts']],
+            ['dev'])
+
+        t6 = copy.deepcopy(d)
+        org.filter_accounts(t6, [], [], ['dev'])
+        self.assertEqual(
+            [a['name'] for a in t6['accounts']],
+            ['prod'])

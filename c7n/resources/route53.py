@@ -104,6 +104,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         name = id = 'Id'
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
+        global_resource = True
 
 
 @resources.register('rrset')
@@ -116,6 +117,7 @@ class ResourceRecordSet(ChildResourceManager):
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         cfn_type = 'AWS::Route53::RecordSet'
+        global_resource = True
 
 
 @resources.register('r53domain')
