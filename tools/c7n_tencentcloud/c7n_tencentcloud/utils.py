@@ -14,6 +14,7 @@ class PageMethod(Enum):
     """
     Offset = 0
     PaginationToken = 1
+    Page = 2
 
 
 def isoformat_datetime_str(date_str: str,
@@ -26,3 +27,15 @@ def isoformat_datetime_str(date_str: str,
     """
     dt = timezone_from.localize(datetime.strptime(date_str, date_str_format))
     return dt.astimezone(timezone_to).isoformat()
+
+
+def convert_date_str(date_str: str,
+                 date_str_format="%Y-%m-%d %H:%M:%S",
+                 timezone_from=pytz.timezone("Asia/Shanghai"),
+                 timezone_to=pytz.utc):
+    """
+    standardize the date string, using isoformat including timezone info
+    example: '2022-09-28'
+    """
+    dt = timezone_from.localize(datetime.strptime(date_str, date_str_format))
+    return dt.astimezone(timezone_to).strftime("%Y-%m-%d")

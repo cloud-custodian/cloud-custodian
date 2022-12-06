@@ -13,7 +13,6 @@ from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters import Filter
-
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 
@@ -105,6 +104,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         name = id = 'Id'
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
+        global_resource = True
 
 
 @resources.register('rrset')
@@ -117,6 +117,7 @@ class ResourceRecordSet(ChildResourceManager):
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         cfn_type = 'AWS::Route53::RecordSet'
+        global_resource = True
 
 
 @resources.register('r53domain')
@@ -460,11 +461,13 @@ def get_logging_config_paginator(client):
 @HostedZone.filter_registry.register('query-logging-enabled')
 class IsQueryLoggingEnabled(Filter):
 
-    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone')
+    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone',
+                   'logs:DescribeSubscriptionFilters')
     schema = type_schema('query-logging-enabled', state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('route53')
+        cw_client = local_session(self.manager.session_factory).client('logs')
         state = self.data.get('state', False)
         results = []
 
@@ -481,7 +484,11 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
+                r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)
             elif not logging and not state:
                 results.append(r)
+
         return results

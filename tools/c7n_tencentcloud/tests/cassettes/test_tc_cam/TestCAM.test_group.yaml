@@ -1,0 +1,174 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - ListUsers
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\":{\"Data\":[{\"Uin\":100027724164,\"Name\":\"sub-account-1\",\"Uid\":14340007,\"Remark\":\"COS\u56FE\u5E8A\",\"ConsoleLogin\":0,\"PhoneNum\":\"13760490350\",\"CountryCode\":\"86\",\"Email\":\"ritch@qq.com\",\"CreateTime\":\"2022-10-05
+        22:40:31\",\"NickName\":\"sub-account-1\"},{\"Uin\":100027755407,\"Name\":\"sub-account-demo\",\"Uid\":14356151,\"Remark\":\"\",\"ConsoleLogin\":1,\"PhoneNum\":\"\",\"CountryCode\":\"86\",\"Email\":\"\",\"CreateTime\":\"2022-10-08
+        15:50:07\",\"NickName\":\"sub-account-demo\"}],\"RequestId\":\"33cfddb6-beb8-46bb-8082-87c829a399db\"}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '500'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 16 Nov 2022 03:39:29 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cam::uin/100002098531:uin/100027724164", "qcs::cam::uin/100002098531:uin/100027755407"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '112'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::cam::uin\/100002098531:uin\/100027724164","Tags":[{"TagKey":"access-key-unused","TagValue":"Resource
+        does not meet policy: remove-keys@2022-11-18T10:55:00+00:00"}]},{"Resource":"qcs::cam::uin\/100002098531:uin\/100027755407","Tags":[{"TagKey":"usage","TagValue":"temp"}]}],"RequestId":"0a00b75e-57b3-48d8-a245-e84e6cc2cd48"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '403'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 16 Nov 2022 03:39:30 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Rp": 100, "SubUin": 100027724164}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '35'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - ListGroupsForUser
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalNum":0,"GroupInfo":[],"RequestId":"db3f9194-f003-4aac-8643-21f92ffc4409"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '93'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 16 Nov 2022 03:39:30 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Rp": 100, "SubUin": 100027755407}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '35'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - ListGroupsForUser
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalNum":1,"GroupInfo":[{"GroupId":251604,"GroupName":"demo","CreateTime":"2022-10-09
+        09:56:17","Remark":""}],"RequestId":"26bbebd8-aa55-4508-8317-71fc3b667a32"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '177'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 16 Nov 2022 03:39:32 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

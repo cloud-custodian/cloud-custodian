@@ -1,26 +1,25 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "90bd7606-f022-11e8-8c75-f3350c9b75d9",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "90bd7606-f022-11e8-8c75-f3350c9b75d9",
-                "content-type": "text/xml",
-                "content-length": "408",
-                "date": "Sat, 24 Nov 2018 19:53:07 GMT"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "ResourceTagSets": [
             {
                 "ResourceType": "hostedzone",
-                "ResourceId": "Z20H1474487I0O",
-                "Tags": []
+                "ResourceId": "Z10481101M6AKWLAEHU70",
+                "Tags": [
+                    {
+                        "Key": "DomainName",
+                        "Value": "vpc.internal"
+                    },
+                    {
+                        "Key": "intuit:cfn:version",
+                        "Value": "1.0.0"
+                    }
+                ]
             },
             {
                 "ResourceType": "hostedzone",
-                "ResourceId": "Z2UGBO0SA2RMJ1",
+                "ResourceId": "Z0423603VKO3K9HA5YQD",
                 "Tags": []
             }
         ]

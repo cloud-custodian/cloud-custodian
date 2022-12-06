@@ -37,14 +37,14 @@ class CollectionRunner:
         self.options = options
         self.reporter = reporter
 
-    def run(self):
+    def run(self) -> bool:
+        # return value is used to signal process exit code.
         event = self.get_event()
         provider = self.get_provider()
 
         if not provider.match_dir(self.options.source_dir):
-            raise NotImplementedError(
-                "no %s source files found" % provider.provider_name
-            )
+            log.warning("no %s source files found" % provider.type)
+            return True
 
         graph = provider.parse(self.options.source_dir)
 
@@ -52,7 +52,7 @@ class CollectionRunner:
             p.expand_variables(p.get_variables())
             p.validate()
 
-        self.reporter.on_execution_started(self.policies)
+        self.reporter.on_execution_started(self.policies, graph)
         # consider inverting this order to allow for results grouped by policy
         # at the moment, we're doing results grouped by resource.
         found = False
@@ -176,6 +176,9 @@ class ResourceGraph:
     def __init__(self, resource_data, src_dir):
         self.resource_data = resource_data
         self.src_dir = src_dir
+
+    def __len__(self):
+        raise NotImplementedError()
 
     def get_resource_by_type(self):
         raise NotImplementedError()
