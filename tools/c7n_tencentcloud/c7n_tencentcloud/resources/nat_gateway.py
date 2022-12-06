@@ -8,7 +8,30 @@ from c7n_tencentcloud.utils import PageMethod, isoformat_datetime_str
 
 @resources.register("nat-gateway")
 class NatGateway(QueryResourceManager):
-    """nat-gateway"""
+    """nat-gateway
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: nat-gateway-with-metrics-filter
+            resource: tencentcloud.nat-gateway
+            filters:
+            - type: value
+              key: CreatedTime
+              value_type: age
+              op: greater-than
+              value: 7
+            - type: metrics
+              name: Conns
+              statistics: Maximum
+              days: 7
+              value: 0
+              missing-value: 0
+              op: equal
+              period: 3600
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""

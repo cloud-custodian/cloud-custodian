@@ -29,7 +29,12 @@ STATISTICS_OPERATORS = {
 
 
 class MetricsFilter(Filter):
-    """MetricsFilter"""
+    """Supports metrics filters on resources.
+
+    Docs on cloud monitor metrics
+    https://www.tencentcloud.com/document/product/248
+
+    """
     name = "metrics"
     schema = type_schema(
         name,
