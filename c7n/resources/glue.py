@@ -27,6 +27,9 @@ class GlueConnection(QueryResourceManager):
         date = 'CreationTime'
         arn_type = "connection"
         cfn_type = 'AWS::Glue::Connection'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @GlueConnection.filter_registry.register('subnet')

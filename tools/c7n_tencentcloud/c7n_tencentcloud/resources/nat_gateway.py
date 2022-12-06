@@ -17,7 +17,10 @@ class NatGateway(QueryResourceManager):
         service = "vpc"
         version = "2017-03-12"
         enum_spec = ("DescribeNatGateways", "Response.NatGatewaySet[]", {})
-        metrics_instance_id_name = "NatGatewayId"
+        metrics_enabled = True
+        metrics_namespace = "QCE/NAT_GATEWAY"
+        metrics_dimension_def = [("natId", "NatGatewayId")]
+        metrics_instance_id_name = "natId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "nat"
         taggable = True

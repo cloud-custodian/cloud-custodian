@@ -36,7 +36,18 @@
                     "dependsOn": [
                         "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
                     ]
-                }
+                },
+                {
+                    "name": "log_connections",
+                    "type": "configurations",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "value": "off"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
+                    ]
+                 }
             ]
         }
     ]

@@ -129,7 +129,9 @@
           "kind": "Storage",
           "location": "southcentralus",
           "tags": {},
-          "properties": {}
+          "properties": {
+            "supportsHttpsTrafficOnly": true
+          }
         }
     ]
 }

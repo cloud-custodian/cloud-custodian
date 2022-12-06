@@ -354,3 +354,24 @@ class ProjectTest(BaseTest):
             user_role_pair = resource['c7n:iamPolicyUserRolePair']
             self.assertTrue("abcdefg" in user_role_pair)
             self.assertTrue('roles/admin' in user_role_pair["abcdefg"])
+
+    def test_compute_meta_filter(self):
+        factory = self.replay_flight_data('project-compute-meta')
+
+        p = self.load_policy(
+            {
+                'name': 'resource',
+                'resource': 'gcp.project',
+                'filters': [{
+                    'type': 'compute-meta',
+                    'key': 'commonInstanceMetadata.items[?key==`enable-oslogin`].value | [0]',
+                    'value_type': 'normalize',
+                    'op': 'ne',
+                    'value': 'true'
+                }]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
