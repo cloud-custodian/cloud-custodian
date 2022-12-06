@@ -8,7 +8,7 @@ from c7n.filters.core import ValueFilter, type_schema
 
 
 @resources.register('mysql-flexibleservers')
-class MySQLFlexibleServers(ArmResourceManager):
+class MySQLFlexibleServer(ArmResourceManager):
     """Azure MySQL Flexible Server Resource
 
     :example:
@@ -41,73 +41,68 @@ class MySQLFlexibleServers(ArmResourceManager):
         )
         resource_type = 'Microsoft.DBForMySQL/servers/flexibleservers/configurations'
 
-# @MySQLFlexibleServer.filter_registry.register('configuration-parameter')
-# class ConfigurationParametersFilter(ValueFilter):
-#      """Filter by configuration parameter for this postresql server
+@MySQLFlexibleServer.filter_registry.register('server-parameter')
+class ServerParametersFilter(ValueFilter):
+     """Filter by configuration parameter for this postresql server
 
-#      Configurations are made available to the filter as a map with each
-#      key holding the name of the configuration and each value holding
-#      the properties of the Configuration as defined here:
-#      https://learn.microsoft.com/en-us/python/api/azure-mgmt-rdbms/azure.mgmt.rdbms.mysql_flexibleservers.models.configuration?view=azure-python
+     Configurations are made available to the filter as a map with each
+     key holding the name of the configuration and each value holding
+     the properties of the Configuration as defined here:
+     https://learn.microsoft.com/en-us/python/api/azure-mgmt-rdbms/azure.mgmt.rdbms.mysql_flexibleservers.models.configuration?view=azure-python
 
-#      :example:
+     :example:
 
-#      Example JSON document showing the data format provided to the filter
+     Example JSON document showing the data format provided to the filter
 
-#      .. code-block:: json
+     .. code-block:: json
 
-#        {
-#          "allowedValues": "TLSv1,TLSv1.1,TLSv1.2"
-#          "dataType": "Set"
-#          "defaultValue": "TLSv1.2"
-#          "description": "Which protocols the server permits for encrypted connections. By default, TLS 1.2 is enforced"
-#          "id": "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroupName>/providers/Microsoft.DBforMySQL/flexibleServers/<serverName>/configurations/tls_version
-#          "isConfigPendingRestart": "False"
-#          "isDynamicConfig": "False"
-#          "isReadOnly": "False"
-#          "name": "tls_version"
-#          "resourceGroup": "<resourceGroupName>"
-#          "source": "system-default"
-#          "systemData": null
-#          "type": "Microsoft.DBforMySQL/flexibleServers/configurations"
-#          "value": "TLSv1.2"
-#        }
+       {
+         "allowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+         "dataType": "Set",
+         "defaultValue": "TLSv1.2",
+         "description": "Which protocols the server permits for encrypted connections.",
+         "isConfigPendingRestart": "False",
+         "isDynamicConfig": "False",
+         "name": "tls_version",
+         "source": "system-default",
+         "value": "TLSv1.2"
+       }
         
-#      :example:
+     :example:
 
-#      Find Mysql flexible server with TLSv1.2 
+     Find Mysql flexible server with TLSv1.2 
 
-#      .. code-block:: yaml
+     .. code-block:: yaml
 
-#          policies:
-#            - name: sql-database-no-log-connections
-#              resource: azure.postgresql-server
-#              filters:
-#                - type: configuration-parameter
-#                  name: tls_version
-#                  key: value
-#                  op: ne
-#                  value: 'on'
+         policies:
+           - name: sql-database-no-log-connections
+             resource: azure.mysql-flexibleservers
+             filters:
+               - type: server-parameter
+                 name: tls_version
+                 key: value
+                 op: ne
+                 value: 'TLSv1.2'
 
-#      """
+     """
 
-#      schema = type_schema(
-#          'configuration-parameter',
-#          required=['type', 'name'],
-#          rinherit=ValueFilter.schema,
-#          name=dict(type='string')
-#      )
+     schema = type_schema(
+         'server-parameter',
+         required=['type', 'name'],
+         rinherit=ValueFilter.schema,
+         name=dict(type='string')
+     )
 
-#      def __call__(self, resource):
-#          key = f'c7n:config-params:{self.data["name"]}'
-#          if key not in resource['properties']:
-#              client = self.manager.get_client()
-#              query = client.configurations.get(
-#                  resource['resourceGroup'],
-#                  resource['name'],
-#                  self.data["name"]
-#              )
+     def __call__(self, resource):
+         key = f'c7n:server-params:{self.data["name"]}'
+         if key not in resource['properties']:
+             client = self.manager.get_client()
+             query = client.configurations.get(
+                 resource['resourceGroup'],
+                 resource['name'],
+                 self.data["name"]
+             )
 
-#              resource['properties'][key] = query.serialize(True).get('properties')
+             resource['properties'][key] = query.serialize(True).get('properties')
 
-#          return super().__call__(resource['properties'][key])
+         return super().__call__(resource['properties'][key])
