@@ -10,6 +10,9 @@ from c7n_tencentcloud.utils import PageMethod, isoformat_datetime_str
 class NatGateway(QueryResourceManager):
     """nat-gateway
 
+    Docs on Nat Gateway
+    https://www.tencentcloud.com/document/product/1015
+
     :example:
 
     .. code-block:: yaml

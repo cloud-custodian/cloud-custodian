@@ -10,6 +10,9 @@ import pytz
 class MySQLBackUp(QueryResourceManager):
     """mysql-backup
 
+    Docs on mysql-backup
+    https://www.tencentcloud.com/document/product/236/37796
+
     :example:
 
     .. code-block:: yaml
