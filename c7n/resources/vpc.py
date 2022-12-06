@@ -17,7 +17,7 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -894,24 +894,39 @@ class UsedSecurityGroup(SGUsage):
                     op: intersect
                     value:
                       - nat_gateway
+
+            policies:
+              - name: security-groups-used-by-alb
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceResourceTypes
+                    op: intersect
+                    value:
+                      - elb-app
     """
     schema = type_schema('used')
 
     instance_owner_id_key = 'c7n:InstanceOwnerIds'
     interface_type_key = 'c7n:InterfaceTypes'
+    interface_resource_type_key = 'c7n:InterfaceResourceTypes'
 
     def _get_eni_attributes(self):
         enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
                 instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                interface_resource_type = get_eni_resource_type(nic)
             else:
                 instance_owner_id = ''
+                interface_resource_type = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
                 enis.append({'GroupId': g['GroupId'],
                              'InstanceOwnerId': instance_owner_id,
-                             'InterfaceType': interface_type})
+                             'InterfaceType': interface_type,
+                             'InterfaceResourceType': interface_resource_type})
         return enis
 
     def process(self, resources, event=None):
@@ -924,12 +939,15 @@ class UsedSecurityGroup(SGUsage):
         for r in resources:
             owner_ids = set()
             interface_types = set()
+            interface_resource_types = set()
             for eni in enis:
                 if r['GroupId'] == eni['GroupId']:
                     owner_ids.add(eni['InstanceOwnerId'])
                     interface_types.add(eni['InterfaceType'])
-            r[self.instance_owner_id_key] = list(owner_ids)
-            r[self.interface_type_key] = list(interface_types)
+                    interface_resource_types.add(eni['InterfaceResourceType'])
+            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
+            r[self.interface_type_key] = list(filter(None, interface_types))
+            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
         return [r for r in resources if r['GroupId'] not in unused]
 
 
