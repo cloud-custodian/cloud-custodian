@@ -26,6 +26,13 @@ def load_policies(options, config):
     policies = PolicyCollection([], config)
     for f in options.config_files:
         policies += policy_load(config, f).filter(options.policy_filter)
+    # Todo: Move loop to policy loader
+    if options.known:
+        for p in policies:
+            p.conditions.env_vars['account'] = config['account']
+            if p.is_runnable(): # Exclude policy from removal when it matches account-info
+                log.info("Skipping policy %s for removal based on conditions: %s", p.name, p.conditions.data)
+                policies.policies.remove(p)
     return policies
 
 
@@ -52,7 +59,7 @@ def region_gc(options, region, policy_config, policies):
         for pn in current_policies:
             if f['FunctionName'].endswith(pn):
                 match = True
-        if options.present:
+        if options.known:
             if match:
                 remove.append(f)
         elif not match:
@@ -148,8 +155,14 @@ def setup_parser():
         '-c', '--config', dest="config_files", nargs="*", action='append',
         help="Policy configuration files(s)", default=[])
     parser.add_argument(
-        "--present", action="store_true", default=False,
-        help='Target policies present in config files for removal instead of skipping them.')
+        "-f", "--folder", dest="folder",
+        help="Folder with c7n policy files.")
+    parser.add_argument(
+        "--accountinfo",
+        help="Account-Info passed from c7n-org as json string.")
+    parser.add_argument(
+        "--known", action="store_true", default=False,
+        help='Mark known policies passed or in folder for cleanup/removal.')
     parser.add_argument(
         '-r', '--region', action='append', dest='regions', metavar='REGION',
         help="AWS Region to target. Can be used multiple times, also supports `all`")
@@ -194,9 +207,19 @@ def main():
     if not options.regions:
         options.regions = [os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')]
 
+    options.accountinfo = json.loads(options.accountinfo)
+
     files = []
-    files.extend(itertools.chain(*options.config_files))
-    files.extend(options.configs)
+
+    if options.folder:
+        for root, dirs, policies in os.walk(options.folder):
+            for policy in policies:
+                files.append(os.path.join(root, policy))
+
+    if options.config_files:
+        files.extend(itertools.chain(*options.config_files))
+        files.extend(options.configs)
+
     options.config_files = files
 
     if not files:
@@ -207,6 +230,8 @@ def main():
         regions=options.regions,
         profile=options.profile,
         assume_role=options.assume_role)
+
+    policy_config['account'] = options.accountinfo
 
     # use cloud provider to initialize policies to get region expansion
     policies = AWS().initialize_policies(

@@ -1076,9 +1076,9 @@ class PolicyConditions:
 
         # note for no filters/conditions, this uses all([]) == true property.
         state = all([f.process([policy_vars], event) for f in self.filters])
-        if not state:
-            self.policy.log.info(
-                'Skipping policy:%s due to execution conditions', self.policy.name)
+        # if not state:
+        #     self.policy.log.info(
+        #         'Skipping policy %s for deployment based on conditions', self.policy.name)
         return state
 
     def iter_filters(self, block_end=False):
