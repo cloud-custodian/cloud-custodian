@@ -22,6 +22,7 @@ from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
 from .aws import shape_validate
 from datetime import datetime, timedelta
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 @resources.register('redshift')
@@ -44,6 +45,7 @@ Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
 Redshift.filter_registry.register('network-location', net_filters.NetworkLocation)
 Redshift.filter_registry.register('offhour', OffHour)
 Redshift.filter_registry.register('onhour', OnHour)
+Redshift.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @Redshift.filter_registry.register('default-vpc')
