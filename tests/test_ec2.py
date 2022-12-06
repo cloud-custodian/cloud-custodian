@@ -1078,6 +1078,91 @@ class TestStop(BaseTest):
         self.assertEqual(len(stopped), 1)
         self.assertEqual(len(hibernated), 1)
 
+    def test_ec2_stop_with_protection_enabled(self):
+        # Test conditions: single running instance, with stop protection
+        session_factory = self.replay_flight_data("test_ec2_stop_with_protection_enabled")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-000b2f5125402eb55"}],
+                "actions": [{"type": "stop", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        perms = policy.get_permissions()
+        self.assertTrue("ec2:ModifyInstanceAttribute" in perms)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-000b2f5125402eb55"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "stopped")
+
+    def test_ec2_stop_with_protection_enabled_handle_error(self):
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-000b2f5125402eb55"}],
+                "actions": [{"type": "stop", "force": True}],
+            }
+        )
+
+        stop_action = policy.resource_manager.actions[0]
+
+        client = mock.MagicMock()
+        client.modify_instance_attribute.side_effect = ClientError(
+            {'Error': {
+                'Code': 'IncorrectInstanceState',
+                'Message': ("The instance 'i-000b2f5125402eb55' must be in a "
+                            "'running', 'pending', 'stopping' or "
+                            "'stopped' state for this operation")
+            }}, 'ModifyInstanceAttribute')
+
+        self.assertEqual(
+            None,
+            stop_action.disable_protection(client, 'stop', [{'InstanceId': 'i-foo'}]),
+        )
+
+        client2 = mock.MagicMock()
+        client2.modify_instance_attribute.side_effect = ClientError(
+            {'Error': {
+                'Code': 'UnauthorizedOperation',
+                'Message': "You are not authorized to perform this operation."
+            }}, 'ModifyInstanceAttribute')
+
+        self.assertRaises(
+            ClientError,
+            stop_action.disable_protection,
+            client2, 'stop', [{'InstanceId': 'i-foo'}],
+        )
+
+    def test_ec2_stop_with_protection_enabled_ephemeral(self):
+        # Test conditions: single running instance (ephemeral), with stop protection
+        session_factory = self.replay_flight_data("test_ec2_stop_with_protection_enabled_ephemeral")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-with-protection-enabled-ephemeral",
+                "resource": "ec2",
+                "filters": [{"InstanceId": "i-0a3e363a5366795dd"}],
+                "actions": [{"type": "stop", "terminate-ephemeral": True, "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        perms = policy.get_permissions()
+        self.assertTrue("ec2:ModifyInstanceAttribute" in perms)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=["i-0a3e363a5366795dd"]
+        )
+        self.assertEqual(instances[0]["State"]["Name"], "terminated")
+
 
 class TestReboot(BaseTest):
 
