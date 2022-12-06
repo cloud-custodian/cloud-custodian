@@ -1942,3 +1942,122 @@ class LakeformationFilter(Filter):
             return False
         account[self.annotation] = list(cross_account)
         return True
+
+
+@filters.register('ses-agg-send-stats')
+class SesAggStats(ValueFilter):
+    """This filter queries SES send statistics and aggregates all
+    the data points into a single report.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-aggregated-send-stats-policy
+                resource: account
+                filters:
+                  - type: ses-agg-send-stats
+    """
+
+    schema = type_schema('ses-agg-send-stats', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ses-send-agg'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        resource_counter = {'DeliveryAttempts': 0,
+                            'Bounces': 0,
+                            'Complaints': 0,
+                            'Rejects': 0,
+                            'BounceRate': 0}
+        for d in get_send_stats.get('SendDataPoints', []):
+            resource_counter['DeliveryAttempts'] += d['DeliveryAttempts']
+            resource_counter['Bounces'] += d['Bounces']
+            resource_counter['Complaints'] += d['Complaints']
+            resource_counter['Rejects'] += d['Rejects']
+        resource_counter['BounceRate'] = round(
+            (resource_counter['Bounces'] /
+             resource_counter['DeliveryAttempts']) * 100)
+        resources[0][self.annotation_key] = resource_counter
+
+        return resources
+
+
+@filters.register('ses-send-stats')
+class SesConsecutiveStats(Filter):
+    """This filter annotates the account resource with SES send statistics for the
+    last n number of days, not including the current date.
+
+    The stats are aggregated into daily metrics. Additionally, the filter also
+    calculates and annotates the max daily bounce rate (percentage). Using this filter,
+    users can alert when the bounce rate for a particular day is higher than the limit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-send-stats
+                resource: account
+                filters:
+                  - type: ses-send-stats
+                    days: 5
+                  - type: value
+                    key: '"c7n:ses-max-bounce-rate"'
+                    op: ge
+                    value: 10
+    """
+    schema = type_schema('ses-send-stats', days={'type': 'number', 'minimum': 2},
+                         required=['days'])
+    send_stats_annotation = 'c7n:ses-send-stats'
+    max_bounce_annotation = 'c7n:ses-max-bounce-rate'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+        check_days = self.data.get('days', 2)
+        utcnow = datetime.datetime.utcnow()
+        expected_dates = set()
+
+        for days in range(1, check_days + 1):
+            expected_dates.add((utcnow - datetime.timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        metrics = {}
+        for d in get_send_stats.get('SendDataPoints', []):
+            ts = d['Timestamp'].strftime('%Y-%m-%d')
+            if ts not in expected_dates:
+                continue
+
+            if not metrics.get(ts):
+                metrics[ts] = {'DeliveryAttempts': 0,
+                               'Bounces': 0,
+                               'Complaints': 0,
+                               'Rejects': 0}
+            metrics[ts]['DeliveryAttempts'] += d['DeliveryAttempts']
+            metrics[ts]['Bounces'] += d['Bounces']
+            metrics[ts]['Complaints'] += d['Complaints']
+            metrics[ts]['Rejects'] += d['Rejects']
+
+        max_bounce_rate = 0
+        for ts, metric in metrics.items():
+            metric['BounceRate'] = round((metric['Bounces'] / metric['DeliveryAttempts']) * 100)
+            if max_bounce_rate < metric['BounceRate']:
+                max_bounce_rate = metric['BounceRate']
+            metric['Date'] = ts
+
+        resources[0][self.send_stats_annotation] = list(metrics.values())
+        resources[0][self.max_bounce_annotation] = max_bounce_rate
+
+        return resources
