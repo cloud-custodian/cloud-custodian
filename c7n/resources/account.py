@@ -2150,6 +2150,11 @@ class ToggleConfigManagedRule(BaseAction):
 class SesAggStats(ValueFilter):
     """This filter queries SES send statistics and aggregates all
     the data points into a single report.
+
+    :example:
+
+    .. code-block:: yaml
+
             policies:
               - name: ses-aggregated-send-stats-policy
                 resource: account
