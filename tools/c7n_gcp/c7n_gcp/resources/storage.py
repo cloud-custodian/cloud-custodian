@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.utils import type_schema
+from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
+from c7n.filters.core import ValueFilter
 
 
 @resources.register('bucket')
@@ -82,3 +83,42 @@ class BucketLevelAccess(MethodAction):
                 'fields': 'iamConfiguration',
                 'projection': 'noAcl',  # not documented but
                 'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
+
+@Bucket.filter_registry.register('log-sinks')
+class BucketLogSinksFilter(ValueFilter):
+    """Filter by storage buckets for log sinks in cloud storage
+
+    
+    :example:
+
+    Example JSON document showing the data format provided to the filter
+
+    .. code-block:: json
+
+        policies:
+          - name: log-filter-for-bucket-log
+            resource: gcp.bucket
+            filters:
+              - type: log-sinks
+                key: log_bucket
+                op: ne
+                value: on
+
+    """
+
+    permissions = ('storage.buckets.get',)
+    schema = type_schema ('log-sinks', rinherit=ValueFilter.schema,)
+
+    def __init__(self, data, manager=None):
+         super().__init__(data, manager)
+
+    def __call__(self, resource):
+        if self.key in resource:
+          return resource[self.key]
+
+        session = local_session(self.manager.session_factory)
+        self.client = session.client('logging', 'v2', 'projects.sinks')
+
+        resource[self.key] = self.client.execute_command('get', {"project": resource['projectId']})
+
+        return super().__call__(resource[self.key])
