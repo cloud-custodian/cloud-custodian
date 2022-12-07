@@ -1,0 +1,840 @@
+{
+    "status_code": 200,
+    "data": {
+        "SendDataPoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 8,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 22,
+                    "hour": 12,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 17,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 20,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 8,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 22,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 22,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 9,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 20,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 26,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 23,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 6,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 19,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 20,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 22,
+                    "hour": 20,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 17,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 15,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 20,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 21,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 17,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 8,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 12,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 16,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 21,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 18,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 6,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 20,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 21,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 5,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 4,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 21,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 6,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 18,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 21,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 4,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 22,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 2,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 58,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 1,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 22,
+                    "hour": 3,
+                    "minute": 43,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 21,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 28,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 8,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 1,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            },
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 18,
+                    "minute": 13,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "DeliveryAttempts": 3,
+                "Bounces": 0,
+                "Complaints": 0,
+                "Rejects": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
