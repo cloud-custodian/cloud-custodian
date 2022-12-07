@@ -116,3 +116,24 @@ class AppSyncWafV2(BaseTest):
             p.run()
         self.assertIn('matching to none or multiple webacls', str(
             ctx.exception))
+
+
+class TestAppSyncApiCache(BaseTest):
+    def test_graphql_api_cache_filter(self):
+        factory = self.replay_flight_data(
+            "test_graphql_api_cache_filter")
+
+        p = self.load_policy(
+            {
+                "name": "graphql-api-cache-filter",
+                "resource": "graphql-api",
+                "filters": [{"type": "api-cache",
+                             "key": "apiCachingBehavior",
+                             "value": "FULL_REQUEST_CACHING"
+                             }],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
