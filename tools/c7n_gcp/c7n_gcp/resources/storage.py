@@ -88,7 +88,6 @@ class BucketLevelAccess(MethodAction):
 class BucketLogSinksFilter(ValueFilter):
     """Filter by storage buckets for log sinks in cloud storage
 
-    
     :example:
 
     Example JSON document showing the data format provided to the filter
