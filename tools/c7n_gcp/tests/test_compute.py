@@ -19,6 +19,17 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 4)
 
+        self.assertResourceURNs(
+            'instance',
+            resources,
+            [
+                'gcp:compute:us-east1:custodian-1291:instance/custodian-dev',
+                'gcp:compute:us-central1:custodian-1291:instance/c7n-jenkins',
+                'gcp:compute:us-central1:custodian-1291:instance/drone',
+                'gcp:compute:us-east1:custodian-1291:instance/custodian',
+            ],
+       )
+
     def test_instance_get(self):
         factory = self.replay_flight_data('instance-get')
         p = self.load_policy(
@@ -196,6 +207,19 @@ class DiskTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
+
+        self.assertResourceURNs(
+            'disk',
+            resources,
+            [
+                'gcp:compute:us-east1:custodian-1291:disk/custodian-dev',
+                'gcp:compute:us-east1:custodian-1291:disk/drone-upgrade',
+                'gcp:compute:us-east1:custodian-1291:disk/custodian',
+                'gcp:compute:us-central1:custodian-1291:disk/c7n-jenkins',
+                'gcp:compute:us-central1:custodian-1291:disk/drone',
+                'gcp:compute:us-central1:custodian-1291:disk/drone-11-1'
+            ],
+       )
 
     def test_disk_snapshot(self):
         factory = self.replay_flight_data('disk-snapshot', project_id='cloud-custodian')

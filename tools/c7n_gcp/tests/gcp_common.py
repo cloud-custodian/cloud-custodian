@@ -17,6 +17,7 @@ from c7n.testing import (
 )
 
 from c7n_gcp.client import Session, LOCAL_THREAD
+from c7n_gcp.provider import GoogleCloud
 
 from recorder import (
     HttpRecorder,
@@ -127,3 +128,7 @@ class BaseTest(FlightRecorderTest):
     @property
     def account_id(self):
         return ""
+
+    def assertResourceURNs(self, resource_type, resources, expected, project_id=None):
+        rm = GoogleCloud.resources.get(resource_type)
+        self.assertEqual(rm.get_urns(resources, project_id=project_id),expected)

@@ -25,6 +25,7 @@ google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^1.42.2"
 
 [tool.poetry.dev-dependencies]
+freezegun = "^1.2.2"
 pytest = "^7.1.2"
 pytest-terraform = "^0.6.0"
 c7n = {path = "../..", develop = true}

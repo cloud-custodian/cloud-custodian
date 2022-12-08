@@ -20,6 +20,13 @@ class BucketTest(BaseTest):
         self.assertEqual(resources[0]['id'], "staging.cloud-custodian.appspot.com")
         self.assertEqual(resources[0]['storageClass'], "STANDARD")
 
+        self.assertResourceURNs(
+            'bucket',
+            resources,
+            ['gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com'],
+            project_id,
+       )
+
     def test_bucket_get(self):
         project_id = 'cloud-custodian'
         bucket_name = "staging.cloud-custodian.appspot.com"

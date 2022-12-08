@@ -5,6 +5,7 @@ import jmespath
 import json
 import itertools
 import logging
+import os
 
 from googleapiclient.errors import HttpError
 
@@ -149,6 +150,10 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
+    # The resource manager type is injected by the PluginRegistry.register
+    # decorator.
+    type: str
+    resource_type: 'TypeInfo'
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -243,6 +248,53 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def augment(self, resources):
         return resources
+
+    @classmethod
+    def get_urns(cls, resources, project_id=None):
+        """Generate URNs for the resources.
+
+        A Uniform Resource Name (URN) is a URI that identifies a resource by
+        name in a particular namespace. A URN may be used to talk about a
+        resource without implying its location or how to access it.
+
+        The generated URNs can uniquely identify any given resource.
+
+        The generated URN is intended to follow a similar pattern to ARN, but be
+        specific to GCP.
+
+        gcp:<service>:<region>:<project>:<resource-type>/<resource-id>
+
+        If the region is "global" then it is omitted from the URN.
+        """
+        return [cls._get_urn(r, project_id) for r in resources]
+
+    @classmethod
+    def _get_urn(cls, resource, project_id=None) -> str:
+        "Generate an URN for the resource."
+        rt = cls.resource_type
+        region = cls._get_region(resource)
+        if region == "global":
+            region = ""
+        if project_id is None:
+            project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+        id = resource[rt.id]
+        return f"gcp:{rt.service}:{region}:{project_id}:{cls.type}/{id}"
+
+    @classmethod
+    def _get_region(cls, resource):
+        """Get the region for a single resource.
+
+        Resources are either global, regional, or zonal. When a resource is
+        is zonal, the region is determined from the zone.
+        """
+        if "region" in resource:
+            return resource["region"].rsplit("/", 1)[-1]
+        if "zone" in resource:
+            zone = resource["zone"].rsplit("/", 1)[-1]
+            # The zone is always "{region}-{zone-id}"
+            return zone.rsplit("-",1)[0]
+
+        return "global"
 
 
 class ChildResourceManager(QueryResourceManager):

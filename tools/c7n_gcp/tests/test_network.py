@@ -92,6 +92,13 @@ class SubnetTest(BaseTest):
         self.assertEqual(subnet['name'], 'default')
         self.assertEqual(subnet['privateIpGoogleAccess'], True)
 
+        self.assertResourceURNs(
+            'subnet',
+            [subnet],
+            ['gcp:compute:us-central1:cloud-custodian:subnet/default'],
+            project_id='cloud-custodian',
+        )
+
     def test_subnet_set_flow(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data('subnet-set-flow', project_id=project_id)
