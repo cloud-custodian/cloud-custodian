@@ -1,0 +1,125 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-004a79105c91013c7", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "", 
+                        "RootDeviceType": "ebs", 
+                        "State": {
+                            "Code": 80, 
+                            "Name": "stopped"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 10, 
+                            "second": 59, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 29, 
+                            "minute": 45
+                        }, 
+                        "ProductCodes": [], 
+                        "StateTransitionReason": "User initiated (2022-11-17 10:53:38 GMT)",
+                        "InstanceId": "i-000b2f5125402eb55", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-b04e92d0", 
+                        "PrivateDnsName": "", 
+                        "KeyName": "m", 
+                        "SecurityGroups": [], 
+                        "ClientToken": "TXGvw1477773959019", 
+                        "InstanceType": "t2.nano", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "OwnerId": "644160558196", 
+                                "NetworkInterfaceId": "eni-caa070b4", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-f453157c", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 10, 
+                                        "second": 59, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 29, 
+                                        "minute": 45
+                                    }
+                                }
+                            }
+                        ], 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-west-2a"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-e99af061", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 10, 
+                                        "second": 0, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 29, 
+                                        "minute": 46
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "StateReason": {
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown", 
+                            "Code": "Client.UserInitiatedShutdown"
+                        }, 
+                        "IamInstanceProfile": {
+                            "Id": "AIPAJO5EMJ3YEMNUF5ZWM", 
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole"
+                        }, 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "", 
+                                "Key": "Name"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1b49d122-39e6-4c2f-8831-9ac43749b589", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 17 Nov 2022 10:55:21 GMT"
+            }
+        }
+    }
+}

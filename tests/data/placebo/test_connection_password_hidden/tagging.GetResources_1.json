@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:cloudhsm:us-east-1:644160558196:cluster/cluster-remd5qbjj6l",
+                "ResourceARN": "arn:aws:glue:us-east-1:644160558196:connection/test",
                 "Tags": []
             }
         ],

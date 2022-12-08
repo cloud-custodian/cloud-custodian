@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 11 Nov 2022 18:57:11 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=181",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4527",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "365206961407",
+        "projectId": "cloud-custodian",
+        "lifecycleState": "ACTIVE",
+        "name": "cloud-custodian",
+        "createTime": "2022-05-17T14:54:05.471Z",
+        "parent": {
+          "type": "organization",
+          "id": "111111111111"
+        }
+      }
+    ]
+  }
+}
