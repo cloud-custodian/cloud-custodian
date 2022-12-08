@@ -667,6 +667,7 @@ class StorageTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+
 class StorageFirewallFilterTest(BaseTest):
 
     def test_query_default_allow(self):
