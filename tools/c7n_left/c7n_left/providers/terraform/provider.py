@@ -47,7 +47,7 @@ class TerraformProvider(IACSourceProvider):
     def parse(self, source_dir):
         graph = TerraformGraph(load_from_path(source_dir), source_dir)
         graph.build()
-        log.debug("Loaded %d resources", len(graph))
+        log.debug("Loaded %d %s resources", len(graph), self.type)
         return graph
 
     def match_dir(self, source_dir):

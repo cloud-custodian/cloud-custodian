@@ -31,7 +31,7 @@ from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
-from c7n.resources.iam import CheckPermissions
+from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
@@ -1437,8 +1437,12 @@ class Stop(BaseAction):
 
     schema = type_schema(
         'stop',
-        **{'terminate-ephemeral': {'type': 'boolean'},
-           'hibernate': {'type': 'boolean'}})
+        **{
+            "terminate-ephemeral": {"type": "boolean"},
+            "hibernate": {"type": "boolean"},
+            "force": {"type": "boolean"},
+        },
+    )
 
     has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
 
@@ -1446,6 +1450,8 @@ class Stop(BaseAction):
         perms = ('ec2:StopInstances',)
         if self.data.get('terminate-ephemeral', False):
             perms += ('ec2:TerminateInstances',)
+        if self.data.get("force"):
+            perms += ("ec2:ModifyInstanceAttribute",)
         return perms
 
     def split_on_storage(self, instances):
@@ -1476,29 +1482,61 @@ class Stop(BaseAction):
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
-            self._run_instances_op(
-                client.terminate_instances,
-                [i['InstanceId'] for i in ephemeral])
+            self._run_instances_op(client, 'terminate', ephemeral)
         if persistent:
             if self.data.get('hibernate', False):
                 enabled, persistent = self.split_on_hibernate(persistent)
                 if enabled:
-                    self._run_instances_op(
-                        client.stop_instances,
-                        [i['InstanceId'] for i in enabled],
-                        Hibernate=True)
-            self._run_instances_op(
-                client.stop_instances,
-                [i['InstanceId'] for i in persistent])
+                    self._run_instances_op(client, 'stop', enabled, Hibernate=True)
+            self._run_instances_op(client, 'stop', persistent)
         return instances
 
-    def _run_instances_op(self, op, instance_ids, **kwargs):
-        while instance_ids:
+    def disable_protection(self, client, op, instances):
+        def modify_instance(i, attribute):
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
+                self.manager.retry(
+                    client.modify_instance_attribute,
+                    InstanceId=i['InstanceId'],
+                    Attribute=attribute,
+                    Value='false',
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    return
+                raise
+
+        def process_instance(i, op):
+            modify_instance(i, 'disableApiStop')
+            if op == 'terminate':
+                modify_instance(i, 'disableApiTermination')
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(process_instance, instances, [op] * len(instances)))
+
+    def _run_instances_op(self, client, op, instances, **kwargs):
+        client_op = client.stop_instances
+        if op == 'terminate':
+            client_op = client.terminate_instances
+
+        instance_ids = [i['InstanceId'] for i in instances]
+
+        while instances:
+            try:
+                return self.manager.retry(client_op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
+                if (
+                    e.response['Error']['Code'] == 'OperationNotPermitted' and
+                    self.data.get('force')
+                ):
+                    self.log.info("Disabling stop and termination protection on instances")
+                    self.disable_protection(
+                        client,
+                        op,
+                        [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
+                    )
+                    continue
                 raise
 
 
@@ -2345,3 +2383,49 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+
+@EC2.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
+    """Filter an EC2 instance that has an IAM instance profile that contains an IAM role that has
+       a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
+       does not contain an IAM role, then it will be treated as not having the policy.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-has-admin-policy
+            resource: ec2
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    permissions = (
+        'iam:GetInstanceProfile',
+        'iam:ListInstanceProfiles',
+        'iam:ListAttachedRolePolicies')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        iam_profiles_mapping = {profile['Arn']: profile for profile in iam_profiles}
+
+        results = []
+        for r in resources:
+            if r['State']['Name'] == 'terminated':
+                continue
+            instance_profile_arn = r.get('IamInstanceProfile', {}).get('Arn')
+            if not instance_profile_arn:
+                continue
+
+            profile = iam_profiles_mapping.get(instance_profile_arn)
+            if not profile:
+                continue
+
+            if self.has_managed_policy(client, profile):
+                results.append(r)
+
+        return results

@@ -37,7 +37,7 @@ class ResultsReporter:
     def __init__(self):
         self.results = []
 
-    def on_execution_started(self, policies):
+    def on_execution_started(self, policies, graph):
         pass
 
     def on_execution_ended(self):
@@ -267,6 +267,7 @@ def write_output_test_policy(tmp_path):
                     {
                         "name": "check-bucket",
                         "resource": "terraform.aws_s3_bucket",
+                        "description": "a description",
                         "filters": [{"server_side_encryption_configuration": "absent"}],
                     }
                 ]
@@ -306,6 +307,7 @@ def test_cli_output_rich(tmp_path):
         ],
     )
     assert result.exit_code == 1
+    assert "Reason: a description\n" in result.output
 
 
 def test_cli_output_github(tmp_path):
@@ -325,10 +327,11 @@ def test_cli_output_github(tmp_path):
         ],
     )
     assert result.exit_code == 1
-    assert result.output == (
-        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf line=25 lineEnd=28"
-        " title=terraform.aws_s3_bucket - policy:check-bucket::\n"
+    expected = (
+        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
+        "title=terraform.aws_s3_bucket - policy:check-bucket::a description"
     )
+    assert expected in result.output
 
 
 def test_cli_output_json_query(tmp_path):
@@ -398,6 +401,7 @@ def test_cli_output_json(tmp_path):
                 "mode": {"type": "terraform-source"},
                 "name": "check-bucket",
                 "resource": "terraform.aws_s3_bucket",
+                "description": "a description",
             },
             "resource": {
                 "__tfmeta": {

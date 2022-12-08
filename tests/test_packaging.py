@@ -23,7 +23,7 @@ def test_package_metadata(package):
         if c.exists():
             found = True
             p = c
-    assert found, "could not find pyproject.yaml"
+    assert found, "could not find %s pyproject.toml" % package
     data = tomli.loads(p.read_text())
     md = data['tool']['poetry']
     assert md.get('homepage') == 'https://cloudcustodian.io'
@@ -38,3 +38,16 @@ def test_package_metadata(package):
     assert md.get('readme', '').endswith('md')
     assert (p.parent / md['readme']).exists()
     assert 'description' in md
+
+
+def test_version_match():
+    """
+    Ensures that the version in c7n.version matches the pyproject.toml version
+    """
+    from c7n.version import version
+    m = __import__('c7n')
+    pyproject = Path(m.__file__).parent.parent / 'pyproject.toml'
+    with open(pyproject, 'r') as f:
+        loaded = tomli.loads(f.read())
+        pyproject_version = loaded['tool']['poetry']['version']
+        assert pyproject_version == version

@@ -250,6 +250,9 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q3 2022
+            'AwsBackupBackupPlan',
+            'AwsBackupBackupVault',
+            'AwsBackupRecoveryPoint',
             'AwsCloudFormationStack',
             'AwsWafRegionalRule',
             'AwsWafRule',
@@ -337,6 +340,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = {
             'AWS::ApiGatewayV2::Stage',
+            'AWS::Athena::DataCatalog',
+            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
@@ -344,15 +349,22 @@ class PolicyMetaLint(BaseTest):
             'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
             'AWS::Config::ResourceCompliance',
+            'AWS::Detective::Graph',
+            'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::TransitGatewayAttachment',
+            'AWS::EC2::TransitGatewayRouteTable',
             'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
             'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::GlobalAccelerator::Accelerator',
+            'AWS::GlobalAccelerator::Listener',
+            'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GuardDuty::Detector',
             'AWS::Kinesis::StreamConsumer',
             'AWS::NetworkFirewall::FirewallPolicy',
@@ -403,6 +415,25 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
             'AWS::AppSync::GraphQLApi',
+            'AWS::DataSync::Task',
+            'AWS::Glue::Job',
+            'AWS::SageMaker::NotebookInstanceLifecycleConfig',
+            'AWS::SES::ContactList',
+            'AWS::SageMaker::Workteam',
+            'AWS::EKS::FargateProfile',
+            'AWS::DataSync::LocationFSxLustre',
+            'AWS::AppConfig::Application',
+            'AWS::DataSync::LocationS3',
+            'AWS::ServiceDiscovery::PublicDnsNamespace',
+            'AWS::EC2::NetworkInsightsAccessScopeAnalysis',
+            'AWS::Route53::HostedZone',
+            'AWS::GuardDuty::IPSet',
+            'AWS::SES::ConfigurationSet',
+            'AWS::GuardDuty::ThreatIntelSet',
+            'AWS::DataSync::LocationNFS',
+            'AWS::DataSync::LocationEFS',
+            'AWS::ServiceDiscovery::Service',
+            'AWS::DataSync::LocationSMB',
         }
 
         resource_map = {}
@@ -514,7 +545,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name'}
+            'apigw-domain-name', 'backup-job'}
 
         missing_method = []
         for k, v in manager.resources.items():
