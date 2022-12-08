@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -19,6 +18,7 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(resource[0]['name'], 'test')
         self.assertEqual(resource[0]['projectId'], project_id)
         self.assertEqual(resource[0]['location'], 'us-central1')
+        self.assertTrue(resource[0].get("environment"))
 
     def test_job_get(self):
         project_id = 'cloud-custodian'

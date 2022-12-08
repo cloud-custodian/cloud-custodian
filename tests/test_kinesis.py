@@ -1,7 +1,18 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
+from .common import BaseTest, event_data
+
+
+def test_stream_config_source(test):
+    p = test.load_policy({
+        'name': 'stream-config',
+        'resource': 'aws.kinesis',
+        'mode': {'type': 'config-rule'}})
+    item = event_data('kinesis-stream.json', 'config')
+    source = p.resource_manager.get_source('config')
+    resource = source.load_resource(item)
+    assert resource['StreamName'] == 'stream-encrypted'
+    assert resource['KeyId'] == 'alias/aws/kinesis'
 
 
 class Kinesis(BaseTest):
@@ -30,7 +41,7 @@ class Kinesis(BaseTest):
                 "name": "kstream",
                 "resource": "kinesis",
                 "filters": [{"StreamName": "sock-drawer"}],
-                "actions": ["delete"],
+                "actions": [{"type": "delete", "force": True}],
             },
             session_factory=factory,
         )
@@ -213,6 +224,73 @@ class Kinesis(BaseTest):
         self.assertEqual(
             factory().client("kinesisanalytics").describe_application(
                 ApplicationName="sock-app"
+            )[
+                "ApplicationDetail"
+            ][
+                "ApplicationStatus"
+            ],
+            "DELETING",
+        )
+
+    def test_video_stream_delete(self):
+        factory = self.replay_flight_data("test_kinesis_video_stream_delete")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-delete",
+                "resource": "kinesis-video",
+                "filters": [{"StreamName": "test-video"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        stream = factory().client("kinesisvideo").describe_stream(StreamName="test-video")[
+            "StreamInfo"
+        ]
+        self.assertEqual(stream["Status"], "DELETING")
+
+    def test_kinesis_video_kms_key(self):
+        session_factory = self.replay_flight_data("test_kinesis_video_kms_key")
+        p = self.load_policy(
+            {
+                "name": "kinesis-video-kms-alias",
+                "resource": "kinesis-video",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/alias/aws/lambda)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['KmsKeyId'],
+            'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')
+
+
+class KinesisAnalyticsAppV2(BaseTest):
+
+    def test_kinesis_analyticsv2_app_delete(self):
+        factory = self.replay_flight_data("test_kinesis_analyticsv2_app_delete")
+        p = self.load_policy(
+            {
+                "name": "kapp",
+                "resource": "kinesis-analyticsv2",
+                "filters": [{"type": "subnet", "key": "tag:Name", "value": "implied", "op": "eq"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            factory().client("kinesisanalyticsv2").describe_application(
+                ApplicationName=resources[0]['ApplicationName']
             )[
                 "ApplicationDetail"
             ][

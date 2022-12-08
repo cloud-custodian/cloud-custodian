@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -25,6 +24,7 @@ class AppEngineApp(QueryResourceManager):
             'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
         asset_type = "appengine.googleapis.com/Application"
         permissions = ('appengine.applications.get',)
+        metric_key = 'resource.labels.module_id'
 
         @staticmethod
         def get(client, resource_info):

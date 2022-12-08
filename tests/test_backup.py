@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
@@ -97,6 +96,6 @@ class BackupVaultTest(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/backup')

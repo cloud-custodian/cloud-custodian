@@ -1,11 +1,14 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 from dateutil import tz as tzutil
 
+import jmespath
+from pytest_terraform import terraform
+
 from .common import BaseTest
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
 
@@ -101,6 +104,82 @@ class AutoScalingTemplateTest(BaseTest):
             [("lt-0877401c93c294001", "4")])
         self.assertEqual(
             LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
+
+
+@terraform('aws_asg')
+def test_asg_propagate_tag_action(test, aws_asg):
+
+    factory = test.replay_flight_data('test_asg_propagate_tag_action')
+    p = test.load_policy({
+        'name': 'asg-tagger',
+        'resource': 'aws.asg',
+        'filters': [
+            {'AutoScalingGroupName': aws_asg['aws_autoscaling_group.bar.id']},
+            {'tag:Owner': 'absent'}
+        ],
+        'actions': [
+            {'type': 'tag', 'key': 'Owner', 'value': 'Kapil', 'propagate': True},
+            {'type': 'propagate-tags', 'tags': ['Owner']}]},
+        session_factory=factory)
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory().client('ec2')
+    itags = {t['Key']: t['Value'] for t in jmespath.search(
+        'Reservations[0].Instances[0].Tags',
+        client.describe_instances(
+            InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
+    assert 'Owner' in itags
+    assert itags['Owner'] == 'Kapil'
+
+
+@terraform("aws_asg_update")
+def test_aws_asg_update(test, aws_asg_update):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    p = test.load_policy(
+        {
+            "name": "asg-update",
+            "resource": "aws.asg",
+            "filters": [{
+                "AutoScalingGroupName": aws_asg_update["aws_autoscaling_group.bar.id"]
+            }],
+            "actions": [{
+                "type": "update",
+                "default-cooldown": 600,
+                "max-instance-lifetime": 604800,
+                "new-instances-protected-from-scale-in": True,
+                "capacity-rebalance": True,
+            }],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    client = factory().client("autoscaling")
+    result = client.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+    )[
+        "AutoScalingGroups"
+    ].pop()
+    test.assertEqual(result["DefaultCooldown"], 600)
+    test.assertEqual(result["MaxInstanceLifetime"], 604800)
+    test.assertTrue(result["NewInstancesProtectedFromScaleIn"])
+    test.assertTrue(result["CapacityRebalance"])
+
+
+def test_aws_asg_update_no_settings(test):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    with test.assertRaises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "asg-update",
+                "resource": "aws.asg",
+                "actions": [{
+                    "type": "update",
+                }],
+            },
+            session_factory=factory,
+        )
 
 
 class AutoScalingTest(BaseTest):
@@ -280,6 +359,28 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_asg_scaling_policy_filter(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-filter",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "scaling-policy",
+                        "key": "PolicyType",
+                        "value": "TargetTrackingScaling"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'asg-test-scaling-policy')
+        self.assertTrue('c7n:matched-policies' in resources[0])
+        self.assertTrue(
+            resources[0]['c7n:matched-policies'][0]['PolicyName'], 'Target Tracking Policy')
 
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data("test_asg_vpc_filter")
@@ -958,3 +1059,22 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class AutoScalingPolicy(BaseTest):
+
+    def test_asg_scaling_policy_enabled(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_enabled")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-enabled",
+                "resource": "scaling-policy",
+                "filters": [
+                    {"type": "value", "key": "PolicyName", "value": "Target Tracking Policy"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0].get('Enabled'))

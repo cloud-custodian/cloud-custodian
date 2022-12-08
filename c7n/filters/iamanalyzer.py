@@ -1,4 +1,3 @@
-# Copyright 2020 Kapil Thangavelu
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -95,7 +94,7 @@ class AccessAnalyzer(ValueFilter):
         if not found:
             raise PolicyExecutionError(
                 "policy:%s no access analyzer found in account or org analyzer specified" % (
-                    self.manager.policy.name
+                    self.manager.ctx.policy.name
                 ))
         return found['arn']
 

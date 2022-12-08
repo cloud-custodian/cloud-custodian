@@ -1,0 +1,339 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "7019"
+                    ],
+                    "date": [
+                        "Mon, 24 May 2021 14:41:55 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "804d0304-66f1-438a-b1e8-baefef7c83ef",
+                        "7e9ce28f-aa84-4393-82b9-821eeb47ddac"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                },
+                                "properties": {
+                                    "vmId": "f6a6b9b2-9b99-45b0-8a18-025998fc74d0",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_A1_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest",
+                                            "exactVersion": "16.04.202104290"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vmmilaytvhe7nwq",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?$expand=instanceview&api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3999,Microsoft.Compute/LowCostGet30Min;31999"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 24 May 2021 14:41:55 GMT"
+                    ],
+                    "content-length": [
+                        "6141"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                        },
+                        "properties": {
+                            "vmId": "f6a6b9b2-9b99-45b0-8a18-025998fc74d0",
+                            "hardwareProfile": {
+                                "vmSize": "Standard_A1_v2"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest",
+                                    "exactVersion": "16.04.202104290"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vmmilaytvhe7nwq",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault"
+                                    }
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded",
+                            "instanceView": {
+                                "computerName": "vmmilaytvhe7nwq",
+                                "osName": "ubuntu",
+                                "osVersion": "16.04",
+                                "vmAgent": {
+                                    "vmAgentVersion": "2.2.54.2",
+                                    "statuses": [
+                                        {
+                                            "code": "ProvisioningState/succeeded",
+                                            "level": "Info",
+                                            "displayStatus": "Ready",
+                                            "message": "Guest Agent is running",
+                                            "time": "2021-05-24T14:41:43+00:00"
+                                        }
+                                    ],
+                                    "extensionHandlers": [
+                                        {
+                                            "type": "Microsoft.Azure.Extensions.CustomScript",
+                                            "typeHandlerVersion": "2.1.3",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready",
+                                                "message": "Plugin enabled"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "disks": [
+                                    {
+                                        "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2021-05-21T14:16:29.7966701+00:00"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2021-05-21T14:16:29.7966701+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "bootDiagnostics": {
+                                    "consoleScreenshotBlobUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/bootdiagnostics-cctestvm-f6a6b9b2-9b99-45b0-8a18-025998fc74d0/cctestvm.f6a6b9b2-9b99-45b0-8a18-025998fc74d0.screenshot.bmp",
+                                    "serialConsoleLogBlobUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/bootdiagnostics-cctestvm-f6a6b9b2-9b99-45b0-8a18-025998fc74d0/cctestvm.f6a6b9b2-9b99-45b0-8a18-025998fc74d0.serialconsole.log"
+                                },
+                                "extensions": [
+                                    {
+                                        "name": "script1",
+                                        "type": "Microsoft.Azure.Extensions.CustomScript",
+                                        "typeHandlerVersion": "2.1.3",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "Enable succeeded: \n[stdout]\nfoo\n\n[stderr]\n"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "hyperVGeneration": "V1",
+                                "statuses": [
+                                    {
+                                        "code": "ProvisioningState/succeeded",
+                                        "level": "Info",
+                                        "displayStatus": "Provisioning succeeded",
+                                        "time": "2021-05-24T12:39:13.2418711+00:00"
+                                    },
+                                    {
+                                        "code": "PowerState/running",
+                                        "level": "Info",
+                                        "displayStatus": "VM running"
+                                    }
+                                ]
+                            }
+                        },
+                        "resources": [
+                            {
+                                "name": "script1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "displayName": "config-app"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.1",
+                                    "settings": {
+                                        "skipDos2Unix": false,
+                                        "timestamp": 123456789
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

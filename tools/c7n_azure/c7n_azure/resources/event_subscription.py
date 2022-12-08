@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_azure.actions.base import AzureBaseAction
@@ -32,5 +31,5 @@ class Delete(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.event_subscriptions.delete(
+        self.client.event_subscriptions.begin_delete(
             resource['properties']['topic'], resource['name'])

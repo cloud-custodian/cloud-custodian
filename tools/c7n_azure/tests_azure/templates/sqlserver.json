@@ -18,7 +18,21 @@
             "administratorLogin": "custodian",
             "administratorLoginPassword": "[guid(resourceGroup().id)]",
             "version": "12.0"
-         }
+         },
+         "resources": [
+            {
+               "type": "auditingSettings",
+               "apiVersion": "2022-02-01-preview",
+               "name": "default",
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+               ],
+               "properties": {
+                  "isAzureMonitorTargetEnabled": true,
+                  "state": "Enabled"
+               }
+            }
+         ]
       },
       {
          "type": "Microsoft.Sql/servers/databases",
@@ -40,6 +54,20 @@
             "zoneRedundant": false
          },
          "resources": [
+            {
+              "comments": "Transparent Data Encryption",
+              "name": "current",
+              "type": "transparentDataEncryption",
+              "apiVersion": "2017-03-01-preview",
+              "properties": {
+                "status": "Enabled"
+              },
+              "dependsOn": [
+               "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]",
+               "[resourceId('Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies', parameters('servers_cctestsqlserver_name'), 'cctestdb', 'default')]",
+               "[resourceId('Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies', parameters('servers_cctestsqlserver_name'), 'cctestdb', 'default')]"
+            ]
+            },
             {
                "name": "default",
                "type": "backupShortTermRetentionPolicies",

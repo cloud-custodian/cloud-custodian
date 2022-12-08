@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -122,7 +121,6 @@ class ResizePlan(AzureBaseAction):
         },
         'additionalProperties': False
     }
-    schema_alias = True
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()  # type azure.mgmt.web.WebSiteManagementClient

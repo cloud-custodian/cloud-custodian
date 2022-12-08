@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -85,7 +84,6 @@ class WebApp(ArmResourceManager):
 @WebApp.filter_registry.register('configuration')
 class ConfigurationFilter(ValueFilter):
     schema = type_schema('configuration', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def __call__(self, i):
         if 'c7n:configuration' not in i:
@@ -96,3 +94,38 @@ class ConfigurationFilter(ValueFilter):
             i['c7n:configuration'] = instance.serialize(keep_readonly=True)['properties']
 
         return super(ConfigurationFilter, self).__call__(i['c7n:configuration'])
+
+
+@WebApp.filter_registry.register('authentication')
+class AuthenticationFilter(ValueFilter):
+    """Web Applications Authentication Filter
+
+    :example:
+
+    This policy will find all web apps without an authentication method enabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: webapp-no-authentication
+            resource: azure.webapp
+            filters:
+              - type: authentication
+                key: enabled
+                value: False
+                op: eq
+    """
+
+    schema = type_schema('authentication', rinherit=ValueFilter.schema)
+
+    def __call__(self, i):
+        if 'c7n:authentication' not in i:
+            client = self.manager.get_client().web_apps
+
+            instance = (
+                client.get_auth_settings(i['resourceGroup'], i['name'])
+            )
+
+            i['c7n:authentication'] = instance.serialize(keep_readonly=True)['properties']
+
+        return super().__call__(i['c7n:authentication'])

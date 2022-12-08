@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
@@ -22,6 +21,15 @@ class MLModel(QueryResourceManager):
         # dimension = 'MLModelId'
         arn_type = "mlmodel"
         permissions_enum = ('machinelearning:DescribeMLModels',)
+
+    def resources(self, query=None, augment=True):
+        try:
+            return super().resources(query, augment)
+        except ClientError as e:
+            # ml not available to new accounts, use sagemaker.
+            if 'no longer available' in str(e):
+                return []
+            raise
 
 
 @MLModel.action_registry.register('delete')

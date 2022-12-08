@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,3 +14,4 @@ class Deployment(QueryResourceManager):
         patch = 'patch_namespaced_deployment'
         delete = 'delete_namespaced_deployment'
         enum_spec = ('list_deployment_for_all_namespaces', 'items', None)
+        plural = 'deployments'

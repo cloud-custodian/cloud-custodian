@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
@@ -15,6 +14,7 @@ class DirectConnect(QueryResourceManager):
         id = 'connectionId'
         name = 'connectionName'
         filter_name = 'connectionId'
+        filter_type = 'scalar'
         arn_type = "dxcon"
         universal_taggable = object()
 

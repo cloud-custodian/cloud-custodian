@@ -1,0 +1,66 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/westus/serviceTags?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-arm-service-request-id": [
+                        "73634a35-fd05-41f6-9063-360507f06da8"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 Feb 2021 18:05:21 GMT"
+                    ],
+                    "content-length": [
+                        "1508080"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "values": [
+                            {
+                                "name": "ApiManagement",
+                                "id": "ApiManagement",
+                                "properties": {
+                                    "addressPrefixes": [
+                                        "13.69.64.76/31",
+                                        "13.69.66.144/28",
+                                        "23.101.67.140/32",
+                                        "51.145.179.78/32",
+                                        "137.117.160.56/32"
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "ApiManagement.WestUS",
+                                "id": "ApiManagement.WestUS",
+                                "properties": {
+                                    "addressPrefixes": [
+                                        "13.64.39.16/32",
+                                        "40.112.242.148/31",
+                                        "40.112.243.240/28"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

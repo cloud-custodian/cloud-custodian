@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -317,21 +316,22 @@ class AzureModeCommon:
     def run_for_event(policy, event=None):
         s = time.time()
 
-        resources = policy.resource_manager.get_resources(
-            [AzureModeCommon.extract_resource_id(policy, event)])
-
-        resources = policy.resource_manager.filter_resources(
-            resources, event)
-
         with policy.ctx:
+            resources = policy.resource_manager.get_resources(
+                [AzureModeCommon.extract_resource_id(policy, event)])
+
+            resources = policy.resource_manager.filter_resources(
+                resources, event)
+
+        with policy.ctx as ctx:
             rt = time.time() - s
 
-            policy.ctx.metrics.put_metric(
+            ctx.metrics.put_metric(
                 'ResourceCount', len(resources), 'Count', Scope="Policy",
                 buffer=False)
-            policy.ctx.metrics.put_metric(
+            ctx.metrics.put_metric(
                 "ResourceTime", rt, "Seconds", Scope="Policy")
-            policy._write_file(
+            ctx.output.write_file(
                 'resources.json', utils.dumps(resources, indent=2))
 
             if not resources:
@@ -345,12 +345,16 @@ class AzureModeCommon:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
                     policy.name, action.name, len(resources))
-                if isinstance(action, EventAction):
-                    results = action.process(resources, event)
-                else:
-                    results = action.process(resources)
-                policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
+                with ctx.tracer.subsegment('action:%s' % action.type):
+                    if isinstance(action, EventAction):
+                        results = action.process(resources, event)
+                    else:
+                        results = action.process(resources)
+                try:
+                    ctx.output.write_file(
+                        "action-%s" % action.name, utils.dumps(results))
+                except (TypeError, OverflowError):
+                    pass
 
         policy.ctx.metrics.put_metric(
             "ActionTime", time.time() - at, "Seconds", Scope="Policy")

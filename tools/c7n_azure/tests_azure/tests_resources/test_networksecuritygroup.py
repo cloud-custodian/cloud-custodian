@@ -1,6 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from mock import patch
+
 from ..azure_common import BaseTest, arm_template
 
 
@@ -63,6 +64,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'value': 'c7n-nsg'},
                 {'type': 'ingress',
                  'ports': '80',
+                 'source': '*',
                  'access': 'Allow'}],
         })
 
@@ -142,6 +144,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'egress',
                  'ports': '22',
                  'ipProtocol': 'TCP',
+                 'destination': '*',
                  'access': 'Allow'}],
         })
 
@@ -167,7 +170,8 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('networksecuritygroup.json')
-    def test_open_ports(self):
+    @patch('uuid.uuid1', return_value='00000000-0000-0000-0000-000000000000')
+    def test_open_ports(self, _1):
         p = self.load_policy({
             'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',

@@ -1,8 +1,8 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
 from datetime import datetime, timedelta
+from dateutil.tz import tzutc
 import json
 import itertools
 import ipaddress
@@ -14,10 +14,10 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies
+from urllib.request import getproxies, proxy_bypass
 
 
-from dateutil.parser import ParserError, parse as parse_date
+from dateutil.parser import ParserError, parse
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -107,6 +107,56 @@ def filter_empty(d):
     return d
 
 
+# We need a minimum floor when examining possible timestamp
+# values to distinguish from other numeric time usages. Use
+# the S3 Launch Date.
+DATE_FLOOR = time.mktime((2006, 3, 19, 0, 0, 0, 0, 0, 0))
+
+
+def parse_date(v, tz=None):
+    """Handle various permutations of a datetime serialization
+    to a datetime with the given timezone.
+
+    Handles strings, seconds since epoch, and milliseconds since epoch.
+    """
+
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime):
+        if v.tzinfo is None:
+            return v.astimezone(tz)
+        return v
+
+    if isinstance(v, str) and not v.isdigit():
+        try:
+            return parse(v).astimezone(tz)
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
+
+    if isinstance(v, (int, float, str)):
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v)).astimezone(tz)
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float, str)):
+        # try interpreting as milliseconds epoch
+        try:
+            if float(v) > DATE_FLOOR:
+                v = datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
+        except exceptions:
+            pass
+
+    return isinstance(v, datetime) and v or None
+
+
 def type_schema(
         type_name, inherits=None, rinherit=None,
         aliases=None, required=None, **props):
@@ -163,6 +213,8 @@ class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, FormatDate):
+            return obj.datetime.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 
@@ -195,7 +247,7 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def camelResource(obj, implicitDate=False):
+def camelResource(obj, implicitDate=False, implicitTitle=True):
     """Some sources from apis return lowerCased where as describe calls
 
     always return TitleCase, this function turns the former to the later
@@ -207,7 +259,12 @@ def camelResource(obj, implicitDate=False):
         return obj
     for k in list(obj.keys()):
         v = obj.pop(k)
-        obj["%s%s" % (k[0].upper(), k[1:])] = v
+        if implicitTitle:
+            ok = "%s%s" % (k[0].upper(), k[1:])
+        else:
+            ok = k
+        obj[ok] = v
+
         if implicitDate:
             # config service handles datetime differently then describe sdks
             # the sdks use knowledge of the shape to support language native
@@ -216,17 +273,18 @@ def camelResource(obj, implicitDate=False):
             # we implicitly sniff keys which look like datetimes, and have an
             # isoformat marker ('T').
             kn = k.lower()
-            if isinstance(v, str) and ('time' in kn or 'date' in kn) and "T" in v:
+            if isinstance(v, (str, int)) and ('time' in kn or 'date' in kn):
                 try:
                     dv = parse_date(v)
                 except ParserError:
-                    pass
-                else:
-                    obj["%s%s" % (k[0].upper(), k[1:])] = dv
+                    dv = None
+                if dv:
+                    obj[ok] = dv
         if isinstance(v, dict):
-            camelResource(v)
+            camelResource(v, implicitDate, implicitTitle)
         elif isinstance(v, list):
-            list(map(camelResource, v))
+            for e in v:
+                camelResource(e, implicitDate, implicitTitle)
     return obj
 
 
@@ -256,9 +314,11 @@ def query_instances(session, client=None, **query):
 CONN_CACHE = threading.local()
 
 
-def local_session(factory):
+def local_session(factory, region=None):
     """Cache a session thread local for up to 45m"""
     factory_region = getattr(factory, 'region', 'global')
+    if region:
+        factory_region = region
     s = getattr(CONN_CACHE, factory_region, {}).get('session')
     t = getattr(CONN_CACHE, factory_region, {}).get('time')
 
@@ -416,6 +476,8 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
+    if isinstance(value, list) or isinstance(value, set):
+        return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
         klass = ipaddress.ip_address
@@ -454,6 +516,20 @@ class IPv4Network(ipaddress.IPv4Network):
             return self._is_subnet_of(other, self)
 
 
+class IPv4List:
+    def __init__(self, ipv4_list):
+        self.ipv4_list = ipv4_list
+
+    def __contains__(self, other):
+        if other is None:
+            return False
+        in_networks = any([other in y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, IPv4Network)])
+        in_addresses = any([other == y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, ipaddress.IPv4Address)])
+        return any([in_networks, in_addresses])
+
+
 def reformat_schema(model):
     """ Reformat schema to be in a more displayable format. """
     if not hasattr(model, 'schema'):
@@ -465,7 +541,7 @@ def reformat_schema(model):
     ret = copy.deepcopy(model.schema['properties'])
 
     if 'type' in ret:
-        del(ret['type'])
+        del ret['type']
 
     for key in model.schema.get('required', []):
         if key in ret:
@@ -506,7 +582,7 @@ def set_value_from_jmespath(source, expression, value, is_first=True):
     source[current_key] = value
 
 
-def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=None, *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -514,16 +590,19 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], *args, **kwargs)
+            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, *args, **kwargs))
+            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
-            return obj.format(*args, **kwargs)
+            if formatter:
+                return formatter(obj, *args, **kwargs)
+            else:
+                return obj.format(*args, **kwargs)
         except err_fallback:
             return obj
     else:
@@ -545,14 +624,28 @@ def parse_url_config(url):
 
 def get_proxy_url(url):
     proxies = getproxies()
-    url_parts = parse_url_config(url)
+    parsed = urlparse.urlparse(url)
 
     proxy_keys = [
-        url_parts['scheme'] + '://' + url_parts['netloc'],
-        url_parts['scheme'],
-        'all://' + url_parts['netloc'],
+        parsed.scheme + '://' + parsed.netloc,
+        parsed.scheme,
+        'all://' + parsed.netloc,
         'all'
     ]
+
+    # Set port if not defined explicitly in url.
+    port = parsed.port
+    if port is None and parsed.scheme == 'http':
+        port = 80
+    elif port is None and parsed.scheme == 'https':
+        port = 443
+
+    hostname = parsed.hostname is not None and parsed.hostname or ''
+
+    # Determine if proxy should be used based on no_proxy entries.
+    # Note this does not support no_proxy ip or cidr entries.
+    if proxy_bypass("%s:%s" % (hostname, port)):
+        return None
 
     for key in proxy_keys:
         if key in proxies:
@@ -699,3 +792,94 @@ def select_keys(d, keys):
     for k in keys:
         result[k] = d.get(k)
     return result
+
+
+def get_human_size(size, precision=2):
+    # interesting discussion on 1024 vs 1000 as base
+    # https://en.wikipedia.org/wiki/Binary_prefix
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    suffixIndex = 0
+    while size > 1024:
+        suffixIndex += 1
+        size = size / 1024.0
+
+    return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def get_support_region(manager):
+    # support is a unique service in that it doesnt support regional endpoints
+    # thus, we need to construct the client based off the regions found here:
+    # https://docs.aws.amazon.com/general/latest/gr/awssupport.html
+    #
+    # aws-cn uses cn-north-1 for both the Beijing and Ningxia regions
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Beijing.html
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Ningxia.html
+
+    partition = get_partition(manager.config.region)
+    support_region = None
+    if partition == "aws":
+        support_region = "us-east-1"
+    elif partition == "aws-us-gov":
+        support_region = "us-gov-west-1"
+    elif partition == "aws-cn":
+        support_region = "cn-north-1"
+    return support_region
+
+
+def get_eni_resource_type(eni):
+    if eni.get('Attachment'):
+        instance_id = eni['Attachment'].get('InstanceId')
+    else:
+        instance_id = None
+    description = eni.get('Description')
+    # EC2
+    if instance_id:
+        rtype = 'ec2'
+    # ELB/ELBv2
+    elif description.startswith('ELB app/'):
+        rtype = 'elb-app'
+    elif description.startswith('ELB net/'):
+        rtype = 'elb-net'
+    elif description.startswith('ELB gwy/'):
+        rtype = 'elb-gwy'
+    elif description.startswith('ELB'):
+        rtype = 'elb'
+    # Other Resources
+    elif description == 'ENI managed by APIGateway':
+        rtype = 'apigw'
+    elif description.startswith('AWS CodeStar Connections'):
+        rtype = 'codestar'
+    elif description.startswith('DAX'):
+        rtype = 'dax'
+    elif description.startswith('AWS created network interface for directory'):
+        rtype = 'dir'
+    elif description == 'DMSNetworkInterface':
+        rtype = 'dms'
+    elif description.startswith('arn:aws:ecs:'):
+        rtype = 'ecs'
+    elif description.startswith('EFS mount target for'):
+        rtype = 'fsmt'
+    elif description.startswith('ElastiCache'):
+        rtype = 'elasticache'
+    elif description.startswith('AWS ElasticMapReduce'):
+        rtype = 'emr'
+    elif description.startswith('CloudHSM Managed Interface'):
+        rtype = 'hsm'
+    elif description.startswith('CloudHsm ENI'):
+        rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('Interface for NAT Gateway'):
+        return 'nat'
+    elif (description == 'RDSNetworkInterface' or
+            description.startswith('Network interface for DBProxy')):
+        rtype = 'rds'
+    elif description == 'RedshiftNetworkInterface':
+        rtype = 'redshift'
+    elif description.startswith('Network Interface for Transit Gateway Attachment'):
+        rtype = 'tgw'
+    elif description.startswith('VPC Endpoint Interface'):
+        rtype = 'vpce'
+    else:
+        rtype = 'unknown'
+    return rtype

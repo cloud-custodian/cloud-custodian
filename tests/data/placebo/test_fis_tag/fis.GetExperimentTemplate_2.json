@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "experimentTemplate": {
+            "id": "EXT3dBw7DdJZ2v8p",
+            "description": "kraken",
+            "targets": {
+                "Roles-Target-1": {
+                    "resourceType": "aws:iam:role",
+                    "resourceArns": [
+                        "arn:aws:iam::644160558196:role/burnify-dev"
+                    ],
+                    "selectionMode": "ALL"
+                }
+            },
+            "actions": {
+                "inject-api-error": {
+                    "actionId": "aws:fis:inject-api-internal-error",
+                    "parameters": {
+                        "duration": "PT32M",
+                        "operations": "RunInstances",
+                        "percentage": "34",
+                        "service": "ec2"
+                    },
+                    "targets": {
+                        "Roles": "Roles-Target-1"
+                    }
+                }
+            },
+            "stopConditions": [
+                {
+                    "source": "none"
+                }
+            ],
+            "creationTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 6,
+                "day": 14,
+                "hour": 7,
+                "minute": 36,
+                "second": 48,
+                "microsecond": 788000
+            },
+            "lastUpdateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 6,
+                "day": 14,
+                "hour": 7,
+                "minute": 36,
+                "second": 48,
+                "microsecond": 788000
+            },
+            "roleArn": "arn:aws:iam::644160558196:role/my-fis-role",
+            "tags": {
+                "Location": "Messina"
+            }
+        }
+    }
+}

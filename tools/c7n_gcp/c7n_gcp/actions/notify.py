@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -6,6 +5,7 @@ from c7n.actions import BaseNotify
 from c7n import utils
 from c7n.resolver import ValuesFrom
 from c7n_gcp.provider import resources as gcp_resources
+from c7n.version import version
 
 
 class Notify(BaseNotify):
@@ -73,7 +73,10 @@ class Notify(BaseNotify):
             'account_id': project,
             'account': project,
             'region': 'all',
-            'policy': self.manager.data
+            'policy': self.manager.data,
+            'execution_id': self.manager.ctx.execution_id,
+            'execution_start': self.manager.ctx.start_time,
+            'version': version
         }
 
         message['action'] = self.expand_variables(message)

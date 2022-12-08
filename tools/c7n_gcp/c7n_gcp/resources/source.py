@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
@@ -18,7 +17,7 @@ class SourceRepository(QueryResourceManager):
         enum_spec = ('list', 'repos[]', None)
         scope = 'project'
         scope_key = 'name'
-        scope_template = "projects/{}-"
+        scope_template = "projects/{}"
         name = id = 'name'
         perm_service = 'source'
         default_report_fields = ["name", "size", "url"]

@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceInfoList": [
+            {
+                "ResourceArn": "arn:aws:s3:::c7n-test-abc",
+                "RoleArn": "arn:aws:iam::644160558196:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 18,
+                    "hour": 14,
+                    "minute": 35,
+                    "second": 41,
+                    "microsecond": 967000
+                }
+            },
+            {
+                "ResourceArn": "arn:aws:s3:::unknown-bucket",
+                "RoleArn": "arn:aws:iam::644160558196:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 16,
+                    "second": 12,
+                    "microsecond": 811000
+                }
+            }
+        ]
+    }
+}

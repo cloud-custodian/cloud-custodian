@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
@@ -65,7 +64,7 @@ class DeleteStack(BaseAction):
             instances = client.describe_instances(StackId=stack_id)['Instances']
             orig_length = len(instances)
             instances = self.filter_resources(instances, 'Status', self.valid_origin_states)
-            if(len(instances) != orig_length):
+            if len(instances) != orig_length:
                 self.log.exception(
                     "All instances must be stopped before deletion. Stack Id: %s Name: %s." %
                     (stack_id, stack['Name']))

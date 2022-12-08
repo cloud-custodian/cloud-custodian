@@ -114,7 +114,29 @@
                 "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688", 
                 "DBInstanceClass": "db.m4.xlarge", 
                 "DbInstancePort": 0, 
-                "DBInstanceIdentifier": "test-03"
+                "DBInstanceIdentifier": "test-03",
+                "TagList": [
+                    {
+                        "Value": "test-test", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "test", 
+                        "Key": "Owner"
+                    }, 
+                    {
+                        "Value": "postgres", 
+                        "Key": "Platform"
+                    }, 
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/09/16", 
+                        "Key": "custodian_next"
+                    }, 
+                    {
+                        "Value": "production", 
+                        "Key": "workload-type"
+                    }
+                ]		
             }
         ], 
         "ResponseMetadata": {

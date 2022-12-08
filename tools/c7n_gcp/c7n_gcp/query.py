@@ -1,4 +1,3 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -189,14 +188,28 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def resources(self, query=None):
         q = query or self.get_resource_query()
-        key = self.get_cache_key(q)
-        resources = self._fetch_resources(q)
-        self._cache.save(key, resources)
+        cache_key = self.get_cache_key(q)
+        resources = None
 
+        if self._cache.load():
+            resources = self._cache.get(cache_key)
+            if resources is not None:
+                self.log.debug("Using cached %s: %d" % (
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
+                    len(resources)))
+
+        if resources is None:
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self._fetch_resources(q)
+            self._cache.save(cache_key, resources)
+
+        self._cache.close()
         resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resources = self.filter_resources(resources)
 
-        # Check if we're out of a policies execution limits.
+        # Check resource limits if we're the current policy execution.
         if self.data == self.ctx.policy.data:
             self.check_resource_limit(len(resources), resource_count)
         return resources
@@ -337,6 +350,10 @@ class TypeInfo(metaclass=TypeMeta):
 
     # cloud asset inventory type
     asset_type = None
+
+    @classmethod
+    def get_metric_resource_name(cls, resource):
+        return resource.get(cls.name)
 
 
 class ChildTypeInfo(TypeInfo):

@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
@@ -16,19 +15,22 @@ import unittest
 import zipfile
 
 import mock
+from mock import patch
 
 from c7n.config import Config
 from c7n.mu import (
     custodian_archive,
     generate_requirements,
     get_exec_options,
+    BucketLambdaNotification,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
     PythonPackageArchive,
     SNSSubscription,
     SQSSubscription,
-    CloudWatchEventSource
+    CloudWatchEventSource,
+    CloudWatchLogSubscription
 )
 
 from .common import (
@@ -127,7 +129,7 @@ class Publish(BaseTest):
         self.assertEqual(result["Runtime"], "python3.6")
 
 
-class PolicyLambdaProvision(BaseTest):
+class PolicyLambdaProvision(Publish):
 
     role = "arn:aws:iam::644160558196:role/custodian-mu"
 
@@ -151,8 +153,54 @@ class PolicyLambdaProvision(BaseTest):
         self.assertEqual(result["FunctionName"], "custodian-sg-modified")
         self.addCleanup(mgr.remove, pl)
 
+    def test_published_lambda_architecture(self):
+        session_factory = self.replay_flight_data("test_published_lambda_architecture")
+        with patch('platform.machine', return_value="arm64"):
+            p = self.load_policy({
+                'name': 'ec2-foo-bar',
+                'resource': 'aws.ec2',
+                'mode': {
+                    'type': 'cloudtrail',
+                    'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'events': ['RunInstances']}})
+            pl = PolicyLambda(p)
+            mgr = LambdaManager(session_factory)
+            result = mgr.publish(pl)
+            self.assertEqual(result["Architectures"], ["arm64"])
+
+    def test_updated_lambda_architecture(self):
+        session_factory = self.replay_flight_data("test_updated_lambda_architecture")
+        lambda_client = session_factory().client("lambda")
+        initial_config = lambda_client.get_function(FunctionName="custodian-ec2-foo-bar")
+        self.assertEqual(initial_config.get('Configuration').get('Architectures'), ["arm64"])
+        with patch('platform.machine', return_value="x86_64"):
+            p1 = self.load_policy({
+                'name': 'ec2-foo-bar',
+                'resource': 'aws.ec2',
+                'mode': {
+                    'type': 'cloudtrail',
+                    'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'events': ['RunInstances']}})
+            pl1 = PolicyLambda(p1)
+            mgr = LambdaManager(session_factory)
+            mgr.publish(pl1)
+            if self.recording:
+                time.sleep(30)
+            updated_config = lambda_client.get_function_configuration(
+                FunctionName="custodian-ec2-foo-bar")
+            self.assertEqual(updated_config.get('Architectures'), ["x86_64"])
+            self.addCleanup(mgr.remove, pl1)
+
     def test_config_poll_rule_evaluation(self):
         session_factory = self.record_flight_data("test_config_poll_rule_provision")
+
+        # config added support for kinesis streams after that test was written
+        # disable that support so the original behavior check on config poll mode
+        # can be verified
+        from c7n.resources.kinesis import KinesisStream
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
+
         p = self.load_policy({
             'name': 'configx',
             'resource': 'aws.kinesis',
@@ -208,6 +256,19 @@ class PolicyLambdaProvision(BaseTest):
         resources = mode.run(event, None)
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:HealthEvent' in resources[0])
+
+    def test_phd_mode_sans_details(self):
+        factory = self.replay_flight_data('test_phd_event_mode')
+        p = self.load_policy(
+            {'name': 'ec2-retire',
+             'resource': 'account',
+             'mode': {'type': 'phd'}}, session_factory=factory)
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(factory)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'source': ['aws.health']}
+        )
 
     def test_phd_mode(self):
         factory = self.replay_flight_data('test_phd_event_mode')
@@ -626,7 +687,7 @@ class PolicyLambdaProvision(BaseTest):
                  'Name': 'Account sechub', 'Description': 'sechub'}},
             hub_action.get(mu_policy.name))
         hub_action.update(mu_policy)
-        hub_action.remove(mu_policy)
+        hub_action.remove(mu_policy, func_deleted=True)
         self.assertEqual(
             hub_action.get(mu_policy.name),
             {'event': False, 'action': None})
@@ -867,6 +928,13 @@ class PolicyLambdaProvision(BaseTest):
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
         )
 
+    def test_different_lambda_handler(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {"handler": "custom.handler"}}}))
+        self.assertEqual(
+            p.get_config()["Handler"],
+            "custom.handler"
+        )
+
     def test_config_defaults(self):
         p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
         self.maxDiff = None
@@ -880,13 +948,193 @@ class PolicyLambdaProvision(BaseTest):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.8",
+                "Runtime": "python3.9",
+                "Architectures": ["x86_64"],
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},
                 "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
             },
         )
+
+    def test_lambda_architecture(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
+        with patch('platform.machine', return_value='arm64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["arm64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
+        with patch('platform.machine', return_value='x86_64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["x86_64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
+
+    def test_remove_permissions_from_event_cloudtrail(self):
+        session_factory = self.replay_flight_data("test_remove_permissions_event")
+        p = self.load_policy({
+            "resource": "ec2",
+            "name": "test",
+            "mode": {"type": "cloudtrail", "events": ["RunInstances"]}},
+            session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl, True)
+        mgr.publish(pl, "Dev", role=ROLE)
+        events = pl.get_events(session_factory)
+
+        lambda_client = session_factory().client("lambda")
+        policy = lambda_client.get_policy(FunctionName="custodian-test")
+        self.assertTrue(policy)
+        self.assertTrue(len(events) > 0)
+
+        for e in events:
+            e.remove(pl, func_deleted=False)
+
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="custodian-test")
+
+        # we should be able to call the remove again even tho it's already gone
+        for e in events:
+            e.remove(pl, func_deleted=False)
+
+        # we should also be able to explicitly remove_permissions even though it's
+        # already gone
+        for e in events:
+            e.remove_permissions(pl, remove_permission=True)
+
+    def test_pause_resume_policy(self):
+        session_factory = self.replay_flight_data("test_pause_resume_policy")
+        p = self.load_policy({
+            "resource": "ec2",
+            "name": "test",
+            "mode": {"type": "cloudtrail", "events": ["RunInstances"]}},
+            session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl, True)
+        mgr.publish(pl, "Dev", role=ROLE)
+        events = pl.get_events(session_factory)
+        self.assertEqual(len(events), 1)
+
+        cw_client = session_factory().client('events')
+
+        events[0].pause(pl)
+        rule = cw_client.describe_rule(Name=pl.event_name)
+        self.assertEqual(rule["State"], "DISABLED")
+
+        # subsequent calls to pause an already paused rule should be a no-op
+        events[0].pause(pl)
+
+        events[0].resume(pl)
+        rule = cw_client.describe_rule(Name=pl.event_name)
+        self.assertEqual(rule["State"], "ENABLED")
+
+        # subsequent calls to resume an already enabled rule should be a no-op
+        events[0].resume(pl)
+
+    def test_cloudwatch_log_subscription(self):
+        session_factory = self.replay_flight_data("test_cloudwatch_log_subscription")
+        func = self.make_func(role=ROLE)
+        LambdaManager(session_factory).publish(func)
+        cwls = CloudWatchLogSubscription(
+            session_factory,
+            [
+                {
+                    "logGroupName": "/aws/lambda/test",
+                    "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/test:*",
+                }
+            ],
+            "foo"
+        )
+        cwls.add(func)
+        lambda_client = session_factory().client("lambda")
+        policy = lambda_client.get_policy(FunctionName="test-foo-bar")
+        self.assertTrue(policy)
+
+        cwls.remove(func, func_deleted=False)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
+
+    def test_sns_subscription_remove_permission_idempotent(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_subscription_remove_permission_idempotent"
+        )
+        func = self.make_func(role=ROLE, runtime="python3.9")
+        mgr = LambdaManager(session_factory)
+
+        mgr.publish(func)
+
+        sns_sub = SNSSubscription(
+            session_factory,
+            topic_arns=["arn:aws:sns:us-east-1:644160558196:test-topic"]
+        )
+        # this shouldn't raise an exception even though we never added it
+        sns_sub.remove(func, func_deleted=False)
+
+        # verify the permissions are not there
+        lambda_client = session_factory().client("lambda")
+        found_function = lambda_client.get_function(FunctionName="test-foo-bar")
+        self.assertTrue(found_function)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
+
+    def test_s3_bucket_lambda_notification_remove_idempotent(self):
+        session_factory = self.replay_flight_data(
+            "test_s3_bucket_lambda_notification_remove_idempotent"
+        )
+        func = self.make_func(role=ROLE, runtime="python3.9")
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, func, True)
+
+        mgr.publish(func)
+
+        bln = BucketLambdaNotification(
+            data={},
+            session_factory=session_factory,
+            bucket={"Name": "c7n-ci20210930214353595400000001"}
+        )
+
+        bln.add(func)
+        bln.remove(func, func_deleted=False)
+
+        # we should be able to do idempotent removal
+        bln.remove(func, func_deleted=False)
+
+        # verify the permissions are gone
+        lambda_client = session_factory().client("lambda")
+        found_function = lambda_client.get_function(FunctionName="test-foo-bar")
+        self.assertTrue(found_function)
+        with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
+            lambda_client.get_policy(FunctionName="test-foo-bar")
 
 
 class PythonArchiveTest(unittest.TestCase):

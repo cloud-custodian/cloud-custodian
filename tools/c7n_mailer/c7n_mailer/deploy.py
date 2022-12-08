@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
@@ -37,7 +36,7 @@ CORE_DEPS = [
     # transport datadog - recursive deps
     'datadog', 'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
-    'requests', 'urllib3', 'idna', 'chardet', 'certifi',
+    'requests', 'urllib3', 'idna', 'charset_normalizer', 'certifi',
     # used by splunk mailer transport
     'jsonpointer', 'jsonpatch',
     # sendgrid dependencies

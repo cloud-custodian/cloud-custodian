@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::ECS::Service",
+                "resourceId": "arn:aws:ecs:us-east-2:644160558196:service/dev/queue-processor",
+                "resourceName": "queue-processor"
+            },
+            {
+                "resourceType": "AWS::ECS::Service",
+                "resourceId": "arn:aws:ecs:us-east-2:644160558196:service/dev/dev-queue-processor",
+                "resourceName": "dev-queue-processor"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

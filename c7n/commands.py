@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter, defaultdict
@@ -9,11 +8,14 @@ import itertools
 import logging
 import os
 import sys
+from typing import List
 
 import yaml
 from yaml.constructor import ConstructorError
 
+from c7n import deprecated
 from c7n.exceptions import ClientError, PolicyValidationError
+from c7n.loader import SourceLocator
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
@@ -194,6 +196,8 @@ def validate(options):
     used_policy_names = set()
     structure = StructureParser()
     errors = []
+    found_deprecations = False
+    footnotes = deprecated.Footnotes()
 
     for config_file in options.configs:
 
@@ -206,7 +210,8 @@ def validate(options):
 
         with open(config_file) as fh:
             if fmt in ('yml', 'yaml', 'json'):
-                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)
+                # our loader is safe loader derived.
+                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
             else:
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
@@ -232,12 +237,31 @@ def validate(options):
                 )
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
+        source_locator = None
+        if fmt in ('yml', 'yaml'):
+            # For yaml files there is at least the expectation that the policy
+            # name is on a line by itself. With JSON, the file could be one big
+            # line. At this stage we are only attempting to find line number for
+            # policies in yaml files.
+            source_locator = SourceLocator(config_file)
         if not errors:
             null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
                     policy = Policy(p, null_config, Bag())
                     policy.validate()
+                    # If the policy is invalid, there isn't much point checking
+                    # for deprecated usage as there is no guarantee as to the
+                    # state of the policy.
+                    if options.check_deprecations != deprecated.SKIP:
+                        report = deprecated.report(policy)
+                        if report:
+                            found_deprecations = True
+                            log.warning("deprecated usage found in policy\n" +
+                                        report.format(
+                                            source_locator=source_locator,
+                                            footnotes=footnotes))
+
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)
@@ -249,12 +273,18 @@ def validate(options):
         log.error("Configuration invalid: {}".format(config_file))
         for e in errors:
             log.error("%s" % e)
+    if found_deprecations:
+        notes = footnotes()
+        if notes:
+            log.warning("deprecation footnotes:\n" + notes)
+        if options.check_deprecations == deprecated.STRICT:
+            sys.exit(1)
     if errors:
         sys.exit(1)
 
 
 @policy_command
-def run(options, policies):
+def run(options, policies: List[Policy]) -> None:
     exit_code = 0
 
     # AWS - Sanity check that we have an assumable role before executing policies
@@ -266,7 +296,7 @@ def run(options, policies):
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
-    errored_policies = []
+    errored_policies: List[str] = []
     for policy in policies:
         try:
             policy()
@@ -543,4 +573,6 @@ def version_cmd(options):
         packages.append('c7n_azure')
     if 'k8s' in found:
         packages.append('c7n_kube')
+    if 'openstack' in found:
+        packages.append('c7n_openstack')
     print(generate_requirements(packages))

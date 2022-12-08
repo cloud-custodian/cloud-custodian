@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageId": "wsi-wxm9q46zg",
+        "ImagePermissions": [
+            {
+                "SharedAccountId": "XXXXXXXXXXXX"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

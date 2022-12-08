@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from collections import Counter
@@ -17,6 +16,7 @@ from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
     ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
@@ -32,6 +32,7 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    get_support_region
 )
 from c7n.resources.ami import AMI
 
@@ -47,6 +48,7 @@ class Snapshot(QueryResourceManager):
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
         id = 'SnapshotId'
+        id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
@@ -68,6 +70,8 @@ class Snapshot(QueryResourceManager):
             query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
         return super(Snapshot, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
@@ -361,6 +365,37 @@ class SnapshotSkipAmiSnapshots(Filter):
         return resources
 
 
+@Snapshot.filter_registry.register('volume')
+class SnapshotVolumeFilter(RelatedResourceFilter):
+    """
+    Filter EBS snapshots by their volume attributes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: snapshot-with-no-volume
+            description: Find any snapshots that do not have a corresponding volume.
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: absent
+          - name: find-snapshots-from-volume
+            resource: aws.ebs-snapshot
+            filters:
+              - type: volume
+                key: VolumeId
+                value: vol-foobarbaz
+    """
+
+    RelatedResource = 'c7n.resources.ebs.EBS'
+    RelatedIdsExpression = 'VolumeId'
+    AnnotationKey = 'Volume'
+
+    schema = type_schema(
+        'volume', rinherit=ValueFilter.schema)
+
+
 @Snapshot.action_registry.register('delete')
 class SnapshotDelete(BaseAction):
     """Deletes EBS snapshots
@@ -468,11 +503,6 @@ class CopySnapshot(BaseAction):
         return self
 
     def process(self, resources):
-        if self.data['target_region'] == self.manager.config.region:
-            self.log.info(
-                "Source and destination region are the same, skipping")
-            return
-
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
@@ -480,8 +510,7 @@ class CopySnapshot(BaseAction):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
 
-        if self.data['target_region'] != self.manager.config.region:
-            cross_region = True
+        cross_region = self.data['target_region'] != self.manager.config.region
 
         params = {}
         params['Encrypted'] = self.data.get('encrypted', True)
@@ -514,6 +543,95 @@ class CopySnapshot(BaseAction):
                 "Cross region copy complete %s", ",".join(copy_ids))
 
 
+@Snapshot.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Action to set permissions for creating volumes from a snapshot
+
+    Use the 'add' and 'remove' parameters to control which accounts to
+    add or remove respectively.  The default is to remove any create
+    volume permissions granted to other AWS accounts.
+
+    Combining this action with the 'cross-account' filter allows you
+    greater control over which accounts will be removed, e.g. using a
+    whitelist:
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ebs-dont-share-cross-account
+                resource: ebs-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist:
+                    - '112233445566'
+                actions:
+                  - type: set-permissions
+                    remove: matched
+    """
+    schema = type_schema(
+        'set-permissions',
+        remove={
+            'oneOf': [
+                {'enum': ['matched']},
+                {'type': 'array', 'items': {
+                    'type': 'string', 'minLength': 12, 'maxLength': 12}},
+            ]},
+        add={
+            'type': 'array', 'items': {
+                'type': 'string', 'minLength': 12, 'maxLength': 12}},
+    )
+
+    permissions = ('ec2:ModifySnapshotAttribute',)
+
+    def validate(self):
+        if self.data.get('remove') == 'matched':
+            found = False
+            for f in self.manager.iter_filters():
+                if isinstance(f, SnapshotCrossAccountAccess):
+                    found = True
+                    break
+            if not found:
+                raise PolicyValidationError(
+                    "policy:%s filter:%s with matched requires cross-account filter" % (
+                        self.manager.ctx.policy.name, self.type))
+
+    def process(self, snapshots):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in snapshots:
+            self.process_image(client, i)
+
+    def process_image(self, client, snapshot):
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+        if not add_accounts and not remove_accounts:
+            return client.reset_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'], Attribute="createVolumePermission")
+        if remove_accounts == 'matched':
+            remove_accounts = snapshot.get(
+                'c7n:' + SnapshotCrossAccountAccess.annotation_key)
+
+        remove = []
+        remove.extend([{'UserId': a} for a in remove_accounts if a != 'all'])
+        if 'all' in remove_accounts:
+            remove.append({'Group': 'all'})
+            remove_accounts.remove('all')
+
+        add = [{'UserId': a} for a in add_accounts]
+
+        if remove:
+            client.modify_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'],
+                CreateVolumePermission={'Remove': remove},
+                OperationType='remove')
+        if add:
+            client.modify_snapshot_attribute(
+                SnapshotId=snapshot['SnapshotId'],
+                CreateVolumePermission={'Add': add},
+                OperationType='add')
+
+
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
@@ -522,6 +640,7 @@ class EBS(QueryResourceManager):
         arn_type = 'volume'
         enum_spec = ('describe_volumes', 'Volumes', None)
         name = id = 'VolumeId'
+        id_prefix = 'vol-'
         filter_name = 'VolumeIds'
         filter_type = 'list'
         date = 'createTime'
@@ -689,7 +808,9 @@ class FaultTolerantSnapshots(Filter):
 
     def pull_check_results(self):
         result = set()
-        client = local_session(self.manager.session_factory).client('support')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
@@ -1076,6 +1197,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
+        unencrypted_volume_tags = v['Tags']
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1115,7 +1237,7 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-crypt-remediation', 'Value': instance_id},
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+                 'Value': v['Attachments'][0]['Device']}] + unencrypted_volume_tags)
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])
@@ -1214,7 +1336,8 @@ class CreateSnapshot(BaseAction):
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
-           'tags': {'type': 'object'}})
+           'tags': {'type': 'object'},
+           'description': {'type': 'string'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1234,8 +1357,16 @@ class CreateSnapshot(BaseAction):
             retry(self.process_volume, client=client, volume=vol_id, tags=tags)
 
     def process_volume(self, client, volume, tags):
+        description = self.data.get('description')
+        if not description:
+            description = "Automated snapshot by c7n - %s" % (self.manager.ctx.policy.name)
+
         try:
-            client.create_snapshot(VolumeId=volume, TagSpecifications=tags)
+            client.create_snapshot(
+                VolumeId=volume,
+                Description=description,
+                TagSpecifications=tags
+            )
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
                 return
@@ -1476,7 +1607,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})

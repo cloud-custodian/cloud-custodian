@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
@@ -33,8 +32,8 @@ class EMRCluster(QueryResourceManager):
         service = 'emr'
         arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
-        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
-        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
+        default_cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', None)
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
@@ -47,9 +46,7 @@ class EMRCluster(QueryResourceManager):
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [
-                {'ClusterStates': [
-                    'running', 'bootstrapping', 'waiting']}]))
+            self.data.get('query', []))
 
     @classmethod
     def get_permissions(cls):
@@ -92,7 +89,7 @@ class EMRCluster(QueryResourceManager):
             result.append(
                 {
                     'Name': 'ClusterStates',
-                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
+                    'Values': self.resource_type.default_cluster_states
                 }
             )
         return result

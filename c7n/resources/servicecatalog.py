@@ -81,7 +81,7 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
 
     schema = type_schema(
         'cross-account',
-        whitelist_accounts_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
     permissions = ('servicecatalog:ListPortfolioAccess',)
@@ -89,14 +89,13 @@ class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
 
     def check_access(self, client, accounts, resources):
         results = []
-        shared_accounts = set()
         for r in resources:
-            accounts = self.manager.retry(
+            shared_accounts = self.manager.retry(
                 client.list_portfolio_access, PortfolioId=r['Id'], ignore_err_codes=(
-                    'ResourceNotFoundException',))
-            if not accounts:
+                    'ResourceNotFoundException',)).get('AccountIds')
+            if not shared_accounts:
                 continue
-            shared_accounts = set(accounts.get('AccountIds'))
+            shared_accounts = set(shared_accounts)
             delta_accounts = shared_accounts.difference(accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
@@ -170,3 +169,19 @@ class RemoveSharedAccounts(BaseAction):
         client = local_session(self.manager.session_factory).client('servicecatalog')
         for p in portfolios:
             self.delete_shared_accounts(client, p)
+
+
+@resources.register('catalog-product')
+class CatalogProduct(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'servicecatalog'
+        arn_type = 'catalog-product'
+        enum_spec = ('search_products_as_admin', 'ProductViewDetails[].ProductViewSummary', None)
+        detail_spec = ('describe_product_as_admin', 'Id', 'ProductId', None)
+        id = 'ProductId'
+        name = 'Name'
+        arn = 'ProductARN'
+        date = 'CreatedTime'
+        universal_taggable = object()
+        cfn_type = 'AWS::ServiceCatalog::CloudFormationProduct'

@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
@@ -461,7 +460,10 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
         arn_type = 'replicationgroup'
         id = name = dimension = 'ReplicationGroupId'
         cfn_type = 'AWS::ElastiCache::ReplicationGroup'
+        arn_separator = ":"
+        universal_taggable = object()
 
+    augment = universal_augment
     permissions = ('elasticache:DescribeReplicationGroups',)
 
 

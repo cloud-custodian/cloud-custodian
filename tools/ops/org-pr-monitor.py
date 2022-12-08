@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Generate metrics for a Github org's pull request status hooks.
 
 Monitoring CI tools, by tracking latency of status on a pull request,

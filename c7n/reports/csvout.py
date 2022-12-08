@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -50,6 +49,20 @@ from c7n.utils import local_session, dumps
 log = logging.getLogger('custodian.reports')
 
 
+def strip_output_path(path, policy_name):
+    """Remove the date portion from an object storage output path.
+    This effectively removes any trailing path segments that follow
+    the last occurrence of the policy name.
+
+    >>> strip_output_path(
+    ...   '/logs/my-policy-name/2020/01/01/01'
+    ...   'my-policy-name'
+    ... )
+    logs/my-policy-name
+    """
+    return ''.join(path.strip('/').rpartition(policy_name)[:-1])
+
+
 def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
     regions = {p.options.region for p in policies}
@@ -70,7 +83,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
             policy_records = record_set(
                 policy.session_factory,
                 policy.ctx.output.config['netloc'],
-                policy.ctx.output.config['path'].strip('/'),
+                strip_output_path(policy.ctx.output.config['path'], policy.name),
                 start_date)
         else:
             policy_records = fs_record_set(policy.ctx.log_dir, policy.name)
@@ -83,10 +96,10 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
         records += policy_records
 
-    rows = formatter.to_csv(records)
+    rows = formatter.to_csv(records, unique=not options.all_findings)
 
     if options.format == 'csv':
-        writer = csv.writer(output_fh, formatter.headers())
+        writer = csv.writer(output_fh, formatter.headers(), quoting=csv.QUOTE_ALL)
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     elif options.format == 'json':
@@ -180,8 +193,14 @@ class Formatter:
         """Only the first record for each id"""
         uniq = []
         keys = set()
+        compiled = None
+        if '.' in self._id_field:
+            compiled = jmespath.compile(self._id_field)
         for rec in records:
-            rec_id = rec[self._id_field]
+            if compiled:
+                rec_id = compiled.search(rec)
+            else:
+                rec_id = rec[self._id_field]
             if rec_id not in keys:
                 uniq.append(rec)
                 keys.add(rec_id)
@@ -200,9 +219,10 @@ class Formatter:
 
         if unique:
             uniq = self.uniq_by_id(records)
+            log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         else:
             uniq = records
-        log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
+            log.debug("Selected %d record(s)" % len(records))
         rows = list(map(self.extract_csv, uniq))
         return rows
 

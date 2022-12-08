@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -27,7 +26,7 @@ class TestCustomResource(KubeTest):
         )
 
         resources = policy.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['apiVersion'], 'stable.example.com/v1')
         self.assertEqual(resources[0]['kind'], 'CronTabCluster')
 
@@ -49,7 +48,7 @@ class TestCustomResource(KubeTest):
         )
 
         resources = policy.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['apiVersion'], 'stable.example.com/v1')
         self.assertEqual(resources[0]['kind'], 'CronTab')
 

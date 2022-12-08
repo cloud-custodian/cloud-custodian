@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
@@ -21,6 +20,7 @@ class DnsManagedZone(QueryResourceManager):
         name = 'name'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
+        scc_type = "google.cloud.dns.ManagedZone"
 
         @staticmethod
         def get(client, resource_info):

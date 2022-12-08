@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -157,6 +156,34 @@ class InstanceTest(BaseTest):
                      'filter': 'name = test-ingwar',
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertIsNone(result['items'][0].get("disks"))
+
+    def test_create_machine_instance_from_instance(self):
+        project_id = 'custodian-tests'
+        factory = self.replay_flight_data('instance-create-machine-instance', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'icmachineinstance',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'create-machine-image'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_filter_effective_firewall(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-effective-firewall', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'test-instance-effective-firewall',
+             'resource': 'gcp.instance',
+             'filters': [
+                 {'type': 'effective-firewall',
+                 'key': 'firewalls[*].name',
+                 'value': 'default-allow-ssh',
+                 'op': 'in',
+                 'value_type': 'swap'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class DiskTest(BaseTest):

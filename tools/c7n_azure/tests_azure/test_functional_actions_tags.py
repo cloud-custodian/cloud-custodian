@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
@@ -64,7 +63,7 @@ class FunctionalActionsTagsTest(BaseTest):
                            'msg': '{op}, {action_date}',
                            'days': self.DAYS}])
 
-        expected_date = utils.now() + datetime.timedelta(days=self.DAYS)
+        expected_date = utils.utcnow() + datetime.timedelta(days=self.DAYS)
         expected = 'delete, ' + expected_date.strftime('%Y/%m/%d')
         self.assertEqual(self._get_tags().get('cctest_mark'), expected)
 

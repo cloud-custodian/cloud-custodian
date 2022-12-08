@@ -1,4 +1,4 @@
-# Copyright Cloud Custodian Authors.
+# Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -13,6 +13,7 @@ class ArtifactDomain(QueryResourceManager):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
         detail_spec = ('describe_domain', 'domain', 'name', 'domain')
+        cfn_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
 
@@ -113,6 +114,7 @@ class ArtifactRepo(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codeartifact'
         enum_spec = ('list_repositories', 'repositories', None)
+        cfn_type = 'AWS::CodeArtifact::Repository'
         id = name = 'name'
         arn = 'arn'
 

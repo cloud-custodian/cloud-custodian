@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -6,9 +5,28 @@ import time
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from dateutil import parser
+from freezegun import freeze_time
 
 
 class SqlInstanceTest(BaseTest):
+
+    def test_sqlinstance_label_params(self):
+        p = self.load_policy({
+            'name': 'sql-labels',
+            'resource': 'gcp.sql-instance'})
+        model = p.resource_manager.resource_type
+        assert model.get_label_params(
+            {'selfLink': 'https://gcp-sql/projects/abc-123/instances/rds-123'},
+            {'k': 'v'}) == {
+                'project': 'abc-123',
+                'instance': 'rds-123',
+                'body': {
+                    'settings': {
+                        'userLabels': {'k': 'v'}
+                    }
+                }
+        }
 
     def test_sqlinstance_query(self):
         project_id = 'cloud-custodian'
@@ -31,6 +49,28 @@ class SqlInstanceTest(BaseTest):
              'database_id': 'cloud-custodian:brenttest-2'})
         self.assertEqual(instance['state'], 'RUNNABLE')
 
+    def test_sqlinstance_offhour(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data("sqlinstance-offhour", project_id=project_id)
+        p = self.load_policy(
+            {
+                "name": "sql-offhour",
+                "resource": "gcp.sql-instance",
+                "filters": [
+                    {
+                        "type": "offhour",
+                        "default_tz": "utc",
+                        "offhour": 18,
+                        "tag": "custodian_offhours",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        with freeze_time(parser.parse("2022/09/01 02:15:00")):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
     def test_stop_instance(self):
         project_id = 'cloud-custodian'
         instance_name = 'custodiansqltest'
@@ -50,6 +90,44 @@ class SqlInstanceTest(BaseTest):
             'get', {'project': project_id,
                     'instance': instance_name})
         self.assertEqual(result['settings']['activationPolicy'], 'NEVER')
+
+    def test_start_instance(self):
+        project_id = 'cloud-custodian'
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-start', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'istart',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'state',
+                        'op': 'equal',
+                        'value': 'RUNNABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.activationPolicy',
+                        'op': 'equal',
+                        'value': 'NEVER'
+                    }
+                ],
+                'actions': ['start']
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['activationPolicy'], 'ALWAYS')
 
     def test_delete_instance(self):
         project_id = 'cloud-custodian'

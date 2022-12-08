@@ -1,12 +1,13 @@
 cask: easy custodian exec via docker
 ====================================
 
-custodian-cask is a Go wrapper over the `cloudcustodian/c7n:latest`
+custodian-cask is a Go wrapper over the `cloudcustodian/c7n`
 Docker image.  It allows you to use the docker image with the same CLI you
 would use for a local Custodian installation. 
 
 This can be useful in situations where you would like to ensure a working
 CLI without requiring Python or package dependencies.
+
 
 Install
 -------

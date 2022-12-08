@@ -1,4 +1,3 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -21,6 +20,7 @@ class Function(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
         name = id = "name"
+        metric_key = "resource.labels.function_name"
         default_report_fields = [
             'name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
 

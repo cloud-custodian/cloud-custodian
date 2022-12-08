@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -6,6 +5,7 @@ import json
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -37,6 +37,7 @@ class SNS(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'sns'
         arn_type = ''
+        arn_service = 'sns'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
@@ -75,6 +76,16 @@ class SNSPostFinding(PostFinding):
                 'Owner': r['Owner'],
                 'TopicName': r['TopicArn'].rsplit(':', 1)[-1]}))
         return envelope
+
+
+@SNS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, topic):
+        return {
+            'topic_arn': topic['TopicArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SNS.action_registry.register('tag')
@@ -348,22 +359,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filters SNS topic by kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sns-encrypt-key-check
-                  resource: sns
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: alias/aws/sns
-    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 

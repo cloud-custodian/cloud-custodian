@@ -1,0 +1,144 @@
+interactions:
+- request:
+    body: '{"DiskIds": ["disk-3i2gnf0k"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Host:
+      - cbs.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDisks
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cbs.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "RequestId": "de139224-f9f6-4cf0-b262-516960e07028",
+        "DiskSet": [{"DeleteWithInstance": false, "RenewFlag": "NOTIFY_AND_MANUAL_RENEW",
+        "LatestOperationState": "", "DiskType": "CLOUD_PREMIUM", "DiskBackupQuota":
+        0, "DiskState": "UNATTACHED", "SnapshotCount": 0, "DiskBackupCount": 0, "AutoRenewFlagError":
+        false, "Rollbacking": false, "InstanceIdList": [], "Encrypt": false, "Tags":
+        [], "DiskName": "Unnamed", "BackupDisk": false, "DeleteSnapshot": 0, "InstanceId":
+        "", "DifferDaysOfDeadline": 24, "ThroughputPerformance": 0, "Migrating": false,
+        "InstanceType": "", "DiskId": "disk-3i2gnf0k", "LastAttachInsId": null, "SnapshotSize":
+        0, "Placement": {"CageId": "", "CdcId": "", "Zone": "ap-singapore-1", "ProjectName":
+        "Default Project", "ProjectId": 0, "CdcName": "", "DedicatedClusterId": null},
+        "IsReturnable": true, "DeadlineTime": "2022-10-23 11:27:30", "Attached": false,
+        "ReturnFailCode": 0, "DiskSize": 50, "MigratePercent": 0, "DiskUsage": "DATA_DISK",
+        "ErrorPrompt": "", "Portable": true, "DiskChargeType": "PREPAID", "SnapshotAbility":
+        true, "DeadlineError": false, "LatestOperationRequestId": "", "RollbackPercent":
+        0, "AutoSnapshotPolicyIds": null, "LatestOperation": "", "Shareable": false,
+        "CreateTime": "2022-09-23 11:27:30"}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1274'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:29:29 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"DiskIds": ["disk-3i2gnf0k"], "Offset": 20, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '57'
+      Content-Type:
+      - application/json
+      Host:
+      - cbs.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDisks
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cbs.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "RequestId": "70530197-9443-4bd2-9f3c-ebd9d59b2b95",
+        "DiskSet": []}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '99'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:29:29 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cbs:ap-singapore:uin/100000750436:instance/disk-3i2gnf0k"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '83'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"e31194a8-83cc-4ef3-b942-7c523039a1f9"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:29:30 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,4 +1,3 @@
-# Copyright 2019 Karol Lassak
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest
@@ -94,3 +93,18 @@ class LabelActionFilterTest(BaseTest):
                 {'type': 'marked-for-op',
                  'op': 'no-such-op'}
             ]))
+
+    def test_parse(self):
+        p = self.load_policy(get_policy(None, [{"type": "marked-for-op", "op": "detach-disks"}]))
+        marked_for = p.resource_manager.filters[0]
+        assert marked_for.parse("resource_policy-detach-disks-2022_10_23_12_10") == (
+            'resource_policy', 'detach-disks', '2022_10_23_12_10')
+
+        assert marked_for.parse("resource_policy-create-machine-image-2022_10_23_12_10") == (
+            'resource_policy', 'create-machine-image', '2022_10_23_12_10')
+
+        assert marked_for.parse("resource_policy-delete-2022_10_23_12_10") == (
+            'resource_policy', 'delete', '2022_10_23_12_10')
+
+        assert marked_for.parse("custom-message-delete-2022_10_23_12_10") == (
+            'custom-message', 'delete', '2022_10_23_12_10')

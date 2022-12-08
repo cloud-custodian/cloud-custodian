@@ -1,10 +1,10 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.filters import IamPolicyFilter
 
 
 @resources.register('bucket')
@@ -20,11 +20,25 @@ class Bucket(QueryResourceManager):
         default_report_fields = [
             "name", "timeCreated", "location", "storageClass"]
         asset_type = "storage.googleapis.com/Bucket"
+        scc_type = "google.cloud.storage.Bucket"
+        metric_key = 'resource.labels.bucket_name'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'bucket': resource_info['bucket_name']})
+
+
+@Bucket.filter_registry.register('iam-policy')
+class BucketIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process bucket resources correctly.
+    """
+    permissions = ('storage.buckets.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = {{"bucket": resource["name"]}}
+        return verb_arguments
 
 
 @Bucket.action_registry.register('set-uniform-access')

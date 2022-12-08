@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "PrefixLists": [
+            {
+                "PrefixListId": "pl-02d12d37020480a5f",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:644160558196:prefix-list/pl-02d12d37020480a5f",
+                "PrefixListName": "All VPC CIDR",
+                "MaxEntries": 1,
+                "Version": 1,
+                "Tags": [],
+                "OwnerId": "644160558196"
+            },
+            {
+                "PrefixListId": "pl-0c79279cd77a6e7c2",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:644160558196:prefix-list/pl-0c79279cd77a6e7c2",
+                "PrefixListName": "All VPC CIDR",
+                "MaxEntries": 1,
+                "Version": 1,
+                "Tags": [
+                ],
+                "OwnerId": "644160558196"
+            },
+            {
+                "PrefixListId": "pl-02cd2c6b",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:aws:prefix-list/pl-02cd2c6b",
+                "PrefixListName": "com.amazonaws.us-east-1.dynamodb",
+                "Tags": [],
+                "OwnerId": "AWS"
+            },
+            {
+                "PrefixListId": "pl-63a5400a",
+                "AddressFamily": "IPv4",
+                "State": "create-complete",
+                "PrefixListArn": "arn:aws:ec2:us-east-1:aws:prefix-list/pl-63a5400a",
+                "PrefixListName": "com.amazonaws.us-east-1.s3",
+                "Tags": [],
+                "OwnerId": "AWS"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

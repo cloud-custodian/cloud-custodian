@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
@@ -25,6 +24,7 @@ class SpannerInstance(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
+        metric_key = "resource.labels.instance_id"
 
         @staticmethod
         def get(client, resource_info):

@@ -43,7 +43,13 @@
                 "StorageEncrypted": true,
                 "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
                 "DBClusterSnapshotArn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-04-27-05-58",
-                "IAMDatabaseAuthenticationEnabled": false
+                "IAMDatabaseAuthenticationEnabled": false,
+                "TagList": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
             },
             {
                 "AvailabilityZones": [

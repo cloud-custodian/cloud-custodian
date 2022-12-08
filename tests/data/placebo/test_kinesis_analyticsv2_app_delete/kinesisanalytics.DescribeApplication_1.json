@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "ApplicationDetail": {
+            "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/test1",
+            "ApplicationName": "test1",
+            "RuntimeEnvironment": "FLINK-1_6",
+            "ServiceExecutionRole": "arn:aws:iam::644160558196:role/service-role/kinesis-analytics-test2-us-east-1",
+            "ApplicationStatus": "READY",
+            "ApplicationVersionId": 1,
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 8,
+                "day": 19,
+                "hour": 17,
+                "minute": 43,
+                "second": 36,
+                "microsecond": 0
+            },
+            "LastUpdateTimestamp": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 8,
+                "day": 19,
+                "hour": 17,
+                "minute": 43,
+                "second": 36,
+                "microsecond": 0
+            },
+            "ApplicationConfigurationDescription": {
+                "FlinkApplicationConfigurationDescription": {
+                    "CheckpointConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "CheckpointingEnabled": true,
+                        "CheckpointInterval": 60000,
+                        "MinPauseBetweenCheckpoints": 5000
+                    },
+                    "MonitoringConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "MetricsLevel": "APPLICATION",
+                        "LogLevel": "INFO"
+                    },
+                    "ParallelismConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "Parallelism": 1,
+                        "ParallelismPerKPU": 1,
+                        "CurrentParallelism": 1,
+                        "AutoScalingEnabled": true
+                    }
+                },
+                "ApplicationSnapshotConfigurationDescription": {
+                    "SnapshotsEnabled": true
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,4 +1,3 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """Run a custodian policy across an organization's accounts
@@ -9,8 +8,9 @@ from collections import Counter
 import logging
 import os
 import time
-import subprocess
+import subprocess  # nosec
 import sys
+from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -18,7 +18,6 @@ from concurrent.futures import (
     as_completed)
 import yaml
 
-import boto3
 from botocore.compat import OrderedDict
 from botocore.exceptions import ClientError
 import click
@@ -29,9 +28,9 @@ from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
-from c7n.reports.csvout import Formatter, fs_record_set
+from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
 
 from c7n_org.utils import environ, account_tags
 
@@ -62,6 +61,8 @@ CONFIG_SCHEMA = {
             ],
             'properties': {
                 'name': {'type': 'string'},
+                'display_name': {'type': 'string'},
+                'org_id': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {
                     'type': 'string',
@@ -83,6 +84,7 @@ CONFIG_SCHEMA = {
             'required': ['subscription_id'],
             'properties': {
                 'subscription_id': {'type': 'string'},
+                'region': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
                 'vars': {'type': 'object'},
@@ -151,7 +153,8 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
+def init(config, use, debug, verbose, accounts, tags, policies,
+        resource=None, policy_tags=(), not_accounts=None):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -162,6 +165,11 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     logging.getLogger('s3transfer').setLevel(logging.WARNING)
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+    accounts = comma_expand(accounts)
+    policies = comma_expand(policies)
+    tags = comma_expand(tags)
+    policy_tags = comma_expand(policy_tags)
 
     # Filter out custodian log messages on console output if not
     # at warning level or higher, see LogFilter docs and #2674
@@ -181,7 +189,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-    filter_accounts(accounts_config, tags, accounts)
+    filter_accounts(accounts_config, tags, accounts, not_accounts)
 
     load_available()
     MainThreadExecutor.c7n_async = False
@@ -189,13 +197,37 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     return accounts_config, custodian_config, executor
 
 
-def resolve_regions(regions):
+def resolve_regions(regions, account):
     if 'all' in regions:
-        client = boto3.client('ec2')
-        return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        try:
+            session = get_session(account, 'c7n-org', 'us-east-1')
+            client = session.client('ec2')
+            return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        except ClientError as e:
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
-    return regions
+
+    return comma_expand(regions)
+
+
+def comma_expand(values):
+    resolved_values = []
+    if not values:
+        return []
+    for v in values:
+        if ',' in v:
+            resolved_values.extend([n.strip() for n in v.split(',')])
+        elif v:
+            resolved_values.append(v)
+    # unique the set
+    return list(dict.fromkeys(resolved_values))
 
 
 def get_session(account, session_name, region):
@@ -227,10 +259,12 @@ def get_session(account, session_name, region):
 
 def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     filtered_accounts = []
+    accounts = comma_expand(accounts)
+    not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
-        if not_accounts and a['name'] in not_accounts:
-            continue
         account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        if not_accounts and (a['name'] in not_accounts or account_id in not_accounts):
+            continue
         if accounts and a['name'] not in accounts and account_id not in accounts:
             continue
         if tags:
@@ -289,7 +323,20 @@ def report_account(account, region, policies_config, output_path, cache_path, de
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
+        if p.ctx.output.type == "s3":
+            delta = timedelta(days=1)
+            begin_date = datetime.now() - delta
+
+            policy_records = record_set(
+                p.session_factory,
+                p.ctx.output.config['netloc'],
+                strip_output_path(p.ctx.output.config['path'], p.name),
+                begin_date
+            )
+        else:
+            policy_records = fs_record_set(p.ctx.log_dir, p.name)
+
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region
@@ -297,6 +344,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
+                    if k in r:
+                        k = 'tag:' + k
                     r[k] = v
         records.extend(policy_records)
     return records
@@ -340,7 +389,7 @@ def report(config, output, use, output_dir, accounts,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     report_account,
                     a, r,
@@ -376,31 +425,35 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, formatter.headers())
+    writer = csv.writer(output, formatter.headers(), quoting=csv.QUOTE_ALL)
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
 
-def _get_env_creds(account, session, region):
-    env = {}
+def _get_env_creds(account, session, region, env=None):
+    env = env or {}
     if account["provider"] == 'aws':
         creds = session._session.get_credentials()
         env['AWS_ACCESS_KEY_ID'] = creds.access_key
         env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
         env['AWS_SESSION_TOKEN'] = creds.token
         env['AWS_DEFAULT_REGION'] = region
+        env['AWS_REGION'] = region
+        env['AWS_ACCOUNT_ID'] = account["account_id"]
+        # we're explicitly setting credential and region configuratio
+        env.pop('AWS_PROFILE', None)
     elif account["provider"] == 'azure':
         env['AZURE_SUBSCRIPTION_ID'] = account["account_id"]
     elif account["provider"] == 'gcp':
         env['GOOGLE_CLOUD_PROJECT'] = account["account_id"]
         env['CLOUDSDK_CORE_PROJECT'] = account["account_id"]
-    return env
+    return filter_empty(env)
 
 
 def run_account_script(account, region, output_dir, debug, script_args):
@@ -410,23 +463,25 @@ def run_account_script(account, region, output_dir, debug, script_args):
     except ClientError:
         return 1
 
-    env = os.environ.copy()
-    env.update(_get_env_creds(account, session, region))
-
+    env = _get_env_creds(account, session, region, dict(os.environ))
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
 
     if debug:
-        subprocess.check_call(args=script_args, env=env)
+        subprocess.check_call(args=script_args, env=env)  # nosec
         return 0
 
     output_dir = os.path.join(output_dir, account['name'], region)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    vars = {"account": account["name"], "account_id": account["account_id"],
+        "region": region, "output_dir": output_dir}
+    script_args = format_string_values(script_args, **vars)
+
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
-            return subprocess.call(
+            return subprocess.call(  # nosec
                 args=script_args, env=env, stdout=stdout, stderr=stderr)
 
 
@@ -457,7 +512,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[
                     w.submit(run_account_script, a, r, output_dir,
                              serial, script_args)] = (a, r)
@@ -487,14 +542,15 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 def accounts_iterator(config):
     for a in config.get('accounts', ()):
-        if isinstance(a['role'], str) and not a['role'].startswith('arn'):
-            a['role'] = "arn:aws:iam::{}:role/{}".format(
-                a['account_id'], a['role'])
+        if 'role' in a:
+            if isinstance(a['role'], str) and not a['role'].startswith('arn'):
+                a['role'] = "arn:aws:iam::{}:role/{}".format(
+                    a['account_id'], a['role'])
         yield {**a, **{'provider': 'aws'}}
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
-             'regions': ['global'],
+             'regions': [a.get('region', 'global')],
              'provider': 'azure',
              'tags': a.get('tags', ()),
              'vars': a.get('vars', {})}
@@ -601,6 +657,7 @@ def run_account(account, region, policies_config, output_path,
 @click.option("-u", "--use", required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
+@click.option('--not-accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
@@ -618,12 +675,13 @@ def run_account(account, region, policies_config, output_path,
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region,
+def run(config, use, output_dir, accounts, not_accounts, tags, region,
         policy, policy_tags, cache_period, cache_path, metrics,
         dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
+        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
+        not_accounts=not_accounts)
     policy_counts = Counter()
     success = True
 
@@ -638,7 +696,7 @@ def run(config, use, output_dir, accounts, tags, region,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ())):
+            for r in resolve_regions(region or a.get('regions', ()), a):
                 futures[w.submit(
                     run_account,
                     a, r,

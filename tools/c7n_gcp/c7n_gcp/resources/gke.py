@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import re
@@ -29,6 +28,8 @@ class KubernetesCluster(QueryResourceManager):
             'name', 'description', 'status', 'currentMasterVersion', 'currentNodeVersion',
             'currentNodeCount', 'location']
         asset_type = 'container.googleapis.com/Cluster'
+        scc_type = 'google.container.Cluster'
+        metric_key = 'resource.labels.cluster_name'
 
         @staticmethod
         def get(client, resource_info):
@@ -38,6 +39,12 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['project_id'],
                         resource_info['location'],
                         resource_info['cluster_name'])})
+
+    def augment(self, resources):
+        for r in resources:
+            if r.get('resourceLabels'):
+                r['labels'] = r['resourceLabels']
+        return resources
 
 
 @resources.register('gke-nodepool')

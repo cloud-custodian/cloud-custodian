@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -154,6 +153,25 @@ class ValidateTest(CliTest):
 
         # duplicate policy names
         self.run_and_expect_failure(["custodian", "validate", yaml_file, yaml_file], 1)
+
+    def test_deprecated(self):
+
+        deprecated = {
+            "policies": [
+                {
+                    "name": "foo",
+                    "resource": "ec2",
+                    "filters": [{"tag:custodian_tagging": "not-null"}],
+                    "actions": [{"type": "unmark", "tags": ["custodian_cleanup"]}],
+                }
+            ]
+        }
+        yaml_file = self.write_policy_file(deprecated)
+
+        self.run_and_expect_success(["custodian", "validate", yaml_file])
+
+        # strict checking should fail as unmark is deprecated
+        self.run_and_expect_failure(["custodian", "validate", "--strict", yaml_file], 1)
 
 
 class SchemaTest(CliTest):

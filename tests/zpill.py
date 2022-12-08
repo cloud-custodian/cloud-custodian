@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import fnmatch
@@ -17,11 +16,10 @@ from botocore.response import StreamingBody
 from placebo import pill
 
 from c7n.testing import CustodianTestCore
-from .constants import ACCOUNT_ID
 
 # Custodian Test Account. This is used only for testing.
-# Access is available for community project maintainers.
 
+ACCOUNT_ID = "644160558196"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -179,7 +177,6 @@ class ZippedPill(pill.Pill):
             self.archive.close()
 
     def save_response(self, service, operation, response_data, http_response=200):
-
         filepath = self.get_new_file_path(service, operation)
         pill.LOG.debug("save_response: path=%s", filepath)
         json_data = {"status_code": http_response, "data": response_data}
@@ -258,6 +255,10 @@ class RedPill(pill.Pill):
         """
         Override to sanitize response metadata and account_ids
         """
+        # aws sso setups involve a short lived credential transfer
+        if service == "portal.sso":
+            return
+
         if 'ResponseMetadata' in response_data:
             response_data['ResponseMetadata'] = {}
 
