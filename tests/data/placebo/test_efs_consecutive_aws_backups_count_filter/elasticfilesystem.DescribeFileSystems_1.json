@@ -1,0 +1,104 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "123456789012", 
+                "CreationToken": "console-528254b5-181c-4dd5-965b-776c733573e1", 
+                "FileSystemId": "fs-03594190a64502ffd", 
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-03594190a64502ffd", 
+                "CreationTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 9,
+                    "minute": 4
+                }, 
+                "LifeCycleState": "available", 
+                "Name": "mock-test-efs-1", 
+                "NumberOfMountTargets": 3, 
+                "SizeInBytes": {
+                    "Value": 6144, 
+                    "Timestamp": {
+                        "hour": 19,
+                        "__class__": "datetime",
+                        "month": 9,
+                        "second": 52,
+                        "microsecond": 776000,
+                        "year": 2022,
+                        "day": 9,
+                        "minute": 4
+                    }, 
+                    "ValueInIA": 0, 
+                    "ValueInStandard": 6144
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "Encrypted": true, 
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
+                "ThroughputMode": "bursting", 
+                "Tags": [
+                    {
+                        "Key": "Name", 
+                        "Value": "mock-test-efs-1"
+                    }, 
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup", 
+                        "Value": "enabled"
+                    }
+                ]
+            },
+            {
+                "OwnerId": "123456789012", 
+                "CreationToken": "console-528254b5-181c-4dd5-965b-776c733573e1", 
+                "FileSystemId": "fs-03594190a64502ffe", 
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-03594190a64502ffe", 
+                "CreationTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 1,
+                    "minute": 4
+                }, 
+                "LifeCycleState": "available", 
+                "Name": "mock-test-efs-2", 
+                "NumberOfMountTargets": 3, 
+                "SizeInBytes": {
+                    "Value": 6144, 
+                    "Timestamp": {
+                        "hour": 19,
+                        "__class__": "datetime",
+                        "month": 9,
+                        "second": 52,
+                        "microsecond": 776000,
+                        "year": 2022,
+                        "day": 1,
+                        "minute": 4
+                    }, 
+                    "ValueInIA": 0, 
+                    "ValueInStandard": 6144
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "Encrypted": true, 
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/9dcae508-b262-4260-9a4f-16f805ecf392", 
+                "ThroughputMode": "bursting", 
+                "Tags": [
+                    {
+                        "Key": "Name", 
+                        "Value": "mock-test-efs-2"
+                    }, 
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup", 
+                        "Value": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+}

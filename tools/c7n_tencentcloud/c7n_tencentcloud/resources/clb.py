@@ -13,7 +13,11 @@ from c7n_tencentcloud.utils import PageMethod, isoformat_datetime_str
 
 @resources.register("clb")
 class CLB(QueryResourceManager):
-    """CLB"""
+    """CLB
+
+    Docs on CLB resources
+    https://www.tencentcloud.com/document/product/214
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
@@ -56,7 +60,38 @@ class CLB(QueryResourceManager):
 
 @CLB.filter_registry.register("metrics")
 class CLBMetricsFilter(MetricsFilter):
-    """CLBMetricsFilter"""
+    """Filter a CLB resource by metrics
+
+    Docs on CLB metrics
+
+    - Public Network CLB
+      https://www.tencentcloud.com/document/product/248/10997
+    - Private Network CLB
+      https://www.tencentcloud.com/document/product/248/39529
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: clb_metrics_filter
+              resource: tencentcloud.clb
+              filters:
+                - type: value
+                  key: CreateTime
+                  value_type: age
+                  value: 30
+                  op: gte
+                - type: metrics
+                  name: TotalReq
+                  statistics: Sum
+                  period: 3600
+                  days: 30
+                  value: 0
+                  missing-value: 0
+                  op: eq
+    """
+
     DEFAULT_NAMESPACE = {"clb:clb": "QCE/LB_PUBLIC"}
 
     def _get_request_params(self, resources, namespace):
