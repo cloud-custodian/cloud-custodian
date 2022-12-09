@@ -7,8 +7,8 @@
                 "ResourceARN": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay",
                 "Tags": [
                     {
-                        "Key": "stacklet:app",
-                        "Value": "EventRelay"
+                        "Key": "custodian_cleanup",
+                        "Value": "Resource does not meet policy: delete@2022/12/09"
                     }
                 ]
             }
