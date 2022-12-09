@@ -3,6 +3,8 @@
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
+from c7n.filters import ValueFilter
+from c7n.utils import type_schema, local_session
 
 
 class DescribeRegionalWaf(DescribeSource):
@@ -87,3 +89,52 @@ class WAFV2(QueryResourceManager):
         'describe': DescribeWafV2,
         'config': ConfigSource
     }
+
+
+@WAFV2.filter_registry.register('logging')
+class WAFV2LoggingFilter(ValueFilter):
+    """
+    Filter by wafv2 logging configuration
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: wafv2-logging-enabled
+            resource: aws.wafv2
+            filters:
+              - not:
+                  - type: logging
+                    key: ResourceArn
+                    value: present
+
+          - name: check-redacted-fields
+            resource: aws.wafv2
+            filters:
+              - type: logging
+                key: RedactedFields[].SingleHeader.Name
+                value: user-agent
+                op: in
+                value_type: swap
+    """
+
+    schema = type_schema('logging', rinherit=ValueFilter.schema)
+    permissions = ('wafv2:GetLoggingConfiguration', )
+    annotation_key = 'c7n:WafV2LoggingConfiguration'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'wafv2', region_name=self.manager.region)
+        for r in resources:
+            if not r.get(self.annotation_key):
+                try:
+                    logging_conf = client.get_logging_configuration(
+                        ResourceArn=r['ARN'])['LoggingConfiguration']
+                except client.exceptions.WAFNonexistentItemException:
+                    continue
+                r[self.annotation_key] = logging_conf
+
+        return [
+            r for r in resources if self.match(
+                r.get(self.annotation_key, {}))]
