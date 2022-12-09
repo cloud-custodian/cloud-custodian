@@ -126,14 +126,14 @@ class WAFV2LoggingFilter(ValueFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'wafv2', region_name=self.manager.region)
-        for r in resources:
-            if not r.get(self.annotation_key):
-                try:
-                    logging_conf = client.get_logging_configuration(
-                        ResourceArn=r['ARN'])['LoggingConfiguration']
-                except client.exceptions.WAFNonexistentItemException:
-                    continue
-                r[self.annotation_key] = logging_conf
+        logging_confs = client.list_logging_configurations(
+            Scope='REGIONAL')['LoggingConfigurations']
+        resource_map = {r['ARN']: r for r in resources}
+        for lc in logging_confs:
+            if lc['ResourceArn'] in resource_map:
+                resource_map[lc['ResourceArn']][self.annotation_key] = lc
+
+        resources = list(resource_map.values())
 
         return [
             r for r in resources if self.match(

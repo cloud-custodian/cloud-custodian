@@ -36,7 +36,7 @@ class WAFTest(BaseTest):
         p = self.load_policy(
             policy,
             session_factory=session_factory,
-            config={'region': 'us-east-2'}
+            config={'region': 'us-east-1'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -71,7 +71,7 @@ class WAFTest(BaseTest):
         p = self.load_policy(
             policy,
             session_factory=session_factory,
-            config={'region': 'us-east-2'}
+            config={'region': 'us-east-1'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
