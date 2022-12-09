@@ -51,3 +51,28 @@ class WAFTest(BaseTest):
                 }
             ]
         )
+
+    def test_wafv2_logging_not_enabled(self):
+        session_factory = self.replay_flight_data(
+            'test_wafv2_no_logging_configuration')
+        policy = {
+            'name': 'foo',
+            'resource': 'aws.wafv2',
+            'filters': [
+                {
+                    'not': [{
+                        'type': 'logging',
+                        'key': 'ResourceArn',
+                        'value': 'present'
+                    }]
+                }
+            ]
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={'region': 'us-east-2'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
