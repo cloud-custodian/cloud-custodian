@@ -86,7 +86,7 @@ class NotifyTest(BaseTest):
 
     # TODO refactor - extract method
     def test_resource_prep(self):
-        session_factory = self.replay_flight_data("test_notify_resource_prep")
+        session_factory = self.record_flight_data("test_notify_resource_prep")
         policy = self.load_policy(
             {"name": "notify-sns",
              "resource": "ec2",
