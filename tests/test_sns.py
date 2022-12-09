@@ -49,11 +49,12 @@ class TestSNS(BaseTest):
                 "resource": "sns",
                 "filters": [
                     {"TopicArn": topic_arn},
-                    {"type": "cross-account", "whitelist": ["123456789012"]},
+                    {"type": "cross-account", "whitelist": ["644160558196"]},
                 ],
                 "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
 
@@ -114,6 +115,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -177,6 +179,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -248,6 +251,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -313,6 +317,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -376,6 +381,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -448,6 +454,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
