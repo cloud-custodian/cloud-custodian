@@ -3,9 +3,6 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay"
-            },
-            {
                 "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement"
             }
         ],

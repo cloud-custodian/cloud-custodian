@@ -4,9 +4,6 @@
         "Topics": [
             {
                 "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:my-encrypted-topic"
-            },
-            {
-                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay"
             }
         ],
         "ResponseMetadata": {}
