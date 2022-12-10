@@ -6065,6 +6065,7 @@
     "GetCompatibleKafkaVersions",
     "ListClusterOperations",
     "ListClusters",
+    "ListClustersV2",
     "ListConfigurationRevisions",
     "ListConfigurations",
     "ListKafkaVersions",
