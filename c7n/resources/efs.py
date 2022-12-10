@@ -15,6 +15,7 @@ from c7n.query import (
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 from .aws import shape_validate
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class EFSDescribe(DescribeSource):
@@ -39,6 +40,7 @@ class ElasticFileSystem(QueryResourceManager):
         filter_type = 'scalar'
         universal_taggable = True
         config_type = cfn_type = 'AWS::EFS::FileSystem'
+        arn = 'FileSystemArn'
 
     source_mapping = {
         'describe': EFSDescribe,
@@ -337,3 +339,6 @@ class EFSHasStatementFilter(HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region
         }
+
+
+ElasticFileSystem.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
