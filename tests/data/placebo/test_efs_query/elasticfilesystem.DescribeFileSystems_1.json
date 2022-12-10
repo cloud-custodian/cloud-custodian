@@ -31,7 +31,8 @@
                     "minute": 4
                 }, 
                 "PerformanceMode": "generalPurpose", 
-                "FileSystemId": "fs-f2603dbb", 
+                "FileSystemId": "fs-f2603dbb",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-f2603dbb",
                 "NumberOfMountTargets": 0, 
                 "LifeCycleState": "available", 
                 "OwnerId": "644160558196"
@@ -54,7 +55,8 @@
                     "minute": 41
                 }, 
                 "PerformanceMode": "generalPurpose", 
-                "FileSystemId": "fs-fd673ab4", 
+                "FileSystemId": "fs-fd673ab4",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-fd673ab4",
                 "NumberOfMountTargets": 0, 
                 "LifeCycleState": "available", 
                 "OwnerId": "644160558196"
