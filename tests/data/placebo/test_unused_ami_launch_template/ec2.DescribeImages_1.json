@@ -39,6 +39,82 @@
                 "RootDeviceType": "ebs",
                 "SriovNetSupport": "simple",
                 "VirtualizationType": "hvm"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-11-04T06:24:45.000Z",
+                "ImageId": "ami-c481fad3",
+                "ImageLocation": "644160558196/Ubuntu1404",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0d16416527e67c663",
+                            "VolumeSize": 8,
+                            "VolumeType": "standard",
+                            "Encrypted": true
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/sdb",
+                        "VirtualName": "ephemeral0"
+                    },
+                    {
+                        "DeviceName": "/dev/sdc",
+                        "VirtualName": "ephemeral1"
+                    }
+                ],
+                "Description": "Mock image",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "Ubuntu1404",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-11-04T06:24:45.000Z",
+                "ImageId": "ami-e0fba8f7",
+                "ImageLocation": "644160558196/Ubuntu1404",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0d16416527e67c663",
+                            "VolumeSize": 8,
+                            "VolumeType": "standard",
+                            "Encrypted": true
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/sdb",
+                        "VirtualName": "ephemeral0"
+                    },
+                    {
+                        "DeviceName": "/dev/sdc",
+                        "VirtualName": "ephemeral1"
+                    }
+                ],
+                "Description": "Mock image",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "Ubuntu1404",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
             }
         ],
         "ResponseMetadata": {

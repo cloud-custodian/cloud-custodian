@@ -510,8 +510,16 @@ class ImageAgeFilter(AgeFilter):
 class ImageUnusedFilter(Filter):
     """Filters images based on usage
 
+    `value`: boolean
+
     true: image has no instances spawned from it
     false: image has instances spawned from it
+
+    `include-launch-configurations`: boolean
+
+    true: include all launch configurations and launch templates (default versions)
+    false: only include launch configurations and launch templates for existing
+    autoscaling groups
 
     :example:
 
@@ -523,17 +531,32 @@ class ImageUnusedFilter(Filter):
                 filters:
                   - type: unused
                     value: true
+                    include-launch-configurations: true
     """
 
-    schema = type_schema('unused', value={'type': 'boolean'})
+    schema = type_schema(
+        'unused',
+        value={'type': 'boolean'},
+        **{
+            'include-launch-configurations': {'type': 'boolean'}
+        }
+    )
 
     def get_permissions(self):
         return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ('asg', 'launch-config', 'ec2')]))
 
-    def _pull_asg_images(self):
-        asgs = self.manager.get_resource_manager('asg').resources()
+    def _pull_launch_configs_templates(self, asgs=None):
+        include_lcfg = self.data.get('include-launch-configurations', False)
+
+        # if we dont pass in asgs and include-launch-configs is false, just bail
+        if asgs is None and include_lcfg is False:
+            return set()
+
+        if asgs is None or include_lcfg:
+            asgs = []
+
         image_ids = set()
         lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
         lcfg_mgr = self.manager.get_resource_manager('launch-config')
@@ -542,19 +565,33 @@ class ImageUnusedFilter(Filter):
             image_ids.update([
                 lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
                 if lcfg['LaunchConfigurationName'] in lcfgs])
+        elif not lcfgs and include_lcfg:
+            image_ids.update([lcfg['ImageId'] for lcfg in lcfg_mgr.resources()])
 
         tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
-        for tversion in tmpl_mgr.get_resources(
-                list(tmpl_mgr.get_asg_templates(asgs).keys())):
-            image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
+        if asgs or include_lcfg:
+            for tversion in tmpl_mgr.get_resources(
+                    list(tmpl_mgr.get_asg_templates(asgs).keys())):
+                image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
         return image_ids
+
+    def _pull_asg_images(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        result = self._pull_launch_configs_templates(asgs)
+        return result
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')
         return {i['ImageId'] for i in ec2_manager.resources()}
 
     def process(self, resources, event=None):
-        images = self._pull_ec2_images().union(self._pull_asg_images())
+
+        op = self._pull_asg_images
+        # asg launch configs is a superset of all launch configs
+        if self.data.get('include-launch-configurations'):
+            op = self._pull_launch_configs_templates
+
+        images = self._pull_ec2_images().union(op())
         if self.data.get('value', True):
             return [r for r in resources if r['ImageId'] not in images]
         return [r for r in resources if r['ImageId'] in images]
