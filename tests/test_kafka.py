@@ -25,7 +25,8 @@ class KafkaTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'tag:NetworkLocation',
                  'value': 'Public'}]},
-            session_factory=factory)
+            session_factory=factory,
+            config={'region': 'ap-northeast-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -42,11 +43,13 @@ class KafkaTest(BaseTest):
                  'tags': {'App': 'Custodian'}},
                 {'type': 'remove-tag',
                  'tags': ['Env']}]},
-            session_factory=factory)
+            session_factory=factory,
+            config={'region': 'ap-northeast-2'}
+        )
         resources = p.run()
         assert len(resources) == 1
-        assert resources[0]['ClusterName'] == 'dev'
-        client = factory().client('kafka')
+        assert resources[0]['ClusterName'] == 'demo-cluster-1'
+        client = factory().client('kafka', region_name='ap-northeast-2')
         assert client.list_tags_for_resource(
             ResourceArn=resources[0]['ClusterArn'])['Tags'] == {
                 'App': 'Custodian'}
@@ -69,14 +72,15 @@ class KafkaTest(BaseTest):
                          'Prometheus': {
                              'JmxExporter': {
                                  'EnabledInBroker': True}}}}}]},
-            session_factory=factory)
+            session_factory=factory,
+            config={'region': 'ap-northeast-2'})
         resources = p.run()
         assert len(resources) == 1
-        assert resources[0]['ClusterName'] == 'dev'
+        assert resources[0]['ClusterName'] == 'demo-cluster-1'
         if self.recording:
             time.sleep(5)
 
-        info = factory().client('kafka').describe_cluster(
+        info = factory().client('kafka', region_name='ap-northeast-2').describe_cluster(
             ClusterArn=resources[0]['ClusterArn'])['ClusterInfo']
 
         assert info['State'] == 'UPDATING'
@@ -87,25 +91,26 @@ class KafkaTest(BaseTest):
             'name': 'kafka',
             'resource': 'aws.kafka',
             'filters': [
-                {'ClusterName': 'dev'}],
+                {'ClusterName': 'demo-cluster-1'}],
             'actions': [
                 {'type': 'delete'},
             ]},
-            session_factory=factory)
+            session_factory=factory,
+            config={'region': 'ap-northeast-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
         if self.recording:
             time.sleep(5)
 
-        client = factory().client('kafka')
+        client = factory().client('kafka', region_name='ap-northeast-2')
         cluster = client.describe_cluster(ClusterArn=resources[0]['ClusterArn']).get('ClusterInfo')
         self.assertEqual(cluster['State'], 'DELETING')
 
     def test_kafka_cluster_kms_filter(self):
         session_factory = self.replay_flight_data('test_kafka_cluster_kms_filter')
-        kms = session_factory().client('kms')
-        expression = 'EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
+        kms = session_factory().client('kms', region_name='ap-northeast-2')
+        expression = 'Provisioned.EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
         p = self.load_policy(
             {
                 'name': 'kafka-kms-filter',
@@ -118,7 +123,8 @@ class KafkaTest(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)

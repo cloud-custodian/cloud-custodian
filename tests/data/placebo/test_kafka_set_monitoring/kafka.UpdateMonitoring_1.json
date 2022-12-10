@@ -1,8 +1,8 @@
 {
-  "status_code": 200,
-  "data": {
-    "ResponseMetadata": {},
-    "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/dev/d9776364-2d39-4f56-90b4-1961339ee936-6",
-    "ClusterOperationArn": "arn:aws:kafka:us-east-1:644160558196:cluster-operation/dev/d9776364-2d39-4f56-90b4-1961339ee936-6/4bf20bb0-f6a5-4148-abe7-f04f022001e6"
-  }
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ClusterArn": "arn:aws:kafka:ap-northeast-2:644160558196:cluster/demo-cluster-1/a4128f17-d0a5-4b03-b858-ea13108e7286-4",
+        "ClusterOperationArn": "arn:aws:kafka:ap-northeast-2:644160558196:cluster-operation/demo-cluster-1/a4128f17-d0a5-4b03-b858-ea13108e7286-4/825acbb9-a77d-4920-9b08-61ab158251bb"
+    }
 }

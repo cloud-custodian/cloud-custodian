@@ -4,27 +4,27 @@
         "Aliases": [
             {
                 "AliasName": "alias/aws/kafka",
-                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/kafka",
-                "TargetKeyId": "133b4e81-8447-4c40-83cd-1db75d52b106",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/kafka",
+                "TargetKeyId": "d0e564f4-ec4c-43bd-b379-a22f92253dbe",
                 "CreationDate": {
                     "__class__": "datetime",
-                    "year": 2019,
-                    "month": 1,
-                    "day": 30,
-                    "hour": 10,
-                    "minute": 11,
-                    "second": 4,
-                    "microsecond": 839000
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
                 },
                 "LastUpdatedDate": {
                     "__class__": "datetime",
-                    "year": 2019,
-                    "month": 1,
-                    "day": 30,
-                    "hour": 10,
-                    "minute": 11,
-                    "second": 4,
-                    "microsecond": 839000
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
                 }
             }
         ],

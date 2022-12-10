@@ -1,7 +1,7 @@
 {
-  "status_code": 200,
-  "data": {
-    "FailedResourcesMap": {},
-    "ResponseMetadata": {}
-  }
+    "status_code": 200,
+    "data": {
+        "FailedResourcesMap": {},
+        "ResponseMetadata": {}
+    }
 }

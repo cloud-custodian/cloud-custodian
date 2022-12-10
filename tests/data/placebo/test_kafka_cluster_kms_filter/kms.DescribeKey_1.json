@@ -3,25 +3,26 @@
     "data": {
         "KeyMetadata": {
             "AWSAccountId": "644160558196",
-            "KeyId": "133b4e81-8447-4c40-83cd-1db75d52b106",
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/133b4e81-8447-4c40-83cd-1db75d52b106",
+            "KeyId": "d0e564f4-ec4c-43bd-b379-a22f92253dbe",
+            "Arn": "arn:aws:kms:ap-northeast-2:644160558196:key/d0e564f4-ec4c-43bd-b379-a22f92253dbe",
             "CreationDate": {
                 "__class__": "datetime",
-                "year": 2019,
-                "month": 1,
-                "day": 30,
-                "hour": 10,
-                "minute": 11,
-                "second": 4,
-                "microsecond": 829000
+                "year": 2022,
+                "month": 12,
+                "day": 9,
+                "hour": 15,
+                "minute": 13,
+                "second": 39,
+                "microsecond": 35000
             },
             "Enabled": true,
-            "Description": "Default master key that protects my Kafka data when no other key is defined",
+            "Description": "Default key that protects my Kafka data when no other key is defined",
             "KeyUsage": "ENCRYPT_DECRYPT",
             "KeyState": "Enabled",
             "Origin": "AWS_KMS",
             "KeyManager": "AWS",
             "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
             "EncryptionAlgorithms": [
                 "SYMMETRIC_DEFAULT"
             ],
