@@ -4,10 +4,7 @@
 from setuptools import setup
 
 packages = \
-['c7n_tencentcloud',
- 'c7n_tencentcloud.actions',
- 'c7n_tencentcloud.filters',
- 'c7n_tencentcloud.resources']
+['c7n_left', 'c7n_left.providers.terraform']
 
 package_data = \
 {'': ['*']}
@@ -18,7 +15,7 @@ install_requires = \
  'boto3 (>=1.26.28,<2.0.0)',
  'botocore (>=1.29.28,<2.0.0)',
  'c7n (>=0.9.21,<0.10.0)',
- 'cos-python-sdk-v5>=1.9.21,<2.0.0',
+ 'click>=8.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
  'importlib-resources (>=5.10.1,<6.0.0)',
@@ -27,21 +24,23 @@ install_requires = \
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrsistent (>=0.19.2,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
- 'pytz>=2022.1',
  'pyyaml (>=6.0,<7.0)',
- 'retrying>=1.3.3,<2.0.0',
+ 'rich>=12.5,<13.0',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
- 'tencentcloud-sdk-python>=3.0.783,<4.0.0',
+ 'tfparse>=0.3,<0.4',
  'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.13,<2.0.0)',
  'zipp (>=3.11.0,<4.0.0)']
 
+entry_points = \
+{'console_scripts': ['c7n-left = c7n_left.cli:cli']}
+
 setup_kwargs = {
-    'name': 'c7n-tencentcloud',
-    'version': '0.1.3',
-    'description': 'Cloud Custodian - Tencent Cloud Provider',
+    'name': 'c7n-left',
+    'version': '0.1.2',
+    'description': 'Custodian policies for IAAC definitions',
     'license': 'Apache-2.0',
     'classifiers': [
         'License :: OSI Approved :: Apache Software License',
@@ -61,6 +60,7 @@ setup_kwargs = {
     'packages': packages,
     'package_data': package_data,
     'install_requires': install_requires,
+    'entry_points': entry_points,
     'python_requires': '>=3.7,<4.0',
 }
 

@@ -1,5 +1,5 @@
-boto3==1.26.27 ; python_version >= "3.7" and python_version < "4.0"
-botocore==1.29.27 ; python_version >= "3.7" and python_version < "4.0"
+boto3==1.26.28 ; python_version >= "3.7" and python_version < "4.0"
+botocore==1.29.28 ; python_version >= "3.7" and python_version < "4.0"
 cached-property==1.5.2 ; python_version >= "3.7" and python_version < "3.8"
 certifi==2022.12.7 ; python_version >= "3.7" and python_version < "4"
 cffi==1.15.1 ; python_version >= "3.7" and python_version < "4.0"

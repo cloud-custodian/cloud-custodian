@@ -1,6 +1,6 @@
 attrs==22.1.0 ; python_version >= "3.7" and python_version < "4.0"
-boto3==1.26.27 ; python_version >= "3.7" and python_version < "4.0"
-botocore==1.29.27 ; python_version >= "3.7" and python_version < "4.0"
+boto3==1.26.28 ; python_version >= "3.7" and python_version < "4.0"
+botocore==1.29.28 ; python_version >= "3.7" and python_version < "4.0"
 certifi==2022.12.7 ; python_version >= "3.7" and python_version < "4"
 charset-normalizer==2.1.1 ; python_version >= "3.7" and python_version < "4"
 datadog==0.34.1 ; python_version >= "3.7" and python_version < "4.0"
