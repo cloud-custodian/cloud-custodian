@@ -18,6 +18,7 @@ install_requires = \
  'boto3 (>=1.26.9,<2.0.0)',
  'botocore (>=1.29.9,<2.0.0)',
  'c7n (>=0.9.21,<0.10.0)',
+ 'cos-python-sdk-v5>=1.9.20,<2.0.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
  'importlib-resources (>=5.10.0,<6.0.0)',
@@ -47,7 +48,7 @@ setup_kwargs = {
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing'
     ],
-    'long_description': 'None',
+    'long_description': None,
     'long_description_content_type': 'text/markdown',
     'author': 'Cloud Custodian Project',
     'author_email': 'cloud-custodian@googlegroups.com',

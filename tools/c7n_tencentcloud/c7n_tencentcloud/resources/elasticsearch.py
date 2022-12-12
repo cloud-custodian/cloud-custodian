@@ -8,10 +8,24 @@ from c7n_tencentcloud.utils import PageMethod
 
 @resources.register("elasticsearch")
 class Elasticsearch(QueryResourceManager):
-    """"
+    """
     elasticsearch - Tencent Cloud Elasticsearch Service (ES) is a cloud-managed Elasticsearch
      service that is highly available and scalable
     https://www.tencentcloud.com/document/product/845/16478?lang=en&pg=
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: tencentcloud-elasticsearch
+          resource: tencentcloud.elasticsearch
+          filters:
+            - type: value
+              key: NodeInfoList.NodeType
+              op: in
+              value:
+                - ES.S1.MEDIUM4
     """
     class resource_type(ResourceTypeInfo):
         """resource_type"""

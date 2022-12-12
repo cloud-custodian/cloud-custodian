@@ -8,7 +8,25 @@ import pytz
 
 @resources.register("mysql-backup")
 class MySQLBackUp(QueryResourceManager):
-    """mysql-backup"""
+    """mysql-backup
+
+    Docs on mysql-backup
+    https://www.tencentcloud.com/document/product/236/37796
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: test_cdb_backup_create_time
+          resource: tencentcloud.mysql-backup
+          filters:
+            - type: value
+              key: Date
+              value: 1
+              value_type: age
+              op: greater-than
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""

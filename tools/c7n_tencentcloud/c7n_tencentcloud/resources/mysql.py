@@ -13,6 +13,29 @@ class MySQL(QueryResourceManager):
     """
     mysql: distributed data storage service, relational databases
     https://www.tencentcloud.com/document/product/236/5147
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: test_cdb_engine_value
+          resource: tencentcloud.mysql
+          filters:
+            - type: value
+              key: EngineType
+              value:
+                - InnoDB
+                - RocksDB
+              op: in
+            - type: value
+              key: EngineVersion
+              op: in
+              value:
+                - '5.5'
+                - '5.6'
+                - '5.7'
+                - '8.0'
     """
 
     class resource_type(ResourceTypeInfo):
@@ -46,6 +69,19 @@ class MySQL(QueryResourceManager):
 
 @MySQL.filter_registry.register('encryption')
 class EncryptionFilter(Filter):
+    """
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: test_cdb_encryption_not_enabled_filter
+          resource: tencentcloud.mysql
+          filters:
+            - type: encryption
+              value: 'NO'
+    """
+
     schema = type_schema('encryption', value={'type': 'boolean'})
 
     def process(self, resources, event=None):
