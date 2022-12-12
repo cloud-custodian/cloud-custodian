@@ -249,8 +249,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def augment(self, resources):
         return resources
 
-    @classmethod
-    def get_urns(cls, resources, project_id=None):
+    def get_urns(self, resources):
         """Generate URNs for the resources.
 
         A Uniform Resource Name (URN) is a URI that identifies a resource by
@@ -266,22 +265,23 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
         If the region is "global" then it is omitted from the URN.
         """
-        return [cls._get_urn(r, project_id) for r in resources]
+        return [self._get_urn(r) for r in resources]
 
-    @classmethod
-    def _get_urn(cls, resource, project_id=None) -> str:
+    def _get_urn(self, resource) -> str:
         "Generate an URN for the resource."
-        rt = cls.resource_type
-        region = cls._get_region(resource)
+        rt = self.resource_type
+        region = self._get_region(resource)
         if region == "global":
             region = ""
-        if project_id is None:
-            project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+        project_id = self._get_project()
         id = resource[rt.id]
-        return f"gcp:{rt.service}:{region}:{project_id}:{cls.type}/{id}"
+        return f"gcp:{rt.service}:{region}:{project_id}:{self.type}/{id}"
 
-    @classmethod
-    def _get_region(cls, resource):
+    def _get_project(self):
+        """By default use the session, also useful hook point."""
+        return local_session(self.session_factory).project_id
+
+    def _get_region(self, resource):
         """Get the region for a single resource.
 
         Resources are either global, regional, or zonal. When a resource is
@@ -292,7 +292,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         if "zone" in resource:
             zone = resource["zone"].rsplit("/", 1)[-1]
             # The zone is always "{region}-{zone-id}"
-            return zone.rsplit("-",1)[0]
+            return zone.rsplit("-", 1)[0]
 
         return "global"
 

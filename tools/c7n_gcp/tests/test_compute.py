@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 class InstanceTest(BaseTest):
 
     def test_instance_query(self):
-        factory = self.replay_flight_data('instance-query')
+        factory = self.replay_flight_data('instance-query', project_id="cloud-custodian")
         p = self.load_policy(
             {'name': 'all-instances',
              'resource': 'gcp.instance'},
@@ -19,14 +19,13 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 4)
 
-        self.assertResourceURNs(
-            'instance',
-            resources,
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:custodian-1291:instance/custodian-dev',
-                'gcp:compute:us-central1:custodian-1291:instance/c7n-jenkins',
-                'gcp:compute:us-central1:custodian-1291:instance/drone',
-                'gcp:compute:us-east1:custodian-1291:instance/custodian',
+                'gcp:compute:us-east1:cloud-custodian:instance/custodian-dev',
+                'gcp:compute:us-central1:cloud-custodian:instance/c7n-jenkins',
+                'gcp:compute:us-central1:cloud-custodian:instance/drone',
+                'gcp:compute:us-east1:cloud-custodian:instance/custodian',
             ],
        )
 
@@ -208,16 +207,15 @@ class DiskTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 6)
 
-        self.assertResourceURNs(
-            'disk',
-            resources,
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:custodian-1291:disk/custodian-dev',
-                'gcp:compute:us-east1:custodian-1291:disk/drone-upgrade',
-                'gcp:compute:us-east1:custodian-1291:disk/custodian',
-                'gcp:compute:us-central1:custodian-1291:disk/c7n-jenkins',
-                'gcp:compute:us-central1:custodian-1291:disk/drone',
-                'gcp:compute:us-central1:custodian-1291:disk/drone-11-1'
+                'gcp:compute:us-east1:cloud-custodian:disk/custodian-dev',
+                'gcp:compute:us-east1:cloud-custodian:disk/drone-upgrade',
+                'gcp:compute:us-east1:cloud-custodian:disk/custodian',
+                'gcp:compute:us-central1:cloud-custodian:disk/c7n-jenkins',
+                'gcp:compute:us-central1:cloud-custodian:disk/drone',
+                'gcp:compute:us-central1:cloud-custodian:disk/drone-11-1'
             ],
        )
 

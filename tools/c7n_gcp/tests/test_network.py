@@ -92,11 +92,9 @@ class SubnetTest(BaseTest):
         self.assertEqual(subnet['name'], 'default')
         self.assertEqual(subnet['privateIpGoogleAccess'], True)
 
-        self.assertResourceURNs(
-            'subnet',
-            [subnet],
-            ['gcp:compute:us-central1:cloud-custodian:subnet/default'],
-            project_id='cloud-custodian',
+        self.assertEqual(
+            p.resource_manager.get_urns([subnet]),
+            ["gcp:compute:us-central1:cloud-custodian:subnet/default"],
         )
 
     def test_subnet_set_flow(self):
