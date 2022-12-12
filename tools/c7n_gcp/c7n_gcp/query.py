@@ -5,7 +5,6 @@ import jmespath
 import json
 import itertools
 import logging
-import os
 
 from googleapiclient.errors import HttpError
 
@@ -377,6 +376,8 @@ class TypeInfo(metaclass=TypeMeta):
 
     # URN generation
     region_key = 'region'
+    # A jmespath into the resource object to find the id element of the URN.
+    urn_id_path = 'id'
 
     @classmethod
     def get_metric_resource_name(cls, resource):
@@ -409,7 +410,7 @@ class TypeInfo(metaclass=TypeMeta):
         region = cls._get_region(resource)
         if region == "global":
             region = ""
-        id = resource[cls.id]
+        id = jmespath.search(cls.urn_id_path, resource)
         # NOTE: not sure whether to use `component` or just the last part of
         # `component` (split on '.') for the part after project
         return f"gcp:{cls.service}:{region}:{project_id}:{cls.component}/{id}"

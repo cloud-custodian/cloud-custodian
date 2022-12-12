@@ -29,6 +29,7 @@ class DataSet(QueryResourceManager):
         scc_type = "google.cloud.bigquery.Dataset"
         metric_key = "resource.labels.dataset_id"
         permissions = ('bigquery.datasets.get',)
+        urn_id_path = "datasetReference.datasetId"
 
         @staticmethod
         def get(client, event):
@@ -70,6 +71,9 @@ class BigQueryJob(QueryResourceManager):
         scope_key = 'projectId'
         name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
+        # id has '<project>:<location>:<jobId>' where location is 'US'
+        # assuming jobId is sufficient here.
+        urn_id_path = "jobReference.jobId"
 
         @staticmethod
         def get(client, event):
@@ -107,6 +111,7 @@ class BigQueryTable(ChildResourceManager):
             ]
         }
         asset_type = "bigquery.googleapis.com/Table"
+        urn_id_path = "tableReference.tableId"
 
         @staticmethod
         def get(client, event):
