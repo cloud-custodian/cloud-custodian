@@ -265,36 +265,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
         If the region is "global" then it is omitted from the URN.
         """
-        return [self._get_urn(r) for r in resources]
-
-    def _get_urn(self, resource) -> str:
-        "Generate an URN for the resource."
-        rt = self.resource_type
-        region = self._get_region(resource)
-        if region == "global":
-            region = ""
-        project_id = self._get_project()
-        id = resource[rt.id]
-        return f"gcp:{rt.service}:{region}:{project_id}:{self.type}/{id}"
-
-    def _get_project(self):
-        """By default use the session, also useful hook point."""
-        return local_session(self.session_factory).project_id
-
-    def _get_region(self, resource):
-        """Get the region for a single resource.
-
-        Resources are either global, regional, or zonal. When a resource is
-        is zonal, the region is determined from the zone.
-        """
-        if "region" in resource:
-            return resource["region"].rsplit("/", 1)[-1]
-        if "zone" in resource:
-            zone = resource["zone"].rsplit("/", 1)[-1]
-            # The zone is always "{region}-{zone-id}"
-            return zone.rsplit("-", 1)[0]
-
-        return "global"
+        return self.resource_type.get_urns(
+            resources, local_session(self.session_factory).project_id)
 
 
 class ChildResourceManager(QueryResourceManager):
@@ -403,9 +375,60 @@ class TypeInfo(metaclass=TypeMeta):
     # cloud asset inventory type
     asset_type = None
 
+    # URN generation
+    region_key = 'region'
+
     @classmethod
     def get_metric_resource_name(cls, resource):
         return resource.get(cls.name)
+
+    @classmethod
+    def get_urns(cls, resources, project_id):
+        """Generate URNs for the resources.
+
+        A Uniform Resource Name (URN) is a URI that identifies a resource by
+        name in a particular namespace. A URN may be used to talk about a
+        resource without implying its location or how to access it.
+
+        The generated URNs can uniquely identify any given resource.
+
+        The generated URN is intended to follow a similar pattern to ARN, but be
+        specific to GCP.
+
+        gcp:<service>:<region>:<project>:<resource-type>/<resource-id>
+
+        If the region is "global" then it is omitted from the URN.
+        """
+        from pprint import pprint
+        pprint(resources)
+        return [cls._get_urn(r, project_id) for r in resources]
+
+    @classmethod
+    def _get_urn(cls, resource, project_id) -> str:
+        "Generate an URN for the resource."
+        region = cls._get_region(resource)
+        if region == "global":
+            region = ""
+        id = resource[cls.id]
+        # NOTE: not sure whether to use `component` or just the last part of
+        # `component` (split on '.') for the part after project
+        return f"gcp:{cls.service}:{region}:{project_id}:{cls.component}/{id}"
+
+    @classmethod
+    def _get_region(cls, resource):
+        """Get the region for a single resource.
+
+        Resources are either global, regional, or zonal. When a resource is
+        is zonal, the region is determined from the zone.
+        """
+        if cls.region_key in resource:
+            return resource[cls.region_key].rsplit("/", 1)[-1]
+        if "zone" in resource:
+            zone = resource["zone"].rsplit("/", 1)[-1]
+            # The zone is always "{region}-{zone-id}"
+            return zone.rsplit("-", 1)[0]
+
+        return "global"
 
 
 class ChildTypeInfo(TypeInfo):
