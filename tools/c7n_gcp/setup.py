@@ -32,6 +32,7 @@ install_requires = \
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
  'ratelimiter>=1.2.0,<2.0.0',
+ 'requests==2.27.1',
  'retrying>=1.3.3,<2.0.0',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',

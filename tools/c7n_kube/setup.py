@@ -30,6 +30,7 @@ install_requires = \
  'pyrsistent (>=0.19.2,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
+ 'requests==2.27.1',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
