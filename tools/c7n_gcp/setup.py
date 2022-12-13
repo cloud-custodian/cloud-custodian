@@ -22,6 +22,7 @@ install_requires = \
  'google-cloud-logging>=3.2,<4.0',
  'google-cloud-monitoring>=2.5.0,<3.0.0',
  'google-cloud-storage>=1.42.2,<2.0.0',
+ 'grpcio==1.49.1',
  'importlib-metadata (>=4.13.0,<5.0.0)',
  'importlib-resources (>=5.10.1,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
