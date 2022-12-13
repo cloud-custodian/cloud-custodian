@@ -379,6 +379,10 @@ class TypeInfo(metaclass=TypeMeta):
     # A jmespath into the resource object to find the id element of the URN.
     # If unset, it uses the value for id.
     urn_id_path = None
+    # It is frequent enough that the id we want for the URN is the last path segment
+    # - ids are frequently '/' delimited strings. Set this to true to get the last
+    # part of the id in the generic implementation.
+    urn_id_last_segment = False
     # By default the component is taken for the URN. Can be overridden by specifying
     # a specific urn_component.
     urn_component = None
@@ -432,7 +436,10 @@ class TypeInfo(metaclass=TypeMeta):
         path = cls.urn_id_path
         if path is None:
             path = cls.id
-        return jmespath.search(path, resource)
+        id = jmespath.search(path, resource)
+        if cls.urn_id_last_segment:
+            id = id.split('/')[-1]
+        return id
 
     @classmethod
     def _get_region(cls, resource):
