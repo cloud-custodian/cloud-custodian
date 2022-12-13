@@ -379,6 +379,9 @@ class TypeInfo(metaclass=TypeMeta):
     # A jmespath into the resource object to find the id element of the URN.
     # If unset, it uses the value for id.
     urn_id_path = None
+    # By default the component is taken for the URN. Can be overridden by specifying
+    # a specific urn_component.
+    urn_component = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):
@@ -412,9 +415,12 @@ class TypeInfo(metaclass=TypeMeta):
         if region == "global":
             region = ""
         id = cls._get_id(resource)
+        component = cls.urn_component
+        if component is None:
+            component = cls.component
         # NOTE: not sure whether to use `component` or just the last part of
         # `component` (split on '.') for the part after project
-        return f"gcp:{cls.service}:{region}:{project_id}:{cls.component}/{id}"
+        return f"gcp:{cls.service}:{region}:{project_id}:{component}/{id}"
 
     @classmethod
     def _get_id(cls, resource):
