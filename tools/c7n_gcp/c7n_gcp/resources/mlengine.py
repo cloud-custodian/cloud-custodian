@@ -23,6 +23,7 @@ class MLModel(QueryResourceManager):
         default_report_fields = [
             id, name, "description", "onlinePredictionLogging"]
         get_requires_event = True
+        urn_component = "model"
 
         @staticmethod
         def get(client, event):
@@ -30,6 +31,10 @@ class MLModel(QueryResourceManager):
                 'get', {'name': jmespath.search(
                     'protoPayload.response.name', event
                 )})
+
+        @classmethod
+        def _get_id(cls, resource):
+            return resource["name"].split('/')[-1]
 
 
 @resources.register('ml-job')
@@ -49,6 +54,7 @@ class MLJob(QueryResourceManager):
         default_report_fields = [
             "jobId", "status", "createTime", "endTime"]
         get_requires_event = True
+        urn_component = "job"
 
         @staticmethod
         def get(client, event):
