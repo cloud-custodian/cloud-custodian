@@ -25,7 +25,8 @@ class AppEngineApp(QueryResourceManager):
         asset_type = "appengine.googleapis.com/Application"
         permissions = ('appengine.applications.get',)
         metric_key = 'resource.labels.module_id'
-        region_key = "locationId"
+        urn_component = "app"
+        urn_region_key = "locationId"
 
         @staticmethod
         def get(client, resource_info):
@@ -50,7 +51,7 @@ class AppEngineChildTypeInfo(ChildTypeInfo):
     permissions = ('appengine.applications.get',)
 
     @classmethod
-    def _get_region(cls, resource):
+    def _get_location(cls, resource):
         "Get the region from the parent."
         return resource["c7n:app-engine"]["locationId"]
 
@@ -70,6 +71,7 @@ class AppEngineCertificate(ChildResourceManager):
         name = 'displayName'
         id = 'id'
         default_report_fields = ['displayName', 'expireTime']
+        urn_component = "certificate"
 
         @staticmethod
         def get(client, resource_info):
@@ -91,6 +93,7 @@ class AppEngineDomain(ChildResourceManager):
         id = 'id'
         name = "name"
         default_report_fields = [id, name]
+        urn_component = "domain"
 
 
 @resources.register('app-engine-domain-mapping')
@@ -108,6 +111,7 @@ class AppEngineDomainMapping(ChildResourceManager):
         name = "name"
         id = 'id'
         default_report_fields = [id, name]
+        urn_component = "domain-mapping"
 
         @staticmethod
         def get(client, resource_info):
@@ -131,6 +135,7 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
         enum_spec = ('list', 'ingressRules[]', None)
         name = id = 'priority'
         default_report_fields = ['priority', 'action', 'sourceRange', 'description']
+        urn_component = "firewall-ingress-rule"
 
         @staticmethod
         def get(client, resource_info):

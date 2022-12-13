@@ -22,10 +22,10 @@ class InstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:cloud-custodian:instances/custodian-dev',
-                'gcp:compute:us-central1:cloud-custodian:instances/c7n-jenkins',
-                'gcp:compute:us-central1:cloud-custodian:instances/drone',
-                'gcp:compute:us-east1:cloud-custodian:instances/custodian',
+                'gcp:compute:us-east1-b:cloud-custodian:instance/custodian-dev',
+                'gcp:compute:us-central1-b:cloud-custodian:instance/c7n-jenkins',
+                'gcp:compute:us-central1-b:cloud-custodian:instance/drone',
+                'gcp:compute:us-east1-d:cloud-custodian:instance/custodian',
             ],
        )
 
@@ -210,12 +210,12 @@ class DiskTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:cloud-custodian:disks/custodian-dev',
-                'gcp:compute:us-east1:cloud-custodian:disks/drone-upgrade',
-                'gcp:compute:us-east1:cloud-custodian:disks/custodian',
-                'gcp:compute:us-central1:cloud-custodian:disks/c7n-jenkins',
-                'gcp:compute:us-central1:cloud-custodian:disks/drone',
-                'gcp:compute:us-central1:cloud-custodian:disks/drone-11-1'
+                'gcp:compute:us-east1-b:cloud-custodian:disk/custodian-dev',
+                'gcp:compute:us-east1-c:cloud-custodian:disk/drone-upgrade',
+                'gcp:compute:us-east1-d:cloud-custodian:disk/custodian',
+                'gcp:compute:us-central1-b:cloud-custodian:disk/c7n-jenkins',
+                'gcp:compute:us-central1-b:cloud-custodian:disk/drone',
+                'gcp:compute:us-central1-b:cloud-custodian:disk/drone-11-1'
             ],
        )
 
@@ -303,7 +303,7 @@ class SnapshotTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:snapshots/snapshot-1'
+                'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
        )
 
@@ -322,7 +322,7 @@ class SnapshotTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:snapshots/snapshot-1'
+                'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
        )
 
@@ -342,7 +342,7 @@ class ImageTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:images/image-1'
+                'gcp:compute::cloud-custodian:image/image-1'
             ],
         )
 
@@ -362,7 +362,7 @@ class ImageTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:images/image-1'
+                'gcp:compute::cloud-custodian:image/image-1'
             ],
         )
 
@@ -385,7 +385,7 @@ class InstanceTemplateTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:instanceTemplates/custodian-instance-template'
+                'gcp:compute::cloud-custodian:instance-template/custodian-instance-template'
             ],
         )
 
@@ -410,7 +410,7 @@ class InstanceTemplateTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:compute::cloud-custodian:instanceTemplates/custodian-instance-template'
+                'gcp:compute::cloud-custodian:instance-template/custodian-instance-template'
             ],
         )
 
@@ -467,7 +467,7 @@ class AutoscalerTest(BaseTest):
             policy.resource_manager.get_urns(resources),
             [
                 # NOTE: zonal resource
-                'gcp:compute:us-central1:cloud-custodian:autoscalers/micro-instance-group-1-to-10'
+                'gcp:compute:us-central1-a:cloud-custodian:autoscaler/micro-instance-group-1-to-10'
             ],
         )
 
@@ -493,7 +493,7 @@ class AutoscalerTest(BaseTest):
             policy.resource_manager.get_urns(resources),
             [
                 # NOTE: zonal resource
-                'gcp:compute:us-central1:cloud-custodian:autoscalers/instance-group-1'
+                'gcp:compute:us-central1-a:cloud-custodian:autoscaler/instance-group-1'
             ],
         )
 

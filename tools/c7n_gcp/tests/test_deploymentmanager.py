@@ -24,7 +24,7 @@ class DMDeploymentTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:deploymentmanager::cloud-custodian:deployments/mydep2'
+                'gcp:deploymentmanager::cloud-custodian:deployment/mydep2'
             ],
         )
 
@@ -50,7 +50,7 @@ class DMDeploymentTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns([deployment]),
             [
-                'gcp:deploymentmanager::cloud-custodian:deployments/mydep2'
+                'gcp:deploymentmanager::cloud-custodian:deployment/mydep2'
             ],
         )
 

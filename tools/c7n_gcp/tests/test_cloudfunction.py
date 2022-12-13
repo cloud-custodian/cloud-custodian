@@ -22,7 +22,7 @@ class FunctionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:cloudfunctions:us-central1:cloud-custodian:functions/hello_http'
+                'gcp:cloudfunctions:us-central1:cloud-custodian:function/hello_http'
             ],
         )
 
@@ -34,6 +34,6 @@ class FunctionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns([func]),
             [
-                'gcp:cloudfunctions:us-central1:cloud-custodian:functions/hello_http'
+                'gcp:cloudfunctions:us-central1:cloud-custodian:function/hello_http'
             ],
         )

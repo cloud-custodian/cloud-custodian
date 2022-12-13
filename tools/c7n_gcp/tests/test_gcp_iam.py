@@ -30,7 +30,7 @@ class ProjectRoleTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(roles),
             [
-                'gcp:iam::cloud-custodian:roles/CustomRole1'
+                'gcp:iam::cloud-custodian:project-role/CustomRole1'
             ],
         )
 
@@ -53,7 +53,7 @@ class ServiceAccountTest(BaseTest):
             p.resource_manager.get_urns([resource]),
             [
                 # NOTE: compare 'custodian-1291' with email given above.
-                'gcp:iam::cloud-custodian:serviceAccounts/devtest@custodian-1291.iam.gserviceaccount.com'
+                'gcp:iam::cloud-custodian:service-account/devtest@custodian-1291.iam.gserviceaccount.com'
             ],
         )
 
@@ -128,8 +128,8 @@ class ServiceAccountKeyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:iam::cloud-custodian:serviceAccountKeys/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/1',
-                'gcp:iam::cloud-custodian:serviceAccountKeys/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2',
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/1',
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2',
             ],
         )
 
@@ -145,6 +145,12 @@ class ServiceAccountKeyTest(BaseTest):
         self.assertEqual(resource['keyType'], 'USER_MANAGED')
         self.assertEqual(resource["c7n:service-account"]["email"],
         "test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com")
+        self.assertEqual(
+            p.resource_manager.get_urns([resource]),
+            [
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2222',
+            ],
+        )
 
     def test_delete_service_account_key(self):
         factory = self.replay_flight_data('iam-delete-service-account-key')
@@ -186,8 +192,8 @@ class IAMRoleTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:iam:::roles/accesscontextmanager.policyAdmin',
-                'gcp:iam:::roles/spanner.viewer',
+                'gcp:iam:::role/accesscontextmanager.policyAdmin',
+                'gcp:iam:::role/spanner.viewer',
             ],
         )
 
@@ -213,6 +219,6 @@ class IAMRoleTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns([resource]),
             [
-                'gcp:iam:::roles/accesscontextmanager.policyAdmin',
+                'gcp:iam:::role/accesscontextmanager.policyAdmin',
             ],
         )

@@ -28,7 +28,7 @@ class Function(QueryResourceManager):
             'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',
             'delete': 'google.cloud.functions.v1.CloudFunctionsService.DeleteFunction',
             'update': 'google.cloud.functions.v1.CloudFunctionsService.UpdateFunction'}
-        urn_component = "functions"
+        urn_component = "function"
 
         @staticmethod
         def get(client, resource_info):
@@ -39,7 +39,7 @@ class Function(QueryResourceManager):
                         **resource_info)})
 
         @classmethod
-        def _get_region(cls, resource):
+        def _get_location(cls, resource):
             "The region is the fourth segment of the name."
             return resource["name"].split('/')[3]
 

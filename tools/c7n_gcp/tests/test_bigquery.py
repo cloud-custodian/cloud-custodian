@@ -21,10 +21,9 @@ class BigQueryDataSetTest(BaseTest):
         self.assertTrue('access' in dataset)
         self.assertEqual(dataset['labels'], {'env': 'dev'})
 
-        # NOTE: confirm is a global resource
         self.assertEqual(
             p.resource_manager.get_urns([dataset]),
-            ["gcp:bigquery::cloud-custodian:datasets/devxyz"],
+            ["gcp:bigquery::cloud-custodian:dataset/devxyz"],
         )
 
 
@@ -45,7 +44,7 @@ class BigQueryJobTest(BaseTest):
         # NOTE: confirm is a global resource
         self.assertEqual(
             p.resource_manager.get_urns(resources),
-            ["gcp:bigquery::cloud-custodian:jobs/US/bquxjob_4c28c9a7_16958c2791d"],
+            ["gcp:bigquery::cloud-custodian:job/US/bquxjob_4c28c9a7_16958c2791d"],
         )
 
     def test_job_get(self):
@@ -72,7 +71,7 @@ class BigQueryJobTest(BaseTest):
         # NOTE: confirm is a global resource
         self.assertEqual(
             p.resource_manager.get_urns(job),
-            ["gcp:bigquery::cloud-custodian:jobs/US/bquxjob_4c28c9a7_16958c2791d"],
+            ["gcp:bigquery::cloud-custodian:job/US/bquxjob_4c28c9a7_16958c2791d"],
         )
 
 
@@ -90,7 +89,7 @@ class BigQueryTableTest(BaseTest):
 
         self.assertEqual(
             p.resource_manager.get_urns(resources),
-            ["gcp:bigquery::cloud-custodian:tables/test"],
+            ["gcp:bigquery::cloud-custodian:table/test/test"],
         )
 
     def test_table_get(self):
@@ -110,7 +109,7 @@ class BigQueryTableTest(BaseTest):
 
         self.assertEqual(
             p.resource_manager.get_urns(job),
-            ["gcp:bigquery::cloud-custodian:tables/test"],
+            ["gcp:bigquery::cloud-custodian:table/qqqqqqqqqqqqq/test"],
         )
 
     def test_table_delete(self):

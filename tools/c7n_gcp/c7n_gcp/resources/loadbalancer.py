@@ -21,6 +21,7 @@ class LoadBalancingAddress(QueryResourceManager):
             name, "description", "address", "status", "region", "addressType"
         ]
         asset_type = "compute.googleapis.com/Address"
+        urn_component = "address"
 
         @staticmethod
         def get(client, resource_info):
@@ -415,6 +416,7 @@ class LoadBalancingTargetInstance(QueryResourceManager):
             name, "description", "creationTimestamp", "zone", "natPolicy", "instance"]
         asset_type = "compute.googleapis.com/TargetInstance"
         urn_component = "target-instance"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):

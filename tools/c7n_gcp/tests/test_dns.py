@@ -22,7 +22,7 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(managed_zone_resources),
             [
-                'gcp:dns::cloud-custodian:managedZones/custodian'
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
             ],
         )
 
@@ -48,7 +48,7 @@ class DnsManagedZoneTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:managedZones/custodian'
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
             ],
         )
 
@@ -90,7 +90,7 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(policy_resources),
             [
-                'gcp:dns::cloud-custodian:policies/custodian'
+                'gcp:dns::cloud-custodian:policy/custodian'
             ],
         )
 
@@ -116,6 +116,6 @@ class DnsPolicyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:dns::cloud-custodian:policies/custodian'
+                'gcp:dns::cloud-custodian:policy/custodian'
             ],
         )

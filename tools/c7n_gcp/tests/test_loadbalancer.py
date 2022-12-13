@@ -20,7 +20,7 @@ class LoadBalancingAddressTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-central1:cloud-custodian:addresses/new1',
+                'gcp:compute:us-central1:cloud-custodian:address/new1',
             ],
         )
 
@@ -43,7 +43,7 @@ class LoadBalancingAddressTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(instances),
             [
-                'gcp:compute:us-central1:cloud-custodian:addresses/custodian-address-1',
+                'gcp:compute:us-central1:cloud-custodian:address/custodian-address-1',
             ],
         )
 
@@ -664,8 +664,7 @@ class LoadBalancingTargetInstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                # NOTE: zonal
-                'gcp:compute:us-central1:cloud-custodian:target-instance/new-target-instance',
+                'gcp:compute:us-central1-a:cloud-custodian:target-instance/new-target-instance',
             ],
         )
 
@@ -688,7 +687,7 @@ class LoadBalancingTargetInstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(instances),
             [
-                'gcp:compute:us-central1:cloud-custodian:target-instance/custodian-target-instance-1',
+                'gcp:compute:us-central1-c:cloud-custodian:target-instance/custodian-target-instance-1',
             ],
         )
 

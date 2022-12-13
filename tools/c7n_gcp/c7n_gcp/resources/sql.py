@@ -131,8 +131,8 @@ class SQLInstanceChildTypeInfo(ChildTypeInfo):
     perm_service = 'cloudsql'
 
     @classmethod
-    def _get_region(cls, resource):
-        return super()._get_region(cls.get_parent( resource))
+    def _get_location(cls, resource):
+        return super()._get_location(cls.get_parent( resource))
 
     @classmethod
     def _get_id(cls, resource):

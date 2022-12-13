@@ -67,7 +67,7 @@ class OrganizationTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns([org]),
             [
-                "gcp:cloudresourcemanager::cloud-custodian:organization/111111111111",
+                "gcp:cloudresourcemanager:::organization/111111111111",
             ],
         )
 
@@ -85,7 +85,7 @@ class OrganizationTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(organization_resources),
             [
-                "gcp:cloudresourcemanager::cloud-custodian:organization/851339424791",
+                "gcp:cloudresourcemanager:::organization/851339424791",
             ],
         )
 
@@ -147,7 +147,7 @@ class FolderTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:cloudresourcemanager::cloud-custodian:folder/112838955399",
+                "gcp:cloudresourcemanager:::folder/112838955399",
             ],
         )
 

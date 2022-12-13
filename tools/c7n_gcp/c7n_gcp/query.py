@@ -375,7 +375,7 @@ class TypeInfo(metaclass=TypeMeta):
     asset_type = None
 
     # URN generation
-    region_key = 'region'
+    urn_region_key = 'region'
     # A jmespath into the resource object to find the id element of the URN.
     # If unset, it uses the value for id.
     urn_id_path = None
@@ -387,7 +387,9 @@ class TypeInfo(metaclass=TypeMeta):
     # a specific urn_component.
     urn_component = None
     # Truly global resources should override this to the empty string.
-    urn_project = None
+    urn_has_project = True
+    # The location element is a zone, not a region.
+    urn_zonal = False
 
     @classmethod
     def get_metric_resource_name(cls, resource):
@@ -406,7 +408,7 @@ class TypeInfo(metaclass=TypeMeta):
         The generated URN is intended to follow a similar pattern to ARN, but be
         specific to GCP.
 
-        gcp:<service>:<region>:<project>:<resource-type>/<resource-id>
+        gcp:<service>:<location>:<project>:<resource-type>/<resource-id>
 
         If the region is "global" then it is omitted from the URN.
         """
@@ -417,19 +419,15 @@ class TypeInfo(metaclass=TypeMeta):
     @classmethod
     def _get_urn(cls, resource, project_id) -> str:
         "Generate an URN for the resource."
-        region = cls._get_region(resource)
-        if region == "global":
-            region = ""
+        location = cls._get_location(resource)
+        if location == "global":
+            location = ""
         id = cls._get_id(resource)
-        component = cls.urn_component
-        if component is None:
-            component = cls.component
-        project = cls.urn_project
-        if project is None:
-            project = project_id
+        if not cls.urn_has_project:
+            project_id = ""
         # NOTE: not sure whether to use `component` or just the last part of
         # `component` (split on '.') for the part after project
-        return f"gcp:{cls.service}:{region}:{project}:{component}/{id}"
+        return f"gcp:{cls.service}:{location}:{project_id}:{cls.urn_component}/{id}"
 
     @classmethod
     def _get_id(cls, resource):
@@ -443,18 +441,18 @@ class TypeInfo(metaclass=TypeMeta):
         return id
 
     @classmethod
-    def _get_region(cls, resource):
+    def _get_location(cls, resource):
         """Get the region for a single resource.
 
         Resources are either global, regional, or zonal. When a resource is
         is zonal, the region is determined from the zone.
         """
-        if cls.region_key in resource:
-            return resource[cls.region_key].rsplit("/", 1)[-1]
-        if "zone" in resource:
+        if cls.urn_zonal and "zone" in resource:
             zone = resource["zone"].rsplit("/", 1)[-1]
-            # The zone is always "{region}-{zone-id}"
-            return zone.rsplit("-", 1)[0]
+            return zone
+
+        if cls.urn_region_key in resource:
+            return resource[cls.urn_region_key].rsplit("/", 1)[-1]
 
         return "global"
 

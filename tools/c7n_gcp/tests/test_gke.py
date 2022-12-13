@@ -22,8 +22,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                # NOTE: zonal - 'zone': 'us-central1-a'
-                'gcp:container:us-central1:cloud-custodian:clusters/standard-cluster-1'
+                'gcp:container:us-central1-a:cloud-custodian:cluster/standard-cluster-1'
             ],
         )
 
@@ -64,8 +63,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(clusters),
             [
-                # NOTE: zonal - 'zone': 'us-central1-a'
-                'gcp:container:us-central1:cloud-custodian:clusters/standard-cluster-1'
+                'gcp:container:us-central1-a:cloud-custodian:cluster/standard-cluster-1'
             ],
         )
 
@@ -113,8 +111,7 @@ class KubernetesClusterNodePoolTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                # NOTE: zonal - 'zone': 'us-central1-a'
-                'gcp:container:us-central1:cloud-custodian:cluster-node-pools/default-pool'
+                'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/default-pool'
             ],
         )
 
@@ -143,7 +140,6 @@ class KubernetesClusterNodePoolTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(pools),
             [
-                # NOTE: zonal - 'zone': 'us-central1-a'
-                'gcp:container:us-central1:cloud-custodian:cluster-node-pools/pool-1'
+                'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/pool-1'
             ],
         )

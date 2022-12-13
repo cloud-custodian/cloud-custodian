@@ -22,7 +22,7 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:dataflow:us-central1:cloud-custodian:projects.jobs/test'
+                'gcp:dataflow:us-central1:cloud-custodian:job/test'
             ],
         )
 
@@ -48,6 +48,6 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:dataflow:us-central1:cloud-custodian:projects.jobs/test1'
+                'gcp:dataflow:us-central1:cloud-custodian:job/test1'
             ],
         )

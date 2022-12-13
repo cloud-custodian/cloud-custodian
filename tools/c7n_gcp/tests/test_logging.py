@@ -127,7 +127,7 @@ class LogExclusionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:exclusions/exclusions',
+                'gcp:logging::cloud-custodian:exclusion/exclusions',
             ],
         )
 
@@ -152,6 +152,6 @@ class LogExclusionTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resource),
             [
-                'gcp:logging::cloud-custodian:exclusions/qwerty',
+                'gcp:logging::cloud-custodian:exclusion/qwerty',
             ],
         )

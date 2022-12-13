@@ -23,7 +23,8 @@ class DataflowJob(QueryResourceManager):
         default_report_fields = [
             'name', 'currentState', 'createTime', 'location']
         permissions = ('dataflow.jobs.list',)
-        region_key = 'location'
+        urn_component = "job"
+        urn_region_key = 'location'
 
         @staticmethod
         def get(client, event):

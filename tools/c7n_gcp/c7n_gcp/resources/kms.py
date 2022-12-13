@@ -25,6 +25,7 @@ class KmsKeyRing(QueryResourceManager):
             "name", "createTime"]
         asset_type = "cloudkms.googleapis.com/KeyRing"
         urn_component = "keyring"
+        urn_id_segments = (-1,)
 
         @staticmethod
         def get(client, resource_info):
@@ -35,12 +36,8 @@ class KmsKeyRing(QueryResourceManager):
             return client.execute_command('get', {'name': name})
 
         @classmethod
-        def _get_region(cls, resource):
+        def _get_location(cls, resource):
             return resource["name"].split('/')[3]
-
-        @classmethod
-        def _get_id(cls, resource):
-            return resource["name"].split('/')[-1]
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -101,6 +98,7 @@ class KmsCryptoKey(ChildResourceManager):
         asset_type = "cloudkms.googleapis.com/CryptoKey"
         scc_type = "google.cloud.kms.CryptoKey"
         urn_component = "cryptokey"
+        urn_id_segments = (5, 7)
 
         @staticmethod
         def get(client, resource_info):
@@ -112,13 +110,8 @@ class KmsCryptoKey(ChildResourceManager):
             return client.execute_command('get', {'name': name})
 
         @classmethod
-        def _get_region(cls, resource):
+        def _get_location(cls, resource):
             return resource["name"].split('/')[3]
-
-        @classmethod
-        def _get_id(cls, resource):
-            parts = resource["name"].split('/')
-            return f"{parts[5]}/{parts[7]}"
 
 
 @KmsCryptoKey.filter_registry.register('iam-policy')
@@ -171,6 +164,7 @@ class KmsCryptoKeyVersion(ChildResourceManager):
         }
         asset_type = "cloudkms.googleapis.com/CryptoKeyVersion"
         urn_component = "cryptokey-version"
+        urn_id_segments = (5, 7, 9)
 
         @staticmethod
         def get(client, resource_info):
@@ -183,10 +177,5 @@ class KmsCryptoKeyVersion(ChildResourceManager):
             return client.execute_command('get', {'name': name})
 
         @classmethod
-        def _get_region(cls, resource):
+        def _get_location(cls, resource):
             return resource["name"].split('/')[3]
-
-        @classmethod
-        def _get_id(cls, resource):
-            parts = resource["name"].split('/')
-            return f"{parts[5]}/{parts[7]}/{parts[9]}"

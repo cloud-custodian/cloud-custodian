@@ -21,7 +21,7 @@ class CloudBillingAccountTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(billingaccount_resources),
-            ["gcp:cloudbilling::cloud-custodian:billingAccounts/CU570D-1A4CU5-70D1A4"],
+            ["gcp:cloudbilling::cloud-custodian:account/CU570D-1A4CU5-70D1A4"],
         )
 
     def test_billingaccount_get(self):
@@ -46,5 +46,5 @@ class CloudBillingAccountTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:cloudbilling::cloud-custodian:billingAccounts/CU570D-1A4CU5-70D1A4"],
+            ["gcp:cloudbilling::cloud-custodian:account/CU570D-1A4CU5-70D1A4"],
         )

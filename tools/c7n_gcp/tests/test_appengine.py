@@ -22,7 +22,7 @@ class AppEngineAppTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps/cloud-custodian"],
+            ["gcp:appengine:europe-west3:cloud-custodian:app/cloud-custodian"],
         )
 
     def test_app_get(self):
@@ -42,7 +42,7 @@ class AppEngineAppTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns([resource]),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps/cloud-custodian"],
+            ["gcp:appengine:europe-west3:cloud-custodian:app/cloud-custodian"],
         )
 
 
@@ -68,7 +68,7 @@ class AppEngineCertificateTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.authorizedCertificates/12277184"],
+            ["gcp:appengine:europe-west3:cloud-custodian:certificate/12277184"],
         )
 
     def test_certificate_get(self):
@@ -92,7 +92,7 @@ class AppEngineCertificateTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns([resource]),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.authorizedCertificates/12277184"],
+            ["gcp:appengine:europe-west3:cloud-custodian:certificate/12277184"],
         )
 
 
@@ -118,7 +118,7 @@ class AppEngineDomainTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.authorizedDomains/gcp-li.ga"],
+            ["gcp:appengine:europe-west3:cloud-custodian:domain/gcp-li.ga"],
         )
 
 
@@ -144,7 +144,7 @@ class AppEngineDomainMappingTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.domainMappings/alex.gcp-li.ga"],
+            ["gcp:appengine:europe-west3:cloud-custodian:domain-mapping/alex.gcp-li.ga"],
         )
 
 
@@ -169,7 +169,7 @@ class AppEngineDomainMappingTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns([resource]),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.domainMappings/alex.gcp-li.ga"],
+            ["gcp:appengine:europe-west3:cloud-custodian:domain-mapping/alex.gcp-li.ga"],
         )
 
 
@@ -194,7 +194,7 @@ class AppEngineFirewallIngressRuleTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.firewall.ingressRules/2147483647"],
+            ["gcp:appengine:europe-west3:cloud-custodian:firewall-ingress-rule/2147483647"],
         )
 
     def test_firewall_ingress_rule_get(self):
@@ -218,5 +218,5 @@ class AppEngineFirewallIngressRuleTest(BaseTest):
 
         self.assertEqual(
             policy.resource_manager.get_urns([resource]),
-            ["gcp:appengine:europe-west3:cloud-custodian:apps.firewall.ingressRules/2147483647"],
+            ["gcp:appengine:europe-west3:cloud-custodian:firewall-ingress-rule/2147483647"],
         )

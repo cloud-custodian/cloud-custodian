@@ -90,6 +90,7 @@ class LogExclusion(QueryResourceManager):
         scope_template = 'projects/{}'
         name = id = 'name'
         default_report_fields = ["name", "description", "createTime", "disabled", "filter"]
+        urn_component = "exclusion"
 
         @staticmethod
         def get(client, resource_info):
