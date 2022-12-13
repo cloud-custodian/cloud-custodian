@@ -22,7 +22,9 @@ class BucketTest(BaseTest):
 
         self.assertEqual(
             p.resource_manager.get_urns(resources),
-            ["gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com"],
+            [
+                "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+            ],
         )
 
     def test_bucket_get(self):
@@ -39,6 +41,13 @@ class BucketTest(BaseTest):
         self.assertEqual(bucket['id'], "staging.cloud-custodian.appspot.com")
         self.assertEqual(bucket['storageClass'], "STANDARD")
         self.assertEqual(bucket['location'], "EU")
+
+        self.assertEqual(
+            p.resource_manager.get_urns([bucket]),
+            [
+                "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+            ],
+        )
 
     def test_enable_uniform_bucket_level_access(self):
         project_id = 'custodian-1291'
