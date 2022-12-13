@@ -30,6 +30,7 @@ class KubernetesCluster(QueryResourceManager):
         asset_type = 'container.googleapis.com/Cluster'
         scc_type = 'google.container.Cluster'
         metric_key = 'resource.labels.cluster_name'
+        urn_component = 'clusters'
 
         @staticmethod
         def get(client, resource_info):
@@ -84,6 +85,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         asset_type = 'container.googleapis.com/NodePool'
         default_report_fields = ['name', 'status', 'version']
         permissions = ('container.nodes.list',)
+        urn_component = 'cluster-node-pools'
 
         @staticmethod
         def get(client, resource_info):
@@ -100,6 +102,11 @@ class KubernetesClusterNodePool(ChildResourceManager):
                         resource_info['cluster_name'],
                         name)}
             )
+
+        @classmethod
+        def _get_region(cls, resource):
+            "Get the region from the parent - the cluster"
+            return super()._get_region(cls.get_parent(resource))
 
 
 @KubernetesCluster.action_registry.register('delete')

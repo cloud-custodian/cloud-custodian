@@ -455,6 +455,11 @@ class ChildTypeInfo(TypeInfo):
         parent_resource = cls.parent_spec['resource']
         return 'c7n:{}'.format(parent_resource)
 
+    @classmethod
+    def get_parent(cls, resource):
+        "Return the annotated parent resource."
+        return resource[cls.get_parent_annotation_key()]
+
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')
 ERROR_CODE = jmespath.compile('error.code')
