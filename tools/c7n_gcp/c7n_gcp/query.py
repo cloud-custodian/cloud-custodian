@@ -382,6 +382,8 @@ class TypeInfo(metaclass=TypeMeta):
     # By default the component is taken for the URN. Can be overridden by specifying
     # a specific urn_component.
     urn_component = None
+    # Truly global resources should override this to the empty string.
+    urn_project = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):
@@ -418,9 +420,12 @@ class TypeInfo(metaclass=TypeMeta):
         component = cls.urn_component
         if component is None:
             component = cls.component
+        project = cls.urn_project
+        if project is None:
+            project = project_id
         # NOTE: not sure whether to use `component` or just the last part of
         # `component` (split on '.') for the part after project
-        return f"gcp:{cls.service}:{region}:{project_id}:{component}/{id}"
+        return f"gcp:{cls.service}:{region}:{project}:{component}/{id}"
 
     @classmethod
     def _get_id(cls, resource):

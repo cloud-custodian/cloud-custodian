@@ -27,6 +27,12 @@ class ProjectRoleTest(BaseTest):
         self.assertEqual(len(roles), 1)
         self.assertEqual(roles[0]['name'], 'projects/cloud-custodian/roles/CustomRole1')
 
+        self.assertEqual(
+            p.resource_manager.get_urns(roles),
+            [
+                'gcp:iam::cloud-custodian:roles/CustomRole1'
+            ],
+        )
 
 class ServiceAccountTest(BaseTest):
 
@@ -38,9 +44,18 @@ class ServiceAccountTest(BaseTest):
             session_factory=factory)
         resource = p.resource_manager.get_resource(
             {'project_id': 'cloud-custodian',
+             # NOTE: flight data doesn't use this email_id.
              'email_id': 'devtest@cloud-custodian.iam.gserviceaccount.com',
+             # NOTE: unique_id not used at all in the get method.
              'unique_id': '110936229421407410679'})
         self.assertEqual(resource['displayName'], 'devtest')
+        self.assertEqual(
+            p.resource_manager.get_urns([resource]),
+            [
+                # NOTE: compare 'custodian-1291' with email given above.
+                'gcp:iam::cloud-custodian:serviceAccounts/devtest@custodian-1291.iam.gserviceaccount.com'
+            ],
+        )
 
     def test_disable(self):
         factory = self.replay_flight_data('iam-service-account-disable')
@@ -110,6 +125,13 @@ class ServiceAccountKeyTest(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["keyType"], "SYSTEM_MANAGED")
         self.assertEqual(resources[1]["keyType"], "USER_MANAGED")
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:iam::cloud-custodian:serviceAccountKeys/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/1',
+                'gcp:iam::cloud-custodian:serviceAccountKeys/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2',
+            ],
+        )
 
     def test_get_service_account_key(self):
         factory = self.replay_flight_data('iam-service-account-key')
@@ -161,6 +183,13 @@ class IAMRoleTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:iam:::roles/accesscontextmanager.policyAdmin',
+                'gcp:iam:::roles/spanner.viewer',
+            ],
+        )
 
     def test_iam_role_get(self):
         project_id = 'cloud-custodian'
@@ -181,3 +210,9 @@ class IAMRoleTest(BaseTest):
         })
 
         self.assertEqual(resource['name'], 'roles/{}'.format(name))
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            [
+                'gcp:iam:::roles/accesscontextmanager.policyAdmin',
+            ],
+        )

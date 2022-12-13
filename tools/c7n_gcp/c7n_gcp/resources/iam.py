@@ -25,6 +25,7 @@ class ProjectRole(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        urn_component = "roles"
 
         @staticmethod
         def get(client, resource_info):
@@ -33,6 +34,10 @@ class ProjectRole(QueryResourceManager):
                     'name': 'projects/{}/roles/{}'.format(
                         resource_info['project_id'],
                         resource_info['role_name'].rsplit('/', 1)[-1])})
+
+        @classmethod
+        def _get_id(cls, resource):
+            return resource["name"].rsplit('/', 1)[-1]
 
 
 @resources.register('service-account')
@@ -51,6 +56,8 @@ class ServiceAccount(QueryResourceManager):
         default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
         asset_type = "iam.googleapis.com/ServiceAccount"
         metric_key = 'resource.labels.unique_id'
+        urn_component = 'serviceAccounts'
+        urn_id_path = 'email'
 
         @staticmethod
         def get(client, resource_info):
@@ -133,6 +140,7 @@ class ServiceAccountKey(ChildResourceManager):
         scc_type = "google.iam.ServiceAccountKey"
         permissions = ("iam.serviceAccounts.list",)
         metric_key = 'metric.labels.key_id'
+        urn_component = "serviceAccountKeys"
 
         @staticmethod
         def get(client, resource_info):
@@ -147,6 +155,11 @@ class ServiceAccountKey(ChildResourceManager):
         @staticmethod
         def get_metric_resource_name(resource):
             return resource["name"].split('/')[-1]
+
+        @classmethod
+        def _get_id(cls, resource):
+            parts =resource["name"].rsplit('/')
+            return f"{parts[3]}/{parts[5]}"
 
 
 @ServiceAccountKey.action_registry.register('delete')
@@ -174,6 +187,8 @@ class Role(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        # Don't show the project ID in the URN.
+        urn_project = ""
 
         @staticmethod
         def get(client, resource_info):
@@ -181,3 +196,7 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
+
+        @classmethod
+        def _get_id(cls, resource):
+            return resource["name"].split('/',1)[-1]
