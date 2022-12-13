@@ -377,7 +377,8 @@ class TypeInfo(metaclass=TypeMeta):
     # URN generation
     region_key = 'region'
     # A jmespath into the resource object to find the id element of the URN.
-    urn_id_path = 'id'
+    # If unset, it uses the value for id.
+    urn_id_path = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):
@@ -410,10 +411,17 @@ class TypeInfo(metaclass=TypeMeta):
         region = cls._get_region(resource)
         if region == "global":
             region = ""
-        id = jmespath.search(cls.urn_id_path, resource)
+        id = cls._get_id(resource)
         # NOTE: not sure whether to use `component` or just the last part of
         # `component` (split on '.') for the part after project
         return f"gcp:{cls.service}:{region}:{project_id}:{cls.component}/{id}"
+
+    @classmethod
+    def _get_id(cls, resource):
+        path = cls.urn_id_path
+        if path is None:
+            path = cls.id
+        return jmespath.search(path, resource)
 
     @classmethod
     def _get_region(cls, resource):

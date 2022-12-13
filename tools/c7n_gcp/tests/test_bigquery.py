@@ -45,7 +45,7 @@ class BigQueryJobTest(BaseTest):
         # NOTE: confirm is a global resource
         self.assertEqual(
             p.resource_manager.get_urns(resources),
-            ["gcp:bigquery::cloud-custodian:jobs/bquxjob_4c28c9a7_16958c2791d"],
+            ["gcp:bigquery::cloud-custodian:jobs/US/bquxjob_4c28c9a7_16958c2791d"],
         )
 
     def test_job_get(self):
@@ -72,7 +72,7 @@ class BigQueryJobTest(BaseTest):
         # NOTE: confirm is a global resource
         self.assertEqual(
             p.resource_manager.get_urns(job),
-            ["gcp:bigquery::cloud-custodian:jobs/bquxjob_4c28c9a7_16958c2791d"],
+            ["gcp:bigquery::cloud-custodian:jobs/US/bquxjob_4c28c9a7_16958c2791d"],
         )
 
 

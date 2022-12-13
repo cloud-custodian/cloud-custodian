@@ -71,9 +71,6 @@ class BigQueryJob(QueryResourceManager):
         scope_key = 'projectId'
         name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
-        # id has '<project>:<location>:<jobId>' where location is 'US'
-        # assuming jobId is sufficient here.
-        urn_id_path = "jobReference.jobId"
 
         @staticmethod
         def get(client, event):
@@ -83,6 +80,11 @@ class BigQueryJob(QueryResourceManager):
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })
+
+        @classmethod
+        def _get_id(cls, resource):
+            jobRef = resource['jobReference']
+            return f"{jobRef['location']}/{jobRef['jobId']}"
 
 
 @resources.register('bq-table')

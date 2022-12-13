@@ -22,10 +22,10 @@ class InstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:cloud-custodian:instance/custodian-dev',
-                'gcp:compute:us-central1:cloud-custodian:instance/c7n-jenkins',
-                'gcp:compute:us-central1:cloud-custodian:instance/drone',
-                'gcp:compute:us-east1:cloud-custodian:instance/custodian',
+                'gcp:compute:us-east1:cloud-custodian:instances/custodian-dev',
+                'gcp:compute:us-central1:cloud-custodian:instances/c7n-jenkins',
+                'gcp:compute:us-central1:cloud-custodian:instances/drone',
+                'gcp:compute:us-east1:cloud-custodian:instances/custodian',
             ],
        )
 
@@ -210,12 +210,12 @@ class DiskTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
-                'gcp:compute:us-east1:cloud-custodian:disk/custodian-dev',
-                'gcp:compute:us-east1:cloud-custodian:disk/drone-upgrade',
-                'gcp:compute:us-east1:cloud-custodian:disk/custodian',
-                'gcp:compute:us-central1:cloud-custodian:disk/c7n-jenkins',
-                'gcp:compute:us-central1:cloud-custodian:disk/drone',
-                'gcp:compute:us-central1:cloud-custodian:disk/drone-11-1'
+                'gcp:compute:us-east1:cloud-custodian:disks/custodian-dev',
+                'gcp:compute:us-east1:cloud-custodian:disks/drone-upgrade',
+                'gcp:compute:us-east1:cloud-custodian:disks/custodian',
+                'gcp:compute:us-central1:cloud-custodian:disks/c7n-jenkins',
+                'gcp:compute:us-central1:cloud-custodian:disks/drone',
+                'gcp:compute:us-central1:cloud-custodian:disks/drone-11-1'
             ],
        )
 
@@ -300,6 +300,13 @@ class SnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:snapshots/snapshot-1'
+            ],
+       )
+
     def test_snapshot_delete(self):
         factory = self.replay_flight_data(
             'snapshot-delete', project_id='cloud-custodian')
@@ -312,6 +319,12 @@ class SnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:snapshots/snapshot-1'
+            ],
+       )
 
 
 class ImageTest(BaseTest):
@@ -326,6 +339,13 @@ class ImageTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:images/image-1'
+            ],
+        )
+
     def test_image_delete(self):
         factory = self.replay_flight_data(
             'image-delete', project_id='cloud-custodian')
@@ -338,6 +358,13 @@ class ImageTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:images/image-1'
+            ],
+        )
 
 
 class InstanceTemplateTest(BaseTest):
@@ -355,6 +382,12 @@ class InstanceTemplateTest(BaseTest):
         resources = policy.run()
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:instanceTemplates/custodian-instance-template'
+            ],
+        )
 
     def test_instance_template_get(self):
         resource_name = 'custodian-instance-template'
@@ -374,6 +407,12 @@ class InstanceTemplateTest(BaseTest):
         event = event_data('instance-template-create.json')
         resources = exec_mode.run(event, None)
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:compute::cloud-custodian:instanceTemplates/custodian-instance-template'
+            ],
+        )
 
     def test_instance_template_delete(self):
         project_id = 'cloud-custodian'
@@ -424,6 +463,13 @@ class AutoscalerTest(BaseTest):
         resources = policy.run()
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                # NOTE: zonal resource
+                'gcp:compute:us-central1:cloud-custodian:autoscalers/micro-instance-group-1-to-10'
+            ],
+        )
 
     def test_autoscaler_get(self):
         resource_name = 'instance-group-1'
@@ -443,6 +489,13 @@ class AutoscalerTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                # NOTE: zonal resource
+                'gcp:compute:us-central1:cloud-custodian:autoscalers/instance-group-1'
+            ],
+        )
 
     def test_autoscaler_set(self):
         project_id = 'cloud-custodian'

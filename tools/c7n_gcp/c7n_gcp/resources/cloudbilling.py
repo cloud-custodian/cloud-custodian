@@ -26,3 +26,9 @@ class CloudBillingAccount(QueryResourceManager):
             return client.execute_query(
                 'get', {'name': jmespath.search(
                     'protoPayload.response.billingAccountInfo.billingAccountName', event)})
+
+        @classmethod
+        def _get_id(cls, resource):
+            # Billing name contains the component element too.
+            id = resource[cls.id]
+            return id.split('/',1)[-1]
