@@ -24,6 +24,7 @@ class KmsKeyRing(QueryResourceManager):
         default_report_fields = [
             "name", "createTime"]
         asset_type = "cloudkms.googleapis.com/KeyRing"
+        urn_component = "keyring"
 
         @staticmethod
         def get(client, resource_info):
@@ -32,6 +33,14 @@ class KmsKeyRing(QueryResourceManager):
                         resource_info['location'],
                         resource_info['key_ring_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_region(cls, resource):
+            return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_id(cls, resource):
+            return resource["name"].split('/')[-1]
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -91,6 +100,7 @@ class KmsCryptoKey(ChildResourceManager):
         }
         asset_type = "cloudkms.googleapis.com/CryptoKey"
         scc_type = "google.cloud.kms.CryptoKey"
+        urn_component = "cryptokey"
 
         @staticmethod
         def get(client, resource_info):
@@ -100,6 +110,15 @@ class KmsCryptoKey(ChildResourceManager):
                         resource_info['key_ring_id'],
                         resource_info['crypto_key_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_region(cls, resource):
+            return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_id(cls, resource):
+            parts = resource["name"].split('/')
+            return f"{parts[5]}/{parts[7]}"
 
 
 @KmsCryptoKey.filter_registry.register('iam-policy')
@@ -151,6 +170,7 @@ class KmsCryptoKeyVersion(ChildResourceManager):
             'use_child_query': True
         }
         asset_type = "cloudkms.googleapis.com/CryptoKeyVersion"
+        urn_component = "cryptokey-version"
 
         @staticmethod
         def get(client, resource_info):
@@ -161,3 +181,12 @@ class KmsCryptoKeyVersion(ChildResourceManager):
                         resource_info['crypto_key_id'],
                         resource_info['crypto_key_version_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_region(cls, resource):
+            return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_id(cls, resource):
+            parts = resource["name"].split('/')
+            return f"{parts[5]}/{parts[7]}/{parts[9]}"
