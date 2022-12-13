@@ -16,6 +16,7 @@ install_requires = \
  'botocore (>=1.29.28,<2.0.0)',
  'c7n (>=0.9.21,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
+ 'google-api-core==2.10.2',
  'google-api-python-client>=2.0,<3.0',
  'google-auth>=2.1.0,<3.0.0',
  'google-cloud-logging>=3.2,<4.0',

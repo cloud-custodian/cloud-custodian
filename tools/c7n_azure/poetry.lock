@@ -573,21 +573,37 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-datalake-nspkg"
+version = "3.0.1"
+description = "Microsoft Azure Data Lake Management Namespace Package [Internal]"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-datalake-nspkg-3.0.1.zip", hash = "sha256:deb192ba422f8b3ec272ce4e88736796f216f28ea5b03f28331d784b7a3f4880"},
+    {file = "azure_mgmt_datalake_nspkg-3.0.1-py2-none-any.whl", hash = "sha256:3b9e2843f5d0fd6015bba13040dfc2f5fe9bc7b02c9d91dd578e8fe852d1b2dd"},
+    {file = "azure_mgmt_datalake_nspkg-3.0.1-py3-none-any.whl", hash = "sha256:2ac6fa13c55b87112199c5fb03a3098cefebed5f44ac34ab3d39b399951b22c4"},
+]
+
+[package.dependencies]
+azure-mgmt-nspkg = ">=3.0.0"
+
+[[package]]
 name = "azure-mgmt-datalake-store"
-version = "1.0.0"
+version = "0.5.0"
 description = "Microsoft Azure Data Lake Store Management Client Library for Python"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "azure-mgmt-datalake-store-1.0.0.zip", hash = "sha256:1ab9952bdeccfa2a237af3cb553b8b99f4112f1beb1edafd0d11f2989bcb6071"},
-    {file = "azure_mgmt_datalake_store-1.0.0-py2.py3-none-any.whl", hash = "sha256:02c0ceed26f9188e588dc1d4b1191184767f48a631e43f4d38de7d114ff61034"},
+    {file = "azure-mgmt-datalake-store-0.5.0.zip", hash = "sha256:9376d35495661d19f8acc5604f67b0bc59493b1835bbc480f9a1952f90017a4c"},
+    {file = "azure_mgmt_datalake_store-0.5.0-py2.py3-none-any.whl", hash = "sha256:2af98236cd7eaa439b239bf761338c866996ce82e9c129b204e8851e5dc095dd"},
 ]
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-mgmt-datalake-nspkg = ">=2.0.0"
+msrestazure = ">=0.4.27,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-dns"
@@ -792,6 +808,22 @@ files = [
 azure-common = ">=1.1,<2.0"
 azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
+
+[[package]]
+name = "azure-mgmt-nspkg"
+version = "3.0.2"
+description = "Microsoft Azure Resource Management Namespace Package [Internal]"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-nspkg-3.0.2.zip", hash = "sha256:8b2287f671529505b296005e6de9150b074344c2c7d1c805b3f053d081d58c52"},
+    {file = "azure_mgmt_nspkg-3.0.2-py2-none-any.whl", hash = "sha256:1c6f5134de78c8907e8b73a8ceaaf1f336a24193a543039994fe002bb5f7f39f"},
+    {file = "azure_mgmt_nspkg-3.0.2-py3-none-any.whl", hash = "sha256:d638ea5fda3ed323db943feb29acaa200f5d8ff092078bf8d29d4a2f8ed16999"},
+]
+
+[package.dependencies]
+azure-nspkg = ">=3.0.0"
 
 [[package]]
 name = "azure-mgmt-policyinsights"
@@ -2311,4 +2343,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "d403b0ef9339e7c85324712da6ac56ee7a373c6f0e6e3bc4d62b940d7b7c65c5"
+content-hash = "55feb294b46d382a8467446833edeea9d7f167c22c748ca2c2c39de0f7226cfe"

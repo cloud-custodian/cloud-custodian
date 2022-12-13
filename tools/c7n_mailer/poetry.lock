@@ -555,21 +555,37 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-datalake-nspkg"
+version = "3.0.1"
+description = "Microsoft Azure Data Lake Management Namespace Package [Internal]"
+category = "main"
+optional = true
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-datalake-nspkg-3.0.1.zip", hash = "sha256:deb192ba422f8b3ec272ce4e88736796f216f28ea5b03f28331d784b7a3f4880"},
+    {file = "azure_mgmt_datalake_nspkg-3.0.1-py2-none-any.whl", hash = "sha256:3b9e2843f5d0fd6015bba13040dfc2f5fe9bc7b02c9d91dd578e8fe852d1b2dd"},
+    {file = "azure_mgmt_datalake_nspkg-3.0.1-py3-none-any.whl", hash = "sha256:2ac6fa13c55b87112199c5fb03a3098cefebed5f44ac34ab3d39b399951b22c4"},
+]
+
+[package.dependencies]
+azure-mgmt-nspkg = ">=3.0.0"
+
+[[package]]
 name = "azure-mgmt-datalake-store"
-version = "1.0.0"
+version = "0.5.0"
 description = "Microsoft Azure Data Lake Store Management Client Library for Python"
 category = "main"
 optional = true
 python-versions = "*"
 files = [
-    {file = "azure-mgmt-datalake-store-1.0.0.zip", hash = "sha256:1ab9952bdeccfa2a237af3cb553b8b99f4112f1beb1edafd0d11f2989bcb6071"},
-    {file = "azure_mgmt_datalake_store-1.0.0-py2.py3-none-any.whl", hash = "sha256:02c0ceed26f9188e588dc1d4b1191184767f48a631e43f4d38de7d114ff61034"},
+    {file = "azure-mgmt-datalake-store-0.5.0.zip", hash = "sha256:9376d35495661d19f8acc5604f67b0bc59493b1835bbc480f9a1952f90017a4c"},
+    {file = "azure_mgmt_datalake_store-0.5.0-py2.py3-none-any.whl", hash = "sha256:2af98236cd7eaa439b239bf761338c866996ce82e9c129b204e8851e5dc095dd"},
 ]
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-mgmt-datalake-nspkg = ">=2.0.0"
+msrestazure = ">=0.4.27,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-dns"
@@ -774,6 +790,22 @@ files = [
 azure-common = ">=1.1,<2.0"
 azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
+
+[[package]]
+name = "azure-mgmt-nspkg"
+version = "3.0.2"
+description = "Microsoft Azure Resource Management Namespace Package [Internal]"
+category = "main"
+optional = true
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-nspkg-3.0.2.zip", hash = "sha256:8b2287f671529505b296005e6de9150b074344c2c7d1c805b3f053d081d58c52"},
+    {file = "azure_mgmt_nspkg-3.0.2-py2-none-any.whl", hash = "sha256:1c6f5134de78c8907e8b73a8ceaaf1f336a24193a543039994fe002bb5f7f39f"},
+    {file = "azure_mgmt_nspkg-3.0.2-py3-none-any.whl", hash = "sha256:d638ea5fda3ed323db943feb29acaa200f5d8ff092078bf8d29d4a2f8ed16999"},
+]
+
+[package.dependencies]
+azure-nspkg = ">=3.0.0"
 
 [[package]]
 name = "azure-mgmt-policyinsights"
@@ -1238,7 +1270,7 @@ azure-mgmt-cosmosdb = "^6.1.0"
 azure-mgmt-costmanagement = "^1.0.0"
 azure-mgmt-databricks = "1.0.0b1"
 azure-mgmt-datafactory = "^1.0.0"
-azure-mgmt-datalake-store = "^1.0.0"
+azure-mgmt-datalake-store = "^0.5.0"
 azure-mgmt-dns = "8.0.0b1"
 azure-mgmt-eventgrid = "^8.0.0"
 azure-mgmt-eventhub = "^8.0.0"
@@ -1291,6 +1323,7 @@ files = []
 develop = true
 
 [package.dependencies]
+google-api-core = "2.10.2"
 google-api-python-client = "^2.0"
 google-auth = "^2.1.0"
 google-cloud-logging = "^3.2"
@@ -1571,32 +1604,26 @@ lua = ["lupa (>=1.13,<2.0)"]
 
 [[package]]
 name = "google-api-core"
-version = "2.11.0"
+version = "2.10.2"
 description = "Google API client core library"
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google-api-core-2.11.0.tar.gz", hash = "sha256:4b9bb5d5a380a0befa0573b302651b8a9a89262c1730e37bf423cec511804c22"},
-    {file = "google_api_core-2.11.0-py3-none-any.whl", hash = "sha256:ce222e27b0de0d7bc63eb043b956996d6dccab14cc3b690aaea91c9cc99dc16e"},
+    {file = "google-api-core-2.10.2.tar.gz", hash = "sha256:10c06f7739fe57781f87523375e8e1a3a4674bf6392cd6131a3222182b971320"},
+    {file = "google_api_core-2.10.2-py3-none-any.whl", hash = "sha256:34f24bd1d5f72a8c4519773d99ca6bf080a6c4e041b4e9f024fe230191dda62e"},
 ]
 
 [package.dependencies]
-google-auth = ">=2.14.1,<3.0dev"
+google-auth = ">=1.25.0,<3.0dev"
 googleapis-common-protos = ">=1.56.2,<2.0dev"
-grpcio = [
-    {version = ">=1.33.2,<2.0dev", optional = true, markers = "extra == \"grpc\""},
-    {version = ">=1.49.1,<2.0dev", optional = true, markers = "python_version >= \"3.11\""},
-]
-grpcio-status = [
-    {version = ">=1.33.2,<2.0dev", optional = true, markers = "extra == \"grpc\""},
-    {version = ">=1.49.1,<2.0dev", optional = true, markers = "python_version >= \"3.11\""},
-]
+grpcio = {version = ">=1.33.2,<2.0dev", optional = true, markers = "extra == \"grpc\""}
+grpcio-status = {version = ">=1.33.2,<2.0dev", optional = true, markers = "extra == \"grpc\""}
 protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
 requests = ">=2.18.0,<3.0.0dev"
 
 [package.extras]
-grpc = ["grpcio (>=1.33.2,<2.0dev)", "grpcio (>=1.49.1,<2.0dev)", "grpcio-status (>=1.33.2,<2.0dev)", "grpcio-status (>=1.49.1,<2.0dev)"]
+grpc = ["grpcio (>=1.33.2,<2.0dev)", "grpcio-status (>=1.33.2,<2.0dev)"]
 grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 

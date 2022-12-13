@@ -43,7 +43,7 @@ install_requires = \
  'azure-mgmt-costmanagement>=1.0.0,<2.0.0',
  'azure-mgmt-databricks==1.0.0b1',
  'azure-mgmt-datafactory>=1.0.0,<2.0.0',
- 'azure-mgmt-datalake-store>=1.0.0,<2.0.0',
+ 'azure-mgmt-datalake-store>=0.5.0,<0.6.0',
  'azure-mgmt-dns==8.0.0b1',
  'azure-mgmt-eventgrid>=8.0.0,<9.0.0',
  'azure-mgmt-eventhub>=8.0.0,<9.0.0',
