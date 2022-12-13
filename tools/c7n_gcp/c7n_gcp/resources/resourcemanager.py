@@ -32,7 +32,7 @@ class Organization(QueryResourceManager):
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.organizations.get',)
         urn_component = "organization"
-        urn_id_last_segment = True
+        urn_id_segments = (-1,)
 
         @staticmethod
         def get(client, resource_info):
@@ -68,7 +68,7 @@ class Folder(QueryResourceManager):
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
         perm_service = 'resourcemanager'
         urn_component = "folder"
-        urn_id_last_segment = True
+        urn_id_segments = (-1,)
 
     def get_resources(self, resource_ids):
         client = self.get_client()
