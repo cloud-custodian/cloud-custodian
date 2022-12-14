@@ -15,16 +15,16 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.26.9,<2.0.0)',
- 'botocore (>=1.29.9,<2.0.0)',
+ 'boto3 (>=1.26.29,<2.0.0)',
+ 'botocore (>=1.29.29,<2.0.0)',
  'c7n (>=0.9.21,<0.10.0)',
- 'cos-python-sdk-v5>=1.9.20,<2.0.0',
+ 'cos-python-sdk-v5>=1.9.21,<2.0.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
- 'importlib-resources (>=5.10.0,<6.0.0)',
+ 'importlib-resources (>=5.10.1,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
- 'jsonschema (>=4.17.0,<5.0.0)',
- 'pkgutil_resolve_name (>=1.3.10,<2.0.0)',
+ 'jsonschema (>=4.17.3,<5.0.0)',
+ 'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrsistent (>=0.19.2,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pytz>=2022.1',
@@ -33,10 +33,10 @@ install_requires = \
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
- 'tencentcloud-sdk-python>=3.0.715,<4.0.0',
+ 'tencentcloud-sdk-python>=3.0.783,<4.0.0',
  'typing-extensions (>=4.4.0,<5.0.0)',
- 'urllib3 (>=1.26.12,<2.0.0)',
- 'zipp (>=3.10.0,<4.0.0)']
+ 'urllib3 (>=1.26.13,<2.0.0)',
+ 'zipp (>=3.11.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-tencentcloud',
@@ -48,7 +48,7 @@ setup_kwargs = {
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing'
     ],
-    'long_description': None,
+    'long_description': 'None',
     'long_description_content_type': 'text/markdown',
     'author': 'Cloud Custodian Project',
     'author_email': 'cloud-custodian@googlegroups.com',
