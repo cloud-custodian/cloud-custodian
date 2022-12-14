@@ -1,26 +1,16 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "SubscriptionsConfirmed": "0", 
-            "DisplayName": "", 
-            "SubscriptionsDeleted": "0", 
-            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
-            "Owner": "123456789012", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:123456789012:test-sns-remove-matched\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-east-1:123456789012:test-sns-remove-matched\"}]}", 
-            "TopicArn": "arn:aws:sns:us-east-1:123456789012:test-sns-remove-matched", 
-            "SubscriptionsPending": "0"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b4c17f22-d36d-5839-aad5-2d15ef7b9ded", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b4c17f22-d36d-5839-aad5-2d15ef7b9ded", 
-                "date": "Sat, 16 Sep 2017 14:48:53 GMT", 
-                "content-length": "2036", 
-                "content-type": "text/xml"
-            }
-        }
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-matched\"},{\"Sid\":\"Public\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-matched\"}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-matched",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
     }
 }
