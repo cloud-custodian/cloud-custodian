@@ -606,8 +606,8 @@ class SoftDeleteFilter(Filter):
                 resource['properties']['c7n:blobServices'] = \
                     blob_services.serialize(True).get('properties', {})
 
-            if resource['properties']['c7n:blobServices'].get('deleteRetentionPolicy').get('enabled') \
-                    == self.enabled:
+            if resource['properties']['c7n:blobServices']\
+                    .get('deleteRetentionPolicy').get('enabled') == self.enabled:
                 result.append(resource)
 
         return result
