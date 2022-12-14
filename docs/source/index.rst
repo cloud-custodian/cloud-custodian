@@ -73,14 +73,36 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    gcp/contribute
    gcp/resources/index
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Tencent Cloud
+
+   tencentcloud/gettingstarted
+   tencentcloud/resources/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: AWS Cloud Control
+
+   awscc/gettingstarted
+   awscc/resources/index
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Kubernetes
+
+   kubernetes/gettingstarted
+   kubernetes/controllermode
+   kubernetes/examples/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Tools
 
    tools/c7n-org
-   tools/cask
-   tools/c7n-mailer   
+   tools/c7n-mailer
+   tools/c7n-left
    tools/c7n-logexporter
    tools/c7n-trailcreator
    tools/c7n-policystream   
@@ -99,4 +121,3 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    developer/tests.rst
    developer/documentation.rst
    developer/packaging.rst
-

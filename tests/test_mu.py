@@ -15,6 +15,7 @@ import unittest
 import zipfile
 
 import mock
+from mock import patch
 
 from c7n.config import Config
 from c7n.mu import (
@@ -152,8 +153,54 @@ class PolicyLambdaProvision(Publish):
         self.assertEqual(result["FunctionName"], "custodian-sg-modified")
         self.addCleanup(mgr.remove, pl)
 
+    def test_published_lambda_architecture(self):
+        session_factory = self.replay_flight_data("test_published_lambda_architecture")
+        with patch('platform.machine', return_value="arm64"):
+            p = self.load_policy({
+                'name': 'ec2-foo-bar',
+                'resource': 'aws.ec2',
+                'mode': {
+                    'type': 'cloudtrail',
+                    'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'events': ['RunInstances']}})
+            pl = PolicyLambda(p)
+            mgr = LambdaManager(session_factory)
+            result = mgr.publish(pl)
+            self.assertEqual(result["Architectures"], ["arm64"])
+
+    def test_updated_lambda_architecture(self):
+        session_factory = self.replay_flight_data("test_updated_lambda_architecture")
+        lambda_client = session_factory().client("lambda")
+        initial_config = lambda_client.get_function(FunctionName="custodian-ec2-foo-bar")
+        self.assertEqual(initial_config.get('Configuration').get('Architectures'), ["arm64"])
+        with patch('platform.machine', return_value="x86_64"):
+            p1 = self.load_policy({
+                'name': 'ec2-foo-bar',
+                'resource': 'aws.ec2',
+                'mode': {
+                    'type': 'cloudtrail',
+                    'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'events': ['RunInstances']}})
+            pl1 = PolicyLambda(p1)
+            mgr = LambdaManager(session_factory)
+            mgr.publish(pl1)
+            if self.recording:
+                time.sleep(30)
+            updated_config = lambda_client.get_function_configuration(
+                FunctionName="custodian-ec2-foo-bar")
+            self.assertEqual(updated_config.get('Architectures'), ["x86_64"])
+            self.addCleanup(mgr.remove, pl1)
+
     def test_config_poll_rule_evaluation(self):
         session_factory = self.record_flight_data("test_config_poll_rule_provision")
+
+        # config added support for kinesis streams after that test was written
+        # disable that support so the original behavior check on config poll mode
+        # can be verified
+        from c7n.resources.kinesis import KinesisStream
+        self.patch(
+            KinesisStream.resource_type, 'config_type', None)
+
         p = self.load_policy({
             'name': 'configx',
             'resource': 'aws.kinesis',
@@ -881,6 +928,13 @@ class PolicyLambdaProvision(Publish):
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
         )
 
+    def test_different_lambda_handler(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {"handler": "custom.handler"}}}))
+        self.assertEqual(
+            p.get_config()["Handler"],
+            "custom.handler"
+        )
+
     def test_config_defaults(self):
         p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
         self.maxDiff = None
@@ -894,13 +948,55 @@ class PolicyLambdaProvision(Publish):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.8",
+                "Runtime": "python3.9",
+                "Architectures": ["x86_64"],
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},
                 "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
             },
         )
+
+    def test_lambda_architecture(self):
+        p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
+        with patch('platform.machine', return_value='arm64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["arm64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
+        with patch('platform.machine', return_value='x86_64'):
+            self.assertEqual(
+                p.get_config(),
+                {
+                    "DeadLetterConfig": {},
+                    "Description": "cloud-custodian lambda policy",
+                    "FunctionName": "custodian-hello",
+                    "Handler": "custodian_policy.run",
+                    "KMSKeyArn": "",
+                    "MemorySize": 512,
+                    "Role": "",
+                    "Runtime": "python3.9",
+                    "Architectures": ["x86_64"],
+                    "Tags": {},
+                    "Timeout": 900,
+                    "TracingConfig": {"Mode": "PassThrough"},
+                    "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
+                },
+            )
 
     def test_remove_permissions_from_event_cloudtrail(self):
         session_factory = self.replay_flight_data("test_remove_permissions_event")

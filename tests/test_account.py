@@ -4,9 +4,11 @@ from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.utils import local_session
+from c7n.utils import local_session, format_string_values
 from c7n.resources import account
 from c7n.testing import mock_datetime_now
+
+from pytest_terraform import terraform
 
 import datetime
 from dateutil import parser, tz
@@ -51,6 +53,21 @@ class AccountTests(BaseTest):
             'updatedAt': datetime.datetime(
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
         }
+
+    def test_macie_disabled(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_disabled')
+        p = self.load_policy({
+            'name': 'macie-check-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'not': [
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_missing(self):
         session_factory = self.replay_flight_data(
@@ -527,9 +544,7 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        assert(
-            resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
-        )
+        assert resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
 
     def test_account_password_policy_update(self):
         factory = self.replay_flight_data("test_account_password_policy_update")
@@ -622,9 +637,7 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
-        assert(
-            policy['MinimumPasswordLength'] == 12
-        )
+        assert policy['MinimumPasswordLength'] == 12
         # assert defaults being set
         self.assertEqual(
             [
@@ -1044,6 +1057,53 @@ class AccountTests(BaseTest):
         self.assertEqual(resp["BlockPublicAccessConfiguration"]
             ["PermittedPublicSecurityGroupRuleRanges"][0]['MaxRange'], 23)
 
+    def test_ses_agg_send_stats(self):
+        factory = self.replay_flight_data('test_ses_agg_send_stats')
+        p = self.load_policy({
+            'name': 'ses-agg-send-stats-policy',
+            'resource': 'account',
+            'filters': [{"type": "ses-agg-send-stats"}]},
+            config={'region': 'us-west-2'},
+            session_factory=factory)
+        resources = p.run()
+        expected_agg_send_stats = {
+            'DeliveryAttempts': 130,
+            'Bounces': 1,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 1
+        }
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:ses-send-agg'], expected_agg_send_stats)
+
+    def test_ses_consecutive_send_stats(self):
+        factory = self.replay_flight_data('test_ses_agg_send_stats')
+        p = self.load_policy({
+            'name': 'ses-consecutive-stats',
+            'resource': 'account',
+            'filters': [{"type": "ses-send-stats", "days": 2}]},
+            config={'region': 'us-west-2'},
+            session_factory=factory)
+        with mock_datetime_now(parser.parse("2022-10-26T00:00:00+00:00"), datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        expected_send_stats = [{
+            'DeliveryAttempts': 17,
+            'Bounces': 1,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 6,
+            'Date': '2022-10-25'}, {
+            'DeliveryAttempts': 20,
+            'Bounces': 0,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 0,
+            'Date': '2022-10-24'}
+        ]
+        self.assertEqual(resources[0]['c7n:ses-send-stats'], expected_send_stats)
+        self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
+
 
 class AccountDataEvents(BaseTest):
 
@@ -1217,3 +1277,161 @@ class AccountDataEvents(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_lakeformation_filter(self):
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3")
+        p = self.load_policy(
+            {
+                'name': 'test-lakeformation-cross-account-bucket',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'lakeformation-s3-cross-account'
+                }],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(
+            resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])
+
+
+@terraform('cloudtrail_success_log_metric_filter')
+def test_cloudtrail_success_log_metric_filter(test, cloudtrail_success_log_metric_filter):
+    session_factory = test.replay_flight_data('test_cloudtrail_success_log_metric_filter')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 0)
+
+
+@terraform('cloudtrail_fail_log_metric_filter_no_alarm')
+def test_cloudtrail_fail_log_metric_filter_no_alarm(test,
+                                                    cloudtrail_fail_log_metric_filter_no_alarm):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter_no_alarm')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_fail_log_metric_filter_no_sns')
+def test_cloudtrail_fail_log_metric_filter_no_sns(test, cloudtrail_fail_log_metric_filter_no_sns):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter_no_sns')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_fail_log_metric_filter')
+def test_cloudtrail_fail_log_metric_filter(test, cloudtrail_fail_log_metric_filter):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_success_include_management_events')
+def test_success_cloudtrail_include_management_events(test,
+                                                      cloudtrail_success_include_management_events):
+    session_factory = \
+        test.replay_flight_data('test_cloudtrail_success_cloudtrail_include_management_events')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'include-management-events': True
+            },
+        ]
+    }
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 0)
+
+
+@terraform('cloudtrail_fail_include_management_events')
+def test_fail_cloudtrail_include_management_events(test, cloudtrail_fail_include_management_events):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_include_management_events')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'include-management-events': True
+            },
+        ]
+    }
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)

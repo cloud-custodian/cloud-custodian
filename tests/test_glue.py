@@ -84,6 +84,24 @@ class TestGlueConnections(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual('PASSWORD' in resources[0].get('ConnectionProperties'), False)
 
+    def test_glue_connection_tag_untag(self):
+        session_factory = self.replay_flight_data("test_glue_connection_tag_untag")
+        p = self.load_policy(
+            {
+                "name": "glue-connection-tags",
+                "resource": "glue-connection",
+                "filters": [{"tag:owner": "pratyush"}],
+                "actions": [{"type": "remove-tag", 'tags': ['owner']}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        arn = p.resource_manager.generate_arn(resources[0]['Name'])
+        tags = client.get_tags(ResourceArn=arn)
+        self.assertEqual(tags.get('Tags'), {})
+
 
 class TestGlueDevEndpoints(BaseTest):
 
@@ -288,6 +306,54 @@ class TestGlueJobs(BaseTest):
         client = session_factory().client("glue")
         jobs = client.get_jobs()["Jobs"]
         self.assertFalse(jobs)
+
+    def test_enable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_enable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-enable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "absent",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertIn("--enable-metrics", job["DefaultArguments"])
+
+    def test_disable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_disable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-disable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "present",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": False}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertNotIn("--enable-metrics", job["DefaultArguments"])
 
 
 class TestGlueCrawlers(BaseTest):
@@ -682,7 +748,7 @@ class TestGlueDataCatalog(BaseTest):
         session = session_factory()
         client = session.client("glue")
         before_cat_setting = client.get_resource_policy()
-        assert('o-4amkskbcf3' in before_cat_setting.get('PolicyInJson'))
+        assert 'o-4amkskbcf3' in before_cat_setting.get('PolicyInJson')
         p = self.load_policy(
             {
                 "name": "net-change-rbp-cross-account",
@@ -712,4 +778,4 @@ class TestGlueDataCatalog(BaseTest):
         )
         p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
         after_cat_setting = client.get_resource_policy()
-        assert('o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson'))
+        assert 'o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson')

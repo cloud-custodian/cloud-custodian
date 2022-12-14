@@ -2,27 +2,16 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__console_sub_0\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test\",\"Condition\":{\"StringLike\":{\"SNS:Endpoint\":\"alfredmarc.gamulo@capitalone.com\"}}}]}",
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:my-encrypted-topic\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}}}]}",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",
-            "KmsMasterKeyId": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41",
-            "TopicArn": "arn:aws:sns:us-east-1:644160558196:test",
+            "KmsMasterKeyId": "arn:aws:kms:ap-northeast-2:644160558196:key/4e587a21-567d-4504-aa8e-879b1b98ca15",
+            "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:my-encrypted-topic",
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
             "SubscriptionsConfirmed": "0",
-            "DisplayName": "test",
+            "DisplayName": "",
             "SubscriptionsDeleted": "0"
         },
-        "ResponseMetadata": {
-            "RequestId": "32c871da-24a5-5f81-8f01-2553fdd3bc31",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "32c871da-24a5-5f81-8f01-2553fdd3bc31",
-                "content-type": "text/xml",
-                "content-length": "2080",
-                "vary": "Accept-Encoding",
-                "date": "Tue, 11 Dec 2018 15:26:45 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

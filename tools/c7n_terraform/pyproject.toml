@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_terraform"
-version = "0.1.4"
+version = "0.1.11"
 readme = "readme.md"
 description = "Cloud Custodian Provider for evaluating Terraform"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
@@ -15,12 +15,11 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-rich = "^1.1.9"
 click = "^8.0"
 python-hcl2 = "^2.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0.0"
+pytest = "^7.1.2"
 c7n = {path = "../..", develop = true}
 
 [build-system]

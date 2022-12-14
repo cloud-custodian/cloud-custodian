@@ -1,17 +1,21 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
 )
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 from .aws import shape_validate
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class EFSDescribe(DescribeSource):
@@ -36,6 +40,7 @@ class ElasticFileSystem(QueryResourceManager):
         filter_type = 'scalar'
         universal_taggable = True
         config_type = cfn_type = 'AWS::EFS::FileSystem'
+        arn = 'FileSystemArn'
 
     source_mapping = {
         'describe': EFSDescribe,
@@ -227,3 +232,113 @@ class LifecyclePolicy(Filter):
             except client.exceptions.FileSystemNotFound:
                 continue
         return resources
+
+
+@ElasticFileSystem.filter_registry.register('check-secure-transport')
+class CheckSecureTransport(Filter):
+    """Find EFS that does not enforce secure transport
+
+    :Example:
+
+    .. code-block:: yaml
+
+     - name: efs-securetransport-check-policy
+       resource: efs
+       filters:
+         - check-secure-transport
+
+    To configure an EFS to enforce secure transport, set up the appropriate
+    Effect and Condition for its policy document. For example:
+
+    .. code-block:: json
+
+        {
+            "Sid": "efs-statement-b3f6b59b-d938-4001-9154-508f67707073",
+            "Effect": "Deny",
+            "Principal": { "AWS": "*" },
+            "Action": "*",
+            "Condition": {
+                "Bool": { "aws:SecureTransport": "false" }
+            }
+        }
+    """
+
+    schema = type_schema('check-secure-transport')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
+
+    policy_annotation = 'c7n:Policy'
+
+    def get_policy(self, client, resource):
+        if self.policy_annotation in resource:
+            return resource[self.policy_annotation]
+        try:
+            result = client.describe_file_system_policy(
+                FileSystemId=resource['FileSystemId'])
+        except client.exceptions.PolicyNotFound:
+            return None
+        resource[self.policy_annotation] = json.loads(result['Policy'])
+        return resource[self.policy_annotation]
+
+    def securetransport_check_policy(self, client, resource):
+        policy = self.get_policy(client, resource)
+        if not policy:
+            return True
+
+        statements = policy['Statement']
+        if isinstance(statements, dict):
+            statements = [statements]
+
+        for s in statements:
+            try:
+                effect = s['Effect']
+                secureTransportValue = s['Condition']['Bool']['aws:SecureTransport']
+                if ((effect == 'Deny' and secureTransportValue == 'false') or
+                        (effect == 'Allow' and secureTransportValue == 'true')):
+                    return False
+            except (KeyError, TypeError):
+                pass
+
+        return True
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('efs')
+        results = [r for r in resources if self.securetransport_check_policy(c, r)]
+        self.log.info(
+            "%d of %d EFS policies don't enforce secure transport",
+            len(results), len(resources))
+        return results
+
+
+@ElasticFileSystem.filter_registry.register('has-statement')
+class EFSHasStatementFilter(HasStatementFilter):
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'c7n:Policy'
+
+    def process(self, resources, event=None):
+        resources = [self.policy_annotate(r) for r in resources]
+        return super().process(resources, event)
+
+    def policy_annotate(self, resource):
+        client = local_session(self.manager.session_factory).client('efs')
+        if self.policy_attribute in resource:
+            return resource
+        try:
+            result = client.describe_file_system_policy(
+                FileSystemId=resource['FileSystemId'])
+            resource[self.policy_attribute] = result['Policy']
+        except client.exceptions.PolicyNotFound:
+            resource[self.policy_attribute] = None
+            return resource
+        return resource
+
+    def get_std_format_args(self, fs):
+        return {
+            'fs_arn': fs['FileSystemArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+
+ElasticFileSystem.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

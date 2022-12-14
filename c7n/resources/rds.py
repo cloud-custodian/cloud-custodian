@@ -37,6 +37,7 @@ import logging
 import operator
 import jmespath
 import re
+from datetime import datetime, timedelta
 from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
@@ -52,7 +53,8 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, RetryPageIterator)
 from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
@@ -984,7 +986,7 @@ class RDSSnapshot(QueryResourceManager):
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = "AWS::RDS::DBSnapshot"
+        config_type = cfn_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
         filter_type = "scalar"
         universal_taggable = True
@@ -1424,6 +1426,9 @@ class RDSSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBSnapshot',)
 
     def process(self, snapshots):
+        snapshots = self.filter_resources(snapshots, 'SnapshotType', ('manual',))
+        if not snapshots:
+            return []
         log.info("Deleting %d rds snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
@@ -1630,31 +1635,35 @@ class ParameterFilter(ValueFilter):
 
         return ret_val
 
+    def handle_paramgroup_cache(self, client, paginator, param_groups):
+        pgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for pg in param_groups:
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'rds-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    pgcache[pg] = pg_values
+                    continue
+                param_list = list(itertools.chain(*[p['Parameters']
+                    for p in paginator.paginate(DBParameterGroupName=pg)]))
+                pgcache[pg] = {
+                    p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
+                    for p in param_list if 'ParameterValue' in p}
+                cache.save(cache_key, pgcache[pg])
+        return pgcache
+
     def process(self, resources, event=None):
         results = []
-        paramcache = {}
-
         client = local_session(self.manager.session_factory).client('rds')
         paginator = client.get_paginator('describe_db_parameters')
-
         param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
                         for db in resources}
-
-        for pg in param_groups:
-            cache_key = {
-                'region': self.manager.config.region,
-                'account_id': self.manager.config.account_id,
-                'rds-pg': pg}
-            pg_values = self.manager._cache.get(cache_key)
-            if pg_values is not None:
-                paramcache[pg] = pg_values
-                continue
-            param_list = list(itertools.chain(*[p['Parameters']
-                for p in paginator.paginate(DBParameterGroupName=pg)]))
-            paramcache[pg] = {
-                p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
-                for p in param_list if 'ParameterValue' in p}
-            self.manager._cache.save(cache_key, paramcache[pg])
+        paramcache = self.handle_paramgroup_cache(client, paginator, param_groups)
 
         for resource in resources:
             for pg in resource['DBParameterGroups']:
@@ -1819,3 +1828,221 @@ class ReservedRDS(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+
+@filters.register('consecutive-snapshots')
+class ConsecutiveSnapshots(Filter):
+    """Returns instances where number of consective daily snapshots is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-daily-snapshot-count
+                resource: rds
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('rds:DescribeDBSnapshots', 'rds:DescribeDBInstances')
+    annotation = 'c7n:DBSnapshots'
+
+    def process_resource_set(self, client, resources):
+        rds_instances = [r['DBInstanceIdentifier'] for r in resources]
+        paginator = client.get_paginator('describe_db_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        db_snapshots = paginator.paginate(Filters=[{'Name': 'db-instance-id',
+          'Values': rds_instances}]).build_full_result().get('DBSnapshots', [])
+
+        inst_map = {}
+        for snapshot in db_snapshots:
+            inst_map.setdefault(snapshot['DBInstanceIdentifier'], []).append(snapshot)
+        for r in resources:
+            r[self.annotation] = inst_map.get(r['DBInstanceIdentifier'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results
+
+
+@filters.register('engine')
+class EngineFilter(ValueFilter):
+    """
+    Filter a rds resource based on its Engine Metadata
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-deprecated-versions
+              resource: aws.rds
+              filters:
+                - type: engine
+                  key: Status
+                  value: deprecated
+    """
+
+    schema = type_schema('engine', rinherit=ValueFilter.schema)
+
+    permissions = ("rds:DescribeDBEngineVersions", )
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        engines = set()
+        engine_versions = set()
+        for r in resources:
+            engines.add(r['Engine'])
+            engine_versions.add(r['EngineVersion'])
+
+        paginator = client.get_paginator('describe_db_engine_versions')
+        response = paginator.paginate(
+            Filters=[
+                {'Name': 'engine', 'Values': list(engines)},
+                {'Name': 'engine-version', 'Values': list(engine_versions)}
+            ],
+            IncludeAll=True,
+        )
+        all_versions = {}
+        matched = []
+        for page in response:
+            for e in page['DBEngineVersions']:
+                all_versions.setdefault(e['Engine'], {})
+                all_versions[e['Engine']][e['EngineVersion']] = e
+        for r in resources:
+            v = all_versions[r['Engine']][r['EngineVersion']]
+            if self.match(v):
+                r['c7n:Engine'] = v
+                matched.append(r)
+        return matched
+
+
+class DescribeDBProxy(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('rds-proxy')
+class RDSProxy(QueryResourceManager):
+    """Resource Manager for RDS DB Proxies
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-proxy-tls-check
+                resource: rds-proxy
+                filters:
+                  - type: value
+                    key: RequireTLS
+                    value: false
+    """
+
+    class resource_type(TypeInfo):
+        service = 'rds'
+        name = id = 'DBProxyName'
+        date = 'CreatedDate'
+        enum_spec = ('describe_db_proxies', 'DBProxies', None)
+        arn = 'DBProxyArn'
+        arn_type = 'db-proxy'
+        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        permissions_enum = ('rds:DescribeDBProxies',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeDBProxy,
+        'config': ConfigSource
+    }
+
+
+@filters.register('db-option-groups')
+class DbOptionGroups(ValueFilter):
+    """This filter describes RDS option groups for associated RDS instances.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-data-in-transit-encrypted
+            resource: aws.rds
+            filters:
+              - type: db-option-groups
+                key: OptionName
+                value: NATIVE_NETWORK_ENCRYPTION
+                op: eq
+    """
+
+    schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
+    policy_annotation = 'c7n:MatchedDBOptionGroups'
+
+    def handle_optiongroup_cache(self, client, paginator, option_groups):
+        pgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for pg in option_groups:
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'rds-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    pgcache[pg] = pg_values
+                    continue
+                option_list = list(itertools.chain(*[p['OptionGroupsList']
+                    for p in paginator.paginate(OptionGroupName=pg)]))
+
+                pgcache[pg] = {}
+                for option in option_list:
+                    if option['Options']:
+                        for p in option['Options']:
+                            pgcache[pg].update({'OptionName': p['OptionName']})
+                cache.save(cache_key, pgcache[pg])
+
+        return pgcache
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_option_groups')
+        option_groups = [db['OptionGroupMemberships'][0]['OptionGroupName']
+                        for db in resources]
+        optioncache = self.handle_optiongroup_cache(client, paginator, option_groups)
+
+        for resource in resources:
+            for pg in resource['OptionGroupMemberships']:
+                pg_values = optioncache[pg['OptionGroupName']]
+                if self.match(pg_values):
+                    resource.setdefault(self.policy_annotation, []).append({
+                        self.data.get('key'): self.data.get('value')})
+                    results.append(resource)
+                    break
+
+        return results

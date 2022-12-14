@@ -653,6 +653,12 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
         return results
 
 
+@ContainerInstance.filter_registry.register('subnet')
+class ContainerInstanceSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "attributes[?name == 'ecs.subnet-id'].value[]"
+
+
 @ContainerInstance.action_registry.register('set-state')
 class SetState(BaseAction):
     """Updates a container instance to either ACTIVE or DRAINING

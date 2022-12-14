@@ -1,0 +1,93 @@
+interactions:
+- request:
+    body: '{"SnapshotIds": ["snap-lbwv0qm5"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '60'
+      Content-Type:
+      - application/json
+      Host:
+      - cbs.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeSnapshots
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cbs.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "RequestId": "37bb60e9-f717-4c48-b794-45b49aab3edf",
+        "SnapshotSet": [{"Tags": [], "Placement": {"CageId": "", "Zone": "ap-singapore-1",
+        "ProjectId": 1159375, "CdcName": "", "CdcId": "", "ProjectName": ""}, "CopyFromRemote":
+        true, "IsPermanent": true, "DiskUsage": "DATA_DISK", "DeadlineTime": "", "Percent":
+        100, "SnapshotId": "snap-lbwv0qm5", "ShareReference": 0, "SnapshotType": "PRIVATE_SNAPSHOT",
+        "DiskSize": 10, "DiskId": "", "SnapshotName": "Copied snap-6z1cbtrc from ap-seoul",
+        "Images": [], "CopyingToRegions": [], "Encrypt": false, "CreateTime": "2020-06-22
+        09:35:03", "ImageCount": 0, "SnapshotState": "NORMAL"}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '655'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 10:14:16 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cvm:ap-singapore:uin/100000750436:volume/snap-lbwv0qm5"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '81'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"cd37750c-8bb8-4ea8-90e9-cc027a4704a1"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 10:14:17 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

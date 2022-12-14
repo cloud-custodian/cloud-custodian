@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cognito-identity:us-east-1:644160558196:identitypool/us-east-1:7af6af21-0a2b-49fb-98e6-07d8a39a3f7a",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:cognito-identity:us-east-1:644160558196:identitypool/us-east-1:us-east-1:dee8f727-00d8-468d-9309-cf1ef485b96c",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

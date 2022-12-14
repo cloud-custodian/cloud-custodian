@@ -30,7 +30,7 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
 
 from c7n_org.utils import environ, account_tags
 
@@ -153,7 +153,8 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
+def init(config, use, debug, verbose, accounts, tags, policies,
+        resource=None, policy_tags=(), not_accounts=None):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -188,7 +189,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-    filter_accounts(accounts_config, tags, accounts)
+    filter_accounts(accounts_config, tags, accounts, not_accounts)
 
     load_available()
     MainThreadExecutor.c7n_async = False
@@ -198,9 +199,18 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
 def resolve_regions(regions, account):
     if 'all' in regions:
-        session = get_session(account, 'c7n-org', "us-east-1")
-        client = session.client('ec2')
-        return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        try:
+            session = get_session(account, 'c7n-org', 'us-east-1')
+            client = session.client('ec2')
+            return [region['RegionName'] for region in client.describe_regions()['Regions']]
+        except ClientError as e:
+            err = e.response['Error']
+            if err['Code'] not in ('AccessDenied', 'AuthFailure'):
+                raise
+            log.warning('error (%s) listing available regions for account:%s - %s',
+                err['Code'], account['name'], err['Message']
+            )
+            return []
     if not regions:
         return ('us-east-1', 'us-west-2')
 
@@ -252,9 +262,9 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     accounts = comma_expand(accounts)
     not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
-        if not_accounts and a['name'] in not_accounts:
-            continue
         account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        if not_accounts and (a['name'] in not_accounts or account_id in not_accounts):
+            continue
         if accounts and a['name'] not in accounts and account_id not in accounts:
             continue
         if tags:
@@ -334,6 +344,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
+                    if k in r:
+                        k = 'tag:' + k
                     r[k] = v
         records.extend(policy_records)
     return records
@@ -413,7 +425,7 @@ def report(config, output, use, output_dir, accounts,
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
-        include_default_fields=not(no_default_fields),
+        include_default_fields=not no_default_fields,
         include_region=False,
         include_policy=False,
         fields=prefix_fields)
@@ -462,6 +474,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
     output_dir = os.path.join(output_dir, account['name'], region)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+    vars = {"account": account["name"], "account_id": account["account_id"],
+        "region": region, "output_dir": output_dir}
+    script_args = format_string_values(script_args, **vars)
 
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
@@ -641,6 +657,7 @@ def run_account(account, region, policies_config, output_path,
 @click.option("-u", "--use", required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
+@click.option('--not-accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
@@ -658,12 +675,13 @@ def run_account(account, region, policies_config, output_path,
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region,
+def run(config, use, output_dir, accounts, not_accounts, tags, region,
         policy, policy_tags, cache_period, cache_path, metrics,
         dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
+        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
+        not_accounts=not_accounts)
     policy_counts = Counter()
     success = True
 

@@ -1,0 +1,147 @@
+interactions:
+- request:
+    body: '{"InstanceIds": ["ins-8ktxnl0g"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '59'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "InstanceSet": [{"Placement": {"Zone":
+        "ap-singapore-4", "HostId": null, "ProjectId": 0}, "InstanceId": "ins-8ktxnl0g",
+        "Uuid": "4d82ea9a-12a9-4354-896c-e27deb4c995a", "InstanceState": "RUNNING",
+        "RestrictState": "NORMAL", "InstanceType": "SA2.MEDIUM4", "CPU": 2, "Memory":
+        4, "InstanceName": "Unnamed", "InstanceChargeType": "POSTPAID_BY_HOUR", "SystemDisk":
+        {"DiskType": "CLOUD_BSSD", "DiskId": "disk-4h5895fq", "DiskSize": 50, "Encrypt":
+        false, "KmsKeyId": null, "ThroughputPerformance": 0, "CdcId": null}, "DataDisks":
+        [], "PrivateIpAddresses": ["192.168.0.14"], "PublicIpAddresses": ["43.159.32.207"],
+        "IPv6Addresses": null, "InternetAccessible": {"InternetMaxBandwidthOut": 5,
+        "InternetChargeType": "TRAFFIC_POSTPAID_BY_HOUR"}, "VirtualPrivateCloud":
+        {"VpcId": "vpc-rdsfj6ot", "SubnetId": "subnet-9hl8a56w", "AsVpcGateway": false},
+        "SecurityGroupIds": ["sg-0tifsp1w"], "LoginSettings": {"KeyIds": ["skey-pz3dn78b"]},
+        "ImageId": "img-eb30mz89", "OsName": "TencentOS Server 3.1 (TK4)", "DefaultLoginUser":
+        "root", "DefaultLoginPort": 22, "RenewFlag": null, "CreatedTime": "2022-09-16T03:26:14Z",
+        "ExpiredTime": null, "Tags": [], "PlatformProjectId": null, "DisasterRecoverGroupId":
+        "", "DedicatedClusterId": "", "CamRoleName": "", "LatestOperation": null,
+        "LatestOperationState": null, "LatestOperationRequestId": null, "IsolatedSource":
+        "NOTISOLATED", "HpcClusterId": "", "DisableApiTermination": false, "RdmaIpAddresses":
+        null, "LicenseType": "TencentCloud", "StopChargingMode": "NOT_APPLICABLE"}],
+        "RequestId": "56a6b4c3-505a-4d23-8688-6a4ef347a873"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1589'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 16 Sep 2022 03:27:40 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"InstanceIds": ["ins-8ktxnl0g"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '33'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - TerminateInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"RequestId": "6c824065-299e-4dbd-a7f1-6acede892566"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '67'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 16 Sep 2022 03:27:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"InstanceIds": ["ins-8ktxnl0g"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '59'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 0, "InstanceSet": [], "RequestId": "96046be7-d344-4294-8827-261e8ae861cc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '103'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 16 Sep 2022 03:27:53 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

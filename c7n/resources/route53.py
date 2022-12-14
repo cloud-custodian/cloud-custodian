@@ -13,9 +13,9 @@ from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters import Filter
-
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
+from c7n.filters.related import RelatedResourceFilter
 
 
 class Route53Base:
@@ -105,6 +105,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         name = id = 'Id'
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
+        global_resource = True
 
 
 @resources.register('rrset')
@@ -117,6 +118,7 @@ class ResourceRecordSet(ChildResourceManager):
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         cfn_type = 'AWS::Route53::RecordSet'
+        global_resource = True
 
 
 @resources.register('r53domain')
@@ -460,11 +462,13 @@ def get_logging_config_paginator(client):
 @HostedZone.filter_registry.register('query-logging-enabled')
 class IsQueryLoggingEnabled(Filter):
 
-    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone')
+    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone',
+                   'logs:DescribeSubscriptionFilters')
     schema = type_schema('query-logging-enabled', state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('route53')
+        cw_client = local_session(self.manager.session_factory).client('logs')
         state = self.data.get('state', False)
         results = []
 
@@ -481,7 +485,131 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
+                r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)
             elif not logging and not state:
                 results.append(r)
+
+        return results
+
+
+@resources.register('resolver-logs')
+class ResolverQueryLogConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'query_log_config'
+        enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
+        name = 'Name'
+        id = 'Id'
+        cfn_type = 'AWS::Route53Resolver::ResolverQueryLoggingConfig'
+
+    annotation_key = 'c7n:Associations'
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+
+    def augment(self, rqlcs):
+        client = local_session(self.session_factory).client('route53resolver')
+        for rqlc in rqlcs:
+            rqlc['Tags'] = self.retry(
+                client.list_tags_for_resource,
+                ResourceArn=rqlc['Arn'])['Tags']
+            rqlc[self.annotation_key] = client.list_resolver_query_log_config_associations().get(
+                'ResolverQueryLogConfigAssociations')
+        return rqlcs
+
+
+@ResolverQueryLogConfig.action_registry.register('associate-vpc')
+class ResolverQueryLogConfigAssociate(BaseAction):
+    """Associates ResolverQueryLogConfig to a VPC
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: r53-resolver-query-log-config-associate
+            resource: resolver-logs
+            filters:
+              - type: value
+                key: 'Name'
+                op: eq
+                value: "Test-rqlc"
+            actions:
+              - type: associate-vpc
+                vpcid: all
+
+    """
+    permissions = (
+        'route53resolver:AssociateResolverQueryLogConfig',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+    schema = type_schema('associate-vpc', vpcid={'type': 'string',
+        'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'}, required=['vpcid'])
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def get_vpc_id(self):
+        vpcs = RelatedResourceFilter.get_resource_manager(self).resources()
+        if self.data.get('vpcid') == 'all':
+            vpc_ids = [v['VpcId'] for v in vpcs]
+        else:
+            vpc_ids = [self.data.get('vpcid')]
+        return vpc_ids
+
+    def is_associated(self, resource, vpc_id):
+        associated = False
+        for association in resource['c7n:Associations']:
+            if association['ResourceId'] == vpc_id:
+                associated = True
+                break
+        return associated
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        vpc_ids = self.get_vpc_id()
+
+        for resource in resources:
+            for vpc_id in vpc_ids:
+                if not self.is_associated(resource, vpc_id):
+                    client.associate_resolver_query_log_config(
+                        ResolverQueryLogConfigId=resource['Id'], ResourceId=vpc_id)
+
+
+@ResolverQueryLogConfig.filter_registry.register('is-associated')
+class LogConfigAssociationsFilter(Filter):
+    """ Checks LogConfig Associations for VPCs.
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+                - name: r53-resolver-query-log-config-associations
+                  resource: resolver-logs
+                  filters:
+                   - type: is-associated
+                     vpcid: "vpc-12345678"
+
+    """
+    permissions = ('route53resolver:ListResolverQueryLogConfigAssociations',)
+    schema = type_schema('is-associated',
+        vpcid={'type': 'string', 'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'},)
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def process(self, resources, event=None):
+        results = []
+        vpc_ids = ResolverQueryLogConfigAssociate.get_vpc_id(self)
+        for resource in resources:
+            status = True
+            for vpc_id in vpc_ids:
+                if not ResolverQueryLogConfigAssociate.is_associated(self, resource, vpc_id):
+                    status = False
+                    break
+
+            if status:
+                results.append(resource)
+
         return results

@@ -3,13 +3,15 @@
 import logging
 
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import (
+    ConfigSource, QueryResourceManager, TypeInfo, DescribeSource, RetryPageIterator)
 from c7n.resources import rds
 from c7n.filters.kms import KmsRelatedFilter
 from .aws import shape_validate
@@ -599,3 +601,60 @@ class RDSClusterSnapshotDelete(BaseAction):
             except (client.exceptions.DBSnapshotNotFoundFault,
                     client.exceptions.InvalidDBSnapshotStateFault):
                 continue
+
+
+@RDSCluster.filter_registry.register('consecutive-snapshots')
+class ConsecutiveSnapshots(Filter):
+    """Returns RDS clusters where number of consective daily snapshots is equal to/or greater
+     than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rdscluster-daily-snapshot-count
+                resource: rds-cluster
+                filters:
+                  - type: consecutive-snapshots
+                    days: 7
+    """
+    schema = type_schema('consecutive-snapshots', days={'type': 'number', 'minimum': 1},
+        required=['days'])
+    permissions = ('rds:DescribeDBClusterSnapshots', 'rds:DescribeDBClusters')
+    annotation = 'c7n:DBClusterSnapshots'
+
+    def process_resource_set(self, client, resources):
+        rds_clusters = [r['DBClusterIdentifier'] for r in resources]
+        paginator = client.get_paginator('describe_db_cluster_snapshots')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        cluster_snapshots = paginator.paginate(Filters=[{'Name': 'db-cluster-id',
+          'Values': rds_clusters}]).build_full_result().get('DBClusterSnapshots', [])
+
+        cluster_map = {}
+        for snapshot in cluster_snapshots:
+            cluster_map.setdefault(snapshot['DBClusterIdentifier'], []).append(snapshot)
+        for r in resources:
+            r[self.annotation] = cluster_map.get(r['DBClusterIdentifier'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+
+        for r in resources:
+            snapshot_dates = set()
+            for snapshot in r[self.annotation]:
+                if snapshot['Status'] == 'available':
+                    snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(snapshot_dates):
+                results.append(r)
+        return results

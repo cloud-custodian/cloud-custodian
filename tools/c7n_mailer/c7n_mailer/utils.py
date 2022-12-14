@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+import boto3
 from datetime import datetime, timedelta
 import functools
 import json
@@ -22,6 +23,36 @@ except ImportError:  # pragma: no cover
 class Providers:
     AWS = 0
     Azure = 1
+    GCP = 2
+
+
+def session_factory(mailer_config):
+    return boto3.Session(
+        region_name=mailer_config['region'],
+        profile_name=mailer_config.get('profile', None))
+
+
+def get_processor(mailer_config, logger):
+    """Find the appropriate queue processor for a given provider
+
+    Import provider-specific processor modules lazily. This way running or provisioning
+    the mailer only requires additional provider packages if they're used in the
+    mailer config.
+    """
+    provider = get_provider(mailer_config)
+
+    if provider == Providers.Azure:
+        from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+        processor = MailerAzureQueueProcessor(mailer_config, logger)
+    elif provider == Providers.GCP:
+        from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+        processor = MailerGcpQueueProcessor(mailer_config, logger)
+    elif provider == Providers.AWS:
+        from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+        aws_session = session_factory(mailer_config)
+        processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+
+    return processor
 
 
 def get_jinja_env(template_folders):
@@ -81,12 +112,11 @@ def get_rendered_jinja(
 # and this function would go through the resource and look for any tag keys
 # that match Owners or SupportTeam, and return those values as targets
 def get_resource_tag_targets(resource, target_tag_keys):
-    if 'Tags' not in resource:
+    if 'Tags' not in resource and 'labels' not in resource:
         return []
-    if isinstance(resource['Tags'], dict):
-        tags = resource['Tags']
-    else:
-        tags = {tag['Key']: tag['Value'] for tag in resource['Tags']}
+    tags = resource.get('Tags', []) or resource.get('labels', [])
+    if isinstance(tags, list):
+        tags = {tag['Key']: tag['Value'] for tag in tags}
     targets = []
     for target_tag_key in target_tag_keys:
         if target_tag_key in tags:
@@ -137,8 +167,11 @@ def get_date_time_delta(delta):
     return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
 
-def get_date_age(date):
-    return (datetime.now(tz=tzutc()) - parser.parse(date)).days
+def get_date_age(date, unit="days"):
+    delta = datetime.now(tz=tzutc()) - parser.parse(date)
+    if unit == "seconds":
+        return delta.seconds
+    return delta.days
 
 
 def format_struct(evt):
@@ -321,7 +354,7 @@ def resource_format(resource, resource_type):
             resource['QueueArn'])
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
-            resource['Name'],
+            resource.get('Name', ''),
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
@@ -354,6 +387,19 @@ def resource_format(resource, resource_type):
         return "Name: %s  RunTime: %s  \n" % (
             resource['FunctionName'],
             resource['Runtime'])
+    elif resource_type == 'service-quota':
+        try:
+            return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+                resource['c7n:UsageMetric']['quota'],
+                resource['c7n:UsageMetric']['metric']
+            )
+        except KeyError:
+            return "ServiceName: %s QuotaName: %s\n" % (
+                resource['ServiceName'],
+                resource['QuotaName'],
+            )
     else:
         return "%s" % format_struct(resource)
 
@@ -361,7 +407,8 @@ def resource_format(resource, resource_type):
 def get_provider(mailer_config):
     if mailer_config.get('queue_url', '').startswith('asq://'):
         return Providers.Azure
-
+    if mailer_config.get('queue_url', '').startswith('projects'):
+        return Providers.GCP
     return Providers.AWS
 
 
@@ -394,6 +441,9 @@ def decrypt(config, logger, session, encrypted_field):
         if provider == Providers.Azure:
             from c7n_mailer.azure_mailer.utils import azure_decrypt
             return azure_decrypt(config, logger, session, encrypted_field)
+        elif provider == Providers.GCP:
+            from c7n_mailer.gcp_mailer.utils import gcp_decrypt
+            return gcp_decrypt(config, logger, encrypted_field)
         elif provider == Providers.AWS:
             return kms_decrypt(config, logger, session, encrypted_field)
         else:

@@ -29,6 +29,10 @@
                     {
                         "Value": "vol-0f53c81b92b4ecfce", 
                         "Key": "maid-origin-volume"
+                    },
+                    {
+                        "Key": "owner",
+                        "Value": "custodian"
                     }
                 ], 
                 "Encrypted": true, 

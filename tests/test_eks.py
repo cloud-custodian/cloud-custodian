@@ -161,3 +161,27 @@ class EKS(BaseTest):
             client.describe_cluster(
                 name='devx')['cluster']['tags'],
             {'App': 'Custodian'})
+
+    def test_kms_filter(self):
+        factory = self.replay_flight_data('test_eks_kms_filter')
+        kms = factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-kms-filter',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/eks)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        kmsKeyId = resources[0]['encryptionConfig'][0]['provider']['keyArn']
+        aliases = kms.list_aliases(KeyId=kmsKeyId)
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')

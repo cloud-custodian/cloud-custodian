@@ -257,6 +257,7 @@ class User(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        config_id = 'UserId'
 
     source_mapping = {
         'describe': DescribeUser,
@@ -440,6 +441,7 @@ class InstanceProfile(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+        cfn_type = 'AWS::IAM::InstanceProfile'
 
 
 @resources.register('iam-certificate')
@@ -701,9 +703,19 @@ class CheckPermissions(Filter):
         actions = self.data['actions']
         matcher = self.get_eval_matcher()
         operator = self.data.get('match-operator', 'and') == 'and' and all or any
-
         arn_resources = list(zip(self.get_iam_arns(resources), resources))
-        self.initialize_boundaries(client, arn_resources)
+
+        # To ignore permission boundaries, override with an allow-all policy
+        self.simulation_boundary_override = '''
+            {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Action": "*",
+                    "Resource": "*"
+                }]
+            }
+        ''' if not self.data.get('boundaries', True) else None
         results = []
         eval_cache = {}
         for arn, r in arn_resources:
@@ -726,49 +738,6 @@ class CheckPermissions(Filter):
                 results.append(r)
         return results
 
-    def initialize_boundaries(self, client, iam_resources):
-        """For IAM boundaries we need to retrieve boundary policy content.
-        """
-        # boundaries aren't attached to these.
-        if (self.manager.type in ('iam-policy', 'iam-group') or
-                self.data.get('boundary', True) is False):
-            return
-
-        # if boundary attributes aren't directly on the resource, fetch
-        # the iam role for the resource to get the boundary.
-        if self.manager.type not in ('iam-role', 'iam-user'):
-            iam_arns = {iam_arn for iam_arn, r in iam_resources if iam_arn is not None}
-            roles = self.manager.get_resource_manager(
-                'iam-role').get_resources(list(iam_arns), augment=False)
-            boundary_iam_map = {
-                r['Arn']: r.get('PermissionsBoundary', {}).get('PermissionsBoundaryArn')
-                for r in roles}
-            boundary_map = {}
-            for iam_arn, r in iam_resources:
-                boundary_map[self.manager.get_arns((r,))[0]] = boundary_iam_map.get(iam_arn)
-        else:
-            boundary_map = {
-                resource_arn: r.get('PermissionsBoundary', {}).get('PermissionsBoundaryArn')
-                for resource_arn, r in iam_resources}
-
-        # fetch boundary policies text
-        boundary_arns = set(boundary_map.values())
-        if None in boundary_arns:
-            boundary_arns.remove(None)
-        policies = self.manager.get_resource_manager(
-            'iam-policy').get_resources(list(boundary_arns))
-        boundaries = {}
-        for p in policies:
-            boundaries[p['Arn']] = json.dumps(client.get_policy_version(
-                PolicyArn=p['Arn'],
-                VersionId=p['DefaultVersionId'])['PolicyVersion']['Document'])
-
-        for resource_arn, boundary_arn in list(boundary_map.items()):
-            if boundary_arn is None:
-                continue
-            boundary_map[resource_arn] = boundaries[boundary_arn]
-        self.boundaries = boundary_map
-
     def get_iam_arns(self, resources):
         return self.manager.get_arns(resources)
 
@@ -789,11 +758,16 @@ class CheckPermissions(Filter):
             PolicySourceArn=arn,
             ActionNames=actions,
             ignore_err_codes=('NoSuchEntity',))
-        if self.boundaries:
-            boundary_policy = self.boundaries.get(
-                self.manager.get_arns([r])[0])
-            if boundary_policy:
-                params['PermissionsBoundaryPolicyInputList'] = [boundary_policy]
+
+        # simulate_principal_policy() respects permission boundaries by default. To opt out of
+        # considering boundaries for this filter, we can provide an allow-all policy
+        # as the boundary.
+        #
+        # Note: Attempting to use an empty list for the boundary seems like a reasonable
+        # impulse too, but that seems to cause the simulator to fall back to its default
+        # of using existing boundaries.
+        if self.simulation_boundary_override:
+            params['PermissionsBoundaryPolicyInputList'] = [self.simulation_boundary_override]
 
         evaluations = (self.manager.retry(
             client.simulate_principal_policy,
@@ -1109,29 +1083,46 @@ class SetPolicy(BaseAction):
         arn={'type': 'string'},
         required=['state', 'arn'])
 
-    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy', "iam:ListAttachedRolePolicies",)
 
     def validate(self):
         if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
             raise PolicyValidationError(
                 '* operator is not supported for state: attached on %s' % (self.manager.data))
 
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_role_policy(
+            RoleName=resource['RoleName'],
+            PolicyArn=policy_arn
+        )
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_role_policy(
+                RoleName=resource['RoleName'],
+                PolicyArn=policy_arn
+            )
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
+        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        return policy_arns
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
+        if policy_arn != "*" and not policy_arn.startswith('arn'):
+            policy_arn = 'arn:{}:iam::{}:policy/{}'.format(
+                get_partition(self.manager.config.region),
+                self.manager.account_id, policy_arn)
         state = self.data['state']
         for r in resources:
             if state == 'attached':
-                client.attach_role_policy(
-                    RoleName=r['RoleName'],
-                    PolicyArn=policy_arn)
+                self.attach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn != "*":
-                try:
-                    client.detach_role_policy(
-                        RoleName=r['RoleName'],
-                        PolicyArn=policy_arn)
-                except client.exceptions.NoSuchEntityException:
-                    continue
+                self.detach_policy(client, r, policy_arn)
             elif state == 'detached' and policy_arn == "*":
                 try:
                     self.detach_all_policies(client, r)
@@ -1139,10 +1130,58 @@ class SetPolicy(BaseAction):
                     continue
 
     def detach_all_policies(self, client, resource):
-        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
-        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        policy_arns = self.list_attached_policies(client, resource)
         for parn in policy_arns:
-            client.detach_role_policy(RoleName=resource['RoleName'], PolicyArn=parn)
+            self.detach_policy(client, resource, parn)
+
+
+@Group.action_registry.register("set-policy")
+class SetGroupPolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on a group.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-group-policy
+          resource: iam-group
+          actions:
+            - type: set-policy
+              state: detached
+              arn: "*"
+            - type: set-policy
+              state: attached
+              arn: arn:aws:iam::{account_id}:policy/my-iam-policy
+
+    """
+
+    permissions = (
+        "iam:AttachGroupPolicy", "iam:DetachGroupPolicy", "iam:ListAttachedGroupPolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_group_policy(
+            GroupName=resource["GroupName"], PolicyArn=policy_arn)
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_group_policy(
+                GroupName=resource["GroupName"], PolicyArn=policy_arn)
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_group_policies(
+            GroupName=resource["GroupName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
 
 
 @Role.action_registry.register('delete')
@@ -1466,6 +1505,62 @@ class UnusedInstanceProfiles(IamRoleUsage):
         return results
 
 
+@InstanceProfile.action_registry.register('set-role')
+class InstanceProfileSetRole(BaseAction):
+    """Upserts specified role name for IAM instance profiles.
+       Instance profile roles are removed when empty role name is specified.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profile-set-role
+            resource: iam-profile
+            actions:
+                - type: set-role
+                  role: my-test-role
+    """
+
+    schema = type_schema('set-role',
+    role={'type': 'string'})
+    permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
+
+    def add_role(self, client, resource, role):
+        self.manager.retry(
+            client.add_role_to_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=role
+        )
+        return
+
+    def remove_role(self, client, resource):
+        self.manager.retry(
+            client.remove_role_from_instance_profile,
+            InstanceProfileName=resource['InstanceProfileName'],
+            RoleName=resource['Roles'][0]['RoleName']
+        )
+        return
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        role = self.data.get('role', '')
+        for r in resources:
+            if not role:
+                if len(r['Roles']) == 0:
+                    continue
+                else:
+                    self.remove_role(client, r)
+            else:
+                if len(r['Roles']) == 0:
+                    self.add_role(client, r, role)
+                elif role == r['Roles'][0]['RoleName']:
+                    continue
+                else:
+                    self.remove_role(client, r)
+                    self.add_role(client, r, role)
+
+
 ###################
 #    IAM Users    #
 ###################
@@ -1568,20 +1663,25 @@ class CredentialReport(Filter):
         return self.schema['properties'][k]['default']
 
     def get_credential_report(self):
-        report = self.manager._cache.get('iam-credential-report')
-        if report:
-            return report
-        data = self.fetch_credential_report()
-        report = {}
-        if isinstance(data, bytes):
-            reader = csv.reader(io.StringIO(data.decode('utf-8')))
-        else:
-            reader = csv.reader(io.StringIO(data))
-        headers = next(reader)
-        for line in reader:
-            info = dict(zip(headers, line))
-            report[info['user']] = self.process_user_record(info)
-        self.manager._cache.save('iam-credential-report', report)
+        cache = self.manager._cache
+        with cache:
+            cache_key = {'account': self.manager.config.account_id, 'iam-credential-report': True}
+            report = cache.get(cache_key)
+
+            if report:
+                return report
+            data = self.fetch_credential_report()
+            report = {}
+            if isinstance(data, bytes):
+                reader = csv.reader(io.StringIO(data.decode('utf-8')))
+            else:
+                reader = csv.reader(io.StringIO(data))
+            headers = next(reader)
+            for line in reader:
+                info = dict(zip(headers, line))
+                report[info['user']] = self.process_user_record(info)
+            cache.save(cache_key, report)
+
         return report
 
     @classmethod
@@ -1610,9 +1710,15 @@ class CredentialReport(Filter):
         try:
             report = client.get_credential_report()
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ReportNotPresent':
+            if e.response['Error']['Code'] == 'ReportNotPresent':
+                report = None
+            elif e.response['Error']['Code'] == 'ReportInProgress':
+                # Someone else asked for the report before it was done. Wait
+                # for it again.
+                time.sleep(self.get_value_or_schema_default('report_delay'))
+                report = client.get_credential_report()
+            else:
                 raise
-            report = None
         if report:
             threshold = datetime.datetime.now(tz=tzutc()) - timedelta(
                 seconds=self.get_value_or_schema_default(
@@ -1923,6 +2029,57 @@ class UserSSHKeyFilter(ValueFilter):
             matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
             self.merge_annotation(r, self.matched_annotation_key, matched_keys)
             if matched_keys:
+                matched.append(r)
+        return matched
+
+
+@User.filter_registry.register('login-profile')
+class UserLoginProfile(ValueFilter):
+    """Filter IAM users that have an associated login-profile
+
+    For quicker evaluation and reduced API traffic, it is recommended to
+    instead use the 'credential' filter with 'password_enabled': true when
+    a delay of up to four hours for credential report syncing is acceptable.
+
+    (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: iam-users-with-console-access
+            resource: iam-user
+            filters:
+              - type: login-profile
+    """
+
+    schema = type_schema('login-profile', rinherit=ValueFilter.schema)
+    permissions = ('iam:GetLoginProfile',)
+    annotation_key = 'c7n:LoginProfile'
+
+    def user_login_profiles(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u[self.annotation_key] = False
+            try:
+                login_profile_resp = client.get_login_profile(UserName=u['UserName'])
+                if u['UserName'] == login_profile_resp['LoginProfile']['UserName']:
+                    u[self.annotation_key] = True
+            except ClientError as e:
+                if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                    raise
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users for login profile" % len(resources))
+            list(w.map(self.user_login_profiles, user_set))
+
+        matched = []
+        for r in resources:
+            if r[self.annotation_key]:
                 matched.append(r)
         return matched
 
@@ -2385,6 +2542,43 @@ def resolve_credential_keys(m_keys, keys):
 #################
 
 
+@Group.filter_registry.register('has-specific-managed-policy')
+class SpecificIamGroupManagedPolicy(Filter):
+    """Filter IAM groups that have a specific policy attached
+
+    For example, if the user wants to check all groups with 'admin-policy':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-groups-have-admin
+            resource: iam-group
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedGroupPolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_group_policies(
+            GroupName=resource['GroupName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            results = []
+            for r in resources:
+                r["ManagedPolicies"] = self._managed_policies(c, r)
+                if self.data.get('value') in r["ManagedPolicies"]:
+                    results.append(r)
+            return results
+        return []
+
+
 @Group.filter_registry.register('has-users')
 class IamGroupUsers(Filter):
     """Filter IAM groups that have users attached based on True/False value:
@@ -2620,3 +2814,41 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@InstanceProfile.filter_registry.register('has-specific-managed-policy')
+class SpecificIamProfileManagedPolicy(Filter):
+    """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
+       policy. If an IAM instance profile does not contain an IAM role, then it will be treated
+       as not having the policy.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profile-has-admin-policy
+            resource: iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, role_name):
+        attached_policies = client.list_attached_role_policies(
+            RoleName=role_name)['AttachedPolicies']
+        return [p['PolicyName'] for p in attached_policies]
+
+    def has_managed_policy(self, client, resource):
+        for role in resource.get('Roles', []):
+            managed_policies = self._managed_policies(client, role.get('RoleName'))
+            if self.data.get('value') in managed_policies:
+                return True
+        return False
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        return [r for r in resources if self.has_managed_policy(c, r)]
