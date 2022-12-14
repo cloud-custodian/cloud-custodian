@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServerId": "s-04070bd555b846c98",
+        "Users": [
+            {
+                "Arn": "arn:aws:transfer:us-east-1:644160558196:user/s-04070bd555b846c98/test",
+                "HomeDirectoryType": "PATH",
+                "Role": "arn:aws:iam::644160558196:role/role",
+                "SshPublicKeyCount": 0,
+                "UserName": "test"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
