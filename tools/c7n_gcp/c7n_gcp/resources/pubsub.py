@@ -16,10 +16,8 @@ class PubSubTypeInfo(TypeInfo):
     version = 'v1'
     scope_template = 'projects/{}'
     name = id = "name"
+    urn_id_segments = (-1,)
 
-    @classmethod
-    def _get_id(cls, resource):
-        return resource["name"].split('/')[-1]
 
 @resources.register('pubsub-topic')
 class PubSubTopic(QueryResourceManager):

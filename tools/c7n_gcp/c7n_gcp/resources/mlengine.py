@@ -24,6 +24,7 @@ class MLModel(QueryResourceManager):
             id, name, "description", "onlinePredictionLogging"]
         get_requires_event = True
         urn_component = "model"
+        urn_id_segments = (-1,)
 
         @staticmethod
         def get(client, event):
@@ -31,10 +32,6 @@ class MLModel(QueryResourceManager):
                 'get', {'name': jmespath.search(
                     'protoPayload.response.name', event
                 )})
-
-        @classmethod
-        def _get_id(cls, resource):
-            return resource["name"].split('/')[-1]
 
 
 @resources.register('ml-job')

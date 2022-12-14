@@ -138,6 +138,7 @@ class ServiceAccountKey(ChildResourceManager):
         permissions = ("iam.serviceAccounts.list",)
         metric_key = 'metric.labels.key_id'
         urn_component = "service-account-key"
+        urn_id_segments = (3, 5)
 
         @staticmethod
         def get(client, resource_info):
@@ -152,11 +153,6 @@ class ServiceAccountKey(ChildResourceManager):
         @staticmethod
         def get_metric_resource_name(resource):
             return resource["name"].split('/')[-1]
-
-        @classmethod
-        def _get_id(cls, resource):
-            parts =resource["name"].rsplit('/')
-            return f"{parts[3]}/{parts[5]}"
 
 
 @ServiceAccountKey.action_registry.register('delete')
@@ -187,6 +183,7 @@ class Role(QueryResourceManager):
         urn_component = "role"
         # Don't show the project ID in the URN.
         urn_has_project = False
+        urn_id_segments = (-1,)
 
         @staticmethod
         def get(client, resource_info):
@@ -194,7 +191,3 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
-
-        @classmethod
-        def _get_id(cls, resource):
-            return resource["name"].split('/',1)[-1]

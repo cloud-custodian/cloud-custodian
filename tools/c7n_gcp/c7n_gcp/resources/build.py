@@ -19,3 +19,4 @@ class CloudBuild(QueryResourceManager):
         permissions = ('cloudbuild.builds.list',)
 
         # Lacking a test so can't confirm any URN.
+        urn_component = "build"

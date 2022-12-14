@@ -53,7 +53,7 @@ class AppEngineChildTypeInfo(ChildTypeInfo):
     @classmethod
     def _get_location(cls, resource):
         "Get the region from the parent."
-        return resource["c7n:app-engine"]["locationId"]
+        return cls.get_parent(resource)["locationId"]
 
 
 @resources.register('app-engine-certificate')
