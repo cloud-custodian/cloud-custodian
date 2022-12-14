@@ -17,7 +17,7 @@
                     "SourceIdentifier": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
                 },
                 "InputParameters": "{}",
-                "ConfigRuleState": "ACTIVE",
+                "ConfigRuleState": "DELETING",
                 "EvaluationModes": [
                     {
                         "Mode": "DETECTIVE"

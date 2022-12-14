@@ -23,7 +23,7 @@
                 "Automatic": true,
                 "MaximumAutomaticAttempts": 5,
                 "RetryAttemptSeconds": 211,
-                "Arn": "arn:aws:config:us-east-1:644160558196:remediation-configuration/test-enable-config-managed-rule/d8a3b47b-bbeb-4995-9601-5af6d674db07"
+                "Arn": "arn:aws:config:us-east-1:644160558196:remediation-configuration/test-enable-config-managed-rule/f5e5f48d-45e5-4e1b-bf6e-9af5d222ad38"
             }
         ],
         "ResponseMetadata": {}

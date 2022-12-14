@@ -174,3 +174,29 @@ class ConfigRuleTest(BaseTest):
             resources[0]['ConfigRuleName'],
             'custodian-config-managed-s3-bucket-public-write-remediate-event'
         )
+
+    def test_remediation_no_results(self):
+        session_factory = self.replay_flight_data("test_config_rule_remediation")
+        policy = {
+            "name": "rule",
+            "resource": "config-rule",
+            "filters": [
+                {
+                    "type": "remediation",
+                    "rule_name": "i-dont-exist",
+                }
+            ]
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Provide a valid rule name match but non-matching remediation config
+        policy['filters'][0]['rule_name'] = 'config-managed-s3-bucket-public-write-remediate-event'
+        policy['filters'][0]['remediation'] = {
+            "TargetId": "intentionally-incorrect-target",
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

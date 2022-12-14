@@ -6,6 +6,7 @@ import json
 import time
 import datetime
 import jmespath
+from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -2038,15 +2039,20 @@ class ToggleConfigManagedRule(BaseAction):
         required=['rule_name'],
     )
 
+    def validate(self):
+        if (
+            self.data.get('enabled', True) and
+            not self.data.get('managed_rule_id')
+        ):
+            raise PolicyValidationError("managed_rule_id required to enable a managed rule")
+        return self
+
     def process(self, accounts):
         client = local_session(self.manager.session_factory).client('config')
         rule = self.ConfigManagedRule(self.data)
         params = self.get_rule_params(rule)
 
         if self.data.get('enabled', True):
-            if not rule.managed_rule_id:
-                raise PolicyValidationError("missing managed config rule id")
-
             client.put_config_rule(**params)
 
             if rule.remediation:
@@ -2055,19 +2061,15 @@ class ToggleConfigManagedRule(BaseAction):
                     RemediationConfigurations=[remediation_params]
                 )
         else:
-            try:
+            with suppress(client.exceptions.NoSuchRemediationConfigurationException):
                 client.delete_remediation_configuration(
                     ConfigRuleName=rule.name
                 )
-            except client.exceptions.NoSuchRemediationConfigurationException:
-                pass
 
-            try:
+            with suppress(client.exceptions.NoSuchConfigRuleException):
                 client.delete_config_rule(
                     ConfigRuleName=rule.name
                 )
-            except client.exceptions.NoSuchConfigRuleException:
-                pass
 
     def get_rule_params(self, rule):
         params = dict(
