@@ -412,8 +412,6 @@ class TypeInfo(metaclass=TypeMeta):
 
         If the region is "global" then it is omitted from the URN.
         """
-        from pprint import pprint
-        pprint(resources)
         return [cls._get_urn(r, project_id) for r in resources]
 
     @classmethod
