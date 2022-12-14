@@ -24,7 +24,7 @@ class MLModel(QueryResourceManager):
             id, name, "description", "onlinePredictionLogging"]
         get_requires_event = True
         urn_component = "model"
-        urn_id_segments = (-1,)
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, event):

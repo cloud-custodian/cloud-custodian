@@ -16,7 +16,7 @@ class PubSubTypeInfo(TypeInfo):
     version = 'v1'
     scope_template = 'projects/{}'
     name = id = "name"
-    urn_id_segments = (-1,)
+    urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
 
 @resources.register('pubsub-topic')

@@ -25,7 +25,7 @@ class KmsKeyRing(QueryResourceManager):
             "name", "createTime"]
         asset_type = "cloudkms.googleapis.com/KeyRing"
         urn_component = "keyring"
-        urn_id_segments = (-1,)
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):

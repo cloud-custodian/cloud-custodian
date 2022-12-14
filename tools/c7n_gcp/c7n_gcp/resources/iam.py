@@ -26,7 +26,7 @@ class ProjectRole(QueryResourceManager):
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
         urn_component = "project-role"
-        urn_id_segments = (-1,)
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -183,7 +183,7 @@ class Role(QueryResourceManager):
         urn_component = "role"
         # Don't show the project ID in the URN.
         urn_has_project = False
-        urn_id_segments = (-1,)
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
