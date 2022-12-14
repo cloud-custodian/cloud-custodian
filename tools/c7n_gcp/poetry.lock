@@ -33,6 +33,10 @@ description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
+files = [
+    {file = "boto3-1.26.29-py3-none-any.whl", hash = "sha256:2e5e80daae3873185b046d1fabc13676aea519e891faf4f27ca71d287bc26039"},
+    {file = "boto3-1.26.29.tar.gz", hash = "sha256:4fb4a0ce2679e5dc1719441192b45687654201d5de76224f2c376b689c9ed4aa"},
+]
 
 [package.dependencies]
 botocore = ">=1.29.29,<1.30.0"
@@ -49,6 +53,10 @@ description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
+files = [
+    {file = "botocore-1.29.29-py3-none-any.whl", hash = "sha256:dca2daf108aae6c847d8ec99b7e918b46ae81713bf70b2199ab94627faf935a1"},
+    {file = "botocore-1.29.29.tar.gz", hash = "sha256:97a6d059e688ff9caa7c0a4e30cc58fa27be8bf3347578ce7c62fb808380fb55"},
+]
 
 [package.dependencies]
 jmespath = ">=0.7.1,<2.0.0"
@@ -185,6 +193,10 @@ description = "Google API Client Library for Python"
 category = "main"
 optional = false
 python-versions = ">=3.7"
+files = [
+    {file = "google-api-python-client-2.70.0.tar.gz", hash = "sha256:262de094d5a30d337f59e66581019fed45b698c078397ac48dd323c0968236e7"},
+    {file = "google_api_python_client-2.70.0-py2.py3-none-any.whl", hash = "sha256:67da78956f2bf4b763305cd791aeab250878c1f88f1422aaba4682a608b8e5a4"},
+]
 
 [package.dependencies]
 google-api-core = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev"
@@ -1078,21 +1090,35 @@ proto-plus = [
     {file = "proto-plus-1.22.1.tar.gz", hash = "sha256:6c7dfd122dfef8019ff654746be4f5b1d9c80bba787fe9611b508dd88be3a2fa"},
     {file = "proto_plus-1.22.1-py3-none-any.whl", hash = "sha256:ea8982669a23c379f74495bc48e3dcb47c822c484ce8ee1d1d7beb339d4e34c5"},
 ]
-protobuf = [
-    {file = "protobuf-4.21.11-cp310-abi3-win32.whl", hash = "sha256:25266bf373ee06d5d66f9eb1ec9d434b243dccce5c32faf151054cfa6f9dcbf1"},
-    {file = "protobuf-4.21.11-cp310-abi3-win_amd64.whl", hash = "sha256:260e346927fd4e6fbb49ab545137b19610c24a1d853dc5f29ddf777ab1987211"},
-    {file = "protobuf-4.21.11-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:4d01ef83517c181d60ea1c6d0b2f644be250ade740d6554a2f5a021b1ad622e3"},
-    {file = "protobuf-4.21.11-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:a5a14b907a191319e7a58b38c583bbf50deb21e002f723a912c5e4f6969a778e"},
-    {file = "protobuf-4.21.11-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:553e35c0878f6855e55f01a14561e6bce6df79b6636a5acf83b9d9ac7eab7922"},
-    {file = "protobuf-4.21.11-cp37-cp37m-win32.whl", hash = "sha256:4b75c947289a2e9c1f37d21c593f1ef6fb4fed33977dfb2ac84f799eb29a8ff4"},
-    {file = "protobuf-4.21.11-cp37-cp37m-win_amd64.whl", hash = "sha256:efb16b16fd3eef25357f84d516062753014b76279ce4e0ec4880badd2fba7370"},
-    {file = "protobuf-4.21.11-cp38-cp38-win32.whl", hash = "sha256:d91a47c77b33580024b0271b65bb820c4e0264c25eb49151ad01e691de8fa0b6"},
-    {file = "protobuf-4.21.11-cp38-cp38-win_amd64.whl", hash = "sha256:bab4b21a986ded225b9392c07ce21c35d790951f51e1ebfd32e4d443b05c3726"},
-    {file = "protobuf-4.21.11-cp39-cp39-win32.whl", hash = "sha256:c3b9e329b4c247dc3ba5c50f60915a84e08278eb6d9e3fa674d0d04ff816bfd7"},
-    {file = "protobuf-4.21.11-cp39-cp39-win_amd64.whl", hash = "sha256:85ccb4753ee21de7dc81a7a68a051f25dbe133ffa01a639ac998427d0b223387"},
-    {file = "protobuf-4.21.11-py2.py3-none-any.whl", hash = "sha256:4922e3320ed70e81f05060822da36923d09fd9e04e17f411f2d8d8d0070f9f5c"},
-    {file = "protobuf-4.21.11-py3-none-any.whl", hash = "sha256:a944dc9550baae276afc7dc8193191d4c2ad660270a1e5ed5a71539817ebe2e2"},
-    {file = "protobuf-4.21.11.tar.gz", hash = "sha256:2c6a4d13732d9b094db31b3841986c38b17ac61a3fe05ee26a779d94c4c3fb43"},
+
+[package.dependencies]
+protobuf = ">=3.19.0,<5.0.0dev"
+
+[package.extras]
+testing = ["google-api-core[grpc] (>=1.31.5)"]
+
+[[package]]
+name = "protobuf"
+version = "4.21.12"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "protobuf-4.21.12-cp310-abi3-win32.whl", hash = "sha256:b135410244ebe777db80298297a97fbb4c862c881b4403b71bac9d4107d61fd1"},
+    {file = "protobuf-4.21.12-cp310-abi3-win_amd64.whl", hash = "sha256:89f9149e4a0169cddfc44c74f230d7743002e3aa0b9472d8c28f0388102fc4c2"},
+    {file = "protobuf-4.21.12-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:299ea899484ee6f44604deb71f424234f654606b983cb496ea2a53e3c63ab791"},
+    {file = "protobuf-4.21.12-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:d1736130bce8cf131ac7957fa26880ca19227d4ad68b4888b3be0dea1f95df97"},
+    {file = "protobuf-4.21.12-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:78a28c9fa223998472886c77042e9b9afb6fe4242bd2a2a5aced88e3f4422aa7"},
+    {file = "protobuf-4.21.12-cp37-cp37m-win32.whl", hash = "sha256:3d164928ff0727d97022957c2b849250ca0e64777ee31efd7d6de2e07c494717"},
+    {file = "protobuf-4.21.12-cp37-cp37m-win_amd64.whl", hash = "sha256:f45460f9ee70a0ec1b6694c6e4e348ad2019275680bd68a1d9314b8c7e01e574"},
+    {file = "protobuf-4.21.12-cp38-cp38-win32.whl", hash = "sha256:6ab80df09e3208f742c98443b6166bcb70d65f52cfeb67357d52032ea1ae9bec"},
+    {file = "protobuf-4.21.12-cp38-cp38-win_amd64.whl", hash = "sha256:1f22ac0ca65bb70a876060d96d914dae09ac98d114294f77584b0d2644fa9c30"},
+    {file = "protobuf-4.21.12-cp39-cp39-win32.whl", hash = "sha256:27f4d15021da6d2b706ddc3860fac0a5ddaba34ab679dc182b60a8bb4e1121cc"},
+    {file = "protobuf-4.21.12-cp39-cp39-win_amd64.whl", hash = "sha256:237216c3326d46808a9f7c26fd1bd4b20015fb6867dc5d263a493ef9a539293b"},
+    {file = "protobuf-4.21.12-py2.py3-none-any.whl", hash = "sha256:a53fd3f03e578553623272dc46ac2f189de23862e68565e83dde203d41b76fc5"},
+    {file = "protobuf-4.21.12-py3-none-any.whl", hash = "sha256:b98d0148f84e3a3c569e19f52103ca1feacdac0d2df8d6533cf983d1fda28462"},
+    {file = "protobuf-4.21.12.tar.gz", hash = "sha256:7cd532c4566d0e6feafecc1059d04c7915aec8e182d1cf7adee8b24ef1e2e6ab"},
 ]
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.py3-none-any.whl", hash = "sha256:39c7e2ec30515947ff4e87fb6f456dfc6e84857d34be479c9d4a4ba4bf46aa5d"},
