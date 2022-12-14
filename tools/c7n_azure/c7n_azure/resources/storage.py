@@ -17,8 +17,7 @@ from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
-                               ValueFilter, Filter)
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -552,35 +551,35 @@ class RequireSecureTransferAction(AzureBaseAction):
         )
 
 
-@Storage.filter_registry.register('soft-delete')
-class SoftDeleteFilter(Filter):
+@Storage.filter_registry.register('blob-services')
+class BlobServicesFilter(ValueFilter):
     """
-    Filter by the current soft delete
+    Filter by the current blob services
     configuration for this storage account.
     :example:
     Find storage accounts with blob services soft delete disabled
+    or retention less than 7 days
     .. code-block:: yaml
         policies:
           - name: storage-no-soft-delete
             resource: azure.storage
             filters:
-              - type: soft-delete
-                enabled: false
+              - or:
+                  - type: blob-services
+                    key: deleteRetentionPolicy.enabled
+                    value: false
+                  - type: blob-services
+                    key: deleteRetentionPolicy.days
+                    value: 7
+                    op: lt
     """
 
-    schema = type_schema(
-        'soft-delete',
-        required=['type', 'enabled'],
-        **{
-            'enabled': {"type": "boolean"},
-        }
-    )
+    schema = type_schema('blob-services', rinherit=ValueFilter.schema)
 
-    log = logging.getLogger('custodian.azure.storage.soft-delete-filter')
+    log = logging.getLogger('custodian.azure.storage.blob-services-filter')
 
     def __init__(self, data, manager=None):
-        super(SoftDeleteFilter, self).__init__(data, manager)
-        self.enabled = self.data['enabled']
+        super(BlobServicesFilter, self).__init__(data, manager)
 
     def process(self, resources, event=None):
         resources, exceptions = ThreadHelper.execute_in_parallel(
@@ -606,8 +605,11 @@ class SoftDeleteFilter(Filter):
                 resource['properties']['c7n:blobServices'] = \
                     blob_services.serialize(True).get('properties', {})
 
-            if resource['properties']['c7n:blobServices']\
-                    .get('deleteRetentionPolicy').get('enabled') == self.enabled:
+            filtered_resources = super(BlobServicesFilter, self).process(
+                [resource['properties']['c7n:blobServices']],
+                event)
+
+            if filtered_resources:
                 result.append(resource)
 
         return result

@@ -650,9 +650,9 @@ class StorageTest(BaseTest):
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
 
-    def test_storage_soft_delete(self):
+    def test_storage_blob_services(self):
         p = self.load_policy({
-            'name': 'test-azure-storage-blob',
+            'name': 'test-azure-blob-services',
             'resource': 'azure.storage',
             'filters': [
                 {'type': 'value',
@@ -660,8 +660,9 @@ class StorageTest(BaseTest):
                 'op': 'glob',
                 'value_type': 'normalize',
                 'value': 'cctstorage*'},
-                {'type': 'soft-delete',
-                'enabled': True}],
+                {'type': 'blob-services',
+                 'key': 'deleteRetentionPolicy.enabled',
+                 'value': True}],
         }, validate=True)
 
         resources = p.run()
