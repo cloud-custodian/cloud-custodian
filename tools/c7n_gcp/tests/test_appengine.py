@@ -147,7 +147,6 @@ class AppEngineDomainMappingTest(BaseTest):
             ["gcp:appengine:europe-west3:cloud-custodian:domain-mapping/alex.gcp-li.ga"],
         )
 
-
     def test_domain_mapping_get(self):
         project_id = 'cloud-custodian'
         app_name = 'apps/' + project_id

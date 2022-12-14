@@ -242,7 +242,7 @@ class SpannerDatabaseInstanceTest(BaseTest):
             policy.resource_manager.get_urns(resources),
             [
                 "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-database",
-                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-favorite-database",
+                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-favorite-database",  # noqa: E501
             ],
         )
 

@@ -27,7 +27,7 @@ class InstanceTest(BaseTest):
                 'gcp:compute:us-central1-b:cloud-custodian:instance/drone',
                 'gcp:compute:us-east1-d:cloud-custodian:instance/custodian',
             ],
-       )
+        )
 
     def test_instance_get(self):
         factory = self.replay_flight_data('instance-get')
@@ -217,7 +217,7 @@ class DiskTest(BaseTest):
                 'gcp:compute:us-central1-b:cloud-custodian:disk/drone',
                 'gcp:compute:us-central1-b:cloud-custodian:disk/drone-11-1'
             ],
-       )
+        )
 
     def test_disk_snapshot(self):
         factory = self.replay_flight_data('disk-snapshot', project_id='cloud-custodian')
@@ -305,7 +305,7 @@ class SnapshotTest(BaseTest):
             [
                 'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
-       )
+        )
 
     def test_snapshot_delete(self):
         factory = self.replay_flight_data(
@@ -324,7 +324,7 @@ class SnapshotTest(BaseTest):
             [
                 'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
-       )
+        )
 
 
 class ImageTest(BaseTest):

@@ -144,7 +144,7 @@ class KmsCryptoKeyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',  # noqa: E501
             ],
         )
 
@@ -177,7 +177,7 @@ class KmsCryptoKeyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',  # noqa: E501
             ],
         )
 
@@ -245,7 +245,7 @@ class KmsCryptoKeyVersionTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
             ],
         )
 
@@ -281,6 +281,6 @@ class KmsCryptoKeyVersionTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
             ],
         )

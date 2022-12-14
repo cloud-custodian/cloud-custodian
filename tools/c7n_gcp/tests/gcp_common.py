@@ -17,7 +17,6 @@ from c7n.testing import (
 )
 
 from c7n_gcp.client import Session, LOCAL_THREAD
-from c7n_gcp.provider import GoogleCloud
 
 from recorder import (
     HttpRecorder,

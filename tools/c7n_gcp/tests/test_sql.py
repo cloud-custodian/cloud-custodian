@@ -225,7 +225,7 @@ class SqlBackupRunTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1555592400197",
+                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1555592400197",  # noqa: E501
             ],
         )
 
@@ -254,7 +254,7 @@ class SqlBackupRunTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1557489381417",
+                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1557489381417",  # noqa: E501
             ],
         )
 
@@ -294,7 +294,7 @@ class SqlSslCertTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/62a43e710693b34d5fdb34911a656fd7a3b76cc7",
+                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/62a43e710693b34d5fdb34911a656fd7a3b76cc7",  # noqa: E501
             ],
         )
 
@@ -323,6 +323,6 @@ class SqlSslCertTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",
+                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
             ],
         )

@@ -601,7 +601,7 @@ class LoadBalancingTargetHttpProxyTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(instances),
             [
-                'gcp:compute::cloud-custodian:target-http-proxy/custodian-load-balancer-0-target-proxy',
+                'gcp:compute::cloud-custodian:target-http-proxy/custodian-load-balancer-0-target-proxy',  # noqa: E501
             ],
         )
 
@@ -687,7 +687,7 @@ class LoadBalancingTargetInstanceTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns(instances),
             [
-                'gcp:compute:us-central1-c:cloud-custodian:target-instance/custodian-target-instance-1',
+                'gcp:compute:us-central1-c:cloud-custodian:target-instance/custodian-target-instance-1',  # noqa: E501
             ],
         )
 

@@ -34,6 +34,7 @@ class ProjectRoleTest(BaseTest):
             ],
         )
 
+
 class ServiceAccountTest(BaseTest):
 
     def test_get(self):
@@ -53,7 +54,7 @@ class ServiceAccountTest(BaseTest):
             p.resource_manager.get_urns([resource]),
             [
                 # NOTE: compare 'custodian-1291' with email given above.
-                'gcp:iam::cloud-custodian:service-account/devtest@custodian-1291.iam.gserviceaccount.com'
+                'gcp:iam::cloud-custodian:service-account/devtest@custodian-1291.iam.gserviceaccount.com'  # noqa: E501
             ],
         )
 
@@ -128,8 +129,8 @@ class ServiceAccountKeyTest(BaseTest):
         self.assertEqual(
             policy.resource_manager.get_urns(resources),
             [
-                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/1',
-                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2',
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/1',  # noqa: E501
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2',  # noqa: E501
             ],
         )
 
@@ -148,7 +149,7 @@ class ServiceAccountKeyTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_urns([resource]),
             [
-                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2222',
+                'gcp:iam::cloud-custodian:service-account-key/test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com/2222',  # noqa: E501
             ],
         )
 

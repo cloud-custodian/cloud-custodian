@@ -81,7 +81,6 @@ class AppEngineCertificate(ChildResourceManager):
                                                 'authorizedCertificatesId': cert_id})
 
 
-
 @resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
     """GCP resource:

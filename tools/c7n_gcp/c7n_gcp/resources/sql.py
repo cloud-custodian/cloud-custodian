@@ -132,7 +132,7 @@ class SQLInstanceChildTypeInfo(ChildTypeInfo):
 
     @classmethod
     def _get_location(cls, resource):
-        return super()._get_location(cls.get_parent( resource))
+        return super()._get_location(cls.get_parent(resource))
 
     @classmethod
     def _get_id(cls, resource):
