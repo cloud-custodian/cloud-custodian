@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "clusters": [
+            "example",
+            "sbx-ditto",
+            "sbx-spark-kubernetes-aws-side"
+        ]
+    }
+}

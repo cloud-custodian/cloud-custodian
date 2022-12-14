@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import difflib
 from functools import partial
 import hashlib
 import logging
 import operator
 import os
+import sys
 
 import click
 import yaml
@@ -60,6 +62,10 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'instance'})
         elif provider == 'azure':
             r = Bag({'type': 'vm'})
+        elif provider == 'awscc':
+            r = Bag({'type': 'logs_loggroup'})
+        elif provider == 'tencentcloud':
+            r = Bag({'type': 'ami'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
@@ -247,22 +253,33 @@ def main(provider, output_dir, group_by):
     try:
         _main(provider, output_dir, group_by)
     except Exception:
-        import traceback, pdb, sys
+        import traceback, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
 
-def write_modified_file(fpath, content):
+def write_modified_file(fpath, content, diff_changes=False):
     content_md5 = hashlib.md5(content.encode('utf8'))
+    file_md5 = disk_content = None
 
     if os.path.exists(fpath):
         with open(fpath, 'rb') as fh:
-            file_md5 = hashlib.md5(fh.read())
-    else:
-        file_md5 = None
+            disk_content = fh.read()
+
+    if disk_content:
+        file_md5 = hashlib.md5(disk_content)
+        disk_content = disk_content.decode('utf8')
 
     if file_md5 and content_md5.hexdigest() == file_md5.hexdigest():
         return False
+
+    if diff_changes and disk_content:
+        sys.stdout.writelines(
+            difflib.context_diff(
+                content.split('\n'),
+                disk_content.split('\n'),
+                fromfile='a/%s' % fpath, tofile='b/%s' % fpath)
+        )
 
     with open(fpath, 'w') as fh:
         fh.write(content)
@@ -299,12 +316,22 @@ def _main(provider, output_dir, group_by):
 
     # Create individual resources pages
     for r in provider_class.resources.values():
+        # FIXME / TODO: temporary work arounds for a few types that have recursion
+        # in jsonschema on these types.
+        if provider == 'awscc' and r.type in (
+                'wafv2_rulegroup',
+                'wafv2_webacl',
+                'amplifyuibuilder_theme',
+                'amplifyuibuilder_component',
+                'amplifybuilder_component'):
+            continue
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(
             rpath, t.render(
                 provider_name=provider,
-                resource=r))
+                resource=r),
+            diff_changes=not written)
 
     # Create files for all groups
     for key, group in sorted(groups.items()):

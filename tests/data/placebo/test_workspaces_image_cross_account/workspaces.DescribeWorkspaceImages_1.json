@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "ImageId": "wsi-wxm9q46zg",
+                "Name": "custodian-workspace-image",
+                "Description": "Test workspace image",
+                "OperatingSystem": {
+                    "Type": "LINUX"
+                },
+                "State": "AVAILABLE",
+                "RequiredTenancy": "DEFAULT",
+                "Created": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 27,
+                    "hour": 15,
+                    "minute": 7,
+                    "second": 16,
+                    "microsecond": 716000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

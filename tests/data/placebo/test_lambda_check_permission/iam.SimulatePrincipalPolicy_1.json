@@ -1,44 +1,47 @@
 {
-  "status_code": 200,
-  "data": {
-    "EvaluationResults": [
-      {
-        "EvalActionName": "iam:ListUsers",
-        "EvalResourceName": "arn:aws:iam::644160558196:user/",
-        "EvalDecision": "explicitDeny",
-        "MatchedStatements": [
-          {
-            "SourcePolicyId": "IAMReadOnlyAccess",
-            "SourcePolicyType": "IAM Policy",
-            "StartPosition": {
-              "Line": 3,
-              "Column": 17
-            },
-            "EndPosition": {
-              "Line": 15,
-              "Column": 6
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalActionName": "iam:ListUsers",
+                "EvalResourceName": "arn:aws:iam::644160558196:user/",
+                "EvalDecision": "explicitDeny",
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "ReadOnlyAccess",
+                        "SourcePolicyType": "IAM Policy",
+                        "StartPosition": {
+                            "Line": 3,
+                            "Column": 16
+                        },
+                        "EndPosition": {
+                            "Line": 1070,
+                            "Column": 4
+                        }
+                    },
+                    {
+                        "SourcePolicyId": "IAMBlockRead",
+                        "SourcePolicyType": "Permissions Boundary Policy",
+                        "StartPosition": {
+                            "Line": 3,
+                            "Column": 19
+                        },
+                        "EndPosition": {
+                            "Line": 14,
+                            "Column": 10
+                        }
+                    }
+                ],
+                "MissingContextValues": [],
+                "OrganizationsDecisionDetail": {
+                    "AllowedByOrganizations": true
+                },
+                "PermissionsBoundaryDecisionDetail": {
+                    "AllowedByPermissionsBoundary": false
+                }
             }
-          },
-          {
-            "SourcePolicyId": "PermissionsBoundaryPolicyInputList.1",
-            "SourcePolicyType": "Permissions Boundary Policy",
-            "StartPosition": {
-              "Line": 1,
-              "Column": 41
-            },
-            "EndPosition": {
-              "Line": 1,
-              "Column": 908
-            }
-          }
         ],
-        "MissingContextValues": [],
-        "PermissionsBoundaryDecisionDetail": {
-          "AllowedByPermissionsBoundary": false
-        }
-      }
-    ],
-    "IsTruncated": false,
-    "ResponseMetadata": {}
-  }
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
 }

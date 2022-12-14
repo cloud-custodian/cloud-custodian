@@ -1,0 +1,69 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "IAMUser",
+        "arn": "arn:aws:iam::644160558196:user/pratyush.mishra@capitalone.com",
+        "accountId": "644160558196",
+        "userName": "pratyush.mishra@capitalone.com",
+        "sessionContext": {
+            "sessionIssuer": {},
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2022-11-15T18:17:16Z",
+                "mfaAuthenticated": "false"
+            }
+        }
+    },
+    "eventTime": "2022-11-15T18:49:20Z",
+    "eventSource": "cloudhsm.amazonaws.com",
+    "eventName": "CreateCluster",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "204.63.43.37",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+    "requestParameters": {
+        "backupRetentionPolicy": {
+            "type": "DAYS",
+            "value": "90"
+        },
+        "hsmType": "hsm1.medium",
+        "subnetIds": [
+            "subnet-07c118e47bb84cee7"
+        ],
+        "tagList": [
+            {
+                "key": "Owner",
+                "value": "test"
+            }
+        ]
+    },
+    "responseElements": {
+        "cluster": {
+            "backupPolicy": "DEFAULT",
+            "backupRetentionPolicy": {
+                "type": "DAYS",
+                "value": "90"
+            },
+            "clusterId": "cluster-dqf7m6ithhc",
+            "createTimestamp": "Nov 15, 2022, 6:49:20 PM",
+            "hsms": [],
+            "hsmType": "hsm1.medium",
+            "state": "CREATE_IN_PROGRESS",
+            "subnetMapping": {
+                "us-east-1a": "subnet-07c118e47bb84cee7"
+            },
+            "vpcId": "vpc-03005fb9b8740263d",
+            "certificates": {}
+        }
+    },
+    "requestID": "ef53d5d7-d422-4692-8f18-d8a1a9644543",
+    "eventID": "afeaa423-04ce-4fc5-9d12-03fb508dff1d",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "644160558196",
+    "eventCategory": "Management",
+    "tlsDetails": {
+        "clientProvidedHostHeader": "cloudhsmv2.us-east-1.amazonaws.com"
+    },
+    "sessionCredentialFromConsole": "true"
+}

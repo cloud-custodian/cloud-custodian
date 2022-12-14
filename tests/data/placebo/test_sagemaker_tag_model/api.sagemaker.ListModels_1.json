@@ -1,33 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Models": [
             {
+                "ModelName": "sagemaker-model",
+                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/sagemaker-model",
                 "CreationTime": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 46, 
-                    "microsecond": 835000, 
-                    "year": 2018, 
-                    "day": 17, 
-                    "minute": 54
-                }, 
-                "ModelName": "tmp-for-test-a", 
-                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/tmp-for-test-a"
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 6,
+                    "day": 21,
+                    "hour": 5,
+                    "minute": 1,
+                    "second": 28,
+                    "microsecond": 466000
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "fe9cf894-c3a6-412d-8b99-8e81a4b40fe7", 
-            "HTTPHeaders": {
-                "date": "Wed, 17 Jan 2018 20:26:46 GMT", 
-                "x-amzn-requestid": "fe9cf894-c3a6-412d-8b99-8e81a4b40fe7", 
-                "content-length": "150", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

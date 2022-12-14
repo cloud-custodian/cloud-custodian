@@ -84,6 +84,7 @@ class NotifyTest(BaseTest):
             },
         )
 
+    # TODO refactor - extract method
     def test_resource_prep(self):
         session_factory = self.record_flight_data("test_notify_resource_prep")
         policy = self.load_policy(
@@ -122,9 +123,21 @@ class NotifyTest(BaseTest):
                 [{'c7n:user-data': 'xyz', 'Id': 'a-123'}]),
             [{'Id': 'a-123'}])
 
+        policy = self.load_policy(
+            {"name": "notify-sns",
+             "resource": "iam-saml-provider",
+             "actions": [
+                 {"type": "notify", "to": ["noone@example.com"],
+                  "transport": {"type": "sns", "topic": "zebra"}}]},
+            session_factory=session_factory)
+        self.assertEqual(
+            policy.resource_manager.actions[0].prepare_resources(
+                [{'SAMLMetadataDocument': 'xyz', 'IDPSSODescriptor': 'abc', 'Id': 'a-123'}]),
+            [{'Id': 'a-123'}])
+
     def test_sns_notify(self):
         session_factory = self.replay_flight_data("test_sns_notify_action")
-        client = session_factory().client("sns")
+        client = session_factory().client("sns", region_name='ap-northeast-2')
         topic = client.create_topic(Name="c7n-notify-test")["TopicArn"]
         self.addCleanup(client.delete_topic, TopicArn=topic)
 
@@ -142,6 +155,7 @@ class NotifyTest(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -149,8 +163,8 @@ class NotifyTest(BaseTest):
     def test_sns_notify_with_msg_attr(self):
         session_factory = self.replay_flight_data("test_sns_notify_action_with_msg_attr")
 
-        sqs = session_factory().client('sqs')
-        sns = session_factory().client('sns')
+        sqs = session_factory().client('sqs', region_name='us-east-1')
+        sns = session_factory().client('sns', region_name='us-east-1')
 
         topic = 'arn:aws:sns:us-east-1:644160558196:test'
 
@@ -185,7 +199,11 @@ class NotifyTest(BaseTest):
             TopicArn=topic)['Subscriptions'][0]['Endpoint']
         self.assertEqual(subscription, 'arn:aws:sqs:us-east-1:644160558196:test-queue')
 
-        self.load_policy(policy, session_factory=session_factory).run()
+        self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        ).run()
         if self.recording:
             time.sleep(20)
 

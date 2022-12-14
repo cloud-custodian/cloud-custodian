@@ -1,0 +1,213 @@
+{
+    "status_code": 200,
+    "data": {
+        "containerInstances": [
+            {
+                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/default-cluster/0166d24fdd304b0abb377be45b1d509e",
+                "ec2InstanceId": "i-0e4f5b592f9181b24",
+                "version": 3,
+                "versionInfo": {
+                    "agentVersion": "1.58.0",
+                    "agentHash": "80ad4ca4",
+                    "dockerVersion": "DockerVersion: 20.10.7"
+                },
+                "registeredResources": [
+                    {
+                        "name": "CPU",
+                        "type": "INTEGER",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 1024
+                    },
+                    {
+                        "name": "MEMORY",
+                        "type": "INTEGER",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 982
+                    },
+                    {
+                        "name": "PORTS",
+                        "type": "STRINGSET",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 0,
+                        "stringSetValue": [
+                            "22",
+                            "2376",
+                            "2375",
+                            "51678",
+                            "51679"
+                        ]
+                    },
+                    {
+                        "name": "PORTS_UDP",
+                        "type": "STRINGSET",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 0,
+                        "stringSetValue": []
+                    }
+                ],
+                "status": "ACTIVE",
+                "agentConnected": true,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "attributes": [
+                    {
+                        "name": "ecs.capability.branch-cni-plugin-version",
+                        "value": "199bfc65-"
+                    },
+                    {
+                        "name": "ecs.ami-id",
+                        "value": "ami-00bf0e20ed7ea8cdc"
+                    },
+                    {
+                        "name": "ecs.availability-zone",
+                        "value": "us-east-1b"
+                    },
+                    {
+                        "name": "ecs.cpu-architecture",
+                        "value": "x86_64"
+                    },
+                    {
+                        "name": "ecs.os-type",
+                        "value": "linux"
+                    },
+                    {
+                        "name": "ecs.vpc-id",
+                        "value": "vpc-d2d616b5"
+                    },
+                    {
+                        "name": "ecs.os-family",
+                        "value": "LINUX"
+                    },
+                    {
+                        "name": "ecs.subnet-id",
+                        "value": "subnet-efbcccb7"
+                    },
+                    {
+                        "name": "ecs.instance-type",
+                        "value": "t2.micro"
+                    },
+                    {
+                        "name": "ecs.capability.cni-plugin-version",
+                        "value": "55b2ae77-2020.09.0"
+                    }
+                ],
+                "registeredAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 26,
+                    "hour": 13,
+                    "minute": 38,
+                    "second": 31,
+                    "microsecond": 13000
+                },
+                "attachments": [],
+                "tags": []
+            },
+            {
+                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/default-cluster/98039d2e644c4181b686519d1d5cd8b8",
+                "ec2InstanceId": "i-03a799cab1c1a3dff",
+                "version": 7,
+                "versionInfo": {
+                    "agentVersion": "1.58.0",
+                    "agentHash": "80ad4ca4",
+                    "dockerVersion": "DockerVersion: 20.10.7"
+                },
+                "registeredResources": [
+                    {
+                        "name": "CPU",
+                        "type": "INTEGER",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 1024
+                    },
+                    {
+                        "name": "MEMORY",
+                        "type": "INTEGER",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 982
+                    },
+                    {
+                        "name": "PORTS",
+                        "type": "STRINGSET",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 0,
+                        "stringSetValue": [
+                            "22",
+                            "2376",
+                            "2375",
+                            "51678",
+                            "51679"
+                        ]
+                    },
+                    {
+                        "name": "PORTS_UDP",
+                        "type": "STRINGSET",
+                        "doubleValue": 0.0,
+                        "longValue": 0,
+                        "integerValue": 0,
+                        "stringSetValue": []
+                    }
+                ],
+                "status": "ACTIVE",
+                "agentConnected": true,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "attributes": [
+                    {
+                        "name": "ecs.capability.branch-cni-plugin-version",
+                        "value": "199bfc65-"
+                    },
+                    {
+                        "name": "ecs.ami-id",
+                        "value": "ami-00bf0e20ed7ea8cdc"
+                    },
+                    {
+                        "name": "ecs.availability-zone",
+                        "value": "us-east-1a"
+                    },
+                    {
+                        "name": "ecs.os-type",
+                        "value": "linux"
+                    },
+                    {
+                        "name": "ecs.vpc-id",
+                        "value": "vpc-d2d616b5"
+                    },
+                    {
+                        "name": "ecs.os-family",
+                        "value": "LINUX"
+                    },
+                    {
+                        "name": "ecs.subnet-id",
+                        "value": "subnet-914763e7"
+                    },
+                    {
+                        "name": "ecs.capability.cni-plugin-version",
+                        "value": "55b2ae77-2020.09.0"
+                    }
+                ],
+                "registeredAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 26,
+                    "hour": 12,
+                    "minute": 41,
+                    "second": 22,
+                    "microsecond": 946000
+                },
+                "attachments": [],
+                "tags": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

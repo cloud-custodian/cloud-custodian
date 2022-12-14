@@ -53,18 +53,8 @@ class Instance(QueryResourceManager):
                     }}
 
 
-@Instance.filter_registry.register('offhour')
-class InstanceOffHour(OffHour):
-
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
-
-
-@Instance.filter_registry.register('onhour')
-class InstanceOnHour(OnHour):
-
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
+Instance.filter_registry.register('offhour', OffHour)
+Instance.filter_registry.register('onhour', OnHour)
 
 
 @Instance.filter_registry.register('effective-firewall')
@@ -295,7 +285,7 @@ class Disk(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
-                        'resourceId': resource_info['disk_id']})
+                        'disk': resource_info['disk_id']})
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -394,7 +384,7 @@ class Snapshot(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'snapshot_id': resource_info['snapshot_id']})
+                        'snapshot': resource_info['snapshot_id']})
 
 
 @Snapshot.action_registry.register('delete')

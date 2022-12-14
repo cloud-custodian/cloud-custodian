@@ -78,15 +78,37 @@ class UrlConfTest(BaseTest):
 
         self.assertEqual(
             dict(utils.parse_url_config('')),
-            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+            {
+                'netloc': '',
+                'path': '',
+                'scheme': '',
+                'url': ''
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
 
         self.assertEqual(
             dict(utils.parse_url_config('aws://')),
-            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+            {
+                'path': '',
+                'scheme': 'aws',
+                'netloc': '',
+                'url': 'aws://'
+            })
+
+        self.assertEqual(
+            dict(utils.parse_url_config('http://example.com:8080')),
+            dict(url='http://example.com:8080',
+                 netloc='example.com:8080',
+                 path='',
+                 scheme='http'))
 
 
 class ProxyUrlTest(BaseTest):
@@ -115,6 +137,36 @@ class ProxyUrlTest(BaseTest):
             proxy_url = utils.get_proxy_url('http://web.site')
             self.assertEqual(proxy_url, 'http://mock.all.proxy.server:8000')
 
+    def test_http_proxy_with_no_proxy_without_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, None)
+
+    def test_http_proxy_with_no_proxy_mismatch_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site')
+            self.assertEqual(proxy_url, 'http://mock.http.proxy.server:8000')
+
+    def test_http_proxy_with_no_proxy_match_explicit_port(self):
+        with mock.patch.dict(os.environ,
+                             {
+                                 'http_proxy': 'http://mock.http.proxy.server:8000',
+                                 'no_proxy': '127.0.0.1,web.site:8080,google.com',
+                             },
+                             clear=True):
+            proxy_url = utils.get_proxy_url('http://web.site:8080')
+            self.assertEqual(proxy_url, None)
+
 
 class UtilTest(BaseTest):
 
@@ -126,7 +178,7 @@ class UtilTest(BaseTest):
 
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
-                    'eventSource': ['ec2.amazonaws.com']},
+                        'eventSource': ['ec2.amazonaws.com']},
              'detail-type': ['AWS API Call via CloudTrail']}
         b = {'detail': {'userIdentity': {
             'userName': [{'anything-but': 'deputy'}]}}}
@@ -172,6 +224,10 @@ class UtilTest(BaseTest):
 
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
+        self.assertEqual(json.dumps(utils.FormatDate(d),
+                                    cls=utils.DateTimeEncoder, indent=2),
+                         '"2018-02-02T12:00:00"')
+
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(list(utils.group_by(items, "Type").keys()), [None, "a", "b"])
@@ -211,6 +267,22 @@ class UtilTest(BaseTest):
         self.assertTrue(a1 in n1)
         self.assertTrue(a1 in n3)
         self.assertFalse(a1 in n4)
+
+    def test_ipv4_list(self):
+        n1 = utils.IPv4Network(u"10.0.0.0/16")
+        n2 = utils.IPv4Network(u"10.0.1.0/24")
+        n3 = utils.IPv4Network(u"10.0.0.5/32")
+        n4 = utils.IPv4Network(u"192.168.1.0/24")
+        IPV4_list = utils.IPv4List([n1, n2])
+        self.assertTrue(n3 in IPV4_list)
+        self.assertFalse(n4 in IPV4_list)
+
+        a1 = ipaddress.ip_address(u"10.0.1.16")
+        self.assertTrue(a1 in IPV4_list)
+        self.assertTrue(a1 in utils.IPv4List([a1, n4]))
+
+        IPV4_list2 = utils.IPv4List([n3, n4])
+        self.assertFalse(a1 in IPV4_list2)
 
     def test_chunks(self):
         self.assertEqual(
@@ -457,6 +529,137 @@ class UtilTest(BaseTest):
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
              'b': '21'})
+
+    def test_get_support_region(self):
+        # AWS Partition
+        mock_manager = mock.MagicMock()
+        mock_manager.config.region = "us-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "us-west-2"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        mock_manager.config.region = "eu-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-east-1", res)
+
+        # GovCloud Partition
+        mock_manager.config.region = "us-gov-west-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        mock_manager.config.region = "us-gov-east-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("us-gov-west-1", res)
+
+        # AWS CN Partition
+        mock_manager.config.region = "cn-northwest-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+        mock_manager.config.region = "cn-north-1"
+        res = utils.get_support_region(mock_manager)
+        self.assertEqual("cn-north-1", res)
+
+    def test_get_eni_resource_type(self):
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Attachment": {"InstanceId": "i-0e040de7dfabbcc8c"}, "Description": ""}),
+            'ec2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB app/test-alb/3d20737b50b4b66e"}),
+            'elb-app')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB net/test-nlb/c973bda47de90e99"}),
+            'elb-net')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB gwy/test-glb/3a85ce44e6caa0af"}),
+            'elb-gwy')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB test-elb"}),
+            'elb')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ENI managed by APIGateway"}),
+            'apigw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS CodeStar Connections"}),
+            'codestar')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "DAX"}),
+            'dax')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS created network interface for directory"}),
+            'dir')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "DMSNetworkInterface"}),
+            'dms')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "arn:aws:ecs:us-west-2:123456789012:attachment/XXXX"}),
+            'ecs')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "EFS mount target for fs-f9b8d350 (fsmt-b716661e)"}),
+            'fsmt')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ElastiCache test-1"}),
+            'elasticache')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS ElasticMapReduce"}),
+            'emr')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "CloudHSM Managed Interface"}),
+            'hsm')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "CloudHsm ENI"}),
+            'hsmv2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS Lambda VPC ENI-test-XXX"}),
+            'lambda')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Interface for NAT Gateway nat-06f54d43caf44bf8d"}),
+            'nat')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "RDSNetworkInterface"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Network interface for DBProxy proxy-XXX-database-1"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "RedshiftNetworkInterface"}),
+            'redshift')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Network Interface for Transit Gateway Attachment tgw-attach-XXX"}),
+            'tgw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "VPC Endpoint Interface vpce-0472c5d3fc4ce1de4"}),
+            'vpce')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": ""}),
+            'unknown')
 
 
 def test_parse_date_floor():

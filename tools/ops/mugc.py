@@ -16,7 +16,6 @@ from c7n import mu
 # TODO: mugc has alot of aws assumptions
 
 from c7n.resources.aws import AWS
-import boto3
 from botocore.exceptions import ClientError
 
 
@@ -32,6 +31,7 @@ def load_policies(options, config):
 
 def region_gc(options, region, policy_config, policies):
 
+    log.debug("Region:%s Starting garbage collection", region)
     session_factory = SessionFactory(
         region=region,
         assume_role=policy_config.assume_role,
@@ -43,15 +43,15 @@ def region_gc(options, region, policy_config, policies):
     client = session_factory().client('lambda')
 
     remove = []
-    current_policies = [p.name for p in policies]
     pattern = re.compile(options.policy_regex)
     for f in funcs:
         if not pattern.match(f['FunctionName']):
             continue
         match = False
-        for pn in current_policies:
-            if f['FunctionName'].endswith(pn):
-                match = True
+        for p in policies:
+            if f['FunctionName'].endswith(p.name):
+                if 'region' not in p.data or p.data['region'] == region:
+                    match = True
         if options.present:
             if match:
                 remove.append(f)
@@ -123,18 +123,21 @@ def resources_gc_prefix(options, policy_config, policy_collection):
             continue
         policy_regions.setdefault(p.options.region, []).append(p)
 
-    regions = get_gc_regions(options.regions)
+    regions = get_gc_regions(options.regions, policy_config)
     for r in regions:
         region_gc(options, r, policy_config, policy_regions.get(r, []))
 
 
-def get_gc_regions(regions):
+def get_gc_regions(regions, policy_config):
     if 'all' in regions:
-        session = boto3.Session(
-            region_name='us-east-1',
-            aws_access_key_id='never',
-            aws_secret_access_key='found')
-        return session.get_available_regions('s3')
+        session_factory = SessionFactory(
+            region='us-east-1',
+            assume_role=policy_config.assume_role,
+            profile=policy_config.profile,
+            external_id=policy_config.external_id)
+
+        client = session_factory().client('ec2')
+        return [region['RegionName'] for region in client.describe_regions()['Regions']]
     return regions
 
 

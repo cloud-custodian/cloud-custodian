@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import itertools
+from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
@@ -20,6 +22,7 @@ from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
+from botocore.config import Config
 
 
 class DescribeAlarm(DescribeSource):
@@ -29,7 +32,6 @@ class DescribeAlarm(DescribeSource):
 
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'alarm'
@@ -86,9 +88,61 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
+@resources.register('composite-alarm')
+class CompositeAlarm(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudwatch'
+        arn_type = 'alarm'
+        enum_spec = ('describe_alarms', 'CompositeAlarms', {'AlarmTypes': ['CompositeAlarm']})
+        id = name = 'AlarmName'
+        arn = 'AlarmArn'
+        date = 'AlarmConfigurationUpdatedTimestamp'
+        cfn_type = 'AWS::CloudWatch::CompositeAlarm'
+        universal_taggable = object()
+
+    augment = universal_augment
+
+    retry = staticmethod(get_retry(('Throttled',)))
+
+
+@CompositeAlarm.action_registry.register('delete')
+class CompositeAlarmDelete(BaseAction):
+    """Delete a cloudwatch composite alarm.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-composite-alarms
+                resource: aws.composite-alarm
+                filters:
+                  - type: value
+                    value_type: age
+                    key: StateUpdatedTimestamp
+                    value: 30
+                    op: ge
+                  - StateValue: INSUFFICIENT_DATA
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudwatch:DeleteAlarms',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('cloudwatch')
+
+        for resource_set in chunks(resources, size=100):
+            self.manager.retry(
+                client.delete_alarms,
+                AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
 @resources.register('event-bus')
 class EventBus(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'event-bus'
@@ -102,14 +156,12 @@ class EventBus(QueryResourceManager):
 
 @EventBus.filter_registry.register('cross-account')
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
-
     # dummy permission
     permissions = ('events:ListEventBuses',)
 
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'rule'
@@ -192,6 +244,19 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     )
 
     permissions = ('events:ListTargetsByRule',)
+    supported_resources = (
+        "aws.sqs",
+        "aws.event-bus",
+        "aws.lambda",
+        "aws.ecs",
+        "aws.ecs-task",
+        "aws.kinesis",
+        "aws.sns",
+        "aws.ssm-parameter",
+        "aws.batch-compute",
+        "aws.codepipeline",
+        "aws.step-machine",
+    )
 
     def validate(self):
         """
@@ -221,21 +286,11 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
     def process(self, resources, event=None):
         # Due to lazy loading of resources, we need to explicilty load the following
         # potential targets for a event rule target:
-        load_resources(
-            [
-                "aws.sqs",
-                "aws.lambda",
-                "aws.ecs-cluster",
-                "aws.ecs-task",
-                "aws.kinesis",
-                "aws.sns",
-                "aws.ssm-parameter",
-                "aws.batch-compute",
-                "aws.codepipeline",
-            ]
-        )
+
+        load_resources(list(self.supported_resources))
         arn_resolver = ArnResolver(self.manager)
         resources = self.get_rules_with_children(resources)
+        resources = [r for r in resources if self.filter_unsupported_resources(r)]
         results = []
 
         if self.data.get('all'):
@@ -251,6 +306,14 @@ class ValidEventRuleTargetFilter(ChildResourceFilter):
                         r.setdefault('c7n:InvalidTargets', []).append(i)
                 results.append(r)
         return results
+
+    def filter_unsupported_resources(self, r):
+        for carn in r.get('c7n:ChildArns'):
+            if 'aws.' + str(ArnResolver.resolve_type(carn)) not in self.supported_resources:
+                self.log.info(
+                    f"Skipping resource {r.get('Arn')}, target type {carn} is not supported")
+                return False
+            return True
 
 
 @EventRule.action_registry.register('delete')
@@ -298,9 +361,58 @@ class EventRuleDelete(BaseAction):
                 client.delete_rule(Name=r['Name'])
 
 
+@EventRule.action_registry.register('set-rule-state')
+class SetRuleState(BaseAction):
+    """
+    This action allows to enable/disable a rule
+
+    :example:
+    .. code-block:: yaml
+        policies:
+            - name: test-rule
+              resource: aws.event-rule
+              filters:
+                - Name: my-event-rule
+              actions:
+                - type: set-rule-state
+                  enabled: true
+    """
+
+    schema = type_schema(
+        'set-rule-state',
+        **{'enabled': {'default': True, 'type': 'boolean'}}
+    )
+    permissions = ('events:EnableRule', 'events:DisableRule',)
+
+    def process(self, resources):
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('events', config=config)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+        enabled = self.data.get('enabled')
+        for resource in resources:
+            try:
+                if enabled:
+                    retry(
+                        client.enable_rule,
+                        Name=resource['Name']
+                    )
+                else:
+                    retry(
+                        client.disable_rule,
+                        Name=resource['Name']
+                    )
+            except (client.exceptions.ResourceNotFoundException,
+                    client.exceptions.ManagedRuleException):
+                continue
+
+
 @resources.register('event-rule-target')
 class EventRuleTarget(ChildResourceManager):
-
     class resource_type(TypeInfo):
         service = 'events'
         arn = False
@@ -312,7 +424,6 @@ class EventRuleTarget(ChildResourceManager):
 
 @EventRuleTarget.filter_registry.register('cross-account')
 class CrossAccountFilter(CrossAccountAccessFilter):
-
     schema = type_schema(
         'cross-account',
         # white list accounts
@@ -329,7 +440,6 @@ class CrossAccountFilter(CrossAccountAccessFilter):
 
 @EventRuleTarget.action_registry.register('delete')
 class DeleteTarget(BaseAction):
-
     schema = type_schema('delete')
     permissions = ('events:RemoveTargets',)
 
@@ -347,7 +457,6 @@ class DeleteTarget(BaseAction):
 
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'logs'
         arn_type = 'log-group'
@@ -371,7 +480,6 @@ class LogGroup(QueryResourceManager):
 
 @resources.register('insight-rule')
 class InsightRule(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudwatch'
         arn_type = 'insight-rule'
@@ -464,6 +572,87 @@ class LogGroupMetrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': 'LogGroupName', 'Value': resource['logGroupName']}]
+
+
+@resources.register('log-metric')
+class LogMetric(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'logs'
+        enum_spec = ('describe_metric_filters', 'metricFilters', None)
+        arn = False
+        id = name = 'filterName'
+        date = 'creationTime'
+        cfn_type = 'AWS::Logs::MetricFilter'
+
+
+@LogMetric.filter_registry.register('alarm')
+class LogMetricAlarmFilter(ValueFilter):
+    """
+    Filter log metric filters based on associated alarms.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: log-metrics-with-alarms
+            resource: aws.log-metric
+            filters:
+              - type: alarm
+                key: AlarmName
+                value: present
+    """
+
+    schema = type_schema('alarm', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:MetricAlarms'
+    FetchThreshold = 10  # below this number of resources, fetch alarms individually
+
+    def augment(self, resources):
+        """Add alarm details to log metric filter resources
+
+        This includes all alarms where the metric name and namespace match
+        a log metric filter's metric transformation.
+        """
+
+        if len(resources) < self.FetchThreshold:
+            client = local_session(self.manager.session_factory).client('cloudwatch')
+            for r in resources:
+                r[self.annotation_key] = list(itertools.chain(*(
+                    self.manager.retry(
+                        client.describe_alarms_for_metric,
+                        Namespace=t['metricNamespace'],
+                        MetricName=t['metricName'])['MetricAlarms']
+                    for t in r.get('metricTransformations', ())
+                )))
+        else:
+            alarms = self.manager.get_resource_manager('aws.alarm').resources()
+
+            # We'll be matching resources to alarms based on namespace and
+            # metric name - this lookup table makes that smoother
+            alarms_by_metric = defaultdict(list)
+            for alarm in alarms:
+                alarms_by_metric[(alarm['Namespace'], alarm['MetricName'])].append(alarm)
+
+            for r in resources:
+                r[self.annotation_key] = list(itertools.chain(*(
+                    alarms_by_metric.get((t['metricNamespace'], t['metricName']), [])
+                    for t in r.get('metricTransformations', ())
+                )))
+
+    def get_permissions(self):
+        return [
+            *self.manager.get_resource_manager('aws.alarm').get_permissions(),
+            'cloudwatch:DescribeAlarmsForMetric'
+        ]
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+
+        matched = []
+        for r in resources:
+            if any((self.match(alarm) for alarm in r[self.annotation_key])):
+                matched.append(r)
+        return matched
 
 
 @LogGroup.action_registry.register('retention')
@@ -574,7 +763,6 @@ class LastWriteDays(Filter):
 
 @LogGroup.filter_registry.register('cross-account')
 class LogCrossAccountFilter(CrossAccountAccessFilter):
-
     schema = type_schema(
         'cross-account',
         # white list accounts
@@ -622,9 +810,44 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         return results
 
 
+@LogGroup.filter_registry.register('subscription-filter')
+class LogSubscriptionFilter(ValueFilter):
+    """Filters CloudWatch log groups by subscriptions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-groups-with-subscriptions
+                resource: log-group
+                filters:
+                  - type: subscription-filter
+                    key: destinationArn
+                    value: arn:aws:lambda:us-east-1:123456789876:function:forwarder
+    """
+    schema = type_schema('subscription-filter', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:SubscriptionFilters'
+    permissions = ('logs:DescribeSubscriptionFilters',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
+        results = []
+        for r in resources:
+            filters = self.manager.retry(
+                client.describe_subscription_filters,
+                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+            if not any(filters):
+                continue
+            for f in filters:
+                r.setdefault(self.annotation_key, []).append(f)
+            if (len(self.data) == 1) or any((self.match(sub) for sub in r[self.annotation_key])):
+                results.append(r)
+        return results
+
+
 @LogGroup.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-
     RelatedIdsExpression = 'kmsKeyId'
 
 
@@ -703,3 +926,48 @@ class EncryptLogGroup(BaseAction):
                     client.disassociate_kms_key(logGroupName=r['logGroupName'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@LogGroup.action_registry.register('put-subscription-filter')
+class SubscriptionFilter(BaseAction):
+    """Create/Update a subscription filter and associate with a log group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-put-subscription-filter
+            resource: log-group
+            actions:
+              - type: put-subscription-filter
+                filter_name: AllLambda
+                filter_pattern: ip
+                destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
+                distribution: Random
+    """
+    schema = type_schema(
+        'put-subscription-filter',
+        filter_name={'type': 'string'},
+        filter_pattern={'type': 'string'},
+        destination_arn={'type': 'string'},
+        distribution={'enum': ['Random', 'ByLogStream']},
+        required=['filter_name', 'destination_arn'])
+    permissions = ('logs:PutSubscriptionFilter',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        filter_name = self.data.get('filter_name')
+        filter_pattern = self.data.get('filter_pattern', '')
+        destination_arn = self.data.get('destination_arn')
+        distribution = self.data.get('distribution', 'ByLogStream')
+
+        for r in resources:
+            client.put_subscription_filter(
+                logGroupName=r['logGroupName'],
+                filterName=filter_name,
+                filterPattern=filter_pattern,
+                destinationArn=destination_arn,
+                distribution=distribution)

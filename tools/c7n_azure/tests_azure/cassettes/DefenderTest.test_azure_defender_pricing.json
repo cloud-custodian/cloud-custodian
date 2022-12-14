@@ -1,0 +1,161 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2018-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 23 Feb 2022 05:27:37 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "content-length": [
+                        "3049"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,217 @@
+interactions:
+- request:
+    body: '{"TagKeys": ["tke-lb-serviceuuid"], "PaginationToken": "", "MaxResults":
+      50}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '76'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"QeRcm_reyeX2v10h_h72DS4_6JTuSLr32BG1Us8Lw6O0wjPWEu-bgN1jQUGc_zjP","Tags":[{"TagKey":"tke-lb-serviceuuid","TagValue":"36fccfa0-01d4-4dcd-bff5-54e725a92996"},{"TagKey":"tke-lb-serviceuuid","TagValue":"79b95461-e200-4713-a125-8bc00372f2e6"},{"TagKey":"tke-lb-serviceuuid","TagValue":"2016ef7b-9de4-45bf-9169-2e8bcae8f300"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3df9d925-ce13-4747-af4d-dfc02896d33e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"20b6f140-c82f-4d24-b227-c8a4b68ea3a0"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4d16b9c5-d3aa-43e1-a3d4-6a43ddd54e83"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b4f9d1d1-12a1-4f04-8bd0-b90ff3bf9256"},{"TagKey":"tke-lb-serviceuuid","TagValue":"18981d80-7c3e-465e-807e-70622df11f2d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4e265ae1-de42-4662-8869-e513e37974bc"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e716e971-4d5a-44f3-ac2d-6dbd1f2a6fdc"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f37671f1-4c0f-447f-8656-ee391bd20465"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7c2d905b-4de1-48c5-82f0-8d06423b85f9"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d0702baa-2537-4c75-9d43-cb89671cb428"},{"TagKey":"tke-lb-serviceuuid","TagValue":"66a8a761-2bbd-46fe-b622-4e83b64044c3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b831b891-11e0-47d4-9d43-0e24634227a0"},{"TagKey":"tke-lb-serviceuuid","TagValue":"01c4f185-a38f-41ba-8def-2eb3a799802e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5ade080c-079e-49ce-829a-53a4cacbec8f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4425f99f-84cf-4576-96ee-b294a1ef6fa7"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9e885454-ef92-4be0-9148-4972d380b372"},{"TagKey":"tke-lb-serviceuuid","TagValue":"40422f12-3be7-45c6-97d3-b4587aa2c656"},{"TagKey":"tke-lb-serviceuuid","TagValue":"040e5463-47a3-4484-ba3b-51d9d6851ba6"},{"TagKey":"tke-lb-serviceuuid","TagValue":"55b7184a-b623-4c2e-a67b-6d1da1b9d64f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"117ded63-e5a0-43d6-bb84-c9d3a83b1671"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3d2f27d7-ffd8-4356-a6aa-19859ee46447"},{"TagKey":"tke-lb-serviceuuid","TagValue":"37968124-eaf2-45f4-9dca-57c99bbc0b1e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ac251c11-4c02-4fdb-b9a4-047954557ace"},{"TagKey":"tke-lb-serviceuuid","TagValue":"49db96c3-081a-4629-9c44-e61949268f6d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9072ba1c-c302-41bd-8790-deeaed14e0f3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6d6ba147-aaf7-4383-96d6-fdd7c80cc7de"},{"TagKey":"tke-lb-serviceuuid","TagValue":"60c39fe1-2b94-455e-9e1a-690b0df4dabd"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b423face-d789-4b75-83d9-fd44a8ac0b0c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e1615e28-bc2f-4944-807a-91d7ae081aef"},{"TagKey":"tke-lb-serviceuuid","TagValue":"97ba8e2e-dbc5-4aa4-91e1-bcc792312191"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9dd8382c-36e7-44a0-acd2-89c74af817bb"},{"TagKey":"tke-lb-serviceuuid","TagValue":"cc7857c0-06f9-41fd-be12-500ddc599c99"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6ea5a454-2d4d-4eaf-bcc8-99500b4eea95"},{"TagKey":"tke-lb-serviceuuid","TagValue":"982d6e49-b432-4dce-bf04-2620a744dd79"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c0b45053-b596-4fe9-8462-01656bbef511"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1353e5e1-84dd-4b74-83f9-f21bd7e41309"},{"TagKey":"tke-lb-serviceuuid","TagValue":"66d99ee9-ab69-4eea-b852-21e2f21c9487"},{"TagKey":"tke-lb-serviceuuid","TagValue":"8d42e2bd-3e9e-49eb-8db6-e60c686934d8"},{"TagKey":"tke-lb-serviceuuid","TagValue":"87ed5a98-1bd9-4288-8248-bdb4d8bb02f4"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5cd8f87a-8f10-4c1a-a3bb-30fa43eb885c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7af46bd7-4612-4ec8-bbc0-5c76af7adb0c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"bae5b533-b722-4b05-b75a-5a85e4c8fa83"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b51d3371-0a0e-438f-a6ff-57a06d40d5b4"},{"TagKey":"tke-lb-serviceuuid","TagValue":"03fd5088-348b-4250-9b82-ddd5ce4e163c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"eabae0f5-83f4-43be-8618-aa3cfc924939"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6b0a07f0-e19e-455f-a0d6-e5b5572a436f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6017f97e-0a54-4c79-8234-f8bcbb2257fd"}],"RequestId":"c9663000-2cc3-45e1-b350-70d944fbcc11"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4259'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:31:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["tke-lb-serviceuuid"], "PaginationToken": "QeRcm_reyeX2v10h_h72DS4_6JTuSLr32BG1Us8Lw6O0wjPWEu-bgN1jQUGc_zjP",
+      "MaxResults": 50}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '140'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"p_-3yyeXCwPxtPOZpQIk29BRP0YXw1NM_vZrqW3OBEmSJB31vHp9GPF7J1zlDN-p","Tags":[{"TagKey":"tke-lb-serviceuuid","TagValue":"8457ca58-7032-441c-ba9a-7262676ae523"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6d27df3c-d2cc-42e6-9801-3c6e74895ac6"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c8e78ba7-6625-42ab-8f04-9ce9b406019f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5969fdfc-def2-434b-bec7-9ed4c9cf9bd8"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a3d7cda1-43ea-41ab-ac53-e84939f065c3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f901ecef-c4a0-4cdf-861e-02f6eb6a24f0"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f5619144-f22c-4ad9-82cb-d0b2f57a20b3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4974a31f-3019-43c4-87a0-5daaee96372a"},{"TagKey":"tke-lb-serviceuuid","TagValue":"377132e8-a947-4f5b-b9a4-0828f79a7637"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c9980920-8750-46d8-905e-ae9a9ce14ac7"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0350cb75-6c9f-4e7d-b90f-b3911db3cf5e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6dea2184-5c1b-4543-b20a-51db4f3353c9"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e7cc8947-a431-4f5f-a8df-514545ade7d0"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6302fe60-b681-485b-91ce-79be9a5a3dd0"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9600f16a-2207-4595-8471-ad1d3148f821"},{"TagKey":"tke-lb-serviceuuid","TagValue":"44853899-b8b9-4978-9fdb-5f00e31174c2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4e7583b6-73ab-4ad5-be15-bf06393f6e81"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0f171bf8-6e3b-4d9c-87c2-78291f5c0bfd"},{"TagKey":"tke-lb-serviceuuid","TagValue":"05de349d-48c6-4ee0-9d55-c5e968e270e8"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c613575d-62a2-4a36-814a-d03b26e3beab"},{"TagKey":"tke-lb-serviceuuid","TagValue":"649364c5-6a85-4fee-82b2-82ecad76e89d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b8a8da9f-bdd0-46f2-88b3-d0d20ddaf453"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0f85ec04-d9ea-4de8-bff6-ca59d164e26f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"545b7e8b-23b1-4919-8f8b-7e828be8a881"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6e63f6c9-8ba7-48fe-9ced-4e7cbdab316d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"644966d6-34b2-4ac9-90d6-10899ad4a445"},{"TagKey":"tke-lb-serviceuuid","TagValue":"91d23041-863f-41af-a1cf-14f1062995f2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7771f06e-40dc-474c-a6c6-52752145c2c2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"2a8696f4-d3bc-42f9-af53-7d28a25770ae"},{"TagKey":"tke-lb-serviceuuid","TagValue":"117bbe24-1488-48b1-91f7-e29f28c50d5d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3fd34504-7c97-4895-a0e8-597812059cf5"},{"TagKey":"tke-lb-serviceuuid","TagValue":"48978966-1bb7-4e36-a633-22ab37ddec26"},{"TagKey":"tke-lb-serviceuuid","TagValue":"402ffde8-47a3-4869-ad8d-46463d8ba51f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"271efbbc-54d5-4a9e-a996-238426aea987"},{"TagKey":"tke-lb-serviceuuid","TagValue":"24934867-9d76-428e-8e87-1be83720fba3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"8d1bca6e-1a4c-4023-9ec4-c5be98f9adb4"},{"TagKey":"tke-lb-serviceuuid","TagValue":"bc54aa0a-4924-446e-9f27-d07d9e00a049"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b2f69412-8ced-4cce-b235-258356e542c1"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e348dfcc-5edf-4fb8-badc-b52161c55679"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1d83ec7d-e02d-41d7-ab4b-482bfe170ce7"},{"TagKey":"tke-lb-serviceuuid","TagValue":"78e6d82f-c8fa-4db5-ba7c-26b8dfe95117"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3132e69d-ec2f-4798-8dbd-d3e7ef5fc56f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5823be07-d2f4-42c9-b710-a1e84f37d795"},{"TagKey":"tke-lb-serviceuuid","TagValue":"2bab97f7-028c-429b-b931-3c8019ad9b12"},{"TagKey":"tke-lb-serviceuuid","TagValue":"590e0d17-ead4-4305-9e02-e98b1551a563"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6a93670a-763d-4509-98df-dcb69ce088b2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6fb7a898-14da-4392-9fb1-58c47e6ca733"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5bbca591-004a-4bc0-a70e-c2a3f75ab86d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"706c3469-112e-4083-b78a-db97a7ca078d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b968107b-da25-463a-bce8-3b0be084ff48"}],"RequestId":"483a7a8f-3742-4054-a716-af6363bab06c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4259'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:31:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["tke-lb-serviceuuid"], "PaginationToken": "p_-3yyeXCwPxtPOZpQIk29BRP0YXw1NM_vZrqW3OBEmSJB31vHp9GPF7J1zlDN-p",
+      "MaxResults": 50}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '140'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"sREf2XzQYdrhYfdkpDhcEEBHvXDeml5nUQywyvH54oCFtLuw0VOR3cksV30LLmzW","Tags":[{"TagKey":"tke-lb-serviceuuid","TagValue":"a37bf785-4d21-4469-828a-e820174569e3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"add27b94-cf41-4fb7-a346-43783889a210"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9a1b76ae-72f1-4e35-92fd-537264a9be42"},{"TagKey":"tke-lb-serviceuuid","TagValue":"423c5a8b-5613-463d-a6b6-64a805dd54ab"},{"TagKey":"tke-lb-serviceuuid","TagValue":"30da357d-384d-4d18-9108-996b289b9e24"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1a045291-0c03-4e1c-ad66-9a0aaf17e583"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4a289172-7e82-4d60-86d0-0496f5f35e0c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1665f102-2475-4290-ac8d-67d2fc8b6061"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a763de58-36d6-43bc-8b95-2394f7503ecc"},{"TagKey":"tke-lb-serviceuuid","TagValue":"00196aae-7229-4f21-8410-e8f040f941ac"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5a1e21c4-f96e-4ee1-92f0-707134508386"},{"TagKey":"tke-lb-serviceuuid","TagValue":"46bb0f2d-3c23-4be5-9b32-1953232cf1aa"},{"TagKey":"tke-lb-serviceuuid","TagValue":"330d581d-102f-4676-94e8-d049e6afc3b5"},{"TagKey":"tke-lb-serviceuuid","TagValue":"dbdc7ee3-bc87-4d4c-a15a-f12b257beab5"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c3b258ad-8977-4244-a945-a2f4509a4afc"},{"TagKey":"tke-lb-serviceuuid","TagValue":"291774c8-9cd8-4055-a0c1-23e0cafbd6cd"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c5191b3e-ddba-4076-ba40-1c380cc6abba"},{"TagKey":"tke-lb-serviceuuid","TagValue":"38170e63-034d-482e-b3ec-5eb286987138"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f3f8cedf-fc08-4741-badd-3b3bb59c336d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9c95ebaf-ab0e-4318-a76c-7f00723e75e7"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6574f8a0-6e3b-40d4-a9d0-e34f1254cbfd"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e3a9e329-0ae6-44d6-a9a3-dba1e1d57829"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0df9b40b-b231-4fcb-8ace-fac4bbb02094"},{"TagKey":"tke-lb-serviceuuid","TagValue":"77a00c05-f3a6-47d8-a012-303f05ba81f9"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6bce2689-4383-4504-8c67-3ab82929f171"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f494c007-5d5b-49f5-9cf1-b3486b351798"},{"TagKey":"tke-lb-serviceuuid","TagValue":"84401d5c-1509-4798-a38c-96b76886c76c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"21967823-0873-49f9-b1e0-7429dc60dd93"},{"TagKey":"tke-lb-serviceuuid","TagValue":"250e5da4-bc6f-42ec-8e01-321de20b318b"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1dae5842-6fae-408c-9db3-e33ac47b7288"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ee1738ea-0e3a-4cbd-aa86-3325759ae998"},{"TagKey":"tke-lb-serviceuuid","TagValue":"17c36c1e-955c-458e-a6a2-31328a94b2bf"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ac098260-0214-4f28-ab86-baecc27a4206"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4759d071-b9f7-4c0a-a4bb-8197d62f993d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6aa2bf54-39f7-4069-bb5d-75795e7f035e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"114db7b5-cf21-44b1-b406-9647111cbb8a"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6c2cc846-7b8a-461a-b7d4-bbedb96714d3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ec09ed75-7cfa-40a5-a29f-2cc06ab9ec13"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3b8077d2-254f-42b1-814f-ba730e556524"},{"TagKey":"tke-lb-serviceuuid","TagValue":"81d7e8ca-6a8c-4d71-8faa-13c8ae42251f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9de8483d-1a80-4b78-ad7b-693929c7377d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"377a6409-80e1-4846-a2ba-c91d5b578926"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c8c4d0ca-20ed-46b3-af03-8ce6badb3acd"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3271eab2-b605-4459-85af-e1af4840a12e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"070599aa-5e3e-4035-bcec-16c18b788069"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4194356a-0223-4fc6-ac42-6a910a361f34"},{"TagKey":"tke-lb-serviceuuid","TagValue":"04ec3346-6fce-4a3a-a226-9e8fb88a3311"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a8f86d68-96be-4a65-aa8e-484c40fce2a2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fb678b9b-08e2-420e-b674-8561235c6059"},{"TagKey":"tke-lb-serviceuuid","TagValue":"86bd128c-891e-11ec-88a7-ea5d3fc88179"}],"RequestId":"773178f5-68bd-4632-9bc8-f2c940d13201"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4259'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:31:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["tke-lb-serviceuuid"], "PaginationToken": "sREf2XzQYdrhYfdkpDhcEEBHvXDeml5nUQywyvH54oCFtLuw0VOR3cksV30LLmzW",
+      "MaxResults": 50}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '140'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"XaUod_JHUq6jLs4x6AbjBdyJ2lQ6errJmypATC90rM2F22GD37HP-2bRq7eH1P-L","Tags":[{"TagKey":"tke-lb-serviceuuid","TagValue":"36d57a0f-4fc5-43dd-b6fc-fe61c2d7af5b"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e850af73-999c-41fd-b72a-12c7f6491cad"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7ca8f196-12b5-41cd-bbe0-6e2cecb212e3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fcc6939f-6a40-462f-b1b1-fb6abaffce30"},{"TagKey":"tke-lb-serviceuuid","TagValue":"79143e73-c75b-4e1a-99a4-a23fe6e90e6c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"06db5b46-6681-4dda-9164-3cd15983ed90"},{"TagKey":"tke-lb-serviceuuid","TagValue":"186525d6-5d8d-4b16-9453-7f7f3c6ed01f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c04def45-3d29-48c0-911f-994be1033aa8"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b207d655-b4c3-44ec-b2b2-fc9abf4dcb9d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0b30fa8b-2cdf-450d-96db-0f27e0636c36"},{"TagKey":"tke-lb-serviceuuid","TagValue":"06207036-0c1d-4991-8c63-42da6abc0fc4"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fd44dc3e-05a2-4382-acc6-849af25df175"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7cbe1421-75b3-4868-a510-3bac7e8b8550"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0fce8885-c66a-49b9-a3eb-f1b47b5764c2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"354de8f9-719c-4568-9e21-2e59d5ecee93"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1e2be626-1db4-4d74-85e7-4a6f4d41497f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"c9b8a979-5611-46b1-80c3-18435684aec2"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4e31fd6d-6b0a-4aec-9d70-f0bc7733a809"},{"TagKey":"tke-lb-serviceuuid","TagValue":"2550e439-d5e3-4223-aaf1-a7b503e5132b"},{"TagKey":"tke-lb-serviceuuid","TagValue":"840e1574-b512-4046-abde-6513bbde7779"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0fadcad5-f70a-4cde-8ab2-f521b775ddd9"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b5fb6316-098b-4d35-8222-a40ca4e2645e"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3c5242be-910a-11eb-85d3-02a05e9b3e6c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b8def6c0-9070-11eb-b2ad-96efc385ee7f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b578f03d-2c81-44ad-a239-33017d19508d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9b8da406-2897-4d60-a4cb-df35f33c4a95"},{"TagKey":"tke-lb-serviceuuid","TagValue":"aa8e064d-34b9-42bf-bea4-847f2687e6c3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1b80407a-0d5c-45d3-a73e-edda1d9556ad"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0a8acfd9-258e-494d-a9b8-f2752ef525af"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b427579b-ab39-4cde-8e30-3305c2e3549b"},{"TagKey":"tke-lb-serviceuuid","TagValue":"5519b388-2732-4ba0-943a-ed129422fddc"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e5aa7275-8e88-4f62-8e7c-39834a5754f4"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ceed836e-cad3-4f51-a399-cb00afd826fa"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3e6e86fa-b283-48fb-8428-5011f5f835fa"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f31c69c7-f349-48e5-843e-350f109c190a"},{"TagKey":"tke-lb-serviceuuid","TagValue":"30a21047-736d-4949-91ae-b7e55202a0e6"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fdc00504-b936-4274-bb2e-974f9c09ab93"},{"TagKey":"tke-lb-serviceuuid","TagValue":"51208832-3bf2-4a46-8754-8f468c16aa5a"},{"TagKey":"tke-lb-serviceuuid","TagValue":"cd3b6333-6cbb-4a5d-a60a-d56b03b79a05"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0b332f6f-88d1-437b-8646-89da65083817"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d55c12d4-e1f7-4093-8779-547491c754a9"},{"TagKey":"tke-lb-serviceuuid","TagValue":"2fe42ca7-c678-49f2-9748-6f0de3cf4792"},{"TagKey":"tke-lb-serviceuuid","TagValue":"739aee4c-d364-4313-91de-8cbe799ebef3"},{"TagKey":"tke-lb-serviceuuid","TagValue":"4154d91e-911c-4359-b8e1-b07720710b3f"},{"TagKey":"tke-lb-serviceuuid","TagValue":"ccd9c277-87ac-47d2-87bd-ca3f50eba857"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e698cd77-3542-4954-ab80-263f5150e87c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6393965d-b2cf-4ff3-8c51-1762ef6ab395"},{"TagKey":"tke-lb-serviceuuid","TagValue":"49423966-a4eb-11e9-96ea-5254004c8917"},{"TagKey":"tke-lb-serviceuuid","TagValue":"675838f9-9e00-11e9-96ea-5254004c8917"},{"TagKey":"tke-lb-serviceuuid","TagValue":"3d6e4add-8725-11e9-97a5-525400da6c84"}],"RequestId":"195a63c6-a88a-4a22-b49a-3c54246b7836"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4259'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:31:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["tke-lb-serviceuuid"], "PaginationToken": "XaUod_JHUq6jLs4x6AbjBdyJ2lQ6errJmypATC90rM2F22GD37HP-2bRq7eH1P-L",
+      "MaxResults": 50}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '140'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","Tags":[{"TagKey":"tke-lb-serviceuuid","TagValue":"57928f9e-826b-11e9-97a5-525400da6c84"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a6655229-7c89-11e9-8c3b-162b63157c55"},{"TagKey":"tke-lb-serviceuuid","TagValue":"0d5d3a7b-7c69-11e9-8c3b-162b63157c55"},{"TagKey":"tke-lb-serviceuuid","TagValue":"92c9785b-7c25-11e9-8c33-525400aceb42"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6adebdf5-7c0d-11e9-97a5-525400da6c84"},{"TagKey":"tke-lb-serviceuuid","TagValue":"56f13140-7c0b-11e9-b8e6-52540087c68d"},{"TagKey":"tke-lb-serviceuuid","TagValue":"472d70b0-7c07-11e9-a261-5254001af703"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f413d918-7ba2-11e9-8c33-525400aceb42"},{"TagKey":"tke-lb-serviceuuid","TagValue":"8d055b14-7b67-11e9-a261-5254001af703"},{"TagKey":"tke-lb-serviceuuid","TagValue":"18b0a6ca-7acf-11e9-8c3b-162b63157c55"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f2041a8c-7aca-11e9-8c3b-162b63157c55"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1396ffa9-7118-11e9-8c33-525400aceb42"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fb3c2374-7060-11e9-8c33-525400aceb42"},{"TagKey":"tke-lb-serviceuuid","TagValue":"b0749ba6-6c63-11e9-8ac2-525400efaa9a"},{"TagKey":"tke-lb-serviceuuid","TagValue":"343bb465-6c52-11e9-917c-5254001cb688"},{"TagKey":"tke-lb-serviceuuid","TagValue":"8308d6e3-6c51-11e9-8514-eaf468329796"},{"TagKey":"tke-lb-serviceuuid","TagValue":"e6e14be4-6b93-11e9-917c-5254001cb688"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d60706b7-6b85-11e9-a11e-525400f68b7c"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a6178fce-6ae5-11e9-926c-7e966ddaf410"},{"TagKey":"tke-lb-serviceuuid","TagValue":"7d610e00-6adf-11e9-af4d-525400fc1685"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d61fc473-6add-11e9-af4d-525400fc1685"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9c626b42-6adc-11e9-a5d7-4aa6167787ff"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d57fecf1-5a55-11e9-8b7b-d63db1eef280"},{"TagKey":"tke-lb-serviceuuid","TagValue":"f366f5d7-5a4f-11e9-8b7b-d63db1eef280"},{"TagKey":"tke-lb-serviceuuid","TagValue":"173c502e-5a4e-11e9-a839-7a2cfd9c87b7"},{"TagKey":"tke-lb-serviceuuid","TagValue":"9c9806b1-26b3-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"a3100036-4fce-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"43438bbe-44b8-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"fe1be964-4492-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6dcbfe50-3fde-11e9-8ae3-5250cc6b0caf"},{"TagKey":"tke-lb-serviceuuid","TagValue":"d9027d12-269d-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"43143b53-269a-11e9-bba7-0a587f861924"},{"TagKey":"tke-lb-serviceuuid","TagValue":"de3d76e2-1ede-11e9-a2bf-0a587f8252fa"}],"RequestId":"3b7031fd-0068-4df6-abaf-8d61faa3175b"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2801'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:31:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,173 @@
+interactions:
+- request:
+    body: '{"Scope": "Local", "Page": 1, "Rp": 200}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '40'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - ListPolicies
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"ServiceTypeList":[],"List":[{"PolicyId":141834197,"PolicyName":"demo-admin-2","Type":1,"Description":"","CreateMode":2,"Attachments":0,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":0,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-11
+        09:50:17","UpdateTime":"2022-10-11 09:50:17","Deactived":0,"DeactivedDetail":[]},{"PolicyId":141818449,"PolicyName":"demo-admin","Type":1,"Description":"","CreateMode":3,"Attachments":0,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":0,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-10
+        20:27:10","UpdateTime":"2022-10-10 20:27:10","Deactived":0,"DeactivedDetail":[]},{"PolicyId":141753149,"PolicyName":"demo","Type":1,"Description":"","CreateMode":3,"Attachments":1,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":1,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-09
+        10:38:07","UpdateTime":"2022-10-09 10:41:53","Deactived":0,"DeactivedDetail":[]}],"TotalNum":3,"RequestId":"6ea2db5a-b52a-43e7-8c74-1966eff36b32"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1067'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 10:52:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141834197}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - ListEntitiesForPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalNum":0,"List":[],"RequestId":"eab2f9b8-edda-4252-b934-f655ad566168"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '88'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 10:52:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141818449}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - ListEntitiesForPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalNum":0,"List":[],"RequestId":"a46599b6-286d-4c8c-9bb6-bc071ab88aa8"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '88'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 10:52:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141753149}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - ListEntitiesForPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalNum":1,"List":[{"Id":"251604","Name":"demo","Uin":0,"RelatedType":2,"AttachmentTime":"2022-10-11T18:40:01+0800"}],"RequestId":"0f42570e-5a9f-4ed5-a6dc-a43643650056"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '185'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 10:52:44 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

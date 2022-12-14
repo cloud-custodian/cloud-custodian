@@ -11,6 +11,8 @@ from .core import MethodAction
 
 from c7n_gcp.provider import resources as gcp_resources
 
+SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'SEVERITY_UNSPECIFIED']
+
 
 class PostFinding(MethodAction):
     """Post finding for matched resources to Cloud Security Command Center.
@@ -44,7 +46,8 @@ class PostFinding(MethodAction):
                 'description': 'qualified name of source to post to CSCC as'},
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
-            'category': {'type': 'string'}})
+            'category': {'type': 'string'},
+            'severity': {'type': 'string', 'enum': SEVERITIES}})
     schema_alias = True
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
 
@@ -53,8 +56,9 @@ class PostFinding(MethodAction):
 
     CustodianSourceName = 'CloudCustodian'
     DefaultCategory = 'Custodian'
+    DefaultSeverity = 'SEVERITY_UNSPECIFIED'
     Service = 'securitycenter'
-    ServiceVersion = 'v1beta1'
+    ServiceVersion = 'v1'
 
     _source = None
 
@@ -152,6 +156,7 @@ class PostFinding(MethodAction):
             'resourceName': resource_name,
             'state': 'ACTIVE',
             'category': self.data.get('category', self.DefaultCategory),
+            'severity': self.data.get('severity', self.DefaultSeverity),
             'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
             'sourceProperties': {
                 'resource_type': self.manager.type,

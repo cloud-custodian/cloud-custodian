@@ -4,6 +4,8 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
+from urllib.request import urlopen, urlparse, Request
+from urllib.error import HTTPError
 import contextlib
 import copy
 import datetime
@@ -23,7 +25,7 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import ClientError, InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
 
 from .resource_map import ResourceMap
@@ -121,6 +123,66 @@ def shape_validate(params, shape_name, service):
     report = validator.validate(params, shape)
     if report.has_errors():
         raise PolicyValidationError(report.generate_report())
+
+
+def get_bucket_region_clientless(bucket, s3_endpoint):
+    """Attempt to determine a bucket region without a client
+
+    We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
+    region. This avoids some issues with cross-account/cross-region uses of the
+    GetBucketPolicy API action. Because bucket names are unique within
+    AWS partitions, we can make requests to a single regional S3 endpoint
+    and get redirected if a bucket lives in another region within the
+    same partition.
+
+    This approach is inspired by some sample code from a Go SDK issue comment,
+    which @sean-zou mentioned in #7593:
+
+    https://github.com/aws/aws-sdk-go/issues/720#issuecomment-613038544
+
+    Return a region string, or None if we're unable to determine one.
+    """
+    region = None
+    s3_endpoint_parts = urlparse(s3_endpoint)
+    # Use a "path-style" S3 URL here to avoid failing TLS certificate validation
+    # on buckets with a dot in the name.
+    #
+    # According to the following blog post, before deprecating path-style
+    # URLs AWS will provide a way for virtual-hosted-style URLs to handle
+    # buckets with dots in their names. Using path-style URLs here in
+    # the meantime seems reasonable, compared to alternatives like forcing
+    # HTTP or ignoring certificate validation.
+    #
+    # https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
+    bucket_endpoint = f'https://{s3_endpoint_parts.netloc}/{bucket}'
+    request = Request(bucket_endpoint, method='HEAD')
+    try:
+        # Dynamic use of urllib trips up static analyzers because
+        # of the potential to accidentally allow unexpected schemes
+        # like file:/. Here we're hardcoding the https scheme, so
+        # we can ignore those specific checks.
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
+        response = urlopen(request)  # nosec B310
+        region = response.headers.get('x-amz-bucket-region')
+    except HTTPError as err:
+        # Permission errors or redirects for valid buckets should still contain a
+        # header we can use to determine the bucket region.
+        region = err.headers.get('x-amz-bucket-region')
+
+    return region
+
+
+def get_bucket_region(bucket, client):
+    """Determine a bucket's region using the GetBucketLocation API action
+
+    Look up a bucket's location constraint and map it to a region name as described in
+    https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
+    """
+    location = client.get_bucket_location(Bucket=bucket)['LocationConstraint']
+
+    # Remap region for cases where the location constraint doesn't match
+    region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
+    return region
 
 
 class Arn(namedtuple('_Arn', (
@@ -535,8 +597,21 @@ class S3Output(BlobOutput):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
         # can't use a local session as we dont want an unassumed session cached.
+        s3_client = self.ctx.session_factory(assume=False).client('s3')
+
+        # Try determining the output bucket region via HTTP requests since
+        # that works more consistently in cross-region scenarios. Fall back
+        # the GetBucketLocation API if necessary.
+        try:
+            self.bucket_region = (
+                get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
+                get_bucket_region(self.bucket, s3_client)
+            )
+        except ClientError as err:
+            raise InvalidOutputConfig(
+                f'unable to determine a region for output bucket {self.bucket}: {err}') from None
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
@@ -588,7 +663,7 @@ class AWS(Provider):
         from c7n.policy import Policy, PolicyCollection
         policies = []
         service_region_map, resource_service_map = get_service_region_map(
-            options.regions, policy_collection.resource_types)
+            options.regions, policy_collection.resource_types, self.type)
         if 'all' in options.regions:
             enabled_regions = {
                 r['RegionName'] for r in
@@ -658,19 +733,18 @@ def fake_session():
     return session
 
 
-def get_service_region_map(regions, resource_types):
+def get_service_region_map(regions, resource_types, provider='aws'):
     # we're not interacting with the apis just using the sdk meta information.
 
     session = fake_session()
     normalized_types = []
     for r in resource_types:
-        if r.startswith('aws.'):
-            normalized_types.append(r[4:])
+        if r.startswith('%s.' % provider):
+            normalized_types.append(r[len(provider) + 1:])
         else:
             normalized_types.append(r)
-
     resource_service_map = {
-        r: clouds['aws'].resources.get(r).resource_type.service
+        r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
     # support for govcloud and china, we only utilize these regions if they
     # are explicitly passed in on the cli.

@@ -214,9 +214,10 @@ class Filter(Element):
             r[self.matched_annotation_key] = intersect_list(
                 values,
                 r.get(self.matched_annotation_key))
-
-        if not values and block_op != 'or':
-            return
+        elif block_op == 'or':
+            r[self.matched_annotation_key] = union_list(
+                values,
+                r.get(self.matched_annotation_key))
 
 
 class BaseValueFilter(Filter):
@@ -255,6 +256,26 @@ class BaseValueFilter(Filter):
             r = ValueRegex(regex).get_resource_value(r)
         return r
 
+    def _validate_value_regex(self, regex):
+        """Specific validation for `value_regex` type
+
+        The `value_regex` type works a little differently.  In
+        particular it doesn't support OPERATORS that perform
+        operations on a list of values, specifically 'intersect',
+        'contains', 'difference', 'in' and 'not-in'
+        """
+        # Sanity check that we can compile
+        try:
+            pattern = re.compile(regex)
+            if pattern.groups != 1:
+                raise PolicyValidationError(
+                    "value_regex must have a single capturing group: %s" %
+                    self.data)
+        except re.error as e:
+            raise PolicyValidationError(
+                "Invalid value_regex: %s %s" % (e, self.data))
+        return self
+
 
 def intersect_list(a, b):
     if b is None:
@@ -265,6 +286,16 @@ def intersect_list(a, b):
     for x in a:
         if x in b:
             res.append(x)
+    return res
+
+
+def union_list(a, b):
+    if not b:
+        return a
+    if not a:
+        return b
+    res = a
+    res.extend(x for x in b if x not in a)
     return res
 
 
@@ -291,6 +322,13 @@ class BooleanGroupFilter(Filter):
     def __bool__(self):
         return True
 
+    def get_deprecations(self):
+        """Return any matching deprecations for the nested filters."""
+        deprecations = []
+        for f in self.filters:
+            deprecations.extend(f.get_deprecations())
+        return deprecations
+
 
 class Or(BooleanGroupFilter):
 
@@ -308,11 +346,20 @@ class Or(BooleanGroupFilter):
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
-        resource_map = {r[rtype_id]: r for r in resources}
+        compiled = None
+        if '.' in rtype_id:
+            compiled = jmespath.compile(rtype_id)
+            resource_map = {compiled.search(r): r for r in resources}
+        else:
+            resource_map = {r[rtype_id]: r for r in resources}
         results = set()
         for f in self.filters:
-            results = results.union([
-                r[rtype_id] for r in f.process(resources, event)])
+            if compiled:
+                results = results.union([
+                    compiled.search(r) for r in f.process(resources, event)])
+            else:
+                results = results.union([
+                    r[rtype_id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
@@ -352,7 +399,12 @@ class Not(BooleanGroupFilter):
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
-        resource_map = {r[rtype_id]: r for r in resources}
+        compiled = None
+        if '.' in rtype_id:
+            compiled = jmespath.compile(rtype_id)
+            resource_map = {compiled.search(r): r for r in resources}
+        else:
+            resource_map = {r[rtype_id]: r for r in resources}
         sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
@@ -361,7 +413,10 @@ class Not(BooleanGroupFilter):
                 break
 
         before = set(resource_map.keys())
-        after = {r[rtype_id] for r in resources}
+        if compiled:
+            after = {compiled.search(r) for r in resources}
+        else:
+            after = {r[rtype_id] for r in resources}
         results = before - after
         sweeper.sweep([])
 
@@ -377,16 +432,28 @@ class AnnotationSweeper:
         self.id_key = id_key
         ra_map = {}
         resource_map = {}
+        compiled = None
+        if '.' in id_key:
+            compiled = jmespath.compile(self.id_key)
         for r in resources:
-            ra_map[r[id_key]] = {k: v for k, v in r.items() if k.startswith('c7n')}
-            resource_map[r[id_key]] = r
+            if compiled:
+                id_ = compiled.search(r)
+            else:
+                id_ = r[self.id_key]
+            ra_map[id_] = {k: v for k, v in r.items() if k.startswith('c7n')}
+            resource_map[id_] = r
         # We keep a full copy of the annotation keys to allow restore.
         self.ra_map = copy.deepcopy(ra_map)
         self.resource_map = resource_map
 
     def sweep(self, resources):
-        for rid in set(self.ra_map).difference([
-                r[self.id_key] for r in resources]):
+        compiled = None
+        if '.' in self.id_key:
+            compiled = jmespath.compile(self.id_key)
+            diff = set(self.ra_map).difference([compiled.search(r) for r in resources])
+        else:
+            diff = set(self.ra_map).difference([r[self.id_key] for r in resources])
+        for rid in diff:
             # Clear annotations if the block filter didn't match
             akeys = [k for k in self.resource_map[rid] if k.startswith('c7n')]
             for k in akeys:
@@ -493,26 +560,6 @@ class ValueFilter(BaseValueFilter):
         if 'value_regex' in self.data:
             return self._validate_value_regex(self.data['value_regex'])
 
-        return self
-
-    def _validate_value_regex(self, regex):
-        """Specific validation for `value_regex` type
-
-        The `value_regex` type works a little differently.  In
-        particular it doesn't support OPERATORS that perform
-        operations on a list of values, specifically 'intersect',
-        'contains', 'difference', 'in' and 'not-in'
-        """
-        # Sanity check that we can compile
-        try:
-            pattern = re.compile(regex)
-            if pattern.groups != 1:
-                raise PolicyValidationError(
-                    "value_regex must have a single capturing group: %s" %
-                    self.data)
-        except re.error as e:
-            raise PolicyValidationError(
-                "Invalid value_regex: %s %s" % (e, self.data))
         return self
 
     def __call__(self, i):

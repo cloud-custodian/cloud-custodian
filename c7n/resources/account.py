@@ -5,6 +5,7 @@
 import json
 import time
 import datetime
+import jmespath
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -17,13 +18,13 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-from .aws import shape_validate
+from .aws import shape_validate, Arn
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -48,6 +49,7 @@ class Account(ResourceManager):
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(QueryResourceManager.retry)
+    source_type = 'describe'
 
     class resource_type(TypeInfo):
         id = 'account_id'
@@ -56,6 +58,8 @@ class Account(ResourceManager):
         global_resource = True
         # fake this for doc gen
         service = "account"
+        # for posting config rule evaluations
+        cfn_type = 'AWS::::Account'
 
     @classmethod
     def get_permissions(cls):
@@ -118,6 +122,8 @@ class MacieEnabled(ValueFilter):
         if super().process([resources[0][self.annotation_key]]):
             return resources
 
+        return []
+
     def get_macie_info(self, account):
         client = local_session(
             self.manager.session_factory).client('macie2')
@@ -147,6 +153,9 @@ class CloudTrailEnabled(Filter):
     Of particular note, the current-region option will evaluate whether cloudtrail is available
     in the current region, either as a multi region trail or as a trail with it as the home region.
 
+    The log-metric-filter-pattern option checks for the existence of a cloudwatch alarm and a
+    corresponding SNS subscription for a specific filter pattern
+
     :example:
 
     .. code-block:: yaml
@@ -160,6 +169,8 @@ class CloudTrailEnabled(Filter):
                     global-events: true
                     multi-region: true
                     running: true
+                    include-management-events: true
+                    log-metric-filter-pattern: "{ ($.eventName = \\"ConsoleLogin\\") }"
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -170,9 +181,13 @@ class CloudTrailEnabled(Filter):
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
            'kms': {'type': 'boolean'},
-           'kms-key': {'type': 'string'}})
+           'kms-key': {'type': 'string'},
+           'include-management-events': {'type': 'boolean'},
+           'log-metric-filter-pattern': {'type': 'string'}})
 
-    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
+    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
+                   'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
+                   'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -206,6 +221,54 @@ class CloudTrailEnabled(Filter):
                         'LatestDeliveryError'):
                     running.append(t)
             trails = running
+        if self.data.get('include-management-events'):
+            matched = []
+            for t in list(trails):
+                selectors = client.get_event_selectors(TrailName=t['TrailARN'])
+                if 'EventSelectors' in selectors.keys():
+                    for s in selectors['EventSelectors']:
+                        if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
+                            matched.append(t)
+            trails = matched
+        if self.data.get('log-metric-filter-pattern'):
+            client_logs = session.client('logs')
+            client_cw = session.client('cloudwatch')
+            sns_manager = self.manager.get_resource_manager('sns-subscription')
+            matched = []
+            for t in list(trails):
+                if 'CloudWatchLogsLogGroupArn' not in t.keys():
+                    continue
+                log_group_name = t['CloudWatchLogsLogGroupArn'].split(':')[6]
+                try:
+                    metric_filters_log_group = \
+                        client_logs.describe_metric_filters(
+                            logGroupName=log_group_name)['metricFilters']
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                        continue
+                filter_matched = None
+                if metric_filters_log_group:
+                    for f in metric_filters_log_group:
+                        if f['filterPattern'] == self.data.get('log-metric-filter-pattern'):
+                            filter_matched = f
+                            break
+                if not filter_matched:
+                    continue
+                alarms = client_cw.describe_alarms_for_metric(
+                    MetricName=filter_matched["metricTransformations"][0]["metricName"],
+                    Namespace=filter_matched["metricTransformations"][0]["metricNamespace"]
+                )['MetricAlarms']
+                alarm_actions = []
+                for a in alarms:
+                    alarm_actions.extend(a['AlarmActions'])
+                if not alarm_actions:
+                    continue
+                alarm_actions = set(alarm_actions)
+                sns_subscriptions = sns_manager.resources()
+                for s in sns_subscriptions:
+                    if s['TopicArn'] in alarm_actions:
+                        matched.append(t)
+            trails = matched
         if trails:
             return []
         return resources
@@ -724,9 +787,9 @@ class ServiceLimit(Filter):
         return True
 
     def process(self, resources, event=None):
+        support_region = get_support_region(self.manager)
         client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
-
+            'support', region_name=support_region)
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
@@ -855,8 +918,9 @@ class RequestLimitIncrease(BaseAction):
     }
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        client = session.client('support', region_name='us-east-1')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         account_id = self.manager.config.account_id
         service_map = {}
         region_map = {}
@@ -1833,3 +1897,167 @@ class SecHubEnabled(Filter):
         if state == bool(sechub):
             return resources
         return []
+
+
+@filters.register('lakeformation-s3-cross-account')
+class LakeformationFilter(Filter):
+    """Flags an account if its using a lakeformation s3 bucket resource from a different account.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: lakeformation-cross-account-bucket
+           resource: aws.account
+           filters:
+            - type: lakeformation-s3-cross-account
+
+    """
+
+    schema = type_schema('lakeformation-s3-cross-account', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lakeformation:ListResources',)
+    annotation = 'c7n:lake-cross-account-s3'
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.process_account(r):
+                results.append(r)
+        return results
+
+    def process_account(self, account):
+        client = local_session(self.manager.session_factory).client('lakeformation')
+        lake_buckets = {
+            Arn.parse(r).resource for r in jmespath.search(
+                'ResourceInfoList[].ResourceArn',
+                client.list_resources())
+        }
+        buckets = {
+            b['Name'] for b in
+            self.manager.get_resource_manager('s3').resources(augment=False)}
+        cross_account = lake_buckets.difference(buckets)
+        if not cross_account:
+            return False
+        account[self.annotation] = list(cross_account)
+        return True
+
+
+@filters.register('ses-agg-send-stats')
+class SesAggStats(ValueFilter):
+    """This filter queries SES send statistics and aggregates all
+    the data points into a single report.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-aggregated-send-stats-policy
+                resource: account
+                filters:
+                  - type: ses-agg-send-stats
+    """
+
+    schema = type_schema('ses-agg-send-stats', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ses-send-agg'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        resource_counter = {'DeliveryAttempts': 0,
+                            'Bounces': 0,
+                            'Complaints': 0,
+                            'Rejects': 0,
+                            'BounceRate': 0}
+        for d in get_send_stats.get('SendDataPoints', []):
+            resource_counter['DeliveryAttempts'] += d['DeliveryAttempts']
+            resource_counter['Bounces'] += d['Bounces']
+            resource_counter['Complaints'] += d['Complaints']
+            resource_counter['Rejects'] += d['Rejects']
+        resource_counter['BounceRate'] = round(
+            (resource_counter['Bounces'] /
+             resource_counter['DeliveryAttempts']) * 100)
+        resources[0][self.annotation_key] = resource_counter
+
+        return resources
+
+
+@filters.register('ses-send-stats')
+class SesConsecutiveStats(Filter):
+    """This filter annotates the account resource with SES send statistics for the
+    last n number of days, not including the current date.
+
+    The stats are aggregated into daily metrics. Additionally, the filter also
+    calculates and annotates the max daily bounce rate (percentage). Using this filter,
+    users can alert when the bounce rate for a particular day is higher than the limit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-send-stats
+                resource: account
+                filters:
+                  - type: ses-send-stats
+                    days: 5
+                  - type: value
+                    key: '"c7n:ses-max-bounce-rate"'
+                    op: ge
+                    value: 10
+    """
+    schema = type_schema('ses-send-stats', days={'type': 'number', 'minimum': 2},
+                         required=['days'])
+    send_stats_annotation = 'c7n:ses-send-stats'
+    max_bounce_annotation = 'c7n:ses-max-bounce-rate'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+        check_days = self.data.get('days', 2)
+        utcnow = datetime.datetime.utcnow()
+        expected_dates = set()
+
+        for days in range(1, check_days + 1):
+            expected_dates.add((utcnow - datetime.timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        metrics = {}
+        for d in get_send_stats.get('SendDataPoints', []):
+            ts = d['Timestamp'].strftime('%Y-%m-%d')
+            if ts not in expected_dates:
+                continue
+
+            if not metrics.get(ts):
+                metrics[ts] = {'DeliveryAttempts': 0,
+                               'Bounces': 0,
+                               'Complaints': 0,
+                               'Rejects': 0}
+            metrics[ts]['DeliveryAttempts'] += d['DeliveryAttempts']
+            metrics[ts]['Bounces'] += d['Bounces']
+            metrics[ts]['Complaints'] += d['Complaints']
+            metrics[ts]['Rejects'] += d['Rejects']
+
+        max_bounce_rate = 0
+        for ts, metric in metrics.items():
+            metric['BounceRate'] = round((metric['Bounces'] / metric['DeliveryAttempts']) * 100)
+            if max_bounce_rate < metric['BounceRate']:
+                max_bounce_rate = metric['BounceRate']
+            metric['Date'] = ts
+
+        resources[0][self.send_stats_annotation] = list(metrics.values())
+        resources[0][self.max_bounce_annotation] = max_bounce_rate
+
+        return resources

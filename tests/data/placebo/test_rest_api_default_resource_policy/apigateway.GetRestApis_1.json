@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "392276a1-4c59-4533-a22c-8a48e3241970",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 10 Aug 2022 10:08:36 GMT",
+                "content-type": "application/json",
+                "content-length": "2002",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "392276a1-4c59-4533-a22c-8a48e3241970",
+                "x-amz-apigw-id": "WpGBvKiqDoEEbJQ="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "6wv8r5sehj",
+                "name": "public-dummy-api",
+                "description": "Doesnt do anything",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 11,
+                    "minute": 58,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false
+            }
+        ]
+    }
+}

@@ -613,3 +613,44 @@ class SecurityHubTest(BaseTest):
                 "Tags": {
                     "workload-type": "other"}
             })
+
+    def test_larger_batch_s3(self):
+        factory = self.replay_flight_data("test_larger_batch")
+
+        policy = self.load_policy(
+            {
+                "name": "ebs-finding",
+                "resource": "ebs-snapshot",
+                "filters": [],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "batch_size": 2,
+                        "title": "EBS Testing",
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "Title": [
+                    {
+                        "Value": "EBS Testing",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+
+        self.assertEqual(len(findings), 2)

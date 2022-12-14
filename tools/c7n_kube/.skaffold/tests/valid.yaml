@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: valid-nginx
+  labels:
+    app.kubernetes.io/name: test-name
+    app.kubernetes.io/instance: test-instance
+    app.kubernetes.io/version: test-version
+    app.kubernetes.io/component: test-component
+    app.kubernetes.io/part-of: test-part-of
+    app.kubernetes.io/managed-by: test-managed-by
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.14.2
+      ports:
+        - containerPort: 80

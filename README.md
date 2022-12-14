@@ -61,6 +61,7 @@ Links
 
 -   [Homepage](http://cloudcustodian.io)
 -   [Docs](http://cloudcustodian.io/docs/index.html)
+-   [Project Roadmap](https://github.com/orgs/cloud-custodian/projects/1)
 -   [Developer Install](https://cloudcustodian.io/docs/developer/installing.html)
 -   [Presentations](https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid)
 
@@ -211,11 +212,26 @@ For specific instructions for AWS, Azure, and GCP, visit the relevant getting st
 Get Involved
 ------------
 
--   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian)
--   [GitHub](https://github.com/cloud-custodian/cloud-custodian)
--   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian)
--   [Reddit](https://reddit.com/r/cloudcustodian)
--   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian)
+-   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
+-   [Slack](https://communityinviter.com/apps/cloud-custodian/c7n-chat) - Real time chat if you're looking for help or interested in contributing to Custodian! 
+    - [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - (Older real time chat, we're likely migrating away from this)
+-   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
+-   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
+-   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA/) - We're working on adding tutorials and other useful information, as well as meeting videos
+
+Community Resources
+-------------------
+
+We have a regular community meeting that is open to all users and developers of every skill level.
+Joining the [mailing list](https://groups.google.com/forum/#!forum/cloud-custodian) will automatically send you a meeting invite. 
+See the notes below for more technical information on joining the meeting. 
+
+- [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
+- [Community Meeting Notes Archive](https://github.com/orgs/cloud-custodian/discussions/categories/announcements)
+- [Upcoming Community Events](https://cloudcustodian.io/events/)
+- [Cloud Custodian Annual Report 2021](https://github.com/cncf/toc/blob/main/reviews/2021-cloud-custodian-annual.md) - Annual health check provided to the CNCF outlining the health of the project
+
 
 Additional Tools
 ----------------
@@ -264,6 +280,7 @@ identified the issue positively or negatively.
 Code of Conduct
 ---------------
 
-This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
-participating, you are expected to honor this code.
+This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+
+By participating, you are expected to honor this code.
 
