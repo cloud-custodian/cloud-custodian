@@ -1538,6 +1538,7 @@ class Suspend(Action):
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
+                    'UnsupportedOperation',
                     'InvalidInstanceID.NotFound',
                     'IncorrectInstanceState'):
                 self.log.warning("Erroring stopping asg instances %s %s" % (
