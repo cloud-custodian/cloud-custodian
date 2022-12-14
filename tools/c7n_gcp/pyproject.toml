@@ -28,9 +28,9 @@ requests = "2.27.1"
 
 google-cloud-logging = "^3.2"
 google-auth = "^2.1.0"
-ratelimiter = "^1.2.0"
 google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^1.42.2"
+pyrate-limiter = "^2.8.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
