@@ -598,15 +598,15 @@ class SoftDeleteFilter(Filter):
         client = self.manager.get_client()
         result = []
         for resource in resources:
-            if 'blobServices' not in resource['properties']:
+            if 'c7n:blobServices' not in resource['properties']:
                 blob_services = client.blob_services.get_service_properties(
                     resource['resourceGroup'],
                     resource['name'])
 
-                resource['properties']['blobServices'] = \
+                resource['properties']['c7n:blobServices'] = \
                     blob_services.serialize(True).get('properties', {})
 
-            if resource['properties']['blobServices'].get('deleteRetentionPolicy').get('enabled') \
+            if resource['properties']['c7n:blobServices'].get('deleteRetentionPolicy').get('enabled') \
                     == self.enabled:
                 result.append(resource)
 
