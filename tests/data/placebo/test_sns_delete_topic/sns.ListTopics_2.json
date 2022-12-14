@@ -2,16 +2,6 @@
     "status_code": 200,
     "data": {
         "Topics": [],
-        "ResponseMetadata": {
-            "RequestId": "ef2a41e9-b9b3-5d5e-878f-148bb8606fb0",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "ef2a41e9-b9b3-5d5e-878f-148bb8606fb0",
-                "content-type": "text/xml",
-                "content-length": "256",
-                "date": "Fri, 24 May 2019 14:28:34 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

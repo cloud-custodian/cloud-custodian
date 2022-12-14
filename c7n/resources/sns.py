@@ -10,7 +10,7 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 from c7n.resources.securityhub import PostFinding
 
@@ -18,17 +18,8 @@ from c7n.resources.securityhub import PostFinding
 class DescribeTopic(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('sns')
-
-        def _augment(r):
-            tags = self.manager.retry(client.list_tags_for_resource,
-                ResourceArn=r['TopicArn'])['Tags']
-            r['Tags'] = tags
-            return r
-
         resources = super().augment(resources)
-        with self.manager.executor_factory(max_workers=3) as w:
-            return list(w.map(_augment, resources))
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('sns')
@@ -52,6 +43,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsPending',
             'SubscriptionsDeleted'
         )
+        universal_taggable = True
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
