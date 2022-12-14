@@ -8,7 +8,25 @@ from c7n_tencentcloud.utils import PageMethod, isoformat_datetime_str
 
 @resources.register("cbs-snapshot")
 class CBSSnapshot(QueryResourceManager):
-    """cbs-snapshot"""
+    """cbs-snapshot
+
+    Docs on cbs-snapshot
+    https://www.tencentcloud.com/document/product/362/31638
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cbs-old-snapshot
+          resource: tencentcloud.cbs-snapshot
+          filters:
+            - type: value
+              key: CreateTime
+              value_type: age
+              op: greater-than
+              value: 90
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
