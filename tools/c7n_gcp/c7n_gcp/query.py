@@ -422,7 +422,7 @@ class TypeInfo(metaclass=TypeMeta):
         location = cls._get_location(resource)
         if location == "global":
             location = ""
-        id = cls._get_id(resource)
+        id = cls._get_urn_id(resource)
         if not cls.urn_has_project:
             project_id = ""
         # NOTE: not sure whether to use `component` or just the last part of
@@ -430,7 +430,7 @@ class TypeInfo(metaclass=TypeMeta):
         return f"gcp:{cls.service}:{location}:{project_id}:{cls.urn_component}/{id}"
 
     @classmethod
-    def _get_id(cls, resource):
+    def _get_urn_id(cls, resource):
         path = cls.urn_id_path
         if path is None:
             path = cls.id

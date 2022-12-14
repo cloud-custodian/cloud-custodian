@@ -135,7 +135,7 @@ class SQLInstanceChildTypeInfo(ChildTypeInfo):
         return super()._get_location(cls.get_parent(resource))
 
     @classmethod
-    def _get_id(cls, resource):
+    def _get_urn_id(cls, resource):
         return f"{resource['instance']}/{resource[cls.id]}"
 
 

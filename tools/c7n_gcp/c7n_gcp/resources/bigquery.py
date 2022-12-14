@@ -84,7 +84,7 @@ class BigQueryJob(QueryResourceManager):
             })
 
         @classmethod
-        def _get_id(cls, resource):
+        def _get_urn_id(cls, resource):
             jobRef = resource['jobReference']
             return f"{jobRef['location']}/{jobRef['jobId']}"
 
@@ -119,7 +119,7 @@ class BigQueryTable(ChildResourceManager):
         urn_id_path = "tableReference.tableId"
 
         @classmethod
-        def _get_id(cls, resource):
+        def _get_urn_id(cls, resource):
             tableRef = resource['tableReference']
             return f"{tableRef['datasetId']}/{tableRef['tableId']}"
 

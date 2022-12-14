@@ -44,7 +44,7 @@ class Function(QueryResourceManager):
             return resource["name"].split('/')[3]
 
         @classmethod
-        def _get_id(cls, resource):
+        def _get_urn_id(cls, resource):
             "The id is the last segment of the name ."
             return resource["name"].split('/', 6)[-1]
 
