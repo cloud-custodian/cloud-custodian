@@ -43,7 +43,10 @@ class KafkaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-08f5a2e4c12adf737'])
+
         self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
+        self.assertEqual(resources[1]['c7n:matched-subnets'], ['subnet-08f5a2e4c12adf737'])
 
     def test_kafka_tag(self):
         factory = self.replay_flight_data('test_kafka_tag')
