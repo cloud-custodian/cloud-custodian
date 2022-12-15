@@ -130,3 +130,18 @@ class KafkaTest(BaseTest):
         self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=(jmespath.search(expression, resources[0])))
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/kafka')
+
+    def test_kafka_cluster_provisioned_and_serverless(self):
+        session_factory = self.replay_flight_data(
+            'test_kafka_cluster_provisioned_and_serverless')
+        p = self.load_policy(
+            {
+                'name': 'kafka-kms-filter',
+                'resource': 'kafka',
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
+        self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
