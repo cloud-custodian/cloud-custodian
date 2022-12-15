@@ -21,6 +21,7 @@ class DMDeployment(QueryResourceManager):
         name = id = 'name'
 
         default_report_fields = ['name', 'description', 'insertTime', 'updateTime']
+        urn_component = "deployment"
 
         @staticmethod
         def get(client, resource_info):

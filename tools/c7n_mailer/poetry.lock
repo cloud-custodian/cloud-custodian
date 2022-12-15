@@ -1194,18 +1194,18 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.26.29"
+version = "1.26.30"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.29-py3-none-any.whl", hash = "sha256:2e5e80daae3873185b046d1fabc13676aea519e891faf4f27ca71d287bc26039"},
-    {file = "boto3-1.26.29.tar.gz", hash = "sha256:4fb4a0ce2679e5dc1719441192b45687654201d5de76224f2c376b689c9ed4aa"},
+    {file = "boto3-1.26.30-py3-none-any.whl", hash = "sha256:e222714a6a841f318d3b6557d915dcc3729ff286e9aa3d03b5d26d6bfce3a3bd"},
+    {file = "boto3-1.26.30.tar.gz", hash = "sha256:13ba1d98ab5e2591be2dd19c779d67aa4210f126a827c9a376532ace435d8df9"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.29,<1.30.0"
+botocore = ">=1.29.30,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -1214,14 +1214,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.29"
+version = "1.29.30"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.29-py3-none-any.whl", hash = "sha256:dca2daf108aae6c847d8ec99b7e918b46ae81713bf70b2199ab94627faf935a1"},
-    {file = "botocore-1.29.29.tar.gz", hash = "sha256:97a6d059e688ff9caa7c0a4e30cc58fa27be8bf3347578ce7c62fb808380fb55"},
+    {file = "botocore-1.29.30-py3-none-any.whl", hash = "sha256:6bfe917c022b92c093da448aae71b18f7dcbbbc69403f57ee39ca4775b2888e6"},
+    {file = "botocore-1.29.30.tar.gz", hash = "sha256:9364417f53842167f8bcf72b9ab3c78457c7df613051101952b2470d9de7ea31"},
 ]
 
 [package.dependencies]
@@ -1330,7 +1330,7 @@ google-cloud-logging = "^3.2"
 google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^1.42.2"
 grpcio = "1.49.1"
-ratelimiter = "^1.2.0"
+pyrate-limiter = "^2.8.4"
 requests = "2.27.1"
 retrying = "^1.3.3"
 
@@ -2645,6 +2645,22 @@ files = [
 diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
+name = "pyrate-limiter"
+version = "2.8.4"
+description = "Python Rate-Limiter using Leaky-Bucket Algorithm"
+category = "main"
+optional = true
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "pyrate_limiter-2.8.4-py3-none-any.whl", hash = "sha256:447e8199a9a4ba55ea9f1fc3348ea77b4cee5da7735c385ee48c17f71bbb9592"},
+    {file = "pyrate_limiter-2.8.4.tar.gz", hash = "sha256:142c86c07f5882dc3c7b8b7c8681f04f258a875735534baac5d8a2eab06398c6"},
+]
+
+[package.extras]
+all = ["filelock (>=3.0)", "redis (>=3.3,<4.0)", "redis-py-cluster (>=2.1.3,<3.0.0)"]
+docs = ["furo (>=2022.3.4,<2023.0.0)", "myst-parser (>=0.17)", "sphinx (>=4.3.0,<5.0.0)", "sphinx-autodoc-typehints (>=1.17,<2.0)", "sphinx-copybutton (>=0.5)", "sphinxcontrib-apidoc (>=0.3,<0.4)"]
+
+[[package]]
 name = "pyrsistent"
 version = "0.19.2"
 description = "Persistent/Functional/Immutable data structures"
@@ -2829,21 +2845,6 @@ files = [
     {file = "PyYAML-6.0-cp39-cp39-win_amd64.whl", hash = "sha256:b3d267842bf12586ba6c734f89d1f5b871df0273157918b0ccefa29deb05c21c"},
     {file = "PyYAML-6.0.tar.gz", hash = "sha256:68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"},
 ]
-
-[[package]]
-name = "ratelimiter"
-version = "1.2.0.post0"
-description = "Simple python rate limiting object"
-category = "main"
-optional = true
-python-versions = "*"
-files = [
-    {file = "ratelimiter-1.2.0.post0-py3-none-any.whl", hash = "sha256:a52be07bc0bb0b3674b4b304550f10c769bbb00fead3072e035904474259809f"},
-    {file = "ratelimiter-1.2.0.post0.tar.gz", hash = "sha256:5c395dcabdbbde2e5178ef3f89b568a3066454a6ddc223b76473dac22f89b4f7"},
-]
-
-[package.extras]
-test = ["pytest (>=3.0)", "pytest-asyncio"]
 
 [[package]]
 name = "redis"

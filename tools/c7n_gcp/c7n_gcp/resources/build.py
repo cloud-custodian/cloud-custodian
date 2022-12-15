@@ -17,3 +17,6 @@ class CloudBuild(QueryResourceManager):
         name = id = "id"
         default_report_fields = ["status", "startTime", "logsURL"]
         permissions = ('cloudbuild.builds.list',)
+
+        # Lacking a test so can't confirm any URN.
+        urn_component = "build"
