@@ -69,7 +69,7 @@ class KafkaCompoundSubnetFilter(SubnetFilter):
             RelatedIdsExpression = "Provisioned.BrokerNodeGroupInfo.ClientSubnets[]"
 
         class ServerlessSubnetFilter(SubnetFilter):
-            RelatedIdsExpression = "Serverless.VpcConfigs[].SubnetIds"
+            RelatedIdsExpression = "Serverless.VpcConfigs[].SubnetIds[]"
 
         p = []
         s = []

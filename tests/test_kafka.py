@@ -30,6 +30,21 @@ class KafkaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_subnet_filter_provisioned_serverless(self):
+        factory = self.replay_flight_data('test_kafka_subnet_filter_provisioned_serverless')
+        p = self.load_policy({
+            'name': 'kafka',
+            'resource': 'aws.kafka',
+            'filters': [
+                {'type': 'subnet',
+                 'key': 'AvailabilityZone',
+                 'value': 'us-east-1b'}]},
+            session_factory=factory,)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
+        self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
+
     def test_kafka_tag(self):
         factory = self.replay_flight_data('test_kafka_tag')
         p = self.load_policy({
