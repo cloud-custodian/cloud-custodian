@@ -556,10 +556,14 @@ class BlobServicesFilter(ValueFilter):
     """
     Filter by the current blob services
     configuration for this storage account.
+
     :example:
+
     Find storage accounts with blob services soft delete disabled
     or retention less than 7 days
+
     .. code-block:: yaml
+
         policies:
           - name: storage-no-soft-delete
             resource: azure.storage
