@@ -24,7 +24,7 @@ Custodian supports managing AWS, Azure, and GCP public cloud environments with K
 
     Custodian can actively enforce security policies by natively integrating with the cloud provider's control plane and remediating in real-time. Includes with unified metrics and reporting.
 
-    [:octicons-arrow-right-24: Getting started](#)
+    [:octicons-arrow-right-24: Getting started](https://cloudcustodian.io/docs/quickstart/index.html)
 
 -   :fontawesome-solid-money-bills:{ .lg .middle } __Cost Management__
 
@@ -32,7 +32,7 @@ Custodian supports managing AWS, Azure, and GCP public cloud environments with K
 
     Setup off-hours to save money by turning off resources when they're not being used. Garbage collect unused resources by looking into utilization metrics. Easily tag and reap unused resources. 
 
-    [:octicons-arrow-right-24: Off Hours](#)
+    [:octicons-arrow-right-24: Off Hours](https://cloudcustodian.io/docs/aws/examples/offhours.html)
 
 -   :material-chevron-triple-left:{ .lg .middle } __Shift Left__
 
