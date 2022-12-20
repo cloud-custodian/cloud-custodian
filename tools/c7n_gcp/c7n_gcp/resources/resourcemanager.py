@@ -10,6 +10,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
+from c7n.filters.core import ValueFilter
 
 
 @resources.register('organization')
@@ -30,6 +31,9 @@ class Organization(QueryResourceManager):
         scc_type = "google.cloud.resourcemanager.Organization"
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.organizations.get',)
+        urn_component = "organization"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
 
         @staticmethod
         def get(client, resource_info):
@@ -64,6 +68,9 @@ class Folder(QueryResourceManager):
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
         perm_service = 'resourcemanager'
+        urn_component = "folder"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
 
     def get_resources(self, resource_ids):
         client = self.get_client()
@@ -99,6 +106,8 @@ class Project(QueryResourceManager):
         perm_service = 'resourcemanager'
         labels = True
         labels_op = 'update'
+        urn_component = "project"
+        urn_has_project = False
 
         @staticmethod
         def get_label_params(resource, labels):
@@ -132,6 +141,46 @@ class ProjectIamPolicyFilter(IamPolicyFilter):
         verb_arguments = SetIamPolicy._verb_arguments(self, resource)
         verb_arguments['body'] = {}
         return verb_arguments
+
+
+@Project.filter_registry.register('compute-meta')
+class ProjectComputeMetaFilter(ValueFilter):
+    """
+    Allows filtering on project-level compute metadata including common instance metadata
+    and quotas.
+
+    :example:
+
+    Find Projects that have not enabled OS Login for compute instances
+
+    .. code-block:: yaml
+
+        policies:
+          - name: project-compute-os-login-not-enabled
+            resource: gcp.project
+            filters:
+              - type: compute-meta
+                key: "commonInstanceMetadata.items[?key==`enable-oslogin`].value | [0]"
+                op: ne
+                value_type: normalize
+                value: true
+
+    """
+
+    key = 'c7n:projectComputeMeta'
+    permissions = ('compute.projects.get',)
+    schema = type_schema('compute-meta', rinherit=ValueFilter.schema)
+
+    def __call__(self, resource):
+        if self.key in resource:
+            return resource[self.key]
+
+        session = local_session(self.manager.session_factory)
+        self.client = session.client('compute', 'v1', 'projects')
+
+        resource[self.key] = self.client.execute_command('get', {"project": resource['projectId']})
+
+        return super().__call__(resource[self.key])
 
 
 @Project.action_registry.register('delete')

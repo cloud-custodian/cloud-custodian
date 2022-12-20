@@ -3,8 +3,10 @@
 from c7n.manager import resources
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('secrets-manager')
@@ -40,6 +42,34 @@ class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
         r[self.policy_annotation] = p = self.client.get_resource_policy(
             SecretId=r['Name']).get('ResourcePolicy', None)
         return p
+
+
+@SecretsManager.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyId'
+
+
+@SecretsManager.filter_registry.register('has-statement')
+class HasStatementFilter(HasStatementFilter):
+
+    def get_std_format_args(self, secret):
+        return {
+            'secret_arn': secret['ARN'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+    def process(self, resources, event=None):
+        self.client = local_session(self.manager.session_factory).client('secretsmanager')
+        for r in resources:
+            try:
+                policy = self.client.get_resource_policy(SecretId=r['Name'])
+                if policy.get('ResourcePolicy'):
+                    r['Policy'] = policy['ResourcePolicy']
+            except self.client.exceptions.ResourceNotFoundException:
+                continue
+
+        return list(filter(None, map(self.process_resource, resources)))
 
 
 @SecretsManager.action_registry.register('tag')

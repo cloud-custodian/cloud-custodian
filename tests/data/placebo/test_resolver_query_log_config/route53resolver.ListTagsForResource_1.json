@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "fa913f4e-f021-11e8-a4e7-8345280902af",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fa913f4e-f021-11e8-a4e7-8345280902af",
+                "content-type": "text/xml",
+                "content-length": "408",
+                "date": "Sat, 24 Nov 2018 19:48:56 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "Test-rqlc"
+            }
+        ]
+    }
+}

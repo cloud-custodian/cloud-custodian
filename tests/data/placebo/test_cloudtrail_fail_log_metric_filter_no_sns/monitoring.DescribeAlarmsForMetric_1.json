@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricAlarms": [
+            {
+                "AlarmName": "NoMFAConsoleLoginAlarm_fail",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:NoMFAConsoleLoginAlarm_fail",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 18,
+                    "hour": 19,
+                    "minute": 7,
+                    "second": 5,
+                    "microsecond": 533000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Unchecked: Initial alarm creation",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 18,
+                    "hour": 19,
+                    "minute": 7,
+                    "second": 5,
+                    "microsecond": 533000
+                },
+                "MetricName": "no_mfa_console_signin_metric_fail",
+                "Namespace": "ImportantMetrics",
+                "Statistic": "Sum",
+                "Dimensions": [],
+                "Period": 60,
+                "EvaluationPeriods": 1,
+                "DatapointsToAlarm": 1,
+                "Threshold": 0.0,
+                "ComparisonOperator": "GreaterThanThreshold",
+                "TreatMissingData": "missing"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

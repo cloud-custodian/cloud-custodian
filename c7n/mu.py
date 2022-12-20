@@ -17,6 +17,7 @@ import shutil
 import time
 import tempfile
 import zipfile
+import platform
 
 
 # We use this for freezing dependencies for serverless environments
@@ -38,7 +39,8 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
 
-LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
+LambdaRetry = get_retry(('InsufficientPermissionsException',
+                         'InvalidParameterValueException',), max_attempts=5)
 LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
@@ -457,7 +459,6 @@ class LambdaManager:
         assert role, "Lambda function role must be specified"
         archive = func.get_archive()
         existing = self.get(func.name, qualifier)
-        function_updated_waiter = self.client.get_waiter('function_updated')
 
         if s3_uri:
             # TODO: support versioned buckets
@@ -474,7 +475,8 @@ class LambdaManager:
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
                 result = self.client.update_function_code(**params)
-                function_updated_waiter.wait(FunctionName=func.name)
+                waiter = self.client.get_waiter('function_updated')
+                waiter.wait(FunctionName=func.name)
                 changed = True
 
             # TODO/Consider also set publish above to false, and publish
@@ -484,6 +486,10 @@ class LambdaManager:
             new_config['Role'] = role
 
             if self._update_tags(existing, new_config.pop('Tags', {})):
+                changed = True
+
+            if self._update_architecture(func, existing,
+                    new_config.pop('Architectures', ["x86_64"]), code_ref):
                 changed = True
 
             config_changed = self.delta_function(old_config, new_config)
@@ -500,6 +506,8 @@ class LambdaManager:
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
             self._update_concurrency(None, func)
+            waiter = self.client.get_waiter('function_active')
+            waiter.wait(FunctionName=func.name)
             changed = True
 
         return result, changed
@@ -520,6 +528,20 @@ class LambdaManager:
         self.client.put_function_concurrency(
             FunctionName=func.name,
             ReservedConcurrentExecutions=func.concurrency)
+
+    def _update_architecture(self, func, existing, new_architecture, code_ref):
+        existing_config = existing.get('Configuration', {})
+        existing_architecture = existing_config.get('Architectures', ["x86_64"])
+        diff = existing_architecture != new_architecture
+        changed = False
+        if diff:
+            log.debug("Updating function architecture: %s" % func.name)
+            params = dict(FunctionName=func.name, Publish=True,
+                          Architectures=new_architecture)
+            params.update(code_ref)
+            self.client.update_function_code(**params)
+            changed = True
+        return changed
 
     def _update_tags(self, existing, new_tags):
         # tag dance
@@ -683,6 +705,10 @@ class AbstractLambdaFunction:
     def get_archive(self):
         """Return the lambda distribution archive object."""
 
+    @abc.abstractproperty
+    def architectures(self):
+        """ """
+
     def get_config(self):
 
         conf = {
@@ -709,6 +735,8 @@ class AbstractLambdaFunction:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
                 'SecurityGroupIds': self.security_groups}
+        if self.architectures:
+            conf['Architectures'] = self.architectures
         return conf
 
 
@@ -823,7 +851,6 @@ def run(event, context):
 class PolicyLambda(AbstractLambdaFunction):
     """Wraps a custodian policy to turn it into a lambda function.
     """
-    handler = "custodian_policy.run"
 
     def __init__(self, policy):
         self.policy = policy
@@ -842,12 +869,16 @@ class PolicyLambda(AbstractLambdaFunction):
             'description', 'cloud-custodian lambda policy')
 
     @property
+    def handler(self):
+        return self.policy.data['mode'].get('handler', 'custodian_policy.run')
+
+    @property
     def role(self):
         return self.policy.data['mode'].get('role', '')
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.8')
+        return self.policy.data['mode'].get('runtime', 'python3.9')
 
     @property
     def memory_size(self):
@@ -900,6 +931,16 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def packages(self):
         return self.policy.data['mode'].get('packages')
+
+    @property
+    def architectures(self):
+        architecture = []
+        arm64_arch = ('aarch64', 'arm64')
+        if platform.machine().lower() in arm64_arch:
+            architecture.append('arm64')
+        else:
+            architecture.append('x86_64')
+        return architecture
 
     def get_events(self, session_factory):
         events = []

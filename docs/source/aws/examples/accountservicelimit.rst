@@ -35,7 +35,8 @@ Global Services
      policies:
        - name: account-service-limits
          resource: account
-         region: us-east-1
+         conditions:
+           - region: us-east-1
          filters:
            - type: service-limit
              services:

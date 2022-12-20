@@ -18,7 +18,7 @@ resource "aws_cloudwatch_log_group" "example" {
 }
 
 resource "aws_iam_role" "example" {
-  name = "example"
+  name_prefix = "example"
 
   assume_role_policy = <<EOF
 {

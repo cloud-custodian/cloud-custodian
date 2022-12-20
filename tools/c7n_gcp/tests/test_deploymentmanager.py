@@ -21,6 +21,12 @@ class DMDeploymentTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], 'mydep2')
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:deploymentmanager::cloud-custodian:deployment/mydep2'
+            ],
+        )
 
     def test_deployment_get(self):
         project_id = 'cloud-custodian'
@@ -41,6 +47,12 @@ class DMDeploymentTest(BaseTest):
         })
 
         self.assertEqual(deployment['id'], '7713223424225049872')
+        self.assertEqual(
+            policy.resource_manager.get_urns([deployment]),
+            [
+                'gcp:deploymentmanager::cloud-custodian:deployment/mydep2'
+            ],
+        )
 
     def test_deployment_delete(self):
         project_id = 'cloud-custodian'

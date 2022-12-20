@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf",
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "05ff3012-a9c9-11e7-8af9-c510054683ae",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "05ff3012-a9c9-11e7-8af9-c510054683ae",
+                "date": "Thu, 05 Oct 2017 12:30:50 GMT",
+                "content-length": "131",
+                "content-type": "application/x-amz-json-1.1"
+            }
+        },
+        "WebACLs": [
+            {
+                "Id": "96494e83-ee49-4505-9f68-9103c6cd9406",
+                "Name": "FMManagedWebACLV2-FMS-TEST-1656966584517",
+                "ARN": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/96494e83-ee49-4505-9f68-9103c6cd9406"
+            }
+        ]
+    }
+}

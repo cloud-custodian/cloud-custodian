@@ -346,11 +346,20 @@ class Or(BooleanGroupFilter):
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
-        resource_map = {r[rtype_id]: r for r in resources}
+        compiled = None
+        if '.' in rtype_id:
+            compiled = jmespath.compile(rtype_id)
+            resource_map = {compiled.search(r): r for r in resources}
+        else:
+            resource_map = {r[rtype_id]: r for r in resources}
         results = set()
         for f in self.filters:
-            results = results.union([
-                r[rtype_id] for r in f.process(resources, event)])
+            if compiled:
+                results = results.union([
+                    compiled.search(r) for r in f.process(resources, event)])
+            else:
+                results = results.union([
+                    r[rtype_id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
@@ -390,7 +399,12 @@ class Not(BooleanGroupFilter):
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
-        resource_map = {r[rtype_id]: r for r in resources}
+        compiled = None
+        if '.' in rtype_id:
+            compiled = jmespath.compile(rtype_id)
+            resource_map = {compiled.search(r): r for r in resources}
+        else:
+            resource_map = {r[rtype_id]: r for r in resources}
         sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
@@ -399,7 +413,10 @@ class Not(BooleanGroupFilter):
                 break
 
         before = set(resource_map.keys())
-        after = {r[rtype_id] for r in resources}
+        if compiled:
+            after = {compiled.search(r) for r in resources}
+        else:
+            after = {r[rtype_id] for r in resources}
         results = before - after
         sweeper.sweep([])
 
@@ -415,16 +432,28 @@ class AnnotationSweeper:
         self.id_key = id_key
         ra_map = {}
         resource_map = {}
+        compiled = None
+        if '.' in id_key:
+            compiled = jmespath.compile(self.id_key)
         for r in resources:
-            ra_map[r[id_key]] = {k: v for k, v in r.items() if k.startswith('c7n')}
-            resource_map[r[id_key]] = r
+            if compiled:
+                id_ = compiled.search(r)
+            else:
+                id_ = r[self.id_key]
+            ra_map[id_] = {k: v for k, v in r.items() if k.startswith('c7n')}
+            resource_map[id_] = r
         # We keep a full copy of the annotation keys to allow restore.
         self.ra_map = copy.deepcopy(ra_map)
         self.resource_map = resource_map
 
     def sweep(self, resources):
-        for rid in set(self.ra_map).difference([
-                r[self.id_key] for r in resources]):
+        compiled = None
+        if '.' in self.id_key:
+            compiled = jmespath.compile(self.id_key)
+            diff = set(self.ra_map).difference([compiled.search(r) for r in resources])
+        else:
+            diff = set(self.ra_map).difference([r[self.id_key] for r in resources])
+        for rid in diff:
             # Clear annotations if the block filter didn't match
             akeys = [k for k in self.resource_map[rid] if k.startswith('c7n')]
             for k in akeys:
