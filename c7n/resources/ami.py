@@ -634,6 +634,7 @@ class ImageAttribute(ValueFilter):
     """
 
     valid_attrs = (
+        'description',
         'kernel',
         'ramdisk',
         'launchPermissions',
@@ -673,8 +674,5 @@ class ImageAttribute(ValueFilter):
                 client.describe_image_attribute,
                 ImageId=image_id,
                 Attribute=attribute)
-            keys = list(fetched_attribute.keys())
-            keys.remove('ResponseMetadata')
-            keys.remove('ImageId')
-            resource['c7n:attribute-%s' % attribute] = fetched_attribute[
-                keys[0]]
+            keys = set(fetched_attribute) - {'ResponseMetadata', 'ImageId'}
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[keys.pop()]
