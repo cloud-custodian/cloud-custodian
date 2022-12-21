@@ -74,7 +74,7 @@ class ConnectInstanceAttributeFilter(ValueFilter):
                 filters:
                   - type: instance-attribute
                     key: Attribute.Value
-                    value: true
+                    value: false
                     attribute_type: CONTACT_LENS
                 actions:
                   - type: set-attributes
