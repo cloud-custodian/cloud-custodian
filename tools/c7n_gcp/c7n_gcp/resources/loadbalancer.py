@@ -21,6 +21,7 @@ class LoadBalancingAddress(QueryResourceManager):
             name, "description", "address", "status", "region", "addressType"
         ]
         asset_type = "compute.googleapis.com/Address"
+        urn_component = "address"
 
         @staticmethod
         def get(client, resource_info):
@@ -60,6 +61,7 @@ class LoadBalancingUrlMap(QueryResourceManager):
             "name", "description", "creationTimestamp", "region", "defaultService"
         ]
         asset_type = "compute.googleapis.com/UrlMap"
+        urn_component = "url-map"
 
         @staticmethod
         def get(client, resource_info):
@@ -84,6 +86,7 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
             "name", "description", "creationTimestamp", "service"
         ]
         asset_type = " compute.googleapis.com/TargetTcpProxy"
+        urn_component = "target-tcp-proxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -108,6 +111,7 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
             "name", "description", "creationTimestamp", "service", "sslPolicy"
         ]
         asset_type = "compute.googleapis.com/TargetSslProxy"
+        urn_component = "target-ssl-proxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -131,6 +135,7 @@ class LoadBalancingSslPolicy(QueryResourceManager):
         default_report_fields = [
             "name", "description", "profile", "minTlsVersion"
         ]
+        urn_component = "ssl-policy"
 
         @staticmethod
         def get(client, resource_info):
@@ -185,6 +190,7 @@ class LoadBalancingSslCertificate(QueryResourceManager):
             "name", "description", "creationTimestamp", "type", "region", "expireTime"
         ]
         asset_type = "compute.googleapis.com/SslCertificate"
+        urn_component = "ssl-certificate"
 
         @staticmethod
         def get(client, resource_info):
@@ -209,6 +215,7 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
         ]
         asset_type = "compute.googleapis.com/TargetHttpsProxy"
         scc_type = "google.compute.TargetHttpsProxy"
+        urn_component = "target-https-proxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -233,6 +240,7 @@ class LoadBalancingBackendBucket(QueryResourceManager):
             "name", "description", "creationTimestamp", "bucketName", "enableCdn"
         ]
         asset_type = "compute.googleapis.com/BackendBucket"
+        urn_component = "backend-bucket"
 
         @staticmethod
         def get(client, resource_info):
@@ -286,6 +294,7 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
         default_report_fields = [
             name, "description", "host", "port", "requestPath", "checkIntervalSec"]
         asset_type = "compute.googleapis.com/HttpsHealthCheck"
+        urn_component = "https-health-check"
 
         @staticmethod
         def get(client, resource_info):
@@ -309,6 +318,7 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
         default_report_fields = [
             name, "description", "host", "port", "requestPath", "checkIntervalSec"]
         asset_type = "compute.googleapis.com/HttpHealthCheck"
+        urn_component = "http-health-check"
 
         @staticmethod
         def get(client, resource_info):
@@ -333,6 +343,7 @@ class LoadBalancingHealthCheck(QueryResourceManager):
             "name", "description", "creationTimestamp", "checkIntervalSec",
             "healthyThreshold", "unhealthyThreshold", "timeoutSec"]
         asset_type = "compute.googleapis.com/HealthCheck"
+        urn_component = "health-check"
 
         @staticmethod
         def get(client, resource_info):
@@ -356,6 +367,7 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "urlMap"]
         asset_type = "compute.googleapis.com/TargetHttpProxy"
+        urn_component = "target-http-proxy"
 
         @staticmethod
         def get(client, resource_info):
@@ -379,6 +391,7 @@ class LoadBalancingBackendService(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "network"]
         asset_type = "compute.googleapis.com/BackendService"
+        urn_component = "backend-service"
 
         @staticmethod
         def get(client, resource_info):
@@ -402,6 +415,8 @@ class LoadBalancingTargetInstance(QueryResourceManager):
         default_report_fields = [
             name, "description", "creationTimestamp", "zone", "natPolicy", "instance"]
         asset_type = "compute.googleapis.com/TargetInstance"
+        urn_component = "target-instance"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -428,6 +443,7 @@ class LoadBalancingTargetPool(QueryResourceManager):
             "failoverRatio", "sessionAffinity", "backupPool"
         ]
         asset_type = "compute.googleapis.com/TargetPool"
+        urn_component = "target-pool"
 
         @staticmethod
         def get(client, resource_info):
@@ -454,6 +470,7 @@ class LoadBalancingForwardingRule(QueryResourceManager):
             "loadBalancerScheme", "serviceName",
         ]
         asset_type = "compute.googleapis.com/ForwardingRule"
+        urn_component = "forwarding-rule"
 
         @staticmethod
         def get(client, resource_info):
@@ -479,6 +496,7 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
             "networkTier", "loadBalancerScheme", "subnetwork", "allowGlobalAccess"
         ]
         asset_type = "compute.googleapis.com/GlobalForwardingRule"
+        urn_component = "global-forwarding-rule"
 
         @staticmethod
         def get(client, resource_info):
@@ -502,6 +520,7 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
             "name", "description", "status", "creationTimestamp", "address", "region"
         ]
         asset_type = "compute.googleapis.com/GlobalAddress"
+        urn_component = "global-address"
 
         @staticmethod
         def get(client, resource_info):

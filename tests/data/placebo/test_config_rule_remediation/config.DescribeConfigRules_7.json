@@ -1,0 +1,431 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleName": "securityhub-lambda-function-settings-check-ff7b6963",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-3jq13q",
+                "ConfigRuleId": "config-rule-3jq13q",
+                "Description": "Checks that the AWS Lambda function settings for runtime, role, timeout, and memory size match the expected values.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::Lambda::Function"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "LAMBDA_FUNCTION_SETTINGS_CHECK"
+                },
+                "InputParameters": "{\"runtime\":\"nodejs14.x,nodejs12.x,python3.9,python3.8,python3.7,python3.6,java11,java8,java8.al2,go1.x,dotnetcore3.1,ruby2.7\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-mfa-enabled-for-iam-console-access-77c4d110",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-7qk8mm",
+                "ConfigRuleId": "config-rule-7qk8mm",
+                "Description": "Checks whether AWS Multi-Factor Authentication (MFA) is enabled for all AWS Identity and Access Management (IAM) users that use a console password.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::IAM::User"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "MFA_ENABLED_FOR_IAM_CONSOLE_ACCESS"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-automatic-minor-version-upgrade-enabled-b07994d3",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-ddeqhn",
+                "ConfigRuleId": "config-rule-ddeqhn",
+                "Description": "This control checks if automatic minor version upgrades are enabled for the Amazon RDS database instance.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_AUTOMATIC_MINOR_VERSION_UPGRADE_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-cluster-deletion-protection-enabled-ce021933",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-hafaoe",
+                "ConfigRuleId": "config-rule-hafaoe",
+                "Description": "Checks if an Amazon Relational Database Service (Amazon RDS) cluster has deletion protection enabled. This rule is NON_COMPLIANT if an RDS cluster does not have deletion protection enabled.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_CLUSTER_DELETION_PROTECTION_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-cluster-multi-az-enabled-6d02703d",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-zfipds",
+                "ConfigRuleId": "config-rule-zfipds",
+                "Description": "This control checks if RDS DB clusters are configured with multi-az.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_CLUSTER_MULTI_AZ_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-deployed-in-vpc-c66ad3aa",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-jxd9w4",
+                "ConfigRuleId": "config-rule-jxd9w4",
+                "Description": "This control checks if an RDS instance is deployed in a VPC (EC2-VPC).",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-enhanced-monitoring-enabled-10256ac2",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-w1kdtq",
+                "ConfigRuleId": "config-rule-w1kdtq",
+                "Description": "Checks whether enhanced monitoring is enabled for Amazon Relational Database Service (Amazon RDS) instances.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_ENHANCED_MONITORING_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-instance-deletion-protection-enabled-0424bd91",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-kcq2cn",
+                "ConfigRuleId": "config-rule-kcq2cn",
+                "Description": "Checks if an Amazon Relational Database Service (Amazon RDS) instance has deletion protection enabled.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_INSTANCE_DELETION_PROTECTION_ENABLED"
+                },
+                "InputParameters": "{\"databaseEngines\":\"mariadb,mysql,oracle-ee,oracle-se2,oracle-se1,oracle-se,postgres,sqlserver-ee,sqlserver-se,sqlserver-ex,sqlserver-web\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-instance-public-access-check-33b05d85",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-178tfr",
+                "ConfigRuleId": "config-rule-178tfr",
+                "Description": "Check whether the Amazon Relational Database Service instances are not publicly accessible.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_INSTANCE_PUBLIC_ACCESS_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-multi-az-support-61b58491",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-kwl7fc",
+                "ConfigRuleId": "config-rule-kwl7fc",
+                "Description": "Checks whether high availability is enabled for your RDS DB instances.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_MULTI_AZ_SUPPORT"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-snapshot-encrypted-8860b277",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-uxd0so",
+                "ConfigRuleId": "config-rule-uxd0so",
+                "Description": "Checks whether Amazon Relational Database Service (Amazon RDS) DB snapshots are encrypted. The rule is NON_COMPLIANT, if Amazon RDS DB snapshots are not encrypted.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_SNAPSHOT_ENCRYPTED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-snapshots-public-prohibited-d04147c6",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-qlbisg",
+                "ConfigRuleId": "config-rule-qlbisg",
+                "Description": "Checks if Amazon Relational Database Service (Amazon RDS) snapshots are public.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBSnapshot",
+                        "AWS::RDS::DBClusterSnapshot"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_SNAPSHOTS_PUBLIC_PROHIBITED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-rds-storage-encrypted-7da07a05",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-rphw3l",
+                "ConfigRuleId": "config-rule-rphw3l",
+                "Description": "Checks whether storage encryption is enabled for your RDS DB instances.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RDS_STORAGE_ENCRYPTED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-redshift-cluster-audit-logging-enabled-fca833b7",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-hwcklg",
+                "ConfigRuleId": "config-rule-hwcklg",
+                "Description": "This control checks whether the Amazon Redshift cluster has audit logging enabled.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::Redshift::Cluster"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{\"loggingEnabled\":\"true\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-redshift-cluster-public-access-check-dbba313f",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-mxmtno",
+                "ConfigRuleId": "config-rule-mxmtno",
+                "Description": "Checks whether Amazon Redshift clusters are not publicly accessible.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::Redshift::Cluster"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "REDSHIFT_CLUSTER_PUBLIC_ACCESS_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-redshift-enhanced-vpc-routing-enabled-28c8a4a7",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-qyov3f",
+                "ConfigRuleId": "config-rule-qyov3f",
+                "Description": "This control checks whether a Redshift cluster has EnhancedVpcRouting enabled.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "REDSHIFT_ENHANCED_VPC_ROUTING_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-redshift-require-tls-ssl-e9a92823",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-83po5g",
+                "ConfigRuleId": "config-rule-83po5g",
+                "Description": "Checks whether Amazon Redshift clusters require TLS/SSL encryption to connect to SQL clients. The rule is NON_COMPLIANT if any Amazon Redshift cluster has parameter require_SSL not set to true.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "REDSHIFT_REQUIRE_TLS_SSL"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-restricted-rdp-1a79a5c5",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-86sgyh",
+                "ConfigRuleId": "config-rule-86sgyh",
+                "Description": "Checks whether the incoming RDP traffic is Allowed from 0.0.0.0/0. This rule is compliant when incoming RDP traffic is restricted.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::SecurityGroup"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "RESTRICTED_INCOMING_TRAFFIC"
+                },
+                "InputParameters": "{\"blockedPort1\":\"3389\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-restricted-ssh-aee651a6",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-wug62r",
+                "ConfigRuleId": "config-rule-wug62r",
+                "Description": "Checks whether the incoming SSH traffic for the security groups is accessible. The rule is compliant when the IP addresses of the incoming SSH traffic in the security groups are restricted. This rule applies only to IPv4.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::SecurityGroup"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "INCOMING_SSH_DISABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-root-account-mfa-enabled-a6035638",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-xkrqui",
+                "ConfigRuleId": "config-rule-xkrqui",
+                "Description": "Checks whether users of your AWS account require a multi-factor authentication (MFA) device to sign in with root credentials.",
+                "Scope": {
+                    "ComplianceResourceTypes": []
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ROOT_ACCOUNT_MFA_ENABLED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-s3-account-level-public-access-blocks-periodic-be7f9a10",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-trnlnc",
+                "ConfigRuleId": "config-rule-trnlnc",
+                "Description": "Checks if the required public access block settings are configured from account level.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_ACCOUNT_LEVEL_PUBLIC_ACCESS_BLOCKS_PERIODIC"
+                },
+                "InputParameters": "{\"RestrictPublicBuckets\":\"True\",\"BlockPublicPolicy\":\"True\",\"BlockPublicAcls\":\"True\",\"IgnorePublicAcls\":\"True\"}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-s3-bucket-blacklisted-actions-prohibited-877f0709",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-zxpcjr",
+                "ConfigRuleId": "config-rule-zxpcjr",
+                "Description": "Checks that the Amazon Simple Storage Service bucket policy does not allow blacklisted bucket-level and object-level actions on resources in the bucket for principals from other AWS accounts.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_BLACKLISTED_ACTIONS_PROHIBITED"
+                },
+                "InputParameters": "{\"blacklistedActionPattern\":\"s3:DeleteBucketPolicy,s3:PutBucketAcl,s3:PutBucketPolicy,s3:PutObjectAcl,s3:PutEncryptionConfiguration\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-s3-bucket-public-read-prohibited-2048f14d",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-61s7gq",
+                "ConfigRuleId": "config-rule-61s7gq",
+                "Description": "Checks to see if S3 buckets are publicly readable.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-s3-bucket-public-write-prohibited-a4282c5b",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-04ncrh",
+                "ConfigRuleId": "config-rule-04ncrh",
+                "Description": "Checks to see if S3 buckets allow public write.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-s3-bucket-server-side-encryption-enabled-f6b70d99",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-segclk",
+                "ConfigRuleId": "config-rule-segclk",
+                "Description": "Checks that your Amazon S3 bucket either has Amazon S3 default encryption enabled or that the S3 bucket policy explicitly denies put-object requests without server side encryption.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            }
+        ],
+        "NextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMzcsMTMsLTUzLDIxLDgzLC0xNiw2OSwxMTQsNzcsMTMsMTI1LDQ1LDExNCw3OCwxMTAsNzAsNjYsNTgsOTYsLTkxLC0yMiw5MiwxMDQsLTY4LC04MSw0OSwtMTUsMjMsMTA2LC03LC05NiwtNTUsMjAsLTg4LC0xMDYsLTg4LDkyLDQsOCwxMDUsMTA0LDEwOSwtMjcsOTEsLTU5LC03NCwtNzQsMzgsMTE2LDEyNSw5NCwtNzAsNDYsLTc0LC0xNSwtOTUsLTUwLDU2LDExOCwtMTAyLDcxLC00Niw4OSw4MSwtMjMsNzYsLTEwNiw3LDM0LDcxLC0yNywyMSwxMTQsLTEyMSw0MCwxLDM1LC05NSwtODAsLTU5LDUxLDE1LDM0LDEwNCwtNTUsMTgsMzQsMzYsLTczLC0yMywtOTAsNDMsMjksMjksLTEyMSwyMywtNzgsLTIsNTksNjksLTQ1LC00OCwxMDIsNzMsLTE3LC00NiwtMzIsLTU2LC02MSwtNjcsNTUsLTg3LC0yLDc2LC0yNyw3NywtOTcsODgsLTkzLDQ1LC05Niw2MSwzMSwtNzcsMzQsLTEyNiwxMTUsMTI1LDk5LDEyNywxOSw5OSw1MywyNCwtODYsNjgsNDMsMjAsLTU1LDExMSw2OSwtNywtOTcsLTEyMyw1MywtNTgsLTExMSwxMjIsMTE1LC0xLC0xLC01MSwxMSwzMywtMTAwLC05NCwtNzEsLTExNCw1MywtODAsLTUzLDExNCwtNSwtODgsMjIsNDQsLTEwOSwtNzUsMTI3LDEyMSwtMTI1LC05OSwtMTcsNjAsLTYzLC02NiwtNzMsLTEyMSwxMjAsLTExNCwxMTMsLTQwLDEyMiwxMTYsLTI2LDExNyw2Miw3NSwtNTIsLTcxLC0xMTcsODYsMTA4LDEyMiwxMiw0MCwtODUsLTU1LC03MywtODUsOTksNjYsLTMsLTg5LC0xNywtMTAxLDExOSwyNSw3NywtMTA1LC01OSwtMTA1LDgsLTUxLDYsLTEwOCwtODYsMjIsLTMyLC05LDgwLC04OCw4Nyw2MywtMiwtMTAyLDYxLDEwLC05NCwtOTEsMjMsMTIwLC00MCw4OSwtODYsLTcsLTYyLC03Myw3OSwtNDYsLTEwOCwzMSw0Nyw0OCwtNzcsLTgsNzUsNDIsNzUsMTAzLC0xMTEsODEsLTk4LC00OCwtNzcsLTQyLDY3LDRdLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbMiwxMDAsLTI2LDExMSwtNjEsODAsLTExNCwtMTcsLTQ5LDgyLDc5LC02MCw0LDYyLC0xMjAsNDhdfX0=",
+        "ResponseMetadata": {}
+    }
+}
