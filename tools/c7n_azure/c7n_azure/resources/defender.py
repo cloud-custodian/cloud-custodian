@@ -154,13 +154,14 @@ class DefenderAlertSettings(DefenderResourceManager, metaclass=QueryMeta):
             - name: default
             - properties.alertNotifications: "On"
     """
-    class resource_type(TypeInfo):
-            doc_groups = ["Security"]
 
-            id = "id"
-            name = "name"
-            enum_spec = ("security_contacts", "list", None)
-            client = "securityContacts"
-            filter_name = None
-            service = "security"
-            resource_type = "Microsoft.Security/alertNotifications"
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        id = "id"
+        name = "name"
+        enum_spec = ("security_contacts", "list", None)
+        client = "securityContacts"
+        filter_name = None
+        service = "security"
+        resource_type = "Microsoft.Security/alertNotifications"
