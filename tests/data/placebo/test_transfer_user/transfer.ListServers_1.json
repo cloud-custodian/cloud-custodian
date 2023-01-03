@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Servers": [
+            {
+                "Arn": "arn:aws:transfer:us-east-1:644160558196:server/s-04070bd555b846c98",
+                "Domain": "S3",
+                "IdentityProviderType": "SERVICE_MANAGED",
+                "EndpointType": "PUBLIC",
+                "LoggingRole": "arn:aws:iam::644160558196:role/role",
+                "ServerId": "s-04070bd555b846c98",
+                "State": "ONLINE",
+                "UserCount": 1
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

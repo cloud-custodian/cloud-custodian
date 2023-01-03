@@ -22,6 +22,7 @@ class Bucket(QueryResourceManager):
         asset_type = "storage.googleapis.com/Bucket"
         scc_type = "google.cloud.storage.Bucket"
         metric_key = 'resource.labels.bucket_name'
+        urn_component = "bucket"
 
         @staticmethod
         def get(client, resource_info):

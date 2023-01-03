@@ -20,6 +20,8 @@ class CloudBillingAccount(QueryResourceManager):
         default_report_fields = ['id', 'displayName']
         asset_type = "cloudbilling.googleapis.com/BillingAccount"
         permissions = ('billing.accounts.list',)
+        urn_component = "account"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, event):

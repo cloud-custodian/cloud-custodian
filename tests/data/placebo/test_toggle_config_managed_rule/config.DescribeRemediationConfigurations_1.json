@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "RemediationConfigurations": [
+            {
+                "ConfigRuleName": "test-enable-config-managed-rule",
+                "TargetType": "SSM_DOCUMENT",
+                "TargetId": "AWS-DisableS3BucketPublicReadWrite",
+                "Parameters": {
+                    "AutomationAssumeRole": {
+                        "StaticValue": {
+                            "Values": [
+                                "arn:aws:iam::644160558196:role/myrole"
+                            ]
+                        }
+                    },
+                    "S3BucketName": {
+                        "ResourceValue": {
+                            "Value": "RESOURCE_ID"
+                        }
+                    }
+                },
+                "Automatic": true,
+                "MaximumAutomaticAttempts": 5,
+                "RetryAttemptSeconds": 211,
+                "Arn": "arn:aws:config:us-east-1:644160558196:remediation-configuration/test-enable-config-managed-rule/f5e5f48d-45e5-4e1b-bf6e-9af5d222ad38"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
