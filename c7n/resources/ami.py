@@ -14,7 +14,7 @@ import jmespath
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.filters import (
-    AgeFilter, Filter, CrossAccountAccessFilter)
+    AgeFilter, ValueFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -609,3 +609,70 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
                     continue
                 results.extend(f.result())
         return results
+
+
+@AMI.filter_registry.register('image-attribute')
+class ImageAttribute(ValueFilter):
+    """AMI Image Value Filter on a given image attribute.
+
+    Filters AMI's with the given AMI attribute
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-unused-recently
+                resource: ami
+                filters:
+                  - type: image-attribute
+                    attribute: lastLaunchedTime
+                    key: "Value"
+                    op: gte
+                    value_type: age
+                    value: 30
+    """
+
+    valid_attrs = (
+        'description',
+        'kernel',
+        'ramdisk',
+        'launchPermissions',
+        'productCodes',
+        'blockDeviceMapping',
+        'sriovNetSupport',
+        'bootMode',
+        'tpmSupport',
+        'uefiData',
+        'lastLaunchedTime',
+        'imdsSupport'
+    )
+
+    schema = type_schema(
+        'image-attribute',
+        rinherit=ValueFilter.schema,
+        attribute={'enum': valid_attrs},
+        required=('attribute',))
+    schema_alias = False
+
+    def get_permissions(self):
+        return ('ec2:DescribeImageAttribute',)
+
+    def process(self, resources, event=None):
+        attribute = self.data['attribute']
+        self.get_image_attribute(resources, attribute)
+        return [resource for resource in resources
+                if self.match(resource['c7n:attribute-%s' % attribute])]
+
+    def get_image_attribute(self, resources, attribute):
+        client = local_session(
+            self.manager.session_factory).client('ec2')
+
+        for resource in resources:
+            image_id = resource['ImageId']
+            fetched_attribute = self.manager.retry(
+                client.describe_image_attribute,
+                ImageId=image_id,
+                Attribute=attribute)
+            keys = set(fetched_attribute) - {'ResponseMetadata', 'ImageId'}
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[keys.pop()]
