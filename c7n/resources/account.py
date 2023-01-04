@@ -100,6 +100,39 @@ class AccountCredentialReport(CredentialReport):
         return results
 
 
+@filters.register('organization')
+class AccountOrganization(ValueFilter):
+    """Check organization enrollment and configuration
+
+    """
+    schema = type_schema('organization', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    annotation_key = 'c7n:org'
+    annotate = False
+
+    permissions = ('organizations:DescribeOrganization',)
+
+    def get_org_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('organizations')
+        try:
+            org_info = client.describe_organization().get('Organization')
+        except client.exceptions.AWSOrganizationsNotInUseException:
+            org_info = {}
+        except ClientError as e:
+            self.log.warning('organization filter error accessing org info %s', e)
+            org_info = None
+        account[self.annotation_key] = org_info
+
+    def process(self, resources, event=None):
+        if self.annotation_key not in resources[0]:
+            self.get_org_info(resources[0])
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+        return []
+
+
 @filters.register('check-macie')
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
