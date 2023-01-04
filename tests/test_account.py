@@ -75,12 +75,14 @@ class AccountTests(BaseTest):
         p = self.load_policy({
             'name': 'org-check',
             'resource': 'aws.account',
-            'filters': [
-                {'type': 'organization',
-                 'key': 'Id',
-                 'op': 'not-equal',
-                 'value': 'o-xyz'}]
-            }, session_factory=factory)
+            'filters': [{
+                'type': 'organization',
+                'key': 'Id',
+                'op': 'not-equal',
+                'value': 'o-xyz'
+            }]},
+            session_factory=factory
+        )
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
