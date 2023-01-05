@@ -116,6 +116,16 @@ class PolicyMetaLint(BaseTest):
         except Exception:
             self.fail("Failed to serialize schema")
 
+    def test_resource_has_id(self):
+        missing = set()
+        for provider in clouds.values():
+            for resource in provider.resources.values():
+                tid = getattr(resource.resource_type, 'id', None)
+                if not tid:
+                    missing.add("%s.%s" % (provider.type, resource.type))
+        if missing:
+            self.fail("missing id %s" % ("\n".join(missing)))
+
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
