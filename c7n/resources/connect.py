@@ -107,5 +107,3 @@ class ConnectInstanceAttributeFilter(ValueFilter):
             for r in resources:
                 client.update_instance_attribute(InstanceId=r["Id"],
                     AttributeType=self.data.get("attribute_type"), Value=self.data.get("value"))
-
-            return
