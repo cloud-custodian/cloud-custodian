@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Queue": {
+            "Name": "BasicQueue",
+            "QueueArn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/queue/6c5eba02-9916-4ec4-9208-94f5acaa7205",
+            "QueueId": "6c5eba02-9916-4ec4-9208-94f5acaa7205",
+            "Description": "A simple, basic voice queue.",
+            "HoursOfOperationId": "8a0ca49e-a5e3-4fdc-bb61-c02c170ca315",
+            "Status": "ENABLED",
+            "Tags": {
+                "custodian_cleanup": "Resource does not meet policy: notify@2022/09/19",
+                "c7n": "True",
+                "abcd": "xyz"
+            }
+        }
+    }
+}

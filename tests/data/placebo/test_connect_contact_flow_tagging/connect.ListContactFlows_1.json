@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ContactFlowSummaryList": [
+            {
+                "Id": "0327d478-1283-4aa7-9c72-47278244ff4e",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/contact-flow/0327d478-1283-4aa7-9c72-47278244ff4e",
+                "Name": "Sample note for screenpop",
+                "ContactFlowType": "CONTACT_FLOW"
+            }
+        ]
+    }
+}

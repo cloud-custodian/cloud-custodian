@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "RoutingProfileSummaryList": [
+            {
+                "Id": "5129a6f0-5ad6-42f2-8a72-46cc954bb80c",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/routing-profile/5129a6f0-5ad6-42f2-8a72-46cc954bb80c",
+                "Name": "Basic Routing Profile"
+            }
+        ]
+    }
+}

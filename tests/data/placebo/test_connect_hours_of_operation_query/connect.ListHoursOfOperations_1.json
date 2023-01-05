@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HoursOfOperationSummaryList": [
+            {
+                "Id": "8a0ca49e-a5e3-4fdc-bb61-c02c170ca315",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/operating-hours/8a0ca49e-a5e3-4fdc-bb61-c02c170ca315",
+                "Name": "Basic Hours"
+            }
+        ]
+    }
+}

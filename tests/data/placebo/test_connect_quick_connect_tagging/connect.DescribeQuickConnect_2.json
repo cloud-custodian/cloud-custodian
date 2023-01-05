@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "QuickConnect": {
+            "QuickConnectARN": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/transfer-destination/82942719-178f-488c-8ff2-6e0bc602ff07",
+            "QuickConnectId": "82942719-178f-488c-8ff2-6e0bc602ff07",
+            "Name": "c7ntest",
+            "QuickConnectConfig": {
+                "QuickConnectType": "PHONE_NUMBER",
+                "PhoneConfig": {
+                    "PhoneNumber": "+18006581030"
+                }
+            },
+            "Tags": {
+                "custodian_cleanup": "Resource does not meet policy: notify@2022/09/19",
+                "c7n": "True"
+            }
+        }
+    }
+}

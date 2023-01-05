@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "User": {
+            "Id": "2309b09e-107e-49d1-8c01-3040d4581fe8",
+            "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/agent/2309b09e-107e-49d1-8c01-3040d4581fe8",
+            "Username": "c7n",
+            "IdentityInfo": {
+                "FirstName": "c7n",
+                "LastName": "test",
+                "Email": "c7ntest@gmail.com"
+            },
+            "PhoneConfig": {
+                "PhoneType": "SOFT_PHONE",
+                "AutoAccept": false,
+                "AfterContactWorkTimeLimit": 0,
+                "DeskPhoneNumber": ""
+            },
+            "DirectoryUserId": "944e3739-5554-49f3-b263-9fc08d001540",
+            "SecurityProfileIds": [
+                "05cb3d14-955c-46f9-b93f-08467226af7e"
+            ],
+            "RoutingProfileId": "5129a6f0-5ad6-42f2-8a72-46cc954bb80c",
+            "Tags": {
+                "c7n": "True",
+                "abcd": "xyz"
+            }
+        }
+    }
+}

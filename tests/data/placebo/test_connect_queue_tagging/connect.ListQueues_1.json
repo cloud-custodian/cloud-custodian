@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "QueueSummaryList": [
+            {
+                "Id": "6c5eba02-9916-4ec4-9208-94f5acaa7205",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/queue/6c5eba02-9916-4ec4-9208-94f5acaa7205",
+                "Name": "BasicQueue",
+                "QueueType": "STANDARD"
+            }
+        ]
+    }
+}

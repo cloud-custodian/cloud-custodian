@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AgentStatus": {
+            "AgentStatusARN": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/agent-state/b32c6675-72a8-4fd2-ace3-af32cdaa9b22",
+            "AgentStatusId": "b32c6675-72a8-4fd2-ace3-af32cdaa9b22",
+            "Name": "Available",
+            "Description": "Available state",
+            "Type": "ROUTABLE",
+            "DisplayOrder": 1,
+            "State": "ENABLED",
+            "Tags": {
+                "custodian_cleanup": "Resource does not meet policy: notify@2022/09/19",
+                "c7n": "True",
+                "abcd": "xyz"
+            }
+        }
+    }
+}

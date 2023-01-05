@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "RoutingProfile": {
+            "InstanceId": "bfa51f82-56de-49a2-b51b-7d666e52ffe3",
+            "Name": "Basic Routing Profile",
+            "RoutingProfileArn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/routing-profile/5129a6f0-5ad6-42f2-8a72-46cc954bb80c",
+            "RoutingProfileId": "5129a6f0-5ad6-42f2-8a72-46cc954bb80c",
+            "Description": "A simple routing profile.",
+            "MediaConcurrencies": [
+                {
+                    "Channel": "CHAT",
+                    "Concurrency": 2
+                },
+                {
+                    "Channel": "TASK",
+                    "Concurrency": 1
+                },
+                {
+                    "Channel": "VOICE",
+                    "Concurrency": 1
+                }
+            ],
+            "DefaultOutboundQueueId": "6c5eba02-9916-4ec4-9208-94f5acaa7205",
+            "Tags": {
+                "custodian_cleanup": "Resource does not meet policy: notify@2022/09/19",
+                "c7n": "True",
+                "abcd": "xyz"
+            }
+        }
+    }
+}

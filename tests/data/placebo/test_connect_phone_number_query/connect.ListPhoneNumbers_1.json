@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "PhoneNumberSummaryList": [
+            {
+                "Id": "91e27087-4e84-46da-a38e-cd2010b6073f",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/phone-number/91e27087-4e84-46da-a38e-cd2010b6073f",
+                "PhoneNumber": "+18006581030",
+                "PhoneNumberType": "TOLL_FREE",
+                "PhoneNumberCountryCode": "US"
+            }
+        ]
+    }
+}

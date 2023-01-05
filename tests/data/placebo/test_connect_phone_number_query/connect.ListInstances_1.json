@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "InstanceSummaryList": [
+            {
+                "Id": "bfa51f82-56de-49a2-b51b-7d666e52ffe3",
+                "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3",
+                "IdentityManagementType": "CONNECT_MANAGED",
+                "InstanceAlias": "c7ntest",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 15,
+                    "hour": 14,
+                    "minute": 19,
+                    "second": 10,
+                    "microsecond": 0
+                },
+                "ServiceRole": "arn:aws:iam::644160558196:role/aws-service-role/connect.amazonaws.com/AWSServiceRoleForAmazonConnect_z4JxeOmr1X95NaviOd88",
+                "InstanceStatus": "ACTIVE",
+                "InboundCallsEnabled": true,
+                "OutboundCallsEnabled": true
+            }
+        ]
+    }
+}

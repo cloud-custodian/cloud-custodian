@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ContactFlow": {
+            "Arn": "arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/contact-flow/0327d478-1283-4aa7-9c72-47278244ff4e",
+            "Id": "0327d478-1283-4aa7-9c72-47278244ff4e",
+            "Name": "Sample note for screenpop",
+            "Type": "CONTACT_FLOW",
+            "State": "ACTIVE",
+            "Description": "Screenpop is a Contact control pannel feature that allows loading a web page optionally with parameters based on attributes. Refer to the screenpop documentation for more information.",
+            "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"2b6ee9f2-0f1a-417c-91c7-bdc12cfc6a07\",\"Metadata\":{\"entryPointPosition\":{\"x\":75,\"y\":20},\"snapToGrid\":false,\"ActionMetadata\":{\"35dde84a-f902-4a2b-9e0d-b6079d2a5260\":{\"position\":{\"x\":928,\"y\":85},\"useDynamic\":false},\"8f9f6aa6-88bc-4bbe-8920-5d2ca2d5cfb4\":{\"position\":{\"x\":1373,\"y\":231}},\"8595ce23-0af7-49e3-8324-22accebefd0d\":{\"position\":{\"x\":696,\"y\":72},\"useDynamic\":false,\"queue\":{\"id\":\"arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/queue/6c5eba02-9916-4ec4-9208-94f5acaa7205\",\"text\":\"BasicQueue\"}},\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\":{\"position\":{\"x\":1147,\"y\":155},\"useDynamic\":false},\"e1aff3c4-01f1-43aa-864e-371a6af4095f\":{\"position\":{\"x\":448,\"y\":94},\"useDynamic\":false},\"2b6ee9f2-0f1a-417c-91c7-bdc12cfc6a07\":{\"position\":{\"x\":209,\"y\":61},\"useDynamic\":false}}},\"Actions\":[{\"Identifier\":\"35dde84a-f902-4a2b-9e0d-b6079d2a5260\",\"Transitions\":{\"NextAction\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"Errors\":[{\"NextAction\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"ErrorType\":\"NoMatchingError\"},{\"NextAction\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"ErrorType\":\"QueueAtCapacity\"}],\"Conditions\":[]},\"Type\":\"TransferContactToQueue\"},{\"Identifier\":\"8f9f6aa6-88bc-4bbe-8920-5d2ca2d5cfb4\",\"Type\":\"DisconnectParticipant\",\"Parameters\":{},\"Transitions\":{}},{\"Identifier\":\"8595ce23-0af7-49e3-8324-22accebefd0d\",\"Parameters\":{\"QueueId\":\"arn:aws:connect:us-east-1:644160558196:instance/bfa51f82-56de-49a2-b51b-7d666e52ffe3/queue/6c5eba02-9916-4ec4-9208-94f5acaa7205\"},\"Transitions\":{\"NextAction\":\"35dde84a-f902-4a2b-9e0d-b6079d2a5260\",\"Errors\":[{\"NextAction\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"ErrorType\":\"NoMatchingError\"}],\"Conditions\":[]},\"Type\":\"UpdateContactTargetQueue\"},{\"Identifier\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"Parameters\":{\"Text\":\"An error ocurred. Goodbye.\"},\"Transitions\":{\"NextAction\":\"8f9f6aa6-88bc-4bbe-8920-5d2ca2d5cfb4\",\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipant\"},{\"Identifier\":\"e1aff3c4-01f1-43aa-864e-371a6af4095f\",\"Parameters\":{\"Attributes\":{\"note\":\"This note demonstrates how attributes can appear in the screen pop.\"}},\"Transitions\":{\"NextAction\":\"8595ce23-0af7-49e3-8324-22accebefd0d\",\"Errors\":[{\"NextAction\":\"e8f664fd-3e86-4aaa-915f-c1fa4a4d4dd0\",\"ErrorType\":\"NoMatchingError\"}],\"Conditions\":[]},\"Type\":\"UpdateContactAttributes\"},{\"Identifier\":\"2b6ee9f2-0f1a-417c-91c7-bdc12cfc6a07\",\"Parameters\":{\"Text\":\"This sets a note attribute for use in a screenpop.\"},\"Transitions\":{\"NextAction\":\"e1aff3c4-01f1-43aa-864e-371a6af4095f\",\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipant\"}]}",
+            "Tags": {
+                "custodian_cleanup": "Resource does not meet policy: notify@2022/09/19",
+                "c7n": "True",
+                "abcd": "xyz"
+            }
+        }
+    }
+}
