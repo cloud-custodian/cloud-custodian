@@ -17,6 +17,19 @@ class WAFTest(BaseTest):
         )
         self.assertEqual(resources[0]["DefaultAction"], {"Type": "BLOCK"})
 
+    def test_wafv2_resolve_resources(self):
+        session_factory = self.replay_flight_data(
+            "test_wafv2_resolve_resources",
+            region="us-east-2"
+        )
+        p = self.load_policy(
+            {"name": "wafv2test", "resource": "aws.wafv2"},
+            session_factory=session_factory,
+            config={"region": "us-east-2"}
+        )
+        resources = p.resource_manager.get_resources(["624e04d2-8b45-45ee-b4ad-e853dac6d070"])
+        assert len(resources) == 1
+
     def test_wafv2_logging_configuration(self):
         session_factory = self.replay_flight_data(
             'test_wafv2_logging_configuration')
