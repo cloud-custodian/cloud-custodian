@@ -128,6 +128,9 @@ class AccountOrganization(ValueFilter):
     def process(self, resources, event=None):
         if self.annotation_key not in resources[0]:
             self.get_org_info(resources[0])
+        # if we can't access org info, we've already logged, and return
+        if resources[0][self.annotation_key] is None:
+            return []
         if super().process([resources[0][self.annotation_key]]):
             return resources
         return []
