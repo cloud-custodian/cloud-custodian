@@ -129,6 +129,8 @@ release of Python manually. [This guide](https://realpython.com/installing-pytho
     ```sh
     helm install c7n-kube c7n/c7n-kube  --namespace c7n-system -f values.yml --create-namespace
     ```
+    See the [Kubernetes section](https://cloudcustodian.io/docs/kubernetes/gettingstarted.html)
+    of the documentation for more information. 
 
 !!! note 
 
