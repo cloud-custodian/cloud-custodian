@@ -104,6 +104,35 @@ class AccountCredentialReport(CredentialReport):
 class AccountOrganization(ValueFilter):
     """Check organization enrollment and configuration
 
+    :example:
+
+    determine if an account is not in an organization
+
+    .. code-block:: yaml
+
+      policies:
+        - name: no-org
+          resource: account
+          filters:
+            - type: organization
+              key: Id
+              value: absent
+
+
+    :example:
+
+    determine if an account is setup for organization policies
+
+    .. code-block:: yaml
+
+       policies:
+         - name: org-policies-not-enabled
+           resource: account
+           filters:
+             - type: organization
+               key: FeatureSet
+               value: ALL
+               op: not-equal
     """
     schema = type_schema('organization', rinherit=ValueFilter.schema)
     schema_alias = False
