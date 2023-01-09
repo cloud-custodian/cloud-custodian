@@ -1013,6 +1013,7 @@ class SpecificIamRoleManagedPolicy(ValueFilter):
             resource: aws.iam-role
             filters:
               - type: has-specific-managed-policy
+                op: in
                 value:
                   - AmazonS3FullAccess
                   - AWSOrganizationsFullAccess

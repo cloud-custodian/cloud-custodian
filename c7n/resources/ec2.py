@@ -2414,6 +2414,7 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
             resource: aws.ec2
             filters:
               - type: has-specific-managed-policy
+                op: in
                 value:
                   - AmazonS3FullAccess
                   - AWSOrganizationsFullAccess
