@@ -52,6 +52,7 @@ class ConnectInstanceAttributeFilter(ValueFilter):
             if self.annotation_key not in r:
                 instance_attribute = client.describe_instance_attribute(InstanceId=r['Id'],
                                 AttributeType=str.upper(self.data.get('attribute_type')))
+                instance_attribute.pop('ResponseMetadata', None)
                 r[self.annotation_key] = instance_attribute
 
             if self.match(r[self.annotation_key]):
