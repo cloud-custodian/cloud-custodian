@@ -1135,6 +1135,59 @@ class SetPolicy(BaseAction):
             self.detach_policy(client, resource, parn)
 
 
+@User.action_registry.register("set-policy")
+class SetUserPolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on a user.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-group-policy
+          resource: iam-user
+          filters:
+            - type: value
+              key: UserName
+              op: not-in
+              value:
+                - AdminUser1
+                - AdminUser2
+              actions:
+            - type: set-policy
+              state: detached
+              arn: arn:aws:iam::aws:policy/AdministratorAccess
+
+    """
+
+    permissions = (
+        "iam:AttachUserPolicy", "iam:DetachUserPolicy", "iam:ListAttachedUserPolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_user_policy(
+            UserName=resource["UserName"], PolicyArn=policy_arn)
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_user_policy(
+                UserName=resource["UserName"], PolicyArn=policy_arn)
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_user_policies(
+            UserName=resource["UserName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
+
+
 @Group.action_registry.register("set-policy")
 class SetGroupPolicy(SetPolicy):
     """Set a specific IAM policy as attached or detached on a group.
