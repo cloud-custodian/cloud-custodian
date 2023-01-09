@@ -33,7 +33,7 @@ class SecurityGroup(QueryResourceManager):
         """resource_type"""
         id = "SecurityGroupId"
         endpoint = "vpc.tencentcloudapi.com"
-        service = "security-group"
+        service = "vpc"
         version = "2017-03-12"
         enum_spec = ("DescribeSecurityGroups", "Response.SecurityGroupSet[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": "20"}}

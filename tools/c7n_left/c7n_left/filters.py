@@ -24,7 +24,7 @@ class Traverse(Filter):
           filters:
             - not:
                - type: traverse
-                 resource: aws_s3_bucket_server_side_encryption_configuration
+                 resources: aws_s3_bucket_server_side_encryption_configuration
                  attrs:
                   - rule.apply_server_side_encryption_by_default.sse_algorithm: aws:kms
 
@@ -40,7 +40,7 @@ class Traverse(Filter):
           filters:
             - network_configuration: present
             - type: traverse
-              resource: [aws_apprunner_vpc_connector, aws_subnet, aws_vpc]
+              resources: [aws_apprunner_vpc_connector, aws_subnet, aws_vpc]
               attrs:
                - type: value
                  key: tag:Env
