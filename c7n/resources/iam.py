@@ -1229,7 +1229,7 @@ class SetUserPolicy(SetPolicy):
               value:
                 - AdminUser1
                 - AdminUser2
-              actions:
+          actions:
             - type: set-policy
               state: detached
               arn: arn:aws:iam::aws:policy/AdministratorAccess
