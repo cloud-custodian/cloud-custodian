@@ -32,7 +32,7 @@ class CBSSnapshot(QueryResourceManager):
         """resource_type"""
         id = "SnapshotId"
         endpoint = "cbs.tencentcloudapi.com"
-        service = "cvm"
+        service = "cbs"
         version = "2017-03-12"
         enum_spec = ("DescribeSnapshots", "Response.SnapshotSet[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
