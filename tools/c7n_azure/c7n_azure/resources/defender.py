@@ -135,3 +135,33 @@ class DefenderAutoProvisioningSetting(DefenderResourceManager, metaclass=QueryMe
         filter_name = None
         service = "security"
         resource_type = "Microsoft.Security/autoProvisioningSettings"
+
+
+@resources.register("defender-alert")
+class DefenderAlertSettings(DefenderResourceManager, metaclass=QueryMeta):
+    """Alert settings for Microsoft Defender.
+
+    :example:
+
+    Check that auto-provisioning is enabled for the Microsoft Defender monitoring agent.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-defender-alert-enabled
+            resource: azure.defender-alert
+            filters:
+            - name: default
+            - properties.alertNotifications: "On"
+    """
+
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        id = "id"
+        name = "name"
+        enum_spec = ("security_contacts", "list", None)
+        client = "securityContacts"
+        filter_name = None
+        service = "security"
+        resource_type = "Microsoft.Security/alertNotifications"

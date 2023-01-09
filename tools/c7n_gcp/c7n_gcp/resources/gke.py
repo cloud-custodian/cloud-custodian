@@ -43,6 +43,8 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['cluster_name'])})
 
     def augment(self, resources):
+        if not resources:
+            return []
         for r in resources:
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']

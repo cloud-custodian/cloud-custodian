@@ -191,3 +191,21 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
+
+
+@resources.register('api-key')
+class ApiKey(QueryResourceManager):
+    """GCP API Key
+    https://cloud.google.com/api-keys/docs/reference/rest/v2/projects.locations.keys#Key
+    """
+    class resource_type(TypeInfo):
+        service = 'apikeys'
+        version = 'v2'
+        component = 'projects.locations.keys'
+        enum_spec = ('list', 'keys[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = 'projects/{}/locations/global'
+        name = id = "name"
+        default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
+        asset_type = "apikeys.googleapis.com/projects.locations.keys"
