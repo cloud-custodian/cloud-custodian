@@ -8,7 +8,25 @@ import pytz
 
 @resources.register("mysql-backup")
 class MySQLBackUp(QueryResourceManager):
-    """mysql-backup"""
+    """mysql-backup
+
+    Docs on mysql-backup
+    https://www.tencentcloud.com/document/product/236/37796
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: test_cdb_backup_create_time
+          resource: tencentcloud.mysql-backup
+          filters:
+            - type: value
+              key: Date
+              value: 1
+              value_type: age
+              op: greater-than
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
@@ -33,6 +51,9 @@ class MySQLBackUp(QueryResourceManager):
             items = resp["Response"]["Items"]
             field_format = self.resource_type.datetime_fields_format["Date"]
             for item in items:
+                # backups in non SUCCESS status don't have a proper date yet
+                if item["Status"] != "SUCCESS":
+                    continue
                 item["Date"] = isoformat_datetime_str(item["Date"],
                                                       field_format[0],
                                                       field_format[1])

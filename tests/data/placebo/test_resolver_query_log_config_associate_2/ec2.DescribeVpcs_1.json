@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-01234567891234", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "TestVPC", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "tagtestvalue", 
+                        "Key": "tagtestkey"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-98ba93f0", 
+                        "CidrBlock": "10.0.42.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.0.42.0/24", 
+                "IsDefault": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "152ebd54-f21c-4026-b3f3-ddb5eb83cdc4", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 22 Dec 2017 16:16:40 GMT"
+            }
+        }
+    }
+}

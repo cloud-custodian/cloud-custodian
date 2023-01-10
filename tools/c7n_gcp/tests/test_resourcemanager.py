@@ -64,6 +64,12 @@ class OrganizationTest(BaseTest):
             "organizations/111111111111"})
         self.assertEqual(org['lifecycleState'], 'ACTIVE')
         self.assertEqual(org['displayName'], 'custodian.com')
+        self.assertEqual(
+            p.resource_manager.get_urns([org]),
+            [
+                "gcp:cloudresourcemanager:::organization/111111111111",
+            ],
+        )
 
     def test_organization_query(self):
         organization_name = 'organizations/851339424791'
@@ -76,6 +82,12 @@ class OrganizationTest(BaseTest):
 
         organization_resources = policy.run()
         self.assertEqual(organization_resources[0]['name'], organization_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(organization_resources),
+            [
+                "gcp:cloudresourcemanager:::organization/851339424791",
+            ],
+        )
 
     def test_organization_set_iam_policy(self):
         resource_full_name = 'organizations/926683928810'
@@ -132,6 +144,12 @@ class FolderTest(BaseTest):
         resources = policy.run()
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0]['parent'], parent)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:cloudresourcemanager:::folder/112838955399",
+            ],
+        )
 
 
 class ProjectTest(BaseTest):
@@ -146,6 +164,12 @@ class ProjectTest(BaseTest):
             "projects/cloud-custodian"})
         self.assertEqual(project['lifecycleState'], 'ACTIVE')
         self.assertEqual(project['name'], 'cloud-custodian')
+        self.assertEqual(
+            p.resource_manager.get_urns([project]),
+            [
+                "gcp:cloudresourcemanager:::project/cloud-custodian",
+            ],
+        )
 
     @pytest.mark.skipif(
         sys.platform.startswith('win'), reason='windows file path fun')
@@ -207,6 +231,14 @@ class ProjectTest(BaseTest):
                              'parent': 'folders/264112811077'}}
         self.assertRaises(NotImplementedError, hierarchy.load_metadata)
         self.assertRaises(NotImplementedError, hierarchy.diff, [])
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                "gcp:cloudresourcemanager:::project/c7n-test-target",
+                "gcp:cloudresourcemanager:::project/practical-truck-276716",
+                "gcp:cloudresourcemanager:::project/hautomation",
+            ],
+        )
 
     def test_project_hierarchy_no_op(self):
 

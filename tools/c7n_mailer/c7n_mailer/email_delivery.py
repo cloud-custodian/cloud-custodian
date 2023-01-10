@@ -43,10 +43,10 @@ class EmailDelivery:
                 # gcp doesn't support the '@' character in their label values so we
                 # allow users to specify an email_base_url to append to the end of their
                 # owner contact tags
-                if not is_email(target) and self.config.get('email_base_url'):
-                    target = "%s@%s" % (target, self.config['email_base_url'])
-                    if is_email(target):
-                        emails.append(target)
+                if not is_email(email) and self.config.get('email_base_url'):
+                    full_email = "%s@%s" % (email, self.config['email_base_url'])
+                    if is_email(full_email):
+                        emails.append(full_email)
         return emails
 
     def get_event_owner_email(self, targets, event):  # TODO: GCP-friendly

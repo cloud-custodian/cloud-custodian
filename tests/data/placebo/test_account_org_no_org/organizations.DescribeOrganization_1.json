@@ -1,0 +1,14 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "HostId": "4tbXPrkIvHzDe7UTWOeiJGxuomJ8SVVvn9cSKQHVTVJdJtVeYDAkwOkd7C0K9k4WtVzvKf1R2iU=", 
+            "RequestId": "29DAAD9315A10452"
+        }, 
+        "Error": {
+            "Message": "dunno", 
+            "Code": "AWSOrganizationsNotInUseException"
+        }
+    }
+}

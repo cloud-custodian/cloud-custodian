@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import jmespath
 import socket
 from retrying import retry
@@ -8,6 +10,7 @@ from .utils import PageMethod
 from c7n.exceptions import PolicyExecutionError
 from requests.exceptions import ConnectionError
 from tencentcloud.common import credential
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.common_client import CommonClient
@@ -79,6 +82,9 @@ class Client:
             if not pagination_token_path:
                 raise PolicyExecutionError("config to use pagination_token but not set token path")
             params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
+        elif paging_method == PageMethod.Page:
+            params[PageMethod.Page.name] = 1
+            params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
         else:
             raise PolicyExecutionError("unsupported paging method")
 
@@ -103,6 +109,11 @@ class Client:
                         break
                     params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) +\
                         int(paging_def["limit"]["value"])
+                elif paging_method == PageMethod.Page:
+                    if len(items) < int(paging_def["limit"]["value"]):
+                        # no more data
+                        break
+                    params[paging_method.name] = int(params[paging_method.name]) + 1
                 else:
                     token = jmespath.search(pagination_token_path, result)
                     if token == "":
@@ -124,7 +135,40 @@ class Session:
         # just using default get_credentials() method
         # steps: Environment Variable -> profile file -> CVM role
         # for reference: https://github.com/TencentCloud/tencentcloud-sdk-python
-        self._cred = credential.DefaultCredentialProvider().get_credentials()
+
+        cred_provider = credential.DefaultCredentialProvider()
+
+        # the DefaultCredentialProvider does not handle sts assumed role sessions
+        # so we need to check for the token first
+        if 'TENCENTCLOUD_TOKEN' in os.environ:
+            if (
+                'TENCENTCLOUD_SECRET_ID' not in os.environ or
+                'TENCENTCLOUD_SECRET_KEY' not in os.environ
+            ):
+                raise TencentCloudSDKException(
+                    'TENCENTCLOUD_TOKEN provided, but one of TENCENTCLOUD_SECRET_ID'
+                    'or TENCENTCLOUD_SECRET_KEY missing'
+                )
+            cred = credential.Credential(
+                secret_id=os.environ['TENCENTCLOUD_SECRET_ID'],
+                secret_key=os.environ['TENCENTCLOUD_SECRET_KEY'],
+                token=os.environ['TENCENTCLOUD_TOKEN']
+            )
+            cred_provider.cred = cred
+
+        self._cred = cred_provider.get_credentials()
+
+    @property
+    def secret_id(self):
+        return self._cred.secret_id
+
+    @property
+    def secret_key(self):
+        return self._cred.secret_key
+
+    @property
+    def token(self):
+        return self._cred.token
 
     def client(self,
                endpoint: str,
