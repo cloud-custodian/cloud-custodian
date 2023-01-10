@@ -65,7 +65,7 @@ class ConnectInstanceAttributeFilter(ValueFilter):
     class SetAttributes(Action):
         """Set the attributes for the connect resources
 
-        :Example:
+        :example:
 
         .. code-block:: yaml
 
