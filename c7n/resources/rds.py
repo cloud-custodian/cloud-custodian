@@ -968,6 +968,10 @@ class RDSSubscriptionDelete(BaseAction):
 
 class DescribeRDSSnapshot(DescribeSource):
 
+    def get_resources(self, ids, cache=True):
+        super_get = super().get_resources
+        return list(itertools.chain(*[super_get((i,)) for i in ids]))
+
     def augment(self, snaps):
         for s in snaps:
             s['Tags'] = s.pop('TagList', ())
