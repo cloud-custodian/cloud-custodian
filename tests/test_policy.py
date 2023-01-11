@@ -14,7 +14,7 @@ from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
-from c7n.resources.aws import AWS, fake_session
+from c7n.resources.aws import AWS, Arn, fake_session
 from c7n.resources.ec2 import EC2
 from c7n.resources.kinesis import KinesisStream
 from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
@@ -499,6 +499,34 @@ class PolicyMetaLint(BaseTest):
                     empty.add(k)
         if empty:
             raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
+
+    def test_valid_arn_type(self):
+        arn_db = load_data('arn-types.json')
+        invalid = {}
+        count = 0
+        for k, v in manager.resources.items():
+            if not v.resource_type.arn_type:
+                continue
+            count += 1
+            svc_arn_map = arn_db.get(v.resource_type.service, {})
+            if not svc_arn_map:
+                continue
+            svc_arns = list(svc_arn_map.values())
+            svc_arn_types = set()
+            for sa in svc_arns:
+                sa_type = Arn.parse(sa).resource_type
+                if sa_type is None:
+                    sa_type = ''
+                if ':' in sa_type:
+                    sa_type = sa_type.split(':', 1)[0]
+                svc_arn_types.add(sa_type)
+
+            if v.resource_type.arn_type not in svc_arn_types:
+                invalid[k] = {'valid': svc_arn_types, 'resource': v.resource_type.arn_type}
+
+        if invalid:
+            raise ValueError("%d %s have invalid arn types in metadata" % (
+                len(invalid), ", ".join(invalid)))
 
     def test_resource_legacy_type(self):
         legacy = set()
