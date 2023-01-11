@@ -1150,7 +1150,7 @@ class SetUserPolicy(SetPolicy):
 
       .. code-block:: yaml
 
-        - name: iam-attach-group-policy
+        - name: iam-attach-user-policy
           resource: iam-user
           filters:
             - type: value
