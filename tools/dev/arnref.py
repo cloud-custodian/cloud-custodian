@@ -27,7 +27,6 @@ def extract_arns(service_page):
     if main_content is None:
         return
 
-    service = main_content.find("h1", class_="topictitle").text
     tables = main_content.find_all("div", class_="table-contents")
 
     arn_map = {}
