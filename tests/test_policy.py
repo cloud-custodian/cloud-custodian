@@ -503,26 +503,42 @@ class PolicyMetaLint(BaseTest):
     def test_valid_arn_type(self):
         arn_db = load_data('arn-types.json')
         invalid = {}
-        count = 0
+        overrides = {'wafv2': set(('webacl',))}
+
+        # we have a few resources where we have synthetic arns
+        # or they aren't in the iam ref docs.
+        allow_list = set(('rrset', 'redshift-reserved', 'elasticsearch-reserved'))
+
         for k, v in manager.resources.items():
+            if k in allow_list:
+                continue
+            svc = v.resource_type.service
             if not v.resource_type.arn_type:
                 continue
-            count += 1
-            svc_arn_map = arn_db.get(v.resource_type.service, {})
+
+            svc_arn_map = arn_db.get(svc, {})
             if not svc_arn_map:
                 continue
+
             svc_arns = list(svc_arn_map.values())
             svc_arn_types = set()
             for sa in svc_arns:
-                sa_type = Arn.parse(sa).resource_type
+                sa_arn = Arn.parse(sa)
+                sa_type = sa_arn.resource_type
                 if sa_type is None:
                     sa_type = ''
+                # wafv2
+                if sa_type.startswith('{') and sa_type.endswith('}'):
+                    sa_type = sa_arn.resource
                 if ':' in sa_type:
                     sa_type = sa_type.split(':', 1)[0]
                 svc_arn_types.add(sa_type)
 
+            svc_arn_types = overrides.get(svc, svc_arn_types)
             if v.resource_type.arn_type not in svc_arn_types:
-                invalid[k] = {'valid': svc_arn_types, 'resource': v.resource_type.arn_type}
+                invalid[k] = {'valid': svc_arn_types,
+                              'service': svc,
+                              'resource': v.resource_type.arn_type}
 
         if invalid:
             raise ValueError("%d %s have invalid arn types in metadata" % (
