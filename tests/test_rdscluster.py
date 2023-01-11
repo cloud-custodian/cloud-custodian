@@ -669,3 +669,26 @@ class RDSClusterSnapshotTest(BaseTest):
             resources[0]["DBClusterSnapshotIdentifier"]
         )
         self.assertEqual(len(restore_permissions_after), 0)
+
+
+class TestRDSClusterParameterGroupFilter(BaseTest):
+
+    def test_param_value_cases(self):
+        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_filter')
+        policy = self.load_policy(
+            {
+                "name": "rds-aurora-paramter-group-check",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "db-cluster-parameter",
+                        "key": "tls_version",
+                        "op": "ne",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 2)
