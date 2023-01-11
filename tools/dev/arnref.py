@@ -1,6 +1,19 @@
+"""Build an arn-type database from aws iam reference docs
+
+Inspired by duo-labs/parliament and salesforce/policy_sentry which
+also parse the reference docs.
+
+The simplest way to run is actually checkout policy_sentry since
+it has a clean copy of the html data.
+
+```
+gh repo clone salesforce/policy_sentry
+python arnref.py --docs-dir policy-sentry/shared/data/docs --output arn-types.json
+```
+
+"""
 from pathlib import Path
 import json
-import re
 
 import click
 from bs4 import BeautifulSoup
