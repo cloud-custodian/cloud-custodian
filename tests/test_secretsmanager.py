@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from botocore.exceptions import ClientError
 
 
 class TestSecretsManager(BaseTest):
@@ -108,3 +109,27 @@ class TestSecretsManager(BaseTest):
         self.assertFalse(resources[0].get('Tags'))
         new_tags = client.describe_secret(SecretId="c7n-test-key").get("Tags")
         self.assertTrue("tag@" in new_tags[0].get("Value"))
+
+    def test_secrets_manager_delete(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_delete')
+        client = session_factory(region="us-east-1").client("secretsmanager")
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-unencrypted-delete',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'test'
+                    }
+                ],
+                'actions': ['delete']
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test')
+        secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
+        self.assertTrue('DeletedDate' in secret_for_del)

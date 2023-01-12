@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
+from c7n.actions import BaseAction
+from c7n.utils import type_schema
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
@@ -137,3 +139,34 @@ class MarkSecretForOp(TagDelayedAction):
                   op: tag
                   days: 1
     """
+
+
+@SecretsManager.action_registry.register('delete')
+class DeleteSecretsManager(BaseAction):
+    """Delete a secret and all of its versions.
+    The default recovery window is 30 days
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-unencrypted-secrets
+                resource: aws.secrets-manager
+                filters:
+                  - type: value
+                    key: KmsKeyId
+                    value: absent
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('secretsmanager:DeleteSecret',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('secretsmanager')
+
+        for r in resources:
+            self.manager.retry(client.delete_secret, SecretId=r['ARN'])
