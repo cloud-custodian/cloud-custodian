@@ -50,15 +50,12 @@ def load_available(resources=True):
     for provider in PROVIDER_NAMES:
         try:
             load_providers((provider,))
-        except (ImportError, ModuleNotFoundError) as e: # pragma: no cover
+        except ImportError as e: # pragma: no cover
             continue
         else:
             found.append(provider)
     if resources:
-        try:
-            load_resources(['%s.*' % s for s in found])
-        except ModuleNotFoundError:
-            pass
+        load_resources(['%s.*' % s for s in found])
     return found
 
 
