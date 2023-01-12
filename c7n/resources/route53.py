@@ -500,7 +500,7 @@ class ResolverQueryLogConfig(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'route53resolver'
-        arn_type = 'query_log_config'
+        arn_type = 'resolver-query-log-config'
         enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
         name = 'Name'
         id = 'Id'

@@ -507,7 +507,23 @@ class PolicyMetaLint(BaseTest):
 
         # we have a few resources where we have synthetic arns
         # or they aren't in the iam ref docs.
-        allow_list = set(('rrset', 'redshift-reserved', 'elasticsearch-reserved'))
+        allow_list = set((
+            # bug in the arnref script or test logic below.
+            'glue-catalog',
+            # these are valid, but v1 & v2 arns get mangled into the
+            # same top level prefix
+            'rest-api',
+            'rest-stage',
+            # synthetics ~ ie. c7n introduced since non exist.
+            # or in some cases where it exists but not usable in iam.
+            'scaling-policy',
+            'glue-classifier',
+            'glue-security-configuration',
+            'event-rule-target',
+            'rrset',
+            'redshift-reserved',
+            'elasticsearch-reserved'
+        ))
 
         for k, v in manager.resources.items():
             if k in allow_list:
@@ -536,7 +552,7 @@ class PolicyMetaLint(BaseTest):
 
             svc_arn_types = overrides.get(svc, svc_arn_types)
             if v.resource_type.arn_type not in svc_arn_types:
-                invalid[k] = {'valid': svc_arn_types,
+                invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,
                               'resource': v.resource_type.arn_type}
 
