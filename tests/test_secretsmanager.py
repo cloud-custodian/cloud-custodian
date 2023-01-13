@@ -138,28 +138,29 @@ class TestSecretsManager(BaseTest):
         session_factory = self.replay_flight_data("test_secretsmanager_remove_matched")
         resource_id = 'arn:aws:secretsmanager:us-east-1:644160558196:secret:test-ZO5wu6'
         client = session_factory().client("secretsmanager")
-        client.put_resource_policy(SecretId=resource_id, ResourcePolicy=json.dumps({
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "SpecificAllow",
-                    "Effect": "Allow",
-                    "Principal": {
-                        "AWS": "arn:aws:iam::644160558196:user/Peter"
+        client.put_resource_policy(SecretId=resource_id, ResourcePolicy=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::644160558196:user/Peter"
+                        },
+                        "Action": "secretsmanager:GetSecretValue",
+                        "Resource": "*"
                     },
-                    "Action": "secretsmanager:GetSecretValue",
-                    "Resource": "*"
-                },
-                {
-                    "Sid": "CrossAccount",
-                    "Effect": "Allow",
-                    "Principal": {
-                        "AWS": "arn:aws:iam::040813553448:user/pratyush"
-                    },
-                    "Action": "secretsmanager:GetSecretValue",
-                    "Resource": "*"
-                }
-            ]
+                    {
+                        "Sid": "CrossAccount",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::040813553448:user/pratyush"
+                        },
+                        "Action": "secretsmanager:GetSecretValue",
+                        "Resource": "*"
+                    }
+                ]
             }))
         p = self.load_policy(
             {
