@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import json
+from c7n.exceptions import PolicyValidationError
 
 
 class TestSecretsManager(BaseTest):
@@ -210,3 +211,14 @@ class TestSecretsManager(BaseTest):
         self.assertEqual(len(resources), 1)
         data = client.get_resource_policy(SecretId=resource_id)
         self.assertEqual(data.get('ResourcePolicy'), None)
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "secrets-manager-remove-matched",
+                "resource": "secrets-manager",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )
