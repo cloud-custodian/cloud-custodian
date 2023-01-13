@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.tags import universal_augment
+from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import local_session, type_schema
 
 
@@ -122,3 +122,9 @@ class DeleteUserPool(BaseAction):
         except ClientError as e:
             self.log.exception(
                 "Exception deleting user pool:\n %s" % e)
+
+
+register_universal_tags(
+    CognitoUserPool.filter_registry,
+    CognitoUserPool.action_registry
+)
