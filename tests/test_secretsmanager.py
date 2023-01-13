@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+import json
 
 
 class TestSecretsManager(BaseTest):
@@ -132,3 +133,46 @@ class TestSecretsManager(BaseTest):
         self.assertEqual(resources[0]['Name'], 'test')
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
+
+    def test_secretsmanager_remove_matched(self):
+        session_factory = self.replay_flight_data("test_secretsmanager_remove_matched")
+        resource_id = 'arn:aws:secretsmanager:us-east-1:644160558196:secret:test-ZO5wu6'
+        client = session_factory().client("secretsmanager")
+        client.put_resource_policy(SecretId=resource_id, ResourcePolicy=json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "SpecificAllow",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::644160558196:user/Peter"
+                    },
+                    "Action": "secretsmanager:GetSecretValue",
+                    "Resource": "*"
+                },
+                {
+                    "Sid": "CrossAccount",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "arn:aws:iam::040813553448:user/pratyush"
+                    },
+                    "Action": "secretsmanager:GetSecretValue",
+                    "Resource": "*"
+                }
+            ]
+            }))
+        p = self.load_policy(
+            {
+                "name": "secrets-manager-rm-matched",
+                "resource": "secrets-manager",
+                "filters": [{"type": "cross-account"}],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = client.get_resource_policy(SecretId=resource_id)
+        access_policy = json.loads(data.get('ResourcePolicy'))
+        self.assertEqual(len(access_policy.get('Statement')), 1)
+        self.assertEqual([s['Sid'] for s in access_policy.get('Statement')], ["SpecificAllow"])
