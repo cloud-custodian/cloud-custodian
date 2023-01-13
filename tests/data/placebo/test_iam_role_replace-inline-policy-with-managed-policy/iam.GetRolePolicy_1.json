@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "RoleName": "us-east-1-LambdaExecutionRole",
+        "PolicyName": "us-east-1-DynamoPolicy",
+        "PolicyDocument": "%7B%22Version%22%3A%-10-17%22%2C%22Statement%22%3A%5B%7B%22Action%22%3A%5B%22dynamodb%3AQuery%22%8D%2C%22Resource%22%3A%22%2A%22%2C%22Effect%22%3A%22Allow%22%7D%5D%7D",
+        "ResponseMetadata": {}
+    }
+}

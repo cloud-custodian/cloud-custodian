@@ -18,6 +18,7 @@ from dateutil.tz import tzutc
 from dateutil.parser import parse as parse_date
 
 from botocore.exceptions import ClientError
+from botocore.config import Config
 
 from c7n import deprecated
 from c7n.actions import BaseAction
@@ -31,7 +32,7 @@ from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
     get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
-    select_keys
+    select_keys, get_retry
 )
 
 from c7n.resources.aws import Arn
@@ -57,7 +58,6 @@ class DescribeGroup(DescribeSource):
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'group'
@@ -93,7 +93,6 @@ class DescribeRole(DescribeSource):
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'role'
@@ -118,7 +117,6 @@ Role.filter_registry.register('marked-for-op', TagActionFilter)
 
 @Role.action_registry.register('post-finding')
 class RolePostFinding(OtherResourcePostFinding):
-
     resource_type = 'AwsIamRole'
 
     def format_resource(self, r):
@@ -243,9 +241,74 @@ class DescribeUser(DescribeSource):
         return results
 
 
+@Role.action_registry.register('replace-inline-policy-with-managed-policy')
+class ReplaceInlinePolicyWithManagedPolicy(BaseAction):
+    """
+    Replace IAM Role attached Inline policies with Managed policies
+    and delete existing inline policies
+
+    :example:
+    .. code-block:: yaml
+        policies:
+            - name: iam-role-with-inline-policy
+              resource: iam-role
+              filters:
+                - Name: role-name
+              actions:
+                - type: replace-inline-policy-with-managed-policy
+
+    """
+
+    schema = type_schema(
+        'replace-inline-policy-with-managed-policy'
+    )
+
+    permissions = (
+        'iam:ListRolePolicies',
+        'iam:GetRolePolicy',
+        'iam:CreatePolicy',
+        'iam:DeletePolicy',
+        'iam:AttachRolePolicy'
+    )
+
+    def process(self, roles):
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('iam', config=config)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+        for role in roles:
+            try:
+                policy_list = retry(
+                    client.list_role_policies, RoleName=role['RoleName']
+                )
+                for policy_name in policy_list['PolicyNames']:
+                    policy_name_converted = policy_name + "_converted"
+                    policy_details = retry(
+                        client.get_role_policy, RoleName=role['RoleName'], PolicyName=policy_name
+                    )
+                    policy_document = json.dumps(policy_details['PolicyDocument'])
+                    create_policy_Response = retry(
+                        client.create_policy, PolicyName=policy_name_converted,
+                        PolicyDocument=policy_document,
+                        Description="Converted inline policy to managed policy"
+                    )
+                    retry(
+                        client.attach_role_policy, RoleName=role['RoleName'],
+                        PolicyArn=create_policy_Response['Policy']['Arn']
+                    )
+                    retry(
+                        client.delete_role_policy, RoleName=role['RoleName'], PolicyName=policy_name
+                    )
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
 @resources.register('iam-user')
 class User(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'user'
@@ -298,7 +361,6 @@ class UserRemoveTag(RemoveTag):
 User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
 
-
 Role.action_registry.register('mark-for-op', TagDelayedAction)
 Role.filter_registry.register('marked-for-op', TagActionFilter)
 
@@ -335,7 +397,7 @@ class SetGroups(BaseAction):
     def validate(self):
         if self.data.get('group') == '':
             raise PolicyValidationError('group cannot be empty on %s'
-                % (self.manager.data))
+                                        % (self.manager.data))
 
     def process(self, resources):
         group_name = self.data['group']
@@ -397,7 +459,6 @@ class DescribePolicy(DescribeSource):
 
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'policy'
@@ -418,7 +479,6 @@ class Policy(QueryResourceManager):
 
 
 class PolicyQueryParser(QueryParser):
-
     QuerySchema = {
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
@@ -431,7 +491,6 @@ class PolicyQueryParser(QueryParser):
 
 @resources.register('iam-profile')
 class InstanceProfile(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'instance-profile'
@@ -446,7 +505,6 @@ class InstanceProfile(QueryResourceManager):
 
 @resources.register('iam-certificate')
 class ServerCertificate(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'iam'
         arn_type = 'server-certificate'
@@ -781,7 +839,7 @@ class CheckPermissions(Filter):
             else:
                 values = ['allowed']
             vf = ValueFilter({'type': 'value', 'key':
-                              'EvalDecision', 'value': values,
+                'EvalDecision', 'value': values,
                               'op': 'in'})
         else:
             vf = ValueFilter(self.data['match'])
@@ -848,7 +906,7 @@ class IamRoleUsage(Filter):
     def scan_asg_roles(self):
         manager = self.manager.get_resource_manager('launch-config')
         return [r['IamInstanceProfile'] for r in manager.resources() if (
-            'IamInstanceProfile' in r)]
+                'IamInstanceProfile' in r)]
 
     def scan_ec2_roles(self):
         manager = self.manager.get_resource_manager('ec2')
@@ -895,10 +953,10 @@ class UsedIamRole(IamRoleUsage):
         roles = self.service_role_usage()
         if self.data.get('state', True):
             return [r for r in resources if (
-                r['Arn'] in roles or r['RoleName'] in roles)]
+                    r['Arn'] in roles or r['RoleName'] in roles)]
 
         return [r for r in resources if (
-            r['Arn'] not in roles and r['RoleName'] not in roles)]
+                r['Arn'] not in roles and r['RoleName'] not in roles)]
 
 
 @Role.filter_registry.register('unused')
@@ -933,7 +991,6 @@ class UnusedIamRole(IamRoleUsage):
 
 @Role.filter_registry.register('cross-account')
 class RoleCrossAccountAccess(CrossAccountAccessFilter):
-
     policy_attribute = 'AssumeRolePolicyDocument'
     permissions = ('iam:ListRoles',)
 
@@ -1114,8 +1171,10 @@ class NoSpecificIamRoleManagedPolicy(Filter):
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         if self.data.get('value'):
-            return [r for r in resources if not self.data.get('value') in
-            self._managed_policies(c, r)]
+            return [r
+                    for r in resources
+                    if not self.data.get('value') in self._managed_policies(c, r)
+                    ]
         return []
 
 
@@ -1337,7 +1396,7 @@ class RoleDelete(BaseAction):
                 self.log.warning(
                     ("Role:%s cannot be deleted, set force "
                      "to detach policy, instance profile and delete, error: %s") % (
-                         r['Arn'], str(e)))
+                        r['Arn'], str(e)))
                 error = e
             except (client.exceptions.NoSuchEntityException,
                     client.exceptions.UnmodifiableEntityException):
@@ -1593,7 +1652,7 @@ class InstanceProfileSetRole(BaseAction):
     """
 
     schema = type_schema('set-role',
-    role={'type': 'string'})
+                         role={'type': 'string'})
     permissions = ('iam:AddRoleToInstanceProfile', 'iam:RemoveRoleFromInstanceProfile',)
 
     def add_role(self, client, resource, role):
@@ -2445,7 +2504,7 @@ class UserDelete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         self.log.debug('Deleting user %s options: %s' %
-            (len(resources), self.data.get('options', 'all')))
+                       (len(resources), self.data.get('options', 'all')))
         for r in resources:
             self.process_user(client, r)
 
@@ -2747,7 +2806,7 @@ class GroupInlinePolicyDelete(BaseAction):
         for policy in r.get('c7n:InlinePolicies', []):
             try:
                 self.manager.retry(client.delete_group_policy,
-                    GroupName=r['GroupName'], PolicyName=policy)
+                                   GroupName=r['GroupName'], PolicyName=policy)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -2852,7 +2911,6 @@ class SamlProvider(QueryResourceManager):
     """
 
     class resource_type(TypeInfo):
-
         service = 'iam'
         name = id = 'Arn'
         enum_spec = ('list_saml_providers', 'SAMLProviderList', None)
@@ -2872,9 +2930,7 @@ class OpenIdDescribe(DescribeSource):
 
 @resources.register('iam-oidc-provider')
 class OpenIdProvider(QueryResourceManager):
-
     class resource_type(TypeInfo):
-
         service = 'iam'
         name = id = 'Arn'
         enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
