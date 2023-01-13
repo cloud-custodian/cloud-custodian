@@ -177,3 +177,36 @@ class TestSecretsManager(BaseTest):
         access_policy = json.loads(data.get('ResourcePolicy'))
         self.assertEqual(len(access_policy.get('Statement')), 1)
         self.assertEqual([s['Sid'] for s in access_policy.get('Statement')], ["SpecificAllow"])
+
+    def test_secretsmanager_remove_rbp(self):
+        session_factory = self.replay_flight_data("test_secretsmanager_remove_rbp")
+        resource_id = 'arn:aws:secretsmanager:us-east-1:644160558196:secret:test-ZO5wu6'
+        client = session_factory().client("secretsmanager")
+        client.put_resource_policy(SecretId=resource_id, ResourcePolicy=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "CrossAccount",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::040813553448:user/pratyush"
+                        },
+                        "Action": "secretsmanager:GetSecretValue",
+                        "Resource": "*"
+                    }
+                ]
+            }))
+        p = self.load_policy(
+            {
+                "name": "secrets-manager-rm-rbp",
+                "resource": "secrets-manager",
+                "filters": [{"type": "cross-account"}],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = client.get_resource_policy(SecretId=resource_id)
+        self.assertEqual(data.get('ResourcePolicy'), None)
