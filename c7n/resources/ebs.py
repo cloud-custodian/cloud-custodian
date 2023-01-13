@@ -1558,7 +1558,7 @@ class ModifyVolume(BaseAction):
               resource: ebs
               filters:
                - type: value
-                 key: CreateDate
+                 key: CreateTime
                  value_type: age
                  value: 7
                  op: greater-than
