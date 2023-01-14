@@ -141,19 +141,19 @@ files = [
 
 [[package]]
 name = "cos-python-sdk-v5"
-version = "1.9.21"
+version = "1.9.22"
 description = "cos-python-sdk-v5"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "cos-python-sdk-v5-1.9.21.tar.gz", hash = "sha256:96023bcc3404fdd111f314bd745c3a4f41e5124451186e02c0999d0484855d0d"},
+    {file = "cos-python-sdk-v5-1.9.22.tar.gz", hash = "sha256:8e18af0b80305f4b3e29a91e5f6e2e71a8d56012ec38f6dcf351b7c7c21eea36"},
 ]
 
 [package.dependencies]
 crcmod = "*"
 pycryptodome = "*"
-requests = ">=2.8,<=2.27.1"
+requests = ">=2.8"
 six = "*"
 xmltodict = "*"
 
@@ -1070,4 +1070,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "6361a42f448e57f98cd20b577d1c7cb59caef332ac9ee668d81e1a278a8a4fb3"
+content-hash = "73424837cbf72db7b99368dd497b19ae851078fca68627fc46fc62a017581970"
