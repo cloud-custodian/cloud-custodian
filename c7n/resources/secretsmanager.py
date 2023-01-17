@@ -163,7 +163,8 @@ class DeleteSecretsManager(BaseAction):
                     key: KmsKeyId
                     value: absent
                 actions:
-                  - delete
+                  - type: delete
+                    recovery_window: 10
     """
 
     schema = type_schema('delete', recovery_window={'type': 'integer'})
