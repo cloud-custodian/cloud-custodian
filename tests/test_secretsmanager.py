@@ -108,3 +108,20 @@ class TestSecretsManager(BaseTest):
         self.assertFalse(resources[0].get('Tags'))
         new_tags = client.describe_secret(SecretId="c7n-test-key").get("Tags")
         self.assertTrue("tag@" in new_tags[0].get("Value"))
+
+    def test_secrets_manager_set_key(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_set_encryption_key')
+        client = session_factory().client('secretsmanager')
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-set-key',
+                'resource': 'aws.secrets-manager',
+                'filters': [{'Name': 'ewerwrwe'}],
+                'actions': [{'type': 'set-encryption', 'key': 'alias/qewrqwer'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_secret(SecretId=resources[0]['Name'])
+        self.assertEqual(response['KmsKeyId'], 'alias/qewrqwer')
