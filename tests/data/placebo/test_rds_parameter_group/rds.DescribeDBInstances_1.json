@@ -1,0 +1,343 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "mysql-compliance",
+                "DBInstanceClass": "db.m6i.large",
+                "Engine": "mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "Endpoint": {
+                    "Address": "mysql-compliance.ctc2kqjo0r7h.us-west-2.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 100,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 7,
+                    "minute": 46,
+                    "second": 11,
+                    "microsecond": 65000
+                },
+                "PreferredBackupWindow": "11:09-11:39",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0f4c97bac9c6a8c54",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "test-pg-mysql",
+                        "ParameterApplyStatus": "pending-reboot"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "test-subnet-group",
+                    "DBSubnetGroupDescription": "testing pe policy",
+                    "VpcId": "vpc-0fba368c467ca4c10",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0170def1adb4cab1c",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09daff72ca504c494",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:06:10-fri:06:40",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 28,
+                    "hour": 5,
+                    "minute": 25,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "8.0.28",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "Iops": 3000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "DbiResourceId": "db-JS7EIMRAK7EXVTQAZCLJOVYD3Q",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-JS7EIMRAK7EXVTQAZCLJOVYD3Q",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:mysql-compliance",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 1000,
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4"
+            },
+            {
+                "DBInstanceIdentifier": "mysql-non-compliance",
+                "DBInstanceClass": "db.m6i.large",
+                "Engine": "mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "Endpoint": {
+                    "Address": "mysql-non-compliance.ctc2kqjo0r7h.us-west-2.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 20,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 7,
+                    "minute": 47,
+                    "second": 14,
+                    "microsecond": 421000
+                },
+                "PreferredBackupWindow": "09:05-09:35",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0f4c97bac9c6a8c54",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.mysql8.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "test-subnet-group",
+                    "DBSubnetGroupDescription": "testing pe policy",
+                    "VpcId": "vpc-0fba368c467ca4c10",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0170def1adb4cab1c",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09daff72ca504c494",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "thu:06:46-thu:07:16",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 28,
+                    "hour": 5,
+                    "minute": 25,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "8.0.28",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "gp2",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "DbiResourceId": "db-UMGLA72GASCSUY2RUE7PJRQLOQ",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-UMGLA72GASCSUY2RUE7PJRQLOQ",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:mysql-non-compliance",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 1000,
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4"
+            },
+            {
+                "DBInstanceIdentifier": "mysql-non-compliance02",
+                "DBInstanceClass": "db.m6i.large",
+                "Engine": "mysql",
+                "DBInstanceStatus": "modifying",
+                "MasterUsername": "admin",
+                "Endpoint": {
+                    "Address": "mysql-non-compliance02.ctc2kqjo0r7h.us-west-2.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 100,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 28,
+                    "hour": 5,
+                    "minute": 12,
+                    "second": 37,
+                    "microsecond": 391000
+                },
+                "PreferredBackupWindow": "08:31-09:01",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0f4c97bac9c6a8c54",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "test-pg-mysql-nc",
+                        "ParameterApplyStatus": "applying"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "test-subnet-group",
+                    "DBSubnetGroupDescription": "testing pe policy",
+                    "VpcId": "vpc-0fba368c467ca4c10",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0170def1adb4cab1c",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09daff72ca504c494",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "thu:09:55-thu:10:25",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 28,
+                    "hour": 5,
+                    "minute": 25,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "MultiAZ": true,
+                "EngineVersion": "8.0.28",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "Iops": 3000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "DbiResourceId": "db-5EDY4Z7SOHU7IXZLRWDGVHO7II",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-5EDY4Z7SOHU7IXZLRWDGVHO7II",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:mysql-non-compliance02",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/19b5cf60-b862-40f0-8278-96ea73baccea",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 1000,
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

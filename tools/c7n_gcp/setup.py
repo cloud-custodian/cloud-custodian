@@ -11,10 +11,10 @@ package_data = \
 
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
- 'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.26.30,<2.0.0)',
- 'botocore (>=1.29.30,<2.0.0)',
- 'c7n (>=0.9.21,<0.10.0)',
+ 'attrs (>=22.2.0,<23.0.0)',
+ 'boto3 (>=1.26.50,<2.0.0)',
+ 'botocore (>=1.29.50,<2.0.0)',
+ 'c7n (>=0.9.22,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
  'google-api-core==2.10.2',
  'google-api-python-client>=2.0,<3.0',
@@ -24,12 +24,12 @@ install_requires = \
  'google-cloud-storage>=1.42.2,<2.0.0',
  'grpcio==1.49.1',
  'importlib-metadata (>=4.13.0,<5.0.0)',
- 'importlib-resources (>=5.10.1,<6.0.0)',
+ 'importlib-resources (>=5.10.2,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
  'jsonschema (>=4.17.3,<5.0.0)',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
  'pyrate-limiter>=2.8.4,<3.0.0',
- 'pyrsistent (>=0.19.2,<0.20.0)',
+ 'pyrsistent (>=0.19.3,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
  'requests==2.27.1',
@@ -38,12 +38,12 @@ install_requires = \
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.4.0,<5.0.0)',
- 'urllib3 (>=1.26.13,<2.0.0)',
+ 'urllib3 (>=1.26.14,<2.0.0)',
  'zipp (>=3.11.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-gcp',
-    'version': '0.4.20',
+    'version': '0.4.21',
     'description': 'Cloud Custodian - Google Cloud Provider',
     'license': 'Apache-2.0',
     'classifiers': [
