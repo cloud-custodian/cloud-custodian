@@ -17,8 +17,7 @@ from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
-                               ValueFilter)
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -550,3 +549,71 @@ class RequireSecureTransferAction(AzureBaseAction):
             resource['name'],
             StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
         )
+
+
+@Storage.filter_registry.register('blob-services')
+class BlobServicesFilter(ValueFilter):
+    """
+    Filter by the current blob services
+    configuration for this storage account.
+
+    :example:
+
+    Find storage accounts with blob services soft delete disabled
+    or retention less than 7 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-soft-delete
+            resource: azure.storage
+            filters:
+              - or:
+                  - type: blob-services
+                    key: deleteRetentionPolicy.enabled
+                    value: false
+                  - type: blob-services
+                    key: deleteRetentionPolicy.days
+                    value: 7
+                    op: lt
+    """
+
+    schema = type_schema('blob-services', rinherit=ValueFilter.schema)
+
+    log = logging.getLogger('custodian.azure.storage.blob-services-filter')
+
+    def __init__(self, data, manager=None):
+        super(BlobServicesFilter, self).__init__(data, manager)
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'c7n:blobServices' not in resource['properties']:
+                blob_services = client.blob_services.get_service_properties(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['c7n:blobServices'] = \
+                    blob_services.serialize(True).get('properties', {})
+
+            filtered_resources = super(BlobServicesFilter, self).process(
+                [resource['properties']['c7n:blobServices']],
+                event)
+
+            if filtered_resources:
+                result.append(resource)
+
+        return result

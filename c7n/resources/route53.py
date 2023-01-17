@@ -16,6 +16,7 @@ from c7n.filters import Filter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 from c7n.filters.related import RelatedResourceFilter
+from c7n import tags
 
 
 class Route53Base:
@@ -500,7 +501,7 @@ class ResolverQueryLogConfig(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'route53resolver'
-        arn_type = 'query_log_config'
+        arn_type = 'resolver-query-log-config'
         enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
         name = 'Name'
         id = 'Id'
@@ -613,3 +614,81 @@ class LogConfigAssociationsFilter(Filter):
                 results.append(resource)
 
         return results
+
+
+@resources.register('readiness-check')
+class ReadinessCheck(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53-recovery-readiness'
+        arn_type = 'readiness-check'
+        enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
+        name = id = 'ReadinessCheckName'
+        global_resource = True
+
+    def augment(self, readiness_checks):
+        client = local_session(self.session_factory).client('route53-recovery-readiness')
+        for r in readiness_checks:
+            Tags = self.retry(
+                client.list_tags_for_resources,
+                ResourceArn=r['ReadinessCheckArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return readiness_checks
+
+
+@ReadinessCheck.action_registry.register('tag')
+class ReadinessAddTag(Tag):
+    """Adds tags to a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-tag
+            resource: readiness-check
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-readiness:TagResource',)
+
+    def process_resource_set(self, client, readiness_checks, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in readiness_checks:
+            client.tag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                Tags=Tags)
+
+
+@ReadinessCheck.action_registry.register('remove-tag')
+class ReadinessCheckRemoveTag(RemoveTag):
+    """Remove tags from a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-check-remove-tag
+            resource: readiness-check
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-readiness:UntagResource',)
+
+    def process_resource_set(self, client, readiness_checks, keys):
+        for r in readiness_checks:
+            client.untag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                TagKeys=keys)
+
+
+ReadinessCheck.action_registry.register('mark-for-op', tags.TagDelayedAction)
+ReadinessCheck.filter_registry.register('marked-for-op', tags.TagActionFilter)

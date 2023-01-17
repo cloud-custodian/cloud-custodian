@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageId": "ami-02a11ce792e2bc296",
+        "LastLaunchedTime": {
+            "Value": "2022-10-20T07:07:19Z"
+        },
+        "ResponseMetadata": {}
+    }
+}

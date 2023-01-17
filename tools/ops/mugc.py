@@ -43,15 +43,15 @@ def region_gc(options, region, policy_config, policies):
     client = session_factory().client('lambda')
 
     remove = []
-    current_policies = [p.name for p in policies]
     pattern = re.compile(options.policy_regex)
     for f in funcs:
         if not pattern.match(f['FunctionName']):
             continue
         match = False
-        for pn in current_policies:
-            if f['FunctionName'].endswith(pn):
-                match = True
+        for p in policies:
+            if f['FunctionName'].endswith(p.name):
+                if 'region' not in p.data or p.data['region'] == region:
+                    match = True
         if options.present:
             if match:
                 remove.append(f)

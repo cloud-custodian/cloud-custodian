@@ -8,13 +8,32 @@ from c7n.filters.core import Filter, ValueFilter
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
-    """security-group"""
+    """security-group
+
+    Docs on security-group
+    https://www.tencentcloud.com/document/product/215/38750
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: security_group_default_restrict
+          resource: tencentcloud.security-group
+          filters:
+            - or:
+                - SecurityGroupName: ccsTest
+                - SecurityGroupName: base-ritch
+            - or:
+                - IpPermissions: not-null
+                - IpPermissionsEgress: not-null
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
         id = "SecurityGroupId"
         endpoint = "vpc.tencentcloudapi.com"
-        service = "security-group"
+        service = "vpc"
         version = "2017-03-12"
         enum_spec = ("DescribeSecurityGroups", "Response.SecurityGroupSet[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": "20"}}
@@ -136,6 +155,23 @@ class SGPermission(Filter):
 
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
+    """
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cidr_not_limit_filter
+          resource: tencentcloud.security-group
+          filters:
+            - or:
+                - type: ingress
+                  Cidr:
+                    value: 0.0.0.0/0
+                - type: ingress
+                  CidrV6:
+                    value: '::/0'
+    """
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',

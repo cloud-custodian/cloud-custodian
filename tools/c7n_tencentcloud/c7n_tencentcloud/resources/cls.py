@@ -18,9 +18,22 @@ class LogGroupDescribe(DescribeSource):
 
 @resources.register("cls")
 class LogTopic(QueryResourceManager):
-    """"
+    """
     CLS - Cloud Log Service (CLS) is a centralized logging solution
     https://www.tencentcloud.com/document/product/614/11254?lang=en&pg=
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: tencentcloud-cls
+          resource: tencentcloud.cls
+          filters:
+            - or:
+              - "Period": 7
+              - "Period": 3600
+              - "Period": None
     """
 
     class resource_type(ResourceTypeInfo):

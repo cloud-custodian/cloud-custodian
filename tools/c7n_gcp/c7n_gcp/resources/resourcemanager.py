@@ -31,6 +31,9 @@ class Organization(QueryResourceManager):
         scc_type = "google.cloud.resourcemanager.Organization"
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.organizations.get',)
+        urn_component = "organization"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
 
         @staticmethod
         def get(client, resource_info):
@@ -65,6 +68,9 @@ class Folder(QueryResourceManager):
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
         perm_service = 'resourcemanager'
+        urn_component = "folder"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
 
     def get_resources(self, resource_ids):
         client = self.get_client()
@@ -100,6 +106,8 @@ class Project(QueryResourceManager):
         perm_service = 'resourcemanager'
         labels = True
         labels_op = 'update'
+        urn_component = "project"
+        urn_has_project = False
 
         @staticmethod
         def get_label_params(resource, labels):

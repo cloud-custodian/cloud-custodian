@@ -49,11 +49,12 @@ class TestSNS(BaseTest):
                 "resource": "sns",
                 "filters": [
                     {"TopicArn": topic_arn},
-                    {"type": "cross-account", "whitelist": ["123456789012"]},
+                    {"type": "cross-account", "whitelist": ["644160558196"]},
                 ],
                 "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
 
@@ -114,6 +115,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -177,6 +179,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -248,6 +251,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -313,6 +317,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -376,6 +381,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -448,6 +454,7 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
@@ -467,7 +474,7 @@ class TestSNS(BaseTest):
 
     def test_sns_topic_encryption(self):
         session_factory = self.replay_flight_data('test_sns_kms_related_filter_test')
-        kms = session_factory().client('kms')
+        kms = session_factory().client('kms', region_name='ap-northeast-2')
         p = self.load_policy(
             {
                 'name': 'test-sns-kms-related-filter',
@@ -486,16 +493,17 @@ class TestSNS(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsMasterKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
     def test_set_sns_topic_encryption(self):
         session_factory = self.replay_flight_data('test_sns_set_encryption')
-        topic = 'arn:aws:sns:us-west-1:644160558196:test'
+        topic = 'arn:aws:sns:ap-northeast-2:644160558196:test'
         p = self.load_policy(
             {
                 'name': 'test-sns-kms-related-filter',
@@ -514,17 +522,18 @@ class TestSNS(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        sns = session_factory().client('sns')
+        sns = session_factory().client('sns', region_name='ap-northeast-2')
         attributes = sns.get_topic_attributes(TopicArn=topic)
         self.assertTrue(attributes['Attributes']['KmsMasterKeyId'], 'alias/aws/sns')
 
     def test_sns_disable_encryption(self):
         session_factory = self.replay_flight_data('test_sns_unset_encryption')
-        topic = 'arn:aws:sns:us-west-1:644160558196:test'
+        topic = 'arn:aws:sns:ap-northeast-2:644160558196:test'
         p = self.load_policy(
             {
                 'name': 'test-sns-kms-related-filter',
@@ -544,22 +553,23 @@ class TestSNS(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
 
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
 
-        sns = session_factory().client('sns')
+        sns = session_factory().client('sns', region_name='ap-northeast-2')
         attributes = sns.get_topic_attributes(TopicArn=topic)['Attributes']
         self.assertFalse(attributes.get('KmsMasterKeyId'))
 
     def test_sns_set_encryption_custom_key(self):
         session_factory = self.replay_flight_data('test_sns_set_encryption_custom_key')
-        topic = 'arn:aws:sns:us-west-1:644160558196:test'
-        key_alias = 'alias/alias/test/key'
-        sns = session_factory().client('sns')
+        topic = 'arn:aws:sns:ap-northeast-2:644160558196:test'
+        key_alias = 'alias/skunk/trails'
+        sns = session_factory().client('sns', region_name='ap-northeast-2')
         p = self.load_policy(
             {
                 'name': 'test-sns-kms-related-filter-alias',
@@ -579,7 +589,8 @@ class TestSNS(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -592,14 +603,18 @@ class TestSNS(BaseTest):
         name: delete-sns
         resource: aws.sns
         filters:
-          - TopicArn: arn:aws:sns:us-west-1:644160558196:test
+          - TopicArn: arn:aws:sns:ap-northeast-2:644160558196:test
         actions:
           - type: delete
         """
-        p = self.load_policy(yaml_load(policy), session_factory=session_factory)
+        p = self.load_policy(
+            yaml_load(policy),
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client('sns')
+        client = session_factory().client('sns', region_name='ap-northeast-2')
         resources = client.list_topics()['Topics']
         self.assertEqual(len(resources), 0)
 
@@ -613,11 +628,12 @@ class TestSNS(BaseTest):
                 "actions": [{"type": "tag", "key": "Tagging", "value": "added"}],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        client = session_factory().client("sns")
+        client = session_factory().client("sns", region_name='ap-northeast-2')
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertEqual(tags[0]["Value"], "added")
 
@@ -638,11 +654,12 @@ class TestSNS(BaseTest):
                 "actions": [{"type": "remove-tag", "tags": ["custodian_cleanup"]}],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        client = session_factory().client("sns")
+        client = session_factory().client("sns", region_name='ap-northeast-2')
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertEqual(len(tags), 0)
 
@@ -668,10 +685,11 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client("sns")
+        client = session_factory().client("sns", region_name='ap-northeast-2')
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "custodian_cleanup")
 
@@ -684,19 +702,21 @@ class TestSNS(BaseTest):
                 {'type': 'post-finding',
                  'types': [
                      'Software and Configuration Checks/OrgStandard/abc-123']}]},
-            session_factory=factory, config={'region': 'us-west-2'})
+            session_factory=factory, config={'region': 'ap-northeast-2'})
         resources = p.resource_manager.get_resources([
-            'arn:aws:sns:us-west-2:644160558196:config-topic'])
+            'arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay'])
         rfinding = p.resource_manager.actions[0].format_resource(
             resources[0])
         self.assertEqual(
             rfinding,
-            {'Details': {'AwsSnsTopic': {
-                'Owner': '644160558196',
-                'TopicName': 'config-topic'}},
-             'Id': 'arn:aws:sns:us-west-2:644160558196:config-topic',
+            {'Details': {
+                'AwsSnsTopic': {
+                    'KmsMasterKeyId': 'arn:aws:kms:ap-northeast-2:644160558196:key/83a5b9da-e2ed-417c-b55b-894a75a8d140',  # noqa
+                    'Owner': '644160558196',
+                    'TopicName': 'sandbox-relay'}},
+             'Id': 'arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay',
              'Partition': 'aws',
-             'Region': 'us-west-2',
+             'Region': 'ap-northeast-2',
              'Type': 'AwsSnsTopic'})
         shape_validate(
             rfinding['Details']['AwsSnsTopic'],
@@ -709,6 +729,7 @@ class TestSNS(BaseTest):
              "source": "config",
              "resource": "sns"},
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
@@ -739,11 +760,14 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["TopicArn"],
-        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+        self.assertEqual(
+            resources[0]["TopicArn"],
+            "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement"
+        )
 
     def test_sns_has_statement_star_definition(self):
         session_factory = self.replay_flight_data(
@@ -770,11 +794,12 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TopicArn"],
-        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement-star")
+        "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement")
 
     def test_sns_has_statement_id(self):
         session_factory = self.replay_flight_data(
@@ -792,11 +817,12 @@ class TestSNS(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TopicArn"],
-        "arn:aws:sns:us-west-1:644160558196:sns-test-has-statement")
+        "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement")
 
 
 class TestSubscription(BaseTest):

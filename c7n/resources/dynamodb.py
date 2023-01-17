@@ -424,7 +424,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'dax'
-        arn_type = 'cluster'
+        arn_type = 'cache'
         enum_spec = ('describe_clusters', 'Clusters', None)
         arn = 'ClusterArn'
         id = name = 'ClusterName'

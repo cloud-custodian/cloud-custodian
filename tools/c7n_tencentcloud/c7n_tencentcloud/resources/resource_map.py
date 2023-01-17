@@ -16,5 +16,6 @@ ResourceMap = {
     "tencentcloud.tcr": "c7n_tencentcloud.resources.tcr.TCR",
     "tencentcloud.security-group": "c7n_tencentcloud.resources.security_group.SecurityGroup",
     "tencentcloud.mysql-backup": "c7n_tencentcloud.resources.mysql_backup.MySQLBackUp",
-    "tencentcloud.mysql": "c7n_tencentcloud.resources.mysql.MySQL"
+    "tencentcloud.mysql": "c7n_tencentcloud.resources.mysql.MySQL",
+    "tencentcloud.cos": "c7n_tencentcloud.resources.cos.COS"
 }

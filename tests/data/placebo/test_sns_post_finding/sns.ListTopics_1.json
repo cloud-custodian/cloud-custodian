@@ -3,19 +3,7 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-west-2:644160558196:aws-command"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-west-2:644160558196:aws-iot-button-sns-topic"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-west-2:644160558196:config-topic"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-west-2:644160558196:dynamodb"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-west-2:644160558196:ocampotest"
+                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay"
             }
         ],
         "ResponseMetadata": {}

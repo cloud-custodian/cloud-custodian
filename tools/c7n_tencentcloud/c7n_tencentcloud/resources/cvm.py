@@ -21,7 +21,25 @@ class CVMDescribe(DescribeSource):
 
 @resources.register("cvm")
 class CVM(QueryResourceManager):
-    """CVM"""
+    """CVM Cloud Virtual Machine
+
+    Docs on CVM resource
+    https://www.tencentcloud.com/document/product/213
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: tencentcloud-cvm
+          resource: tencentcloud.cvm
+          filters:
+            - type: value
+              key: InstanceType
+              op: in
+              value:
+                - S1.SMALL1
+    """
 
     source_mapping = {'describe': CVMDescribe}
 
@@ -94,7 +112,22 @@ class CvmAction(TencentCloudBaseAction):
 
 @CVM.action_registry.register('stop')
 class CvmStopAction(CvmAction):
-    """stop_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-marked-for-op-stop
+          resource: tencentcloud.cvm
+          filters:
+            - type: marked-for-op
+              op: stop
+              skew: 14
+          actions:
+            - type: stop
+    """
     schema = type_schema("stop")
     t_api_method_name = "StopInstances"
 
@@ -114,13 +147,39 @@ class CvmStopAction(CvmAction):
 
 @CVM.action_registry.register('start')
 class CvmStartAction(CvmAction):
-    """start_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-start
+          resource: tencentcloud.cvm
+          actions:
+            - type: start
+    """
     schema = type_schema("start")
     t_api_method_name = "StartInstances"
 
 
 @CVM.action_registry.register('terminate')
 class CvmTerminateAction(CvmAction):
-    """terminate_cvm"""
+    """Action to stop a running cvm instance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cvm-marked-for-op-terminate
+          resource: tencentcloud.cvm
+          filters:
+            - type: marked-for-op
+              op: terminate
+              skew: 14
+          actions:
+            - type: terminate
+    """
     schema = type_schema("terminate")
     t_api_method_name = "TerminateInstances"
