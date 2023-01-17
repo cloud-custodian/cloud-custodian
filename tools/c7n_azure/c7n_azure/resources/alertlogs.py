@@ -17,7 +17,7 @@ class AlertLogs(ArmResourceManager):
 
         policies:
         - name: list-advisor-security-recommendations
-          resource: azure.alert_logs
+          resource: azure.alert-logs
           filters:
             - type: value
               key: location
