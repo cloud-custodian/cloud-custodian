@@ -2391,16 +2391,62 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
        a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
        does not contain an IAM role, then it will be treated as not having the policy.
 
-    :Example:
+    :example:
 
     .. code-block:: yaml
 
         policies:
           - name: ec2-instance-has-admin-policy
-            resource: ec2
+            resource: aws.ec2
             filters:
               - type: has-specific-managed-policy
                 value: admin-policy
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have an
+    attached policy matching a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-selected-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: in
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy names matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy ARNs matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-aws-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
     """
 
     permissions = (
@@ -2425,7 +2471,11 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
             if not profile:
                 continue
 
-            if self.has_managed_policy(client, profile):
+            self.get_managed_policies(client, [profile])
+
+            matched_keys = [k for k in profile[self.annotation_key] if self.match(k)]
+            self.merge_annotation(profile, self.matched_annotation_key, matched_keys)
+            if matched_keys:
                 results.append(r)
 
         return results

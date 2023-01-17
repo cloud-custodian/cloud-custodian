@@ -223,3 +223,18 @@ class IAMRoleTest(BaseTest):
                 'gcp:iam:::role/accesscontextmanager.policyAdmin',
             ],
         )
+
+
+class ApiKeyTest(BaseTest):
+
+    def test_api_key_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('api-key-list', project_id)
+        p = self.load_policy(
+            {'name': 'gcp-api-key-list',
+             'resource': 'gcp.api-key',
+             'filters': [
+                 {'name': 'projects/cloud-custodian/locations/global/keys/xxxx-xxxx'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
