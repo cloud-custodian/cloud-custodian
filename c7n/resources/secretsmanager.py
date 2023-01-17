@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import jmespath
 from c7n.manager import resources
 from c7n.actions import BaseAction, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
@@ -146,7 +147,9 @@ class MarkSecretForOp(TagDelayedAction):
 @SecretsManager.action_registry.register('delete')
 class DeleteSecretsManager(BaseAction):
     """Delete a secret and all of its versions.
-    The default recovery window is 30 days
+    The recovery window is the number of days from 7 to 30 that
+    Secrets Manager waits before permanently deleting the secret
+    with default as 30
 
     :example:
 
@@ -163,7 +166,7 @@ class DeleteSecretsManager(BaseAction):
                   - delete
     """
 
-    schema = type_schema('delete')
+    schema = type_schema('delete', recovery_window={'type': 'integer'})
     permissions = ('secretsmanager:DeleteSecret',)
 
     def process(self, resources):
@@ -171,7 +174,12 @@ class DeleteSecretsManager(BaseAction):
             self.manager.session_factory).client('secretsmanager')
 
         for r in resources:
-            self.manager.retry(client.delete_secret, SecretId=r['ARN'])
+            if 'ReplicationStatus' in r:
+                rep_regions = jmespath.search('ReplicationStatus[*].Region', r)
+                self.manager.retry(client.remove_regions_from_replication,
+                  SecretId=r['ARN'], RemoveReplicaRegions=rep_regions)
+            self.manager.retry(client.delete_secret,
+              SecretId=r['ARN'], RecoveryWindowInDays=self.data.get('recovery_window', 30))
 
 
 @SecretsManager.action_registry.register('remove-statements')

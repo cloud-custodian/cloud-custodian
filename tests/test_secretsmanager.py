@@ -125,13 +125,19 @@ class TestSecretsManager(BaseTest):
                         'value': 'test'
                     }
                 ],
-                'actions': ['delete']
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'recovery_window': 7
+                    }
+                ]
             },
             session_factory=session_factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test')
+        self.assertEqual(len(resources[0].get('ReplicationStatus')), 2)
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
 
