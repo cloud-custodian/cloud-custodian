@@ -38,6 +38,9 @@ class EmailDelivery:
             if target in ('resource-owner', 'event-owner'):
                 continue
             for email in target.split(':'):
+                email = email.strip()
+                if not email:
+                    continue
                 if is_email(target):
                     emails.append(target)
                 # gcp doesn't support the '@' character in their label values so we
