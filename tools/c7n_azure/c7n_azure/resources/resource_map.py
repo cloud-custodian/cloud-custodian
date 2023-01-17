@@ -67,5 +67,5 @@ ResourceMap = {
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
     "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
-    "azure.alert_logs": "c7n_azure.resources.alertlogs.AlertLogs"
+    "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs"
 }
