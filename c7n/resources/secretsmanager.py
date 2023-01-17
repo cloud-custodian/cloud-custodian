@@ -151,7 +151,7 @@ class SetEncryptionAction(Action):
         policies:
             - name: set-secret-encryption
               resource: aws.secrets-manager
-              action:
+              actions:
                 - type: set-encryption
                   key: alias/foo/bar
     """
