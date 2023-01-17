@@ -262,6 +262,11 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q1 2023
+            'AwsWafv2RuleGroup',
+            'AwsWafv2WebAcl',
+            'AwsEc2LaunchTemplate',
+            'AwsSageMakerNotebookInstance',
             # q3 2022
             'AwsBackupBackupPlan',
             'AwsBackupBackupVault',
