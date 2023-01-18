@@ -885,6 +885,21 @@ class RDSTest(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_rds_with_query_parameter(self):
+        factory = self.replay_flight_data("test_rds_with_query_parameter")
+        p = self.load_policy(
+            {
+                "name": "rds-with-query-parameter",
+                "resource": "rds",
+                "query": [{"Filters": [{"Name": "engine", "Values": ["mariadb"]}]}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_rds_db_option_groups(self):
         session_factory = self.replay_flight_data("test_rds_db_option_groups")
         p = self.load_policy(

@@ -59,7 +59,7 @@ from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier, merge_dict_list)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import OtherResourcePostFinding
 
@@ -98,6 +98,7 @@ class RDS(QueryResourceManager):
         arn_separator = ':'
         enum_spec = ('describe_db_instances', 'DBInstances', None)
         id = 'DBInstanceIdentifier'
+        config_id = 'DbiResourceId'
         name = 'Endpoint.Address'
         filter_name = 'DBInstanceIdentifier'
         filter_type = 'scalar'
@@ -121,6 +122,13 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+    def resources(self, query=None):
+        if query is None and 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        return super(RDS, self).resources(query=query)
 
     source_mapping = {
         'describe': DescribeRDS,
@@ -967,6 +975,10 @@ class RDSSubscriptionDelete(BaseAction):
 
 
 class DescribeRDSSnapshot(DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        super_get = super().get_resources
+        return list(itertools.chain(*[super_get((i,)) for i in ids]))
 
     def augment(self, snaps):
         for s in snaps:

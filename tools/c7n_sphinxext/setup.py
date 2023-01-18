@@ -13,20 +13,20 @@ install_requires = \
 ['Pygments>=2.10.0,<3.0.0',
  'Sphinx>=4.2.0,<5.0.0',
  'argcomplete (>=2.0.0,<3.0.0)',
- 'attrs (>=22.1.0,<23.0.0)',
- 'boto3 (>=1.26.30,<2.0.0)',
- 'botocore (>=1.29.30,<2.0.0)',
- 'c7n (>=0.9.21,<0.10.0)',
+ 'attrs (>=22.2.0,<23.0.0)',
+ 'boto3 (>=1.26.50,<2.0.0)',
+ 'botocore (>=1.29.50,<2.0.0)',
+ 'c7n (>=0.9.22,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
  'docutils>=0.14,<0.18',
  'importlib-metadata (>=4.13.0,<5.0.0)',
- 'importlib-resources (>=5.10.1,<6.0.0)',
+ 'importlib-resources (>=5.10.2,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
  'jsonschema (>=4.17.3,<5.0.0)',
  'myst-parser>=0.18.0,<0.19.0',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
- 'pyrsistent (>=0.19.2,<0.20.0)',
+ 'pyrsistent (>=0.19.3,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
  'recommonmark>=0.6.0,<0.7.0',
@@ -37,7 +37,7 @@ install_requires = \
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.4.0,<5.0.0)',
- 'urllib3 (>=1.26.13,<2.0.0)',
+ 'urllib3 (>=1.26.14,<2.0.0)',
  'zipp (>=3.11.0,<4.0.0)']
 
 entry_points = \
@@ -45,7 +45,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-sphinxext',
-    'version': '1.1.20',
+    'version': '1.1.21',
     'description': 'Cloud Custodian - Sphinx Extensions',
     'license': 'Apache-2.0',
     'classifiers': [
