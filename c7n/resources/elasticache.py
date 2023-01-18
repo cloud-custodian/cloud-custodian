@@ -248,7 +248,7 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'elasticache'
-        arn_type = 'subnet-group'
+        arn_type = 'subnetgroup'
         enum_spec = ('describe_cache_subnet_groups',
                      'CacheSubnetGroups', None)
         name = id = 'CacheSubnetGroupName'

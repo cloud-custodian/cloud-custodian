@@ -39,7 +39,7 @@ def custodian_archive(packages=None, deps=()):
         'jmespath',
         'retrying',
         'python-dateutil',
-        'ratelimiter',
+        'pyrate-limiter',
         'google-auth',
         'google-auth-httplib2',
         'google-api-python-client'))

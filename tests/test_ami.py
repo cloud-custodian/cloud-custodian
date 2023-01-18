@@ -352,6 +352,46 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ImageId'], 'ami-0515ff4f8f9dbeb31')
 
+    def test_ami_with_last_launched_time(self):
+        factory = self.replay_flight_data('test_ami_with_last_launched_time')
+        p = self.load_policy(
+            {
+                "name": "test-ami-last-launched-time",
+                "resource": "ami",
+                "filters": [{"type": "image-attribute",
+                             "attribute": "lastLaunchedTime",
+                             "key": "Value",
+                             "op": "gte",
+                             "value_type": "age",
+                             "value": 1}],
+            },
+            {"region": "ap-southeast-2"},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:attribute-lastLaunchedTime']
+                         ['Value'], '2022-10-20T07:07:19Z')
+
+    def test_ami_with_no_last_launched_time(self):
+        factory = self.replay_flight_data('test_ami_with_no_last_launched_time')
+        p = self.load_policy(
+            {
+                "name": "test-ami-last-launched-time",
+                "resource": "ami",
+                "filters": [{"type": "image-attribute",
+                             "attribute": "lastLaunchedTime",
+                             "key": "Value",
+                             "op": "gte",
+                             "value_type": "age",
+                             "value": 1}],
+            },
+            {"region": "ap-southeast-2"},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_unused_ami_true(self):
         factory = self.replay_flight_data("test_unused_ami_true")
         p = self.load_policy(

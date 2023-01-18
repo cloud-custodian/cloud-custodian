@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "item": [
+            {
+                "deploymentId": "0oox4h",
+                "stageName": "test1",
+                "cacheClusterEnabled": false,
+                "cacheClusterSize": "0.5",
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {
+                    "*/*": {
+                        "metricsEnabled": false,
+                        "dataTraceEnabled": false,
+                        "throttlingBurstLimit": 5000,
+                        "throttlingRateLimit": 10000.0,
+                        "cachingEnabled": false,
+                        "cacheTtlInSeconds": 300,
+                        "cacheDataEncrypted": false,
+                        "requireAuthorizationForCacheControl": true,
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+                    }
+                },
+                "tracingEnabled": false,
+                "webAclArn": "arn:aws:wafv2:us-west-2:644160558196:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/421a319f-8bfc-497b-bdce-597ab3337bd2",
+                "tags": {
+                    "ENV": "DEV"
+                },
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 22,
+                    "minute": 41,
+                    "second": 37,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

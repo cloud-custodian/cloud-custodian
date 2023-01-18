@@ -1,0 +1,176 @@
+interactions:
+- request:
+    body: '{"Scope": "Local", "Page": 1, "Rp": 200}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '40'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - ListPolicies
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"ServiceTypeList":[],"List":[{"PolicyId":141834197,"PolicyName":"demo-admin-2","Type":1,"Description":"","CreateMode":2,"Attachments":0,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":0,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-11
+        09:50:17","UpdateTime":"2022-10-11 09:50:17","Deactived":0,"DeactivedDetail":[]},{"PolicyId":141818449,"PolicyName":"demo-admin","Type":1,"Description":"","CreateMode":3,"Attachments":0,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":0,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-10
+        20:27:10","UpdateTime":"2022-10-10 20:27:10","Deactived":0,"DeactivedDetail":[]},{"PolicyId":141753149,"PolicyName":"demo","Type":1,"Description":"","CreateMode":3,"Attachments":0,"ServiceType":"","IsAttached":null,"IsServiceLinkedPolicy":0,"AttachEntityCount":0,"AttachEntityBoundaryCount":0,"AddTime":"2022-10-09
+        10:38:07","UpdateTime":"2022-10-09 10:41:53","Deactived":0,"DeactivedDetail":[]}],"TotalNum":3,"RequestId":"e37196d7-b0ba-4c8b-821b-f7bc50fa458a"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1067'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 03:23:15 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141834197}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PolicyDocument":"{\"version\":\"2.0\",\"statement\":[{\"effect\":\"allow\",\"action\":\"*\",\"resource\":\"*\"}]}","UpdateTime":"2022-10-11
+        09:50:17","AddTime":"2022-10-11 09:50:17","PolicyName":"demo-admin-2","Description":"","Type":1,"PresetAlias":null,"IsServiceLinkedRolePolicy":0,"RequestId":"6c5b32e1-eebe-4d2f-b16f-9311328651ed"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '351'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 03:23:15 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141818449}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PolicyDocument":"{\"version\":\"2.0\",\"statement\":[{\"effect\":\"allow\",\"action\":[\"*\"],\"resource\":[\"*\"]}]}","UpdateTime":"2022-10-10
+        20:27:10","AddTime":"2022-10-10 20:27:10","PolicyName":"demo-admin","Description":"","Type":1,"PresetAlias":null,"IsServiceLinkedRolePolicy":0,"RequestId":"8db16aa8-8a42-4377-bfce-07b78bbc9b95"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '353'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 03:23:16 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"PolicyId": 141753149}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Host:
+      - cam.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetPolicy
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-01-16'
+    method: POST
+    uri: https://cam.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PolicyDocument":"{\"version\":\"2.0\",\"statement\":[{\"effect\":\"allow\",\"action\":[\"cos:AbortMultipartUpload\",\"cos:DescribeJob\",\"cos:GetBucket\",\"cos:GetBucketACL\",\"cos:GetBucketAccelerate\",\"cos:GetBucketCORS\",\"cos:GetBucketDomain\",\"cos:GetBucketDomainCertificate\",\"cos:GetBucketEncryption\",\"cos:GetBucketIntelligentTiering\",\"cos:GetBucketInventory\",\"cos:GetBucketLifecycle\",\"cos:GetBucketLocation\",\"cos:GetBucketLogging\",\"cos:GetBucketNotification\",\"cos:GetBucketObjectVersions\",\"cos:GetBucketOrigin\",\"cos:GetBucketPolicy\",\"cos:GetBucketReferer\",\"cos:GetBucketReplication\",\"cos:GetBucketTagging\",\"cos:GetBucketVersionAcl\",\"cos:GetBucketVersioning\",\"cos:GetBucketWebsite\",\"cos:GetLiveChannel\",\"cos:GetObject\",\"cos:GetObjectACL\",\"cos:GetObjectTagging\",\"cos:GetObjectVersionAcl\",\"cos:GetService\",\"cos:GetVodPlayList\",\"cos:HeadBucket\",\"cos:HeadObject\",\"cos:ListJobs\",\"cos:ListMultipartUploads\",\"cos:ListParts\",\"cos:OptionsObject\"],\"resource\":[\"*\"]},{\"effect\":\"deny\",\"action\":[\"aa:*\"],\"resource\":[\"*\"]}]}","UpdateTime":"2022-10-09
+        10:41:53","AddTime":"2022-10-09 10:38:07","PolicyName":"demo","Description":"","Type":1,"PresetAlias":null,"IsServiceLinkedRolePolicy":0,"RequestId":"01ab536d-6aff-4e3f-acf4-90424ea49184"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1323'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 03:23:16 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

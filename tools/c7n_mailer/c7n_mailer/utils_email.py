@@ -90,6 +90,8 @@ def set_mimetext_headers(
     message['From'] = from_addr
     message['To'] = ', '.join(to_addrs)
     if cc_addrs:
+        # NOTE filter out unenhanced cc_addrs added by self.get_mimetext_message
+        cc_addrs = [cc for cc in cc_addrs if is_email(cc)]
         message['Cc'] = ', '.join(cc_addrs)
     if additional_headers:
         for k, v in additional_headers.items():
@@ -118,6 +120,7 @@ def get_mimetext_message(config, logger, message, resources, to_addrs):
         subject=get_message_subject(message),
         from_addr=message['action'].get('from', config['from_address']),
         to_addrs=to_addrs,
+        # FIXME cc has been processed and enhanced in get_email_to_addrs_to_resources_map
         cc_addrs=message['action'].get('cc', []),
         additional_headers=config.get('additional_email_headers', {}),
         priority=message['action'].get('priority_header', None),

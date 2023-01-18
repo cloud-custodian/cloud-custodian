@@ -3,19 +3,9 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-pratyush"
+                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay"
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "1c0c4659-da1c-5dee-bf96-1333b3172a18",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1c0c4659-da1c-5dee-bf96-1333b3172a18",
-                "content-type": "text/xml",
-                "content-length": "377",
-                "date": "Thu, 30 May 2019 23:27:07 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

@@ -29,7 +29,38 @@ STATISTICS_OPERATORS = {
 
 
 class MetricsFilter(Filter):
-    """MetricsFilter"""
+    """Supports metrics filters on resources.
+
+    Docs on cloud monitor metrics
+    https://www.tencentcloud.com/document/product/248
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cvm-underutilized
+            resource: tencentcloud.cvm
+            filters:
+              - type: metrics
+                name: CPUUsage
+                days: 3
+                period: 3600
+                value: 1.5
+                statistics: Average
+                op: less-than
+          - name: clb_metrics_filter
+            resource: tencentcloud.clb
+            filters:
+              - type: metrics
+                name: TotalReq
+                statistics: Sum
+                period: 3600
+                days: 30
+                value: 0
+                missing-value: 0
+                op: eq
+    """
     name = "metrics"
     schema = type_schema(
         name,

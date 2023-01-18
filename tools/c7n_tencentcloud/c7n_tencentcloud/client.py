@@ -82,6 +82,9 @@ class Client:
             if not pagination_token_path:
                 raise PolicyExecutionError("config to use pagination_token but not set token path")
             params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
+        elif paging_method == PageMethod.Page:
+            params[PageMethod.Page.name] = 1
+            params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
         else:
             raise PolicyExecutionError("unsupported paging method")
 
@@ -106,6 +109,11 @@ class Client:
                         break
                     params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) +\
                         int(paging_def["limit"]["value"])
+                elif paging_method == PageMethod.Page:
+                    if len(items) < int(paging_def["limit"]["value"]):
+                        # no more data
+                        break
+                    params[paging_method.name] = int(params[paging_method.name]) + 1
                 else:
                     token = jmespath.search(pagination_token_path, result)
                     if token == "":
@@ -149,6 +157,18 @@ class Session:
             cred_provider.cred = cred
 
         self._cred = cred_provider.get_credentials()
+
+    @property
+    def secret_id(self):
+        return self._cred.secret_id
+
+    @property
+    def secret_key(self):
+        return self._cred.secret_key
+
+    @property
+    def token(self):
+        return self._cred.token
 
     def client(self,
                endpoint: str,

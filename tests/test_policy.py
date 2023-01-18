@@ -14,7 +14,7 @@ from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
-from c7n.resources.aws import AWS, fake_session
+from c7n.resources.aws import AWS, Arn, fake_session
 from c7n.resources.ec2 import EC2
 from c7n.resources.kinesis import KinesisStream
 from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
@@ -115,6 +115,19 @@ class PolicyMetaLint(BaseTest):
             dumps(generate())
         except Exception:
             self.fail("Failed to serialize schema")
+
+    def test_detail_spec_format(self):
+
+        failed = []
+        for k, v in manager.resources.items():
+            detail_spec = getattr(v.resource_type, 'detail_spec', None)
+            if not detail_spec:
+                continue
+            if not len(detail_spec) == 4:
+                failed.append(k)
+        if failed:
+            self.fail(
+                "%s resources have invalid detail_specs" % ", ".join(failed))
 
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
@@ -249,7 +262,15 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q1 2023
+            'AwsWafv2RuleGroup',
+            'AwsWafv2WebAcl',
+            'AwsEc2LaunchTemplate',
+            'AwsSageMakerNotebookInstance',
             # q3 2022
+            'AwsBackupBackupPlan',
+            'AwsBackupBackupVault',
+            'AwsBackupRecoveryPoint',
             'AwsCloudFormationStack',
             'AwsWafRegionalRule',
             'AwsWafRule',
@@ -337,6 +358,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = {
             'AWS::ApiGatewayV2::Stage',
+            'AWS::Athena::DataCatalog',
+            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
@@ -344,15 +367,22 @@ class PolicyMetaLint(BaseTest):
             'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
             'AWS::Config::ResourceCompliance',
+            'AWS::Detective::Graph',
+            'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::TransitGatewayAttachment',
+            'AWS::EC2::TransitGatewayRouteTable',
             'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
             'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::GlobalAccelerator::Accelerator',
+            'AWS::GlobalAccelerator::Listener',
+            'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GuardDuty::Detector',
             'AWS::Kinesis::StreamConsumer',
             'AWS::NetworkFirewall::FirewallPolicy',
@@ -475,6 +505,66 @@ class PolicyMetaLint(BaseTest):
         if empty:
             raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
 
+    def test_valid_arn_type(self):
+        arn_db = load_data('arn-types.json')
+        invalid = {}
+        overrides = {'wafv2': set(('webacl',))}
+
+        # we have a few resources where we have synthetic arns
+        # or they aren't in the iam ref docs.
+        allow_list = set((
+            # bug in the arnref script or test logic below.
+            'glue-catalog',
+            # these are valid, but v1 & v2 arns get mangled into the
+            # same top level prefix
+            'rest-api',
+            'rest-stage',
+            # synthetics ~ ie. c7n introduced since non exist.
+            # or in some cases where it exists but not usable in iam.
+            'scaling-policy',
+            'glue-classifier',
+            'glue-security-configuration',
+            'event-rule-target',
+            'rrset',
+            'redshift-reserved',
+            'elasticsearch-reserved'
+        ))
+
+        for k, v in manager.resources.items():
+            if k in allow_list:
+                continue
+            svc = v.resource_type.service
+            if not v.resource_type.arn_type:
+                continue
+
+            svc_arn_map = arn_db.get(svc, {})
+            if not svc_arn_map:
+                continue
+
+            svc_arns = list(svc_arn_map.values())
+            svc_arn_types = set()
+            for sa in svc_arns:
+                sa_arn = Arn.parse(sa)
+                sa_type = sa_arn.resource_type
+                if sa_type is None:
+                    sa_type = ''
+                # wafv2
+                if sa_type.startswith('{') and sa_type.endswith('}'):
+                    sa_type = sa_arn.resource
+                if ':' in sa_type:
+                    sa_type = sa_type.split(':', 1)[0]
+                svc_arn_types.add(sa_type)
+
+            svc_arn_types = overrides.get(svc, svc_arn_types)
+            if v.resource_type.arn_type not in svc_arn_types:
+                invalid[k] = {'valid': sorted(svc_arn_types),
+                              'service': svc,
+                              'resource': v.resource_type.arn_type}
+
+        if invalid:
+            raise ValueError("%d %s have invalid arn types in metadata" % (
+                len(invalid), ", ".join(invalid)))
+
     def test_resource_legacy_type(self):
         legacy = set()
         marker = object()
@@ -533,7 +623,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name'}
+            'apigw-domain-name', 'backup-job'}
 
         missing_method = []
         for k, v in manager.resources.items():

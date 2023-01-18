@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_sphinxext"
-version = "1.1.20"
+version = "1.1.21"
 description = "Cloud Custodian - Sphinx Extensions"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -27,6 +27,9 @@ sphinx_markdown_tables = "^0.0.12"
 myst-parser = "^0.18.0"
 click = "^8.0"
 docutils = ">=0.14,<0.18"
+
+# pin for cos-python-sdk-v5
+requests = "2.27.1"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}

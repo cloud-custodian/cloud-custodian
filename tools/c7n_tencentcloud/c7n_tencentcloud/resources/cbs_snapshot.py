@@ -8,13 +8,31 @@ from c7n_tencentcloud.utils import PageMethod, isoformat_datetime_str
 
 @resources.register("cbs-snapshot")
 class CBSSnapshot(QueryResourceManager):
-    """cbs-snapshot"""
+    """cbs-snapshot
+
+    Docs on cbs-snapshot
+    https://www.tencentcloud.com/document/product/362/31638
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cbs-old-snapshot
+          resource: tencentcloud.cbs-snapshot
+          filters:
+            - type: value
+              key: CreateTime
+              value_type: age
+              op: greater-than
+              value: 90
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
         id = "SnapshotId"
         endpoint = "cbs.tencentcloudapi.com"
-        service = "cvm"
+        service = "cbs"
         version = "2017-03-12"
         enum_spec = ("DescribeSnapshots", "Response.SnapshotSet[]", {})
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}

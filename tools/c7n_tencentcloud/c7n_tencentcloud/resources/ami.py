@@ -11,7 +11,27 @@ from c7n_tencentcloud.utils import PageMethod
 
 @resources.register("ami")
 class AMI(QueryResourceManager):
-    """ami"""
+    """ami Tencent Cloud image
+
+    Docs on ami resource
+    https://www.tencentcloud.com/document/product/213/4940
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: ami_old_and_not_used
+          resource: tencentcloud.ami
+          filters:
+            - type: unused
+              value: true
+            - type: value
+              key: CreatedTime
+              value_type: age
+              value: 90
+              op: greater-than
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""

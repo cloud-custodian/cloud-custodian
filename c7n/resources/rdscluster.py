@@ -1,12 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
-
+import itertools
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -18,6 +18,8 @@ from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
+
+from c7n.resources.rds import ParameterFilter
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -657,4 +659,45 @@ class ConsecutiveSnapshots(Filter):
                     snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
+        return results
+
+
+@RDSCluster.filter_registry.register('db-cluster-parameter')
+class ClusterParameterFilter(ParameterFilter):
+    """
+    Applies value type filter on set db cluster parameter values.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: rdscluster-pg
+                resource: rds-cluster
+                filters:
+                  - type: db-cluster-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
+    policy_annotation = 'c7n:MatchedDBClusterParameter'
+    param_group_attribute = 'DBClusterParameterGroup'
+
+    def _get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+        return param_list
+
+    def process(self, resources, event=None):
+        results = []
+        parameter_group_list = {db.get(self.param_group_attribute) for db in resources}
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
+        for resource in resources:
+            pg_values = paramcache[resource['DBClusterParameterGroup']]
+            if self.match(pg_values):
+                resource.setdefault(self.policy_annotation, []).append(
+                    self.data.get('key'))
+                results.append(resource)
         return results

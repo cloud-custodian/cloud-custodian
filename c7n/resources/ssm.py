@@ -612,7 +612,7 @@ class SSMDocument(QueryResourceManager):
                 'Values': ['Self']}]})
         name = id = 'Name'
         date = 'RegistrationDate'
-        arn_type = 'Document'
+        arn_type = 'document'
 
     permissions = ('ssm:ListDocuments',)
 

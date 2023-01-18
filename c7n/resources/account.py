@@ -6,6 +6,7 @@ import json
 import time
 import datetime
 import jmespath
+from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -97,6 +98,71 @@ class AccountCredentialReport(CredentialReport):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
+
+
+@filters.register('organization')
+class AccountOrganization(ValueFilter):
+    """Check organization enrollment and configuration
+
+    :example:
+
+    determine if an account is not in an organization
+
+    .. code-block:: yaml
+
+      policies:
+        - name: no-org
+          resource: account
+          filters:
+            - type: organization
+              key: Id
+              value: absent
+
+
+    :example:
+
+    determine if an account is setup for organization policies
+
+    .. code-block:: yaml
+
+       policies:
+         - name: org-policies-not-enabled
+           resource: account
+           filters:
+             - type: organization
+               key: FeatureSet
+               value: ALL
+               op: not-equal
+    """
+    schema = type_schema('organization', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    annotation_key = 'c7n:org'
+    annotate = False
+
+    permissions = ('organizations:DescribeOrganization',)
+
+    def get_org_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('organizations')
+        try:
+            org_info = client.describe_organization().get('Organization')
+        except client.exceptions.AWSOrganizationsNotInUseException:
+            org_info = {}
+        except ClientError as e:
+            self.log.warning('organization filter error accessing org info %s', e)
+            org_info = None
+        account[self.annotation_key] = org_info
+
+    def process(self, resources, event=None):
+        if self.annotation_key not in resources[0]:
+            self.get_org_info(resources[0])
+        # if we can't access org info, we've already logged, and return
+        if resources[0][self.annotation_key] is None:
+            return []
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+        return []
 
 
 @filters.register('check-macie')
@@ -1942,3 +2008,325 @@ class LakeformationFilter(Filter):
             return False
         account[self.annotation] = list(cross_account)
         return True
+
+
+@actions.register('toggle-config-managed-rule')
+class ToggleConfigManagedRule(BaseAction):
+    """Enables or disables an AWS Config Managed Rule
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: config-managed-s3-bucket-public-write-remediate-event
+            description: |
+              This policy detects if S3 bucket allows public write by the bucket policy
+              or ACL and remediates.
+            comment: |
+              This policy detects if S3 bucket policy or ACL allows public write access.
+              When the bucket is evaluated as 'NON_COMPLIANT', the action
+              'AWS-DisableS3BucketPublicReadWrite' is triggered and remediates.
+            resource: account
+            filters:
+              - type: missing
+                policy:
+                  resource: config-rule
+                  filters:
+                    - type: remediation
+                      rule_name: &rule_name 'config-managed-s3-bucket-public-write-remediate-event'
+                      remediation: &remediation-config
+                        TargetId: AWS-DisableS3BucketPublicReadWrite
+                        Automatic: true
+                        MaximumAutomaticAttempts: 5
+                        RetryAttemptSeconds: 211
+                        Parameters:
+                          AutomationAssumeRole:
+                            StaticValue:
+                              Values:
+                                - 'arn:aws:iam::{account_id}:role/myrole'
+                          S3BucketName:
+                            ResourceValue:
+                              Value: RESOURCE_ID
+            actions:
+              - type: toggle-config-managed-rule
+                rule_name: *rule_name
+                managed_rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+                resource_types:
+                  - 'AWS::S3::Bucket'
+                rule_parameters: '{}'
+                remediation: *remediation-config
+    """
+
+    permissions = (
+        'config:DescribeConfigRules',
+        'config:DescribeRemediationConfigurations',
+        'config:PutRemediationConfigurations',
+        'config:PutConfigRule',
+    )
+
+    schema = type_schema('toggle-config-managed-rule',
+        enabled={'type': 'boolean', 'default': True},
+        rule_name={'type': 'string'},
+        rule_prefix={'type': 'string'},
+        managed_rule_id={'type': 'string'},
+        resource_types={'type': 'array', 'items':
+                        {'pattern': '^AWS::*', 'type': 'string'}},
+        resource_tag={
+            'type': 'object',
+            'properties': {
+                'key': {'type': 'string'},
+                'value': {'type': 'string'},
+            },
+            'required': ['key', 'value'],
+        },
+        resource_id={'type': 'string'},
+        rule_parameters={'type': 'string'},
+        remediation={
+            'type': 'object',
+            'properties': {
+                'TargetType': {'type': 'string'},
+                'TargetId': {'type': 'string'},
+                'Automatic': {'type': 'boolean'},
+                'Parameters': {'type': 'object'},
+                'MaximumAutomaticAttempts': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 25,
+                },
+                'RetryAttemptSeconds': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 2678000,
+                },
+                'ExecutionControls': {'type': 'object'},
+            },
+        },
+        tags={'type': 'object'},
+        required=['rule_name'],
+    )
+
+    def validate(self):
+        if (
+            self.data.get('enabled', True) and
+            not self.data.get('managed_rule_id')
+        ):
+            raise PolicyValidationError("managed_rule_id required to enable a managed rule")
+        return self
+
+    def process(self, accounts):
+        client = local_session(self.manager.session_factory).client('config')
+        rule = self.ConfigManagedRule(self.data)
+        params = self.get_rule_params(rule)
+
+        if self.data.get('enabled', True):
+            client.put_config_rule(**params)
+
+            if rule.remediation:
+                remediation_params = self.get_remediation_params(rule)
+                client.put_remediation_configurations(
+                    RemediationConfigurations=[remediation_params]
+                )
+        else:
+            with suppress(client.exceptions.NoSuchRemediationConfigurationException):
+                client.delete_remediation_configuration(
+                    ConfigRuleName=rule.name
+                )
+
+            with suppress(client.exceptions.NoSuchConfigRuleException):
+                client.delete_config_rule(
+                    ConfigRuleName=rule.name
+                )
+
+    def get_rule_params(self, rule):
+        params = dict(
+            ConfigRuleName=rule.name,
+            Description=rule.description,
+            Source={
+                'Owner': 'AWS',
+                'SourceIdentifier': rule.managed_rule_id,
+            },
+            InputParameters=rule.rule_parameters
+        )
+
+        # A config rule scope can include one or more resource types,
+        # a combination of a tag key and value, or a combination of
+        # one resource type and one resource ID
+        params.update({'Scope': {'ComplianceResourceTypes': rule.resource_types}})
+        if rule.resource_tag:
+            params.update({'Scope': {
+                'TagKey': rule.resource_tag['key'],
+                'TagValue': rule.resource_tag['value']}
+            })
+        elif rule.resource_id:
+            params.update({'Scope': {'ComplianceResourceId': rule.resource_id}})
+
+        return dict(ConfigRule=params)
+
+    def get_remediation_params(self, rule):
+        rule.remediation['ConfigRuleName'] = rule.name
+        if 'TargetType' not in rule.remediation:
+            rule.remediation['TargetType'] = 'SSM_DOCUMENT'
+        return rule.remediation
+
+    class ConfigManagedRule:
+        """Wraps the action data into an AWS Config Managed Rule.
+        """
+
+        def __init__(self, data):
+            self.data = data
+
+        @property
+        def name(self):
+            prefix = self.data.get('rule_prefix', 'custodian-')
+            return "%s%s" % (prefix, self.data.get('rule_name', ''))
+
+        @property
+        def description(self):
+            return self.data.get(
+                'description', 'cloud-custodian AWS Config Managed Rule policy')
+
+        @property
+        def tags(self):
+            return self.data.get('tags', {})
+
+        @property
+        def resource_types(self):
+            return self.data.get('resource_types', [])
+
+        @property
+        def managed_rule_id(self):
+            return self.data.get('managed_rule_id', '')
+
+        @property
+        def resource_tag(self):
+            return self.data.get('resource_tag', {})
+
+        @property
+        def resource_id(self):
+            return self.data.get('resource_id', '')
+
+        @property
+        def rule_parameters(self):
+            return self.data.get('rule_parameters', '')
+
+        @property
+        def remediation(self):
+            return self.data.get('remediation', {})
+
+
+@filters.register('ses-agg-send-stats')
+class SesAggStats(ValueFilter):
+    """This filter queries SES send statistics and aggregates all
+    the data points into a single report.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-aggregated-send-stats-policy
+                resource: account
+                filters:
+                  - type: ses-agg-send-stats
+    """
+
+    schema = type_schema('ses-agg-send-stats', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ses-send-agg'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        resource_counter = {'DeliveryAttempts': 0,
+                            'Bounces': 0,
+                            'Complaints': 0,
+                            'Rejects': 0,
+                            'BounceRate': 0}
+        for d in get_send_stats.get('SendDataPoints', []):
+            resource_counter['DeliveryAttempts'] += d['DeliveryAttempts']
+            resource_counter['Bounces'] += d['Bounces']
+            resource_counter['Complaints'] += d['Complaints']
+            resource_counter['Rejects'] += d['Rejects']
+        resource_counter['BounceRate'] = round(
+            (resource_counter['Bounces'] /
+             resource_counter['DeliveryAttempts']) * 100)
+        resources[0][self.annotation_key] = resource_counter
+
+        return resources
+
+
+@filters.register('ses-send-stats')
+class SesConsecutiveStats(Filter):
+    """This filter annotates the account resource with SES send statistics for the
+    last n number of days, not including the current date.
+
+    The stats are aggregated into daily metrics. Additionally, the filter also
+    calculates and annotates the max daily bounce rate (percentage). Using this filter,
+    users can alert when the bounce rate for a particular day is higher than the limit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-send-stats
+                resource: account
+                filters:
+                  - type: ses-send-stats
+                    days: 5
+                  - type: value
+                    key: '"c7n:ses-max-bounce-rate"'
+                    op: ge
+                    value: 10
+    """
+    schema = type_schema('ses-send-stats', days={'type': 'number', 'minimum': 2},
+                         required=['days'])
+    send_stats_annotation = 'c7n:ses-send-stats'
+    max_bounce_annotation = 'c7n:ses-max-bounce-rate'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+        check_days = self.data.get('days', 2)
+        utcnow = datetime.datetime.utcnow()
+        expected_dates = set()
+
+        for days in range(1, check_days + 1):
+            expected_dates.add((utcnow - datetime.timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        metrics = {}
+        for d in get_send_stats.get('SendDataPoints', []):
+            ts = d['Timestamp'].strftime('%Y-%m-%d')
+            if ts not in expected_dates:
+                continue
+
+            if not metrics.get(ts):
+                metrics[ts] = {'DeliveryAttempts': 0,
+                               'Bounces': 0,
+                               'Complaints': 0,
+                               'Rejects': 0}
+            metrics[ts]['DeliveryAttempts'] += d['DeliveryAttempts']
+            metrics[ts]['Bounces'] += d['Bounces']
+            metrics[ts]['Complaints'] += d['Complaints']
+            metrics[ts]['Rejects'] += d['Rejects']
+
+        max_bounce_rate = 0
+        for ts, metric in metrics.items():
+            metric['BounceRate'] = round((metric['Bounces'] / metric['DeliveryAttempts']) * 100)
+            if max_bounce_rate < metric['BounceRate']:
+                max_bounce_rate = metric['BounceRate']
+            metric['Date'] = ts
+
+        resources[0][self.send_stats_annotation] = list(metrics.values())
+        resources[0][self.max_bounce_annotation] = max_bounce_rate
+
+        return resources

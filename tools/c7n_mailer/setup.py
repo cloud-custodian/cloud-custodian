@@ -21,6 +21,7 @@ install_requires = \
  'python-dateutil>=2.8.1,<3.0.0',
  'pyyaml>=5.4.0',
  'redis>=3.4.1,<4.0.0',
+ 'requests==2.27.1',
  'sendgrid>=6.1.1,<7.0.0',
  'types-six>=1.16.10,<2.0.0']
 
@@ -34,7 +35,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-mailer',
-    'version': '0.6.20',
+    'version': '0.6.21',
     'description': 'Cloud Custodian - Reference Mailer',
     'license': 'Apache-2.0',
     'classifiers': [

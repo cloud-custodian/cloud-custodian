@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Server": {
+            "Arn": "arn:aws:transfer:us-east-1:644160558196:server/s-4a6d521483294bd79",
+            "ProtocolDetails": {
+                "PassiveIp": "AUTO"
+            },
+            "Domain": "S3",
+            "EndpointType": "PUBLIC",
+            "HostKeyFingerprint": "SHA256:Nc+Gi84M3QEPVTGvI28TVsJ2g6MEHuQIh4+H9aPTk1w=",
+            "IdentityProviderType": "SERVICE_MANAGED",
+            "LoggingRole": "arn:aws:iam::644160558196:role/service-role/AWSTransferLoggingAccess",
+            "Protocols": [
+                "SFTP"
+            ],
+            "SecurityPolicyName": "TransferSecurityPolicy-2020-06",
+            "ServerId": "s-4a6d521483294bd79",
+            "State": "OFFLINE",
+            "Tags": [],
+            "UserCount": 0
+        },
+        "ResponseMetadata": {}
+    }
+}
