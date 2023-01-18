@@ -156,12 +156,10 @@ class DeleteSecretsManager(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: delete-unencrypted-secrets
+              - name: delete-cross-account-secrets
                 resource: aws.secrets-manager
                 filters:
-                  - type: value
-                    key: KmsKeyId
-                    value: absent
+                  - type: cross-account
                 actions:
                   - type: delete
                     recovery_window: 10
