@@ -1,0 +1,48 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272021-05-25T00%3A00%3A00Z%27",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 23 Aug 2021 06:35:09 GMT"
+                    ],
+                    "content-length": [
+                        "37257"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Resources/subscriptions/resourcegroups/delete",
+                                    "localizedValue": "Microsoft.Resources/subscriptions/resourcegroups/delete"
+                                },
+                                "eventTimestamp": "2021-08-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
