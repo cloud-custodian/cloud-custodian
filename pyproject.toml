@@ -52,8 +52,6 @@ pytest-sugar = "^0.9.2"
 click = "^8.0"
 freezegun = "^1.2.2"
 pytest-recording = "^0.12.1"
-# pin for cos-python-sdk-v5 issue
-requests = "2.27.1"
 
 [tool.black]
 skip-string-normalization = true
