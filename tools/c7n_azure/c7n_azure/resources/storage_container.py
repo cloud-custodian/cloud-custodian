@@ -5,7 +5,7 @@ from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.resources.arm import ChildArmResourceManager
-from c7n.filters.core import type_schema
+from c7n.filters.core import type_schema, ValueFilter
 from c7n_azure.utils import ResourceIdParser
 from msrestazure.tools import parse_resource_id
 
@@ -111,3 +111,34 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             resource['name'],
             public_access=self.data['value']
         )
+
+@StorageContainer.filter_registry.register('insight-operational-logs')
+class InsightOperationalLogsFilter(ValueFilter):
+    """Filters activity logs on Azure Storage Container 
+
+    :example:
+
+        Find all activity log on storage container that are not private and set them to private
+
+    .. code-block: yaml
+
+
+        policies:
+          - name: storage-container-public
+            description: |
+              Find all containers with public access enabled
+            resource: azure.storage-container
+            filters:
+              - type: insight-operational-logs
+                key: properties.publicAccess
+                op: not-equal
+                value: None   # Possible values: Blob, Container, None
+    """
+    schema = type_schema('insight-operational-logs', rinherit=ValueFilter.schema)
+    
+    def process(self, resources, event=None):
+        for r in resources:
+            if 'insights-operational-logs' in r['name']:
+                self.log.warning("Storage container '%s' is storing activity logs. Setting access to private.", r['name'])
+                self.set_public_access_level(r['id'], 'Private')
+            return resources
