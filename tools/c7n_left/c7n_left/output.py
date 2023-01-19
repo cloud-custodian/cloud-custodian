@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 
 import jmespath
-from rich.console import Console
+from rich.console import Console, Group
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
@@ -142,7 +142,7 @@ class Summary(Output):
         self.counter_resources_by_policy = {}
         self.count_policy_matches = 0
         self.count_total_resources = 0
-        self.resource_matches = set()
+        self.resource_name_matches = set()
 
     def on_execution_started(self, policies, graph):
         unevaluated = Counter()
@@ -166,19 +166,18 @@ class Summary(Output):
     def on_results(self, results):
         for r in results:
             self.count_policy_matches += 1
-            self.resource_matches.add(r.resource.name)
+            self.resource_name_matches.add(r.resource.name)
 
     def on_execution_ended(self):
-
         unevaluated = sum(self.counter_unevaluated_by_type.values())
         compliant = (
-            self.count_total_resources - len(self.resource_matches) - unevaluated
+            self.count_total_resources - len(self.resource_name_matches) - unevaluated
         )
 
         msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
-        if self.resource_matches:
+        if self.resource_name_matches:
             msg += ", %d resources have %d policy violations" % (
-                len(self.resource_matches),
+                len(self.resource_name_matches),
                 self.count_policy_matches,
             )
 
@@ -200,6 +199,14 @@ severity_colors = {
 
 def severity_key(a):
     return severity_levels.get(a.severity.lower(), severity_levels["unknown"])
+
+
+def get_severity_color(policy):
+    severity = policy.severity.lower()
+    if severity not in severity_colors:
+        severity = "unknown"
+    style = severity_colors.get(severity)
+    return severity, style
 
 
 class SummaryPolicy(Summary):
@@ -224,10 +231,7 @@ class SummaryPolicy(Summary):
         table.add_column("Result")
 
         for p in self.policies:
-            severity = p.severity.lower()
-            if severity not in severity_colors:
-                severity = "unknown"
-            style = severity_colors.get(severity)
+            severity, style = get_severity_color(p)
             total = self.counter_resources_by_policy[p.name]
             failed = self.counter_policy_matches.get(p.name, 0)
             passed = total - failed
@@ -262,27 +266,37 @@ class SummaryResource(Summary):
     def on_results(self, results):
         super().on_results(results)
         for r in results:
-            self.resource_policy_matches.setdefault(r.resource.name, set()).add(
-                r.policy.name
-            )
+            self.resource_policy_matches.setdefault(r.resource.name, []).append(r)
 
-    def on_execution_ended(self, results):
-        table = Table(title="Summary - By Resource")
-        table.add_column("")
-        for r in sorted(self.resource_matches):
-            table = Table(title=r.resource.name)
-            table.add_column("")
-            # ordered policies by severity under resource.
-            for p in self.policies:
-                if p not in self.resource_policy_matches:
-                    continue
-            for p in self.resource_policy_matches:
-                pass
+    def on_execution_ended(self):
+        table = Table(title="Summary - By Resource", show_header=False)
+        table.add_column("type")
+        table.add_column("matches")
+        pnames = [p for p in self.policies]
+        keyfunc = lambda p: pnames.index(p.name)
+        rtypes = {n.split(".", 1)[0] for n in self.resource_policy_matches}
 
+        for rtype in sorted(rtypes):
+            prefix = "%s." % rtype
+            rmatches = [r for r in self.resource_policy_matches if r.startswith(prefix)]
+            rtables = []
+            for r in sorted(rmatches):
+                ptable = Table(
+                    title=r.split(".", 1)[-1], title_justify="left", show_header=False
+                )
+                ptable.add_column("Severity")
+                ptable.add_column("Policy")
+                for m in self.resource_policy_matches[r]:
+                    policy = self.policies[m.policy.name]
+                    severity, style = get_severity_color(policy)
+                    ptable.add_row(Text(severity, style=style), Text(policy.name))
+                rtables.append(ptable)
+            table.add_row(rtype, Group(*rtables))
+        self.console.print(table)
         super().on_execution_ended()
 
 
-summary = {"policy": SummaryPolicy, "resource": SummaryResource}
+summary_options = {"policy": SummaryPolicy, "resource": SummaryResource}
 
 
 class MultiOutput:
@@ -324,7 +338,8 @@ class GithubFormat(Output):
 @report_outputs.register("cli")
 class RichMulti(MultiOutput):
     def __init__(self, ctx, config):
-        super().__init__([RichCli(ctx, config), SummaryPolicy(ctx, config)])
+        summary = summary_options[config.summary](ctx, config)
+        super().__init__([RichCli(ctx, config), summary])
 
 
 @report_outputs.register("github")
