@@ -2,13 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
+from collections import Counter
 from pathlib import Path
 import time
 
 import jmespath
 from rich.console import Console
 from rich.syntax import Syntax
+from rich.table import Table
+from rich.text import Text
 
+from .core import CollectionRunner
 from c7n.output import OutputRegistry
 
 
@@ -77,7 +81,6 @@ class Output:
         pass
 
 
-@report_outputs.register("cli")
 class RichCli(Output):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
@@ -130,6 +133,158 @@ class RichResult:
         yield ""
 
 
+class Summary(Output):
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.console = Console(file=config.output_file)
+        self.counter_unevaluated_by_type = {}
+        self.counter_resources_by_type = {}
+        self.counter_resources_by_policy = {}
+        self.count_policy_matches = 0
+        self.count_total_resources = 0
+        self.resource_matches = set()
+
+    def on_execution_started(self, policies, graph):
+        unevaluated = Counter()
+        policy_resources = Counter()
+        type_counts = Counter()
+
+        resource_count = 0
+        for rtype, resources in graph.get_resources_by_type():
+            resource_count += len(resources)
+            type_counts[rtype] = len(resources)
+            for p in policies:
+                if not CollectionRunner.match_type(rtype, p):
+                    unevaluated[rtype] = len(resources)
+                else:
+                    policy_resources[p.name] = len(resources)
+        self.counter_unevaluated_by_type = unevaluated
+        self.counter_resources_by_type = type_counts
+        self.counter_resources_by_policy = policy_resources
+        self.count_total_resources = resource_count
+
+    def on_results(self, results):
+        for r in results:
+            self.count_policy_matches += 1
+            self.resource_matches.add(r.resource.name)
+
+    def on_execution_ended(self):
+
+        unevaluated = sum(self.counter_unevaluated_by_type.values())
+        compliant = (
+            self.count_total_resources - len(self.resource_matches) - unevaluated
+        )
+
+        msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
+        if self.resource_matches:
+            msg += ", %d resources have %d policy violations" % (
+                len(self.resource_matches),
+                self.count_policy_matches,
+            )
+
+        if unevaluated:
+            msg += ", %d resources unevaluated" % (unevaluated)
+        self.console.print(msg)
+
+
+severity_levels = {"critical": 0, "high": 10, "medium": 20, "low": 30, "unknown": 40}
+
+severity_colors = {
+    "critical": "red",
+    "high": "yellow",
+    "medium": "green_yellow",
+    "low": "violet",
+    "unknown": "grey42",
+}
+
+
+def severity_key(a):
+    return severity_levels.get(a.severity.lower(), severity_levels["unknown"])
+
+
+class SummaryPolicy(Summary):
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.counter_policy_matches = Counter()
+        self.policies = []
+
+    def on_execution_started(self, policies, graph):
+        super().on_execution_started(policies, graph)
+        self.policies = sorted(map(PolicyMetadata, policies), key=severity_key)
+
+    def on_results(self, results):
+        super().on_results(results)
+        for r in results:
+            self.counter_policy_matches[r.policy.name] += 1
+
+    def on_execution_ended(self):
+        table = Table(title="Summary - By Policy")
+        table.add_column("Severity")
+        table.add_column("Policy")
+        table.add_column("Result")
+
+        for p in self.policies:
+            severity = p.severity.lower()
+            if severity not in severity_colors:
+                severity = "unknown"
+            style = severity_colors.get(severity)
+            total = self.counter_resources_by_policy[p.name]
+            failed = self.counter_policy_matches.get(p.name, 0)
+            passed = total - failed
+
+            if failed:
+                msg_result = "[red]%d[/red] failed [green]%d[/green] passed" % (
+                    failed,
+                    passed,
+                )
+            elif not passed:
+                continue
+            else:
+                msg_result = "[green]%d[/green] passed" % passed
+
+            table.add_row(Text(severity, style=style), Text(p.name), msg_result)
+        self.console.print(table)
+        super().on_execution_ended()
+
+
+class SummaryResource(Summary):
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.policies = {}
+        self.resource_policy_matches = {}
+
+    def on_execution_started(self, policies, graph):
+        super().on_execution_started(policies, graph)
+        self.policies = {
+            p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)
+        }
+
+    def on_results(self, results):
+        super().on_results(results)
+        for r in results:
+            self.resource_policy_matches.setdefault(r.resource.name, set()).add(
+                r.policy.name
+            )
+
+    def on_execution_ended(self, results):
+        table = Table(title="Summary - By Resource")
+        table.add_column("")
+        for r in sorted(self.resource_matches):
+            table = Table(title=r.resource.name)
+            table.add_column("")
+            # ordered policies by severity under resource.
+            for p in self.policies:
+                if p not in self.resource_policy_matches:
+                    continue
+            for p in self.resource_policy_matches:
+                pass
+
+        super().on_execution_ended()
+
+
+summary = {"policy": SummaryPolicy, "resource": SummaryResource}
+
+
 class MultiOutput:
     def __init__(self, outputs):
         self.outputs = outputs
@@ -166,12 +321,18 @@ class GithubFormat(Output):
         return f"::error file={filename},line={resource.line_start},lineEnd={resource.line_end},title={title}::{message}"  # noqa
 
 
+@report_outputs.register("cli")
+class RichMulti(MultiOutput):
+    def __init__(self, ctx, config):
+        super().__init__([RichCli(ctx, config), SummaryPolicy(ctx, config)])
+
+
 @report_outputs.register("github")
 class GithubOutput(MultiOutput):
     "For github action execution we want both line annotation and cli outputs"
 
     def __init__(self, ctx, config):
-        super().__init__([GithubFormat(ctx, config), RichCli(ctx, config)])
+        super().__init__([GithubFormat(ctx, config), RichMulti(ctx, config)])
 
 
 class JSONEncoder(json.JSONEncoder):
