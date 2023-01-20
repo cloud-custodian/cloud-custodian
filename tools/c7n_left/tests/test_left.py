@@ -259,7 +259,7 @@ def test_multi_resource_policy(tmp_path):
     assert len(data["results"]) == 2
 
 
-def write_output_test_policy(tmp_path, policy=None):
+def write_output_test_policy(tmp_path, policy=None, policy_path="policy.json"):
     policies = (
         policy
         and {"policies": [policy]}
@@ -274,7 +274,7 @@ def write_output_test_policy(tmp_path, policy=None):
             ]
         }
     )
-    (tmp_path / "policy.json").write_text(json.dumps(policies))
+    (tmp_path / policy_path).write_text(json.dumps(policies))
 
 
 def test_cli_no_policies(tmp_path, caplog):

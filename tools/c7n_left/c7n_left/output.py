@@ -13,6 +13,7 @@ from rich.table import Table
 from rich.text import Text
 
 from .core import CollectionRunner
+from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
 
 
@@ -153,8 +154,12 @@ class Summary(Output):
 
         resource_count = 0
         for rtype, resources in graph.get_resources_by_type():
+            resources = self.options.exex_filter(rtype, resources)
             if "_" not in rtype:
                 continue
+            if not resources:
+                continue
+
             resource_count += len(resources)
             type_counts[rtype] = len(resources)
             for p in policies:
@@ -192,8 +197,6 @@ class Summary(Output):
         self.console.print(msg)
 
 
-severity_levels = {"critical": 0, "high": 10, "medium": 20, "low": 30, "unknown": 40}
-
 severity_colors = {
     "critical": "red",
     "high": "yellow",
@@ -204,7 +207,7 @@ severity_colors = {
 
 
 def severity_key(a):
-    return severity_levels.get(a.severity.lower(), severity_levels["unknown"])
+    return SEVERITY_LEVELS.get(a.severity.lower(), SEVERITY_LEVELS["unknown"])
 
 
 def get_severity_color(policy):

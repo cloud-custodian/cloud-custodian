@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+from collections import defaultdict
 import fnmatch
 import logging
 
@@ -13,6 +14,7 @@ from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
 from .filters import Traverse
+from .utils import SEVERITY_LEVELS
 
 log = logging.getLogger("c7n.iac")
 
@@ -29,6 +31,95 @@ class IACSourceProvider(Provider):
 
     def initialize_policies(self, policies, options):
         return policies
+
+
+class ExecutionFilter:
+
+    supported_filters = ("policy", "type", "severity")
+
+    def __init__(self, filters):
+        self.filters = filters
+
+    @classmethod
+    def parse(cls, options):
+        """cli option filtering support
+
+        --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
+        """
+        if not options.filters:
+            return cls(defaultdict(list))
+
+        filters = {}
+        for kv in options.filters.split(" "):
+            if "=" not in kv:
+                raise ValueError("key=value pair missing `=`")
+            k, v = kv.split("=")
+            if k not in cls.supported_filters:
+                raise ValueError("unsupported filter %s" % k)
+            if "," in v:
+                v = v.split(",")
+            else:
+                v = [v]
+            filters[k] = v
+
+        invalid_severities = set()
+        if filters["severity"]:
+            invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
+        if invalid_severities:
+            raise ValueError(
+                "invalid severity for filtering %s" % (", ".join(invalid_severities))
+            )
+
+    def _filter_policy_name(self, policies):
+        if not self.filters["policy"]:
+            return policies
+        results = []
+        for pf in self.filters["policy"]:
+            for p in policies:
+                if fnmatch.fnmatch(p.name, pf):
+                    results.append(p)
+        return results
+
+    def _filter_policy_severity(self, policies):
+        # if we have a single severity filter we default to filtering
+        # all severities at a higher level. ie filtering on medium,
+        # gets and critcial, high.
+        if not self.filters["severity"]:
+            return policies
+
+        def get_severity(p):
+            return p.data.get("metadata", {}).get("severity")
+
+        def filter_severity(p):
+            severity = get_severity(p)
+            p_slevel = SEVERITY_LEVELS[severity]
+            f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
+            return p_slevel <= f_slevel
+
+        if len(self.filters["severity"]) == 1:
+            return list(filter(filter_severity, policies))
+
+        results = []
+        # if we mulitple, match on each level
+        fseverities = set(self.filters["severity"])
+        for p in policies:
+            if get_severity(sf) not in fseverities:
+                continue
+            results.append(p)
+        return results
+
+    def filter_policies(self, policies):
+        policies = self._filter_policy_name(policies)
+        policies = self._filter_policy_level(policies)
+        return policies
+
+    def filter_resources(self, rtype, resources):
+        if not self.filters["type"]:
+            return resources
+        for rf in self.filters["type"]:
+            if fnmatch.fnmatch(rtype, rf):
+                return resources
+        return []
 
 
 class CollectionRunner:
@@ -57,6 +148,10 @@ class CollectionRunner:
         # at the moment, we're doing results grouped by resource.
         found = False
         for rtype, resources in graph.get_resources_by_type():
+            if self.options.exec_filter:
+                resources = self.options.exec_filter.filter_resources(resources)
+            if not resources:
+                continue
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
