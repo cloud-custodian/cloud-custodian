@@ -1,6 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+import jmespath
 from c7n.manager import resources
+from c7n.actions import BaseAction, RemovePolicyBase
+from c7n.exceptions import PolicyValidationError
+from c7n.utils import type_schema
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
@@ -137,3 +142,96 @@ class MarkSecretForOp(TagDelayedAction):
                   op: tag
                   days: 1
     """
+
+
+@SecretsManager.action_registry.register('delete')
+class DeleteSecretsManager(BaseAction):
+    """Delete a secret and all of its versions.
+    The recovery window is the number of days from 7 to 30 that
+    Secrets Manager waits before permanently deleting the secret
+    with default as 30
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-cross-account-secrets
+                resource: aws.secrets-manager
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: delete
+                    recovery_window: 10
+    """
+
+    schema = type_schema('delete', recovery_window={'type': 'integer'})
+    permissions = ('secretsmanager:DeleteSecret',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('secretsmanager')
+
+        for r in resources:
+            if 'ReplicationStatus' in r:
+                rep_regions = jmespath.search('ReplicationStatus[*].Region', r)
+                self.manager.retry(client.remove_regions_from_replication,
+                  SecretId=r['ARN'], RemoveReplicaRegions=rep_regions)
+            self.manager.retry(client.delete_secret,
+              SecretId=r['ARN'], RecoveryWindowInDays=self.data.get('recovery_window', 30))
+
+
+@SecretsManager.action_registry.register('remove-statements')
+class SecretsManagerRemovePolicyStatement(RemovePolicyBase):
+    """
+    Action to remove resource based policy statements from secrets manager
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: secrets-manager-cross-account
+            resource: aws.secrets-manager
+            filters:
+              - type: cross-account
+            actions:
+              - type: remove-statements
+                statement_ids: matched
+    """
+
+    permissions = ("secretsmanager:DeleteResourcePolicy", "secretsmanager:PutResourcePolicy",)
+
+    def validate(self):
+        for f in self.manager.iter_filters():
+            if isinstance(f, CrossAccountAccessFilter):
+                return self
+        raise PolicyValidationError(
+            '`remove-statements` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('secretsmanager')
+        for r in resources:
+            try:
+                self.process_resource(client, r)
+            except Exception:
+                self.log.exception("Error processing secretsmanager:%s", r['ARN'])
+
+    def process_resource(self, client, resource):
+        p = json.loads(resource.get('c7n:AccessPolicy'))
+        if p is None:
+            return
+
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+        if statements:
+            client.put_resource_policy(
+                SecretId=resource['ARN'],
+                ResourcePolicy=json.dumps(p)
+            )
+        else:
+            client.delete_resource_policy(SecretId=resource['ARN'])

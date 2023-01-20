@@ -271,3 +271,26 @@ class OrgTest(TestUtils):
         self.assertEqual(
             [a['name'] for a in t6['accounts']],
             ['prod'])
+
+    def test_accounts_iterator(self):
+        config = {
+            "vars": {"default_tz": "Sydney/Australia"},
+            "accounts": [
+                {
+                    'name': 'dev',
+                    'account_id': '123456789012',
+                    'tags': ["environment:dev"],
+                    "vars": {"environment": "dev"},
+                },
+                {
+                    'name': 'dev2',
+                    'account_id': '123456789013',
+                    'tags': ["environment:dev"],
+                    "vars": {"environment": "dev", "default_tz": "UTC"},
+                },
+            ]
+        }
+        accounts = [a for a in org.accounts_iterator(config)]
+        accounts[0]["vars"]["default_tz"] = "Sydney/Australia"
+        # NOTE allow override at account level
+        accounts[1]["vars"]["default_tz"] = "UTC"
