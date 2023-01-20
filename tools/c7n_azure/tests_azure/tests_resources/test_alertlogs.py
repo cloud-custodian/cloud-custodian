@@ -22,15 +22,14 @@ class AlertLogsTest(BaseTest):
             'resource': 'azure.alert-logs',
             'filters': [
                 {'type': 'value',
-                    'key': 'location',
-                    'value': 'Global'},
+                 'key': 'location',
+                 'value': 'Global'},
                 {'type': 'value',
-                      'key': "properties.condition.allOf[?field=='properties.incidentType'].equals|[0]",
-                      'value': 'Incident'},
+                 'key': "properties.condition.allOf[?field=='properties.incidentType'].equals|[0]",
+                 'value': 'Incident'},
                 {'type': 'value',
-                      'key': 'properties.actions.actionGroups',
-                       'value': 'not-null'}]
+                 'key': 'properties.actions.actionGroups',
+                 'value': 'not-null'}]
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
