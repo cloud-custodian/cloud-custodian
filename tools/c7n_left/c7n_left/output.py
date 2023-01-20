@@ -12,7 +12,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-from .core import CollectionRunner
+from .core import CollectionRunner, PolicyMetadata
 from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
 
@@ -24,47 +24,6 @@ def get_reporter(config):
     for k, v in report_outputs.items():
         if k == config.output:
             return v(None, config)
-
-
-class PolicyMetadata:
-    def __init__(self, policy):
-        self.policy = policy
-
-    @property
-    def resource_type(self):
-        return self.policy.resource_type
-
-    @property
-    def provider(self):
-        return self.policy.provider_name
-
-    @property
-    def name(self):
-        return self.policy.name
-
-    @property
-    def description(self):
-        return self.policy.data.get("description")
-
-    @property
-    def category(self):
-        return " ".join(self.policy.data.get("metadata", {}).get("category", []))
-
-    @property
-    def severity(self):
-        return self.policy.data.get("metadata", {}).get("severity", "")
-
-    @property
-    def title(self):
-        title = self.policy.data.get("metadata", {}).get("title", "")
-        if title:
-            return title
-        title = f"{self.resource_type} - policy:{self.name}"
-        if self.category:
-            title += f"category:{self.category}"
-        if self.severity:
-            title += f"severity:{self.severity}"
-        return title
 
 
 class Output:
@@ -154,7 +113,7 @@ class Summary(Output):
 
         resource_count = 0
         for rtype, resources in graph.get_resources_by_type():
-            resources = self.options.exex_filter(rtype, resources)
+            resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
             if not resources:

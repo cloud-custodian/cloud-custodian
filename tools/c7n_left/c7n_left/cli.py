@@ -10,7 +10,7 @@ from c7n.config import Config
 
 from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
-from .core import CollectionRunner
+from .core import CollectionRunner, ExecutionFilter
 from .utils import load_policies
 
 
@@ -52,6 +52,7 @@ def run(
         output_file=output_file,
         output_query=output_query,
         summary=summary,
+        filters=filters,
     )
     exec_filter = ExecutionFilter.parse(config)
     config["exec_filter"] = exec_filter
@@ -60,7 +61,7 @@ def run(
         log.warning("no policies found")
         sys.exit(1)
     reporter = get_reporter(config)
-    runner = CollectionRunner(policies, config, reporter, exec_filter)
+    runner = CollectionRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 
 

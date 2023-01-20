@@ -4,6 +4,7 @@
 from collections import defaultdict
 import fnmatch
 import logging
+import operator
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
@@ -33,12 +34,56 @@ class IACSourceProvider(Provider):
         return policies
 
 
+class PolicyMetadata:
+    def __init__(self, policy):
+        self.policy = policy
+
+    @property
+    def resource_type(self):
+        return self.policy.resource_type
+
+    @property
+    def provider(self):
+        return self.policy.provider_name
+
+    @property
+    def name(self):
+        return self.policy.name
+
+    @property
+    def description(self):
+        return self.policy.data.get("description")
+
+    @property
+    def category(self):
+        return " ".join(self.policy.data.get("metadata", {}).get("category", []))
+
+    @property
+    def severity(self):
+        return self.policy.data.get("metadata", {}).get("severity", "unknown").lower()
+
+    @property
+    def title(self):
+        title = self.policy.data.get("metadata", {}).get("title", "")
+        if title:
+            return title
+        title = f"{self.resource_type} - policy:{self.name}"
+        if self.category:
+            title += f"category:{self.category}"
+        if self.severity:
+            title += f"severity:{self.severity}"
+        return title
+
+
 class ExecutionFilter:
 
-    supported_filters = ("policy", "type", "severity")
+    supported_filters = ("policy", "type", "severity", "category", "id")
 
     def __init__(self, filters):
         self.filters = filters
+
+    def __len__(self):
+        return len(self.filters)
 
     @classmethod
     def parse(cls, options):
@@ -49,7 +94,7 @@ class ExecutionFilter:
         if not options.filters:
             return cls(defaultdict(list))
 
-        filters = {}
+        filters = defaultdict(list)
         for kv in options.filters.split(" "):
             if "=" not in kv:
                 raise ValueError("key=value pair missing `=`")
@@ -61,7 +106,11 @@ class ExecutionFilter:
             else:
                 v = [v]
             filters[k] = v
+        cls._validate_severities(filters)
+        return cls(filters)
 
+    @classmethod
+    def _validate_severities(cls, filters):
         invalid_severities = set()
         if filters["severity"]:
             invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
@@ -70,14 +119,18 @@ class ExecutionFilter:
                 "invalid severity for filtering %s" % (", ".join(invalid_severities))
             )
 
-    def _filter_policy_name(self, policies):
-        if not self.filters["policy"]:
-            return policies
+    def filter_attribute(self, filter_name, attribute, items):
+        if not self.filters[attribute] or not items:
+            return items
         results = []
-        for pf in self.filters["policy"]:
-            for p in policies:
-                if fnmatch.fnmatch(p.name, pf):
-                    results.append(p)
+        op_class = (
+            isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
+        )
+        op = op_class(attribute)
+        for f in self.filters[attribute]:
+            for i in items:
+                if fnmatch.fnmatch(op(i), f):
+                    results.append(i)
         return results
 
     def _filter_policy_severity(self, policies):
@@ -87,12 +140,8 @@ class ExecutionFilter:
         if not self.filters["severity"]:
             return policies
 
-        def get_severity(p):
-            return p.data.get("metadata", {}).get("severity")
-
         def filter_severity(p):
-            severity = get_severity(p)
-            p_slevel = SEVERITY_LEVELS[severity]
+            p_slevel = SEVERITY_LEVELS[p.severity]
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
             return p_slevel <= f_slevel
 
@@ -100,26 +149,38 @@ class ExecutionFilter:
             return list(filter(filter_severity, policies))
 
         results = []
-        # if we mulitple, match on each level
+        # if we have mulitple values, match on each, note no support for glob on severity
+        # since its a controlled vocab.
         fseverities = set(self.filters["severity"])
         for p in policies:
-            if get_severity(sf) not in fseverities:
+            if p.serverity not in fseverities:
                 continue
             results.append(p)
         return results
 
     def filter_policies(self, policies):
-        policies = self._filter_policy_name(policies)
-        policies = self._filter_policy_level(policies)
-        return policies
+        policies = list(map(PolicyMetadata, policies))
+        policies = self.filter_attribute("policy", "name", policies)
+        policies = self.filter_attribute("category", "category", policies)
+        policies = self._filter_policy_severity(policies)
+        return [pm.policy for pm in policies]
+
+    def _filter_resource_id(self, resources):
+        if not self.filters["id"]:
+            return resources
+        results = []
+        for r in resources:
+            id = r["__tfmeta"]["path"].split(".", 1)[-1]
+            for idf in self.filters["id"]:
+                if fnmatch.fnmatch(id, idf):
+                    results.append(r)
+        return results
 
     def filter_resources(self, rtype, resources):
-        if not self.filters["type"]:
-            return resources
-        for rf in self.filters["type"]:
-            if fnmatch.fnmatch(rtype, rf):
-                return resources
-        return []
+        if not self.filter_attribute("type", "type", [{"type": rtype}]):
+            return []
+        resources = self._filter_resource_id(resources)
+        return resources
 
 
 class CollectionRunner:
@@ -149,7 +210,7 @@ class CollectionRunner:
         found = False
         for rtype, resources in graph.get_resources_by_type():
             if self.options.exec_filter:
-                resources = self.options.exec_filter.filter_resources(resources)
+                resources = self.options.exec_filter.filter_resources(rtype, resources)
             if not resources:
                 continue
             for p in self.policies:

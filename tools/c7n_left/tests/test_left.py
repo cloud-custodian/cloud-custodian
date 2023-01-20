@@ -452,3 +452,9 @@ def test_cli_output_json(tmp_path):
             },
         }
     ]
+
+
+class TestExecution:
+    def test_empty_parse(self):
+        filters = core.ExecutionFilter.parse(Config.empty(filters=None))
+        assert len(filters) == 0
