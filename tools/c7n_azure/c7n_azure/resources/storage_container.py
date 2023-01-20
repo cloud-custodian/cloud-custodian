@@ -132,7 +132,7 @@ class InsightOperationalLogsFilter(ValueFilter):
               - type: insight-operational-logs
                 key: properties.publicAccess
                 op: not-equal
-                value: None   # Possible values: Blob, Container, None
+                value: None   #Possible values: Blob, Container, None
     """
     schema = type_schema('insight-operational-logs', rinherit=ValueFilter.schema)
     
