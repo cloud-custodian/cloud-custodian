@@ -9,7 +9,7 @@ import click
 from c7n.config import Config
 
 from .entry import initialize_iac
-from .output import get_reporter, report_outputs
+from .output import get_reporter, report_outputs, summary_options
 from .core import CollectionRunner
 from .utils import load_policies
 
@@ -31,7 +31,8 @@ def cli():
 @click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
 @click.option("--output-file", type=click.File("w"), default="-")
 @click.option("--output-query", default=None)
-def run(format, policy_dir, directory, output, output_file, output_query):
+@click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
+def run(format, policy_dir, directory, output, output_file, output_query, summary):
     """evaluate policies against IaC sources.
 
     WARNING - CLI interface subject to change.
@@ -42,6 +43,7 @@ def run(format, policy_dir, directory, output, output_file, output_query):
         output=output,
         output_file=output_file,
         output_query=output_query,
+        summary=summary,
     )
     policies = load_policies(policy_dir, config)
     if not policies:
