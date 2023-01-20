@@ -308,6 +308,29 @@ def test_cli_output_rich(tmp_path):
     )
     assert result.exit_code == 1
     assert "Reason: a description\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
+def test_cli_output_rich_resource_summary(tmp_path):
+    write_output_test_policy(tmp_path)
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "--summary",
+            "resource",
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "Reason: a description\n" in result.output
+    assert "1 failed 2 passed" in result.output
 
 
 def test_cli_output_github(tmp_path):
