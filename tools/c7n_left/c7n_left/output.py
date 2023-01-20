@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 
 import jmespath
-from rich.console import Console, Group
+from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
@@ -140,6 +140,7 @@ class Summary(Output):
         self.counter_unevaluated_by_type = {}
         self.counter_resources_by_type = {}
         self.counter_resources_by_policy = {}
+        self.counter_policies_by_type = {}
         self.count_policy_matches = 0
         self.count_total_resources = 0
         self.resource_name_matches = set()
@@ -148,19 +149,24 @@ class Summary(Output):
         unevaluated = Counter()
         policy_resources = Counter()
         type_counts = Counter()
+        type_policies = Counter()
 
         resource_count = 0
         for rtype, resources in graph.get_resources_by_type():
+            if "_" not in rtype:
+                continue
             resource_count += len(resources)
             type_counts[rtype] = len(resources)
             for p in policies:
                 if not CollectionRunner.match_type(rtype, p):
                     unevaluated[rtype] = len(resources)
                 else:
+                    type_policies[rtype] += 1
                     policy_resources[p.name] = len(resources)
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
         self.counter_resources_by_policy = policy_resources
+        self.counter_policies_by_type = type_policies
         self.count_total_resources = resource_count
 
     def on_results(self, results):
@@ -269,29 +275,41 @@ class SummaryResource(Summary):
             self.resource_policy_matches.setdefault(r.resource.name, []).append(r)
 
     def on_execution_ended(self):
-        table = Table(title="Summary - By Resource", show_header=False)
+        table = Table(title="Summary - By Resource")
         table.add_column("type")
-        table.add_column("matches")
-        pnames = [p for p in self.policies]
-        keyfunc = lambda p: pnames.index(p.name)
-        rtypes = {n.split(".", 1)[0] for n in self.resource_policy_matches}
+        table.add_column("count")
+        table.add_column("policies")
+        table.add_column("evaluations")
+
+        rtypes = {n.split(".", 1)[0] for n in self.counter_resources_by_type}
 
         for rtype in sorted(rtypes):
+            if "_" not in rtype:
+                continue
             prefix = "%s." % rtype
             rmatches = [r for r in self.resource_policy_matches if r.startswith(prefix)]
-            rtables = []
-            for r in sorted(rmatches):
-                ptable = Table(
-                    title=r.split(".", 1)[-1], title_justify="left", show_header=False
+
+            pcount = self.counter_policies_by_type[rtype]
+            pcount_style = pcount and "gray" or "red"
+
+            eval_ok = self.counter_resources_by_type[rtype] - len(rmatches)
+            eval_fail = len(rmatches)
+
+            if pcount and eval_fail:
+                eval_msg = "[red]%d[/red] failed [green]%d[/green] passed" % (
+                    eval_fail,
+                    eval_ok,
                 )
-                ptable.add_column("Severity")
-                ptable.add_column("Policy")
-                for m in self.resource_policy_matches[r]:
-                    policy = self.policies[m.policy.name]
-                    severity, style = get_severity_color(policy)
-                    ptable.add_row(Text(severity, style=style), Text(policy.name))
-                rtables.append(ptable)
-            table.add_row(rtype, Group(*rtables))
+            elif pcount:
+                eval_msg = "[green]%d[/green] passed" % eval_ok
+            else:
+                eval_msg = "na"
+            table.add_row(
+                rtype,
+                "%s" % self.counter_resources_by_type[rtype],
+                Text(str(pcount), style=pcount_style),
+                eval_msg,
+            )
         self.console.print(table)
         super().on_execution_ended()
 
