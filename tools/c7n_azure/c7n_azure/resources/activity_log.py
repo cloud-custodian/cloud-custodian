@@ -1,4 +1,4 @@
-from collections import Iterator
+from collections.abc import Iterator
 import datetime
 
 from c7n_azure.provider import resources
