@@ -259,21 +259,22 @@ def test_multi_resource_policy(tmp_path):
     assert len(data["results"]) == 2
 
 
-def write_output_test_policy(tmp_path):
-    (tmp_path / "policy.json").write_text(
-        json.dumps(
-            {
-                "policies": [
-                    {
-                        "name": "check-bucket",
-                        "resource": "terraform.aws_s3_bucket",
-                        "description": "a description",
-                        "filters": [{"server_side_encryption_configuration": "absent"}],
-                    }
-                ]
-            }
-        )
+def write_output_test_policy(tmp_path, policy=None):
+    policies = (
+        policy
+        and {"policies": [policy]}
+        or {
+            "policies": [
+                {
+                    "name": "check-bucket",
+                    "resource": "terraform.aws_s3_bucket",
+                    "description": "a description",
+                    "filters": [{"server_side_encryption_configuration": "absent"}],
+                }
+            ]
+        }
     )
+    (tmp_path / "policy.json").write_text(json.dumps(policies))
 
 
 def test_cli_no_policies(tmp_path, caplog):
@@ -312,7 +313,14 @@ def test_cli_output_rich(tmp_path):
 
 
 def test_cli_output_rich_resource_summary(tmp_path):
-    write_output_test_policy(tmp_path)
+    write_output_test_policy(
+        tmp_path,
+        {
+            "name": "check-flow",
+            "resource": "terraform.aws_vpc",
+            "filters": [{"tags.Env": "Dev"}],
+        },
+    )
     runner = CliRunner()
     result = runner.invoke(
         cli.cli,
@@ -323,14 +331,15 @@ def test_cli_output_rich_resource_summary(tmp_path):
             "--summary",
             "resource",
             "-d",
-            str(terraform_dir / "aws_s3_encryption_audit"),
+            str(terraform_dir / "vpc_flow_logs"),
             "-o",
             "cli",
         ],
     )
     assert result.exit_code == 1
-    assert "Reason: a description\n" in result.output
-    assert "1 failed 2 passed" in result.output
+    assert "Summary - By Resource" in result.output
+    assert "1 failed 1 passed" in result.output
+    assert "1 compliant of 5 total" in result.output
 
 
 def test_cli_output_github(tmp_path):
