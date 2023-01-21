@@ -112,6 +112,7 @@ class Summary(Output):
         type_policies = Counter()
 
         resource_count = 0
+
         for rtype, resources in graph.get_resources_by_type():
             resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
@@ -127,6 +128,7 @@ class Summary(Output):
                 else:
                     type_policies[rtype] += 1
                     policy_resources[p.name] = len(resources)
+
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
         self.counter_resources_by_policy = policy_resources
@@ -139,11 +141,10 @@ class Summary(Output):
             self.resource_name_matches.add(r.resource.name)
 
     def on_execution_ended(self):
-        unevaluated = sum(self.counter_unevaluated_by_type.values())
+        unevaluated = sum([v for k, v in self.counter_unevaluated_by_type.items() if k not in set(self.counter_policies_by_type)])
         compliant = (
             self.count_total_resources - len(self.resource_name_matches) - unevaluated
         )
-
         msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
         if self.resource_name_matches:
             msg += ", %d resources have %d policy violations" % (
