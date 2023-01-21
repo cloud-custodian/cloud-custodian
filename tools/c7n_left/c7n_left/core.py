@@ -60,7 +60,7 @@ class PolicyMetadata:
 
     @property
     def severity(self):
-        return self.policy.data.get("metadata", {}).get("severity", "unknown").lower()
+        return self.policy.data.get("metadata", {}).get("severity", "").lower()
 
     @property
     def title(self):
@@ -141,7 +141,7 @@ class ExecutionFilter:
             return policies
 
         def filter_severity(p):
-            p_slevel = SEVERITY_LEVELS[p.severity]
+            p_slevel = SEVERITY_LEVELS[p.severity] or "unknown"
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
             return p_slevel <= f_slevel
 

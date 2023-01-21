@@ -51,7 +51,9 @@ def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(
         json.dumps({"policies": [policy]}, indent=2)
     )
-    config = Config.empty(policy_dir=tmp_path, source_dir=terraform_dir)
+    config = Config.empty(
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None
+    )
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -454,7 +456,35 @@ def test_cli_output_json(tmp_path):
     ]
 
 
+class PolicyLoad:
+    def __init__(self, policy_dir):
+        self.policy_dir = policy_dir
+
+    def get_policies(self):
+        config = Config.empty(policy_dir=self.policy_dir)
+        policies = utils.load_policies(self.policy_dir, config)
+        return policies
+
+    def get_graph(self, root_module):
+        return TerraformProvider().parse(root_module)
+
+    def write_policy(self, policy, path="policy.json"):
+        policy_file = self.policy_dir / path
+        extant = {"policies": []}
+        if policy_file.exists():
+            extant = json.loads(policy_file.read_text())
+        extant["policies"].append(policy)
+        policy_file.write_text(json.dumps(extant))
+
+
 class TestExecution:
+    @pytest.fixture
+    def policy_load(tmp_path):
+        return PolicyLoad(tmp_path)
+
     def test_empty_parse(self):
         filters = core.ExecutionFilter.parse(Config.empty(filters=None))
         assert len(filters) == 0
+
+    def test_resource_filter(self):
+        pass

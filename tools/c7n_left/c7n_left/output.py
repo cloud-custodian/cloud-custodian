@@ -141,7 +141,13 @@ class Summary(Output):
             self.resource_name_matches.add(r.resource.name)
 
     def on_execution_ended(self):
-        unevaluated = sum([v for k, v in self.counter_unevaluated_by_type.items() if k not in set(self.counter_policies_by_type)])
+        unevaluated = sum(
+            [
+                v
+                for k, v in self.counter_unevaluated_by_type.items()
+                if k not in set(self.counter_policies_by_type)
+            ]
+        )
         compliant = (
             self.count_total_resources - len(self.resource_name_matches) - unevaluated
         )
