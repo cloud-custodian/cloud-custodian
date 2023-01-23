@@ -31,6 +31,7 @@ pyyaml = ">=5.4.0"
 tabulate = "^0.8.6"
 importlib-metadata = ">=4.11.1"
 docutils = ">=0.14,<0.18"
+moto = "^4.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
