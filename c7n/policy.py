@@ -950,7 +950,10 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
     schema = utils.type_schema(
         'config-rule',
-        evaluation={'type': 'array', 'items': {'enum': ['proactive', 'detective']}},
+        evaluation={'oneOf': [
+            {'type': 'array', 'items': {'enum': ['preventative', 'detective']}},
+            {'enum': ['preventative', 'detective']}
+        ]},
         rinherit=LambdaMode.schema)
 
     def validate(self):
