@@ -76,9 +76,9 @@ class PolicyMetadata:
             return title
         title = f"{self.resource_type} - policy:{self.name}"
         if self.categories:
-            title += f"category:{self.display_category}"
+            title += f" category:{self.display_category}"
         if self.severity:
-            title += f"severity:{self.severity}"
+            title += f" severity:{self.severity}"
         return title
 
     def __repr__(self):
