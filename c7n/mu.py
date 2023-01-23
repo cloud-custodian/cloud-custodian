@@ -1728,6 +1728,8 @@ class ConfigRule(AWSEventBase):
                 'MessageType': 'ScheduledNotification'
             }]
             params['MaximumExecutionFrequency'] = self.data['schedule']
+        if self.data.get('evaluation'):
+            params['EvaluationModes'] = [{'Mode': e.upper()} for e in self.data['evaluation']]
         return params
 
     def get(self, rule_name):
