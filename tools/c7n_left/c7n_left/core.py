@@ -55,8 +55,15 @@ class PolicyMetadata:
         return self.policy.data.get("description")
 
     @property
-    def category(self):
-        return " ".join(self.policy.data.get("metadata", {}).get("category", []))
+    def display_category(self):
+        return " ".join(self.categories)
+
+    @property
+    def categories(self):
+        categories = self.policy.data.get("metadata", {}).get("category", [])
+        if isinstance(categories, str):
+            categories = [categories]
+        return categories
 
     @property
     def severity(self):
@@ -68,11 +75,14 @@ class PolicyMetadata:
         if title:
             return title
         title = f"{self.resource_type} - policy:{self.name}"
-        if self.category:
-            title += f"category:{self.category}"
+        if self.categories:
+            title += f"category:{self.display_category}"
         if self.severity:
             title += f"severity:{self.severity}"
         return title
+
+    def __repr__(self):
+        return "<PolicyMetadata name:%s resource:%s>" % (self.name, self.resource_type)
 
 
 class ExecutionFilter:
@@ -120,16 +130,24 @@ class ExecutionFilter:
             )
 
     def filter_attribute(self, filter_name, attribute, items):
-        if not self.filters[attribute] or not items:
+        if not self.filters[filter_name] or not items:
             return items
         results = []
         op_class = (
             isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
         )
         op = op_class(attribute)
-        for f in self.filters[attribute]:
+        for f in self.filters[filter_name]:
             for i in items:
-                if fnmatch.fnmatch(op(i), f):
+                v = op(i)
+                if not v:
+                    continue
+                elif isinstance(v, list):
+                    for el in v:
+                        if fnmatch.fnmatch(el, f):
+                            results.append(i)
+                            break
+                elif fnmatch.fnmatch(v, f):
                     results.append(i)
         return results
 
@@ -141,7 +159,7 @@ class ExecutionFilter:
             return policies
 
         def filter_severity(p):
-            p_slevel = SEVERITY_LEVELS[p.severity] or "unknown"
+            p_slevel = SEVERITY_LEVELS[p.severity or "unknown"]
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
             return p_slevel <= f_slevel
 
@@ -161,7 +179,7 @@ class ExecutionFilter:
     def filter_policies(self, policies):
         policies = list(map(PolicyMetadata, policies))
         policies = self.filter_attribute("policy", "name", policies)
-        policies = self.filter_attribute("category", "category", policies)
+        policies = self.filter_attribute("category", "categories", policies)
         policies = self._filter_policy_severity(policies)
         return [pm.policy for pm in policies]
 

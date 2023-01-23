@@ -456,7 +456,7 @@ def test_cli_output_json(tmp_path):
     ]
 
 
-class PolicyLoad:
+class PolicyEnv:
     def __init__(self, policy_dir):
         self.policy_dir = policy_dir
 
@@ -468,6 +468,9 @@ class PolicyLoad:
     def get_graph(self, root_module):
         return TerraformProvider().parse(root_module)
 
+    def get_selection(self, filter_expression):
+        return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
+
     def write_policy(self, policy, path="policy.json"):
         policy_file = self.policy_dir / path
         extant = {"policies": []}
@@ -477,14 +480,84 @@ class PolicyLoad:
         policy_file.write_text(json.dumps(extant))
 
 
-class TestExecution:
+class TestSelection:
     @pytest.fixture
-    def policy_load(tmp_path):
-        return PolicyLoad(tmp_path)
+    def policy_env(self, tmp_path):
+        return PolicyEnv(tmp_path)
 
-    def test_empty_parse(self):
-        filters = core.ExecutionFilter.parse(Config.empty(filters=None))
-        assert len(filters) == 0
+    def test_parse(self, policy_env):
+        selection = policy_env.get_selection(None)
+        assert len(selection) == 0
 
-    def test_resource_filter(self):
-        pass
+        selection = policy_env.get_selection("type=aws_flog_log,aws_iam_*")
+        assert selection.filters["type"] == ["aws_flog_log", "aws_iam_*"]
+
+        selection = policy_env.get_selection("type=aws_flow_log severity=high")
+        assert dict(selection.filters) == {
+            "type": ["aws_flow_log"],
+            "severity": ["high"],
+        }
+
+        # check some value errors
+        with pytest.raises(ValueError) as err:
+            policy_env.get_selection("cotegory=abc")
+        assert "unsupported filter" in str(err.value)
+
+        with pytest.raises(ValueError) as err:
+            policy_env.get_selection("severity=check")
+        assert "invalid severity" in str(err.value)
+
+        with pytest.raises(ValueError) as err:
+            policy_env.get_selection("xyz")
+        assert "key=value pair missing" in str(err)
+
+    def test_resource_filter(self, policy_env):
+        selection = policy_env.get_selection("type=aws_vpc id=example")
+        graph = policy_env.get_graph(terraform_dir / "vpc_flow_logs")
+        (rtype, resources) = list(graph.get_resources_by_type("aws_flow_log"))[0]
+        assert selection.filter_resources(rtype, resources) == []
+
+        for rtype, resources in graph.get_resources_by_type():
+            resources = selection.filter_resources(rtype, resources)
+            if rtype != "aws_vpc":
+                assert not resources
+            else:
+                assert len(resources) == 1
+                break
+        assert resources[0]["__tfmeta"]["path"] == "aws_vpc.example"
+
+    def test_policy_filter(self, policy_env):
+        policy_env.write_policy(
+            {
+                "name": "test-a",
+                "resource": "terraform.aws_vpc",
+            }
+        )
+        policy_env.write_policy(
+            {
+                "name": "test-b",
+                "resource": "terraform.aws_log_group",
+                "metadata": {"severity": "high", "category": "encryption"},
+            }
+        )
+        policy_env.write_policy(
+            {
+                "name": "test-c",
+                "resource": "terraform.aws_ebs_volume",
+                "metadata": {"severity": "high", "category": ["encryption", "cost"]},
+            }
+        )
+
+        policies = policy_env.get_policies()
+
+        selection = policy_env.get_selection("severity=low")
+        assert {p.name for p in selection.filter_policies(policies)} == {
+            "test-b",
+            "test-c",
+        }
+
+        selection = policy_env.get_selection("category=cost")
+        assert {p.name for p in selection.filter_policies(policies)} == {"test-c"}
+
+        selection = policy_env.get_selection("policy=test-a")
+        assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
