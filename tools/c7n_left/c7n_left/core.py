@@ -171,7 +171,7 @@ class ExecutionFilter:
         # since its a controlled vocab.
         fseverities = set(self.filters["severity"])
         for p in policies:
-            if p.serverity not in fseverities:
+            if (p.severity or "unknown") not in fseverities:
                 continue
             results.append(p)
         return results

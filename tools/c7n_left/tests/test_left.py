@@ -343,6 +343,40 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_selection(tmp_path):
+    write_output_test_policy(
+        tmp_path,
+        {
+            "name": "check-flow",
+            "resource": "terraform.aws_vpc",
+            "filters": [{"tags.Env": "Dev"}],
+        },
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "--filters",
+            "type=aws_vpc",
+            "--summary",
+            "resource",
+            "-d",
+            str(terraform_dir / "vpc_flow_logs"),
+            "-o",
+            "cli",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "Summary - By Resource" in result.output
+    assert "1 failed 1 passed" in result.output
+    assert "1 compliant of 2 total" in result.output
+
+
 def test_cli_output_rich_resource_summary(tmp_path):
     write_output_test_policy(
         tmp_path,
@@ -592,6 +626,13 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("severity=low")
     assert {p.name for p in selection.filter_policies(policies)} == {
+        "test-b",
+        "test-c",
+    }
+
+    selection = policy_env.get_selection("severity=high,unknown")
+    assert {p.name for p in selection.filter_policies(policies)} == {
+        "test-a",
         "test-b",
         "test-c",
     }
