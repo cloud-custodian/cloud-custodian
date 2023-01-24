@@ -1,0 +1,268 @@
+{
+  "typeName": "AWS::CloudTrail::EventDataStore",
+  "description": "A storage lake of event data against which you can run complex SQL-based queries. An event data store can include events that you have logged on your account from the last 90 to 2555 days (about three months to up to seven years).",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-cloudtrail.git",
+  "definitions": {
+    "AdvancedFieldSelector": {
+      "description": "A single selector statement in an advanced event selector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Field": {
+          "description": "A field in an event record on which to filter events to be logged. Supported fields include readOnly, eventCategory, eventSource (for management events), eventName, resources.type, and resources.ARN.",
+          "type": "string",
+          "pattern": "([\\w|\\d|\\.|_]+)",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "Equals": {
+          "description": "An operator that includes events that match the exact value of the event record field specified as the value of Field. This is the only valid operator that you can use with the readOnly, eventCategory, and resources.type fields.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "StartsWith": {
+          "description": "An operator that includes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "EndsWith": {
+          "description": "An operator that includes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotEquals": {
+          "description": "An operator that excludes events that match the exact value of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotStartsWith": {
+          "description": "An operator that excludes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotEndsWith": {
+          "description": "An operator that excludes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        }
+      },
+      "required": [
+        "Field"
+      ]
+    },
+    "AdvancedEventSelector": {
+      "description": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record ?elds. They help you control costs by logging only those events that are important to you.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "description": "An optional, descriptive name for an advanced event selector, such as \"Log data events for only two S3 buckets\".",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "FieldSelectors": {
+          "description": "Contains all selector statements in an advanced event selector.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/AdvancedFieldSelector"
+          }
+        }
+      },
+      "required": [
+        "FieldSelectors"
+      ]
+    },
+    "Tag": {
+      "description": "An arbitrary set of tags (key-value pairs) for this event data store.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string"
+        },
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    },
+    "Timestamp": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "AdvancedEventSelectors": {
+      "description": "The advanced event selectors that were used to select events for the data store.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AdvancedEventSelector"
+      },
+      "uniqueItems": true,
+      "insertionOrder": false
+    },
+    "CreatedTimestamp": {
+      "description": "The timestamp of the event data store's creation.",
+      "$ref": "#/definitions/Timestamp"
+    },
+    "EventDataStoreArn": {
+      "description": "The ARN of the event data store.",
+      "type": "string"
+    },
+    "MultiRegionEnabled": {
+      "description": "Indicates whether the event data store includes events from all regions, or only from the region in which it was created.",
+      "type": "boolean"
+    },
+    "Name": {
+      "description": "The name of the event data store.",
+      "type": "string"
+    },
+    "OrganizationEnabled": {
+      "description": "Indicates that an event data store is collecting logged events for an organization.",
+      "type": "boolean"
+    },
+    "RetentionPeriod": {
+      "description": "The retention period, in days.",
+      "type": "integer"
+    },
+    "Status": {
+      "description": "The status of an event data store. Values are ENABLED and PENDING_DELETION.",
+      "type": "string"
+    },
+    "TerminationProtectionEnabled": {
+      "description": "Indicates whether the event data store is protected from termination.",
+      "type": "boolean"
+    },
+    "UpdatedTimestamp": {
+      "description": "The timestamp showing when an event data store was updated, if applicable. UpdatedTimestamp is always either the same or newer than the time shown in CreatedTimestamp.",
+      "$ref": "#/definitions/Timestamp"
+    },
+    "KmsKeyId": {
+      "description": "Specifies the KMS key ID to use to encrypt the events delivered by CloudTrail. The value can be an alias name prefixed by 'alias/', a fully specified ARN to an alias, a fully specified ARN to a key, or a globally unique identifier.",
+      "type": "string"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "required": [],
+  "readOnlyProperties": [
+    "/properties/EventDataStoreArn",
+    "/properties/CreatedTimestamp",
+    "/properties/UpdatedTimestamp",
+    "/properties/Status"
+  ],
+  "primaryIdentifier": [
+    "/properties/EventDataStoreArn"
+  ],
+  "propertyTransform": {
+    "/properties/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", KmsKeyId])"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "CloudTrail:CreateEventDataStore",
+        "CloudTrail:AddTags",
+        "iam:PassRole",
+        "iam:GetRole",
+        "iam:CreateServiceLinkedRole",
+        "organizations:DescribeOrganization",
+        "organizations:ListAWSServiceAccessForOrganization"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "CloudTrail:GetEventDataStore",
+        "CloudTrail:ListEventDataStores",
+        "CloudTrail:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "CloudTrail:UpdateEventDataStore",
+        "CloudTrail:RestoreEventDataStore",
+        "CloudTrail:AddTags",
+        "CloudTrail:RemoveTags",
+        "iam:PassRole",
+        "iam:GetRole",
+        "iam:CreateServiceLinkedRole",
+        "organizations:DescribeOrganization",
+        "organizations:ListAWSServiceAccessForOrganization"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "CloudTrail:DeleteEventDataStore"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "CloudTrail:ListEventDataStores",
+        "CloudTrail:GetEventDataStore",
+        "CloudTrail:ListTags"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

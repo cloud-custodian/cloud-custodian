@@ -209,6 +209,13 @@
         "route53resolver:ListTagsForResource"
       ]
     },
+    "list": {
+      "permissions": [
+        "route53resolver:ListFirewallRules",
+        "route53resolver:GetFirewallRuleGroup",
+        "route53resolver:TagResource"
+      ]
+    },
     "delete": {
       "permissions": [
         "route53resolver:DeleteFirewallRuleGroup",

@@ -61,6 +61,12 @@
     "Destination": {
       "type": "string"
     },
+    "SourceArn": {
+      "type": "string"
+    },
+    "DestinationArn": {
+      "type": "string"
+    },
     "Protocol": {
       "$ref": "#/definitions/Protocol"
     },
@@ -84,7 +90,9 @@
   "readOnlyProperties": [
     "/properties/NetworkInsightsPathId",
     "/properties/NetworkInsightsPathArn",
-    "/properties/CreatedDate"
+    "/properties/CreatedDate",
+    "/properties/SourceArn",
+    "/properties/DestinationArn"
   ],
   "primaryIdentifier": [
     "/properties/NetworkInsightsPathId"

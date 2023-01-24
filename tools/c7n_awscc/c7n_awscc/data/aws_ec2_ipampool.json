@@ -147,6 +147,13 @@
         "$ref": "#/definitions/ProvisionedCidr"
       }
     },
+    "AwsService": {
+      "description": "Limits which service in Amazon Web Services that the pool can be used in.",
+      "type": "string",
+      "enum": [
+        "ec2"
+      ]
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
       "type": "array",
@@ -178,15 +185,13 @@
     "/properties/State",
     "/properties/StateMessage"
   ],
-  "writeOnlyProperties": [
-    "/properties/IpamScopeId"
-  ],
   "createOnlyProperties": [
     "/properties/IpamScopeId",
     "/properties/SourceIpamPoolId",
     "/properties/Locale",
     "/properties/AddressFamily",
-    "/properties/PubliclyAdvertisable"
+    "/properties/PubliclyAdvertisable",
+    "/properties/AwsService"
   ],
   "handlers": {
     "create": {

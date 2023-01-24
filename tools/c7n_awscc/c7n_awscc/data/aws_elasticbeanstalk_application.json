@@ -1,0 +1,126 @@
+{
+  "typeName": "AWS::ElasticBeanstalk::Application",
+  "description": "The AWS::ElasticBeanstalk::Application resource specifies an Elastic Beanstalk application.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-elasticbeanstalk.git",
+  "properties": {
+    "ApplicationName": {
+      "description": "A name for the Elastic Beanstalk application. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the application name.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "Your description of the application.",
+      "type": "string"
+    },
+    "ResourceLifecycleConfig": {
+      "description": "Specifies an application resource lifecycle configuration to prevent your application from accumulating too many versions.",
+      "$ref": "#/definitions/ApplicationResourceLifecycleConfig"
+    }
+  },
+  "definitions": {
+    "ApplicationResourceLifecycleConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ServiceRole": {
+          "description": "The ARN of an IAM service role that Elastic Beanstalk has permission to assume. The ServiceRole property is required the first time that you provide a ResourceLifecycleConfig for the application. After you provide it once, Elastic Beanstalk persists the Service Role with the application, and you don't need to specify it again. You can, however, specify it in subsequent updates to change the Service Role to another value.",
+          "type": "string"
+        },
+        "VersionLifecycleConfig": {
+          "description": "Defines lifecycle settings for application versions.",
+          "$ref": "#/definitions/ApplicationVersionLifecycleConfig"
+        }
+      }
+    },
+    "ApplicationVersionLifecycleConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxAgeRule": {
+          "description": "Specify a max age rule to restrict the length of time that application versions are retained for an application.",
+          "$ref": "#/definitions/MaxAgeRule"
+        },
+        "MaxCountRule": {
+          "description": "Specify a max count rule to restrict the number of application versions that are retained for an application.",
+          "$ref": "#/definitions/MaxCountRule"
+        }
+      }
+    },
+    "MaxAgeRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DeleteSourceFromS3": {
+          "description": "Set to true to delete a version's source bundle from Amazon S3 when Elastic Beanstalk deletes the application version.",
+          "type": "boolean"
+        },
+        "Enabled": {
+          "description": "Specify true to apply the rule, or false to disable it.",
+          "type": "boolean"
+        },
+        "MaxAgeInDays": {
+          "description": "Specify the number of days to retain an application versions.",
+          "type": "integer"
+        }
+      }
+    },
+    "MaxCountRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DeleteSourceFromS3": {
+          "description": "Set to true to delete a version's source bundle from Amazon S3 when Elastic Beanstalk deletes the application version.",
+          "type": "boolean"
+        },
+        "Enabled": {
+          "description": "Specify true to apply the rule, or false to disable it.",
+          "type": "boolean"
+        },
+        "MaxCount": {
+          "description": "Specify the maximum number of application versions to retain.",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "createOnlyProperties": [
+    "/properties/ApplicationName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApplicationName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "elasticbeanstalk:CreateApplication"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "elasticbeanstalk:DescribeApplications"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "elasticbeanstalk:UpdateApplication",
+        "elasticbeanstalk:UpdateApplicationResourceLifecycle"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "elasticbeanstalk:DeleteApplication"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "elasticbeanstalk:DescribeApplications"
+      ]
+    }
+  }
+}

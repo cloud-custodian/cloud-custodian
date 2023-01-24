@@ -24,6 +24,10 @@
       "minLength": 0,
       "maxLength": 160
     },
+    "RunningStatus": {
+      "description": "Start Experiment. Default is False",
+      "$ref": "#/definitions/RunningStatusObject"
+    },
     "RandomizationSalt": {
       "type": "string",
       "minLength": 0,
@@ -58,6 +62,15 @@
     "OnlineAbConfig": {
       "$ref": "#/definitions/OnlineAbConfigObject"
     },
+    "Segment": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 2048,
+      "pattern": "([-a-zA-Z0-9._]*)|(arn:[^:]*:[^:]*:[^:]*:[^:]*:segment/[-a-zA-Z0-9._]*)"
+    },
+    "RemoveSegment": {
+      "type": "boolean"
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
       "type": "array",
@@ -69,6 +82,44 @@
     }
   },
   "definitions": {
+    "RunningStatusObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Status": {
+          "description": "Provide START or STOP action to apply on an experiment",
+          "type": "string"
+        },
+        "AnalysisCompleteTime": {
+          "description": "Provide the analysis Completion time for an experiment",
+          "type": "string"
+        },
+        "Reason": {
+          "description": "Reason is a required input for stopping the experiment",
+          "type": "string"
+        },
+        "DesiredState": {
+          "description": "Provide CANCELLED or COMPLETED desired state when stopping an experiment",
+          "type": "string",
+          "pattern": "^(CANCELLED|COMPLETED)"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "Status",
+            "AnalysisCompleteTime"
+          ]
+        },
+        {
+          "required": [
+            "Status",
+            "Reason",
+            "DesiredState"
+          ]
+        }
+      ]
+    },
     "TreatmentObject": {
       "type": "object",
       "properties": {
@@ -138,7 +189,6 @@
         "MetricName",
         "EntityIdKey",
         "ValueKey",
-        "EventPattern",
         "DesiredChange"
       ],
       "additionalProperties": false
@@ -231,7 +281,9 @@
     "create": {
       "permissions": [
         "evidently:CreateExperiment",
-        "evidently:TagResource"
+        "evidently:TagResource",
+        "evidently:GetExperiment",
+        "evidently:StartExperiment"
       ]
     },
     "read": {
@@ -244,13 +296,17 @@
       "permissions": [
         "evidently:UpdateExperiment",
         "evidently:TagResource",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetExperiment",
+        "evidently:StartExperiment",
+        "evidently:StopExperiment"
       ]
     },
     "delete": {
       "permissions": [
         "evidently:DeleteExperiment",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetExperiment"
       ]
     }
   },

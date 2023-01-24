@@ -1,0 +1,134 @@
+{
+  "typeName": "AWS::BillingConductor::PricingPlan",
+  "description": "Pricing Plan enables you to customize your billing details consistent with the usage that accrues in each of your billing groups.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-billing-conductor.git",
+  "definitions": {
+    "PricingRuleArn": {
+      "description": "Pricing Rule ARN",
+      "type": "string",
+      "pattern": "arn:aws(-cn)?:billingconductor::[0-9]{12}:pricingrule/[a-zA-Z0-9]{10}"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "description": "Pricing Plan ARN",
+      "type": "string",
+      "pattern": "arn:aws(-cn)?:billingconductor::[0-9]{12}:pricingplan/[a-zA-Z0-9]{10}"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z0-9_\\+=\\.\\-@]+"
+    },
+    "PricingRuleArns": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/PricingRuleArn"
+      }
+    },
+    "Size": {
+      "type": "integer",
+      "description": "Number of associated pricing rules"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "CreationTime": {
+      "description": "Creation timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "LastModifiedTime": {
+      "description": "Latest modified timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Size",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "billingconductor:CreatePricingPlan",
+        "billingconductor:AssociatePricingRules"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "billingconductor:ListPricingPlans",
+        "billingconductor:ListPricingRulesAssociatedToPricingPlan",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "billingconductor:ListPricingPlans",
+        "billingconductor:ListPricingRulesAssociatedToPricingPlan",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "billingconductor:ListPricingPlans",
+        "billingconductor:UpdatePricingPlan",
+        "billingconductor:ListPricingRulesAssociatedToPricingPlan",
+        "billingconductor:AssociatePricingRules",
+        "billingconductor:DisassociatePricingRules",
+        "billingconductor:TagResource",
+        "billingconductor:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "billingconductor:DeletePricingPlan"
+      ]
+    }
+  }
+}

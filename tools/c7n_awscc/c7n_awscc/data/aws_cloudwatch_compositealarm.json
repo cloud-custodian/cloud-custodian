@@ -63,10 +63,25 @@
       },
       "description": "The actions to execute when this alarm transitions to the INSUFFICIENT_DATA state from any other state. Each action is specified as an Amazon Resource Name (ARN).",
       "maxItems": 5
+    },
+    "ActionsSuppressor": {
+      "description": "Actions will be suppressed if the suppressor alarm is in the ALARM state. ActionsSuppressor can be an AlarmName or an Amazon Resource Name (ARN) from an existing alarm. ",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1600
+    },
+    "ActionsSuppressorWaitPeriod": {
+      "description": "Actions will be suppressed if ExtensionPeriod is active. The length of time that actions are suppressed is in seconds.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "ActionsSuppressorExtensionPeriod": {
+      "description": "Actions will be suppressed if WaitPeriod is active. The length of time that actions are suppressed is in seconds.",
+      "type": "integer",
+      "minimum": 0
     }
   },
   "required": [
-    "AlarmName",
     "AlarmRule"
   ],
   "readOnlyProperties": [
@@ -108,5 +123,8 @@
         "cloudwatch:DescribeAlarms"
       ]
     }
+  },
+  "tagging": {
+    "taggable": false
   }
 }

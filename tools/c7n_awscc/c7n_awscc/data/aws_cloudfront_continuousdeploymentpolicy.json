@@ -1,0 +1,168 @@
+{
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "cloudfront:GetContinuousDeploymentPolicy"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "cloudfront:CreateContinuousDeploymentPolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cloudfront:UpdateContinuousDeploymentPolicy"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cloudfront:ListContinuousDeploymentPolicies"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cloudfront:DeleteContinuousDeploymentPolicy"
+      ]
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/LastModifiedTime"
+  ],
+  "typeName": "AWS::CloudFront::ContinuousDeploymentPolicy",
+  "description": "Resource Type definition for AWS::CloudFront::ContinuousDeploymentPolicy",
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "definitions": {
+    "SingleWeightConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SessionStickinessConfig": {
+          "$ref": "#/definitions/SessionStickinessConfig"
+        },
+        "Weight": {
+          "multipleOf": 0.01,
+          "maximum": 1,
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "Weight"
+      ]
+    },
+    "ContinuousDeploymentPolicyConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "StagingDistributionDnsNames": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "TrafficConfig": {
+          "$ref": "#/definitions/TrafficConfig"
+        }
+      },
+      "required": [
+        "Enabled",
+        "StagingDistributionDnsNames"
+      ]
+    },
+    "SingleHeaderConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Header": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 256
+        },
+        "Value": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 1783
+        }
+      },
+      "required": [
+        "Header",
+        "Value"
+      ]
+    },
+    "SessionStickinessConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "IdleTTL": {
+          "multipleOf": 1,
+          "maximum": 3600,
+          "type": "integer",
+          "minimum": 300
+        },
+        "MaximumTTL": {
+          "multipleOf": 1,
+          "maximum": 3600,
+          "type": "integer",
+          "minimum": 300
+        }
+      },
+      "required": [
+        "IdleTTL",
+        "MaximumTTL"
+      ]
+    },
+    "TrafficConfig": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SingleWeightConfig": {
+          "$ref": "#/definitions/SingleWeightConfig"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "SingleWeight",
+            "SingleHeader"
+          ]
+        },
+        "SingleHeaderConfig": {
+          "$ref": "#/definitions/SingleHeaderConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ]
+    }
+  },
+  "properties": {
+    "ContinuousDeploymentPolicyConfig": {
+      "$ref": "#/definitions/ContinuousDeploymentPolicyConfig"
+    },
+    "LastModifiedTime": {
+      "type": "string"
+    },
+    "Id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ContinuousDeploymentPolicyConfig"
+  ]
+}

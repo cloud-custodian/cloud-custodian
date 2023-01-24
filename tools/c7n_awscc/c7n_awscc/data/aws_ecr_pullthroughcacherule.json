@@ -1,0 +1,98 @@
+{
+  "typeName": "AWS::ECR::PullThroughCacheRule",
+  "description": "The AWS::ECR::PullThroughCacheRule resource configures the upstream registry configuration details for an Amazon Elastic Container Registry (Amazon Private ECR) pull-through cache.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ecr.git",
+  "definitions": {
+    "PullThroughCacheRule": {
+      "minItems": 0,
+      "maxItems": 25,
+      "type": "object",
+      "properties": {
+        "RegistryId": {
+          "$ref": "#/definitions/RegistryId"
+        },
+        "EcrRepositoryPrefix": {
+          "$ref": "#/definitions/EcrRepositoryPrefix"
+        },
+        "UpstreamRegistryUrl": {
+          "$ref": "#/definitions/UpstreamRegistryUrl"
+        }
+      },
+      "required": [
+        "EcrRepositoryPrefix",
+        "UpstreamRegistryUrl"
+      ],
+      "additionalProperties": false
+    },
+    "RegistryId": {
+      "type": "string",
+      "description": "The account ID of the registry pull-through cache repository will be created in.",
+      "pattern": "^[0-9]{12}$"
+    },
+    "EcrRepositoryPrefix": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 20,
+      "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
+      "pattern": "^([a-z0-9]+(?:[._-][a-z0-9]+)*)$"
+    },
+    "UpstreamRegistryUrl": {
+      "type": "string",
+      "description": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached"
+    }
+  },
+  "properties": {
+    "EcrRepositoryPrefix": {
+      "type": "string",
+      "description": "The ECRRepositoryPrefix is a custom alias for upstream registry url.",
+      "minLength": 2,
+      "maxLength": 20,
+      "pattern": "^([a-z0-9]+(?:[._-][a-z0-9]+)*)$"
+    },
+    "UpstreamRegistryUrl": {
+      "type": "string",
+      "description": "The upstreamRegistryUrl is the endpoint of upstream registry url of the public repository to be cached"
+    }
+  },
+  "taggable": false,
+  "primaryIdentifier": [
+    "/properties/EcrRepositoryPrefix"
+  ],
+  "createOnlyProperties": [
+    "/properties/EcrRepositoryPrefix",
+    "/properties/UpstreamRegistryUrl"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ecr:DescribePullThroughCacheRules",
+        "ecr:CreatePullThroughCacheRule",
+        "ecr:DeletePullThroughCacheRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ecr:DescribePullThroughCacheRules"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ecr:DescribePullThroughCacheRules",
+        "ecr:CreatePullThroughCacheRule",
+        "ecr:DeletePullThroughCacheRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ecr:DescribePullThroughCacheRules",
+        "ecr:DeletePullThroughCacheRule"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ecr:DescribePullThroughCacheRules"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -41,6 +41,10 @@
       "maxLength": 256,
       "pattern": "^arn:[a-z0-9-]+:kms:[a-z0-9-]+:\\d{12}:(key|alias)/.+\\Z"
     },
+    "DataProtectionPolicy": {
+      "description": "The body of the policy document you want to use for this topic.\n\nYou can only add one policy per topic.\n\nThe policy must be in JSON string format.\n\nLength Constraints: Maximum length of 30720",
+      "type": "object"
+    },
     "RetentionInDays": {
       "description": "The number of days to retain the log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.",
       "type": "integer",
@@ -61,6 +65,10 @@
         545,
         731,
         1827,
+        2192,
+        2557,
+        2922,
+        3288,
         3653
       ]
     },
@@ -84,13 +92,21 @@
         "logs:DescribeLogGroups",
         "logs:CreateLogGroup",
         "logs:PutRetentionPolicy",
-        "logs:TagLogGroup"
+        "logs:TagLogGroup",
+        "logs:GetDataProtectionPolicy",
+        "logs:PutDataProtectionPolicy",
+        "logs:CreateLogDelivery",
+        "s3:REST.PUT.OBJECT",
+        "firehose:TagDeliveryStream",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies"
       ]
     },
     "read": {
       "permissions": [
         "logs:DescribeLogGroups",
-        "logs:ListTagsLogGroup"
+        "logs:ListTagsLogGroup",
+        "logs:GetDataProtectionPolicy"
       ]
     },
     "update": {
@@ -101,13 +117,19 @@
         "logs:PutRetentionPolicy",
         "logs:DeleteRetentionPolicy",
         "logs:TagLogGroup",
-        "logs:UntagLogGroup"
+        "logs:UntagLogGroup",
+        "logs:GetDataProtectionPolicy",
+        "logs:PutDataProtectionPolicy",
+        "logs:CreateLogDelivery",
+        "s3:REST.PUT.OBJECT",
+        "firehose:TagDeliveryStream"
       ]
     },
     "delete": {
       "permissions": [
         "logs:DescribeLogGroups",
-        "logs:DeleteLogGroup"
+        "logs:DeleteLogGroup",
+        "logs:DeleteDataProtectionPolicy"
       ]
     },
     "list": {
@@ -127,5 +149,11 @@
     "/properties/LogGroupName"
   ],
   "additionalProperties": false,
-  "taggable": true
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  }
 }

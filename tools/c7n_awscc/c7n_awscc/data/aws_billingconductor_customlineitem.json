@@ -1,0 +1,239 @@
+{
+  "typeName": "AWS::BillingConductor::CustomLineItem",
+  "description": "A custom line item is an one time charge that is applied to a specific billing group's bill.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-billing-conductor.git",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "Type": {
+      "type": "string",
+      "enum": [
+        "FEE",
+        "CREDIT"
+      ]
+    },
+    "CustomLineItemPercentageChargeDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ChildAssociatedResources": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "(arn:aws(-cn)?:billingconductor::[0-9]{12}:(customlineitem|billinggroup)/)?[a-zA-Z0-9]{10,12}"
+          }
+        },
+        "PercentageValue": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      },
+      "required": [
+        "PercentageValue"
+      ]
+    },
+    "CustomLineItemFlatChargeDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ChargeValue": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000
+        }
+      },
+      "required": [
+        "ChargeValue"
+      ]
+    },
+    "CustomLineItemChargeDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Flat": {
+          "$ref": "#/definitions/CustomLineItemFlatChargeDetails"
+        },
+        "Percentage": {
+          "$ref": "#/definitions/CustomLineItemPercentageChargeDetails"
+        },
+        "Type": {
+          "$ref": "#/definitions/Type"
+        }
+      },
+      "required": [
+        "Type"
+      ]
+    },
+    "InclusiveStartBillingPeriod": {
+      "type": "string",
+      "pattern": "\\d{4}-(0?[1-9]|1[012])"
+    },
+    "ExclusiveEndBillingPeriod": {
+      "type": "string",
+      "pattern": "\\d{4}-(0?[1-9]|1[012])"
+    },
+    "BillingPeriodRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "InclusiveStartBillingPeriod": {
+          "$ref": "#/definitions/InclusiveStartBillingPeriod"
+        },
+        "ExclusiveEndBillingPeriod": {
+          "$ref": "#/definitions/ExclusiveEndBillingPeriod"
+        }
+      }
+    }
+  },
+  "properties": {
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z0-9_\\+=\\.\\-@]+"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "CustomLineItemChargeDetails": {
+      "$ref": "#/definitions/CustomLineItemChargeDetails"
+    },
+    "BillingGroupArn": {
+      "description": "Billing Group ARN",
+      "type": "string",
+      "pattern": "arn:aws(-cn)?:billingconductor::[0-9]{12}:billinggroup/?[0-9]{12}"
+    },
+    "BillingPeriodRange": {
+      "$ref": "#/definitions/BillingPeriodRange"
+    },
+    "Arn": {
+      "description": "ARN",
+      "type": "string",
+      "pattern": "(arn:aws(-cn)?:billingconductor::[0-9]{12}:customlineitem/)?[a-zA-Z0-9]{10}"
+    },
+    "CreationTime": {
+      "description": "Creation timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "LastModifiedTime": {
+      "description": "Latest modified timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "AssociationSize": {
+      "description": "Number of source values associated to this custom line item",
+      "type": "integer"
+    },
+    "ProductCode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 29
+    },
+    "CurrencyCode": {
+      "type": "string",
+      "enum": [
+        "USD",
+        "CNY"
+      ]
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name",
+    "BillingGroupArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime",
+    "/properties/AssociationSize",
+    "/properties/CurrencyCode",
+    "/properties/ProductCode"
+  ],
+  "createOnlyProperties": [
+    "/properties/BillingGroupArn",
+    "/properties/BillingPeriodRange/InclusiveStartBillingPeriod",
+    "/properties/BillingPeriodRange/ExclusiveEndBillingPeriod",
+    "/properties/CustomLineItemChargeDetails/Type"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "billingconductor:CreateCustomLineItem",
+        "billingconductor:BatchAssociateResourcesToCustomLineItem",
+        "billingconductor:ListCustomLineItems"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "billingconductor:ListCustomLineItems",
+        "billingconductor:ListResourcesAssociatedToCustomLineItem",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "billingconductor:ListCustomLineItems",
+        "billingconductor:ListResourcesAssociatedToCustomLineItem",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "billingconductor:UpdateCustomLineItem",
+        "billingconductor:ListCustomLineItems",
+        "billingconductor:ListResourcesAssociatedToCustomLineItem",
+        "billingconductor:BatchAssociateResourcesToCustomLineItem",
+        "billingconductor:BatchDisassociateResourcesFromCustomLineItem",
+        "billingconductor:TagResource",
+        "billingconductor:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "billingconductor:DeleteCustomLineItem",
+        "billingconductor:BatchDisassociateResourcesFromCustomLineItem",
+        "billingconductor:ListResourcesAssociatedToCustomLineItem"
+      ]
+    }
+  }
+}

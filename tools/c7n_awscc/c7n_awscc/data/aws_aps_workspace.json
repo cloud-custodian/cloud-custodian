@@ -25,13 +25,26 @@
         "Value"
       ],
       "additionalProperties": false
+    },
+    "LoggingConfiguration": {
+      "description": "Logging configuration",
+      "type": "object",
+      "properties": {
+        "LogGroupArn": {
+          "description": "CloudWatch log group ARN",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512
+        }
+      },
+      "additionalProperties": false
     }
   },
   "properties": {
     "WorkspaceId": {
       "description": "Required to identify a specific APS Workspace.",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}$",
       "minLength": 1,
       "maxLength": 100
     },
@@ -44,7 +57,7 @@
     "Arn": {
       "description": "Workspace arn.",
       "type": "string",
-      "pattern": "^arn:\b(aws|aws-us-gov|aws-cn)\b:aps:[a-z0-9-]+:[0-9]+:workspace/[a-zA-Z0-9-]+$",
+      "pattern": "^arn:(aws|aws-us-gov|aws-cn):aps:[a-z0-9-]+:[0-9]+:workspace/[a-zA-Z0-9-]+$",
       "minLength": 1,
       "maxLength": 128
     },
@@ -55,6 +68,9 @@
     "PrometheusEndpoint": {
       "description": "AMP Workspace prometheus endpoint",
       "type": "string"
+    },
+    "LoggingConfiguration": {
+      "$ref": "#/definitions/LoggingConfiguration"
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -73,7 +89,13 @@
     "/properties/Arn",
     "/properties/PrometheusEndpoint"
   ],
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "primaryIdentifier": [
     "/properties/Arn"
   ],
@@ -82,14 +104,17 @@
       "permissions": [
         "aps:CreateWorkspace",
         "aps:TagResource",
-        "aps:CreateAlertManagerDefinition"
+        "aps:CreateAlertManagerDefinition",
+        "aps:DescribeAlertManagerDefinition",
+        "aps:CreateLoggingConfiguration"
       ]
     },
     "read": {
       "permissions": [
         "aps:DescribeWorkspace",
         "aps:ListTagsForResource",
-        "aps:DescribeAlertManagerDefinition"
+        "aps:DescribeAlertManagerDefinition",
+        "aps:DescribeLoggingConfiguration"
       ]
     },
     "update": {
@@ -98,13 +123,15 @@
         "aps:TagResource",
         "aps:UntagResource",
         "aps:ListTagsForResource",
-        "aps:PutAlertManagerDefinition"
+        "aps:PutAlertManagerDefinition",
+        "aps:UpdateLoggingConfiguration"
       ]
     },
     "delete": {
       "permissions": [
         "aps:DeleteWorkspace",
-        "aps:DeleteAlertManagerDefinition"
+        "aps:DeleteAlertManagerDefinition",
+        "aps:DeleteLoggingConfiguration"
       ]
     },
     "list": {

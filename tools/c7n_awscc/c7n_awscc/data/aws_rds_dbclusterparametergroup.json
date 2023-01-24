@@ -1,0 +1,120 @@
+{
+  "typeName": "AWS::RDS::DBClusterParameterGroup",
+  "description": "The AWS::RDS::DBClusterParameterGroup resource creates a new Amazon RDS DB cluster parameter group. For more information, see Managing an Amazon Aurora DB Cluster in the Amazon Aurora User Guide.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-rds",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Description": {
+      "description": "A friendly description for this DB cluster parameter group.",
+      "type": "string"
+    },
+    "Family": {
+      "description": "The DB cluster parameter group family name. A DB cluster parameter group can be associated with one and only one DB cluster parameter group family, and can be applied only to a DB cluster running a DB engine and engine version compatible with that DB cluster parameter group family.",
+      "type": "string"
+    },
+    "Parameters": {
+      "description": "An array of parameters to be modified. A maximum of 20 parameters can be modified in a single request.",
+      "type": "object"
+    },
+    "DBClusterParameterGroupName": {
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9])*$"
+    },
+    "Tags": {
+      "description": "The list of tags for the cluster parameter group.",
+      "type": "array",
+      "maxItems": 50,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/DBClusterParameterGroupName": "$lowercase(DBClusterParameterGroupName)"
+  },
+  "required": [
+    "Description",
+    "Family",
+    "Parameters"
+  ],
+  "createOnlyProperties": [
+    "/properties/DBClusterParameterGroupName",
+    "/properties/Description",
+    "/properties/Family"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Parameters"
+  ],
+  "primaryIdentifier": [
+    "/properties/DBClusterParameterGroupName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rds:AddTagsToResource",
+        "rds:CreateDBClusterParameterGroup",
+        "rds:DescribeDBClusterParameterGroups",
+        "rds:DescribeDBClusterParameters",
+        "rds:DescribeEngineDefaultClusterParameters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBClusterParameterGroup"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeDBClusterParameterGroups",
+        "rds:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rds:AddTagsToResource",
+        "rds:DescribeDBClusterParameterGroups",
+        "rds:DescribeDBClusterParameters",
+        "rds:DescribeDBClusters",
+        "rds:DescribeEngineDefaultClusterParameters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBClusterParameterGroup",
+        "rds:RemoveTagsFromResource",
+        "rds:ResetDBClusterParameterGroup"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBClusterParameterGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBClusterParameterGroups"
+      ]
+    }
+  }
+}

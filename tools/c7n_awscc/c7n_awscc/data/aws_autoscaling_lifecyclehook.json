@@ -54,7 +54,9 @@
     "/properties/AutoScalingGroupName",
     "/properties/LifecycleHookName"
   ],
-  "taggable": false,
+  "tagging": {
+    "taggable": false
+  },
   "handlers": {
     "create": {
       "permissions": [

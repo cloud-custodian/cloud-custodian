@@ -118,8 +118,7 @@
       "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/ValidationConfiguration"
-      },
-      "minItems": 1
+      }
     }
   },
   "definitions": {
@@ -132,6 +131,11 @@
         },
         "Key": {
           "type": "string"
+        },
+        "BucketOwner": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 12
         }
       },
       "additionalProperties": false,
@@ -170,6 +174,11 @@
         },
         "Key": {
           "type": "string"
+        },
+        "BucketOwner": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 12
         }
       },
       "additionalProperties": false,
@@ -223,6 +232,11 @@
         },
         "Overwrite": {
           "type": "boolean"
+        },
+        "MaxOutputFiles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
         }
       },
       "additionalProperties": false,

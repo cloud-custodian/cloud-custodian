@@ -421,6 +421,10 @@
         },
         "JoinInstruction": {
           "$ref": "#/definitions/JoinInstruction"
+        },
+        "DataSetArn": {
+          "type": "string",
+          "description": "<p>The Amazon Resource Name (ARN) for the dataset.</p>"
         }
       }
     },
@@ -766,6 +770,18 @@
           "default": 36
         }
       }
+    },
+    "DataSetUsageConfiguration": {
+      "type": "object",
+      "description": "<p>The dataset usage configuration for the dataset.</p>",
+      "properties": {
+        "DisableUseAsDirectQuerySource": {
+          "type": "boolean"
+        },
+        "DisableUseAsImportedSource": {
+          "type": "boolean"
+        }
+      }
     }
   },
   "properties": {
@@ -860,6 +876,9 @@
     },
     "IngestionWaitPolicy": {
       "$ref": "#/definitions/IngestionWaitPolicy"
+    },
+    "DataSetUsageConfiguration": {
+      "$ref": "#/definitions/DataSetUsageConfiguration"
     }
   },
   "readOnlyProperties": [

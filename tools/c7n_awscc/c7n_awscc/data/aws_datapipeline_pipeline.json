@@ -1,0 +1,252 @@
+{
+  "typeName": "AWS::DataPipeline::Pipeline",
+  "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datapipeline",
+  "properties": {
+    "Activate": {
+      "description": "Indicates whether to validate and start the pipeline or stop an active pipeline. By default, the value is set to true.",
+      "type": "boolean"
+    },
+    "Description": {
+      "description": "A description of the pipeline.",
+      "type": "string"
+    },
+    "Name": {
+      "description": "The name of the pipeline.",
+      "type": "string"
+    },
+    "ParameterObjects": {
+      "description": "The parameter objects used with the pipeline.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ParameterObject"
+      }
+    },
+    "ParameterValues": {
+      "description": "The parameter values used with the pipeline.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ParameterValue"
+      }
+    },
+    "PipelineObjects": {
+      "description": "The objects that define the pipeline. These objects overwrite the existing pipeline definition. Not all objects, fields, and values can be updated. For information about restrictions, see Editing Your Pipeline in the AWS Data Pipeline Developer Guide.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PipelineObject"
+      }
+    },
+    "PipelineTags": {
+      "description": "A list of arbitrary tags (key-value pairs) to associate with the pipeline, which you can use to control permissions. For more information, see Controlling Access to Pipelines and Resources in the AWS Data Pipeline Developer Guide.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PipelineTag"
+      }
+    },
+    "PipelineId": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "ParameterObject": {
+      "type": "object",
+      "properties": {
+        "Attributes": {
+          "description": "The attributes of the parameter object.",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParameterAttribute"
+          }
+        },
+        "Id": {
+          "description": "The ID of the parameter object.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Attributes",
+        "Id"
+      ],
+      "additionalProperties": false
+    },
+    "ParameterAttribute": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The field identifier.",
+          "type": "string"
+        },
+        "StringValue": {
+          "description": "The field value, expressed as a String.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "StringValue"
+      ],
+      "additionalProperties": false
+    },
+    "ParameterValue": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "description": "The ID of the parameter value.",
+          "type": "string"
+        },
+        "StringValue": {
+          "description": "The field value, expressed as a String.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Id",
+        "StringValue"
+      ],
+      "additionalProperties": false
+    },
+    "Field": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "Specifies the name of a field for a particular object. To view valid values for a particular field, see Pipeline Object Reference in the AWS Data Pipeline Developer Guide.",
+          "type": "string"
+        },
+        "RefValue": {
+          "description": "A field value that you specify as an identifier of another object in the same pipeline definition.",
+          "type": "string"
+        },
+        "StringValue": {
+          "description": "A field value that you specify as a string. To view valid values for a particular field, see Pipeline Object Reference in the AWS Data Pipeline Developer Guide.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key"
+      ]
+    },
+    "PipelineObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Fields": {
+          "description": "Key-value pairs that define the properties of the object.",
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "Id": {
+          "description": "The ID of the object.",
+          "type": "string"
+        },
+        "Name": {
+          "description": "The name of the object.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Fields",
+        "Id",
+        "Name"
+      ]
+    },
+    "PipelineTag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key name of a tag.",
+          "type": "string"
+        },
+        "Value": {
+          "description": "The value to associate with the key name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/PipelineTags"
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/PipelineId"
+  ],
+  "createOnlyProperties": [
+    "/properties/Description",
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/PipelineId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "datapipeline:CreatePipeline",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:DescribePipelines",
+        "datapipeline:ValidatePipelineDefinition",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:AddTags"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:DescribePipelines"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:AddTags",
+        "datapipeline:RemoveTags",
+        "datapipeline:DeactivatePipeline",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:ValidatePipelineDefinition",
+        "datapipeline:DescribePipelines",
+        "datapipeline:AddTags",
+        "datapipeline:RemoveTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribePipelines",
+        "datapipeline:RemoveTags"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "datapipeline:ListPipelines"
+      ]
+    }
+  }
+}

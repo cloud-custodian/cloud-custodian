@@ -208,12 +208,14 @@
     },
     "read": {
       "permissions": [
-        "ec2:DescribeNetworkInsightsAccessScopes"
+        "ec2:DescribeNetworkInsightsAccessScopes",
+        "ec2:GetNetworkInsightsAccessScopeContent"
       ]
     },
     "update": {
       "permissions": [
         "ec2:DescribeNetworkInsightsAccessScopes",
+        "ec2:GetNetworkInsightsAccessScopeContent",
         "ec2:CreateTags",
         "ec2:DeleteTags"
       ]

@@ -89,9 +89,6 @@
     "/properties/PoolCount",
     "/properties/IpamScopeType"
   ],
-  "writeOnlyProperties": [
-    "/properties/IpamId"
-  ],
   "createOnlyProperties": [
     "/properties/IpamId"
   ],

@@ -148,6 +148,35 @@
         "Username"
       ]
     },
+    "DatabricksParameters": {
+      "type": "object",
+      "description": "<p>Databricks parameters.</p>",
+      "properties": {
+        "Host": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "description": "<p>Host.</p>"
+        },
+        "Port": {
+          "type": "number",
+          "maximum": 65535,
+          "minimum": 1,
+          "description": "<p>Port.</p>"
+        },
+        "SqlEndpointPath": {
+          "type": "string",
+          "maxLength": 4096,
+          "minLength": 1,
+          "description": "<p>The HTTP Path of the Databricks data source.</p>"
+        }
+      },
+      "required": [
+        "Host",
+        "Port",
+        "SqlEndpointPath"
+      ]
+    },
     "DataSourceCredentials": {
       "type": "object",
       "description": "<p>Data source credentials. This is a variant type structure. For this structure to be\n            valid, only one of the attributes can be non-null.</p>",
@@ -159,6 +188,13 @@
         },
         "CredentialPair": {
           "$ref": "#/definitions/CredentialPair"
+        },
+        "SecretArn": {
+          "type": "string",
+          "pattern": "^arn:[-a-z0-9]*:secretsmanager:[-a-z0-9]*:[0-9]{12}:secret:.+",
+          "maxLength": 2048,
+          "minLength": 1,
+          "description": "<p>The Amazon Resource Name (ARN) of the secret associated with the data source in Amazon Secrets Manager.</p>"
         }
       }
     },
@@ -242,6 +278,9 @@
         },
         "S3Parameters": {
           "$ref": "#/definitions/S3Parameters"
+        },
+        "DatabricksParameters": {
+          "$ref": "#/definitions/DatabricksParameters"
         }
       }
     },
@@ -255,6 +294,7 @@
         "AURORA",
         "AURORA_POSTGRESQL",
         "AWS_IOT_ANALYTICS",
+        "DATABRICKS",
         "GITHUB",
         "JIRA",
         "MARIADB",

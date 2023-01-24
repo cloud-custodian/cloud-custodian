@@ -48,12 +48,16 @@
     },
     "TokenSigningPublicKeys": {
       "type": "object",
+      "additionalProperties": false,
       "patternProperties": {
         "[a-zA-Z0-9:_-]+": {
           "type": "string",
           "maxLength": 5120
         }
       }
+    },
+    "EnableCachingForHttp": {
+      "type": "boolean"
     },
     "Tags": {
       "type": "array",

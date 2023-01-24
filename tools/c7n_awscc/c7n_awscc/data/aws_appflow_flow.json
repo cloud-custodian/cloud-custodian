@@ -58,6 +58,10 @@
       "items": {
         "$ref": "#/definitions/Tag"
       }
+    },
+    "MetadataCatalogConfig": {
+      "description": "Configurations of metadata catalog of the flow.",
+      "$ref": "#/definitions/MetadataCatalogConfig"
     }
   },
   "definitions": {
@@ -87,6 +91,10 @@
           "description": "Type of source connector",
           "$ref": "#/definitions/ConnectorType"
         },
+        "ApiVersion": {
+          "description": "The API version that the destination connector uses.",
+          "$ref": "#/definitions/ApiVersion"
+        },
         "ConnectorProfileName": {
           "description": "Name of source connector profile",
           "$ref": "#/definitions/ConnectorProfileName"
@@ -113,6 +121,10 @@
         "ConnectorType": {
           "description": "Destination connector type",
           "$ref": "#/definitions/ConnectorType"
+        },
+        "ApiVersion": {
+          "description": "The API version that the destination connector uses.",
+          "$ref": "#/definitions/ApiVersion"
         },
         "ConnectorProfileName": {
           "description": "Name of destination connector profile",
@@ -190,6 +202,50 @@
       ],
       "additionalProperties": false
     },
+    "MetadataCatalogConfig": {
+      "description": "Configurations of metadata catalog of the flow.",
+      "type": "object",
+      "properties": {
+        "GlueDataCatalog": {
+          "description": "Configurations of glue data catalog of the flow.",
+          "$ref": "#/definitions/GlueDataCatalog"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GlueDataCatalog": {
+      "description": "Trigger settings of the flow.",
+      "type": "object",
+      "properties": {
+        "RoleArn": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 512,
+          "pattern": "arn:aws:iam:.*:[0-9]+:.*"
+        },
+        "DatabaseName": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 255,
+          "pattern": "[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*"
+        },
+        "TablePrefix": {
+          "description": "A string containing the value for the tag",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128,
+          "pattern": "[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*"
+        }
+      },
+      "required": [
+        "RoleArn",
+        "DatabaseName",
+        "TablePrefix"
+      ],
+      "additionalProperties": false
+    },
     "DestinationConnectorProperties": {
       "description": "Destination connector details",
       "type": "object",
@@ -215,8 +271,17 @@
         "LookoutMetrics": {
           "$ref": "#/definitions/LookoutMetricsDestinationProperties"
         },
+        "Marketo": {
+          "$ref": "#/definitions/MarketoDestinationProperties"
+        },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskDestinationProperties"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorDestinationProperties"
+        },
+        "SAPOData": {
+          "$ref": "#/definitions/SAPODataDestinationProperties"
         }
       }
     },
@@ -277,6 +342,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskSourceProperties"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorSourceProperties"
         }
       }
     },
@@ -328,6 +396,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskConnectorOperator"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/Operator"
         }
       }
     },
@@ -353,6 +424,9 @@
         "ScheduleEndTime": {
           "type": "number"
         },
+        "FirstExecutionFrom": {
+          "type": "number"
+        },
         "TimeZone": {
           "type": "string",
           "maxLength": 256
@@ -361,11 +435,31 @@
           "type": "number",
           "minimum": 0,
           "maximum": 36000
+        },
+        "FlowErrorDeactivationThreshold": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
         }
       },
       "required": [
         "ScheduleExpression"
       ],
+      "additionalProperties": false
+    },
+    "CustomProperties": {
+      "description": "A map for properties for custom connector.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,2048}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
       "additionalProperties": false
     },
     "TriggerType": {
@@ -379,6 +473,11 @@
     "Object": {
       "type": "string",
       "maxLength": 512,
+      "pattern": "\\S+"
+    },
+    "EntityName": {
+      "type": "string",
+      "maxLength": 1024,
       "pattern": "\\S+"
     },
     "EnableDynamicFieldUpdate": {
@@ -444,6 +543,18 @@
       },
       "additionalProperties": false
     },
+    "SuccessResponseHandlingConfig": {
+      "type": "object",
+      "properties": {
+        "BucketPrefix": {
+          "$ref": "#/definitions/BucketPrefix"
+        },
+        "BucketName": {
+          "$ref": "#/definitions/BucketName"
+        }
+      },
+      "additionalProperties": false
+    },
     "Name": {
       "type": "string",
       "maxLength": 128,
@@ -454,7 +565,8 @@
       "enum": [
         "INSERT",
         "UPSERT",
-        "UPDATE"
+        "UPDATE",
+        "DELETE"
       ]
     },
     "FileType": {
@@ -471,6 +583,12 @@
         "None",
         "SingleFile"
       ]
+    },
+    "TargetFileSize": {
+      "type": "integer"
+    },
+    "PreserveSourceDataTyping": {
+      "type": "boolean"
     },
     "PrefixType": {
       "type": "string",
@@ -490,6 +608,19 @@
         "MINUTE"
       ]
     },
+    "PathPrefixHierarchy": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PathPrefix"
+      }
+    },
+    "PathPrefix": {
+      "type": "string",
+      "enum": [
+        "EXECUTION_ID",
+        "SCHEMA_VERSION"
+      ]
+    },
     "PrefixConfig": {
       "type": "object",
       "properties": {
@@ -498,6 +629,9 @@
         },
         "PrefixFormat": {
           "$ref": "#/definitions/PrefixFormat"
+        },
+        "PathPrefixHierarchy": {
+          "$ref": "#/definitions/PathPrefixHierarchy"
         }
       },
       "additionalProperties": false
@@ -507,6 +641,9 @@
       "properties": {
         "AggregationType": {
           "$ref": "#/definitions/AggregationType"
+        },
+        "TargetFileSize": {
+          "$ref": "#/definitions/TargetFileSize"
         }
       }
     },
@@ -521,6 +658,9 @@
         },
         "AggregationConfig": {
           "$ref": "#/definitions/AggregationConfig"
+        },
+        "PreserveSourceDataTyping": {
+          "$ref": "#/definitions/PreserveSourceDataTyping"
         }
       },
       "additionalProperties": false
@@ -563,10 +703,17 @@
         "Infornexus",
         "Amplitude",
         "Veeva",
+        "CustomConnector",
         "EventBridge",
         "Upsolver",
         "LookoutMetrics"
       ]
+    },
+    "ApiVersion": {
+      "description": "The API version that the connector will use.",
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 256
     },
     "ConnectorProfileName": {
       "description": "Name of connector profile",
@@ -688,6 +835,9 @@
         },
         "IncludeDeletedRecords": {
           "$ref": "#/definitions/IncludeDeletedRecords"
+        },
+        "DataTransferApi": {
+          "$ref": "#/definitions/DataTransferApi"
         }
       },
       "required": [
@@ -779,6 +929,49 @@
       ],
       "additionalProperties": false
     },
+    "CustomConnectorSourceProperties": {
+      "type": "object",
+      "properties": {
+        "EntityName": {
+          "$ref": "#/definitions/EntityName"
+        },
+        "CustomProperties": {
+          "$ref": "#/definitions/CustomProperties"
+        }
+      },
+      "required": [
+        "EntityName"
+      ],
+      "additionalProperties": false
+    },
+    "CustomConnectorDestinationProperties": {
+      "type": "object",
+      "properties": {
+        "EntityName": {
+          "$ref": "#/definitions/EntityName"
+        },
+        "ErrorHandlingConfig": {
+          "$ref": "#/definitions/ErrorHandlingConfig"
+        },
+        "WriteOperationType": {
+          "$ref": "#/definitions/WriteOperationType"
+        },
+        "IdFieldNames": {
+          "description": "List of fields used as ID when performing a write operation.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CustomProperties": {
+          "$ref": "#/definitions/CustomProperties"
+        }
+      },
+      "required": [
+        "EntityName"
+      ],
+      "additionalProperties": false
+    },
     "ZendeskDestinationProperties": {
       "type": "object",
       "properties": {
@@ -844,6 +1037,34 @@
       ],
       "additionalProperties": false
     },
+    "SAPODataDestinationProperties": {
+      "type": "object",
+      "properties": {
+        "ObjectPath": {
+          "$ref": "#/definitions/Object"
+        },
+        "ErrorHandlingConfig": {
+          "$ref": "#/definitions/ErrorHandlingConfig"
+        },
+        "SuccessResponseHandlingConfig": {
+          "$ref": "#/definitions/SuccessResponseHandlingConfig"
+        },
+        "IdFieldNames": {
+          "description": "List of fields used as ID when performing a write operation.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "WriteOperationType": {
+          "$ref": "#/definitions/WriteOperationType"
+        }
+      },
+      "required": [
+        "ObjectPath"
+      ],
+      "additionalProperties": false
+    },
     "SalesforceDestinationProperties": {
       "type": "object",
       "properties": {
@@ -862,6 +1083,9 @@
         },
         "WriteOperationType": {
           "$ref": "#/definitions/WriteOperationType"
+        },
+        "DataTransferApi": {
+          "$ref": "#/definitions/DataTransferApi"
         }
       },
       "required": [
@@ -934,6 +1158,21 @@
       },
       "additionalProperties": false
     },
+    "MarketoDestinationProperties": {
+      "type": "object",
+      "properties": {
+        "Object": {
+          "$ref": "#/definitions/Object"
+        },
+        "ErrorHandlingConfig": {
+          "$ref": "#/definitions/ErrorHandlingConfig"
+        }
+      },
+      "required": [
+        "Object"
+      ],
+      "additionalProperties": false
+    },
     "DatetimeTypeFieldName": {
       "description": "Name of the datetime/timestamp data type field to be used for importing incremental records from the source",
       "type": "string",
@@ -948,8 +1187,10 @@
         "Map_all",
         "Mask",
         "Merge",
+        "Passthrough",
         "Truncate",
-        "Validate"
+        "Validate",
+        "Partition"
       ]
     },
     "OperatorPropertiesKeys": {
@@ -969,7 +1210,9 @@
         "MATH_OPERATION_FIELDS_ORDER",
         "CONCAT_FORMAT",
         "SUBFIELD_CATEGORY_MAP",
-        "EXCLUDE_SOURCE_FIELDS_LIST"
+        "EXCLUDE_SOURCE_FIELDS_LIST",
+        "INCLUDE_NEW_FIELDS",
+        "ORDERED_PARTITION_KEYS_LIST"
       ]
     },
     "TaskPropertiesObject": {
@@ -1290,6 +1533,32 @@
         "NO_OP"
       ]
     },
+    "Operator": {
+      "type": "string",
+      "enum": [
+        "PROJECTION",
+        "LESS_THAN",
+        "GREATER_THAN",
+        "CONTAINS",
+        "BETWEEN",
+        "LESS_THAN_OR_EQUAL_TO",
+        "GREATER_THAN_OR_EQUAL_TO",
+        "EQUAL_TO",
+        "NOT_EQUAL_TO",
+        "ADDITION",
+        "MULTIPLICATION",
+        "DIVISION",
+        "SUBTRACTION",
+        "MASK_ALL",
+        "MASK_FIRST_N",
+        "MASK_LAST_N",
+        "VALIDATE_NON_NULL",
+        "VALIDATE_NON_ZERO",
+        "VALIDATE_NON_NEGATIVE",
+        "VALIDATE_NUMERIC",
+        "NO_OP"
+      ]
+    },
     "Status": {
       "type": "string",
       "enum": [
@@ -1297,6 +1566,14 @@
         "Draft",
         "Errored",
         "Suspended"
+      ]
+    },
+    "DataTransferApi": {
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "BULKV2",
+        "REST_SYNC"
       ]
     }
   },

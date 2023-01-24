@@ -1,0 +1,184 @@
+{
+  "typeName": "AWS::SES::ConfigurationSet",
+  "description": "Resource schema for AWS::SES::ConfigurationSet.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses.git",
+  "definitions": {
+    "TrackingOptions": {
+      "description": "An object that defines the open and click tracking options for emails that you send using the configuration set.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CustomRedirectDomain": {
+          "type": "string",
+          "description": "The domain to use for tracking open and click events."
+        }
+      }
+    },
+    "DeliveryOptions": {
+      "description": "An object that defines the dedicated IP pool that is used to send emails that you send using the configuration set.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TlsPolicy": {
+          "type": "string",
+          "description": "Specifies whether messages that use the configuration set are required to use Transport Layer Security (TLS). If the value is Require , messages are only delivered if a TLS connection can be established. If the value is Optional , messages can be delivered in plain text if a TLS connection can't be established.",
+          "pattern": "REQUIRE|OPTIONAL"
+        },
+        "SendingPoolName": {
+          "type": "string",
+          "description": "The name of the dedicated IP pool to associate with the configuration set."
+        }
+      }
+    },
+    "ReputationOptions": {
+      "description": "An object that defines whether or not Amazon SES collects reputation metrics for the emails that you send that use the configuration set.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReputationMetricsEnabled": {
+          "type": "boolean",
+          "description": "If true , tracking of reputation metrics is enabled for the configuration set. If false , tracking of reputation metrics is disabled for the configuration set.",
+          "pattern": "true|false"
+        }
+      }
+    },
+    "SendingOptions": {
+      "description": "An object that defines whether or not Amazon SES can send email that you send using the configuration set.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SendingEnabled": {
+          "type": "boolean",
+          "pattern": "true|false"
+        }
+      }
+    },
+    "SuppressionOptions": {
+      "description": "An object that contains information about the suppression list preferences for your account.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SuppressedReasons": {
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "description": "A list that contains the reasons that email addresses are automatically added to the suppression list for your account.",
+          "items": {
+            "type": "string",
+            "description": "The reason that the address was added to the suppression list for your account",
+            "pattern": "BOUNCE|COMPLAINT"
+          }
+        }
+      }
+    },
+    "DashboardOptions": {
+      "type": "object",
+      "description": "Preferences regarding the Dashboard feature.",
+      "additionalProperties": false,
+      "properties": {
+        "EngagementMetrics": {
+          "type": "string",
+          "description": "Whether emails sent with this configuration set have engagement tracking enabled.",
+          "pattern": "ENABLED|DISABLED"
+        }
+      },
+      "required": [
+        "EngagementMetrics"
+      ]
+    },
+    "GuardianOptions": {
+      "type": "object",
+      "description": "Preferences regarding the Guardian feature.",
+      "additionalProperties": false,
+      "properties": {
+        "OptimizedSharedDelivery": {
+          "type": "string",
+          "description": "Whether emails sent with this configuration set have optimized delivery algorithm enabled.",
+          "pattern": "ENABLED|DISABLED"
+        }
+      },
+      "required": [
+        "OptimizedSharedDelivery"
+      ]
+    },
+    "VdmOptions": {
+      "description": "An object that contains Virtual Deliverability Manager (VDM) settings for this configuration set.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DashboardOptions": {
+          "$ref": "#/definitions/DashboardOptions"
+        },
+        "GuardianOptions": {
+          "$ref": "#/definitions/GuardianOptions"
+        }
+      }
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the configuration set.",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{1,64}$"
+    },
+    "TrackingOptions": {
+      "$ref": "#/definitions/TrackingOptions"
+    },
+    "DeliveryOptions": {
+      "$ref": "#/definitions/DeliveryOptions"
+    },
+    "ReputationOptions": {
+      "$ref": "#/definitions/ReputationOptions"
+    },
+    "SendingOptions": {
+      "$ref": "#/definitions/SendingOptions"
+    },
+    "SuppressionOptions": {
+      "$ref": "#/definitions/SuppressionOptions"
+    },
+    "VdmOptions": {
+      "$ref": "#/definitions/VdmOptions"
+    }
+  },
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "taggable": false,
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ses:CreateConfigurationSet"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ses:GetConfigurationSet",
+        "ses:DescribeConfigurationSet"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ses:PutConfigurationSetTrackingOptions",
+        "ses:PutConfigurationSetDeliveryOptions",
+        "ses:PutConfigurationSetReputationOptions",
+        "ses:PutConfigurationSetSendingOptions",
+        "ses:PutConfigurationSetSuppressionOptions",
+        "ses:PutConfigurationSetVdmOptions"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ses:DeleteConfigurationSet"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ses:ListConfigurationSets"
+      ]
+    }
+  }
+}

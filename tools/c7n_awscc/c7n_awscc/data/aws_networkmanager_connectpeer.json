@@ -1,0 +1,211 @@
+{
+  "typeName": "AWS::NetworkManager::ConnectPeer",
+  "description": "AWS::NetworkManager::ConnectPeer Resource Type Definition.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkmanager/aws-networkmanager-connectpeer",
+  "properties": {
+    "PeerAddress": {
+      "description": "The IP address of the Connect peer.",
+      "type": "string"
+    },
+    "CoreNetworkAddress": {
+      "description": "The IP address of a core network.",
+      "type": "string"
+    },
+    "BgpOptions": {
+      "description": "Bgp options for connect peer.",
+      "$ref": "#/definitions/BgpOptions"
+    },
+    "InsideCidrBlocks": {
+      "description": "The inside IP addresses used for a Connect peer configuration.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "CoreNetworkId": {
+      "description": "The ID of the core network.",
+      "type": "string"
+    },
+    "ConnectAttachmentId": {
+      "description": "The ID of the attachment to connect.",
+      "type": "string"
+    },
+    "ConnectPeerId": {
+      "description": "The ID of the Connect peer.",
+      "type": "string"
+    },
+    "EdgeLocation": {
+      "description": "The Connect peer Regions where edges are located.",
+      "type": "string"
+    },
+    "State": {
+      "description": "State of the connect peer.",
+      "type": "string"
+    },
+    "CreatedAt": {
+      "description": "Connect peer creation time.",
+      "type": "string"
+    },
+    "Configuration": {
+      "description": "Configuration of the connect peer.",
+      "$ref": "#/definitions/ConnectPeerConfiguration"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "ConnectPeerConfiguration": {
+      "type": "object",
+      "properties": {
+        "CoreNetworkAddress": {
+          "type": "string"
+        },
+        "PeerAddress": {
+          "type": "string"
+        },
+        "InsideCidrBlocks": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string"
+          }
+        },
+        "Protocol": {
+          "$ref": "#/definitions/TunnelProtocol"
+        },
+        "BgpConfigurations": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/ConnectPeerBgpConfiguration"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "TunnelProtocol": {
+      "description": "Tunnel protocol type (Only support GRE for now)",
+      "type": "string"
+    },
+    "BgpOptions": {
+      "description": "Bgp options",
+      "type": "object",
+      "properties": {
+        "PeerAsn": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConnectPeerBgpConfiguration": {
+      "description": "Bgp configuration for connect peer",
+      "type": "object",
+      "properties": {
+        "CoreNetworkAsn": {
+          "type": "number"
+        },
+        "PeerAsn": {
+          "type": "number"
+        },
+        "CoreNetworkAddress": {
+          "type": "string"
+        },
+        "PeerAddress": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/PeerAddress",
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions",
+    "/properties/InsideCidrBlocks",
+    "/properties/ConnectAttachmentId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/PeerAddress",
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions",
+    "/properties/InsideCidrBlocks"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConnectPeerId",
+    "/properties/State",
+    "/properties/CreatedAt",
+    "/properties/Configuration",
+    "/properties/CoreNetworkId",
+    "/properties/EdgeLocation"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectPeerId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:CreateConnectPeer",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "networkmanager:GetConnectPeer"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "networkmanager:ListTagsForResource",
+        "networkmanager:TagResource",
+        "networkmanager:UntagResource",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:DeleteConnectPeer",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "networkmanager:ListConnectPeers"
+      ]
+    }
+  }
+}

@@ -1522,6 +1522,160 @@
     "Arn": {
       "type": "string",
       "maxLength": 1000
+    },
+    "CustomDocumentEnrichmentConfiguration": {
+      "type": "object",
+      "properties": {
+        "InlineConfigurations": {
+          "$ref": "#/definitions/InlineConfigurations"
+        },
+        "PreExtractionHookConfiguration": {
+          "$ref": "#/definitions/HookConfiguration"
+        },
+        "PostExtractionHookConfiguration": {
+          "$ref": "#/definitions/HookConfiguration"
+        },
+        "RoleArn": {
+          "$ref": "#/definitions/RoleArn"
+        }
+      },
+      "additionalProperties": false
+    },
+    "InlineConfigurations": {
+      "description": "List of InlineCustomDocumentEnrichmentConfigurations",
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/InlineCustomDocumentEnrichmentConfiguration"
+      }
+    },
+    "InlineCustomDocumentEnrichmentConfiguration": {
+      "type": "object",
+      "properties": {
+        "Condition": {
+          "$ref": "#/definitions/DocumentAttributeCondition"
+        },
+        "Target": {
+          "$ref": "#/definitions/DocumentAttributeTarget"
+        },
+        "DocumentContentDeletion": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DocumentAttributeCondition": {
+      "type": "object",
+      "properties": {
+        "ConditionDocumentAttributeKey": {
+          "$ref": "#/definitions/DocumentAttributeKey"
+        },
+        "Operator": {
+          "$ref": "#/definitions/ConditionOperator"
+        },
+        "ConditionOnValue": {
+          "$ref": "#/definitions/DocumentAttributeValue"
+        }
+      },
+      "required": [
+        "ConditionDocumentAttributeKey",
+        "Operator"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentAttributeTarget": {
+      "type": "object",
+      "properties": {
+        "TargetDocumentAttributeKey": {
+          "$ref": "#/definitions/DocumentAttributeKey"
+        },
+        "TargetDocumentAttributeValueDeletion": {
+          "type": "boolean"
+        },
+        "TargetDocumentAttributeValue": {
+          "$ref": "#/definitions/DocumentAttributeValue"
+        }
+      },
+      "required": [
+        "TargetDocumentAttributeKey"
+      ],
+      "additionalProperties": false
+    },
+    "ConditionOperator": {
+      "type": "string",
+      "enum": [
+        "GreaterThan",
+        "GreaterThanOrEquals",
+        "LessThan",
+        "LessThanOrEquals",
+        "Equals",
+        "NotEquals",
+        "Contains",
+        "NotContains",
+        "Exists",
+        "NotExists",
+        "BeginsWith"
+      ]
+    },
+    "DocumentAttributeKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "[a-zA-Z0-9_][a-zA-Z0-9_-]*"
+    },
+    "DocumentAttributeValue": {
+      "type": "object",
+      "properties": {
+        "StringValue": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "StringListValue": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "LongValue": {
+          "$ref": "#/definitions/Long"
+        },
+        "DateValue": {
+          "$ref": "#/definitions/Timestamp"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Long": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "Timestamp": {
+      "type": "string"
+    },
+    "HookConfiguration": {
+      "type": "object",
+      "properties": {
+        "InvocationCondition": {
+          "$ref": "#/definitions/DocumentAttributeCondition"
+        },
+        "LambdaArn": {
+          "$ref": "#/definitions/LambdaArn"
+        },
+        "S3Bucket": {
+          "$ref": "#/definitions/S3BucketName"
+        }
+      },
+      "required": [
+        "LambdaArn",
+        "S3Bucket"
+      ],
+      "additionalProperties": false
+    },
+    "LambdaArn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
     }
   },
   "properties": {
@@ -1555,6 +1709,9 @@
     "Tags": {
       "description": "Tags for labeling the data source",
       "$ref": "#/definitions/TagList"
+    },
+    "CustomDocumentEnrichmentConfiguration": {
+      "$ref": "#/definitions/CustomDocumentEnrichmentConfiguration"
     }
   },
   "required": [

@@ -6,10 +6,13 @@
   "definitions": {},
   "properties": {
     "TargetType": {
-      "description": "The target type. Value must be THING_GROUP.",
+      "description": "The target type. Value must be THING_GROUP, CLIENT_ID, SOURCE_IP, PRINCIPAL_ID.",
       "type": "string",
       "enum": [
-        "THING_GROUP"
+        "THING_GROUP",
+        "CLIENT_ID",
+        "SOURCE_IP",
+        "PRINCIPAL_ID"
       ]
     },
     "TargetName": {
@@ -17,7 +20,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "pattern": "[a-zA-Z0-9:_-]+"
+      "pattern": "[a-zA-Z0-9.:_-]+"
     },
     "LogLevel": {
       "description": "The log level for a specific target. Valid values are: ERROR, WARN, INFO, DEBUG, or DISABLED.",
@@ -35,7 +38,7 @@
       "type": "string",
       "minLength": 13,
       "maxLength": 140,
-      "pattern": "[a-zA-Z0-9:_-]+"
+      "pattern": "[a-zA-Z0-9.:_-]+"
     }
   },
   "createOnlyProperties": [

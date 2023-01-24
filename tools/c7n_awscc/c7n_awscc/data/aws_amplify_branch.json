@@ -50,6 +50,11 @@
         "$ref": "#/definitions/EnvironmentVariable"
       }
     },
+    "Framework": {
+      "type": "string",
+      "maxLength": 255,
+      "pattern": "(?s).*"
+    },
     "PullRequestEnvironmentName": {
       "type": "string",
       "maxLength": 20,

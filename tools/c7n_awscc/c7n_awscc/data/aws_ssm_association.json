@@ -206,6 +206,11 @@
           "calendar3"
         ]
       ]
+    },
+    "ScheduleOffset": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6
     }
   },
   "required": [

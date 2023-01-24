@@ -3,6 +3,267 @@
   "description": "Amazon Lex conversational bot performing automated tasks such as ordering a pizza, booking a hotel, and so on.",
   "sourceUrl": "https://docs.aws.amazon.com/lexv2/latest/dg/build-create.html",
   "definitions": {
+    "BotAliasLocaleSettingsList": {
+      "description": "A list of bot alias locale settings to add to the bot alias.",
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 50,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/BotAliasLocaleSettingsItem"
+      }
+    },
+    "BotAliasLocaleSettingsItem": {
+      "description": "A locale setting in alias",
+      "type": "object",
+      "properties": {
+        "LocaleId": {
+          "description": "A string used to identify the locale",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "BotAliasLocaleSetting": {
+          "$ref": "#/definitions/BotAliasLocaleSettings"
+        }
+      },
+      "required": [
+        "LocaleId",
+        "BotAliasLocaleSetting"
+      ],
+      "additionalProperties": false
+    },
+    "BotAliasLocaleSettings": {
+      "description": "You can use this parameter to specify a specific Lambda function to run different functions in different locales.",
+      "type": "object",
+      "properties": {
+        "CodeHookSpecification": {
+          "$ref": "#/definitions/CodeHookSpecification"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "description": "Whether the Lambda code hook is enabled"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "additionalProperties": false
+    },
+    "CodeHookSpecification": {
+      "description": "Contains information about code hooks that Amazon Lex calls during a conversation.",
+      "type": "object",
+      "properties": {
+        "LambdaCodeHook": {
+          "$ref": "#/definitions/LambdaCodeHook"
+        }
+      },
+      "required": [
+        "LambdaCodeHook"
+      ],
+      "additionalProperties": false
+    },
+    "LambdaCodeHook": {
+      "description": "Contains information about code hooks that Amazon Lex calls during a conversation.",
+      "type": "object",
+      "properties": {
+        "CodeHookInterfaceVersion": {
+          "description": "The version of the request-response that you want Amazon Lex to use to invoke your Lambda function.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5
+        },
+        "LambdaArn": {
+          "description": "The Amazon Resource Name (ARN) of the Lambda function.",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "CodeHookInterfaceVersion",
+        "LambdaArn"
+      ],
+      "additionalProperties": false
+    },
+    "ConversationLogSettings": {
+      "description": "Contains information about code hooks that Amazon Lex calls during a conversation.",
+      "type": "object",
+      "properties": {
+        "AudioLogSettings": {
+          "$ref": "#/definitions/AudioLogSettings"
+        },
+        "TextLogSettings": {
+          "$ref": "#/definitions/TextLogSettings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AudioLogSettings": {
+      "description": "List of audio log settings that pertain to the conversation log settings for the bot's TestBotAlias.",
+      "type": "array",
+      "maxItems": 1,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/AudioLogSetting"
+      }
+    },
+    "TextLogSettings": {
+      "description": "List of text log settings that pertain to the conversation log settings for the bot's TestBotAlias",
+      "type": "array",
+      "maxItems": 1,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/TextLogSetting"
+      }
+    },
+    "AudioLogSetting": {
+      "description": "Settings for logging audio of conversations between Amazon Lex and a user. You specify whether to log audio and the Amazon S3 bucket where the audio file is stored.",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "$ref": "#/definitions/AudioLogDestination"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "description": ""
+        }
+      },
+      "required": [
+        "Destination",
+        "Enabled"
+      ],
+      "additionalProperties": false
+    },
+    "TextLogSetting": {
+      "description": "Contains information about code hooks that Amazon Lex calls during a conversation.",
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "$ref": "#/definitions/TextLogDestination"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "description": ""
+        }
+      },
+      "required": [
+        "Destination",
+        "Enabled"
+      ],
+      "additionalProperties": false
+    },
+    "AudioLogDestination": {
+      "description": "The location of audio log files collected when conversation logging is enabled for a bot.",
+      "type": "object",
+      "properties": {
+        "S3Bucket": {
+          "$ref": "#/definitions/S3BucketLogDestination"
+        }
+      },
+      "required": [
+        "S3Bucket"
+      ],
+      "additionalProperties": false
+    },
+    "TextLogDestination": {
+      "description": "Defines the Amazon CloudWatch Logs destination log group for conversation text logs.",
+      "type": "object",
+      "properties": {
+        "CloudWatch": {
+          "$ref": "#/definitions/CloudWatchLogGroupLogDestination"
+        }
+      },
+      "required": [
+        "CloudWatch"
+      ],
+      "additionalProperties": false
+    },
+    "CloudWatchLogGroupLogDestination": {
+      "type": "object",
+      "properties": {
+        "CloudWatchLogGroupArn": {
+          "description": "A string used to identify the groupArn for the Cloudwatch Log Group",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "LogPrefix": {
+          "description": "A string containing the value for the Log Prefix",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "CloudWatchLogGroupArn",
+        "LogPrefix"
+      ],
+      "additionalProperties": false
+    },
+    "S3BucketLogDestination": {
+      "description": "Specifies an Amazon S3 bucket for logging audio conversations",
+      "type": "object",
+      "properties": {
+        "S3BucketArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of an Amazon S3 bucket where audio log files are stored.",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^arn:[\\w\\-]+:s3:::[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$"
+        },
+        "LogPrefix": {
+          "type": "string",
+          "description": "The Amazon S3 key of the deployment package.",
+          "minLength": 0,
+          "maxLength": 1024
+        },
+        "KmsKeyArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of an AWS Key Management Service (KMS) key for encrypting audio log files stored in an S3 bucket.",
+          "minLength": 20,
+          "maxLength": 2048,
+          "pattern": "^arn:[\\w\\-]+:kms:[\\w\\-]+:[\\d]{12}:(?:key\\/[\\w\\-]+|alias\\/[a-zA-Z0-9:\\/_\\-]{1,256})$"
+        }
+      },
+      "required": [
+        "LogPrefix",
+        "S3BucketArn"
+      ],
+      "additionalProperties": false
+    },
+    "TestBotAliasSettings": {
+      "description": "Configuring the test bot alias settings for a given bot",
+      "type": "object",
+      "properties": {
+        "BotAliasLocaleSettings": {
+          "$ref": "#/definitions/BotAliasLocaleSettingsList"
+        },
+        "ConversationLogSettings": {
+          "$ref": "#/definitions/ConversationLogSettings"
+        },
+        "Description": {
+          "$ref": "#/definitions/Description"
+        },
+        "SentimentAnalysisSettings": {
+          "description": "Determines whether Amazon Lex will use Amazon Comprehend to detect the sentiment of user utterances.",
+          "type": "object",
+          "properties": {
+            "DetectSentiment": {
+              "type": "boolean",
+              "description": "Enable to call Amazon Comprehend for Sentiment natively within Lex"
+            }
+          },
+          "required": [
+            "DetectSentiment"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "RoleArn": {
       "description": "The Amazon Resource Name (ARN) of an IAM role that has permission to access the bot.",
       "type": "string",
@@ -114,6 +375,14 @@
         "VoiceId": {
           "type": "string",
           "description": "The Amazon Polly voice ID that Amazon Lex uses for voice interaction with the user."
+        },
+        "Engine": {
+          "type": "string",
+          "description": "Indicates the type of Amazon Polly voice that Amazon Lex should use for voice interaction with the user. For more information, see the engine parameter of the SynthesizeSpeech operation in the Amazon Polly developer guide.",
+          "enum": [
+            "standard",
+            "neural"
+          ]
         }
       },
       "required": [
@@ -424,6 +693,147 @@
       "minimum": 0,
       "maximum": 5
     },
+    "MessageSelectionStrategy": {
+      "description": "Indicates how a message is selected from a message group among retries.",
+      "type": "string",
+      "enum": [
+        "Random",
+        "Ordered"
+      ]
+    },
+    "AllowedInputTypes": {
+      "description": "Specifies the allowed input types.",
+      "type": "object",
+      "properties": {
+        "AllowAudioInput": {
+          "description": "Indicates whether audio input is allowed.",
+          "type": "boolean"
+        },
+        "AllowDTMFInput": {
+          "description": "Indicates whether DTMF input is allowed.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "AllowAudioInput",
+        "AllowDTMFInput"
+      ],
+      "additionalProperties": false
+    },
+    "DTMFSpecification": {
+      "description": "Specifies the settings on DTMF input.",
+      "type": "object",
+      "properties": {
+        "DeletionCharacter": {
+          "description": "The DTMF character that clears the accumulated DTMF digits and immediately ends the input.",
+          "type": "string",
+          "pattern": "^[A-D0-9#*]{1}$"
+        },
+        "EndCharacter": {
+          "description": "The DTMF character that immediately ends input. If the user does not press this character, the input ends after the end timeout.",
+          "type": "string",
+          "pattern": "^[A-D0-9#*]{1}$"
+        },
+        "EndTimeoutMs": {
+          "description": "How long the bot should wait after the last DTMF character input before assuming that the input has concluded.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "MaxLength": {
+          "description": "The maximum number of DTMF digits allowed in an utterance.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        }
+      },
+      "required": [
+        "DeletionCharacter",
+        "EndCharacter",
+        "EndTimeoutMs",
+        "MaxLength"
+      ],
+      "additionalProperties": false
+    },
+    "AudioSpecification": {
+      "description": "Specifies the audio input specifications.",
+      "type": "object",
+      "properties": {
+        "EndTimeoutMs": {
+          "description": "Time for which a bot waits after the customer stops speaking to assume the utterance is finished.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "MaxLengthMs": {
+          "description": "Time for how long Amazon Lex waits before speech input is truncated and the speech is returned to application.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "EndTimeoutMs",
+        "MaxLengthMs"
+      ],
+      "additionalProperties": false
+    },
+    "AudioAndDTMFInputSpecification": {
+      "description": "Specifies the audio and DTMF input specification.",
+      "type": "object",
+      "properties": {
+        "StartTimeoutMs": {
+          "description": "Time for which a bot waits before assuming that the customer isn't going to speak or press a key. This timeout is shared between Audio and DTMF inputs.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "DTMFSpecification": {
+          "$ref": "#/definitions/DTMFSpecification"
+        },
+        "AudioSpecification": {
+          "$ref": "#/definitions/AudioSpecification"
+        }
+      },
+      "required": [
+        "StartTimeoutMs"
+      ],
+      "additionalProperties": false
+    },
+    "TextInputSpecification": {
+      "description": "Specifies the text input specifications.",
+      "type": "object",
+      "properties": {
+        "StartTimeoutMs": {
+          "description": "Time for which a bot waits before re-prompting a customer for text input.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "StartTimeoutMs"
+      ],
+      "additionalProperties": false
+    },
+    "PromptAttemptSpecification": {
+      "description": "Specifies the settings on a prompt attempt.",
+      "type": "object",
+      "properties": {
+        "AllowedInputTypes": {
+          "$ref": "#/definitions/AllowedInputTypes"
+        },
+        "AllowInterrupt": {
+          "description": "Indicates whether the user can interrupt a speech prompt attempt from the bot.",
+          "type": "boolean"
+        },
+        "AudioAndDTMFInputSpecification": {
+          "$ref": "#/definitions/AudioAndDTMFInputSpecification"
+        },
+        "TextInputSpecification": {
+          "$ref": "#/definitions/TextInputSpecification"
+        }
+      },
+      "required": [
+        "AllowedInputTypes"
+      ],
+      "additionalProperties": false
+    },
     "PromptSpecification": {
       "description": "Prompts the user to confirm the intent.",
       "type": "object",
@@ -437,6 +847,19 @@
         "AllowInterrupt": {
           "description": "Indicates whether the user can interrupt a speech prompt from the bot.",
           "type": "boolean"
+        },
+        "MessageSelectionStrategy": {
+          "$ref": "#/definitions/MessageSelectionStrategy"
+        },
+        "PromptAttemptsSpecification": {
+          "description": "Specifies the advanced settings on each attempt of the prompt.",
+          "type": "object",
+          "patternProperties": {
+            "^(Initial|Retry1|Retry2|Retry3|Retry4|Retry5)$": {
+              "$ref": "#/definitions/PromptAttemptSpecification"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "required": [
@@ -802,6 +1225,23 @@
       ],
       "additionalProperties": false
     },
+    "AudioRecognitionStrategy": {
+      "description": "Enables using slot values as a custom vocabulary when recognizing user utterances.",
+      "type": "string",
+      "enum": [
+        "UseSlotValuesAsCustomVocabulary"
+      ]
+    },
+    "AdvancedRecognitionSetting": {
+      "description": "Provides settings that enable advanced recognition settings for slot values.",
+      "type": "object",
+      "properties": {
+        "AudioRecognitionStrategy": {
+          "$ref": "#/definitions/AudioRecognitionStrategy"
+        }
+      },
+      "additionalProperties": false
+    },
     "SlotValueSelectionSetting": {
       "description": "Contains settings used by Amazon Lex to select a slot value.",
       "type": "object",
@@ -811,6 +1251,9 @@
         },
         "RegexFilter": {
           "$ref": "#/definitions/SlotValueRegexFilter"
+        },
+        "AdvancedRecognitionSetting": {
+          "$ref": "#/definitions/AdvancedRecognitionSetting"
         }
       },
       "required": [
@@ -901,6 +1344,50 @@
       },
       "required": [
         "Name"
+      ],
+      "additionalProperties": false
+    },
+    "CustomVocabularyItem": {
+      "description": "A custom vocabulary item that contains the phrase to recognize and a weight to give the boost.",
+      "type": "object",
+      "properties": {
+        "Phrase": {
+          "description": "Phrase that should be recognized.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "Weight": {
+          "description": "The degree to which the phrase recognition is boosted.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        }
+      },
+      "required": [
+        "Phrase"
+      ],
+      "additionalProperties": false
+    },
+    "CustomVocabularyItems": {
+      "type": "array",
+      "maxItems": 500,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/CustomVocabularyItem"
+      }
+    },
+    "CustomVocabulary": {
+      "description": "A custom vocabulary is a list of specific phrases that you want Amazon Lex V2 to recognize in the audio input.",
+      "type": "object",
+      "properties": {
+        "CustomVocabularyItems": {
+          "$ref": "#/definitions/CustomVocabularyItems"
+        }
+      },
+      "required": [
+        "CustomVocabularyItems"
       ],
       "additionalProperties": false
     },
@@ -1091,12 +1578,15 @@
         "SlotTypes": {
           "description": "List of SlotTypes",
           "type": "array",
-          "maxItems": 100,
+          "maxItems": 250,
           "uniqueItems": true,
           "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/SlotType"
           }
+        },
+        "CustomVocabulary": {
+          "$ref": "#/definitions/CustomVocabulary"
         }
       },
       "required": [
@@ -1202,6 +1692,9 @@
     "AutoBuildBotLocales": {
       "description": "Specifies whether to build the bot locales after bot creation completes.",
       "type": "boolean"
+    },
+    "TestBotAliasSettings": {
+      "$ref": "#/definitions/TestBotAliasSettings"
     }
   },
   "taggable": true,
@@ -1254,7 +1747,11 @@
         "lex:BuildBotLocale",
         "lex:ListBots",
         "lex:ListBotLocales",
-        "s3:GetObject"
+        "lex:CreateCustomVocabulary",
+        "lex:UpdateCustomVocabulary",
+        "lex:DeleteCustomVocabulary",
+        "s3:GetObject",
+        "lex:UpdateBotAlias"
       ]
     },
     "read": {
@@ -1291,7 +1788,11 @@
         "lex:BuildBotLocale",
         "lex:ListBots",
         "lex:ListBotLocales",
-        "s3:GetObject"
+        "lex:CreateCustomVocabulary",
+        "lex:UpdateCustomVocabulary",
+        "lex:DeleteCustomVocabulary",
+        "s3:GetObject",
+        "lex:UpdateBotAlias"
       ]
     },
     "delete": {
@@ -1304,7 +1805,8 @@
         "lex:DeleteSlot",
         "lex:DeleteBotVersion",
         "lex:DeleteBotChannel",
-        "lex:DeleteBotAlias"
+        "lex:DeleteBotAlias",
+        "lex:DeleteCustomVocabulary"
       ]
     },
     "list": {

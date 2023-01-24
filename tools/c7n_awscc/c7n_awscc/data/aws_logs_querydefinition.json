@@ -14,7 +14,6 @@
     "Name": {
       "description": "A name for the saved query definition",
       "type": "string",
-      "pattern": "^([^:*\\/]+\\/?)*[^:*\\/]+$",
       "minLength": 1,
       "maxLength": 255
     },

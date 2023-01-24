@@ -191,41 +191,7 @@
       ]
     },
     "AuthParameters": {
-      "type": "object",
-      "minProperties": 1,
-      "maxProperties": 2,
-      "properties": {
-        "ApiKeyAuthParameters": {
-          "$ref": "#/definitions/ApiKeyAuthParameters"
-        },
-        "BasicAuthParameters": {
-          "$ref": "#/definitions/BasicAuthParameters"
-        },
-        "OAuthParameters": {
-          "$ref": "#/definitions/OAuthParameters"
-        },
-        "InvocationHttpParameters": {
-          "$ref": "#/definitions/ConnectionHttpParameters"
-        }
-      },
-      "oneOf": [
-        {
-          "required": [
-            "BasicAuthParameters"
-          ]
-        },
-        {
-          "required": [
-            "OAuthParameters"
-          ]
-        },
-        {
-          "required": [
-            "ApiKeyAuthParameters"
-          ]
-        }
-      ],
-      "additionalProperties": false
+      "$ref": "#/definitions/AuthParameters"
     }
   },
   "additionalProperties": false,
@@ -241,9 +207,7 @@
     "/properties/SecretArn"
   ],
   "writeOnlyProperties": [
-    "/definitions/BasicAuthParameters/Password",
-    "/definitions/ApiKeyAuthParameters/ApiKeyValue",
-    "/definitions/OAuthParameters/ClientParameters/ClientSecret"
+    "/properties/AuthParameters"
   ],
   "primaryIdentifier": [
     "/properties/Name"

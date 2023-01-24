@@ -1,0 +1,143 @@
+{
+  "typeName": "AWS::IoTTwinMaker::Scene",
+  "description": "Resource schema for AWS::IoTTwinMaker::Scene",
+  "definitions": {
+    "DateTimeFormat": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "properties": {
+    "SceneId": {
+      "description": "The ID of the scene.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z_0-9][a-zA-Z_\\-0-9]*[a-zA-Z0-9]+"
+    },
+    "Arn": {
+      "description": "The ARN of the scene.",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "pattern": "arn:((aws)|(aws-cn)|(aws-us-gov)):iottwinmaker:[a-z0-9-]+:[0-9]{12}:[\\/a-zA-Z0-9_\\-\\.:]+"
+    },
+    "Description": {
+      "description": "The description of the scene.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 512
+    },
+    "ContentLocation": {
+      "description": "The relative path that specifies the location of the content definition file.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 256,
+      "pattern": "[sS]3://[A-Za-z0-9._/-]+"
+    },
+    "CreationDateTime": {
+      "description": "The date and time when the scene was created.",
+      "$ref": "#/definitions/DateTimeFormat"
+    },
+    "UpdateDateTime": {
+      "description": "The date and time of the current update.",
+      "$ref": "#/definitions/DateTimeFormat"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "A key-value pair to associate with a resource.",
+      "patternProperties": {
+        "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "WorkspaceId": {
+      "description": "The ID of the scene.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z_0-9][a-zA-Z_\\-0-9]*[a-zA-Z0-9]+"
+    },
+    "Capabilities": {
+      "description": "A list of capabilities that the scene uses to render.",
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 256,
+        "pattern": ".*"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "WorkspaceId",
+    "SceneId",
+    "ContentLocation"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationDateTime",
+    "/properties/UpdateDateTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/SceneId",
+    "/properties/WorkspaceId"
+  ],
+  "primaryIdentifier": [
+    "/properties/WorkspaceId",
+    "/properties/SceneId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iottwinmaker:CreateScene",
+        "iottwinmaker:GetWorkspace"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:GetScene",
+        "iottwinmaker:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListTagsForResource",
+        "iottwinmaker:TagResource",
+        "iottwinmaker:UntagResource",
+        "iottwinmaker:UpdateScene"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iottwinmaker:DeleteScene",
+        "iottwinmaker:GetWorkspace"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListTagsForResource",
+        "iottwinmaker:ListScenes"
+      ]
+    }
+  }
+}

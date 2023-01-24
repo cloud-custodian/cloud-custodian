@@ -1,0 +1,197 @@
+{
+  "typeName": "AWS::ApiGatewayV2::Api",
+  "description": "Resource Type definition for AWS::ApiGatewayV2::Api",
+  "additionalProperties": false,
+  "properties": {
+    "RouteSelectionExpression": {
+      "type": "string"
+    },
+    "BodyS3Location": {
+      "$ref": "#/definitions/BodyS3Location"
+    },
+    "Description": {
+      "type": "string"
+    },
+    "ApiEndpoint": {
+      "type": "string"
+    },
+    "BasePath": {
+      "type": "string"
+    },
+    "FailOnWarnings": {
+      "type": "boolean"
+    },
+    "DisableExecuteApiEndpoint": {
+      "type": "boolean"
+    },
+    "DisableSchemaValidation": {
+      "type": "boolean"
+    },
+    "Name": {
+      "type": "string"
+    },
+    "Target": {
+      "type": "string"
+    },
+    "CredentialsArn": {
+      "type": "string"
+    },
+    "CorsConfiguration": {
+      "$ref": "#/definitions/Cors"
+    },
+    "Version": {
+      "type": "string"
+    },
+    "ProtocolType": {
+      "type": "string"
+    },
+    "RouteKey": {
+      "type": "string"
+    },
+    "ApiId": {
+      "type": "string"
+    },
+    "Body": {
+      "type": "object"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "This resource type use map for Tags, suggest to use List of Tag",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "type": "string"
+        }
+      }
+    },
+    "ApiKeySelectionExpression": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "BodyS3Location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Etag": {
+          "type": "string"
+        },
+        "Bucket": {
+          "type": "string"
+        },
+        "Version": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      }
+    },
+    "Cors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AllowOrigins": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string"
+          }
+        },
+        "AllowCredentials": {
+          "type": "boolean"
+        },
+        "ExposeHeaders": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string"
+          }
+        },
+        "AllowHeaders": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string"
+          }
+        },
+        "MaxAge": {
+          "type": "integer"
+        },
+        "AllowMethods": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "createOnlyProperties": [
+    "/properties/ProtocolType"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApiId"
+  ],
+  "readOnlyProperties": [
+    "/properties/ApiId",
+    "/properties/ApiEndpoint"
+  ],
+  "writeOnlyProperties": [
+    "/properties/BasePath",
+    "/properties/Body",
+    "/properties/BodyS3Location",
+    "/properties/BodyS3Location/Etag",
+    "/properties/BodyS3Location/Bucket",
+    "/properties/BodyS3Location/Version",
+    "/properties/BodyS3Location/Key",
+    "/properties/CredentialsArn",
+    "/properties/FailOnWarnings",
+    "/properties/RouteKey",
+    "/properties/Target",
+    "/properties/DisableSchemaValidation"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apigateway:POST",
+        "s3:getObject"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:PATCH",
+        "apigateway:GET",
+        "apigateway:PUT",
+        "s3:getObject"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "apigateway:GET",
+        "s3:getObject"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "apigateway:GET",
+        "apigateway:DELETE",
+        "s3:getObject"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "apigateway:GET",
+        "s3:getObject"
+      ]
+    }
+  }
+}

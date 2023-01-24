@@ -76,7 +76,20 @@
           "items": {
             "$ref": "#/definitions/SsmParameter"
           },
-          "maxItems": 200
+          "minItems": 1,
+          "maxItems": 200,
+          "default": []
+        },
+        "DynamicParameters": {
+          "description": "The parameters with dynamic values to set when starting the SSM automation document.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/DynamicSsmParameter"
+          },
+          "maxItems": 200,
+          "default": []
         }
       }
     },
@@ -94,7 +107,6 @@
           "uniqueItems": true,
           "insertionOrder": true,
           "maxItems": 10,
-          "minItems": 1,
           "items": {
             "$ref": "#/definitions/SsmParameterValue"
           }
@@ -110,6 +122,102 @@
       "description": "A value of the parameter to set when starting the SSM automation document.",
       "type": "string",
       "maxLength": 10000
+    },
+    "DynamicSsmParameter": {
+      "description": "A parameter with a dynamic value to set when starting the SSM automation document.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "Value": {
+          "$ref": "#/definitions/DynamicSsmParameterValue"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ],
+      "additionalProperties": false
+    },
+    "DynamicSsmParameterValue": {
+      "description": "Value of the dynamic parameter to set when starting the SSM automation document.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Variable": {
+          "$ref": "#/definitions/VariableType"
+        }
+      }
+    },
+    "VariableType": {
+      "description": "The variable types used as dynamic parameter value when starting the SSM automation document.",
+      "type": "string",
+      "enum": [
+        "INCIDENT_RECORD_ARN",
+        "INVOLVED_RESOURCES"
+      ]
+    },
+    "Integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PagerDutyConfiguration": {
+          "$ref": "#/definitions/PagerDutyConfiguration"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "PagerDutyConfiguration"
+          ]
+        }
+      ]
+    },
+    "PagerDutyConfiguration": {
+      "description": "The pagerDuty configuration to use when starting the incident.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "Name",
+        "SecretId",
+        "PagerDutyIncidentConfiguration"
+      ],
+      "properties": {
+        "Name": {
+          "description": "The name of the pagerDuty configuration.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "SecretId": {
+          "description": "The AWS secrets manager secretId storing the pagerDuty token.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "PagerDutyIncidentConfiguration": {
+          "$ref": "#/definitions/PagerDutyIncidentConfiguration"
+        }
+      }
+    },
+    "PagerDutyIncidentConfiguration": {
+      "description": "The pagerDuty incident configuration.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ServiceId": {
+          "description": "The pagerDuty serviceId.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "ServiceId"
+      ]
     },
     "Tag": {
       "description": "A key-value pair to tag a resource.",
@@ -157,6 +265,7 @@
         "NotificationTargets": {
           "description": "The list of notification targets.",
           "type": "array",
+          "default": [],
           "maxItems": 10,
           "items": {
             "$ref": "#/definitions/NotificationTargetItem"
@@ -173,6 +282,17 @@
           "description": "The title string.",
           "type": "string",
           "maxLength": 200
+        },
+        "IncidentTags": {
+          "description": "Tags that get applied to incidents created by the StartIncident API action.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "default": [],
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
         }
       }
     },
@@ -180,6 +300,7 @@
       "type": "array",
       "uniqueItems": true,
       "insertionOrder": true,
+      "default": [],
       "items": {
         "$ref": "#/definitions/SnsArn"
       }
@@ -223,7 +344,6 @@
       "type": "array",
       "default": [],
       "maxItems": 5,
-      "minItems": 1,
       "uniqueItems": true,
       "insertionOrder": false,
       "items": {
@@ -241,13 +361,23 @@
         "$ref": "#/definitions/Action"
       }
     },
+    "Integrations": {
+      "description": "The list of integrations.",
+      "type": "array",
+      "default": [],
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/definitions/Integration"
+      }
+    },
     "Tags": {
       "description": "The tags to apply to the response plan.",
       "type": "array",
       "default": [],
       "uniqueItems": true,
       "insertionOrder": false,
-      "minItems": 1,
       "maxItems": 50,
       "items": {
         "$ref": "#/definitions/Tag"
@@ -276,7 +406,10 @@
     "create": {
       "permissions": [
         "ssm-incidents:CreateResponsePlan",
-        "iam:PassRole"
+        "iam:PassRole",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt",
+        "kms:GenerateDataKey*"
       ]
     },
     "read": {
@@ -291,7 +424,10 @@
         "iam:PassRole",
         "ssm-incidents:TagResource",
         "ssm-incidents:UntagResource",
-        "ssm-incidents:ListTagsForResource"
+        "ssm-incidents:ListTagsForResource",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt",
+        "kms:GenerateDataKey*"
       ]
     },
     "delete": {

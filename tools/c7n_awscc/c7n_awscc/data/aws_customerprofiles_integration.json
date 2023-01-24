@@ -535,6 +535,27 @@
         "SourceFlowConfig"
       ],
       "additionalProperties": false
+    },
+    "ObjectTypeMapping": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "Value": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z_0-9-]*$",
+          "minLength": 1,
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
     }
   },
   "properties": {
@@ -577,11 +598,17 @@
       },
       "minItems": 0,
       "maxItems": 50
+    },
+    "ObjectTypeNames": {
+      "description": "The mapping between 3rd party event types and ObjectType names",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ObjectTypeMapping"
+      }
     }
   },
   "required": [
-    "DomainName",
-    "ObjectTypeName"
+    "DomainName"
   ],
   "handlers": {
     "create": {

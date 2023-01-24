@@ -25,6 +25,7 @@
         "SessionPinningFilters": {
           "description": "Each item in the list represents a class of SQL operations that normally cause all later statements in a session using a proxy to be pinned to the same underlying database connection.",
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
@@ -33,7 +34,8 @@
           "description": "One or more SQL statements for the proxy to run when opening each new database connection.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "properties": {
@@ -59,12 +61,14 @@
     },
     "DBInstanceIdentifiers": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "string"
       }
     },
     "DBClusterIdentifiers": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "string"
       }

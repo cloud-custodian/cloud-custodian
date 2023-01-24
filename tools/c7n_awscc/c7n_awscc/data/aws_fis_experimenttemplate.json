@@ -124,6 +124,16 @@
           },
           "additionalProperties": false
         },
+        "Parameters": {
+          "type": "object",
+          "patternProperties": {
+            ".{1,64}": {
+              "type": "string",
+              "maxLength": 1024
+            }
+          },
+          "additionalProperties": false
+        },
         "Filters": {
           "$ref": "#/definitions/ExperimentTemplateTargetFilterList"
         },
@@ -224,6 +234,52 @@
       },
       "additionalProperties": false
     },
+    "ExperimentTemplateLogConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CloudWatchLogsConfiguration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "LogGroupArn": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 2048
+            }
+          },
+          "required": [
+            "LogGroupArn"
+          ]
+        },
+        "S3Configuration": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "BucketName": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 63
+            },
+            "Prefix": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "required": [
+            "BucketName"
+          ]
+        },
+        "LogSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "LogSchemaVersion"
+      ]
+    },
     "RoleArn": {
       "type": "string",
       "description": "The Amazon Resource Name (ARN) of an IAM role that grants the AWS FIS service permission to perform service actions on your behalf.",
@@ -245,6 +301,9 @@
     },
     "StopConditions": {
       "$ref": "#/definitions/ExperimentTemplateStopConditionList"
+    },
+    "LogConfiguration": {
+      "$ref": "#/definitions/ExperimentTemplateLogConfiguration"
     },
     "RoleArn": {
       "$ref": "#/definitions/RoleArn"

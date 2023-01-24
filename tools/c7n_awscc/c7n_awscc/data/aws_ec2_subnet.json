@@ -18,6 +18,9 @@
     "AvailabilityZone": {
       "type": "string"
     },
+    "AvailabilityZoneId": {
+      "type": "string"
+    },
     "CidrBlock": {
       "type": "string"
     },
@@ -36,6 +39,27 @@
     },
     "OutpostArn": {
       "type": "string"
+    },
+    "Ipv6Native": {
+      "type": "boolean"
+    },
+    "EnableDns64": {
+      "type": "boolean"
+    },
+    "PrivateDnsNameOptionsOnLaunch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "HostnameType": {
+          "type": "string"
+        },
+        "EnableResourceNameDnsARecord": {
+          "type": "boolean"
+        },
+        "EnableResourceNameDnsAAAARecord": {
+          "type": "boolean"
+        }
+      }
     },
     "Tags": {
       "type": "array",
@@ -64,14 +88,18 @@
     }
   },
   "required": [
-    "VpcId",
-    "CidrBlock"
+    "VpcId"
   ],
   "createOnlyProperties": [
     "/properties/VpcId",
     "/properties/AvailabilityZone",
+    "/properties/AvailabilityZoneId",
     "/properties/CidrBlock",
-    "/properties/OutpostArn"
+    "/properties/OutpostArn",
+    "/properties/Ipv6Native"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/Ipv6CidrBlock"
   ],
   "primaryIdentifier": [
     "/properties/SubnetId"
@@ -110,6 +138,12 @@
       "permissions": [
         "ec2:DescribeSubnets",
         "ec2:DeleteSubnet"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeSubnets",
+        "ec2:DescribeNetworkAcls"
       ]
     }
   }

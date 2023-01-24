@@ -68,6 +68,13 @@
       },
       "minItems": 1,
       "insertionOrder": true
+    },
+    "GroupingType": {
+      "description": "The grouping type of the application",
+      "type": "string",
+      "enum": [
+        "ACCOUNT_BASED"
+      ]
     }
   },
   "definitions": {
@@ -298,6 +305,14 @@
         "JMXPrometheusExporter": {
           "description": "The JMX Prometheus Exporter settings.",
           "$ref": "#/definitions/JMXPrometheusExporter"
+        },
+        "HANAPrometheusExporter": {
+          "description": "The HANA DB Prometheus Exporter settings.",
+          "$ref": "#/definitions/HANAPrometheusExporter"
+        },
+        "HAClusterPrometheusExporter": {
+          "description": "The HA cluster Prometheus Exporter settings.",
+          "$ref": "#/definitions/HAClusterPrometheusExporter"
         }
       },
       "additionalProperties": false
@@ -346,7 +361,51 @@
           "type": "string"
         },
         "PrometheusPort": {
-          "description": "Prometheus exporter port",
+          "description": "Prometheus exporter port.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HANAPrometheusExporter": {
+      "description": "The HANA DB Prometheus Exporter settings.",
+      "type": "object",
+      "properties": {
+        "HANASID": {
+          "description": "HANA DB SID.",
+          "type": "string"
+        },
+        "HANAPort": {
+          "description": "The HANA DB port.",
+          "type": "string"
+        },
+        "HANASecretName": {
+          "description": "The secret name which manages the HANA DB credentials e.g. {\n  \"username\": \"<>\",\n  \"password\": \"<>\"\n}.",
+          "type": "string"
+        },
+        "AgreeToInstallHANADBClient": {
+          "description": "A flag which indicates agreeing to install SAP HANA DB client.",
+          "type": "boolean"
+        },
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "HANASID",
+        "HANAPort",
+        "HANASecretName",
+        "AgreeToInstallHANADBClient"
+      ],
+      "additionalProperties": false
+    },
+    "HAClusterPrometheusExporter": {
+      "description": "The HA cluster Prometheus Exporter settings.",
+      "type": "object",
+      "properties": {
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
           "type": "string"
         }
       },
@@ -538,7 +597,8 @@
         "applicationinsights:DescribeComponentConfigurationRecommendation",
         "applicationinsights:UpdateComponentConfiguration",
         "applicationinsights:ListComponents"
-      ]
+      ],
+      "timeoutInMinutes": 600
     },
     "read": {
       "permissions": [
@@ -572,7 +632,8 @@
         "applicationinsights:DescribeComponentConfiguration",
         "applicationinsights:DescribeComponentConfigurationRecommendation",
         "applicationinsights:UpdateComponentConfiguration"
-      ]
+      ],
+      "timeoutInMinutes": 600
     },
     "delete": {
       "permissions": [

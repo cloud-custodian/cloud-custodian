@@ -51,6 +51,30 @@
       "required": [
         "BucketName"
       ]
+    },
+    "ThumbnailConfiguration": {
+      "description": "Recording Thumbnail Configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RecordingMode": {
+          "description": "Thumbnail Recording Mode, which determines whether thumbnails are recorded at an interval or are disabled.",
+          "type": "string",
+          "enum": [
+            "INTERVAL",
+            "DISABLED"
+          ]
+        },
+        "TargetIntervalSeconds": {
+          "description": "Thumbnail recording Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.",
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 60
+        }
+      },
+      "required": [
+        "RecordingMode"
+      ]
     }
   },
   "properties": {
@@ -77,6 +101,13 @@
         "ACTIVE"
       ]
     },
+    "RecordingReconnectWindowSeconds": {
+      "description": "Recording Reconnect Window Seconds. (0 means disabled)",
+      "type": "integer",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 300
+    },
     "DestinationConfiguration": {
       "$ref": "#/definitions/DestinationConfiguration"
     },
@@ -89,6 +120,9 @@
       "items": {
         "$ref": "#/definitions/Tag"
       }
+    },
+    "ThumbnailConfiguration": {
+      "$ref": "#/definitions/ThumbnailConfiguration"
     }
   },
   "additionalProperties": false,
@@ -106,7 +140,11 @@
     "/properties/Name",
     "/properties/DestinationConfiguration",
     "/properties/DestinationConfiguration/S3",
-    "/properties/DestinationConfiguration/S3/BucketName"
+    "/properties/DestinationConfiguration/S3/BucketName",
+    "/properties/RecordingReconnectWindowSeconds",
+    "/properties/ThumbnailConfiguration",
+    "/properties/ThumbnailConfiguration/RecordingMode",
+    "/properties/ThumbnailConfiguration/TargetIntervalSeconds"
   ],
   "handlers": {
     "create": {

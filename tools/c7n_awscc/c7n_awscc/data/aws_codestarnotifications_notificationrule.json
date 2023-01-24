@@ -93,14 +93,17 @@
     "Name"
   ],
   "createOnlyProperties": [
-    "/properties/Resource",
-    "/properties/Tags"
+    "/properties/Resource"
   ],
   "primaryIdentifier": [
     "/properties/Arn"
   ],
   "readOnlyProperties": [
     "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/EventTypeId",
+    "/properties/TargetAddress"
   ],
   "handlers": {
     "create": {
@@ -126,7 +129,9 @@
     },
     "update": {
       "permissions": [
-        "codestar-notifications:updateNotificationRule"
+        "codestar-notifications:updateNotificationRule",
+        "codestar-notifications:TagResource",
+        "codestar-notifications:UntagResource"
       ]
     }
   }

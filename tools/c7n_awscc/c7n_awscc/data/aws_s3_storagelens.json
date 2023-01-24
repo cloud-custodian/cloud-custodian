@@ -62,6 +62,39 @@
         }
       }
     },
+    "AdvancedCostOptimizationMetrics": {
+      "description": "Enables advanced cost optimization metrics.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether advanced cost optimization metrics are enabled or disabled.",
+          "type": "boolean"
+        }
+      }
+    },
+    "AdvancedDataProtectionMetrics": {
+      "description": "Enables advanced data protection metrics.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether advanced data protection metrics are enabled or disabled.",
+          "type": "boolean"
+        }
+      }
+    },
+    "DetailedStatusCodesMetrics": {
+      "description": "Enables detailed status codes metrics.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsEnabled": {
+          "description": "Specifies whether detailed status codes metrics are enabled or disabled.",
+          "type": "boolean"
+        }
+      }
+    },
     "SelectionCriteria": {
       "description": "Selection criteria for prefix-level metrics.",
       "type": "object",
@@ -115,6 +148,15 @@
         "ActivityMetrics": {
           "$ref": "#/definitions/ActivityMetrics"
         },
+        "AdvancedCostOptimizationMetrics": {
+          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
+        },
+        "AdvancedDataProtectionMetrics": {
+          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
+        },
+        "DetailedStatusCodesMetrics": {
+          "$ref": "#/definitions/DetailedStatusCodesMetrics"
+        },
         "PrefixLevel": {
           "$ref": "#/definitions/PrefixLevel"
         }
@@ -127,6 +169,15 @@
       "properties": {
         "ActivityMetrics": {
           "$ref": "#/definitions/ActivityMetrics"
+        },
+        "AdvancedCostOptimizationMetrics": {
+          "$ref": "#/definitions/AdvancedCostOptimizationMetrics"
+        },
+        "AdvancedDataProtectionMetrics": {
+          "$ref": "#/definitions/AdvancedDataProtectionMetrics"
+        },
+        "DetailedStatusCodesMetrics": {
+          "$ref": "#/definitions/DetailedStatusCodesMetrics"
         },
         "BucketLevel": {
           "$ref": "#/definitions/BucketLevel"

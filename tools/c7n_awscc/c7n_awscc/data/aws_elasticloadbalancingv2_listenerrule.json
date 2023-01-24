@@ -354,7 +354,6 @@
       "required": [
         "TokenEndpoint",
         "Issuer",
-        "ClientSecret",
         "UserInfoEndpoint",
         "ClientId",
         "AuthorizationEndpoint"

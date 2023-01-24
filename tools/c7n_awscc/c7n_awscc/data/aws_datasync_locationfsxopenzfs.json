@@ -1,0 +1,191 @@
+{
+  "typeName": "AWS::DataSync::LocationFSxOpenZFS",
+  "description": "Resource schema for AWS::DataSync::LocationFSxOpenZFS.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datasync.git",
+  "definitions": {
+    "Tag": {
+      "additionalProperties": false,
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key for an AWS resource tag.",
+          "pattern": "^[a-zA-Z0-9\\s+=._:/-]+$",
+          "maxLength": 256,
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for an AWS resource tag.",
+          "pattern": "^[a-zA-Z0-9\\s+=._:@/-]+$",
+          "maxLength": 256,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "Protocol": {
+      "additionalProperties": false,
+      "description": "Configuration settings for an NFS or SMB protocol, currently only support NFS",
+      "type": "object",
+      "properties": {
+        "NFS": {
+          "$ref": "#/definitions/NFS"
+        }
+      }
+    },
+    "NFS": {
+      "additionalProperties": false,
+      "description": "FSx OpenZFS file system NFS protocol information",
+      "type": "object",
+      "properties": {
+        "MountOptions": {
+          "$ref": "#/definitions/MountOptions"
+        }
+      },
+      "required": [
+        "MountOptions"
+      ]
+    },
+    "MountOptions": {
+      "additionalProperties": false,
+      "description": "The NFS mount options that DataSync can use to mount your NFS share.",
+      "type": "object",
+      "properties": {
+        "Version": {
+          "description": "The specific NFS version that you want DataSync to use to mount your NFS share.",
+          "type": "string",
+          "enum": [
+            "AUTOMATIC",
+            "NFS3",
+            "NFS4_0",
+            "NFS4_1"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "FsxFilesystemArn": {
+      "description": "The Amazon Resource Name (ARN) for the FSx OpenZFS file system.",
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):fsx:[a-z\\-0-9]+:[0-9]{12}:file-system/fs-[0-9a-f]+$"
+    },
+    "SecurityGroupArns": {
+      "description": "The ARNs of the security groups that are to use to configure the FSx OpenZFS file system.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 128,
+        "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):ec2:[a-z\\-0-9]*:[0-9]{12}:security-group/sg-[a-f0-9]+$"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "insertionOrder": false
+    },
+    "Protocol": {
+      "$ref": "#/definitions/Protocol"
+    },
+    "Subdirectory": {
+      "description": "A subdirectory in the location's path.",
+      "type": "string",
+      "maxLength": 4096,
+      "pattern": "^[a-zA-Z0-9_\\-\\+\\./\\(\\)\\$\\p{Zs}]+$"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "maxItems": 50,
+      "minItems": 0,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "LocationArn": {
+      "description": "The Amazon Resource Name (ARN) of the Amazon FSx OpenZFS file system location that is created.",
+      "type": "string",
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:location/loc-[0-9a-z]{17}$",
+      "maxLength": 128
+    },
+    "LocationUri": {
+      "description": "The URL of the FSx OpenZFS that was described.",
+      "type": "string",
+      "pattern": "^(efs|nfs|s3|smb|fsxw|hdfs|fsxl|fsxz)://[a-zA-Z0-9.:/\\-]+$",
+      "maxLength": 4356
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "additionalProperties": false,
+  "required": [
+    "SecurityGroupArns",
+    "FsxFilesystemArn",
+    "Protocol"
+  ],
+  "readOnlyProperties": [
+    "/properties/LocationArn",
+    "/properties/LocationUri"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Subdirectory",
+    "/properties/FsxFilesystemArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/LocationArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/FsxFilesystemArn",
+    "/properties/SecurityGroupArns",
+    "/properties/Protocol",
+    "/properties/Subdirectory"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "datasync:CreateLocationFsxOpenZfs",
+        "datasync:DescribeLocationFsxOpenZfs",
+        "datasync:ListTagsForResource",
+        "fsx:DescribeFileSystems",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "datasync:DescribeLocationFsxOpenZfs",
+        "datasync:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "datasync:DescribeLocationFsxOpenZfs",
+        "datasync:ListTagsForResource",
+        "datasync:TagResource",
+        "datasync:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "datasync:DeleteLocation"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "datasync:ListLocations"
+      ]
+    }
+  }
+}

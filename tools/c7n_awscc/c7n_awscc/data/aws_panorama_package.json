@@ -20,7 +20,7 @@
       "minLength": 1,
       "maxLength": 255
     },
-    "CreatedTime": {
+    "Timestamp": {
       "type": "integer"
     },
     "StorageLocation": {
@@ -89,7 +89,7 @@
       "$ref": "#/definitions/StorageLocation"
     },
     "CreatedTime": {
-      "$ref": "#/definitions/CreatedTime"
+      "$ref": "#/definitions/Timestamp"
     },
     "Tags": {
       "$ref": "#/definitions/TagList"
@@ -104,7 +104,6 @@
     "/properties/PackageId",
     "/properties/Arn",
     "/properties/CreatedTime",
-    "/properties/StorageLocation",
     "/properties/StorageLocation/Bucket",
     "/properties/StorageLocation/RepoPrefixLocation",
     "/properties/StorageLocation/GeneratedPrefixLocation",

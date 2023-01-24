@@ -16,7 +16,8 @@
         "CSV",
         "JSON",
         "PARQUET",
-        "EXCEL"
+        "EXCEL",
+        "ORC"
       ],
       "type": "string"
     },

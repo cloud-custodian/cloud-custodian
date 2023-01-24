@@ -59,12 +59,12 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "PublicKeyMaterial"
-  ],
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/Fingerprint"
+  ],
+  "writeOnlyProperties": [
+    "/properties/PublicKeyMaterial"
   ],
   "createOnlyProperties": [
     "/properties/PublicKeyMaterial",

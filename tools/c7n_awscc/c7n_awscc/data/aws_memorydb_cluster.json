@@ -42,6 +42,13 @@
         "Key",
         "Value"
       ]
+    },
+    "DataTieringStatus": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false"
+      ]
     }
   },
   "properties": {
@@ -124,6 +131,11 @@
       "description": "A flag that enables in-transit encryption when set to true.\n\nYou cannot modify the value of TransitEncryptionEnabled after the cluster is created. To enable in-transit encryption on a cluster you must set TransitEncryptionEnabled to true when you create a cluster.",
       "type": "boolean"
     },
+    "DataTiering": {
+      "type": "object",
+      "description": "Enables data tiering. Data tiering is only supported for clusters using the r6gd node type. This parameter must be set when using r6gd nodes.",
+      "$ref": "#/definitions/DataTieringStatus"
+    },
     "KmsKeyId": {
       "description": "The ID of the KMS key used to encrypt the cluster.",
       "type": "string"
@@ -188,6 +200,7 @@
   "createOnlyProperties": [
     "/properties/ClusterName",
     "/properties/TLSEnabled",
+    "/properties/DataTiering",
     "/properties/KmsKeyId",
     "/properties/Port",
     "/properties/SnapshotArns",

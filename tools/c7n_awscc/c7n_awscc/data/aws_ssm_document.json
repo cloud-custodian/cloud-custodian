@@ -155,6 +155,15 @@
       },
       "minItems": 1,
       "insertionOrder": false
+    },
+    "UpdateMethod": {
+      "description": "Update method - when set to 'Replace', the update will replace the existing document; when set to 'NewVersion', the update will create a new version.",
+      "type": "string",
+      "enum": [
+        "Replace",
+        "NewVersion"
+      ],
+      "default": "Replace"
     }
   },
   "additionalProperties": false,
@@ -162,14 +171,8 @@
     "Content"
   ],
   "createOnlyProperties": [
-    "/properties/Content",
-    "/properties/Attachments",
     "/properties/Name",
-    "/properties/VersionName",
-    "/properties/DocumentType",
-    "/properties/DocumentFormat",
-    "/properties/TargetType",
-    "/properties/Requires"
+    "/properties/DocumentType"
   ],
   "primaryIdentifier": [
     "/properties/Name"
@@ -194,12 +197,19 @@
         "ssm:AddTagsToResource",
         "ssm:RemoveTagsFromResource",
         "ssm:ListTagsForResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "ssm:UpdateDocumentDefaultVersion",
+        "ssm:DescribeDocument"
       ]
     },
     "delete": {
       "permissions": [
         "ssm:DeleteDocument"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm:ListDocuments"
       ]
     }
   }

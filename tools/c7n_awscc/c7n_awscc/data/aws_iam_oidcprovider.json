@@ -5,6 +5,7 @@
   "properties": {
     "ClientIdList": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "minLength": 1,
         "maxLength": 255,
@@ -18,6 +19,7 @@
     },
     "ThumbprintList": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "minLength": 40,
         "maxLength": 40,
@@ -35,6 +37,7 @@
     "Tags": {
       "type": "array",
       "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       }
@@ -96,7 +99,8 @@
         "iam:AddClientIDToOpenIDConnectProvider",
         "iam:GetOpenIDConnectProvider",
         "iam:TagOpenIDConnectProvider",
-        "iam:UntagOpenIDConnectProvider"
+        "iam:UntagOpenIDConnectProvider",
+        "iam:ListOpenIDConnectProviderTags"
       ]
     },
     "delete": {
@@ -110,5 +114,11 @@
         "iam:GetOpenIDConnectProvider"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
   }
 }

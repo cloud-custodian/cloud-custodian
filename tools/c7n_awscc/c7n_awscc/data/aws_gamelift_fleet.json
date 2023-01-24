@@ -1,33 +1,23 @@
 {
+  "$schema": "https://schema.cloudformation.us-east-1.amazonaws.com/provider.definition.schema.v1.json",
   "typeName": "AWS::GameLift::Fleet",
-  "description": "The AWS::GameLift::Fleet resource creates an Amazon GameLift (GameLift) fleet to host game servers.  A fleet is a set of EC2 instances, each of which can host multiple game sessions.",
+  "description": "The AWS::GameLift::Fleet resource creates an Amazon GameLift (GameLift) fleet to host game servers. A fleet is a set of EC2 or Anywhere instances, each of which can host multiple game sessions.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-gamelift.git",
   "definitions": {
-    "LocationCapacity": {
-      "description": "Current resource capacity settings in a specified fleet or location. The location value might refer to a fleet's remote location or its home Region.",
-      "type": "object",
+    "AnywhereConfiguration": {
+      "description": "Configuration for Anywhere fleet.",
       "properties": {
-        "DesiredEC2Instances": {
-          "description": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.",
-          "type": "integer",
-          "minimum": 0
-        },
-        "MinSize": {
-          "description": "The minimum value allowed for the fleet's instance count for a location. When creating a new fleet, GameLift automatically sets this value to \"0\". After the fleet is active, you can change this value.",
-          "type": "integer",
-          "minimum": 0
-        },
-        "MaxSize": {
-          "description": "The maximum value that is allowed for the fleet's instance count for a location. When creating a new fleet, GameLift automatically sets this value to \"1\". Once the fleet is active, you can change this value.",
-          "type": "integer",
-          "minimum": 0
+        "Cost": {
+          "description": "Cost of compute can be specified on Anywhere Fleets to prioritize placement across Queue destinations based on Cost.",
+          "type": "string",
+          "pattern": "^\\d{1,5}(?:\\.\\d{1,5})?$",
+          "minLength": 1,
+          "maxLength": 11
         }
       },
       "additionalProperties": false,
       "required": [
-        "DesiredEC2Instances",
-        "MinSize",
-        "MaxSize"
+        "Cost"
       ]
     },
     "CertificateConfiguration": {
@@ -60,7 +50,7 @@
         "IpRange": {
           "description": "A range of allowed IP addresses. This value must be expressed in CIDR notation. Example: \"000.000.000.000/[subnet mask]\" or optionally the shortened version \"0.0.0.0/[subnet mask]\".",
           "type": "string",
-          "pattern": "(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$)"
+          "pattern": "(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-9]|[1-2][0-9]|3[0-2]))$)"
         },
         "Protocol": {
           "description": "The network communication protocol used by the fleet.",
@@ -89,7 +79,34 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 64,
-      "pattern": "^[a-z]+(-([a-z]+|\\d))*"
+      "pattern": "^[A-Za-z0-9\\-]+"
+    },
+    "LocationCapacity": {
+      "description": "Current resource capacity settings in a specified fleet or location. The location value might refer to a fleet's remote location or its home Region.",
+      "type": "object",
+      "properties": {
+        "DesiredEC2Instances": {
+          "description": "The number of EC2 instances you want to maintain in the specified fleet location. This value must fall between the minimum and maximum size limits.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "MinSize": {
+          "description": "The minimum value allowed for the fleet's instance count for a location. When creating a new fleet, GameLift automatically sets this value to \"0\". After the fleet is active, you can change this value.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "MaxSize": {
+          "description": "The maximum value that is allowed for the fleet's instance count for a location. When creating a new fleet, GameLift automatically sets this value to \"1\". Once the fleet is active, you can change this value.",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "DesiredEC2Instances",
+        "MinSize",
+        "MaxSize"
+      ]
     },
     "LocationConfiguration": {
       "description": "A remote location where a multi-location fleet can deploy EC2 instances for game hosting.",
@@ -183,9 +200,21 @@
     }
   },
   "properties": {
+    "AnywhereConfiguration": {
+      "description": "Configuration for Anywhere fleet.",
+      "$ref": "#/definitions/AnywhereConfiguration"
+    },
     "CertificateConfiguration": {
       "description": "Indicates whether to generate a TLS/SSL certificate for the new fleet. TLS certificates are used for encrypting traffic between game clients and game servers running on GameLift. If this parameter is not set, certificate generation is disabled. This fleet setting cannot be changed once the fleet is created.",
       "$ref": "#/definitions/CertificateConfiguration"
+    },
+    "ComputeType": {
+      "description": "ComputeType to differentiate EC2 hardware managed by GameLift and Anywhere hardware managed by the customer.",
+      "type": "string",
+      "enum": [
+        "EC2",
+        "ANYWHERE"
+      ]
     },
     "Description": {
       "description": "A human-readable description of a fleet.",
@@ -302,12 +331,12 @@
     "BuildId": {
       "description": "A unique identifier for a build to be deployed on the new fleet. If you are deploying the fleet with a custom game build, you must specify this property. The build must have been successfully uploaded to Amazon GameLift and be in a READY status. This fleet setting cannot be changed once the fleet is created.",
       "type": "string",
-      "pattern": "^build-\\S+|^arn:.*:build\\/build-\\S+"
+      "pattern": "^build-\\S+|^arn:.*:build/build-\\S+"
     },
     "ScriptId": {
       "description": "A unique identifier for a Realtime script to be deployed on a new Realtime Servers fleet. The script must have been successfully uploaded to Amazon GameLift. This fleet setting cannot be changed once the fleet is created.\n\nNote: It is not currently possible to use the !Ref command to reference a script created with a CloudFormation template for the fleet property ScriptId. Instead, use Fn::GetAtt Script.Arn or Fn::GetAtt Script.Id to retrieve either of these properties as input for ScriptId. Alternatively, enter a ScriptId string manually.",
       "type": "string",
-      "pattern": "^script-\\S+|^arn:.*:script\\/script-\\S+"
+      "pattern": "^script-\\S+|^arn:.*:script/script-\\S+"
     },
     "RuntimeConfiguration": {
       "description": "Instructions for launching server processes on each instance in the fleet. Server processes run either a custom game build executable or a Realtime script. The runtime configuration defines the server executables or launch script file, launch parameters, and the number of processes to run concurrently on each instance. When creating a fleet, the runtime configuration must have at least one server process configuration; otherwise the request fails with an invalid request exception.\n\nThis parameter is required unless the parameters ServerLaunchPath and ServerLaunchParameters are defined. Runtime configuration has replaced these parameters, but fleets that use them will continue to work.",
@@ -326,42 +355,8 @@
       "maxLength": 1024
     }
   },
-  "allOf": [
-    {
-      "required": [
-        "EC2InstanceType",
-        "Name"
-      ]
-    },
-    {
-      "oneOf": [
-        {
-          "required": [
-            "BuildId"
-          ]
-        },
-        {
-          "required": [
-            "ScriptId"
-          ]
-        }
-      ]
-    },
-    {
-      "oneOf": [
-        {
-          "required": [
-            "RuntimeConfiguration"
-          ]
-        },
-        {
-          "required": [
-            "ServerLaunchParameters",
-            "ServerLaunchPath"
-          ]
-        }
-      ]
-    }
+  "required": [
+    "Name"
   ],
   "additionalProperties": false,
   "createOnlyProperties": [
@@ -376,7 +371,8 @@
     "/properties/ScriptId",
     "/properties/ServerLaunchParameters",
     "/properties/ServerLaunchPath",
-    "/properties/CertificateType"
+    "/properties/CertificateType",
+    "/properties/ComputeType"
   ],
   "deprecatedProperties": [
     "/properties/LogPaths",

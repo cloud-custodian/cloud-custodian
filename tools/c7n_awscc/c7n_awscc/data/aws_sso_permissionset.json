@@ -32,6 +32,39 @@
       "type": "string",
       "minLength": 20,
       "maxLength": 2048
+    },
+    "CustomerManagedPolicyReference": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "pattern": "[\\w+=,.@-]+",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Path": {
+          "type": "string",
+          "pattern": "((/[A-Za-z0-9\\.,\\+@=_-]+)*)/",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false
+    },
+    "PermissionsBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CustomerManagedPolicyReference": {
+          "$ref": "#/definitions/CustomerManagedPolicyReference"
+        },
+        "ManagedPolicyArn": {
+          "$ref": "#/definitions/ManagedPolicyArn"
+        }
+      }
     }
   },
   "properties": {
@@ -52,7 +85,7 @@
     "Description": {
       "description": "The permission set description.",
       "type": "string",
-      "pattern": "[\\p{L}\\p{M}\\p{Z}\\p{S}\\p{N}\\p{P}]*",
+      "pattern": "[\\u0009\\u000A\\u000D\\u0020-\\u007E\\u00A1-\\u00FF]*",
       "minLength": 1,
       "maxLength": 700
     },
@@ -83,7 +116,8 @@
       "items": {
         "$ref": "#/definitions/ManagedPolicyArn"
       },
-      "maxItems": 20
+      "maxItems": 20,
+      "default": []
     },
     "InlinePolicy": {
       "description": "The inline policy to put in permission set.",
@@ -99,6 +133,18 @@
         "$ref": "#/definitions/Tag"
       },
       "maxItems": 50
+    },
+    "CustomerManagedPolicyReferences": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/CustomerManagedPolicyReference"
+      },
+      "maxItems": 20,
+      "default": []
+    },
+    "PermissionsBoundary": {
+      "$ref": "#/definitions/PermissionsBoundary"
     }
   },
   "additionalProperties": false,
@@ -123,7 +169,10 @@
         "sso:CreatePermissionSet",
         "sso:PutInlinePolicyToPermissionSet",
         "sso:AttachManagedPolicyToPermissionSet",
+        "sso:AttachCustomerManagedPolicyReferenceToPermissionSet",
+        "sso:PutPermissionsBoundaryToPermissionSet",
         "sso:ListManagedPoliciesInPermissionSet",
+        "sso:ListCustomerManagedPolicyReferencesInPermissionSet",
         "sso:TagResource"
       ]
     },
@@ -132,7 +181,9 @@
         "sso:DescribePermissionSet",
         "sso:ListTagsForResource",
         "sso:ListManagedPoliciesInPermissionSet",
-        "sso:GetInlinePolicyForPermissionSet"
+        "sso:ListCustomerManagedPolicyReferencesInPermissionSet",
+        "sso:GetInlinePolicyForPermissionSet",
+        "sso:GetPermissionsBoundaryForPermissionSet"
       ]
     },
     "update": {
@@ -142,9 +193,15 @@
         "sso:UntagResource",
         "sso:ListTagsForResource",
         "sso:AttachManagedPolicyToPermissionSet",
+        "sso:AttachCustomerManagedPolicyReferenceToPermissionSet",
         "sso:DetachManagedPolicyFromPermissionSet",
+        "sso:DetachCustomerManagedPolicyReferenceFromPermissionSet",
         "sso:ListManagedPoliciesInPermissionSet",
+        "sso:ListCustomerManagedPolicyReferencesInPermissionSet",
         "sso:PutInlinePolicyToPermissionSet",
+        "sso:GetPermissionsBoundaryForPermissionSet",
+        "sso:DeletePermissionsBoundaryFromPermissionSet",
+        "sso:PutPermissionsBoundaryToPermissionSet",
         "sso:DeleteInlinePolicyFromPermissionSet",
         "sso:ProvisionPermissionSet",
         "sso:DescribePermissionSetProvisioningStatus"

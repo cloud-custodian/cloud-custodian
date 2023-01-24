@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::KMS::ReplicaKey",
-  "description": "The AWS::KMS::ReplicaKey resource specifies a multi-region replica customer master key (CMK) in AWS Key Management Service (AWS KMS).",
+  "description": "The AWS::KMS::ReplicaKey resource specifies a multi-region replica AWS KMS key in AWS Key Management Service (AWS KMS).",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-kms",
   "definitions": {
     "Tag": {
@@ -29,30 +29,30 @@
   },
   "properties": {
     "PrimaryKeyArn": {
-      "description": "Identifies the primary CMK to create a replica of. Specify the Amazon Resource Name (ARN) of the CMK. You cannot specify an alias or key ID. For help finding the ARN, see Finding the Key ID and ARN in the AWS Key Management Service Developer Guide.",
+      "description": "Identifies the primary AWS KMS key to create a replica of. Specify the Amazon Resource Name (ARN) of the AWS KMS key. You cannot specify an alias or key ID. For help finding the ARN, see Finding the Key ID and ARN in the AWS Key Management Service Developer Guide.",
       "type": "string",
       "minLength": 1,
       "maxLength": 256
     },
     "Description": {
-      "description": "A description of the CMK. Use a description that helps you to distinguish this CMK from others in the account, such as its intended use.",
+      "description": "A description of the AWS KMS key. Use a description that helps you to distinguish this AWS KMS key from others in the account, such as its intended use.",
       "type": "string",
       "minLength": 0,
       "maxLength": 8192
     },
     "Enabled": {
-      "description": "Specifies whether the customer master key (CMK) is enabled. Disabled CMKs cannot be used in cryptographic operations.",
+      "description": "Specifies whether the AWS KMS key is enabled. Disabled AWS KMS keys cannot be used in cryptographic operations.",
       "type": "boolean"
     },
     "KeyPolicy": {
-      "description": "The key policy that authorizes use of the CMK. The key policy must observe the following rules.",
+      "description": "The key policy that authorizes use of the AWS KMS key. The key policy must observe the following rules.",
       "type": [
         "object",
         "string"
       ]
     },
     "PendingWindowInDays": {
-      "description": "Specifies the number of days in the waiting period before AWS KMS deletes a CMK that has been removed from a CloudFormation stack. Enter a value between 7 and 30 days. The default value is 30 days.",
+      "description": "Specifies the number of days in the waiting period before AWS KMS deletes an AWS KMS key that has been removed from a CloudFormation stack. Enter a value between 7 and 30 days. The default value is 30 days.",
       "type": "integer",
       "minimum": 7,
       "maximum": 30

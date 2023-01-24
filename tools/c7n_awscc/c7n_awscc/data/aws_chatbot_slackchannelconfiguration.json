@@ -6,6 +6,7 @@
     "SlackWorkspaceId": {
       "description": "The id of the Slack workspace",
       "type": "string",
+      "pattern": "^[0-9A-Z]{1,255}$",
       "minLength": 1,
       "maxLength": 256
     },
@@ -31,6 +32,7 @@
     "SnsTopicArns": {
       "description": "ARNs of SNS topics which delivers notifications to AWS Chatbot, for example CloudWatch alarm notifications.",
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "string",
         "pattern": "^arn:(aws[a-zA-Z-]*)?:[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,1023}$"
@@ -50,6 +52,7 @@
     "GuardrailPolicies": {
       "description": "The list of IAM policy ARNs that are applied as channel guardrails. The AWS managed 'AdministratorAccess' policy is applied as a default if this is not set.",
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "string",
         "pattern": "^(^$|arn:aws:iam:[A-Za-z0-9_\\/.-]{0,63}:[A-Za-z0-9_\\/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_\\/+=,@.-]{0,1023})$"

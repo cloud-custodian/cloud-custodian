@@ -19,7 +19,7 @@
       "type": "string"
     },
     "HlsIngest": {
-      "description": "A short text description of the Channel.",
+      "description": "An HTTP Live Streaming (HLS) ingest resource configuration.",
       "$ref": "#/definitions/HlsIngest"
     },
     "Tags": {
@@ -75,7 +75,13 @@
           "description": "The ingest URL to which the source stream should be sent.",
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "Id",
+        "Username",
+        "Password",
+        "Url"
+      ]
     },
     "Tag": {
       "type": "object",
@@ -116,7 +122,10 @@
   ],
   "readOnlyProperties": [
     "/properties/Arn",
-    "/properties/HlsIngest"
+    "/properties/HlsIngest/ingestEndpoints/*/Id",
+    "/properties/HlsIngest/ingestEndpoints/*/Username",
+    "/properties/HlsIngest/ingestEndpoints/*/Password",
+    "/properties/HlsIngest/ingestEndpoints/*/Url"
   ],
   "createOnlyProperties": [
     "/properties/Id",

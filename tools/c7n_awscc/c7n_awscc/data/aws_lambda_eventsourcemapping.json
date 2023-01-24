@@ -36,21 +36,8 @@
       "maxLength": 1024
     },
     "FilterCriteria": {
-      "type": "object",
       "description": "The filter criteria to control event filtering.",
-      "additionalProperties": false,
-      "properties": {
-        "Filters": {
-          "description": "List of filters of this FilterCriteria",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/Filter"
-          },
-          "minItems": 1,
-          "maxItems": 20
-        }
-      }
+      "$ref": "#/definitions/FilterCriteria"
     },
     "FunctionName": {
       "description": "The name of the Lambda function.",
@@ -86,7 +73,7 @@
     "StartingPosition": {
       "description": "The position in a stream from which to start reading. Required for Amazon Kinesis and Amazon DynamoDB Streams sources.",
       "type": "string",
-      "pattern": "(LATEST|TRIM_HORIZON)+",
+      "pattern": "(LATEST|TRIM_HORIZON|AT_TIMESTAMP)+",
       "minLength": 6,
       "maxLength": 12
     },
@@ -152,6 +139,18 @@
     "SelfManagedEventSource": {
       "description": "Self-managed event source endpoints.",
       "$ref": "#/definitions/SelfManagedEventSource"
+    },
+    "AmazonManagedKafkaEventSourceConfig": {
+      "description": "Specific configuration settings for an MSK event source.",
+      "$ref": "#/definitions/AmazonManagedKafkaEventSourceConfig"
+    },
+    "SelfManagedKafkaEventSourceConfig": {
+      "description": "Specific configuration settings for a Self-Managed Apache Kafka event source.",
+      "$ref": "#/definitions/SelfManagedKafkaEventSourceConfig"
+    },
+    "ScalingConfig": {
+      "description": "The scaling configuration for the event source.",
+      "$ref": "#/definitions/ScalingConfig"
     }
   },
   "definitions": {
@@ -163,6 +162,23 @@
         "OnFailure": {
           "description": "The destination configuration for failed invocations.",
           "$ref": "#/definitions/OnFailure"
+        }
+      }
+    },
+    "FilterCriteria": {
+      "type": "object",
+      "description": "The filter criteria to control event filtering.",
+      "additionalProperties": false,
+      "properties": {
+        "Filters": {
+          "description": "List of filters of this FilterCriteria",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/Filter"
+          },
+          "minItems": 1,
+          "maxItems": 20
         }
       }
     },
@@ -253,6 +269,52 @@
           "maxItems": 10
         }
       }
+    },
+    "ConsumerGroupId": {
+      "description": "The identifier for the Kafka Consumer Group to join.",
+      "type": "string",
+      "pattern": "[a-zA-Z0-9-\\/*:_+=.@-]*",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "AmazonManagedKafkaEventSourceConfig": {
+      "description": "Specific configuration settings for an MSK event source.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ConsumerGroupId": {
+          "description": "The identifier for the Kafka Consumer Group to join.",
+          "$ref": "#/definitions/ConsumerGroupId"
+        }
+      }
+    },
+    "SelfManagedKafkaEventSourceConfig": {
+      "description": "Specific configuration settings for a Self-Managed Apache Kafka event source.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ConsumerGroupId": {
+          "description": "The identifier for the Kafka Consumer Group to join.",
+          "$ref": "#/definitions/ConsumerGroupId"
+        }
+      }
+    },
+    "MaximumConcurrency": {
+      "description": "The maximum number of concurrent functions that an event source can invoke.",
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 1000
+    },
+    "ScalingConfig": {
+      "description": "The scaling configuration for the event source.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaximumConcurrency": {
+          "description": "The maximum number of concurrent functions that the event source can invoke.",
+          "$ref": "#/definitions/MaximumConcurrency"
+        }
+      }
     }
   },
   "required": [
@@ -261,7 +323,10 @@
   "createOnlyProperties": [
     "/properties/EventSourceArn",
     "/properties/StartingPosition",
-    "/properties/SelfManagedEventSource"
+    "/properties/StartingPositionTimestamp",
+    "/properties/SelfManagedEventSource",
+    "/properties/AmazonManagedKafkaEventSourceConfig",
+    "/properties/SelfManagedKafkaEventSourceConfig"
   ],
   "readOnlyProperties": [
     "/properties/Id"

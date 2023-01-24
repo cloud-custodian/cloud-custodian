@@ -73,7 +73,13 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "primaryIdentifier": [
     "/properties/Arn"
   ],

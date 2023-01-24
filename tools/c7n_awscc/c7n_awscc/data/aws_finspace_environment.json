@@ -210,5 +210,9 @@
         "finspace:ListEnvironments"
       ]
     }
+  },
+  "propertyTransform": {
+    "/properties/SuperuserParameters": null,
+    "/properties/DataBundles": null
   }
 }

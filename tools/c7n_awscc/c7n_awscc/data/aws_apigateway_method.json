@@ -285,7 +285,12 @@
     "/properties/HttpMethod"
   ],
   "replacementStrategy": "delete_then_create",
-  "taggable": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [

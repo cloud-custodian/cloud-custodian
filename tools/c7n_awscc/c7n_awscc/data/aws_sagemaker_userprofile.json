@@ -71,6 +71,9 @@
           "$ref": "#/definitions/KernelGatewayAppSettings",
           "description": "The kernel gateway app settings."
         },
+        "RStudioServerProAppSettings": {
+          "$ref": "#/definitions/RStudioServerProAppSettings"
+        },
         "SecurityGroups": {
           "type": "array",
           "description": "The security groups for the Amazon Virtual Private Cloud (VPC) that Studio uses for communication.",
@@ -138,7 +141,32 @@
             "ml.g4dn.4xlarge",
             "ml.g4dn.8xlarge",
             "ml.g4dn.12xlarge",
-            "ml.g4dn.16xlarge"
+            "ml.g4dn.16xlarge",
+            "ml.r5.large",
+            "ml.r5.xlarge",
+            "ml.r5.2xlarge",
+            "ml.r5.4xlarge",
+            "ml.r5.8xlarge",
+            "ml.r5.12xlarge",
+            "ml.r5.16xlarge",
+            "ml.r5.24xlarge",
+            "ml.p3dn.24xlarge",
+            "ml.m5d.large",
+            "ml.m5d.xlarge",
+            "ml.m5d.2xlarge",
+            "ml.m5d.4xlarge",
+            "ml.m5d.8xlarge",
+            "ml.m5d.12xlarge",
+            "ml.m5d.16xlarge",
+            "ml.m5d.24xlarge",
+            "ml.g5.xlarge",
+            "ml.g5.2xlarge",
+            "ml.g5.4xlarge",
+            "ml.g5.8xlarge",
+            "ml.g5.12xlarge",
+            "ml.g5.16xlarge",
+            "ml.g5.24xlarge",
+            "ml.g5.48xlarge"
           ]
         },
         "SageMakerImageArn": {
@@ -250,6 +278,29 @@
         "Key",
         "Value"
       ]
+    },
+    "RStudioServerProAppSettings": {
+      "type": "object",
+      "description": "A collection of settings that configure user interaction with the RStudioServerPro app.",
+      "additionalProperties": false,
+      "properties": {
+        "AccessStatus": {
+          "type": "string",
+          "description": "Indicates whether the current user has access to the RStudioServerPro app.",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "UserGroup": {
+          "type": "string",
+          "description": "The level of permissions that the user has within the RStudioServerPro app. This value defaults to User. The Admin value allows the user access to the RStudio Administrative Dashboard.",
+          "enum": [
+            "R_STUDIO_ADMIN",
+            "R_STUDIO_USER"
+          ]
+        }
+      }
     }
   },
   "required": [
@@ -261,6 +312,8 @@
     "/properties/UserProfileName",
     "/properties/SingleSignOnUserIdentifier",
     "/properties/SingleSignOnUserValue",
+    "/properties/UserSettings/RStudioServerProAppSettings/AccessStatus",
+    "/properties/UserSettings/RStudioServerProAppSettings/UserGroup",
     "/properties/Tags"
   ],
   "writeOnlyProperties": [

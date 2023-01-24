@@ -52,6 +52,17 @@
         "EnableXRay": {
           "description": "If you set this to true, RUM enables xray tracing for the user sessions that RUM samples. RUM adds an xray trace header to allowed HTTP requests. It also records an xray segment for allowed HTTP requests. You can see traces and segments from these user sessions in the xray console and the CW ServiceLens console.",
           "type": "boolean"
+        },
+        "MetricDestinations": {
+          "description": "An array of structures which define the destinations and the metrics that you want to send.",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/MetricDestination"
+          }
         }
       }
     },
@@ -127,6 +138,93 @@
         "performance",
         "http"
       ]
+    },
+    "MetricDestination": {
+      "description": "An structure which defines the destination and the metrics that you want to send.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Destination": {
+          "description": "Defines the destination to send the metrics to. Valid values are CloudWatch and Evidently. If you specify Evidently, you must also specify the ARN of the Evidently experiment that is to be the destination and an IAM role that has permission to write to the experiment.",
+          "type": "string",
+          "enum": [
+            "CloudWatch",
+            "Evidently"
+          ]
+        },
+        "DestinationArn": {
+          "type": "string",
+          "pattern": "arn:[^:]*:[^:]*:[^:]*:[^:]*:.*",
+          "description": "Use this parameter only if Destination is Evidently. This parameter specifies the ARN of the Evidently experiment that will receive the extended metrics."
+        },
+        "IamRoleArn": {
+          "type": "string",
+          "pattern": "arn:[^:]*:[^:]*:[^:]*:[^:]*:.*",
+          "description": "This parameter is required if Destination is Evidently. If Destination is CloudWatch, do not use this parameter.\n\nThis parameter specifies the ARN of an IAM role that RUM will assume to write to the Evidently experiment that you are sending metrics to. This role must have permission to write to that experiment."
+        },
+        "MetricDefinitions": {
+          "description": "An array of structures which define the metrics that you want to send.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 2000,
+          "items": {
+            "$ref": "#/definitions/MetricDefinition"
+          }
+        }
+      },
+      "required": [
+        "Destination"
+      ]
+    },
+    "MetricDefinition": {
+      "description": "A single metric definition",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name for the metric that is defined in this structure. Valid values are the following:\n\nPerformanceNavigationDuration\n\nPerformanceResourceDuration\n\nNavigationSatisfiedTransaction\n\nNavigationToleratedTransaction\n\nNavigationFrustratedTransaction\n\nWebVitalsCumulativeLayoutShift\n\nWebVitalsFirstInputDelay\n\nWebVitalsLargestContentfulPaint\n\nJsErrorCount\n\nHttpErrorCount\n\nSessionCount",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "ValueKey": {
+          "description": "The field within the event object that the metric value is sourced from.\n\nIf you omit this field, a hardcoded value of 1 is pushed as the metric value. This is useful if you just want to count the number of events that the filter catches.\n\nIf this metric is sent to Evidently, this field will be passed to Evidently raw and Evidently will handle data extraction from the event.",
+          "type": "string",
+          "pattern": ".*",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "UnitLabel": {
+          "description": "The CloudWatch metric unit to use for this metric. If you omit this field, the metric is recorded with no unit.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "DimensionKeys": {
+          "description": "Use this field only if you are sending the metric to CloudWatch.\n\nThis field is a map of field paths to dimension names. It defines the dimensions to associate with this metric in CloudWatch. Valid values for the entries in this field are the following:\n\n\"metadata.pageId\": \"PageId\"\n\n\"metadata.browserName\": \"BrowserName\"\n\n\"metadata.deviceType\": \"DeviceType\"\n\n\"metadata.osName\": \"OSName\"\n\n\"metadata.countryCode\": \"CountryCode\"\n\n\"event_details.fileType\": \"FileType\"\n\nAll dimensions listed in this field must also be included in EventPattern.",
+          "type": "object",
+          "patternProperties": {
+            "^(?!:).*[^\\s].*": {
+              "type": "string",
+              "pattern": ".*[^\\s].*",
+              "minLength": 1,
+              "maxLength": 255
+            }
+          },
+          "additionalProperties": false
+        },
+        "EventPattern": {
+          "description": "The pattern that defines the metric, specified as a JSON object. RUM checks events that happen in a user's session against the pattern, and events that match the pattern are sent to the metric destination.\n\nWhen you define extended metrics, the metric definition is not valid if EventPattern is omitted.\n\nExample event patterns:\n\n'{ \"event_type\": [\"com.amazon.rum.js_error_event\"], \"metadata\": { \"browserName\": [ \"Chrome\", \"Safari\" ], } }'\n\n'{ \"event_type\": [\"com.amazon.rum.performance_navigation_event\"], \"metadata\": { \"browserName\": [ \"Chrome\", \"Firefox\" ] }, \"event_details\": { \"duration\": [{ \"numeric\": [ \"<\", 2000 ] }] } }'\n\n'{ \"event_type\": [\"com.amazon.rum.performance_navigation_event\"], \"metadata\": { \"browserName\": [ \"Chrome\", \"Safari\" ], \"countryCode\": [ \"US\" ] }, \"event_details\": { \"duration\": [{ \"numeric\": [ \">=\", 2000, \"<\", 8000 ] }] } }'\n\nIf the metrics destination' is CloudWatch and the event also matches a value in DimensionKeys, then the metric is published with the specified dimensions.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "Name"
+      ]
     }
   },
   "properties": {
@@ -187,7 +285,9 @@
         "rum:TagResource",
         "cognito-identity:DescribeIdentityPool",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "rum:PutRumMetricsDestination",
+        "rum:BatchCreateRumMetricDefinitions"
       ]
     },
     "read": {
@@ -197,7 +297,9 @@
         "s3:GetObject",
         "s3:DoesObjectExist",
         "s3:GetObjectAcl",
-        "rum:ListTagsForResource"
+        "rum:ListTagsForResource",
+        "rum:ListRumMetricsDestinations",
+        "rum:BatchGetRumMetricDefinitions"
       ]
     },
     "update": {
@@ -223,7 +325,14 @@
         "rum:UntagResource",
         "rum:ListTagsForResource",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "rum:PutRumMetricsDestination",
+        "rum:DeleteRumMetricsDestination",
+        "rum:ListRumMetricsDestinations",
+        "rum:BatchCreateRumMetricDefinitions",
+        "rum:BatchDeleteRumMetricDefinitions",
+        "rum:BatchGetRumMetricDefinitions",
+        "rum:UpdateRumMetricDefinition"
       ]
     },
     "delete": {
@@ -234,7 +343,9 @@
         "logs:DeleteLogDelivery",
         "s3:DeleteObject",
         "s3:DoesObjectExist",
-        "rum:UntagResource"
+        "rum:UntagResource",
+        "rum:DeleteRumMetricsDestination",
+        "rum:BatchDeleteRumMetricDefinitions"
       ]
     },
     "list": {

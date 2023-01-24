@@ -47,6 +47,7 @@
         },
         "AdvancedBackupSettings": {
           "type": "array",
+          "insertionOrder": true,
           "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/AdvancedBackupSettingResourceType"
@@ -54,6 +55,7 @@
         },
         "BackupPlanRule": {
           "type": "array",
+          "insertionOrder": true,
           "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/BackupRuleResourceType"
@@ -95,6 +97,7 @@
         },
         "CopyActions": {
           "type": "array",
+          "insertionOrder": true,
           "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/CopyActionResourceType"
@@ -180,6 +183,11 @@
         "backup:ListTags",
         "backup:TagResource",
         "backup:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup:ListBackupPlans"
       ]
     }
   }

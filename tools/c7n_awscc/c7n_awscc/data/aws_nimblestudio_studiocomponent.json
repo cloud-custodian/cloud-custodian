@@ -1,41 +1,31 @@
 {
   "typeName": "AWS::NimbleStudio::StudioComponent",
-  "description": "Represents a studio component which connects a non-Nimble Studio resource in your account to your studio",
+  "description": "Represents a studio component that connects a non-Nimble Studio resource in your account to your studio",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-nimblestudio",
   "definitions": {
     "ActiveDirectoryComputerAttribute": {
       "type": "object",
-      "description": "<p>An LDAP attribute of an Active Directory computer account, in the form of a name:value pair.</p>",
+      "description": "<p>An LDAP attribute of an Active Directory computer account, in the form of a name:value\n            pair.</p>",
       "properties": {
-        "Value": {
-          "type": "string",
-          "maxLength": 64,
-          "minLength": 1,
-          "description": "<p>The value for the LDAP attribute.</p>"
-        },
         "Name": {
           "type": "string",
           "maxLength": 40,
           "minLength": 1,
           "description": "<p>The name for the LDAP attribute.</p>"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "description": "<p>The value for the LDAP attribute.</p>"
         }
       },
       "additionalProperties": false
     },
     "ActiveDirectoryConfiguration": {
       "type": "object",
-      "description": "<p>The configuration for a Microsoft Active Directory (Microsoft AD) studio resource.</p>",
+      "description": "<p>The configuration for a Microsoft Active Directory (Microsoft AD) studio\n            resource.</p>",
       "properties": {
-        "DirectoryId": {
-          "type": "string",
-          "description": "<p>The directory ID of the Directory Service for Microsoft Active Directory to access using this studio component.</p>"
-        },
-        "OrganizationalUnitDistinguishedName": {
-          "type": "string",
-          "maxLength": 2000,
-          "minLength": 1,
-          "description": "<p>The distinguished name (DN) and organizational unit (OU) of an Active Directory computer.</p>"
-        },
         "ComputerAttributes": {
           "type": "array",
           "items": {
@@ -44,6 +34,16 @@
           "maxItems": 50,
           "minItems": 0,
           "description": "<p>A collection of custom attributes for an Active Directory computer.</p>"
+        },
+        "DirectoryId": {
+          "type": "string",
+          "description": "<p>The directory ID of the Directory Service for Microsoft Active Directory to access\n            using this studio component.</p>"
+        },
+        "OrganizationalUnitDistinguishedName": {
+          "type": "string",
+          "maxLength": 2000,
+          "minLength": 1,
+          "description": "<p>The distinguished name (DN) and organizational unit (OU) of an Active Directory\n            computer.</p>"
         }
       },
       "additionalProperties": false
@@ -54,18 +54,17 @@
       "properties": {
         "ActiveDirectoryUser": {
           "type": "string",
-          "description": "<p>The name of an Active Directory user that is used on ComputeFarm worker instances.</p>"
+          "description": "<p>The name of an Active Directory user that is used on ComputeFarm worker\n            instances.</p>"
         },
         "Endpoint": {
           "type": "string",
-          "description": "<p>The endpoint of the ComputeFarm that is accessed by the studio component resource.</p>"
+          "description": "<p>The endpoint of the ComputeFarm that is accessed by the studio component\n            resource.</p>"
         }
       },
       "additionalProperties": false
     },
     "LaunchProfilePlatform": {
       "type": "string",
-      "description": "",
       "enum": [
         "LINUX",
         "WINDOWS"
@@ -73,11 +72,11 @@
     },
     "LicenseServiceConfiguration": {
       "type": "object",
-      "description": "<p>The configuration for a license service that is associated with a studio resource.</p>",
+      "description": "<p>The configuration for a license service that is associated with a studio\n            resource.</p>",
       "properties": {
         "Endpoint": {
           "type": "string",
-          "description": "<p>The endpoint of the license service that is accessed by the studio component resource.</p>"
+          "description": "<p>The endpoint of the license service that is accessed by the studio component\n            resource.</p>"
         }
       },
       "additionalProperties": false
@@ -86,33 +85,40 @@
       "type": "object",
       "description": "<p>A parameter for a studio component script, in the form of a key:value pair.</p>",
       "properties": {
-        "Value": {
-          "type": "string",
-          "maxLength": 256,
-          "minLength": 1,
-          "description": "<p>A script parameter value.</p>"
-        },
         "Key": {
           "type": "string",
           "maxLength": 64,
           "minLength": 1,
           "pattern": "^[a-zA-Z_][a-zA-Z0-9_]+$",
           "description": "<p>A script parameter key.</p>"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "description": "<p>A script parameter value.</p>"
         }
       },
       "additionalProperties": false
     },
     "SharedFileSystemConfiguration": {
       "type": "object",
-      "description": "<p>The configuration for a shared file storage system that is associated with a studio resource.</p>",
+      "description": "<p>The configuration for a shared file storage system that is associated with a studio\n            resource.</p>",
       "properties": {
         "Endpoint": {
           "type": "string",
-          "description": "<p>The endpoint of the shared file system that is accessed by the studio component resource.</p>"
+          "description": "<p>The endpoint of the shared file system that is accessed by the studio component\n            resource.</p>"
         },
         "FileSystemId": {
           "type": "string",
           "description": "<p>The unique identifier for a file system.</p>"
+        },
+        "LinuxMountPoint": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 0,
+          "pattern": "^(/?|(\\$HOME)?(/[^/\\n\\s\\\\]+)*)$",
+          "description": "<p>The mount location for a shared file system on a Linux virtual workstation.</p>"
         },
         "ShareName": {
           "type": "string",
@@ -122,65 +128,95 @@
           "type": "string",
           "pattern": "^[A-Z]$",
           "description": "<p>The mount location for a shared file system on a Windows virtual workstation.</p>"
-        },
-        "LinuxMountPoint": {
-          "type": "string",
-          "maxLength": 128,
-          "minLength": 0,
-          "pattern": "^(/?|(\\$HOME)?(/[^/\\n\\s\\\\]+)*)$",
-          "description": "<p>The mount location for a shared file system on a Linux virtual workstation.</p>"
         }
       },
       "additionalProperties": false
     },
     "StudioComponentConfiguration": {
-      "type": "object",
       "description": "<p>The configuration of the studio component, based on component type.</p>",
-      "properties": {
-        "LicenseServiceConfiguration": {
-          "$ref": "#/definitions/LicenseServiceConfiguration"
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "ActiveDirectoryConfiguration",
+          "properties": {
+            "ActiveDirectoryConfiguration": {
+              "$ref": "#/definitions/ActiveDirectoryConfiguration"
+            }
+          },
+          "required": [
+            "ActiveDirectoryConfiguration"
+          ],
+          "additionalProperties": false
         },
-        "ComputeFarmConfiguration": {
-          "$ref": "#/definitions/ComputeFarmConfiguration"
+        {
+          "type": "object",
+          "title": "ComputeFarmConfiguration",
+          "properties": {
+            "ComputeFarmConfiguration": {
+              "$ref": "#/definitions/ComputeFarmConfiguration"
+            }
+          },
+          "required": [
+            "ComputeFarmConfiguration"
+          ],
+          "additionalProperties": false
         },
-        "ActiveDirectoryConfiguration": {
-          "$ref": "#/definitions/ActiveDirectoryConfiguration"
+        {
+          "type": "object",
+          "title": "LicenseServiceConfiguration",
+          "properties": {
+            "LicenseServiceConfiguration": {
+              "$ref": "#/definitions/LicenseServiceConfiguration"
+            }
+          },
+          "required": [
+            "LicenseServiceConfiguration"
+          ],
+          "additionalProperties": false
         },
-        "SharedFileSystemConfiguration": {
-          "$ref": "#/definitions/SharedFileSystemConfiguration"
+        {
+          "type": "object",
+          "title": "SharedFileSystemConfiguration",
+          "properties": {
+            "SharedFileSystemConfiguration": {
+              "$ref": "#/definitions/SharedFileSystemConfiguration"
+            }
+          },
+          "required": [
+            "SharedFileSystemConfiguration"
+          ],
+          "additionalProperties": false
         }
-      },
-      "additionalProperties": false
+      ]
     },
     "StudioComponentInitializationScript": {
       "type": "object",
       "description": "<p>Initialization scripts for studio components.</p>",
       "properties": {
-        "Script": {
-          "type": "string",
-          "maxLength": 5120,
-          "minLength": 1,
-          "description": "<p>The initialization script.</p>"
-        },
         "LaunchProfileProtocolVersion": {
           "type": "string",
           "maxLength": 10,
           "minLength": 0,
           "pattern": "^2021\\-03\\-31$",
-          "description": "<p>The version number of the protocol that is used by the launch profile. The only valid version is \"2021-03-31\".</p>"
+          "description": "<p>The version number of the protocol that is used by the launch profile. The only valid\n            version is \"2021-03-31\".</p>"
         },
         "Platform": {
           "$ref": "#/definitions/LaunchProfilePlatform"
         },
         "RunContext": {
           "$ref": "#/definitions/StudioComponentInitializationScriptRunContext"
+        },
+        "Script": {
+          "type": "string",
+          "maxLength": 5120,
+          "minLength": 1,
+          "description": "<p>The initialization script.</p>"
         }
       },
       "additionalProperties": false
     },
     "StudioComponentInitializationScriptRunContext": {
       "type": "string",
-      "description": "",
       "enum": [
         "SYSTEM_INITIALIZATION",
         "USER_INITIALIZATION"
@@ -188,7 +224,6 @@
     },
     "StudioComponentSubtype": {
       "type": "string",
-      "description": "",
       "enum": [
         "AWS_MANAGED_MICROSOFT_AD",
         "AMAZON_FSX_FOR_WINDOWS",
@@ -198,7 +233,6 @@
     },
     "StudioComponentType": {
       "type": "string",
-      "description": "",
       "enum": [
         "ACTIVE_DIRECTORY",
         "SHARED_FILE_SYSTEM",
@@ -209,7 +243,6 @@
     },
     "Tags": {
       "type": "object",
-      "description": "",
       "patternProperties": {
         ".+": {
           "type": "string"
@@ -231,11 +264,10 @@
     "Ec2SecurityGroupIds": {
       "type": "array",
       "items": {
-        "type": "string",
-        "description": ""
+        "type": "string"
       },
       "maxItems": 30,
-      "minItems": 1,
+      "minItems": 0,
       "description": "<p>The EC2 security groups that control access to the studio component.</p>"
     },
     "InitializationScripts": {
@@ -251,6 +283,11 @@
       "minLength": 0,
       "description": "<p>The name for the studio component.</p>"
     },
+    "RuntimeRoleArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 0
+    },
     "ScriptParameters": {
       "type": "array",
       "items": {
@@ -260,12 +297,17 @@
       "minItems": 0,
       "description": "<p>Parameters for the studio component scripts.</p>"
     },
+    "SecureInitializationRoleArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 0
+    },
     "StudioComponentId": {
       "type": "string"
     },
     "StudioId": {
       "type": "string",
-      "description": "<p>The studioId. </p>"
+      "description": "<p>The studio ID. </p>"
     },
     "Subtype": {
       "$ref": "#/definitions/StudioComponentSubtype"
@@ -277,6 +319,11 @@
       "$ref": "#/definitions/StudioComponentType"
     }
   },
+  "required": [
+    "StudioId",
+    "Name",
+    "Type"
+  ],
   "readOnlyProperties": [
     "/properties/StudioComponentId"
   ],
@@ -289,14 +336,10 @@
     "/properties/StudioComponentId",
     "/properties/StudioId"
   ],
-  "required": [
-    "StudioId",
-    "Name",
-    "Type"
-  ],
   "handlers": {
     "create": {
       "permissions": [
+        "iam:PassRole",
         "nimble:CreateStudioComponent",
         "nimble:TagResource",
         "ds:AuthorizeApplication",
@@ -312,6 +355,7 @@
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
         "nimble:UpdateStudioComponent",
         "ds:AuthorizeApplication",
         "ec2:DescribeSecurityGroups",

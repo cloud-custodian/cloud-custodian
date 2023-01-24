@@ -88,6 +88,11 @@
     "/properties/SubnetIds",
     "/properties/VpcId"
   ],
+  "required": [
+    "SubnetIds",
+    "VpcId",
+    "TransitGatewayId"
+  ],
   "taggable": true,
   "readOnlyProperties": [
     "/properties/Id"

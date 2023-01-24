@@ -327,6 +327,9 @@
           "default": "",
           "type": "string"
         },
+        "ContinuousDeploymentPolicyId": {
+          "type": "string"
+        },
         "CustomErrorResponses": {
           "items": {
             "$ref": "#/definitions/CustomErrorResponse"
@@ -382,6 +385,9 @@
         "S3Origin": {
           "$ref": "#/definitions/LegacyS3Origin"
         },
+        "Staging": {
+          "type": "boolean"
+        },
         "ViewerCertificate": {
           "$ref": "#/definitions/ViewerCertificate",
           "default": {
@@ -394,7 +400,8 @@
         }
       },
       "required": [
-        "Enabled"
+        "Enabled",
+        "DefaultCacheBehavior"
       ],
       "type": "object"
     },
@@ -560,6 +567,9 @@
           "type": "string"
         },
         "Id": {
+          "type": "string"
+        },
+        "OriginAccessControlId": {
           "type": "string"
         },
         "OriginCustomHeaders": {

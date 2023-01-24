@@ -1,0 +1,195 @@
+{
+  "typeName": "AWS::Logs::MetricFilter",
+  "resourceLink": {
+    "templateUri": "/cloudwatch/home?region=${awsRegion}#logsV2:log-groups/log-group/${LogGroupName}/edit-metric-filter/${MetricName}",
+    "mappings": {
+      "MetricName": "/MetricName",
+      "LogGroupName": "/LogGroupName"
+    }
+  },
+  "description": "Specifies a metric filter that describes how CloudWatch Logs extracts information from logs and transforms it into Amazon CloudWatch metrics.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
+  "tagging": {
+    "taggable": false
+  },
+  "definitions": {
+    "Dimension": {
+      "description": "the key-value pairs that further define a metric.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key of the dimension. Maximum length of 255.",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the dimension. Maximum length of 255.",
+          "minLength": 1,
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "MetricTransformation": {
+      "type": "object",
+      "properties": {
+        "DefaultValue": {
+          "description": "The value to emit when a filter pattern does not match a log event. This value can be null.",
+          "type": "number"
+        },
+        "MetricName": {
+          "description": "The name of the CloudWatch metric. Metric name must be in ASCII format.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^((?![:*$])[\\x00-\\x7F]){1,255}"
+        },
+        "MetricNamespace": {
+          "$comment": "Namespaces can be up to 256 characters long; valid characters include 0-9A-Za-z.-_/#",
+          "description": "The namespace of the CloudWatch metric.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[0-9a-zA-Z\\.\\-_\\/#]{1,256}"
+        },
+        "MetricValue": {
+          "description": "The value to publish to the CloudWatch metric when a filter pattern matches a log event.",
+          "type": "string",
+          "pattern": ".{1,100}",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "Unit": {
+          "description": "The unit to assign to the metric. If you omit this, the unit is set as None.",
+          "type": "string",
+          "enum": [
+            "Seconds",
+            "Microseconds",
+            "Milliseconds",
+            "Bytes",
+            "Kilobytes",
+            "Megabytes",
+            "Gigabytes",
+            "Terabytes",
+            "Bits",
+            "Kilobits",
+            "Megabits",
+            "Gigabits",
+            "Terabits",
+            "Percent",
+            "Count",
+            "Bytes/Second",
+            "Kilobytes/Second",
+            "Megabytes/Second",
+            "Gigabytes/Second",
+            "Terabytes/Second",
+            "Bits/Second",
+            "Kilobits/Second",
+            "Megabits/Second",
+            "Gigabits/Second",
+            "Terabits/Second",
+            "Count/Second",
+            "None"
+          ]
+        },
+        "Dimensions": {
+          "description": "Dimensions are the key-value pairs that further define a metric",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/definitions/Dimension"
+          }
+        }
+      },
+      "required": [
+        "MetricName",
+        "MetricNamespace",
+        "MetricValue"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "FilterName": {
+      "description": "A name for the metric filter.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[^:*]{1,512}"
+    },
+    "FilterPattern": {
+      "description": "Pattern that Logs follows to interpret each entry in a log.",
+      "type": "string",
+      "maxLength": 1024
+    },
+    "LogGroupName": {
+      "description": "Existing log group that you want to associate with this filter.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[.\\-_/#A-Za-z0-9]{1,512}"
+    },
+    "MetricTransformations": {
+      "description": "A collection of information that defines how metric data gets emitted.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/MetricTransformation"
+      }
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:PutMetricFilter",
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:PutMetricFilter",
+        "logs:DescribeMetricFilters"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteMetricFilter"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:DescribeMetricFilters"
+      ]
+    }
+  },
+  "required": [
+    "FilterPattern",
+    "LogGroupName",
+    "MetricTransformations"
+  ],
+  "createOnlyProperties": [
+    "/properties/FilterName",
+    "/properties/LogGroupName"
+  ],
+  "primaryIdentifier": [
+    "/properties/LogGroupName",
+    "/properties/FilterName"
+  ],
+  "additionalProperties": false
+}

@@ -97,8 +97,7 @@
     },
     "Fingerprint": {
       "description": "The fingerprint of the Sidewalk application server private key.",
-      "type": "string",
-      "pattern": "[a-fA-F0-9]{64}"
+      "type": "string"
     },
     "Arn": {
       "description": "PartnerAccount arn. Returned after successful create.",
@@ -118,7 +117,11 @@
   "additionalProperties": false,
   "readOnlyProperties": [
     "/properties/Arn",
-    "/properties/SidewalkResponse"
+    "/properties/Fingerprint"
+  ],
+  "writeOnlyProperties": [
+    "/properties/SidewalkUpdate",
+    "/properties/Sidewalk"
   ],
   "createOnlyProperties": [
     "/properties/PartnerAccountId"

@@ -51,6 +51,9 @@
       "description": "The Amazon Resource Name (ARN) of the IPAM.",
       "type": "string"
     },
+    "Description": {
+      "type": "string"
+    },
     "PublicDefaultScopeId": {
       "description": "The Id of the default scope for publicly routable IP space, created with this IPAM.",
       "type": "string",
@@ -63,9 +66,6 @@
     "ScopeCount": {
       "description": "The number of scopes that currently exist in this IPAM.",
       "type": "integer"
-    },
-    "Description": {
-      "type": "string"
     },
     "OperatingRegions": {
       "description": "The regions IPAM is enabled for. Allows pools to be created in these regions, as well as enabling monitoring",
@@ -102,6 +102,7 @@
     "create": {
       "permissions": [
         "ec2:CreateIpam",
+        "iam:CreateServiceLinkedRole",
         "ec2:CreateTags"
       ]
     },

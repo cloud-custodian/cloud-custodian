@@ -4,7 +4,7 @@
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-IoTSiteWise.git",
   "definitions": {
     "AssetProperty": {
-      "description": "The asset property's definition, alias, and notification state.",
+      "description": "The asset property's definition, alias, unit, and notification state.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -29,6 +29,10 @@
             "ENABLED",
             "DISABLED"
           ]
+        },
+        "Unit": {
+          "description": "The unit of measure (such as Newtons or RPM) of the asset property. If you don't specify a value for this parameter, the service uses the value of the assetModelProperty in the asset model.",
+          "type": "string"
         }
       }
     },
@@ -86,6 +90,10 @@
     },
     "AssetName": {
       "description": "A unique, friendly name for the asset.",
+      "type": "string"
+    },
+    "AssetDescription": {
+      "description": "A description for the asset",
       "type": "string"
     },
     "AssetProperties": {

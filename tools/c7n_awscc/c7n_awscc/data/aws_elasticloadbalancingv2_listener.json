@@ -233,6 +233,9 @@
         "SessionCookieName": {
           "type": "string"
         },
+        "UseExistingClientSecret": {
+          "type": "boolean"
+        },
         "AuthenticationRequestExtraParams": {
           "type": "object",
           "patternProperties": {
@@ -245,7 +248,6 @@
       "required": [
         "TokenEndpoint",
         "Issuer",
-        "ClientSecret",
         "UserInfoEndpoint",
         "ClientId",
         "AuthorizationEndpoint"

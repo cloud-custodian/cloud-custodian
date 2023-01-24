@@ -9,6 +9,12 @@
       "pattern": "arn:aws:appflow:.*:[0-9]+:.*",
       "maxLength": 512
     },
+    "ConnectorLabel": {
+      "description": "The label of the connector. The label is unique for each ConnectorRegistration in your AWS account. Only needed if calling for CUSTOMCONNECTOR connector type/.",
+      "type": "string",
+      "pattern": "[\\w!@#.-]+",
+      "maxLength": 256
+    },
     "ConnectorProfileName": {
       "description": "The maximum number of items to retrieve in a single batch.",
       "type": "string",
@@ -64,15 +70,13 @@
         "Dynatrace",
         "Infornexus",
         "Amplitude",
-        "Veeva"
+        "Veeva",
+        "CustomConnector"
       ]
     },
     "ConnectorProfileConfig": {
       "description": "Connector specific configurations needed to create connector profile",
       "type": "object",
-      "required": [
-        "ConnectorProfileCredentials"
-      ],
       "properties": {
         "ConnectorProfileProperties": {
           "$ref": "#/definitions/ConnectorProfileProperties"
@@ -121,6 +125,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskConnectorProfileProperties"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorProfileProperties"
         }
       }
     },
@@ -175,6 +182,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskConnectorProfileCredentials"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorProfileCredentials"
         }
       }
     },
@@ -354,10 +364,6 @@
     },
     "RedshiftConnectorProfileCredentials": {
       "type": "object",
-      "required": [
-        "Username",
-        "Password"
-      ],
       "properties": {
         "Username": {
           "description": "The name of the user.",
@@ -372,7 +378,6 @@
     "RedshiftConnectorProfileProperties": {
       "type": "object",
       "required": [
-        "DatabaseUrl",
         "BucketName",
         "RoleArn"
       ],
@@ -392,6 +397,26 @@
         "RoleArn": {
           "description": "The Amazon Resource Name (ARN) of the IAM role.",
           "$ref": "#/definitions/RoleArn"
+        },
+        "IsRedshiftServerless": {
+          "description": "If Amazon AppFlow will connect to Amazon Redshift Serverless or Amazon Redshift cluster.",
+          "type": "boolean"
+        },
+        "DataApiRoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the IAM role that grants Amazon AppFlow access to the data through the Amazon Redshift Data API.",
+          "$ref": "#/definitions/DataApiRoleArn"
+        },
+        "ClusterIdentifier": {
+          "description": "The unique identifier of the Amazon Redshift cluster.",
+          "$ref": "#/definitions/ClusterIdentifier"
+        },
+        "WorkgroupName": {
+          "description": "The name of the Amazon Redshift serverless workgroup",
+          "$ref": "#/definitions/WorkgroupName"
+        },
+        "DatabaseName": {
+          "description": "The name of the Amazon Redshift database that will store the transferred data.",
+          "$ref": "#/definitions/DatabaseName"
         }
       }
     },
@@ -399,17 +424,7 @@
       "type": "object",
       "properties": {
         "BasicAuthCredentials": {
-          "type": "object",
-          "properties": {
-            "Username": {
-              "description": "The name of the user.",
-              "$ref": "#/definitions/Username"
-            },
-            "Password": {
-              "description": "The password that corresponds to the username.",
-              "$ref": "#/definitions/Password"
-            }
-          }
+          "$ref": "#/definitions/BasicAuthCredentials"
         },
         "OAuthCredentials": {
           "type": "object",
@@ -703,6 +718,193 @@
         }
       }
     },
+    "CustomConnectorProfileCredentials": {
+      "type": "object",
+      "required": [
+        "AuthenticationType"
+      ],
+      "properties": {
+        "AuthenticationType": {
+          "$ref": "#/definitions/AuthenticationType"
+        },
+        "Basic": {
+          "$ref": "#/definitions/BasicAuthCredentials"
+        },
+        "Oauth2": {
+          "$ref": "#/definitions/OAuth2Credentials"
+        },
+        "ApiKey": {
+          "$ref": "#/definitions/ApiKeyCredentials"
+        },
+        "Custom": {
+          "$ref": "#/definitions/CustomAuthCredentials"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CustomConnectorProfileProperties": {
+      "type": "object",
+      "properties": {
+        "ProfileProperties": {
+          "$ref": "#/definitions/ProfileProperties"
+        },
+        "OAuth2Properties": {
+          "$ref": "#/definitions/OAuth2Properties"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ApiKeyCredentials": {
+      "type": "object",
+      "required": [
+        "ApiKey"
+      ],
+      "properties": {
+        "ApiKey": {
+          "$ref": "#/definitions/ApiKey"
+        },
+        "ApiSecretKey": {
+          "$ref": "#/definitions/ApiSecretKey"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CustomAuthCredentials": {
+      "type": "object",
+      "required": [
+        "CustomAuthenticationType"
+      ],
+      "properties": {
+        "CustomAuthenticationType": {
+          "$ref": "#/definitions/CustomAuthenticationType"
+        },
+        "CredentialsMap": {
+          "$ref": "#/definitions/CredentialsMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CredentialsMap": {
+      "description": "A map for properties for custom authentication.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,128}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "OAuth2Credentials": {
+      "type": "object",
+      "properties": {
+        "ClientId": {
+          "$ref": "#/definitions/ClientId"
+        },
+        "ClientSecret": {
+          "$ref": "#/definitions/ClientSecret"
+        },
+        "AccessToken": {
+          "$ref": "#/definitions/AccessToken"
+        },
+        "RefreshToken": {
+          "$ref": "#/definitions/RefreshToken"
+        },
+        "OAuthRequest": {
+          "$ref": "#/definitions/ConnectorOAuthRequest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "BasicAuthCredentials": {
+      "type": "object",
+      "required": [
+        "Username",
+        "Password"
+      ],
+      "properties": {
+        "Username": {
+          "$ref": "#/definitions/Username"
+        },
+        "Password": {
+          "$ref": "#/definitions/Password"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AuthenticationType": {
+      "type": "string",
+      "enum": [
+        "OAUTH2",
+        "APIKEY",
+        "BASIC",
+        "CUSTOM"
+      ]
+    },
+    "OAuth2Properties": {
+      "type": "object",
+      "properties": {
+        "TokenUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "pattern": "^(https?)://[-a-zA-Z0-9+&amp;@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&amp;@#/%=~_|]"
+        },
+        "OAuth2GrantType": {
+          "$ref": "#/definitions/OAuth2GrantType"
+        },
+        "TokenUrlCustomProperties": {
+          "$ref": "#/definitions/TokenUrlCustomProperties"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProfileProperties": {
+      "description": "A map for properties for custom connector.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,256}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "OAuth2GrantType": {
+      "type": "string",
+      "enum": [
+        "CLIENT_CREDENTIALS",
+        "AUTHORIZATION_CODE"
+      ]
+    },
+    "TokenUrlCustomProperties": {
+      "description": "A map for properties for custom connector Token Url.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,128}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "CustomAuthenticationType": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 256
+    },
     "ClientId": {
       "type": "string",
       "pattern": "\\S+",
@@ -771,6 +973,26 @@
     "RoleArn": {
       "type": "string",
       "pattern": "arn:aws:iam:.*:[0-9]+:.*",
+      "maxLength": 512
+    },
+    "DataApiRoleArn": {
+      "type": "string",
+      "pattern": "arn:aws:iam:.*:[0-9]+:.*",
+      "maxLength": 512
+    },
+    "ClusterIdentifier": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 512
+    },
+    "WorkgroupName": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 512
+    },
+    "DatabaseName": {
+      "type": "string",
+      "pattern": "\\S+",
       "maxLength": 512
     },
     "Warehouse": {

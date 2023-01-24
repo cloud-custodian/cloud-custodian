@@ -1,0 +1,207 @@
+{
+  "typeName": "AWS::FSx::DataRepositoryAssociation",
+  "description": "Resource Type definition for AWS::FSx::DataRepositoryAssociation",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-fsx.git",
+  "resourceLink": {
+    "templateUri": "/fsx/home?region=${awsRegion}#data-repository-associations-details/${FileSystemId}/${AssociationId}",
+    "mappings": {
+      "AssociationId": "/AssociationId",
+      "FileSystemId": "/FileSystemId"
+    }
+  },
+  "definitions": {
+    "EventType": {
+      "type": "string",
+      "enum": [
+        "NEW",
+        "CHANGED",
+        "DELETED"
+      ]
+    },
+    "EventTypes": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/EventType"
+      },
+      "maxItems": 3
+    },
+    "AutoImportPolicy": {
+      "description": "Specifies the type of updated objects (new, changed, deleted) that will be automatically imported from the linked S3 bucket to your file system.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Events": {
+          "$ref": "#/definitions/EventTypes"
+        }
+      },
+      "required": [
+        "Events"
+      ]
+    },
+    "AutoExportPolicy": {
+      "description": "Specifies the type of updated objects (new, changed, deleted) that will be automatically exported from your file system to the linked S3 bucket.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Events": {
+          "$ref": "#/definitions/EventTypes"
+        }
+      },
+      "required": [
+        "Events"
+      ]
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "S3": {
+      "description": "The configuration for an Amazon S3 data repository linked to an Amazon FSx Lustre file system with a data repository association. The configuration defines which file events (new, changed, or deleted files or directories) are automatically imported from the linked data repository to the file system or automatically exported from the file system to the data repository.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AutoImportPolicy": {
+          "$ref": "#/definitions/AutoImportPolicy"
+        },
+        "AutoExportPolicy": {
+          "$ref": "#/definitions/AutoExportPolicy"
+        }
+      }
+    }
+  },
+  "properties": {
+    "AssociationId": {
+      "type": "string",
+      "description": "The system-generated, unique ID of the data repository association."
+    },
+    "ResourceARN": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) for a given resource. ARNs uniquely identify Amazon Web Services resources. We require an ARN when you need to specify a resource unambiguously across all of Amazon Web Services. For more information, see Amazon Resource Names (ARNs) in the Amazon Web Services General Reference."
+    },
+    "FileSystemId": {
+      "type": "string",
+      "description": "The globally unique ID of the file system, assigned by Amazon FSx."
+    },
+    "FileSystemPath": {
+      "type": "string",
+      "description": "This path specifies where in your file system files will be exported from or imported to. This file system directory can be linked to only one Amazon S3 bucket, and no other S3 bucket can be linked to the directory."
+    },
+    "DataRepositoryPath": {
+      "type": "string",
+      "description": "The path to the Amazon S3 data repository that will be linked to the file system. The path can be an S3 bucket or prefix in the format s3://myBucket/myPrefix/ . This path specifies where in the S3 data repository files will be imported from or exported to."
+    },
+    "BatchImportMetaDataOnCreate": {
+      "type": "boolean",
+      "description": "A boolean flag indicating whether an import data repository task to import metadata should run after the data repository association is created. The task runs if this flag is set to true."
+    },
+    "ImportedFileChunkSize": {
+      "type": "integer",
+      "description": "For files imported from a data repository, this value determines the stripe count and maximum amount of data per file (in MiB) stored on a single physical disk. The maximum number of disks that a single file can be striped across is limited by the total number of disks that make up the file system."
+    },
+    "S3": {
+      "description": "The configuration for an Amazon S3 data repository linked to an Amazon FSx Lustre file system with a data repository association. The configuration defines which file events (new, changed, or deleted files or directories) are automatically imported from the linked data repository to the file system or automatically exported from the file system to the data repository.",
+      "$ref": "#/definitions/S3"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "description": "A list of Tag values, with a maximum of 50 elements."
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true
+  },
+  "additionalProperties": false,
+  "required": [
+    "FileSystemId",
+    "FileSystemPath",
+    "DataRepositoryPath"
+  ],
+  "createOnlyProperties": [
+    "/properties/FileSystemId",
+    "/properties/FileSystemPath",
+    "/properties/DataRepositoryPath",
+    "/properties/BatchImportMetaDataOnCreate"
+  ],
+  "primaryIdentifier": [
+    "/properties/AssociationId"
+  ],
+  "readOnlyProperties": [
+    "/properties/AssociationId",
+    "/properties/ResourceARN"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "fsx:CreateDataRepositoryAssociation",
+        "fsx:DescribeDataRepositoryAssociations",
+        "fsx:TagResource",
+        "s3:ListBucket",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy"
+      ],
+      "timeoutInMinutes": 120
+    },
+    "read": {
+      "permissions": [
+        "fsx:DescribeDataRepositoryAssociations"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "fsx:DescribeDataRepositoryAssociations",
+        "fsx:UpdateDataRepositoryAssociation",
+        "fsx:TagResource",
+        "fsx:UntagResource",
+        "s3:ListBucket",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "delete": {
+      "permissions": [
+        "fsx:DescribeDataRepositoryAssociations",
+        "fsx:DeleteDataRepositoryAssociation"
+      ],
+      "timeoutInMinutes": 180
+    },
+    "list": {
+      "permissions": [
+        "fsx:DescribeDataRepositoryAssociations"
+      ]
+    }
+  }
+}

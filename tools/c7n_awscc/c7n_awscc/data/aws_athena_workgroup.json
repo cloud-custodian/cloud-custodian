@@ -282,6 +282,12 @@
   "createOnlyProperties": [
     "/properties/Name"
   ],
+  "deprecatedProperties": [
+    "/properties/WorkGroupConfigurationUpdates"
+  ],
+  "writeOnlyProperties": [
+    "/properties/WorkGroupConfigurationUpdates"
+  ],
   "primaryIdentifier": [
     "/properties/Name"
   ],

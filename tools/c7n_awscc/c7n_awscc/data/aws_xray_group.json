@@ -43,6 +43,7 @@
     },
     "Tags": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "object",
         "required": [

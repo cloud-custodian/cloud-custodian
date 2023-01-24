@@ -23,6 +23,7 @@
     "Tags": {
       "type": "array",
       "uniqueItems": false,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       }
@@ -96,5 +97,11 @@
         "iam:GetSAMLProvider"
       ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
   }
 }

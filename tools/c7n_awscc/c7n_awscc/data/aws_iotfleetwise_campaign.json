@@ -1,0 +1,344 @@
+{
+  "typeName": "AWS::IoTFleetWise::Campaign",
+  "description": "Definition of AWS::IoTFleetWise::Campaign Resource Type",
+  "definitions": {
+    "Compression": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "SNAPPY"
+      ],
+      "default": "OFF"
+    },
+    "UpdateCampaignAction": {
+      "type": "string",
+      "enum": [
+        "APPROVE",
+        "SUSPEND",
+        "RESUME",
+        "UPDATE"
+      ]
+    },
+    "CampaignStatus": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "WAITING_FOR_APPROVAL",
+        "RUNNING",
+        "SUSPENDED"
+      ]
+    },
+    "DiagnosticsMode": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "SEND_ACTIVE_DTCS"
+      ],
+      "default": "OFF"
+    },
+    "SignalInformation": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MaxSampleCount": {
+          "maximum": 4294967295,
+          "type": "number",
+          "minimum": 1
+        },
+        "Name": {
+          "minLength": 1,
+          "pattern": "^[\\w|*|-]+(\\.[\\w|*|-]+)*$",
+          "type": "string",
+          "maxLength": 150
+        },
+        "MinimumSamplingIntervalMs": {
+          "maximum": 4294967295,
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "Name"
+      ]
+    },
+    "TimeBasedCollectionScheme": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PeriodMs": {
+          "maximum": 60000,
+          "type": "number",
+          "minimum": 10000
+        }
+      },
+      "required": [
+        "PeriodMs"
+      ]
+    },
+    "SpoolingMode": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "TO_DISK"
+      ],
+      "default": "OFF"
+    },
+    "TriggerMode": {
+      "type": "string",
+      "enum": [
+        "ALWAYS",
+        "RISING_EDGE"
+      ]
+    },
+    "CollectionScheme": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "TimeBasedCollectionScheme",
+          "properties": {
+            "TimeBasedCollectionScheme": {
+              "$ref": "#/definitions/TimeBasedCollectionScheme"
+            }
+          },
+          "required": [
+            "TimeBasedCollectionScheme"
+          ]
+        },
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "title": "ConditionBasedCollectionScheme",
+          "properties": {
+            "ConditionBasedCollectionScheme": {
+              "$ref": "#/definitions/ConditionBasedCollectionScheme"
+            }
+          },
+          "required": [
+            "ConditionBasedCollectionScheme"
+          ]
+        }
+      ]
+    },
+    "ConditionBasedCollectionScheme": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "MinimumTriggerIntervalMs": {
+          "maximum": 4294967295,
+          "type": "number",
+          "minimum": 0
+        },
+        "Expression": {
+          "minLength": 1,
+          "type": "string",
+          "maxLength": 2048
+        },
+        "TriggerMode": {
+          "$ref": "#/definitions/TriggerMode"
+        },
+        "ConditionLanguageVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "Expression"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Status": {
+      "$ref": "#/definitions/CampaignStatus"
+    },
+    "Action": {
+      "$ref": "#/definitions/UpdateCampaignAction"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Compression": {
+      "$ref": "#/definitions/Compression"
+    },
+    "Description": {
+      "minLength": 1,
+      "pattern": "^[^\\u0000-\\u001F\\u007F]+$",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "Priority": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "SignalsToCollect": {
+      "minItems": 0,
+      "maxItems": 1000,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SignalInformation"
+      }
+    },
+    "StartTime": {
+      "format": "date-time",
+      "type": "string",
+      "default": "0"
+    },
+    "Name": {
+      "minLength": 1,
+      "pattern": "^[a-zA-Z\\d\\-_:]+$",
+      "type": "string",
+      "maxLength": 100
+    },
+    "ExpiryTime": {
+      "format": "date-time",
+      "type": "string",
+      "default": "253402214400"
+    },
+    "LastModificationTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "SpoolingMode": {
+      "$ref": "#/definitions/SpoolingMode"
+    },
+    "SignalCatalogArn": {
+      "type": "string"
+    },
+    "PostTriggerCollectionDuration": {
+      "maximum": 4294967295,
+      "type": "number",
+      "minimum": 0,
+      "default": 0
+    },
+    "DataExtraDimensions": {
+      "minItems": 0,
+      "maxItems": 5,
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "minLength": 1,
+        "pattern": "^[a-zA-Z0-9_.]+$",
+        "type": "string",
+        "maxLength": 150
+      }
+    },
+    "DiagnosticsMode": {
+      "$ref": "#/definitions/DiagnosticsMode"
+    },
+    "TargetArn": {
+      "type": "string"
+    },
+    "Arn": {
+      "type": "string"
+    },
+    "CollectionScheme": {
+      "$ref": "#/definitions/CollectionScheme"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "maxItems": 50,
+      "minItems": 0
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Status",
+    "/properties/CreationTime",
+    "/properties/LastModificationTime"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Action"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/TargetArn",
+    "/properties/SignalCatalogArn",
+    "/properties/PostTriggerCollectionDuration",
+    "/properties/DiagnosticsMode",
+    "/properties/SpoolingMode",
+    "/properties/CollectionScheme",
+    "/properties/Priority",
+    "/properties/Compression",
+    "/properties/StartTime",
+    "/properties/ExpiryTime"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "required": [
+    "Name",
+    "Action",
+    "CollectionScheme",
+    "SignalCatalogArn",
+    "TargetArn"
+  ],
+  "handlers": {
+    "read": {
+      "permissions": [
+        "iotfleetwise:GetCampaign",
+        "iotfleetwise:ListTagsForResource"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "iotfleetwise:CreateCampaign",
+        "iotfleetwise:GetCampaign"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iotfleetwise:UpdateCampaign",
+        "iotfleetwise:TagResource",
+        "iotfleetwise:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iotfleetwise:ListCampaigns",
+        "iotfleetwise:GetCampaign"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iotfleetwise:DeleteCampaign",
+        "iotfleetwise:GetCampaign"
+      ]
+    }
+  }
+}

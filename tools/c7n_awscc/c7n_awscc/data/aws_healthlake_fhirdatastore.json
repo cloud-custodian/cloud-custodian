@@ -209,7 +209,11 @@
         "kms:GenerateDataKey",
         "kms:Decrypt",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ram:GetResourceShareInvitations",
+        "ram:AcceptResourceShareInvitation",
+        "glue:CreateDatabase",
+        "glue:DeleteDatabase"
       ]
     },
     "read": {
@@ -234,7 +238,11 @@
         "healthlake:DescribeFHIRDatastore",
         "iam:PassRole",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ram:GetResourceShareInvitations",
+        "ram:AcceptResourceShareInvitation",
+        "glue:CreateDatabase",
+        "glue:DeleteDatabase"
       ]
     },
     "list": {

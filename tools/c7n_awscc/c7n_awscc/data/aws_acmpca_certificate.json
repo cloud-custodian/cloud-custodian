@@ -60,8 +60,38 @@
         },
         "SubjectAlternativeNames": {
           "$ref": "#/definitions/GeneralNameList"
+        },
+        "CustomExtensions": {
+          "$ref": "#/definitions/CustomExtensionList"
         }
       }
+    },
+    "CustomExtensionList": {
+      "description": "Array of X.509 extensions for a certificate.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CustomExtension"
+      }
+    },
+    "CustomExtension": {
+      "description": "Structure that contains X.509 extension information for a certificate.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Critical": {
+          "type": "boolean"
+        },
+        "ObjectIdentifier": {
+          "$ref": "#/definitions/CustomObjectIdentifier"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ObjectIdentifier",
+        "Value"
+      ]
     },
     "GeneralNameList": {
       "type": "array",
@@ -241,8 +271,35 @@
         },
         "GenerationQualifier": {
           "type": "string"
+        },
+        "CustomAttributes": {
+          "$ref": "#/definitions/CustomAttributeList"
         }
       }
+    },
+    "CustomAttributeList": {
+      "description": "Array of X.500 attribute type and value. CustomAttributes cannot be used along with pre-defined attributes.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CustomAttribute"
+      }
+    },
+    "CustomAttribute": {
+      "description": "Structure that contains X.500 attribute type and value.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ObjectIdentifier": {
+          "$ref": "#/definitions/CustomObjectIdentifier"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ObjectIdentifier",
+        "Value"
+      ]
     },
     "Validity": {
       "description": "Validity for a certificate.",

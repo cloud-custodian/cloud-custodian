@@ -99,6 +99,7 @@
     },
     "EndpointIds": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/EndpointId"
       }

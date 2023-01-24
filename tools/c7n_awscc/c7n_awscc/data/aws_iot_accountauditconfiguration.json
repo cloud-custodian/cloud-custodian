@@ -48,6 +48,12 @@
         },
         "UnauthenticatedCognitoRoleOverlyPermissiveCheck": {
           "$ref": "#/definitions/AuditCheckConfiguration"
+        },
+        "IntermediateCaRevokedForActiveDeviceCertificatesCheck": {
+          "$ref": "#/definitions/AuditCheckConfiguration"
+        },
+        "IoTPolicyPotentialMisConfigurationCheck": {
+          "$ref": "#/definitions/AuditCheckConfiguration"
         }
       },
       "additionalProperties": false

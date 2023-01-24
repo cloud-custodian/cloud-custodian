@@ -96,7 +96,8 @@
   "required": [
     "InstanceArn",
     "Content",
-    "Name"
+    "Name",
+    "Type"
   ],
   "handlers": {
     "create": {

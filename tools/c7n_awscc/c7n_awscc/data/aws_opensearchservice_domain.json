@@ -182,6 +182,9 @@
         },
         "VolumeSize": {
           "type": "integer"
+        },
+        "Throughput": {
+          "type": "integer"
         }
       }
     },
@@ -202,14 +205,16 @@
       "additionalProperties": false,
       "properties": {
         "Value": {
+          "description": "The key of the tag.",
           "type": "string",
-          "minLength": 1,
-          "maxLength": 255
+          "minLength": 0,
+          "maxLength": 256
         },
         "Key": {
+          "description": "The value of the tag.",
           "type": "string",
-          "minLength": 1,
-          "maxLength": 127
+          "minLength": 0,
+          "maxLength": 128
         }
       },
       "required": [
@@ -304,7 +309,7 @@
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
-        "^.$": {
+        "^.*$": {
           "type": "string"
         }
       }
@@ -338,8 +343,11 @@
   },
   "additionalProperties": false,
   "createOnlyProperties": [
-    "/properties/AdvancedSecurityOptions",
     "/properties/DomainName"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/EncryptionAtRestOptions/properties",
+    "/properties/AdvancedSecurityOptions/properties/Enabled"
   ],
   "readOnlyProperties": [
     "/properties/Id",

@@ -268,7 +268,8 @@
         "BIGINT",
         "BOOLEAN",
         "DOUBLE",
-        "VARCHAR"
+        "VARCHAR",
+        "TIMESTAMP"
       ]
     },
     "TargetMultiMeasureAttributeName": {

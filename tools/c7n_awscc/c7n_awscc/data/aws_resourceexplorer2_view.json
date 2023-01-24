@@ -1,0 +1,113 @@
+{
+  "typeName": "AWS::ResourceExplorer2::View",
+  "description": "Definition of AWS::ResourceExplorer2::View Resource Type",
+  "definitions": {
+    "IncludedProperty": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false
+    },
+    "Filters": {
+      "type": "object",
+      "properties": {
+        "FilterString": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "FilterString"
+      ],
+      "additionalProperties": false
+    },
+    "TagMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "IncludedProperties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IncludedProperty"
+      },
+      "insertionOrder": false
+    },
+    "Filters": {
+      "$ref": "#/definitions/Filters"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    },
+    "ViewArn": {
+      "type": "string"
+    },
+    "ViewName": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\\-]{1,64}$"
+    }
+  },
+  "required": [
+    "ViewName"
+  ],
+  "readOnlyProperties": [
+    "/properties/ViewArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ViewName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ViewArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "resource-explorer-2:CreateView",
+        "resource-explorer-2:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "resource-explorer-2:GetView"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "resource-explorer-2:UpdateView",
+        "resource-explorer-2:TagResource",
+        "resource-explorer-2:UntagResource",
+        "resource-explorer-2:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "resource-explorer-2:DeleteView",
+        "resource-explorer-2:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "resource-explorer-2:ListViews"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "cloudFormationSystemTags": false,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "additionalProperties": false
+}

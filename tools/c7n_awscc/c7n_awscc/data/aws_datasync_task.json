@@ -187,6 +187,14 @@
             "ONLY_FILES_TRANSFERRED",
             "NONE"
           ]
+        },
+        "ObjectTags": {
+          "description": "A value that determines whether object tags should be read from the source object store and written to the destination object store.",
+          "type": "string",
+          "enum": [
+            "PRESERVE",
+            "NONE"
+          ]
         }
       }
     },
@@ -277,14 +285,6 @@
       "maxLength": 128,
       "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]*:[0-9]{12}:task/task-[0-9a-f]{17}$"
     },
-    "ErrorCode": {
-      "description": "Errors that AWS DataSync encountered during execution of the task. You can use this error code to help troubleshoot issues.",
-      "type": "string"
-    },
-    "ErrorDetail": {
-      "description": "Detailed description of an error that was encountered during the task execution.",
-      "type": "string"
-    },
     "Status": {
       "description": "The status of the task that was described.",
       "type": "string",
@@ -303,7 +303,13 @@
       "$ref": "#/definitions/DestinationNetworkInterfaceArns"
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "DestinationLocationArn",
@@ -311,8 +317,6 @@
   ],
   "readOnlyProperties": [
     "/properties/TaskArn",
-    "/properties/ErrorCode",
-    "/properties/ErrorDetail",
     "/properties/Status",
     "/properties/SourceNetworkInterfaceArns",
     "/properties/DestinationNetworkInterfaceArns"

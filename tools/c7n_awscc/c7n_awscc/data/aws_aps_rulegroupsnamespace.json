@@ -70,7 +70,13 @@
   "readOnlyProperties": [
     "/properties/Arn"
   ],
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "primaryIdentifier": [
     "/properties/Arn"
   ],
@@ -98,6 +104,12 @@
     "delete": {
       "permissions": [
         "aps:DeleteRuleGroupsNamespace"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "aps:ListRuleGroupsNamespaces",
+        "aps:ListTagsForResource"
       ]
     }
   }

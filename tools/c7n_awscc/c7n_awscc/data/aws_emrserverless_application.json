@@ -1,0 +1,344 @@
+{
+  "typeName": "AWS::EMRServerless::Application",
+  "description": "Resource schema for AWS::EMRServerless::Application Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Architecture": {
+      "description": "The cpu architecture of an application.",
+      "enum": [
+        "ARM64",
+        "X86_64"
+      ],
+      "type": "string"
+    },
+    "InitialCapacityConfigMap": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/InitialCapacityConfigKeyValuePair"
+      }
+    },
+    "InitialCapacityConfigKeyValuePair": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "Worker type for an analytics framework.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^[a-zA-Z]+[-_]*[a-zA-Z]+$"
+        },
+        "Value": {
+          "$ref": "#/definitions/InitialCapacityConfig"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "InitialCapacityConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WorkerCount": {
+          "description": "Initial count of workers to be initialized when an Application is started. This count will be continued to be maintained until the Application is stopped",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "WorkerConfiguration": {
+          "$ref": "#/definitions/WorkerConfiguration"
+        }
+      },
+      "required": [
+        "WorkerCount",
+        "WorkerConfiguration"
+      ]
+    },
+    "WorkerConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Cpu": {
+          "description": "Per worker CPU resource. vCPU is the only supported unit and specifying vCPU is optional.",
+          "$ref": "#/definitions/CpuSize"
+        },
+        "Memory": {
+          "description": "Per worker memory resource. GB is the only supported unit and specifying GB is optional.",
+          "$ref": "#/definitions/MemorySize"
+        },
+        "Disk": {
+          "description": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional",
+          "$ref": "#/definitions/DiskSize"
+        }
+      },
+      "required": [
+        "Cpu",
+        "Memory"
+      ]
+    },
+    "MaximumAllowedResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Cpu": {
+          "description": "Per worker CPU resource. vCPU is the only supported unit and specifying vCPU is optional.",
+          "$ref": "#/definitions/CpuSize"
+        },
+        "Memory": {
+          "description": "Per worker memory resource. GB is the only supported unit and specifying GB is optional.",
+          "$ref": "#/definitions/MemorySize"
+        },
+        "Disk": {
+          "description": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional",
+          "$ref": "#/definitions/DiskSize"
+        }
+      },
+      "required": [
+        "Cpu",
+        "Memory"
+      ]
+    },
+    "AutoStartConfiguration": {
+      "description": "Configuration for Auto Start of Application",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "If set to true, the Application will automatically start. Defaults to true.",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": []
+    },
+    "AutoStopConfiguration": {
+      "description": "Configuration for Auto Stop of Application",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "description": "If set to true, the Application will automatically stop after being idle. Defaults to true.",
+          "type": "boolean",
+          "default": true
+        },
+        "IdleTimeoutMinutes": {
+          "type": "integer",
+          "description": "The amount of time [in minutes] to wait before auto stopping the Application when idle. Defaults to 15 minutes."
+        }
+      },
+      "required": []
+    },
+    "NetworkConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SubnetIds": {
+          "description": "The ID of the subnets in the VPC to which you want to connect your job or application.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/definitions/SubnetId"
+          }
+        },
+        "SecurityGroupIds": {
+          "description": "The ID of the security groups in the VPC to which you want to connect your job or application.",
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/definitions/SecurityGroupId"
+          }
+        }
+      },
+      "required": []
+    },
+    "SubnetId": {
+      "description": "Identifier of a subnet",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[-0-9a-zA-Z]+"
+    },
+    "SecurityGroupId": {
+      "description": "Identifier of a security group",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[-0-9a-zA-Z]+"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 128 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9 /_.:=+@-]+$"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9 /_.:=+@-]*$"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "CpuSize": {
+      "description": "Per worker CPU resource. vCPU is the only supported unit and specifying vCPU is optional.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 15,
+      "pattern": "^[1-9][0-9]*(\\s)?(vCPU|vcpu|VCPU)?$"
+    },
+    "MemorySize": {
+      "description": "Per worker memory resource. GB is the only supported unit and specifying GB is optional.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 15,
+      "pattern": "^[1-9][0-9]*(\\s)?(GB|gb|gB|Gb)?$"
+    },
+    "DiskSize": {
+      "description": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 15,
+      "pattern": "^[1-9][0-9]*(\\s)?(GB|gb|gB|Gb)$"
+    }
+  },
+  "properties": {
+    "Architecture": {
+      "$ref": "#/definitions/Architecture"
+    },
+    "Name": {
+      "description": "User friendly Application name.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9._\\/#-]+$"
+    },
+    "ReleaseLabel": {
+      "description": "EMR release label.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    },
+    "Type": {
+      "description": "The type of the application",
+      "type": "string"
+    },
+    "InitialCapacity": {
+      "description": "Initial capacity initialized when an Application is started.",
+      "$ref": "#/definitions/InitialCapacityConfigMap"
+    },
+    "MaximumCapacity": {
+      "description": "Maximum allowed cumulative resources for an Application. No new resources will be created once the limit is hit.",
+      "$ref": "#/definitions/MaximumAllowedResources"
+    },
+    "Tags": {
+      "description": "Tag map with key and value",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "AutoStartConfiguration": {
+      "description": "Configuration for Auto Start of Application.",
+      "$ref": "#/definitions/AutoStartConfiguration"
+    },
+    "AutoStopConfiguration": {
+      "description": "Configuration for Auto Stop of Application.",
+      "$ref": "#/definitions/AutoStopConfiguration"
+    },
+    "NetworkConfiguration": {
+      "description": "Network Configuration for customer VPC connectivity.",
+      "$ref": "#/definitions/NetworkConfiguration"
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the EMR Serverless Application.",
+      "type": "string"
+    },
+    "ApplicationId": {
+      "description": "The ID of the EMR Serverless Application.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ReleaseLabel",
+    "Type"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/ReleaseLabel",
+    "/properties/Type"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/ApplicationId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApplicationId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "emr-serverless:CreateApplication",
+        "emr-serverless:TagResource",
+        "emr-serverless:GetApplication",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "emr-serverless:GetApplication"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "emr-serverless:UpdateApplication",
+        "emr-serverless:TagResource",
+        "emr-serverless:UntagResource",
+        "emr-serverless:GetApplication"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "emr-serverless:DeleteApplication",
+        "emr-serverless:GetApplication"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "emr-serverless:ListApplications"
+      ]
+    }
+  }
+}

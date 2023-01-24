@@ -93,13 +93,17 @@
       "maxLength": 4356
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "User",
-    "Password",
-    "SecurityGroupArns",
-    "FsxFilesystemArn"
+    "SecurityGroupArns"
   ],
   "readOnlyProperties": [
     "/properties/LocationArn",

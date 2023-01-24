@@ -182,7 +182,8 @@
     "create": {
       "permissions": [
         "evidently:CreateFeature",
-        "evidently:TagResource"
+        "evidently:TagResource",
+        "evidently:GetFeature"
       ]
     },
     "read": {
@@ -196,13 +197,15 @@
         "evidently:UpdateFeature",
         "evidently:ListTagsForResource",
         "evidently:TagResource",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetFeature"
       ]
     },
     "delete": {
       "permissions": [
         "evidently:DeleteFeature",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetFeature"
       ]
     }
   },

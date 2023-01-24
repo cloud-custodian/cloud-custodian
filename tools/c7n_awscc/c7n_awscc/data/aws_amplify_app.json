@@ -87,6 +87,14 @@
       "maxLength": 1000,
       "pattern": "(?s).*"
     },
+    "Platform": {
+      "type": "string",
+      "enum": [
+        "WEB",
+        "WEB_DYNAMIC",
+        "WEB_COMPUTE"
+      ]
+    },
     "Repository": {
       "type": "string",
       "pattern": "(?s).*"
@@ -139,6 +147,11 @@
           "items": {
             "$ref": "#/definitions/EnvironmentVariable"
           }
+        },
+        "Framework": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "(?s).*"
         },
         "PullRequestEnvironmentName": {
           "type": "string",

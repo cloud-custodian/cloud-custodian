@@ -91,18 +91,24 @@
       "permissions": [
         "route53-recovery-control-config:CreateControlPanel",
         "route53-recovery-control-config:DescribeCluster",
-        "route53-recovery-control-config:DescribeControlPanel"
+        "route53-recovery-control-config:DescribeControlPanel",
+        "route53-recovery-control-config:ListTagsForResource",
+        "route53-recovery-control-config:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "route53-recovery-control-config:DescribeControlPanel"
+        "route53-recovery-control-config:DescribeControlPanel",
+        "route53-recovery-control-config:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "route53-recovery-control-config:UpdateControlPanel",
-        "route53-recovery-control-config:DescribeControlPanel"
+        "route53-recovery-control-config:DescribeControlPanel",
+        "route53-recovery-control-config:ListTagsForResource",
+        "route53-recovery-control-config:TagResource",
+        "route53-recovery-control-config:UntagResource"
       ]
     },
     "delete": {

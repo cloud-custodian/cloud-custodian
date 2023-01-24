@@ -53,6 +53,28 @@
       },
       "insertionOrder": false,
       "uniqueItems": true
+    },
+    "Tag": {
+      "description": "A key-value pair to tag a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "pattern": "^(?!aws:)[a-zA-Z+-=._:/]+$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
     }
   },
   "properties": {
@@ -68,6 +90,17 @@
     "DeletionProtected": {
       "$ref": "#/definitions/DeletionProtected",
       "default": false
+    },
+    "Tags": {
+      "description": "The tags to apply to the replication set.",
+      "type": "array",
+      "default": [],
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
     }
   },
   "additionalProperties": false,
@@ -77,7 +110,7 @@
   "required": [
     "Regions"
   ],
-  "taggable": false,
+  "taggable": true,
   "readOnlyProperties": [
     "/properties/Arn"
   ],
@@ -93,14 +126,18 @@
     "read": {
       "permissions": [
         "ssm-incidents:ListReplicationSets",
-        "ssm-incidents:GetReplicationSet"
+        "ssm-incidents:GetReplicationSet",
+        "ssm-incidents:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "ssm-incidents:UpdateReplicationSet",
         "ssm-incidents:UpdateDeletionProtection",
-        "ssm-incidents:GetReplicationSet"
+        "ssm-incidents:GetReplicationSet",
+        "ssm-incidents:TagResource",
+        "ssm-incidents:UntagResource",
+        "ssm-incidents:ListTagsForResource"
       ]
     },
     "delete": {

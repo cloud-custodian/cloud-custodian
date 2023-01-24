@@ -29,13 +29,13 @@
       "additionalProperties": false,
       "properties": {
         "MinRetentionDays": {
-          "type": "number"
+          "type": "integer"
         },
         "MaxRetentionDays": {
-          "type": "number"
+          "type": "integer"
         },
         "ChangeableForDays": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -88,6 +88,9 @@
     "/properties/BackupVaultName",
     "/properties/EncryptionKeyArn"
   ],
+  "writeOnlyProperties": [
+    "/properties/LockConfiguration/ChangeableForDays"
+  ],
   "readOnlyProperties": [
     "/properties/BackupVaultArn"
   ],
@@ -135,6 +138,11 @@
     "delete": {
       "permissions": [
         "backup:DeleteBackupVault"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup:ListBackupVaults"
       ]
     }
   }

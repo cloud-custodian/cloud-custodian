@@ -1,0 +1,122 @@
+{
+  "typeName": "AWS::Oam::Link",
+  "description": "Definition of AWS::Oam::Link Resource Type",
+  "definitions": {
+    "ResourceType": {
+      "type": "string",
+      "enum": [
+        "AWS::CloudWatch::Metric",
+        "AWS::Logs::LogGroup",
+        "AWS::XRay::Trace"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048
+    },
+    "Label": {
+      "type": "string"
+    },
+    "LabelTemplate": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1
+    },
+    "ResourceTypes": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ResourceType"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "SinkIdentifier": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 1
+    },
+    "Tags": {
+      "description": "Tags to apply to the link",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]{1,128}$": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "pattern": "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]{0,256}$",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      }
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
+  "required": [
+    "LabelTemplate",
+    "ResourceTypes",
+    "SinkIdentifier"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Label"
+  ],
+  "createOnlyProperties": [
+    "/properties/SinkIdentifier",
+    "/properties/LabelTemplate"
+  ],
+  "writeOnlyProperties": [
+    "/properties/LabelTemplate"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "oam:CreateLink",
+        "oam:GetLink",
+        "cloudwatch:Link",
+        "logs:Link",
+        "xray:Link"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "oam:GetLink"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "oam:GetLink",
+        "oam:UpdateLink",
+        "cloudwatch:Link",
+        "logs:Link",
+        "xray:Link",
+        "oam:TagResource",
+        "oam:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "oam:DeleteLink",
+        "oam:GetLink"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "oam:ListLinks"
+      ]
+    }
+  },
+  "replacementStrategy": "delete_then_create",
+  "additionalProperties": false
+}

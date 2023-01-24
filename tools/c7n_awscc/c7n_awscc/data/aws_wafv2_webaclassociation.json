@@ -36,7 +36,8 @@
         "wafv2:AssociateWebACL",
         "elasticloadbalancing:SetWebACL",
         "apigateway:SetWebACL",
-        "appsync:SetWebACL"
+        "appsync:SetWebACL",
+        "cognito-idp:AssociateWebACL"
       ]
     },
     "delete": {
@@ -46,13 +47,16 @@
         "wafv2:GetWebACL",
         "elasticloadbalancing:SetWebACL",
         "apigateway:SetWebACL",
-        "appsync:SetWebACL"
+        "appsync:SetWebACL",
+        "cognito-idp:DisassociateWebACL",
+        "cognito-idp:GetWebACLForResource"
       ]
     },
     "read": {
       "permissions": [
         "wafv2:GetWebACLForResource",
-        "wafv2:GetWebACL"
+        "wafv2:GetWebACL",
+        "cognito-idp:GetWebACLForResource"
       ]
     },
     "update": {

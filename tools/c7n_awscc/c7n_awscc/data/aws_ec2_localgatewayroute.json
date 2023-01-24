@@ -1,0 +1,97 @@
+{
+  "typeName": "AWS::EC2::LocalGatewayRoute",
+  "description": "Describes a route for a local gateway route table.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2-lgw.git",
+  "properties": {
+    "DestinationCidrBlock": {
+      "description": "The CIDR block used for destination matches.",
+      "type": "string"
+    },
+    "LocalGatewayRouteTableId": {
+      "description": "The ID of the local gateway route table.",
+      "type": "string"
+    },
+    "LocalGatewayVirtualInterfaceGroupId": {
+      "description": "The ID of the virtual interface group.",
+      "type": "string"
+    },
+    "NetworkInterfaceId": {
+      "description": "The ID of the network interface.",
+      "type": "string"
+    },
+    "State": {
+      "description": "The state of the route.",
+      "type": "string"
+    },
+    "Type": {
+      "description": "The route type.",
+      "type": "string"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "DestinationCidrBlock",
+        "LocalGatewayRouteTableId",
+        "LocalGatewayVirtualInterfaceGroupId"
+      ]
+    },
+    {
+      "required": [
+        "DestinationCidrBlock",
+        "LocalGatewayRouteTableId",
+        "NetworkInterfaceId"
+      ]
+    }
+  ],
+  "createOnlyProperties": [
+    "/properties/DestinationCidrBlock",
+    "/properties/LocalGatewayRouteTableId"
+  ],
+  "readOnlyProperties": [
+    "/properties/State",
+    "/properties/Type"
+  ],
+  "primaryIdentifier": [
+    "/properties/DestinationCidrBlock",
+    "/properties/LocalGatewayRouteTableId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateLocalGatewayRoute",
+        "ec2:SearchLocalGatewayRoutes"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:SearchLocalGatewayRoutes"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteLocalGatewayRoute",
+        "ec2:SearchLocalGatewayRoutes"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeLocalGatewayRouteTables",
+        "ec2:SearchLocalGatewayRoutes"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyLocalGatewayRoute",
+        "ec2:SearchLocalGatewayRoutes"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

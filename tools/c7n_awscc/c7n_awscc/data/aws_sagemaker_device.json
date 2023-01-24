@@ -68,7 +68,6 @@
     },
     "Device": {
       "description": "The Edge Device you want to register against a device fleet",
-      "type": "object",
       "$ref": "#/definitions/Device"
     },
     "Tags": {
@@ -84,10 +83,10 @@
   ],
   "additionalProperties": false,
   "primaryIdentifier": [
-    "/properties/DeviceFleetName"
+    "/properties/Device/DeviceName"
   ],
   "createOnlyProperties": [
-    "/properties/DeviceFleetName"
+    "/properties/Device/DeviceName"
   ],
   "handlers": {
     "create": {

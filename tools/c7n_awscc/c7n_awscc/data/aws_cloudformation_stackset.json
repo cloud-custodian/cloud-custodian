@@ -155,6 +155,16 @@
           "items": {
             "$ref": "#/definitions/OrganizationalUnitId"
           }
+        },
+        "AccountFilterType": {
+          "description": "The filter type you want to apply on organizational units and accounts.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "UNION",
+            "INTERSECTION",
+            "DIFFERENCE"
+          ]
         }
       },
       "additionalProperties": false
@@ -284,7 +294,7 @@
       "description": "Location of file containing the template body. The URL must point to a template (max size: 460,800 bytes) that is located in an Amazon S3 bucket.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 5120
     },
     "CallAs": {
       "description": "Specifies the AWS account that you are acting from. By default, SELF is specified. For self-managed permissions, specify SELF; for service-managed permissions, if you are signed in to the organization's management account, specify SELF. If you are signed in to a delegated administrator account, specify DELEGATED_ADMIN.",
@@ -344,9 +354,10 @@
         "cloudformation:CreateStackSet",
         "cloudformation:CreateStackInstances",
         "cloudformation:DescribeStackSetOperation",
+        "cloudformation:ListStackSetOperationResults",
         "cloudformation:TagResource"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "read": {
       "permissions": [
@@ -363,19 +374,21 @@
         "cloudformation:DeleteStackInstances",
         "cloudformation:UpdateStackInstances",
         "cloudformation:DescribeStackSetOperation",
+        "cloudformation:ListStackSetOperationResults",
         "cloudformation:TagResource",
         "cloudformation:UntagResource"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "delete": {
       "permissions": [
         "cloudformation:DeleteStackSet",
         "cloudformation:DeleteStackInstances",
         "cloudformation:DescribeStackSetOperation",
+        "cloudformation:ListStackSetOperationResults",
         "cloudformation:UntagResource"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "list": {
       "permissions": [

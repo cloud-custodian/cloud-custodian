@@ -54,6 +54,13 @@
     "TemplateBody": {
       "type": "string"
     },
+    "TemplateType": {
+      "type": "string",
+      "enum": [
+        "FLEET_PROVISIONING",
+        "JITP"
+      ]
+    },
     "PreProvisioningHook": {
       "$ref": "#/definitions/ProvisioningHook"
     },
@@ -71,7 +78,8 @@
     "TemplateBody"
   ],
   "createOnlyProperties": [
-    "/properties/TemplateName"
+    "/properties/TemplateName",
+    "/properties/TemplateType"
   ],
   "readOnlyProperties": [
     "/properties/TemplateArn"

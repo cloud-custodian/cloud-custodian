@@ -100,8 +100,7 @@
           "type": "object"
         },
         "Body": {
-          "description": "The body of a web request. This immediately follows the request headers.",
-          "type": "object"
+          "$ref": "#/definitions/Body"
         },
         "Method": {
           "description": "The HTTP method of a web request. The method indicates the type of operation that the request is asking the origin to perform.",
@@ -109,6 +108,12 @@
         },
         "JsonBody": {
           "$ref": "#/definitions/JsonBody"
+        },
+        "Headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "Cookies": {
+          "$ref": "#/definitions/Cookies"
         }
       },
       "additionalProperties": false
@@ -125,6 +130,9 @@
         },
         "InvalidFallbackBehavior": {
           "$ref": "#/definitions/BodyParsingFallbackBehavior"
+        },
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
         }
       },
       "required": [
@@ -387,6 +395,9 @@
         },
         "CaptchaConfig": {
           "$ref": "#/definitions/CaptchaConfig"
+        },
+        "ChallengeConfig": {
+          "$ref": "#/definitions/ChallengeConfig"
         }
       },
       "required": [
@@ -433,6 +444,16 @@
         },
         "Captcha": {
           "description": "Checks valid token exists with request.",
+          "type": "object",
+          "properties": {
+            "CustomRequestHandling": {
+              "$ref": "#/definitions/CustomRequestHandling"
+            }
+          },
+          "additionalProperties": false
+        },
+        "Challenge": {
+          "description": "Checks that the request has a valid token with an unexpired challenge timestamp and, if not, returns a browser challenge to the client.",
           "type": "object",
           "properties": {
             "CustomRequestHandling": {
@@ -669,6 +690,9 @@
           "items": {
             "$ref": "#/definitions/TextTransformation"
           }
+        },
+        "SensitivityLevel": {
+          "$ref": "#/definitions/SensitivityLevel"
         }
       },
       "required": [
@@ -918,6 +942,15 @@
       },
       "additionalProperties": false
     },
+    "ChallengeConfig": {
+      "type": "object",
+      "properties": {
+        "ImmunityTimeProperty": {
+          "$ref": "#/definitions/ImmunityTimeProperty"
+        }
+      },
+      "additionalProperties": false
+    },
     "ImmunityTimeProperty": {
       "type": "object",
       "properties": {
@@ -931,6 +964,150 @@
         "ImmunityTime"
       ],
       "additionalProperties": false
+    },
+    "Body": {
+      "description": "The body of a web request. This immediately follows the request headers.",
+      "type": "object",
+      "properties": {
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Headers": {
+      "description": "Includes headers of a web request.",
+      "type": "object",
+      "properties": {
+        "MatchPattern": {
+          "$ref": "#/definitions/HeaderMatchPattern"
+        },
+        "MatchScope": {
+          "$ref": "#/definitions/MapMatchScope"
+        },
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
+        }
+      },
+      "required": [
+        "MatchPattern",
+        "MatchScope",
+        "OversizeHandling"
+      ],
+      "additionalProperties": false
+    },
+    "Cookies": {
+      "description": "Includes headers of a web request.",
+      "type": "object",
+      "properties": {
+        "MatchPattern": {
+          "$ref": "#/definitions/CookieMatchPattern"
+        },
+        "MatchScope": {
+          "$ref": "#/definitions/MapMatchScope"
+        },
+        "OversizeHandling": {
+          "$ref": "#/definitions/OversizeHandling"
+        }
+      },
+      "required": [
+        "MatchPattern",
+        "MatchScope",
+        "OversizeHandling"
+      ],
+      "additionalProperties": false
+    },
+    "HeaderMatchPattern": {
+      "description": "The pattern to look for in the request headers.",
+      "type": "object",
+      "properties": {
+        "All": {
+          "description": "Inspect all parts of the web request headers.",
+          "type": "object"
+        },
+        "IncludedHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "maxItems": 199
+        },
+        "ExcludedHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "maxItems": 199
+        }
+      },
+      "additionalProperties": false
+    },
+    "CookieMatchPattern": {
+      "description": "The pattern to look for in the request cookies.",
+      "type": "object",
+      "properties": {
+        "All": {
+          "description": "Inspect all parts of the web request cookies.",
+          "type": "object"
+        },
+        "IncludedCookies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "minItems": 1,
+          "maxItems": 199
+        },
+        "ExcludedCookies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".*\\S.*",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "minItems": 1,
+          "maxItems": 199
+        }
+      },
+      "additionalProperties": false
+    },
+    "MapMatchScope": {
+      "description": "The parts of the request to match against using the MatchPattern.",
+      "type": "string",
+      "enum": [
+        "ALL",
+        "KEY",
+        "VALUE"
+      ]
+    },
+    "OversizeHandling": {
+      "description": "Handling of requests containing oversize fields",
+      "type": "string",
+      "enum": [
+        "CONTINUE",
+        "MATCH",
+        "NO_MATCH"
+      ]
+    },
+    "SensitivityLevel": {
+      "description": "Sensitivity Level current only used for sqli match statements.",
+      "type": "string",
+      "enum": [
+        "LOW",
+        "HIGH"
+      ]
     }
   },
   "properties": {
@@ -1009,8 +1186,8 @@
     "/properties/Arn",
     "/properties/Id",
     "/properties/LabelNamespace",
-    "/properties/AvailableLabels",
-    "/properties/ConsumedLabels"
+    "/properties/AvailableLabels/*/Name",
+    "/properties/ConsumedLabels/*/Name"
   ],
   "additionalProperties": false,
   "handlers": {

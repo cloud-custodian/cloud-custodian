@@ -27,7 +27,11 @@
           "pattern": "^[ a-zA-Z0-9\\+\\-=._:/@]{1,256}$"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
     }
   },
   "properties": {

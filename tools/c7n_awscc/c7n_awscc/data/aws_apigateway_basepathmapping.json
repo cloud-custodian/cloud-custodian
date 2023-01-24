@@ -4,9 +4,6 @@
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "additionalProperties": false,
   "properties": {
-    "Id": {
-      "type": "string"
-    },
     "BasePath": {
       "type": "string",
       "description": "The base path name that callers of the API must provide in the URL after the domain name."
@@ -35,7 +32,12 @@
     "/properties/DomainName",
     "/properties/BasePath"
   ],
-  "taggable": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [

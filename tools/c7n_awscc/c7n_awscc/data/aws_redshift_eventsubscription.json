@@ -131,7 +131,9 @@
       }
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true
+  },
   "additionalProperties": false,
   "required": [
     "SubscriptionName"
@@ -149,6 +151,11 @@
     "/properties/SubscriptionCreationTime",
     "/properties/SourceIdsList",
     "/properties/EventCategoriesList"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Tags",
+    "/properties/Tags/*/Key",
+    "/properties/Tags/*/Value"
   ],
   "handlers": {
     "create": {

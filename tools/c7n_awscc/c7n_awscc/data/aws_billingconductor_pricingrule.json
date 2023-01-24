@@ -1,0 +1,206 @@
+{
+  "typeName": "AWS::BillingConductor::PricingRule",
+  "description": "A markup/discount that is defined for a specific set of services that can later be associated with a pricing plan.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-billing-conductor.git",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "FreeTier": {
+      "description": "The possible customizable free tier configurations.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Activated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Activated"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "description": "Pricing rule ARN",
+      "type": "string",
+      "pattern": "arn:aws(-cn)?:billingconductor::[0-9]{12}:pricingrule/[a-zA-Z0-9]{10}"
+    },
+    "Name": {
+      "description": "Pricing rule name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z0-9_\\+=\\.\\-@]+"
+    },
+    "Description": {
+      "description": "Pricing rule description",
+      "type": "string",
+      "maxLength": 1024
+    },
+    "Scope": {
+      "description": "A term used to categorize the granularity of a Pricing Rule.",
+      "type": "string",
+      "enum": [
+        "GLOBAL",
+        "SERVICE",
+        "BILLING_ENTITY",
+        "SKU"
+      ]
+    },
+    "Type": {
+      "description": "One of MARKUP, DISCOUNT or TIERING that describes the behaviour of the pricing rule.",
+      "type": "string",
+      "enum": [
+        "MARKUP",
+        "DISCOUNT",
+        "TIERING"
+      ]
+    },
+    "ModifierPercentage": {
+      "description": "Pricing rule modifier percentage",
+      "type": "number",
+      "minimum": 0
+    },
+    "Service": {
+      "description": "The service which a pricing rule is applied on",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z0-9\\.\\-]+"
+    },
+    "BillingEntity": {
+      "description": "The seller of services provided by AWS, their affiliates, or third-party providers selling services via AWS Marketplaces. Supported billing entities are AWS, AWS Marketplace, and AISPL.",
+      "type": "string",
+      "enum": [
+        "AWS",
+        "AWS Marketplace",
+        "AISPL"
+      ]
+    },
+    "Tiering": {
+      "description": "The set of tiering configurations for the pricing rule.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FreeTier": {
+          "$ref": "#/definitions/FreeTier"
+        }
+      }
+    },
+    "UsageType": {
+      "description": "The UsageType which a SKU pricing rule is modifying",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^\\S+$"
+    },
+    "Operation": {
+      "description": "The Operation which a SKU pricing rule is modifying",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^\\S+$"
+    },
+    "AssociatedPricingPlanCount": {
+      "description": "The number of pricing plans associated with pricing rule",
+      "type": "integer",
+      "minimum": 0
+    },
+    "CreationTime": {
+      "description": "Creation timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "LastModifiedTime": {
+      "description": "Latest modified timestamp in UNIX epoch time format",
+      "type": "integer"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name",
+    "Scope",
+    "Type"
+  ],
+  "createOnlyProperties": [
+    "/properties/Scope",
+    "/properties/Service",
+    "/properties/BillingEntity",
+    "/properties/UsageType",
+    "/properties/Operation"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/AssociatedPricingPlanCount",
+    "/properties/CreationTime",
+    "/properties/LastModifiedTime"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "billingconductor:CreatePricingRule",
+        "billingconductor:ListPricingRules"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "billingconductor:ListPricingRules",
+        "billingconductor:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "billingconductor:UpdatePricingRule",
+        "billingconductor:ListPricingRules",
+        "billingconductor:TagResource",
+        "billingconductor:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "billingconductor:DeletePricingRule"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "billingconductor:ListPricingRules",
+        "billingconductor:ListTagsForResource"
+      ]
+    }
+  }
+}

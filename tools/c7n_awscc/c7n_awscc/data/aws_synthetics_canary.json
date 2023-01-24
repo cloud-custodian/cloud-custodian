@@ -71,6 +71,10 @@
     "VisualReference": {
       "description": "Visual reference configuration for visual testing",
       "$ref": "#/definitions/VisualReference"
+    },
+    "DeleteLambdaResourcesOnCanaryDeletion": {
+      "description": "Deletes associated lambda resources created by Synthetics if set to True. Default is False",
+      "type": "boolean"
     }
   },
   "definitions": {

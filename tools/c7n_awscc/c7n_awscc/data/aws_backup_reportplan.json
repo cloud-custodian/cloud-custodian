@@ -72,6 +72,33 @@
           "items": {
             "type": "string"
           }
+        },
+        "Accounts": {
+          "type": "array",
+          "description": "The list of AWS accounts that a report covers.",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "OrganizationUnits": {
+          "type": "array",
+          "description": "The list of AWS organization units that a report covers.",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "Regions": {
+          "type": "array",
+          "description": "The list of AWS regions that a report covers.",
+          "insertionOrder": false,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
         }
       },
       "additionalProperties": false,

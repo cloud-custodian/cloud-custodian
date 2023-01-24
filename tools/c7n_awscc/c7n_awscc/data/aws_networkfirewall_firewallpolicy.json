@@ -38,48 +38,48 @@
       "properties": {
         "StatelessDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
         },
         "StatelessFragmentDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
         },
         "StatelessCustomActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/CustomAction"
           }
         },
         "StatelessRuleGroupReferences": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/StatelessRuleGroupReference"
           }
         },
         "StatefulRuleGroupReferences": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/StatefulRuleGroupReference"
           }
         },
         "StatefulDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
@@ -127,8 +127,8 @@
       "properties": {
         "Dimensions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/Dimension"
           }
@@ -162,6 +162,9 @@
         },
         "Priority": {
           "$ref": "#/definitions/Priority"
+        },
+        "Override": {
+          "$ref": "#/definitions/StatefulRuleGroupOverride"
         }
       },
       "required": [
@@ -190,11 +193,29 @@
       "minimum": 1,
       "maximum": 65535
     },
+    "StatefulRuleGroupOverride": {
+      "type": "object",
+      "properties": {
+        "Action": {
+          "$ref": "#/definitions/OverrideAction"
+        }
+      },
+      "additionalProperties": false
+    },
+    "OverrideAction": {
+      "type": "string",
+      "enum": [
+        "DROP_TO_ALERT"
+      ]
+    },
     "StatefulEngineOptions": {
       "type": "object",
       "properties": {
         "RuleOrder": {
           "$ref": "#/definitions/RuleOrder"
+        },
+        "StreamExceptionPolicy": {
+          "$ref": "#/definitions/StreamExceptionPolicy"
         }
       },
       "additionalProperties": false
@@ -204,6 +225,13 @@
       "enum": [
         "DEFAULT_ACTION_ORDER",
         "STRICT_ORDER"
+      ]
+    },
+    "StreamExceptionPolicy": {
+      "type": "string",
+      "enum": [
+        "DROP",
+        "CONTINUE"
       ]
     }
   },

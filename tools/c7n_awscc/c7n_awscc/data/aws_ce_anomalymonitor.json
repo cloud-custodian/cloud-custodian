@@ -7,6 +7,30 @@
       "description": "Monitor ARN",
       "type": "string",
       "pattern": "^arn:aws[-a-z0-9]*:[a-z0-9]+:[-a-z0-9]*:[0-9]{12}:[-a-zA-Z0-9/:_]+$"
+    },
+    "ResourceTag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name for the tag.",
+          "pattern": "^(?!aws:).*$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
     }
   },
   "properties": {
@@ -62,6 +86,16 @@
       "description": "The value for evaluated dimensions.",
       "type": "integer",
       "minimum": 0
+    },
+    "ResourceTags": {
+      "type": "array",
+      "description": "Tags to assign to monitor.",
+      "items": {
+        "$ref": "#/definitions/ResourceTag"
+      },
+      "minItems": 0,
+      "maxItems": 200,
+      "insertionOrder": false
     }
   },
   "additionalProperties": false,
@@ -72,7 +106,8 @@
   "createOnlyProperties": [
     "/properties/MonitorType",
     "/properties/MonitorDimension",
-    "/properties/MonitorSpecification"
+    "/properties/MonitorSpecification",
+    "/properties/ResourceTags"
   ],
   "readOnlyProperties": [
     "/properties/MonitorArn",
@@ -88,7 +123,8 @@
   "handlers": {
     "create": {
       "permissions": [
-        "ce:CreateAnomalyMonitor"
+        "ce:CreateAnomalyMonitor",
+        "ce:TagResource"
       ]
     },
     "read": {

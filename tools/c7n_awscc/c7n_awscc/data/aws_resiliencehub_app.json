@@ -53,11 +53,14 @@
         },
         "MappingType": {
           "type": "string",
-          "pattern": "CfnStack|Resource"
+          "pattern": "CfnStack|Resource|Terraform"
         },
         "ResourceName": {
           "type": "string",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9_\\-]{1,59}$"
+        },
+        "TerraformSourceName": {
+          "type": "string"
         },
         "PhysicalResourceId": {
           "$ref": "#/definitions/PhysicalResourceId"
@@ -109,6 +112,14 @@
       "items": {
         "$ref": "#/definitions/ResourceMapping"
       }
+    },
+    "AppAssessmentSchedule": {
+      "description": "Assessment execution schedule.",
+      "type": "string",
+      "enum": [
+        "Disabled",
+        "Daily"
+      ]
     }
   },
   "additionalProperties": false,
@@ -131,6 +142,8 @@
       "permissions": [
         "cloudformation:DescribeStacks",
         "cloudformation:ListStackResources",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
         "resiliencehub:CreateApp",
         "resiliencehub:TagResource",
         "resiliencehub:PutDraftAppVersionTemplate",
@@ -150,6 +163,8 @@
       "permissions": [
         "cloudformation:DescribeStacks",
         "cloudformation:ListStackResources",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
         "resiliencehub:UpdateApp",
         "resiliencehub:PutDraftAppVersionTemplate",
         "resiliencehub:AddDraftAppVersionResourceMappings",

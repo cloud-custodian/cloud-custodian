@@ -82,9 +82,19 @@
             "rtp-fec",
             "rtp",
             "rist",
-            "srt-listener"
+            "fujitsu-qos",
+            "srt-listener",
+            "srt-caller"
           ],
-          "description": "The protocol that is used by the source or output."
+          "description": "The protocol that is used by the source."
+        },
+        "SenderIpAddress": {
+          "type": "string",
+          "description": "The IP address that the flow communicates with to initiate connection with the sender for fujitsu-qos protocol."
+        },
+        "SenderControlPort": {
+          "type": "integer",
+          "description": "The port that the flow uses to send outbound requests to initiate connection with the sender for fujitsu-qos protocol."
         },
         "StreamId": {
           "type": "string",
@@ -93,6 +103,14 @@
         "SourceIngestPort": {
           "type": "string",
           "description": "The port that the flow will be listening on for incoming content.(ReadOnly)"
+        },
+        "SourceListenerAddress": {
+          "type": "string",
+          "description": "Source IP or domain name for SRT-caller protocol."
+        },
+        "SourceListenerPort": {
+          "type": "integer",
+          "description": "Source port for SRT-caller protocol."
         },
         "VpcInterfaceName": {
           "type": "string",
@@ -176,6 +194,28 @@
         "RecoveryWindow": {
           "type": "integer",
           "description": "Search window time to look for dash-7 packets"
+        },
+        "FailoverMode": {
+          "type": "string",
+          "description": "The type of failover you choose for this flow. MERGE combines the source streams into a single stream, allowing graceful recovery from any single-source loss. FAILOVER allows switching between different streams.",
+          "enum": [
+            "MERGE",
+            "FAILOVER"
+          ]
+        },
+        "SourcePriority": {
+          "type": "object",
+          "description": "The priority you want to assign to a source. You can have a primary stream and a backup stream or two equally prioritized streams.",
+          "properties": {
+            "PrimarySource": {
+              "type": "string",
+              "description": "The name of the source you choose as the primary source for this flow."
+            }
+          },
+          "required": [
+            "PrimarySource"
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

@@ -8,6 +8,7 @@
     "awscc.amplify_branch": "c7n_awscc.resources.amplify_branch.AmplifyBranch",
     "awscc.amplify_domain": "c7n_awscc.resources.amplify_domain.AmplifyDomain",
     "awscc.amplifyuibuilder_component": "c7n_awscc.resources.amplifyuibuilder_component.AmplifyuibuilderComponent",
+    "awscc.amplifyuibuilder_form": "c7n_awscc.resources.amplifyuibuilder_form.AmplifyuibuilderForm",
     "awscc.amplifyuibuilder_theme": "c7n_awscc.resources.amplifyuibuilder_theme.AmplifyuibuilderTheme",
     "awscc.apigateway_account": "c7n_awscc.resources.apigateway_account.ApigatewayAccount",
     "awscc.apigateway_apikey": "c7n_awscc.resources.apigateway_apikey.ApigatewayApikey",
@@ -15,19 +16,31 @@
     "awscc.apigateway_basepathmapping": "c7n_awscc.resources.apigateway_basepathmapping.ApigatewayBasepathmapping",
     "awscc.apigateway_clientcertificate": "c7n_awscc.resources.apigateway_clientcertificate.ApigatewayClientcertificate",
     "awscc.apigateway_deployment": "c7n_awscc.resources.apigateway_deployment.ApigatewayDeployment",
+    "awscc.apigateway_documentationpart": "c7n_awscc.resources.apigateway_documentationpart.ApigatewayDocumentationpart",
     "awscc.apigateway_documentationversion": "c7n_awscc.resources.apigateway_documentationversion.ApigatewayDocumentationversion",
     "awscc.apigateway_domainname": "c7n_awscc.resources.apigateway_domainname.ApigatewayDomainname",
     "awscc.apigateway_method": "c7n_awscc.resources.apigateway_method.ApigatewayMethod",
     "awscc.apigateway_model": "c7n_awscc.resources.apigateway_model.ApigatewayModel",
     "awscc.apigateway_requestvalidator": "c7n_awscc.resources.apigateway_requestvalidator.ApigatewayRequestvalidator",
+    "awscc.apigateway_resource": "c7n_awscc.resources.apigateway_resource.ApigatewayResource",
+    "awscc.apigateway_restapi": "c7n_awscc.resources.apigateway_restapi.ApigatewayRestapi",
     "awscc.apigateway_stage": "c7n_awscc.resources.apigateway_stage.ApigatewayStage",
     "awscc.apigateway_usageplan": "c7n_awscc.resources.apigateway_usageplan.ApigatewayUsageplan",
+    "awscc.apigatewayv2_api": "c7n_awscc.resources.apigatewayv2_api.Apigatewayv2Api",
+    "awscc.apigatewayv2_authorizer": "c7n_awscc.resources.apigatewayv2_authorizer.Apigatewayv2Authorizer",
+    "awscc.apigatewayv2_deployment": "c7n_awscc.resources.apigatewayv2_deployment.Apigatewayv2Deployment",
+    "awscc.apigatewayv2_model": "c7n_awscc.resources.apigatewayv2_model.Apigatewayv2Model",
+    "awscc.apigatewayv2_vpclink": "c7n_awscc.resources.apigatewayv2_vpclink.Apigatewayv2Vpclink",
+    "awscc.appflow_connector": "c7n_awscc.resources.appflow_connector.AppflowConnector",
     "awscc.appflow_connectorprofile": "c7n_awscc.resources.appflow_connectorprofile.AppflowConnectorprofile",
     "awscc.appflow_flow": "c7n_awscc.resources.appflow_flow.AppflowFlow",
+    "awscc.appintegrations_dataintegration": "c7n_awscc.resources.appintegrations_dataintegration.AppintegrationsDataintegration",
     "awscc.appintegrations_eventintegration": "c7n_awscc.resources.appintegrations_eventintegration.AppintegrationsEventintegration",
     "awscc.applicationinsights_application": "c7n_awscc.resources.applicationinsights_application.ApplicationinsightsApplication",
     "awscc.apprunner_service": "c7n_awscc.resources.apprunner_service.ApprunnerService",
+    "awscc.apprunner_vpcingressconnection": "c7n_awscc.resources.apprunner_vpcingressconnection.ApprunnerVpcingressconnection",
     "awscc.appstream_application": "c7n_awscc.resources.appstream_application.AppstreamApplication",
+    "awscc.appstream_directoryconfig": "c7n_awscc.resources.appstream_directoryconfig.AppstreamDirectoryconfig",
     "awscc.appstream_entitlement": "c7n_awscc.resources.appstream_entitlement.AppstreamEntitlement",
     "awscc.appsync_domainname": "c7n_awscc.resources.appsync_domainname.AppsyncDomainname",
     "awscc.appsync_domainnameapiassociation": "c7n_awscc.resources.appsync_domainnameapiassociation.AppsyncDomainnameapiassociation",
@@ -39,12 +52,20 @@
     "awscc.athena_workgroup": "c7n_awscc.resources.athena_workgroup.AthenaWorkgroup",
     "awscc.auditmanager_assessment": "c7n_awscc.resources.auditmanager_assessment.AuditmanagerAssessment",
     "awscc.autoscaling_lifecyclehook": "c7n_awscc.resources.autoscaling_lifecyclehook.AutoscalingLifecyclehook",
+    "awscc.autoscaling_scalingpolicy": "c7n_awscc.resources.autoscaling_scalingpolicy.AutoscalingScalingpolicy",
+    "awscc.autoscaling_scheduledaction": "c7n_awscc.resources.autoscaling_scheduledaction.AutoscalingScheduledaction",
     "awscc.autoscaling_warmpool": "c7n_awscc.resources.autoscaling_warmpool.AutoscalingWarmpool",
     "awscc.backup_backupplan": "c7n_awscc.resources.backup_backupplan.BackupBackupplan",
     "awscc.backup_backupvault": "c7n_awscc.resources.backup_backupvault.BackupBackupvault",
     "awscc.backup_framework": "c7n_awscc.resources.backup_framework.BackupFramework",
     "awscc.backup_reportplan": "c7n_awscc.resources.backup_reportplan.BackupReportplan",
+    "awscc.batch_computeenvironment": "c7n_awscc.resources.batch_computeenvironment.BatchComputeenvironment",
+    "awscc.batch_jobqueue": "c7n_awscc.resources.batch_jobqueue.BatchJobqueue",
     "awscc.batch_schedulingpolicy": "c7n_awscc.resources.batch_schedulingpolicy.BatchSchedulingpolicy",
+    "awscc.billingconductor_billinggroup": "c7n_awscc.resources.billingconductor_billinggroup.BillingconductorBillinggroup",
+    "awscc.billingconductor_customlineitem": "c7n_awscc.resources.billingconductor_customlineitem.BillingconductorCustomlineitem",
+    "awscc.billingconductor_pricingplan": "c7n_awscc.resources.billingconductor_pricingplan.BillingconductorPricingplan",
+    "awscc.billingconductor_pricingrule": "c7n_awscc.resources.billingconductor_pricingrule.BillingconductorPricingrule",
     "awscc.budgets_budgetsaction": "c7n_awscc.resources.budgets_budgetsaction.BudgetsBudgetsaction",
     "awscc.cassandra_keyspace": "c7n_awscc.resources.cassandra_keyspace.CassandraKeyspace",
     "awscc.cassandra_table": "c7n_awscc.resources.cassandra_table.CassandraTable",
@@ -53,24 +74,31 @@
     "awscc.ce_costcategory": "c7n_awscc.resources.ce_costcategory.CeCostcategory",
     "awscc.certificatemanager_account": "c7n_awscc.resources.certificatemanager_account.CertificatemanagerAccount",
     "awscc.chatbot_slackchannelconfiguration": "c7n_awscc.resources.chatbot_slackchannelconfiguration.ChatbotSlackchannelconfiguration",
+    "awscc.cloudformation_hookdefaultversion": "c7n_awscc.resources.cloudformation_hookdefaultversion.CloudformationHookdefaultversion",
+    "awscc.cloudformation_hooktypeconfig": "c7n_awscc.resources.cloudformation_hooktypeconfig.CloudformationHooktypeconfig",
     "awscc.cloudformation_resourcedefaultversion": "c7n_awscc.resources.cloudformation_resourcedefaultversion.CloudformationResourcedefaultversion",
     "awscc.cloudformation_stackset": "c7n_awscc.resources.cloudformation_stackset.CloudformationStackset",
     "awscc.cloudformation_typeactivation": "c7n_awscc.resources.cloudformation_typeactivation.CloudformationTypeactivation",
     "awscc.cloudfront_cachepolicy": "c7n_awscc.resources.cloudfront_cachepolicy.CloudfrontCachepolicy",
     "awscc.cloudfront_cloudfrontoriginaccessidentity": "c7n_awscc.resources.cloudfront_cloudfrontoriginaccessidentity.CloudfrontCloudfrontoriginaccessidentity",
+    "awscc.cloudfront_continuousdeploymentpolicy": "c7n_awscc.resources.cloudfront_continuousdeploymentpolicy.CloudfrontContinuousdeploymentpolicy",
     "awscc.cloudfront_distribution": "c7n_awscc.resources.cloudfront_distribution.CloudfrontDistribution",
     "awscc.cloudfront_function": "c7n_awscc.resources.cloudfront_function.CloudfrontFunction",
     "awscc.cloudfront_keygroup": "c7n_awscc.resources.cloudfront_keygroup.CloudfrontKeygroup",
+    "awscc.cloudfront_originaccesscontrol": "c7n_awscc.resources.cloudfront_originaccesscontrol.CloudfrontOriginaccesscontrol",
     "awscc.cloudfront_originrequestpolicy": "c7n_awscc.resources.cloudfront_originrequestpolicy.CloudfrontOriginrequestpolicy",
     "awscc.cloudfront_publickey": "c7n_awscc.resources.cloudfront_publickey.CloudfrontPublickey",
     "awscc.cloudfront_realtimelogconfig": "c7n_awscc.resources.cloudfront_realtimelogconfig.CloudfrontRealtimelogconfig",
     "awscc.cloudfront_responseheaderspolicy": "c7n_awscc.resources.cloudfront_responseheaderspolicy.CloudfrontResponseheaderspolicy",
+    "awscc.cloudtrail_eventdatastore": "c7n_awscc.resources.cloudtrail_eventdatastore.CloudtrailEventdatastore",
     "awscc.cloudtrail_trail": "c7n_awscc.resources.cloudtrail_trail.CloudtrailTrail",
     "awscc.cloudwatch_compositealarm": "c7n_awscc.resources.cloudwatch_compositealarm.CloudwatchCompositealarm",
     "awscc.cloudwatch_metricstream": "c7n_awscc.resources.cloudwatch_metricstream.CloudwatchMetricstream",
     "awscc.codeartifact_domain": "c7n_awscc.resources.codeartifact_domain.CodeartifactDomain",
     "awscc.codeartifact_repository": "c7n_awscc.resources.codeartifact_repository.CodeartifactRepository",
+    "awscc.codedeploy_application": "c7n_awscc.resources.codedeploy_application.CodedeployApplication",
     "awscc.codeguruprofiler_profilinggroup": "c7n_awscc.resources.codeguruprofiler_profilinggroup.CodeguruprofilerProfilinggroup",
+    "awscc.codepipeline_customactiontype": "c7n_awscc.resources.codepipeline_customactiontype.CodepipelineCustomactiontype",
     "awscc.codestarconnections_connection": "c7n_awscc.resources.codestarconnections_connection.CodestarconnectionsConnection",
     "awscc.codestarnotifications_notificationrule": "c7n_awscc.resources.codestarnotifications_notificationrule.CodestarnotificationsNotificationrule",
     "awscc.config_aggregationauthorization": "c7n_awscc.resources.config_aggregationauthorization.ConfigAggregationauthorization",
@@ -81,9 +109,15 @@
     "awscc.connect_contactflow": "c7n_awscc.resources.connect_contactflow.ConnectContactflow",
     "awscc.connect_contactflowmodule": "c7n_awscc.resources.connect_contactflowmodule.ConnectContactflowmodule",
     "awscc.connect_hoursofoperation": "c7n_awscc.resources.connect_hoursofoperation.ConnectHoursofoperation",
+    "awscc.connect_instance": "c7n_awscc.resources.connect_instance.ConnectInstance",
+    "awscc.connect_instancestorageconfig": "c7n_awscc.resources.connect_instancestorageconfig.ConnectInstancestorageconfig",
+    "awscc.connect_phonenumber": "c7n_awscc.resources.connect_phonenumber.ConnectPhonenumber",
     "awscc.connect_quickconnect": "c7n_awscc.resources.connect_quickconnect.ConnectQuickconnect",
+    "awscc.connect_rule": "c7n_awscc.resources.connect_rule.ConnectRule",
+    "awscc.connect_tasktemplate": "c7n_awscc.resources.connect_tasktemplate.ConnectTasktemplate",
     "awscc.connect_user": "c7n_awscc.resources.connect_user.ConnectUser",
     "awscc.connect_userhierarchygroup": "c7n_awscc.resources.connect_userhierarchygroup.ConnectUserhierarchygroup",
+    "awscc.connectcampaigns_campaign": "c7n_awscc.resources.connectcampaigns_campaign.ConnectcampaignsCampaign",
     "awscc.cur_reportdefinition": "c7n_awscc.resources.cur_reportdefinition.CurReportdefinition",
     "awscc.customerprofiles_domain": "c7n_awscc.resources.customerprofiles_domain.CustomerprofilesDomain",
     "awscc.customerprofiles_integration": "c7n_awscc.resources.customerprofiles_integration.CustomerprofilesIntegration",
@@ -94,8 +128,12 @@
     "awscc.databrew_recipe": "c7n_awscc.resources.databrew_recipe.DatabrewRecipe",
     "awscc.databrew_ruleset": "c7n_awscc.resources.databrew_ruleset.DatabrewRuleset",
     "awscc.databrew_schedule": "c7n_awscc.resources.databrew_schedule.DatabrewSchedule",
+    "awscc.datapipeline_pipeline": "c7n_awscc.resources.datapipeline_pipeline.DatapipelinePipeline",
     "awscc.datasync_agent": "c7n_awscc.resources.datasync_agent.DatasyncAgent",
     "awscc.datasync_locationefs": "c7n_awscc.resources.datasync_locationefs.DatasyncLocationefs",
+    "awscc.datasync_locationfsxlustre": "c7n_awscc.resources.datasync_locationfsxlustre.DatasyncLocationfsxlustre",
+    "awscc.datasync_locationfsxontap": "c7n_awscc.resources.datasync_locationfsxontap.DatasyncLocationfsxontap",
+    "awscc.datasync_locationfsxopenzfs": "c7n_awscc.resources.datasync_locationfsxopenzfs.DatasyncLocationfsxopenzfs",
     "awscc.datasync_locationfsxwindows": "c7n_awscc.resources.datasync_locationfsxwindows.DatasyncLocationfsxwindows",
     "awscc.datasync_locationhdfs": "c7n_awscc.resources.datasync_locationhdfs.DatasyncLocationhdfs",
     "awscc.datasync_locationnfs": "c7n_awscc.resources.datasync_locationnfs.DatasyncLocationnfs",
@@ -106,11 +144,17 @@
     "awscc.detective_graph": "c7n_awscc.resources.detective_graph.DetectiveGraph",
     "awscc.detective_memberinvitation": "c7n_awscc.resources.detective_memberinvitation.DetectiveMemberinvitation",
     "awscc.devopsguru_resourcecollection": "c7n_awscc.resources.devopsguru_resourcecollection.DevopsguruResourcecollection",
+    "awscc.directoryservice_simplead": "c7n_awscc.resources.directoryservice_simplead.DirectoryserviceSimplead",
+    "awscc.docdbelastic_cluster": "c7n_awscc.resources.docdbelastic_cluster.DocdbelasticCluster",
     "awscc.dynamodb_globaltable": "c7n_awscc.resources.dynamodb_globaltable.DynamodbGlobaltable",
+    "awscc.dynamodb_table": "c7n_awscc.resources.dynamodb_table.DynamodbTable",
+    "awscc.ec2_capacityreservation": "c7n_awscc.resources.ec2_capacityreservation.Ec2Capacityreservation",
     "awscc.ec2_capacityreservationfleet": "c7n_awscc.resources.ec2_capacityreservationfleet.Ec2Capacityreservationfleet",
     "awscc.ec2_carriergateway": "c7n_awscc.resources.ec2_carriergateway.Ec2Carriergateway",
+    "awscc.ec2_customergateway": "c7n_awscc.resources.ec2_customergateway.Ec2Customergateway",
     "awscc.ec2_dhcpoptions": "c7n_awscc.resources.ec2_dhcpoptions.Ec2Dhcpoptions",
     "awscc.ec2_ec2fleet": "c7n_awscc.resources.ec2_ec2fleet.Ec2Ec2Fleet",
+    "awscc.ec2_eip": "c7n_awscc.resources.ec2_eip.Ec2Eip",
     "awscc.ec2_flowlog": "c7n_awscc.resources.ec2_flowlog.Ec2Flowlog",
     "awscc.ec2_gatewayroutetableassociation": "c7n_awscc.resources.ec2_gatewayroutetableassociation.Ec2Gatewayroutetableassociation",
     "awscc.ec2_host": "c7n_awscc.resources.ec2_host.Ec2Host",
@@ -118,7 +162,9 @@
     "awscc.ec2_ipam": "c7n_awscc.resources.ec2_ipam.Ec2Ipam",
     "awscc.ec2_ipampool": "c7n_awscc.resources.ec2_ipampool.Ec2Ipampool",
     "awscc.ec2_ipamscope": "c7n_awscc.resources.ec2_ipamscope.Ec2Ipamscope",
+    "awscc.ec2_localgatewayroute": "c7n_awscc.resources.ec2_localgatewayroute.Ec2Localgatewayroute",
     "awscc.ec2_localgatewayroutetablevpcassociation": "c7n_awscc.resources.ec2_localgatewayroutetablevpcassociation.Ec2Localgatewayroutetablevpcassociation",
+    "awscc.ec2_natgateway": "c7n_awscc.resources.ec2_natgateway.Ec2Natgateway",
     "awscc.ec2_networkacl": "c7n_awscc.resources.ec2_networkacl.Ec2Networkacl",
     "awscc.ec2_networkinsightsaccessscope": "c7n_awscc.resources.ec2_networkinsightsaccessscope.Ec2Networkinsightsaccessscope",
     "awscc.ec2_networkinsightsaccessscopeanalysis": "c7n_awscc.resources.ec2_networkinsightsaccessscopeanalysis.Ec2Networkinsightsaccessscopeanalysis",
@@ -130,14 +176,20 @@
     "awscc.ec2_spotfleet": "c7n_awscc.resources.ec2_spotfleet.Ec2Spotfleet",
     "awscc.ec2_subnet": "c7n_awscc.resources.ec2_subnet.Ec2Subnet",
     "awscc.ec2_transitgateway": "c7n_awscc.resources.ec2_transitgateway.Ec2Transitgateway",
+    "awscc.ec2_transitgatewayattachment": "c7n_awscc.resources.ec2_transitgatewayattachment.Ec2Transitgatewayattachment",
     "awscc.ec2_transitgatewayconnect": "c7n_awscc.resources.ec2_transitgatewayconnect.Ec2Transitgatewayconnect",
     "awscc.ec2_transitgatewaymulticastdomain": "c7n_awscc.resources.ec2_transitgatewaymulticastdomain.Ec2Transitgatewaymulticastdomain",
     "awscc.ec2_transitgatewaypeeringattachment": "c7n_awscc.resources.ec2_transitgatewaypeeringattachment.Ec2Transitgatewaypeeringattachment",
     "awscc.ec2_transitgatewayvpcattachment": "c7n_awscc.resources.ec2_transitgatewayvpcattachment.Ec2Transitgatewayvpcattachment",
+    "awscc.ec2_volume": "c7n_awscc.resources.ec2_volume.Ec2Volume",
     "awscc.ec2_vpc": "c7n_awscc.resources.ec2_vpc.Ec2Vpc",
     "awscc.ec2_vpcdhcpoptionsassociation": "c7n_awscc.resources.ec2_vpcdhcpoptionsassociation.Ec2Vpcdhcpoptionsassociation",
     "awscc.ec2_vpcendpoint": "c7n_awscc.resources.ec2_vpcendpoint.Ec2Vpcendpoint",
+    "awscc.ec2_vpcpeeringconnection": "c7n_awscc.resources.ec2_vpcpeeringconnection.Ec2Vpcpeeringconnection",
+    "awscc.ec2_vpnconnection": "c7n_awscc.resources.ec2_vpnconnection.Ec2Vpnconnection",
+    "awscc.ec2_vpngateway": "c7n_awscc.resources.ec2_vpngateway.Ec2Vpngateway",
     "awscc.ecr_publicrepository": "c7n_awscc.resources.ecr_publicrepository.EcrPublicrepository",
+    "awscc.ecr_pullthroughcacherule": "c7n_awscc.resources.ecr_pullthroughcacherule.EcrPullthroughcacherule",
     "awscc.ecr_registrypolicy": "c7n_awscc.resources.ecr_registrypolicy.EcrRegistrypolicy",
     "awscc.ecr_replicationconfiguration": "c7n_awscc.resources.ecr_replicationconfiguration.EcrReplicationconfiguration",
     "awscc.ecr_repository": "c7n_awscc.resources.ecr_repository.EcrRepository",
@@ -154,17 +206,27 @@
     "awscc.eks_addon": "c7n_awscc.resources.eks_addon.EksAddon",
     "awscc.eks_cluster": "c7n_awscc.resources.eks_cluster.EksCluster",
     "awscc.eks_fargateprofile": "c7n_awscc.resources.eks_fargateprofile.EksFargateprofile",
+    "awscc.eks_identityproviderconfig": "c7n_awscc.resources.eks_identityproviderconfig.EksIdentityproviderconfig",
+    "awscc.eks_nodegroup": "c7n_awscc.resources.eks_nodegroup.EksNodegroup",
     "awscc.elasticache_globalreplicationgroup": "c7n_awscc.resources.elasticache_globalreplicationgroup.ElasticacheGlobalreplicationgroup",
+    "awscc.elasticache_subnetgroup": "c7n_awscc.resources.elasticache_subnetgroup.ElasticacheSubnetgroup",
     "awscc.elasticache_user": "c7n_awscc.resources.elasticache_user.ElasticacheUser",
     "awscc.elasticache_usergroup": "c7n_awscc.resources.elasticache_usergroup.ElasticacheUsergroup",
+    "awscc.elasticbeanstalk_application": "c7n_awscc.resources.elasticbeanstalk_application.ElasticbeanstalkApplication",
+    "awscc.elasticbeanstalk_applicationversion": "c7n_awscc.resources.elasticbeanstalk_applicationversion.ElasticbeanstalkApplicationversion",
+    "awscc.elasticbeanstalk_configurationtemplate": "c7n_awscc.resources.elasticbeanstalk_configurationtemplate.ElasticbeanstalkConfigurationtemplate",
+    "awscc.elasticbeanstalk_environment": "c7n_awscc.resources.elasticbeanstalk_environment.ElasticbeanstalkEnvironment",
     "awscc.elasticloadbalancingv2_listener": "c7n_awscc.resources.elasticloadbalancingv2_listener.Elasticloadbalancingv2Listener",
     "awscc.elasticloadbalancingv2_listenerrule": "c7n_awscc.resources.elasticloadbalancingv2_listenerrule.Elasticloadbalancingv2Listenerrule",
+    "awscc.elasticloadbalancingv2_targetgroup": "c7n_awscc.resources.elasticloadbalancingv2_targetgroup.Elasticloadbalancingv2Targetgroup",
     "awscc.emr_studio": "c7n_awscc.resources.emr_studio.EmrStudio",
     "awscc.emr_studiosessionmapping": "c7n_awscc.resources.emr_studiosessionmapping.EmrStudiosessionmapping",
     "awscc.emrcontainers_virtualcluster": "c7n_awscc.resources.emrcontainers_virtualcluster.EmrcontainersVirtualcluster",
+    "awscc.emrserverless_application": "c7n_awscc.resources.emrserverless_application.EmrserverlessApplication",
     "awscc.events_apidestination": "c7n_awscc.resources.events_apidestination.EventsApidestination",
     "awscc.events_archive": "c7n_awscc.resources.events_archive.EventsArchive",
     "awscc.events_connection": "c7n_awscc.resources.events_connection.EventsConnection",
+    "awscc.events_endpoint": "c7n_awscc.resources.events_endpoint.EventsEndpoint",
     "awscc.eventschemas_registrypolicy": "c7n_awscc.resources.eventschemas_registrypolicy.EventschemasRegistrypolicy",
     "awscc.evidently_experiment": "c7n_awscc.resources.evidently_experiment.EvidentlyExperiment",
     "awscc.evidently_feature": "c7n_awscc.resources.evidently_feature.EvidentlyFeature",
@@ -181,30 +243,39 @@
     "awscc.frauddetector_label": "c7n_awscc.resources.frauddetector_label.FrauddetectorLabel",
     "awscc.frauddetector_outcome": "c7n_awscc.resources.frauddetector_outcome.FrauddetectorOutcome",
     "awscc.frauddetector_variable": "c7n_awscc.resources.frauddetector_variable.FrauddetectorVariable",
+    "awscc.fsx_datarepositoryassociation": "c7n_awscc.resources.fsx_datarepositoryassociation.FsxDatarepositoryassociation",
     "awscc.gamelift_alias": "c7n_awscc.resources.gamelift_alias.GameliftAlias",
+    "awscc.gamelift_build": "c7n_awscc.resources.gamelift_build.GameliftBuild",
     "awscc.gamelift_fleet": "c7n_awscc.resources.gamelift_fleet.GameliftFleet",
     "awscc.gamelift_gameservergroup": "c7n_awscc.resources.gamelift_gameservergroup.GameliftGameservergroup",
+    "awscc.gamelift_location": "c7n_awscc.resources.gamelift_location.GameliftLocation",
     "awscc.globalaccelerator_accelerator": "c7n_awscc.resources.globalaccelerator_accelerator.GlobalacceleratorAccelerator",
     "awscc.globalaccelerator_endpointgroup": "c7n_awscc.resources.globalaccelerator_endpointgroup.GlobalacceleratorEndpointgroup",
     "awscc.globalaccelerator_listener": "c7n_awscc.resources.globalaccelerator_listener.GlobalacceleratorListener",
     "awscc.glue_registry": "c7n_awscc.resources.glue_registry.GlueRegistry",
     "awscc.glue_schema": "c7n_awscc.resources.glue_schema.GlueSchema",
+    "awscc.grafana_workspace": "c7n_awscc.resources.grafana_workspace.GrafanaWorkspace",
     "awscc.greengrassv2_componentversion": "c7n_awscc.resources.greengrassv2_componentversion.Greengrassv2Componentversion",
+    "awscc.greengrassv2_deployment": "c7n_awscc.resources.greengrassv2_deployment.Greengrassv2Deployment",
     "awscc.groundstation_config": "c7n_awscc.resources.groundstation_config.GroundstationConfig",
     "awscc.groundstation_missionprofile": "c7n_awscc.resources.groundstation_missionprofile.GroundstationMissionprofile",
     "awscc.healthlake_fhirdatastore": "c7n_awscc.resources.healthlake_fhirdatastore.HealthlakeFhirdatastore",
+    "awscc.iam_instanceprofile": "c7n_awscc.resources.iam_instanceprofile.IamInstanceprofile",
     "awscc.iam_oidcprovider": "c7n_awscc.resources.iam_oidcprovider.IamOidcprovider",
     "awscc.iam_role": "c7n_awscc.resources.iam_role.IamRole",
     "awscc.iam_samlprovider": "c7n_awscc.resources.iam_samlprovider.IamSamlprovider",
     "awscc.iam_servercertificate": "c7n_awscc.resources.iam_servercertificate.IamServercertificate",
     "awscc.iam_virtualmfadevice": "c7n_awscc.resources.iam_virtualmfadevice.IamVirtualmfadevice",
+    "awscc.identitystore_group": "c7n_awscc.resources.identitystore_group.IdentitystoreGroup",
     "awscc.imagebuilder_distributionconfiguration": "c7n_awscc.resources.imagebuilder_distributionconfiguration.ImagebuilderDistributionconfiguration",
     "awscc.imagebuilder_image": "c7n_awscc.resources.imagebuilder_image.ImagebuilderImage",
     "awscc.imagebuilder_imagepipeline": "c7n_awscc.resources.imagebuilder_imagepipeline.ImagebuilderImagepipeline",
     "awscc.imagebuilder_infrastructureconfiguration": "c7n_awscc.resources.imagebuilder_infrastructureconfiguration.ImagebuilderInfrastructureconfiguration",
+    "awscc.inspector_assessmenttarget": "c7n_awscc.resources.inspector_assessmenttarget.InspectorAssessmenttarget",
     "awscc.inspectorv2_filter": "c7n_awscc.resources.inspectorv2_filter.Inspectorv2Filter",
     "awscc.iot_accountauditconfiguration": "c7n_awscc.resources.iot_accountauditconfiguration.IotAccountauditconfiguration",
     "awscc.iot_authorizer": "c7n_awscc.resources.iot_authorizer.IotAuthorizer",
+    "awscc.iot_cacertificate": "c7n_awscc.resources.iot_cacertificate.IotCacertificate",
     "awscc.iot_certificate": "c7n_awscc.resources.iot_certificate.IotCertificate",
     "awscc.iot_custommetric": "c7n_awscc.resources.iot_custommetric.IotCustommetric",
     "awscc.iot_dimension": "c7n_awscc.resources.iot_dimension.IotDimension",
@@ -212,19 +283,30 @@
     "awscc.iot_fleetmetric": "c7n_awscc.resources.iot_fleetmetric.IotFleetmetric",
     "awscc.iot_logging": "c7n_awscc.resources.iot_logging.IotLogging",
     "awscc.iot_mitigationaction": "c7n_awscc.resources.iot_mitigationaction.IotMitigationaction",
+    "awscc.iot_policy": "c7n_awscc.resources.iot_policy.IotPolicy",
     "awscc.iot_provisioningtemplate": "c7n_awscc.resources.iot_provisioningtemplate.IotProvisioningtemplate",
     "awscc.iot_resourcespecificlogging": "c7n_awscc.resources.iot_resourcespecificlogging.IotResourcespecificlogging",
+    "awscc.iot_rolealias": "c7n_awscc.resources.iot_rolealias.IotRolealias",
     "awscc.iot_scheduledaudit": "c7n_awscc.resources.iot_scheduledaudit.IotScheduledaudit",
     "awscc.iot_securityprofile": "c7n_awscc.resources.iot_securityprofile.IotSecurityprofile",
+    "awscc.iot_thing": "c7n_awscc.resources.iot_thing.IotThing",
     "awscc.iot_topicrule": "c7n_awscc.resources.iot_topicrule.IotTopicrule",
     "awscc.iot_topicruledestination": "c7n_awscc.resources.iot_topicruledestination.IotTopicruledestination",
+    "awscc.iotanalytics_channel": "c7n_awscc.resources.iotanalytics_channel.IotanalyticsChannel",
     "awscc.iotanalytics_dataset": "c7n_awscc.resources.iotanalytics_dataset.IotanalyticsDataset",
     "awscc.iotanalytics_datastore": "c7n_awscc.resources.iotanalytics_datastore.IotanalyticsDatastore",
     "awscc.iotanalytics_pipeline": "c7n_awscc.resources.iotanalytics_pipeline.IotanalyticsPipeline",
     "awscc.iotcoredeviceadvisor_suitedefinition": "c7n_awscc.resources.iotcoredeviceadvisor_suitedefinition.IotcoredeviceadvisorSuitedefinition",
+    "awscc.iotevents_alarmmodel": "c7n_awscc.resources.iotevents_alarmmodel.IoteventsAlarmmodel",
     "awscc.iotevents_detectormodel": "c7n_awscc.resources.iotevents_detectormodel.IoteventsDetectormodel",
     "awscc.iotevents_input": "c7n_awscc.resources.iotevents_input.IoteventsInput",
     "awscc.iotfleethub_application": "c7n_awscc.resources.iotfleethub_application.IotfleethubApplication",
+    "awscc.iotfleetwise_campaign": "c7n_awscc.resources.iotfleetwise_campaign.IotfleetwiseCampaign",
+    "awscc.iotfleetwise_decodermanifest": "c7n_awscc.resources.iotfleetwise_decodermanifest.IotfleetwiseDecodermanifest",
+    "awscc.iotfleetwise_fleet": "c7n_awscc.resources.iotfleetwise_fleet.IotfleetwiseFleet",
+    "awscc.iotfleetwise_modelmanifest": "c7n_awscc.resources.iotfleetwise_modelmanifest.IotfleetwiseModelmanifest",
+    "awscc.iotfleetwise_signalcatalog": "c7n_awscc.resources.iotfleetwise_signalcatalog.IotfleetwiseSignalcatalog",
+    "awscc.iotfleetwise_vehicle": "c7n_awscc.resources.iotfleetwise_vehicle.IotfleetwiseVehicle",
     "awscc.iotsitewise_accesspolicy": "c7n_awscc.resources.iotsitewise_accesspolicy.IotsitewiseAccesspolicy",
     "awscc.iotsitewise_asset": "c7n_awscc.resources.iotsitewise_asset.IotsitewiseAsset",
     "awscc.iotsitewise_assetmodel": "c7n_awscc.resources.iotsitewise_assetmodel.IotsitewiseAssetmodel",
@@ -232,9 +314,14 @@
     "awscc.iotsitewise_gateway": "c7n_awscc.resources.iotsitewise_gateway.IotsitewiseGateway",
     "awscc.iotsitewise_portal": "c7n_awscc.resources.iotsitewise_portal.IotsitewisePortal",
     "awscc.iotsitewise_project": "c7n_awscc.resources.iotsitewise_project.IotsitewiseProject",
+    "awscc.iottwinmaker_componenttype": "c7n_awscc.resources.iottwinmaker_componenttype.IottwinmakerComponenttype",
+    "awscc.iottwinmaker_entity": "c7n_awscc.resources.iottwinmaker_entity.IottwinmakerEntity",
+    "awscc.iottwinmaker_scene": "c7n_awscc.resources.iottwinmaker_scene.IottwinmakerScene",
+    "awscc.iottwinmaker_workspace": "c7n_awscc.resources.iottwinmaker_workspace.IottwinmakerWorkspace",
     "awscc.iotwireless_destination": "c7n_awscc.resources.iotwireless_destination.IotwirelessDestination",
     "awscc.iotwireless_fuotatask": "c7n_awscc.resources.iotwireless_fuotatask.IotwirelessFuotatask",
     "awscc.iotwireless_multicastgroup": "c7n_awscc.resources.iotwireless_multicastgroup.IotwirelessMulticastgroup",
+    "awscc.iotwireless_networkanalyzerconfiguration": "c7n_awscc.resources.iotwireless_networkanalyzerconfiguration.IotwirelessNetworkanalyzerconfiguration",
     "awscc.iotwireless_partneraccount": "c7n_awscc.resources.iotwireless_partneraccount.IotwirelessPartneraccount",
     "awscc.iotwireless_wirelessdevice": "c7n_awscc.resources.iotwireless_wirelessdevice.IotwirelessWirelessdevice",
     "awscc.iotwireless_wirelessgateway": "c7n_awscc.resources.iotwireless_wirelessgateway.IotwirelessWirelessgateway",
@@ -242,19 +329,24 @@
     "awscc.ivs_playbackkeypair": "c7n_awscc.resources.ivs_playbackkeypair.IvsPlaybackkeypair",
     "awscc.ivs_recordingconfiguration": "c7n_awscc.resources.ivs_recordingconfiguration.IvsRecordingconfiguration",
     "awscc.ivs_streamkey": "c7n_awscc.resources.ivs_streamkey.IvsStreamkey",
+    "awscc.kafkaconnect_connector": "c7n_awscc.resources.kafkaconnect_connector.KafkaconnectConnector",
     "awscc.kendra_datasource": "c7n_awscc.resources.kendra_datasource.KendraDatasource",
     "awscc.kendra_faq": "c7n_awscc.resources.kendra_faq.KendraFaq",
     "awscc.kendra_index": "c7n_awscc.resources.kendra_index.KendraIndex",
+    "awscc.kendraranking_executionplan": "c7n_awscc.resources.kendraranking_executionplan.KendrarankingExecutionplan",
     "awscc.kinesis_stream": "c7n_awscc.resources.kinesis_stream.KinesisStream",
+    "awscc.kinesisanalyticsv2_application": "c7n_awscc.resources.kinesisanalyticsv2_application.Kinesisanalyticsv2Application",
     "awscc.kinesisfirehose_deliverystream": "c7n_awscc.resources.kinesisfirehose_deliverystream.KinesisfirehoseDeliverystream",
     "awscc.kinesisvideo_signalingchannel": "c7n_awscc.resources.kinesisvideo_signalingchannel.KinesisvideoSignalingchannel",
     "awscc.kinesisvideo_stream": "c7n_awscc.resources.kinesisvideo_stream.KinesisvideoStream",
     "awscc.kms_alias": "c7n_awscc.resources.kms_alias.KmsAlias",
     "awscc.kms_key": "c7n_awscc.resources.kms_key.KmsKey",
     "awscc.kms_replicakey": "c7n_awscc.resources.kms_replicakey.KmsReplicakey",
+    "awscc.lakeformation_tag": "c7n_awscc.resources.lakeformation_tag.LakeformationTag",
     "awscc.lambda_codesigningconfig": "c7n_awscc.resources.lambda_codesigningconfig.LambdaCodesigningconfig",
     "awscc.lambda_eventsourcemapping": "c7n_awscc.resources.lambda_eventsourcemapping.LambdaEventsourcemapping",
     "awscc.lambda_function": "c7n_awscc.resources.lambda_function.LambdaFunction",
+    "awscc.lambda_url": "c7n_awscc.resources.lambda_url.LambdaUrl",
     "awscc.lex_bot": "c7n_awscc.resources.lex_bot.LexBot",
     "awscc.lex_botalias": "c7n_awscc.resources.lex_botalias.LexBotalias",
     "awscc.lex_resourcepolicy": "c7n_awscc.resources.lex_resourcepolicy.LexResourcepolicy",
@@ -262,18 +354,26 @@
     "awscc.licensemanager_license": "c7n_awscc.resources.licensemanager_license.LicensemanagerLicense",
     "awscc.lightsail_alarm": "c7n_awscc.resources.lightsail_alarm.LightsailAlarm",
     "awscc.lightsail_bucket": "c7n_awscc.resources.lightsail_bucket.LightsailBucket",
+    "awscc.lightsail_certificate": "c7n_awscc.resources.lightsail_certificate.LightsailCertificate",
+    "awscc.lightsail_container": "c7n_awscc.resources.lightsail_container.LightsailContainer",
     "awscc.lightsail_database": "c7n_awscc.resources.lightsail_database.LightsailDatabase",
     "awscc.lightsail_disk": "c7n_awscc.resources.lightsail_disk.LightsailDisk",
+    "awscc.lightsail_distribution": "c7n_awscc.resources.lightsail_distribution.LightsailDistribution",
     "awscc.lightsail_instance": "c7n_awscc.resources.lightsail_instance.LightsailInstance",
     "awscc.lightsail_loadbalancer": "c7n_awscc.resources.lightsail_loadbalancer.LightsailLoadbalancer",
     "awscc.lightsail_loadbalancertlscertificate": "c7n_awscc.resources.lightsail_loadbalancertlscertificate.LightsailLoadbalancertlscertificate",
     "awscc.lightsail_staticip": "c7n_awscc.resources.lightsail_staticip.LightsailStaticip",
+    "awscc.logs_destination": "c7n_awscc.resources.logs_destination.LogsDestination",
     "awscc.logs_loggroup": "c7n_awscc.resources.logs_loggroup.LogsLoggroup",
+    "awscc.logs_metricfilter": "c7n_awscc.resources.logs_metricfilter.LogsMetricfilter",
     "awscc.logs_querydefinition": "c7n_awscc.resources.logs_querydefinition.LogsQuerydefinition",
     "awscc.logs_resourcepolicy": "c7n_awscc.resources.logs_resourcepolicy.LogsResourcepolicy",
     "awscc.lookoutequipment_inferencescheduler": "c7n_awscc.resources.lookoutequipment_inferencescheduler.LookoutequipmentInferencescheduler",
     "awscc.lookoutmetrics_anomalydetector": "c7n_awscc.resources.lookoutmetrics_anomalydetector.LookoutmetricsAnomalydetector",
     "awscc.lookoutvision_project": "c7n_awscc.resources.lookoutvision_project.LookoutvisionProject",
+    "awscc.m2_application": "c7n_awscc.resources.m2_application.M2Application",
+    "awscc.m2_environment": "c7n_awscc.resources.m2_environment.M2Environment",
+    "awscc.macie_allowlist": "c7n_awscc.resources.macie_allowlist.MacieAllowlist",
     "awscc.macie_customdataidentifier": "c7n_awscc.resources.macie_customdataidentifier.MacieCustomdataidentifier",
     "awscc.macie_findingsfilter": "c7n_awscc.resources.macie_findingsfilter.MacieFindingsfilter",
     "awscc.macie_session": "c7n_awscc.resources.macie_session.MacieSession",
@@ -285,30 +385,51 @@
     "awscc.mediapackage_channel": "c7n_awscc.resources.mediapackage_channel.MediapackageChannel",
     "awscc.mediapackage_originendpoint": "c7n_awscc.resources.mediapackage_originendpoint.MediapackageOriginendpoint",
     "awscc.mediapackage_packaginggroup": "c7n_awscc.resources.mediapackage_packaginggroup.MediapackagePackaginggroup",
+    "awscc.mediatailor_playbackconfiguration": "c7n_awscc.resources.mediatailor_playbackconfiguration.MediatailorPlaybackconfiguration",
     "awscc.memorydb_acl": "c7n_awscc.resources.memorydb_acl.MemorydbAcl",
     "awscc.memorydb_cluster": "c7n_awscc.resources.memorydb_cluster.MemorydbCluster",
     "awscc.memorydb_parametergroup": "c7n_awscc.resources.memorydb_parametergroup.MemorydbParametergroup",
     "awscc.memorydb_subnetgroup": "c7n_awscc.resources.memorydb_subnetgroup.MemorydbSubnetgroup",
     "awscc.memorydb_user": "c7n_awscc.resources.memorydb_user.MemorydbUser",
+    "awscc.msk_batchscramsecret": "c7n_awscc.resources.msk_batchscramsecret.MskBatchscramsecret",
+    "awscc.msk_cluster": "c7n_awscc.resources.msk_cluster.MskCluster",
+    "awscc.msk_configuration": "c7n_awscc.resources.msk_configuration.MskConfiguration",
     "awscc.mwaa_environment": "c7n_awscc.resources.mwaa_environment.MwaaEnvironment",
     "awscc.networkfirewall_firewall": "c7n_awscc.resources.networkfirewall_firewall.NetworkfirewallFirewall",
     "awscc.networkfirewall_firewallpolicy": "c7n_awscc.resources.networkfirewall_firewallpolicy.NetworkfirewallFirewallpolicy",
     "awscc.networkfirewall_loggingconfiguration": "c7n_awscc.resources.networkfirewall_loggingconfiguration.NetworkfirewallLoggingconfiguration",
     "awscc.networkfirewall_rulegroup": "c7n_awscc.resources.networkfirewall_rulegroup.NetworkfirewallRulegroup",
+    "awscc.networkmanager_connectattachment": "c7n_awscc.resources.networkmanager_connectattachment.NetworkmanagerConnectattachment",
+    "awscc.networkmanager_connectpeer": "c7n_awscc.resources.networkmanager_connectpeer.NetworkmanagerConnectpeer",
+    "awscc.networkmanager_corenetwork": "c7n_awscc.resources.networkmanager_corenetwork.NetworkmanagerCorenetwork",
     "awscc.networkmanager_device": "c7n_awscc.resources.networkmanager_device.NetworkmanagerDevice",
     "awscc.networkmanager_globalnetwork": "c7n_awscc.resources.networkmanager_globalnetwork.NetworkmanagerGlobalnetwork",
     "awscc.networkmanager_link": "c7n_awscc.resources.networkmanager_link.NetworkmanagerLink",
     "awscc.networkmanager_site": "c7n_awscc.resources.networkmanager_site.NetworkmanagerSite",
+    "awscc.networkmanager_sitetositevpnattachment": "c7n_awscc.resources.networkmanager_sitetositevpnattachment.NetworkmanagerSitetositevpnattachment",
+    "awscc.networkmanager_vpcattachment": "c7n_awscc.resources.networkmanager_vpcattachment.NetworkmanagerVpcattachment",
     "awscc.nimblestudio_launchprofile": "c7n_awscc.resources.nimblestudio_launchprofile.NimblestudioLaunchprofile",
     "awscc.nimblestudio_streamingimage": "c7n_awscc.resources.nimblestudio_streamingimage.NimblestudioStreamingimage",
     "awscc.nimblestudio_studio": "c7n_awscc.resources.nimblestudio_studio.NimblestudioStudio",
     "awscc.nimblestudio_studiocomponent": "c7n_awscc.resources.nimblestudio_studiocomponent.NimblestudioStudiocomponent",
+    "awscc.oam_link": "c7n_awscc.resources.oam_link.OamLink",
+    "awscc.oam_sink": "c7n_awscc.resources.oam_sink.OamSink",
+    "awscc.opensearchserverless_accesspolicy": "c7n_awscc.resources.opensearchserverless_accesspolicy.OpensearchserverlessAccesspolicy",
+    "awscc.opensearchserverless_collection": "c7n_awscc.resources.opensearchserverless_collection.OpensearchserverlessCollection",
+    "awscc.opensearchserverless_securityconfig": "c7n_awscc.resources.opensearchserverless_securityconfig.OpensearchserverlessSecurityconfig",
+    "awscc.opensearchserverless_securitypolicy": "c7n_awscc.resources.opensearchserverless_securitypolicy.OpensearchserverlessSecuritypolicy",
+    "awscc.opensearchserverless_vpcendpoint": "c7n_awscc.resources.opensearchserverless_vpcendpoint.OpensearchserverlessVpcendpoint",
     "awscc.opensearchservice_domain": "c7n_awscc.resources.opensearchservice_domain.OpensearchserviceDomain",
     "awscc.opsworkscm_server": "c7n_awscc.resources.opsworkscm_server.OpsworkscmServer",
+    "awscc.organizations_account": "c7n_awscc.resources.organizations_account.OrganizationsAccount",
+    "awscc.organizations_organizationalunit": "c7n_awscc.resources.organizations_organizationalunit.OrganizationsOrganizationalunit",
+    "awscc.organizations_policy": "c7n_awscc.resources.organizations_policy.OrganizationsPolicy",
     "awscc.panorama_applicationinstance": "c7n_awscc.resources.panorama_applicationinstance.PanoramaApplicationinstance",
     "awscc.panorama_package": "c7n_awscc.resources.panorama_package.PanoramaPackage",
     "awscc.panorama_packageversion": "c7n_awscc.resources.panorama_packageversion.PanoramaPackageversion",
+    "awscc.personalize_dataset": "c7n_awscc.resources.personalize_dataset.PersonalizeDataset",
     "awscc.pinpoint_inapptemplate": "c7n_awscc.resources.pinpoint_inapptemplate.PinpointInapptemplate",
+    "awscc.pipes_pipe": "c7n_awscc.resources.pipes_pipe.PipesPipe",
     "awscc.qldb_stream": "c7n_awscc.resources.qldb_stream.QldbStream",
     "awscc.quicksight_analysis": "c7n_awscc.resources.quicksight_analysis.QuicksightAnalysis",
     "awscc.quicksight_dashboard": "c7n_awscc.resources.quicksight_dashboard.QuicksightDashboard",
@@ -316,22 +437,44 @@
     "awscc.quicksight_datasource": "c7n_awscc.resources.quicksight_datasource.QuicksightDatasource",
     "awscc.quicksight_template": "c7n_awscc.resources.quicksight_template.QuicksightTemplate",
     "awscc.quicksight_theme": "c7n_awscc.resources.quicksight_theme.QuicksightTheme",
+    "awscc.rds_dbcluster": "c7n_awscc.resources.rds_dbcluster.RdsDbcluster",
+    "awscc.rds_dbclusterparametergroup": "c7n_awscc.resources.rds_dbclusterparametergroup.RdsDbclusterparametergroup",
+    "awscc.rds_dbinstance": "c7n_awscc.resources.rds_dbinstance.RdsDbinstance",
+    "awscc.rds_dbparametergroup": "c7n_awscc.resources.rds_dbparametergroup.RdsDbparametergroup",
     "awscc.rds_dbproxy": "c7n_awscc.resources.rds_dbproxy.RdsDbproxy",
     "awscc.rds_dbproxyendpoint": "c7n_awscc.resources.rds_dbproxyendpoint.RdsDbproxyendpoint",
     "awscc.rds_dbproxytargetgroup": "c7n_awscc.resources.rds_dbproxytargetgroup.RdsDbproxytargetgroup",
+    "awscc.rds_dbsubnetgroup": "c7n_awscc.resources.rds_dbsubnetgroup.RdsDbsubnetgroup",
+    "awscc.rds_eventsubscription": "c7n_awscc.resources.rds_eventsubscription.RdsEventsubscription",
     "awscc.rds_globalcluster": "c7n_awscc.resources.rds_globalcluster.RdsGlobalcluster",
+    "awscc.rds_optiongroup": "c7n_awscc.resources.rds_optiongroup.RdsOptiongroup",
     "awscc.redshift_cluster": "c7n_awscc.resources.redshift_cluster.RedshiftCluster",
+    "awscc.redshift_clusterparametergroup": "c7n_awscc.resources.redshift_clusterparametergroup.RedshiftClusterparametergroup",
+    "awscc.redshift_clustersubnetgroup": "c7n_awscc.resources.redshift_clustersubnetgroup.RedshiftClustersubnetgroup",
     "awscc.redshift_endpointaccess": "c7n_awscc.resources.redshift_endpointaccess.RedshiftEndpointaccess",
     "awscc.redshift_endpointauthorization": "c7n_awscc.resources.redshift_endpointauthorization.RedshiftEndpointauthorization",
     "awscc.redshift_eventsubscription": "c7n_awscc.resources.redshift_eventsubscription.RedshiftEventsubscription",
     "awscc.redshift_scheduledaction": "c7n_awscc.resources.redshift_scheduledaction.RedshiftScheduledaction",
+    "awscc.redshiftserverless_namespace": "c7n_awscc.resources.redshiftserverless_namespace.RedshiftserverlessNamespace",
+    "awscc.redshiftserverless_workgroup": "c7n_awscc.resources.redshiftserverless_workgroup.RedshiftserverlessWorkgroup",
+    "awscc.refactorspaces_route": "c7n_awscc.resources.refactorspaces_route.RefactorspacesRoute",
+    "awscc.rekognition_collection": "c7n_awscc.resources.rekognition_collection.RekognitionCollection",
     "awscc.rekognition_project": "c7n_awscc.resources.rekognition_project.RekognitionProject",
+    "awscc.rekognition_streamprocessor": "c7n_awscc.resources.rekognition_streamprocessor.RekognitionStreamprocessor",
     "awscc.resiliencehub_app": "c7n_awscc.resources.resiliencehub_app.ResiliencehubApp",
     "awscc.resiliencehub_resiliencypolicy": "c7n_awscc.resources.resiliencehub_resiliencypolicy.ResiliencehubResiliencypolicy",
+    "awscc.resourceexplorer2_defaultviewassociation": "c7n_awscc.resources.resourceexplorer2_defaultviewassociation.Resourceexplorer2Defaultviewassociation",
+    "awscc.resourceexplorer2_index": "c7n_awscc.resources.resourceexplorer2_index.Resourceexplorer2Index",
+    "awscc.resourceexplorer2_view": "c7n_awscc.resources.resourceexplorer2_view.Resourceexplorer2View",
     "awscc.resourcegroups_group": "c7n_awscc.resources.resourcegroups_group.ResourcegroupsGroup",
     "awscc.robomaker_fleet": "c7n_awscc.resources.robomaker_fleet.RobomakerFleet",
     "awscc.robomaker_robot": "c7n_awscc.resources.robomaker_robot.RobomakerRobot",
+    "awscc.robomaker_robotapplication": "c7n_awscc.resources.robomaker_robotapplication.RobomakerRobotapplication",
     "awscc.robomaker_simulationapplication": "c7n_awscc.resources.robomaker_simulationapplication.RobomakerSimulationapplication",
+    "awscc.rolesanywhere_crl": "c7n_awscc.resources.rolesanywhere_crl.RolesanywhereCrl",
+    "awscc.rolesanywhere_profile": "c7n_awscc.resources.rolesanywhere_profile.RolesanywhereProfile",
+    "awscc.rolesanywhere_trustanchor": "c7n_awscc.resources.rolesanywhere_trustanchor.RolesanywhereTrustanchor",
+    "awscc.route53_cidrcollection": "c7n_awscc.resources.route53_cidrcollection.Route53Cidrcollection",
     "awscc.route53_healthcheck": "c7n_awscc.resources.route53_healthcheck.Route53Healthcheck",
     "awscc.route53_hostedzone": "c7n_awscc.resources.route53_hostedzone.Route53Hostedzone",
     "awscc.route53_keysigningkey": "c7n_awscc.resources.route53_keysigningkey.Route53Keysigningkey",
@@ -361,21 +504,33 @@
     "awscc.sagemaker_device": "c7n_awscc.resources.sagemaker_device.SagemakerDevice",
     "awscc.sagemaker_devicefleet": "c7n_awscc.resources.sagemaker_devicefleet.SagemakerDevicefleet",
     "awscc.sagemaker_domain": "c7n_awscc.resources.sagemaker_domain.SagemakerDomain",
+    "awscc.sagemaker_featuregroup": "c7n_awscc.resources.sagemaker_featuregroup.SagemakerFeaturegroup",
     "awscc.sagemaker_image": "c7n_awscc.resources.sagemaker_image.SagemakerImage",
+    "awscc.sagemaker_modelpackage": "c7n_awscc.resources.sagemaker_modelpackage.SagemakerModelpackage",
     "awscc.sagemaker_modelpackagegroup": "c7n_awscc.resources.sagemaker_modelpackagegroup.SagemakerModelpackagegroup",
     "awscc.sagemaker_monitoringschedule": "c7n_awscc.resources.sagemaker_monitoringschedule.SagemakerMonitoringschedule",
     "awscc.sagemaker_pipeline": "c7n_awscc.resources.sagemaker_pipeline.SagemakerPipeline",
     "awscc.sagemaker_project": "c7n_awscc.resources.sagemaker_project.SagemakerProject",
     "awscc.sagemaker_userprofile": "c7n_awscc.resources.sagemaker_userprofile.SagemakerUserprofile",
+    "awscc.scheduler_schedule": "c7n_awscc.resources.scheduler_schedule.SchedulerSchedule",
+    "awscc.scheduler_schedulegroup": "c7n_awscc.resources.scheduler_schedulegroup.SchedulerSchedulegroup",
     "awscc.servicecatalog_cloudformationprovisionedproduct": "c7n_awscc.resources.servicecatalog_cloudformationprovisionedproduct.ServicecatalogCloudformationprovisionedproduct",
     "awscc.servicecatalog_serviceaction": "c7n_awscc.resources.servicecatalog_serviceaction.ServicecatalogServiceaction",
     "awscc.servicecatalogappregistry_application": "c7n_awscc.resources.servicecatalogappregistry_application.ServicecatalogappregistryApplication",
     "awscc.servicecatalogappregistry_attributegroup": "c7n_awscc.resources.servicecatalogappregistry_attributegroup.ServicecatalogappregistryAttributegroup",
+    "awscc.ses_configurationset": "c7n_awscc.resources.ses_configurationset.SesConfigurationset",
+    "awscc.ses_configurationseteventdestination": "c7n_awscc.resources.ses_configurationseteventdestination.SesConfigurationseteventdestination",
     "awscc.ses_contactlist": "c7n_awscc.resources.ses_contactlist.SesContactlist",
+    "awscc.ses_emailidentity": "c7n_awscc.resources.ses_emailidentity.SesEmailidentity",
+    "awscc.ses_template": "c7n_awscc.resources.ses_template.SesTemplate",
+    "awscc.ses_vdmattributes": "c7n_awscc.resources.ses_vdmattributes.SesVdmattributes",
     "awscc.signer_signingprofile": "c7n_awscc.resources.signer_signingprofile.SignerSigningprofile",
+    "awscc.sns_topic": "c7n_awscc.resources.sns_topic.SnsTopic",
+    "awscc.sqs_queue": "c7n_awscc.resources.sqs_queue.SqsQueue",
     "awscc.ssm_association": "c7n_awscc.resources.ssm_association.SsmAssociation",
     "awscc.ssm_document": "c7n_awscc.resources.ssm_document.SsmDocument",
     "awscc.ssm_resourcedatasync": "c7n_awscc.resources.ssm_resourcedatasync.SsmResourcedatasync",
+    "awscc.ssm_resourcepolicy": "c7n_awscc.resources.ssm_resourcepolicy.SsmResourcepolicy",
     "awscc.ssmcontacts_contact": "c7n_awscc.resources.ssmcontacts_contact.SsmcontactsContact",
     "awscc.ssmcontacts_contactchannel": "c7n_awscc.resources.ssmcontacts_contactchannel.SsmcontactsContactchannel",
     "awscc.ssmincidents_replicationset": "c7n_awscc.resources.ssmincidents_replicationset.SsmincidentsReplicationset",
@@ -384,11 +539,20 @@
     "awscc.sso_permissionset": "c7n_awscc.resources.sso_permissionset.SsoPermissionset",
     "awscc.stepfunctions_activity": "c7n_awscc.resources.stepfunctions_activity.StepfunctionsActivity",
     "awscc.stepfunctions_statemachine": "c7n_awscc.resources.stepfunctions_statemachine.StepfunctionsStatemachine",
+    "awscc.supportapp_accountalias": "c7n_awscc.resources.supportapp_accountalias.SupportappAccountalias",
+    "awscc.supportapp_slackchannelconfiguration": "c7n_awscc.resources.supportapp_slackchannelconfiguration.SupportappSlackchannelconfiguration",
+    "awscc.supportapp_slackworkspaceconfiguration": "c7n_awscc.resources.supportapp_slackworkspaceconfiguration.SupportappSlackworkspaceconfiguration",
     "awscc.synthetics_canary": "c7n_awscc.resources.synthetics_canary.SyntheticsCanary",
+    "awscc.synthetics_group": "c7n_awscc.resources.synthetics_group.SyntheticsGroup",
     "awscc.timestream_database": "c7n_awscc.resources.timestream_database.TimestreamDatabase",
     "awscc.timestream_scheduledquery": "c7n_awscc.resources.timestream_scheduledquery.TimestreamScheduledquery",
     "awscc.timestream_table": "c7n_awscc.resources.timestream_table.TimestreamTable",
+    "awscc.transfer_agreement": "c7n_awscc.resources.transfer_agreement.TransferAgreement",
+    "awscc.transfer_certificate": "c7n_awscc.resources.transfer_certificate.TransferCertificate",
+    "awscc.transfer_connector": "c7n_awscc.resources.transfer_connector.TransferConnector",
+    "awscc.transfer_profile": "c7n_awscc.resources.transfer_profile.TransferProfile",
     "awscc.transfer_workflow": "c7n_awscc.resources.transfer_workflow.TransferWorkflow",
+    "awscc.voiceid_domain": "c7n_awscc.resources.voiceid_domain.VoiceidDomain",
     "awscc.wafv2_ipset": "c7n_awscc.resources.wafv2_ipset.Wafv2Ipset",
     "awscc.wafv2_loggingconfiguration": "c7n_awscc.resources.wafv2_loggingconfiguration.Wafv2Loggingconfiguration",
     "awscc.wafv2_regexpatternset": "c7n_awscc.resources.wafv2_regexpatternset.Wafv2Regexpatternset",
@@ -396,6 +560,7 @@
     "awscc.wafv2_webacl": "c7n_awscc.resources.wafv2_webacl.Wafv2Webacl",
     "awscc.wafv2_webaclassociation": "c7n_awscc.resources.wafv2_webaclassociation.Wafv2Webaclassociation",
     "awscc.xray_group": "c7n_awscc.resources.xray_group.XrayGroup",
+    "awscc.xray_resourcepolicy": "c7n_awscc.resources.xray_resourcepolicy.XrayResourcepolicy",
     "awscc.xray_samplingrule": "c7n_awscc.resources.xray_samplingrule.XraySamplingrule"
   },
   "augment": {
@@ -431,6 +596,10 @@
       "service": "amplifyuibuilder",
       "type": "amplifyuibuilder_component"
     },
+    "AWS::AmplifyUIBuilder::Form": {
+      "service": "amplifyuibuilder",
+      "type": "amplifyuibuilder_form"
+    },
     "AWS::AmplifyUIBuilder::Theme": {
       "service": "amplifyuibuilder",
       "type": "amplifyuibuilder_theme"
@@ -460,13 +629,18 @@
       "service": "apigateway",
       "type": "apigateway_deployment"
     },
+    "AWS::ApiGateway::DocumentationPart": {
+      "service": "apigateway",
+      "type": "apigateway_documentationpart"
+    },
     "AWS::ApiGateway::DocumentationVersion": {
       "service": "apigateway",
       "type": "apigateway_documentationversion"
     },
     "AWS::ApiGateway::DomainName": {
       "service": "apigateway",
-      "type": "apigateway_domainname"
+      "type": "apigateway_domainname",
+      "c7n_type": "aws.apigw-domain-name"
     },
     "AWS::ApiGateway::Method": {
       "service": "apigateway",
@@ -480,6 +654,16 @@
       "service": "apigateway",
       "type": "apigateway_requestvalidator"
     },
+    "AWS::ApiGateway::Resource": {
+      "service": "apigateway",
+      "type": "apigateway_resource",
+      "c7n_type": "aws.rest-resource"
+    },
+    "AWS::ApiGateway::RestApi": {
+      "service": "apigateway",
+      "type": "apigateway_restapi",
+      "c7n_type": "aws.rest-api"
+    },
     "AWS::ApiGateway::Stage": {
       "service": "apigateway",
       "type": "apigateway_stage",
@@ -489,6 +673,31 @@
       "service": "apigateway",
       "type": "apigateway_usageplan"
     },
+    "AWS::ApiGatewayV2::Api": {
+      "service": "apigatewayv2",
+      "type": "apigatewayv2_api",
+      "c7n_type": "aws.apigwv2"
+    },
+    "AWS::ApiGatewayV2::Authorizer": {
+      "service": "apigatewayv2",
+      "type": "apigatewayv2_authorizer"
+    },
+    "AWS::ApiGatewayV2::Deployment": {
+      "service": "apigatewayv2",
+      "type": "apigatewayv2_deployment"
+    },
+    "AWS::ApiGatewayV2::Model": {
+      "service": "apigatewayv2",
+      "type": "apigatewayv2_model"
+    },
+    "AWS::ApiGatewayV2::VpcLink": {
+      "service": "apigatewayv2",
+      "type": "apigatewayv2_vpclink"
+    },
+    "AWS::AppFlow::Connector": {
+      "service": "appflow",
+      "type": "appflow_connector"
+    },
     "AWS::AppFlow::ConnectorProfile": {
       "service": "appflow",
       "type": "appflow_connectorprofile"
@@ -496,6 +705,10 @@
     "AWS::AppFlow::Flow": {
       "service": "appflow",
       "type": "appflow_flow"
+    },
+    "AWS::AppIntegrations::DataIntegration": {
+      "service": "appintegrations",
+      "type": "appintegrations_dataintegration"
     },
     "AWS::AppIntegrations::EventIntegration": {
       "service": "appintegrations",
@@ -509,9 +722,17 @@
       "service": "apprunner",
       "type": "apprunner_service"
     },
+    "AWS::AppRunner::VpcIngressConnection": {
+      "service": "apprunner",
+      "type": "apprunner_vpcingressconnection"
+    },
     "AWS::AppStream::Application": {
       "service": "appstream",
       "type": "appstream_application"
+    },
+    "AWS::AppStream::DirectoryConfig": {
+      "service": "appstream",
+      "type": "appstream_directoryconfig"
     },
     "AWS::AppStream::Entitlement": {
       "service": "appstream",
@@ -557,6 +778,15 @@
       "service": "autoscaling",
       "type": "autoscaling_lifecyclehook"
     },
+    "AWS::AutoScaling::ScalingPolicy": {
+      "service": "autoscaling",
+      "type": "autoscaling_scalingpolicy",
+      "c7n_type": "aws.scaling-policy"
+    },
+    "AWS::AutoScaling::ScheduledAction": {
+      "service": "autoscaling",
+      "type": "autoscaling_scheduledaction"
+    },
     "AWS::AutoScaling::WarmPool": {
       "service": "autoscaling",
       "type": "autoscaling_warmpool"
@@ -579,9 +809,35 @@
       "service": "backup",
       "type": "backup_reportplan"
     },
+    "AWS::Batch::ComputeEnvironment": {
+      "service": "batch",
+      "type": "batch_computeenvironment",
+      "c7n_type": "aws.batch-compute"
+    },
+    "AWS::Batch::JobQueue": {
+      "service": "batch",
+      "type": "batch_jobqueue",
+      "c7n_type": "aws.batch-queue"
+    },
     "AWS::Batch::SchedulingPolicy": {
       "service": "batch",
       "type": "batch_schedulingpolicy"
+    },
+    "AWS::BillingConductor::BillingGroup": {
+      "service": "billingconductor",
+      "type": "billingconductor_billinggroup"
+    },
+    "AWS::BillingConductor::CustomLineItem": {
+      "service": "billingconductor",
+      "type": "billingconductor_customlineitem"
+    },
+    "AWS::BillingConductor::PricingPlan": {
+      "service": "billingconductor",
+      "type": "billingconductor_pricingplan"
+    },
+    "AWS::BillingConductor::PricingRule": {
+      "service": "billingconductor",
+      "type": "billingconductor_pricingrule"
     },
     "AWS::Budgets::BudgetsAction": {
       "service": "budgets",
@@ -615,6 +871,14 @@
       "service": null,
       "type": "chatbot_slackchannelconfiguration"
     },
+    "AWS::CloudFormation::HookDefaultVersion": {
+      "service": "cloudformation",
+      "type": "cloudformation_hookdefaultversion"
+    },
+    "AWS::CloudFormation::HookTypeConfig": {
+      "service": "cloudformation",
+      "type": "cloudformation_hooktypeconfig"
+    },
     "AWS::CloudFormation::ResourceDefaultVersion": {
       "service": "cloudformation",
       "type": "cloudformation_resourcedefaultversion"
@@ -635,6 +899,10 @@
       "service": "cloudfront",
       "type": "cloudfront_cloudfrontoriginaccessidentity"
     },
+    "AWS::CloudFront::ContinuousDeploymentPolicy": {
+      "service": "cloudfront",
+      "type": "cloudfront_continuousdeploymentpolicy"
+    },
     "AWS::CloudFront::Distribution": {
       "service": "cloudfront",
       "type": "cloudfront_distribution",
@@ -647,6 +915,10 @@
     "AWS::CloudFront::KeyGroup": {
       "service": "cloudfront",
       "type": "cloudfront_keygroup"
+    },
+    "AWS::CloudFront::OriginAccessControl": {
+      "service": "cloudfront",
+      "type": "cloudfront_originaccesscontrol"
     },
     "AWS::CloudFront::OriginRequestPolicy": {
       "service": "cloudfront",
@@ -664,6 +936,10 @@
       "service": "cloudfront",
       "type": "cloudfront_responseheaderspolicy"
     },
+    "AWS::CloudTrail::EventDataStore": {
+      "service": "cloudtrail",
+      "type": "cloudtrail_eventdatastore"
+    },
     "AWS::CloudTrail::Trail": {
       "service": "cloudtrail",
       "type": "cloudtrail_trail",
@@ -671,7 +947,8 @@
     },
     "AWS::CloudWatch::CompositeAlarm": {
       "service": "cloudwatch",
-      "type": "cloudwatch_compositealarm"
+      "type": "cloudwatch_compositealarm",
+      "c7n_type": "aws.composite-alarm"
     },
     "AWS::CloudWatch::MetricStream": {
       "service": "cloudwatch",
@@ -679,15 +956,26 @@
     },
     "AWS::CodeArtifact::Domain": {
       "service": "codeartifact",
-      "type": "codeartifact_domain"
+      "type": "codeartifact_domain",
+      "c7n_type": "aws.artifact-domain"
     },
     "AWS::CodeArtifact::Repository": {
       "service": "codeartifact",
-      "type": "codeartifact_repository"
+      "type": "codeartifact_repository",
+      "c7n_type": "aws.artifact-repo"
+    },
+    "AWS::CodeDeploy::Application": {
+      "service": "codedeploy",
+      "type": "codedeploy_application",
+      "c7n_type": "aws.codedeploy-app"
     },
     "AWS::CodeGuruProfiler::ProfilingGroup": {
       "service": "codeguruprofiler",
       "type": "codeguruprofiler_profilinggroup"
+    },
+    "AWS::CodePipeline::CustomActionType": {
+      "service": "codepipeline",
+      "type": "codepipeline_customactiontype"
     },
     "AWS::CodeStarConnections::Connection": {
       "service": "codestar-connections",
@@ -729,9 +1017,29 @@
       "service": "connect",
       "type": "connect_hoursofoperation"
     },
+    "AWS::Connect::Instance": {
+      "service": "connect",
+      "type": "connect_instance"
+    },
+    "AWS::Connect::InstanceStorageConfig": {
+      "service": "connect",
+      "type": "connect_instancestorageconfig"
+    },
+    "AWS::Connect::PhoneNumber": {
+      "service": "connect",
+      "type": "connect_phonenumber"
+    },
     "AWS::Connect::QuickConnect": {
       "service": "connect",
       "type": "connect_quickconnect"
+    },
+    "AWS::Connect::Rule": {
+      "service": "connect",
+      "type": "connect_rule"
+    },
+    "AWS::Connect::TaskTemplate": {
+      "service": "connect",
+      "type": "connect_tasktemplate"
     },
     "AWS::Connect::User": {
       "service": "connect",
@@ -740,6 +1048,10 @@
     "AWS::Connect::UserHierarchyGroup": {
       "service": "connect",
       "type": "connect_userhierarchygroup"
+    },
+    "AWS::ConnectCampaigns::Campaign": {
+      "service": "connectcampaigns",
+      "type": "connectcampaigns_campaign"
     },
     "AWS::CUR::ReportDefinition": {
       "service": "cur",
@@ -781,6 +1093,10 @@
       "service": "databrew",
       "type": "databrew_schedule"
     },
+    "AWS::DataPipeline::Pipeline": {
+      "service": "datapipeline",
+      "type": "datapipeline_pipeline"
+    },
     "AWS::DataSync::Agent": {
       "service": "datasync",
       "type": "datasync_agent"
@@ -788,6 +1104,18 @@
     "AWS::DataSync::LocationEFS": {
       "service": "datasync",
       "type": "datasync_locationefs"
+    },
+    "AWS::DataSync::LocationFSxLustre": {
+      "service": "datasync",
+      "type": "datasync_locationfsxlustre"
+    },
+    "AWS::DataSync::LocationFSxONTAP": {
+      "service": "datasync",
+      "type": "datasync_locationfsxontap"
+    },
+    "AWS::DataSync::LocationFSxOpenZFS": {
+      "service": "datasync",
+      "type": "datasync_locationfsxopenzfs"
     },
     "AWS::DataSync::LocationFSxWindows": {
       "service": "datasync",
@@ -829,9 +1157,26 @@
       "service": "devops-guru",
       "type": "devopsguru_resourcecollection"
     },
+    "AWS::DirectoryService::SimpleAD": {
+      "service": null,
+      "type": "directoryservice_simplead"
+    },
+    "AWS::DocDBElastic::Cluster": {
+      "service": null,
+      "type": "docdbelastic_cluster"
+    },
     "AWS::DynamoDB::GlobalTable": {
       "service": "dynamodb",
       "type": "dynamodb_globaltable"
+    },
+    "AWS::DynamoDB::Table": {
+      "service": "dynamodb",
+      "type": "dynamodb_table",
+      "c7n_type": "aws.dynamodb-table"
+    },
+    "AWS::EC2::CapacityReservation": {
+      "service": "ec2",
+      "type": "ec2_capacityreservation"
     },
     "AWS::EC2::CapacityReservationFleet": {
       "service": "ec2",
@@ -841,6 +1186,11 @@
       "service": "ec2",
       "type": "ec2_carriergateway"
     },
+    "AWS::EC2::CustomerGateway": {
+      "service": "ec2",
+      "type": "ec2_customergateway",
+      "c7n_type": "aws.customer-gateway"
+    },
     "AWS::EC2::DHCPOptions": {
       "service": "ec2",
       "type": "ec2_dhcpoptions"
@@ -848,6 +1198,11 @@
     "AWS::EC2::EC2Fleet": {
       "service": "ec2",
       "type": "ec2_ec2fleet"
+    },
+    "AWS::EC2::EIP": {
+      "service": "ec2",
+      "type": "ec2_eip",
+      "c7n_type": "aws.elastic-ip"
     },
     "AWS::EC2::FlowLog": {
       "service": "ec2",
@@ -879,9 +1234,18 @@
       "service": "ec2",
       "type": "ec2_ipamscope"
     },
+    "AWS::EC2::LocalGatewayRoute": {
+      "service": "ec2",
+      "type": "ec2_localgatewayroute"
+    },
     "AWS::EC2::LocalGatewayRouteTableVPCAssociation": {
       "service": "ec2",
       "type": "ec2_localgatewayroutetablevpcassociation"
+    },
+    "AWS::EC2::NatGateway": {
+      "service": "ec2",
+      "type": "ec2_natgateway",
+      "c7n_type": "aws.nat-gateway"
     },
     "AWS::EC2::NetworkAcl": {
       "service": "ec2",
@@ -933,6 +1297,11 @@
       "type": "ec2_transitgateway",
       "c7n_type": "aws.transit-gateway"
     },
+    "AWS::EC2::TransitGatewayAttachment": {
+      "service": "ec2",
+      "type": "ec2_transitgatewayattachment",
+      "c7n_type": "aws.transit-attachment"
+    },
     "AWS::EC2::TransitGatewayConnect": {
       "service": "ec2",
       "type": "ec2_transitgatewayconnect"
@@ -949,6 +1318,11 @@
       "service": "ec2",
       "type": "ec2_transitgatewayvpcattachment"
     },
+    "AWS::EC2::Volume": {
+      "service": "ec2",
+      "type": "ec2_volume",
+      "c7n_type": "aws.ebs"
+    },
     "AWS::EC2::VPC": {
       "service": "ec2",
       "type": "ec2_vpc",
@@ -963,9 +1337,28 @@
       "type": "ec2_vpcendpoint",
       "c7n_type": "aws.vpc-endpoint"
     },
+    "AWS::EC2::VPCPeeringConnection": {
+      "service": "ec2",
+      "type": "ec2_vpcpeeringconnection",
+      "c7n_type": "aws.peering-connection"
+    },
+    "AWS::EC2::VPNConnection": {
+      "service": "ec2",
+      "type": "ec2_vpnconnection",
+      "c7n_type": "aws.vpn-connection"
+    },
+    "AWS::EC2::VPNGateway": {
+      "service": "ec2",
+      "type": "ec2_vpngateway",
+      "c7n_type": "aws.vpn-gateway"
+    },
     "AWS::ECR::PublicRepository": {
       "service": "ecr",
       "type": "ecr_publicrepository"
+    },
+    "AWS::ECR::PullThroughCacheRule": {
+      "service": "ecr",
+      "type": "ecr_pullthroughcacherule"
     },
     "AWS::ECR::RegistryPolicy": {
       "service": "ecr",
@@ -1039,9 +1432,22 @@
       "service": "eks",
       "type": "eks_fargateprofile"
     },
+    "AWS::EKS::IdentityProviderConfig": {
+      "service": "eks",
+      "type": "eks_identityproviderconfig"
+    },
+    "AWS::EKS::Nodegroup": {
+      "service": "eks",
+      "type": "eks_nodegroup"
+    },
     "AWS::ElastiCache::GlobalReplicationGroup": {
       "service": "elasticache",
       "type": "elasticache_globalreplicationgroup"
+    },
+    "AWS::ElastiCache::SubnetGroup": {
+      "service": "elasticache",
+      "type": "elasticache_subnetgroup",
+      "c7n_type": "aws.cache-subnet-group"
     },
     "AWS::ElastiCache::User": {
       "service": "elasticache",
@@ -1051,6 +1457,24 @@
       "service": "elasticache",
       "type": "elasticache_usergroup"
     },
+    "AWS::ElasticBeanstalk::Application": {
+      "service": "elasticbeanstalk",
+      "type": "elasticbeanstalk_application",
+      "c7n_type": "aws.elasticbeanstalk"
+    },
+    "AWS::ElasticBeanstalk::ApplicationVersion": {
+      "service": "elasticbeanstalk",
+      "type": "elasticbeanstalk_applicationversion"
+    },
+    "AWS::ElasticBeanstalk::ConfigurationTemplate": {
+      "service": "elasticbeanstalk",
+      "type": "elasticbeanstalk_configurationtemplate"
+    },
+    "AWS::ElasticBeanstalk::Environment": {
+      "service": "elasticbeanstalk",
+      "type": "elasticbeanstalk_environment",
+      "c7n_type": "aws.elasticbeanstalk-environment"
+    },
     "AWS::ElasticLoadBalancingV2::Listener": {
       "service": "elbv2",
       "type": "elasticloadbalancingv2_listener"
@@ -1058,6 +1482,11 @@
     "AWS::ElasticLoadBalancingV2::ListenerRule": {
       "service": "elbv2",
       "type": "elasticloadbalancingv2_listenerrule"
+    },
+    "AWS::ElasticLoadBalancingV2::TargetGroup": {
+      "service": "elbv2",
+      "type": "elasticloadbalancingv2_targetgroup",
+      "c7n_type": "aws.app-elb-target-group"
     },
     "AWS::EMR::Studio": {
       "service": "emr",
@@ -1071,6 +1500,10 @@
       "service": "emr-containers",
       "type": "emrcontainers_virtualcluster"
     },
+    "AWS::EMRServerless::Application": {
+      "service": null,
+      "type": "emrserverless_application"
+    },
     "AWS::Events::ApiDestination": {
       "service": "events",
       "type": "events_apidestination"
@@ -1082,6 +1515,10 @@
     "AWS::Events::Connection": {
       "service": "events",
       "type": "events_connection"
+    },
+    "AWS::Events::Endpoint": {
+      "service": "events",
+      "type": "events_endpoint"
     },
     "AWS::EventSchemas::RegistryPolicy": {
       "service": "schemas",
@@ -1109,7 +1546,8 @@
     },
     "AWS::FIS::ExperimentTemplate": {
       "service": "fis",
-      "type": "fis_experimenttemplate"
+      "type": "fis_experimenttemplate",
+      "c7n_type": "aws.fis-template"
     },
     "AWS::FMS::NotificationChannel": {
       "service": "fms",
@@ -1147,9 +1585,18 @@
       "service": "frauddetector",
       "type": "frauddetector_variable"
     },
+    "AWS::FSx::DataRepositoryAssociation": {
+      "service": "fsx",
+      "type": "fsx_datarepositoryassociation"
+    },
     "AWS::GameLift::Alias": {
       "service": "gamelift",
       "type": "gamelift_alias"
+    },
+    "AWS::GameLift::Build": {
+      "service": "gamelift",
+      "type": "gamelift_build",
+      "c7n_type": "aws.gamelift-build"
     },
     "AWS::GameLift::Fleet": {
       "service": "gamelift",
@@ -1159,6 +1606,10 @@
     "AWS::GameLift::GameServerGroup": {
       "service": "gamelift",
       "type": "gamelift_gameservergroup"
+    },
+    "AWS::GameLift::Location": {
+      "service": "gamelift",
+      "type": "gamelift_location"
     },
     "AWS::GlobalAccelerator::Accelerator": {
       "service": "globalaccelerator",
@@ -1180,9 +1631,17 @@
       "service": "glue",
       "type": "glue_schema"
     },
+    "AWS::Grafana::Workspace": {
+      "service": "grafana",
+      "type": "grafana_workspace"
+    },
     "AWS::GreengrassV2::ComponentVersion": {
       "service": "greengrassv2",
       "type": "greengrassv2_componentversion"
+    },
+    "AWS::GreengrassV2::Deployment": {
+      "service": "greengrassv2",
+      "type": "greengrassv2_deployment"
     },
     "AWS::GroundStation::Config": {
       "service": "groundstation",
@@ -1195,6 +1654,11 @@
     "AWS::HealthLake::FHIRDatastore": {
       "service": "healthlake",
       "type": "healthlake_fhirdatastore"
+    },
+    "AWS::IAM::InstanceProfile": {
+      "service": "iam",
+      "type": "iam_instanceprofile",
+      "c7n_type": "aws.iam-profile"
     },
     "AWS::IAM::OIDCProvider": {
       "service": "iam",
@@ -1217,6 +1681,10 @@
       "service": "iam",
       "type": "iam_virtualmfadevice"
     },
+    "AWS::IdentityStore::Group": {
+      "service": "identitystore",
+      "type": "identitystore_group"
+    },
     "AWS::ImageBuilder::DistributionConfiguration": {
       "service": "imagebuilder",
       "type": "imagebuilder_distributionconfiguration"
@@ -1233,6 +1701,10 @@
       "service": "imagebuilder",
       "type": "imagebuilder_infrastructureconfiguration"
     },
+    "AWS::Inspector::AssessmentTarget": {
+      "service": "inspector",
+      "type": "inspector_assessmenttarget"
+    },
     "AWS::InspectorV2::Filter": {
       "service": "inspector2",
       "type": "inspectorv2_filter"
@@ -1244,6 +1716,10 @@
     "AWS::IoT::Authorizer": {
       "service": "iot",
       "type": "iot_authorizer"
+    },
+    "AWS::IoT::CACertificate": {
+      "service": "iot",
+      "type": "iot_cacertificate"
     },
     "AWS::IoT::Certificate": {
       "service": "iot",
@@ -1273,6 +1749,10 @@
       "service": "iot",
       "type": "iot_mitigationaction"
     },
+    "AWS::IoT::Policy": {
+      "service": "iot",
+      "type": "iot_policy"
+    },
     "AWS::IoT::ProvisioningTemplate": {
       "service": "iot",
       "type": "iot_provisioningtemplate"
@@ -1280,6 +1760,10 @@
     "AWS::IoT::ResourceSpecificLogging": {
       "service": "iot",
       "type": "iot_resourcespecificlogging"
+    },
+    "AWS::IoT::RoleAlias": {
+      "service": "iot",
+      "type": "iot_rolealias"
     },
     "AWS::IoT::ScheduledAudit": {
       "service": "iot",
@@ -1289,6 +1773,11 @@
       "service": "iot",
       "type": "iot_securityprofile"
     },
+    "AWS::IoT::Thing": {
+      "service": "iot",
+      "type": "iot_thing",
+      "c7n_type": "aws.iot"
+    },
     "AWS::IoT::TopicRule": {
       "service": "iot",
       "type": "iot_topicrule"
@@ -1296,6 +1785,10 @@
     "AWS::IoT::TopicRuleDestination": {
       "service": "iot",
       "type": "iot_topicruledestination"
+    },
+    "AWS::IoTAnalytics::Channel": {
+      "service": "iotanalytics",
+      "type": "iotanalytics_channel"
     },
     "AWS::IoTAnalytics::Dataset": {
       "service": "iotanalytics",
@@ -1313,6 +1806,10 @@
       "service": "iotdeviceadvisor",
       "type": "iotcoredeviceadvisor_suitedefinition"
     },
+    "AWS::IoTEvents::AlarmModel": {
+      "service": "iotevents",
+      "type": "iotevents_alarmmodel"
+    },
     "AWS::IoTEvents::DetectorModel": {
       "service": "iotevents",
       "type": "iotevents_detectormodel"
@@ -1324,6 +1821,30 @@
     "AWS::IoTFleetHub::Application": {
       "service": "iotfleethub",
       "type": "iotfleethub_application"
+    },
+    "AWS::IoTFleetWise::Campaign": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_campaign"
+    },
+    "AWS::IoTFleetWise::DecoderManifest": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_decodermanifest"
+    },
+    "AWS::IoTFleetWise::Fleet": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_fleet"
+    },
+    "AWS::IoTFleetWise::ModelManifest": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_modelmanifest"
+    },
+    "AWS::IoTFleetWise::SignalCatalog": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_signalcatalog"
+    },
+    "AWS::IoTFleetWise::Vehicle": {
+      "service": "iotfleetwise",
+      "type": "iotfleetwise_vehicle"
     },
     "AWS::IoTSiteWise::AccessPolicy": {
       "service": "iotsitewise",
@@ -1353,6 +1874,22 @@
       "service": "iotsitewise",
       "type": "iotsitewise_project"
     },
+    "AWS::IoTTwinMaker::ComponentType": {
+      "service": "iottwinmaker",
+      "type": "iottwinmaker_componenttype"
+    },
+    "AWS::IoTTwinMaker::Entity": {
+      "service": "iottwinmaker",
+      "type": "iottwinmaker_entity"
+    },
+    "AWS::IoTTwinMaker::Scene": {
+      "service": "iottwinmaker",
+      "type": "iottwinmaker_scene"
+    },
+    "AWS::IoTTwinMaker::Workspace": {
+      "service": "iottwinmaker",
+      "type": "iottwinmaker_workspace"
+    },
     "AWS::IoTWireless::Destination": {
       "service": "iotwireless",
       "type": "iotwireless_destination"
@@ -1364,6 +1901,10 @@
     "AWS::IoTWireless::MulticastGroup": {
       "service": "iotwireless",
       "type": "iotwireless_multicastgroup"
+    },
+    "AWS::IoTWireless::NetworkAnalyzerConfiguration": {
+      "service": "iotwireless",
+      "type": "iotwireless_networkanalyzerconfiguration"
     },
     "AWS::IoTWireless::PartnerAccount": {
       "service": "iotwireless",
@@ -1393,6 +1934,10 @@
       "service": "ivs",
       "type": "ivs_streamkey"
     },
+    "AWS::KafkaConnect::Connector": {
+      "service": "kafkaconnect",
+      "type": "kafkaconnect_connector"
+    },
     "AWS::Kendra::DataSource": {
       "service": "kendra",
       "type": "kendra_datasource"
@@ -1405,10 +1950,19 @@
       "service": "kendra",
       "type": "kendra_index"
     },
+    "AWS::KendraRanking::ExecutionPlan": {
+      "service": null,
+      "type": "kendraranking_executionplan"
+    },
     "AWS::Kinesis::Stream": {
       "service": "kinesis",
       "type": "kinesis_stream",
       "c7n_type": "aws.kinesis"
+    },
+    "AWS::KinesisAnalyticsV2::Application": {
+      "service": "kinesisanalyticsv2",
+      "type": "kinesisanalyticsv2_application",
+      "c7n_type": "aws.kinesis-analyticsv2"
     },
     "AWS::KinesisFirehose::DeliveryStream": {
       "service": "kinesis-firehose",
@@ -1437,6 +1991,10 @@
       "service": "kms",
       "type": "kms_replicakey"
     },
+    "AWS::LakeFormation::Tag": {
+      "service": "lakeformation",
+      "type": "lakeformation_tag"
+    },
     "AWS::Lambda::CodeSigningConfig": {
       "service": "lambda",
       "type": "lambda_codesigningconfig"
@@ -1449,6 +2007,10 @@
       "service": "lambda",
       "type": "lambda_function",
       "c7n_type": "aws.lambda"
+    },
+    "AWS::Lambda::Url": {
+      "service": "lambda",
+      "type": "lambda_url"
     },
     "AWS::Lex::Bot": {
       "service": "lexv2-models",
@@ -1478,6 +2040,14 @@
       "service": "lightsail",
       "type": "lightsail_bucket"
     },
+    "AWS::Lightsail::Certificate": {
+      "service": "lightsail",
+      "type": "lightsail_certificate"
+    },
+    "AWS::Lightsail::Container": {
+      "service": "lightsail",
+      "type": "lightsail_container"
+    },
     "AWS::Lightsail::Database": {
       "service": "lightsail",
       "type": "lightsail_database"
@@ -1485,6 +2055,10 @@
     "AWS::Lightsail::Disk": {
       "service": "lightsail",
       "type": "lightsail_disk"
+    },
+    "AWS::Lightsail::Distribution": {
+      "service": "lightsail",
+      "type": "lightsail_distribution"
     },
     "AWS::Lightsail::Instance": {
       "service": "lightsail",
@@ -1502,10 +2076,19 @@
       "service": "lightsail",
       "type": "lightsail_staticip"
     },
+    "AWS::Logs::Destination": {
+      "service": "logs",
+      "type": "logs_destination"
+    },
     "AWS::Logs::LogGroup": {
       "service": "logs",
       "type": "logs_loggroup",
       "c7n_type": "aws.log-group"
+    },
+    "AWS::Logs::MetricFilter": {
+      "service": "logs",
+      "type": "logs_metricfilter",
+      "c7n_type": "aws.log-metric"
     },
     "AWS::Logs::QueryDefinition": {
       "service": "logs",
@@ -1526,6 +2109,18 @@
     "AWS::LookoutVision::Project": {
       "service": "lookoutvision",
       "type": "lookoutvision_project"
+    },
+    "AWS::M2::Application": {
+      "service": "m2",
+      "type": "m2_application"
+    },
+    "AWS::M2::Environment": {
+      "service": "m2",
+      "type": "m2_environment"
+    },
+    "AWS::Macie::AllowList": {
+      "service": "macie",
+      "type": "macie_allowlist"
     },
     "AWS::Macie::CustomDataIdentifier": {
       "service": "macie",
@@ -1571,6 +2166,10 @@
       "service": "mediapackage",
       "type": "mediapackage_packaginggroup"
     },
+    "AWS::MediaTailor::PlaybackConfiguration": {
+      "service": "mediatailor",
+      "type": "mediatailor_playbackconfiguration"
+    },
     "AWS::MemoryDB::ACL": {
       "service": "memorydb",
       "type": "memorydb_acl"
@@ -1590,6 +2189,19 @@
     "AWS::MemoryDB::User": {
       "service": "memorydb",
       "type": "memorydb_user"
+    },
+    "AWS::MSK::BatchScramSecret": {
+      "service": null,
+      "type": "msk_batchscramsecret"
+    },
+    "AWS::MSK::Cluster": {
+      "service": null,
+      "type": "msk_cluster",
+      "c7n_type": "aws.kafka"
+    },
+    "AWS::MSK::Configuration": {
+      "service": null,
+      "type": "msk_configuration"
     },
     "AWS::MWAA::Environment": {
       "service": "mwaa",
@@ -1613,6 +2225,18 @@
       "service": "network-firewall",
       "type": "networkfirewall_rulegroup"
     },
+    "AWS::NetworkManager::ConnectAttachment": {
+      "service": "networkmanager",
+      "type": "networkmanager_connectattachment"
+    },
+    "AWS::NetworkManager::ConnectPeer": {
+      "service": "networkmanager",
+      "type": "networkmanager_connectpeer"
+    },
+    "AWS::NetworkManager::CoreNetwork": {
+      "service": "networkmanager",
+      "type": "networkmanager_corenetwork"
+    },
     "AWS::NetworkManager::Device": {
       "service": "networkmanager",
       "type": "networkmanager_device"
@@ -1628,6 +2252,14 @@
     "AWS::NetworkManager::Site": {
       "service": "networkmanager",
       "type": "networkmanager_site"
+    },
+    "AWS::NetworkManager::SiteToSiteVpnAttachment": {
+      "service": "networkmanager",
+      "type": "networkmanager_sitetositevpnattachment"
+    },
+    "AWS::NetworkManager::VpcAttachment": {
+      "service": "networkmanager",
+      "type": "networkmanager_vpcattachment"
     },
     "AWS::NimbleStudio::LaunchProfile": {
       "service": "nimble",
@@ -1645,6 +2277,34 @@
       "service": "nimble",
       "type": "nimblestudio_studiocomponent"
     },
+    "AWS::Oam::Link": {
+      "service": "oam",
+      "type": "oam_link"
+    },
+    "AWS::Oam::Sink": {
+      "service": "oam",
+      "type": "oam_sink"
+    },
+    "AWS::OpenSearchServerless::AccessPolicy": {
+      "service": "opensearchserverless",
+      "type": "opensearchserverless_accesspolicy"
+    },
+    "AWS::OpenSearchServerless::Collection": {
+      "service": "opensearchserverless",
+      "type": "opensearchserverless_collection"
+    },
+    "AWS::OpenSearchServerless::SecurityConfig": {
+      "service": "opensearchserverless",
+      "type": "opensearchserverless_securityconfig"
+    },
+    "AWS::OpenSearchServerless::SecurityPolicy": {
+      "service": "opensearchserverless",
+      "type": "opensearchserverless_securitypolicy"
+    },
+    "AWS::OpenSearchServerless::VpcEndpoint": {
+      "service": "opensearchserverless",
+      "type": "opensearchserverless_vpcendpoint"
+    },
     "AWS::OpenSearchService::Domain": {
       "service": "es",
       "type": "opensearchservice_domain"
@@ -1653,6 +2313,18 @@
       "service": "opsworkscm",
       "type": "opsworkscm_server",
       "c7n_type": "aws.opswork-cm"
+    },
+    "AWS::Organizations::Account": {
+      "service": "organizations",
+      "type": "organizations_account"
+    },
+    "AWS::Organizations::OrganizationalUnit": {
+      "service": "organizations",
+      "type": "organizations_organizationalunit"
+    },
+    "AWS::Organizations::Policy": {
+      "service": "organizations",
+      "type": "organizations_policy"
     },
     "AWS::Panorama::ApplicationInstance": {
       "service": "panorama",
@@ -1666,9 +2338,17 @@
       "service": "panorama",
       "type": "panorama_packageversion"
     },
+    "AWS::Personalize::Dataset": {
+      "service": "personalize",
+      "type": "personalize_dataset"
+    },
     "AWS::Pinpoint::InAppTemplate": {
       "service": "pinpoint",
       "type": "pinpoint_inapptemplate"
+    },
+    "AWS::Pipes::Pipe": {
+      "service": "pipes",
+      "type": "pipes_pipe"
     },
     "AWS::QLDB::Stream": {
       "service": "qldb",
@@ -1698,6 +2378,26 @@
       "service": "quicksight",
       "type": "quicksight_theme"
     },
+    "AWS::RDS::DBCluster": {
+      "service": "rds",
+      "type": "rds_dbcluster",
+      "c7n_type": "aws.rds-cluster"
+    },
+    "AWS::RDS::DBClusterParameterGroup": {
+      "service": "rds",
+      "type": "rds_dbclusterparametergroup",
+      "c7n_type": "aws.rds-cluster-param-group"
+    },
+    "AWS::RDS::DBInstance": {
+      "service": "rds",
+      "type": "rds_dbinstance",
+      "c7n_type": "aws.rds-proxy"
+    },
+    "AWS::RDS::DBParameterGroup": {
+      "service": "rds",
+      "type": "rds_dbparametergroup",
+      "c7n_type": "aws.rds-param-group"
+    },
     "AWS::RDS::DBProxy": {
       "service": "rds",
       "type": "rds_dbproxy"
@@ -1710,14 +2410,37 @@
       "service": "rds",
       "type": "rds_dbproxytargetgroup"
     },
+    "AWS::RDS::DBSubnetGroup": {
+      "service": "rds",
+      "type": "rds_dbsubnetgroup",
+      "c7n_type": "aws.rds-subnet-group"
+    },
+    "AWS::RDS::EventSubscription": {
+      "service": "rds",
+      "type": "rds_eventsubscription",
+      "c7n_type": "aws.rds-subscription"
+    },
     "AWS::RDS::GlobalCluster": {
       "service": "rds",
       "type": "rds_globalcluster"
+    },
+    "AWS::RDS::OptionGroup": {
+      "service": "rds",
+      "type": "rds_optiongroup"
     },
     "AWS::Redshift::Cluster": {
       "service": "redshift",
       "type": "redshift_cluster",
       "c7n_type": "aws.redshift"
+    },
+    "AWS::Redshift::ClusterParameterGroup": {
+      "service": "redshift",
+      "type": "redshift_clusterparametergroup"
+    },
+    "AWS::Redshift::ClusterSubnetGroup": {
+      "service": "redshift",
+      "type": "redshift_clustersubnetgroup",
+      "c7n_type": "aws.redshift-subnet-group"
     },
     "AWS::Redshift::EndpointAccess": {
       "service": "redshift",
@@ -1735,9 +2458,29 @@
       "service": "redshift",
       "type": "redshift_scheduledaction"
     },
+    "AWS::RedshiftServerless::Namespace": {
+      "service": null,
+      "type": "redshiftserverless_namespace"
+    },
+    "AWS::RedshiftServerless::Workgroup": {
+      "service": null,
+      "type": "redshiftserverless_workgroup"
+    },
+    "AWS::RefactorSpaces::Route": {
+      "service": null,
+      "type": "refactorspaces_route"
+    },
+    "AWS::Rekognition::Collection": {
+      "service": "rekognition",
+      "type": "rekognition_collection"
+    },
     "AWS::Rekognition::Project": {
       "service": "rekognition",
       "type": "rekognition_project"
+    },
+    "AWS::Rekognition::StreamProcessor": {
+      "service": "rekognition",
+      "type": "rekognition_streamprocessor"
     },
     "AWS::ResilienceHub::App": {
       "service": "resiliencehub",
@@ -1746,6 +2489,18 @@
     "AWS::ResilienceHub::ResiliencyPolicy": {
       "service": "resiliencehub",
       "type": "resiliencehub_resiliencypolicy"
+    },
+    "AWS::ResourceExplorer2::DefaultViewAssociation": {
+      "service": null,
+      "type": "resourceexplorer2_defaultviewassociation"
+    },
+    "AWS::ResourceExplorer2::Index": {
+      "service": null,
+      "type": "resourceexplorer2_index"
+    },
+    "AWS::ResourceExplorer2::View": {
+      "service": null,
+      "type": "resourceexplorer2_view"
     },
     "AWS::ResourceGroups::Group": {
       "service": "resource-groups",
@@ -1759,9 +2514,29 @@
       "service": "robomaker",
       "type": "robomaker_robot"
     },
+    "AWS::RoboMaker::RobotApplication": {
+      "service": "robomaker",
+      "type": "robomaker_robotapplication"
+    },
     "AWS::RoboMaker::SimulationApplication": {
       "service": "robomaker",
       "type": "robomaker_simulationapplication"
+    },
+    "AWS::RolesAnywhere::CRL": {
+      "service": "rolesanywhere",
+      "type": "rolesanywhere_crl"
+    },
+    "AWS::RolesAnywhere::Profile": {
+      "service": "rolesanywhere",
+      "type": "rolesanywhere_profile"
+    },
+    "AWS::RolesAnywhere::TrustAnchor": {
+      "service": "rolesanywhere",
+      "type": "rolesanywhere_trustanchor"
+    },
+    "AWS::Route53::CidrCollection": {
+      "service": "route53",
+      "type": "route53_cidrcollection"
     },
     "AWS::Route53::HealthCheck": {
       "service": "route53",
@@ -1884,9 +2659,17 @@
       "service": "sagemaker",
       "type": "sagemaker_domain"
     },
+    "AWS::SageMaker::FeatureGroup": {
+      "service": "sagemaker",
+      "type": "sagemaker_featuregroup"
+    },
     "AWS::SageMaker::Image": {
       "service": "sagemaker",
       "type": "sagemaker_image"
+    },
+    "AWS::SageMaker::ModelPackage": {
+      "service": "sagemaker",
+      "type": "sagemaker_modelpackage"
     },
     "AWS::SageMaker::ModelPackageGroup": {
       "service": "sagemaker",
@@ -1908,6 +2691,14 @@
       "service": "sagemaker",
       "type": "sagemaker_userprofile"
     },
+    "AWS::Scheduler::Schedule": {
+      "service": "scheduler",
+      "type": "scheduler_schedule"
+    },
+    "AWS::Scheduler::ScheduleGroup": {
+      "service": "scheduler",
+      "type": "scheduler_schedulegroup"
+    },
     "AWS::ServiceCatalog::CloudFormationProvisionedProduct": {
       "service": "servicecatalog",
       "type": "servicecatalog_cloudformationprovisionedproduct"
@@ -1924,13 +2715,43 @@
       "service": "servicecatalog-appregistry",
       "type": "servicecatalogappregistry_attributegroup"
     },
+    "AWS::SES::ConfigurationSet": {
+      "service": "ses",
+      "type": "ses_configurationset"
+    },
+    "AWS::SES::ConfigurationSetEventDestination": {
+      "service": "ses",
+      "type": "ses_configurationseteventdestination"
+    },
     "AWS::SES::ContactList": {
       "service": "ses",
       "type": "ses_contactlist"
     },
+    "AWS::SES::EmailIdentity": {
+      "service": "ses",
+      "type": "ses_emailidentity"
+    },
+    "AWS::SES::Template": {
+      "service": "ses",
+      "type": "ses_template"
+    },
+    "AWS::SES::VdmAttributes": {
+      "service": "ses",
+      "type": "ses_vdmattributes"
+    },
     "AWS::Signer::SigningProfile": {
       "service": "signer",
       "type": "signer_signingprofile"
+    },
+    "AWS::SNS::Topic": {
+      "service": "sns",
+      "type": "sns_topic",
+      "c7n_type": "aws.sns"
+    },
+    "AWS::SQS::Queue": {
+      "service": "sqs",
+      "type": "sqs_queue",
+      "c7n_type": "aws.sqs"
     },
     "AWS::SSM::Association": {
       "service": "ssm",
@@ -1943,6 +2764,10 @@
     "AWS::SSM::ResourceDataSync": {
       "service": "ssm",
       "type": "ssm_resourcedatasync"
+    },
+    "AWS::SSM::ResourcePolicy": {
+      "service": "ssm",
+      "type": "ssm_resourcepolicy"
     },
     "AWS::SSMContacts::Contact": {
       "service": "ssm-contacts",
@@ -1977,9 +2802,25 @@
       "type": "stepfunctions_statemachine",
       "c7n_type": "aws.step-machine"
     },
+    "AWS::SupportApp::AccountAlias": {
+      "service": null,
+      "type": "supportapp_accountalias"
+    },
+    "AWS::SupportApp::SlackChannelConfiguration": {
+      "service": null,
+      "type": "supportapp_slackchannelconfiguration"
+    },
+    "AWS::SupportApp::SlackWorkspaceConfiguration": {
+      "service": null,
+      "type": "supportapp_slackworkspaceconfiguration"
+    },
     "AWS::Synthetics::Canary": {
       "service": "synthetics",
       "type": "synthetics_canary"
+    },
+    "AWS::Synthetics::Group": {
+      "service": "synthetics",
+      "type": "synthetics_group"
     },
     "AWS::Timestream::Database": {
       "service": null,
@@ -1993,9 +2834,29 @@
       "service": null,
       "type": "timestream_table"
     },
+    "AWS::Transfer::Agreement": {
+      "service": "transfer",
+      "type": "transfer_agreement"
+    },
+    "AWS::Transfer::Certificate": {
+      "service": "transfer",
+      "type": "transfer_certificate"
+    },
+    "AWS::Transfer::Connector": {
+      "service": "transfer",
+      "type": "transfer_connector"
+    },
+    "AWS::Transfer::Profile": {
+      "service": "transfer",
+      "type": "transfer_profile"
+    },
     "AWS::Transfer::Workflow": {
       "service": "transfer",
       "type": "transfer_workflow"
+    },
+    "AWS::VoiceID::Domain": {
+      "service": null,
+      "type": "voiceid_domain"
     },
     "AWS::WAFv2::IPSet": {
       "service": "wafv2",
@@ -2015,7 +2876,8 @@
     },
     "AWS::WAFv2::WebACL": {
       "service": "wafv2",
-      "type": "wafv2_webacl"
+      "type": "wafv2_webacl",
+      "c7n_type": "aws.wafv2"
     },
     "AWS::WAFv2::WebACLAssociation": {
       "service": "wafv2",
@@ -2024,6 +2886,10 @@
     "AWS::XRay::Group": {
       "service": "xray",
       "type": "xray_group"
+    },
+    "AWS::XRay::ResourcePolicy": {
+      "service": "xray",
+      "type": "xray_resourcepolicy"
     },
     "AWS::XRay::SamplingRule": {
       "service": "xray",

@@ -32,12 +32,12 @@
     "DatabaseName": {
       "description": "The name for the database which the table to be created belongs to.",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_.-]{3,64}$"
+      "pattern": "^[a-zA-Z0-9_.-]{3,256}$"
     },
     "TableName": {
       "description": "The name for the table. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the table name.",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_.-]{3,64}$"
+      "pattern": "^[a-zA-Z0-9_.-]{3,256}$"
     },
     "RetentionProperties": {
       "description": "The retention duration of the memory store and the magnetic store.",
@@ -52,6 +52,54 @@
           "type": "string"
         }
       },
+      "additionalProperties": false
+    },
+    "MagneticStoreWriteProperties": {
+      "description": "The properties that determine whether magnetic store writes are enabled.",
+      "type": "object",
+      "properties": {
+        "EnableMagneticStoreWrites": {
+          "description": "Boolean flag indicating whether magnetic store writes are enabled.",
+          "type": "boolean"
+        },
+        "MagneticStoreRejectedDataLocation": {
+          "description": "Location to store information about records that were asynchronously rejected during magnetic store writes.",
+          "type": "object",
+          "properties": {
+            "S3Configuration": {
+              "description": "S3 configuration for location to store rejections from magnetic store writes",
+              "type": "object",
+              "properties": {
+                "BucketName": {
+                  "description": "The bucket name used to store the data.",
+                  "type": "string"
+                },
+                "ObjectKeyPrefix": {
+                  "description": "String used to prefix all data in the bucket.",
+                  "type": "string"
+                },
+                "EncryptionOption": {
+                  "description": "Either SSE_KMS or SSE_S3.",
+                  "type": "string"
+                },
+                "KmsKeyId": {
+                  "description": "Must be provided if SSE_KMS is specified as the encryption option",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "EncryptionOption",
+                "BucketName"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "EnableMagneticStoreWrites"
+      ],
       "additionalProperties": false
     },
     "Tags": {

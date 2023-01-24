@@ -19,6 +19,7 @@
     "ConformancePackInputParameter": {
       "description": "Input parameters in the form of key-value pairs for the conformance pack.",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "ParameterName": {
           "$ref": "#/definitions/ParameterName"
@@ -66,6 +67,23 @@
       "minLength": 1,
       "maxLength": 1024
     },
+    "TemplateSSMDocumentDetails": {
+      "description": "The TemplateSSMDocumentDetails object contains the name of the SSM document and the version of the SSM document.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DocumentName": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128
+        },
+        "DocumentVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
     "ConformancePackInputParameters": {
       "description": "A list of ConformancePackInputParameter objects.",
       "type": "array",
@@ -82,7 +100,8 @@
   ],
   "writeOnlyProperties": [
     "/properties/TemplateBody",
-    "/properties/TemplateS3Uri"
+    "/properties/TemplateS3Uri",
+    "/properties/TemplateSSMDocumentDetails"
   ],
   "createOnlyProperties": [
     "/properties/ConformancePackName"

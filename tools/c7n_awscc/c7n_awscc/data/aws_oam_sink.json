@@ -1,0 +1,92 @@
+{
+  "typeName": "AWS::Oam::Sink",
+  "description": "Resource Type definition for AWS::Oam::Sink",
+  "properties": {
+    "Arn": {
+      "description": "The Amazon resource name (ARN) of the ObservabilityAccessManager Sink",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "Name": {
+      "description": "The name of the ObservabilityAccessManager Sink.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[a-zA-Z0-9_.-]+$"
+    },
+    "Policy": {
+      "description": "The policy of this ObservabilityAccessManager Sink.",
+      "type": "object"
+    },
+    "Tags": {
+      "description": "Tags to apply to the sink",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]{1,128}$": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "pattern": "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]{0,256}$",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      }
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
+  "required": [
+    "Name"
+  ],
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "oam:CreateSink",
+        "oam:PutSinkPolicy",
+        "oam:GetSinkPolicy",
+        "oam:GetSink"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "oam:DeleteSink",
+        "oam:GetSinkPolicy",
+        "oam:GetSink"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "oam:ListSinks"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "oam:GetSinkPolicy",
+        "oam:GetSink"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "oam:PutSinkPolicy",
+        "oam:GetSinkPolicy",
+        "oam:GetSink",
+        "oam:TagResource",
+        "oam:UntagResource"
+      ]
+    }
+  }
+}

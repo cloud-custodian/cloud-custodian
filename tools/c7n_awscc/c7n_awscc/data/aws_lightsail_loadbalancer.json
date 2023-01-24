@@ -64,6 +64,10 @@
       "description": "Configuration option to adjust session stickiness cookie duration parameter.",
       "type": "string"
     },
+    "TlsPolicyName": {
+      "description": "The name of the TLS policy to apply to the load balancer.",
+      "type": "string"
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
       "type": "array",

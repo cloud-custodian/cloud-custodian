@@ -62,6 +62,12 @@
       "minLength": 3,
       "maxLength": 255
     },
+    "BucketAccountId": {
+      "description": "The AWS account ID associated with the S3 bucket associated with this access point.",
+      "type": "string",
+      "pattern": "^\\d{12}$",
+      "maxLength": 64
+    },
     "VpcConfiguration": {
       "description": "If you include this field, Amazon S3 restricts access to this Access Point to requests from the specified Virtual Private Cloud (VPC).",
       "$ref": "#/definitions/VpcConfiguration"
@@ -109,6 +115,7 @@
   "createOnlyProperties": [
     "/properties/Name",
     "/properties/Bucket",
+    "/properties/BucketAccountId",
     "/properties/VpcConfiguration",
     "/properties/PublicAccessBlockConfiguration"
   ],

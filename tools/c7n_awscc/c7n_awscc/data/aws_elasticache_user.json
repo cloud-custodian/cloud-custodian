@@ -44,6 +44,34 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the user account.",
       "type": "string"
+    },
+    "AuthenticationMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "description": "Authentication Type",
+          "type": "string",
+          "enum": [
+            "password",
+            "no-password-required",
+            "iam"
+          ]
+        },
+        "Passwords": {
+          "type": "array",
+          "$comment": "List of passwords.",
+          "uniqueItems": true,
+          "insertionOrder": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Passwords used for this user account. You can create up to two passwords for each user."
+        }
+      },
+      "required": [
+        "Type"
+      ]
     }
   },
   "additionalProperties": false,
@@ -64,7 +92,8 @@
   "writeOnlyProperties": [
     "/properties/Passwords",
     "/properties/NoPasswordRequired",
-    "/properties/AccessString"
+    "/properties/AccessString",
+    "/properties/AuthenticationMode"
   ],
   "primaryIdentifier": [
     "/properties/UserId"

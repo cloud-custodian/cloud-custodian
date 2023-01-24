@@ -23,6 +23,9 @@
     "DataDelivery": {
       "$ref": "#/definitions/DataDeliveryObject"
     },
+    "AppConfigResource": {
+      "$ref": "#/definitions/AppConfigResourceObject"
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
       "type": "array",
@@ -83,6 +86,24 @@
       ],
       "additionalProperties": false
     },
+    "AppConfigResourceObject": {
+      "type": "object",
+      "properties": {
+        "ApplicationId": {
+          "type": "string",
+          "pattern": "[a-z0-9]{4,7}"
+        },
+        "EnvironmentId": {
+          "type": "string",
+          "pattern": "[a-z0-9]{4,7}"
+        }
+      },
+      "required": [
+        "ApplicationId",
+        "EnvironmentId"
+      ],
+      "additionalProperties": false
+    },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
       "type": "object",
@@ -125,12 +146,21 @@
     "create": {
       "permissions": [
         "evidently:CreateProject",
+        "evidently:GetProject",
         "logs:CreateLogDelivery",
         "logs:GetLogDelivery",
         "logs:ListLogDeliveries",
         "s3:PutBucketPolicy",
         "s3:GetBucketPolicy",
-        "evidently:TagResource"
+        "evidently:TagResource",
+        "evidently:ExportProjectAsConfiguration",
+        "appconfig:GetEnvironment",
+        "appconfig:CreateConfigurationProfile",
+        "appconfig:CreateHostedConfigurationVersion",
+        "appconfig:CreateExtensionAssociation",
+        "appconfig:TagResource",
+        "iam:GetRole",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
@@ -158,12 +188,22 @@
         "logs:DescribeLogGroups",
         "evidently:TagResource",
         "evidently:UntagResource",
-        "evidently:ListTagsForResource"
+        "evidently:ListTagsForResource",
+        "evidently:GetProject",
+        "evidently:ExportProjectAsConfiguration",
+        "appconfig:GetEnvironment",
+        "appconfig:CreateConfigurationProfile",
+        "appconfig:CreateHostedConfigurationVersion",
+        "appconfig:CreateExtensionAssociation",
+        "appconfig:TagResource",
+        "iam:GetRole",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "delete": {
       "permissions": [
         "evidently:DeleteProject",
+        "evidently:GetProject",
         "logs:CreateLogDelivery",
         "logs:GetLogDelivery",
         "logs:DeleteLogDelivery",
@@ -171,7 +211,10 @@
         "s3:GetBucketPolicy",
         "logs:DescribeResourcePolicies",
         "logs:DescribeLogGroups",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "appconfig:DeleteHostedConfigurationVersion",
+        "appconfig:DeleteExtensionAssociation",
+        "appconfig:DeleteConfigurationProfile"
       ]
     }
   },
