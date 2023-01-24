@@ -75,8 +75,17 @@ def import_resource_classes(resource_map, resource_types):
         rmodule, rclass = provider_value.rsplit('.', 1)
         rmods.add(rmodule)
 
+    import_errs = set()
     for rmodule in rmods:
-        mod_map[rmodule] = importlib.import_module(rmodule)
+        try:
+            mod_map[rmodule] = importlib.import_module(rmodule)
+        except ModuleNotFoundError:
+            import_errs.add(rmodule)
+
+    for emod in import_errs:
+        for rtype, rclass in resource_map.items():
+            if emod == rclass.rsplit('.', 1)[0]:
+                resource_types.remove(rtype)
 
     for rtype in resource_types:
         if rtype in not_found:
