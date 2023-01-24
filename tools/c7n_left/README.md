@@ -83,23 +83,40 @@ Available filters
 
 - `name` - policy name
 - `category` - policy category
-- `severity` - policy severity (unknown, low, medium, high, critical)
+- `severity` - minimum policy severity (unknown, low, medium, high, critical)
 - `type` - resource type, ie. aws_security_group
 - `id` - resource id  ie. aws_vpc.example 
 
+Multiple values for a given filter can be specified as comma separate values, and all filters
+except severity support globbing.
+
 Examples
 ```
-# run all encryption policies on ebs volumes
-c7n-left run -p policy_dir -d terraform --filters="category=encryption type=aws_ebs_volume"
+# run all encryption policies on ebs volumes and sqs queues
+c7n-left run -p policy_dir -d terraform --filters="category=encryption type=aws_ebs_volume,aws_sqs_queue"
 
 # run all medium and higher level policies cost policies
 c7n-left run -p policy_dir -d terraform --filters="severity=medium category=cost"
 ```
 
+policy values for severity and category are specified in its metadata section. ie
+
+```yaml
+policies:
+  - name: check-encryption
+    resource: [aws_ebs_volume, aws_sqs_queue]
+    metadata:
+      category: [encryption, security]
+      severity: high
+    filters:
+       - kms_master_key_id: absent
+```       
+
+
 ## Outputs
 
 if your using this in github actions, we have special output mode
-for reporting annotations directly into the ui with `--output github`
+for reporting annotations directly into pull requests with `--output github`
 
 We also display a summary output after displaying resource matches, there are
 two summary displays available, the default policy summary, and a resource summary

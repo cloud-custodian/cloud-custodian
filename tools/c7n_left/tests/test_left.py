@@ -600,6 +600,32 @@ def test_selection_resource_filter(policy_env):
     assert resources[0]["__tfmeta"]["path"] == "aws_vpc.example"
 
 
+def test_selection_policy_invalid_values(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.aws_vpc",
+            "metadata": {"severity": "abc", "category": True},
+        }
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.aws_vpc",
+            "metadata": {"severity": ["abc"], "category": 1},
+        }
+    )
+
+    policies = policy_env.get_policies()
+
+    selection = policy_env.get_selection("severity=unknown")
+    assert {p.name for p in selection.filter_policies(policies)} == {"test-a", "test-b"}
+
+    selection = policy_env.get_selection("category=cost")
+    assert {p.name for p in selection.filter_policies(policies)} == set()
+
+
 def test_selection_policy_filter(policy_env):
     policy_env.write_policy(
         {

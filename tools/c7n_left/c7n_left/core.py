@@ -63,11 +63,18 @@ class PolicyMetadata:
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
             categories = [categories]
+        if not isinstance(categories, list) or (
+            categories and not isinstance(categories[0], str)
+        ):
+            categories = []
         return categories
 
     @property
     def severity(self):
-        return self.policy.data.get("metadata", {}).get("severity", "").lower()
+        value = self.policy.data.get("metadata", {}).get("severity", "")
+        if isinstance(value, str):
+            return value.lower()
+        return ""
 
     @property
     def title(self):
@@ -159,7 +166,7 @@ class ExecutionFilter:
             return policies
 
         def filter_severity(p):
-            p_slevel = SEVERITY_LEVELS[p.severity or "unknown"]
+            p_slevel = SEVERITY_LEVELS.get(p.severity) or SEVERITY_LEVELS.get("unknown")
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
             return p_slevel <= f_slevel
 
