@@ -12,7 +12,8 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-from .core import CollectionRunner
+from .core import CollectionRunner, PolicyMetadata
+from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
 
 
@@ -23,47 +24,6 @@ def get_reporter(config):
     for k, v in report_outputs.items():
         if k == config.output:
             return v(None, config)
-
-
-class PolicyMetadata:
-    def __init__(self, policy):
-        self.policy = policy
-
-    @property
-    def resource_type(self):
-        return self.policy.resource_type
-
-    @property
-    def provider(self):
-        return self.policy.provider_name
-
-    @property
-    def name(self):
-        return self.policy.name
-
-    @property
-    def description(self):
-        return self.policy.data.get("description")
-
-    @property
-    def category(self):
-        return " ".join(self.policy.data.get("metadata", {}).get("category", []))
-
-    @property
-    def severity(self):
-        return self.policy.data.get("metadata", {}).get("severity", "")
-
-    @property
-    def title(self):
-        title = self.policy.data.get("metadata", {}).get("title", "")
-        if title:
-            return title
-        title = f"{self.resource_type} - policy:{self.name}"
-        if self.category:
-            title += f"category:{self.category}"
-        if self.severity:
-            title += f"severity:{self.severity}"
-        return title
 
 
 class Output:
@@ -152,9 +112,14 @@ class Summary(Output):
         type_policies = Counter()
 
         resource_count = 0
+
         for rtype, resources in graph.get_resources_by_type():
+            resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
+            if not resources:
+                continue
+
             resource_count += len(resources)
             type_counts[rtype] = len(resources)
             for p in policies:
@@ -163,6 +128,7 @@ class Summary(Output):
                 else:
                     type_policies[rtype] += 1
                     policy_resources[p.name] = len(resources)
+
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
         self.counter_resources_by_policy = policy_resources
@@ -175,11 +141,16 @@ class Summary(Output):
             self.resource_name_matches.add(r.resource.name)
 
     def on_execution_ended(self):
-        unevaluated = sum(self.counter_unevaluated_by_type.values())
+        unevaluated = sum(
+            [
+                v
+                for k, v in self.counter_unevaluated_by_type.items()
+                if k not in set(self.counter_policies_by_type)
+            ]
+        )
         compliant = (
             self.count_total_resources - len(self.resource_name_matches) - unevaluated
         )
-
         msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
         if self.resource_name_matches:
             msg += ", %d resources have %d policy violations" % (
@@ -192,8 +163,6 @@ class Summary(Output):
         self.console.print(msg)
 
 
-severity_levels = {"critical": 0, "high": 10, "medium": 20, "low": 30, "unknown": 40}
-
 severity_colors = {
     "critical": "red",
     "high": "yellow",
@@ -204,7 +173,7 @@ severity_colors = {
 
 
 def severity_key(a):
-    return severity_levels.get(a.severity.lower(), severity_levels["unknown"])
+    return SEVERITY_LEVELS.get(a.severity.lower(), SEVERITY_LEVELS["unknown"])
 
 
 def get_severity_color(policy):
