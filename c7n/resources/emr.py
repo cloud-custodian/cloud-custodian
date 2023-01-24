@@ -9,7 +9,8 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
+from c7n.tags import universal_augment
 from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
@@ -345,6 +346,14 @@ class DeleteEMRSecurityConfiguration(BaseAction):
                 continue
 
 
+class DescribeEMRServerlessApp(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super().augment(resources))
+
+
 @resources.register('emr-serverless-app')
 class EMRServerless(QueryResourceManager):
     """Resource manager for Elastic MapReduce Serverless Application
@@ -352,8 +361,7 @@ class EMRServerless(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'emr-serverless'
-        arn_type = ''
-        arn_separator = "/"
+        arn_type = '/applications'
         enum_spec = ('list_applications', 'applications', None)
         name = 'name'
         id = 'id'
@@ -361,14 +369,10 @@ class EMRServerless(QueryResourceManager):
         cfn_type = 'AWS::EMRServerless::Application'
         permission_prefix = 'emr-serverless'
 
-    def augment(self, resources):
-        for r in resources:
-            client = local_session(self.session_factory).client('emr-serverless')
-            r['tags'] = client.list_tags_for_resource(resourceArn=r['arn'])['tags']
-        return resources
-
-    def get_arns(self, resources):
-        return [self.generate_arn('/applications/' + r['id']) for r in resources]
+    source_mapping = {
+        'describe': DescribeEMRServerlessApp,
+        'config': ConfigSource
+    }
 
 
 EMRServerless.action_registry.register('mark-for-op', TagDelayedAction)
