@@ -951,10 +951,14 @@ class ConfigRuleMode(LambdaMode):
     schema = utils.type_schema(
         'config-rule',
         evaluation={'oneOf': [
-            {'type': 'array', 'items': {'enum': ['preventative', 'detective']}},
-            {'enum': ['preventative', 'detective']}
+            {'type': 'array', 'items': {'enum': ['proactive', 'detective']}},
+            {'enum': ['proactive', 'detective']}
         ]},
         rinherit=LambdaMode.schema)
+
+    not_applicable = {
+        'annotation': 'The rule does not apply.',
+        'compliance_type': 'NOT_APPLICABLE'}
 
     def validate(self):
         super(ConfigRuleMode, self).validate()
@@ -977,7 +981,14 @@ class ConfigRuleMode(LambdaMode):
         evaluation = None
         resources = []
 
-        # TODO config resource type matches policy check
+        session = utils.local_session(self.policy.session_factory)
+        client = session.client('config')
+
+        # for proactive evaluation, config doesn't allow us to specify resource types of interest
+        # which means we'll be invoked for all changes.
+        if cfg_item['resourceType'] != self.policy.resource_manager.resource_type.config_type:
+            evaluation = dict(self.not_applicable)
+
         if event.get('eventLeftScope') or cfg_item['configurationItemStatus'] in (
                 "ResourceDeleted",
                 "ResourceNotRecorded",
@@ -1003,8 +1014,7 @@ class ConfigRuleMode(LambdaMode):
                         self.policy.name)
                 }
 
-        client = utils.local_session(
-            self.policy.session_factory).client('config')
+
         client.put_evaluations(
             Evaluations=[{
                 'ComplianceResourceType': cfg_item['resourceType'],

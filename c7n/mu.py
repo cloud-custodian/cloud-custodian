@@ -1678,15 +1678,11 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
+
 class ConfigRule(AWSEventBase):
     """Use a lambda as a custom config rule.
     """
     client_service = 'config'
-
-    eval_map = {
-        'preventative': 'PROACTIVE',
-        'detective': 'DETECTIVE'
-    }
 
     def __repr__(self):
         return "<ConfigRule>"
@@ -1741,11 +1737,10 @@ class ConfigRule(AWSEventBase):
             params['MaximumExecutionFrequency'] = self.data['schedule']
 
         eval_modes = self.get_eval_mode()
-        if 'preventative' in eval_modes:
+        if 'proactive' in eval_modes:
             params.pop('Scope', None)
         if self.data.get('evaluation'):
-            params['EvaluationModes'] = [{'Mode': self.eval_map[e]} for e in self.get_eval_mode()]
-
+            params['EvaluationModes'] = [{'Mode': e.upper()} for e in self.get_eval_mode()]
         return params
 
     def get(self, rule_name):
