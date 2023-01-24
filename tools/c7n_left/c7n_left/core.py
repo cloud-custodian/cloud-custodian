@@ -1,8 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+from collections import defaultdict
 import fnmatch
 import logging
+import operator
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
@@ -13,6 +15,7 @@ from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
 from .filters import Traverse
+from .utils import SEVERITY_LEVELS
 
 log = logging.getLogger("c7n.iac")
 
@@ -29,6 +32,180 @@ class IACSourceProvider(Provider):
 
     def initialize_policies(self, policies, options):
         return policies
+
+
+class PolicyMetadata:
+    def __init__(self, policy):
+        self.policy = policy
+
+    @property
+    def resource_type(self):
+        return self.policy.resource_type
+
+    @property
+    def provider(self):
+        return self.policy.provider_name
+
+    @property
+    def name(self):
+        return self.policy.name
+
+    @property
+    def description(self):
+        return self.policy.data.get("description")
+
+    @property
+    def display_category(self):
+        return " ".join(self.categories)
+
+    @property
+    def categories(self):
+        categories = self.policy.data.get("metadata", {}).get("category", [])
+        if isinstance(categories, str):
+            categories = [categories]
+        if not isinstance(categories, list) or (
+            categories and not isinstance(categories[0], str)
+        ):
+            categories = []
+        return categories
+
+    @property
+    def severity(self):
+        value = self.policy.data.get("metadata", {}).get("severity", "")
+        if isinstance(value, str):
+            return value.lower()
+        return ""
+
+    @property
+    def title(self):
+        title = self.policy.data.get("metadata", {}).get("title", "")
+        if title:
+            return title
+        title = f"{self.resource_type} - policy:{self.name}"
+        if self.categories:
+            title += f" category:{self.display_category}"
+        if self.severity:
+            title += f" severity:{self.severity}"
+        return title
+
+    def __repr__(self):
+        return "<PolicyMetadata name:%s resource:%s>" % (self.name, self.resource_type)
+
+
+class ExecutionFilter:
+
+    supported_filters = ("policy", "type", "severity", "category", "id")
+
+    def __init__(self, filters):
+        self.filters = filters
+
+    def __len__(self):
+        return len(self.filters)
+
+    @classmethod
+    def parse(cls, options):
+        """cli option filtering support
+
+        --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
+        """
+        if not options.filters:
+            return cls(defaultdict(list))
+
+        filters = defaultdict(list)
+        for kv in options.filters.split(" "):
+            if "=" not in kv:
+                raise ValueError("key=value pair missing `=`")
+            k, v = kv.split("=")
+            if k not in cls.supported_filters:
+                raise ValueError("unsupported filter %s" % k)
+            if "," in v:
+                v = v.split(",")
+            else:
+                v = [v]
+            filters[k] = v
+        cls._validate_severities(filters)
+        return cls(filters)
+
+    @classmethod
+    def _validate_severities(cls, filters):
+        invalid_severities = set()
+        if filters["severity"]:
+            invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
+        if invalid_severities:
+            raise ValueError(
+                "invalid severity for filtering %s" % (", ".join(invalid_severities))
+            )
+
+    def filter_attribute(self, filter_name, attribute, items):
+        if not self.filters[filter_name] or not items:
+            return items
+        results = []
+        op_class = (
+            isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
+        )
+        op = op_class(attribute)
+        for f in self.filters[filter_name]:
+            for i in items:
+                v = op(i)
+                if not v:
+                    continue
+                elif isinstance(v, list):
+                    for el in v:
+                        if fnmatch.fnmatch(el, f):
+                            results.append(i)
+                            break
+                elif fnmatch.fnmatch(v, f):
+                    results.append(i)
+        return results
+
+    def _filter_policy_severity(self, policies):
+        # if we have a single severity filter we default to filtering
+        # all severities at a higher level. ie filtering on medium,
+        # gets and critcial, high.
+        if not self.filters["severity"]:
+            return policies
+
+        def filter_severity(p):
+            p_slevel = SEVERITY_LEVELS.get(p.severity) or SEVERITY_LEVELS.get("unknown")
+            f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
+            return p_slevel <= f_slevel
+
+        if len(self.filters["severity"]) == 1:
+            return list(filter(filter_severity, policies))
+
+        results = []
+        # if we have mulitple values, match on each, note no support for glob on severity
+        # since its a controlled vocab.
+        fseverities = set(self.filters["severity"])
+        for p in policies:
+            if (p.severity or "unknown") not in fseverities:
+                continue
+            results.append(p)
+        return results
+
+    def filter_policies(self, policies):
+        policies = list(map(PolicyMetadata, policies))
+        policies = self.filter_attribute("policy", "name", policies)
+        policies = self.filter_attribute("category", "categories", policies)
+        policies = self._filter_policy_severity(policies)
+        return [pm.policy for pm in policies]
+
+    def _filter_resource_id(self, resources):
+        if not self.filters["id"]:
+            return resources
+        results = []
+        for r in resources:
+            id = r["__tfmeta"]["path"].split(".", 1)[-1]
+            for idf in self.filters["id"]:
+                if fnmatch.fnmatch(id, idf):
+                    results.append(r)
+        return results
+
+    def filter_resources(self, rtype, resources):
+        if not self.filter_attribute("type", "type", [{"type": rtype}]):
+            return []
+        resources = self._filter_resource_id(resources)
+        return resources
 
 
 class CollectionRunner:
@@ -57,6 +234,10 @@ class CollectionRunner:
         # at the moment, we're doing results grouped by resource.
         found = False
         for rtype, resources in graph.get_resources_by_type():
+            if self.options.exec_filter:
+                resources = self.options.exec_filter.filter_resources(rtype, resources)
+            if not resources:
+                continue
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
