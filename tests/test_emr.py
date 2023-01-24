@@ -343,4 +343,4 @@ class TestEMRServerless(BaseTest):
         client = session_factory().client('emr-serverless')
         tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])['tags']
         self.assertEqual(len(tags), 1)
-        self.assertEqual(tags, {'foo': 'Resource does not meet policy: notify@2023/01/25'})
+        self.assertEqual(tags, {'foo': 'Resource does not meet policy: notify@2023/01/26'})

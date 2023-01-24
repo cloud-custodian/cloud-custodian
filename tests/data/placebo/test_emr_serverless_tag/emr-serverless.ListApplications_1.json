@@ -4,9 +4,9 @@
         "ResponseMetadata": {},
         "applications": [
             {
-                "id": "00f7b3ke5ld5df09",
+                "id": "00f7bot3h1dbr009",
                 "name": "test-emr-serverless",
-                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00f7b3ke5ld5df09",
+                "arn": "arn:aws:emr-serverless:us-east-1:644160558196:/applications/00f7bot3h1dbr009",
                 "releaseLabel": "emr-6.9.0",
                 "type": "Spark",
                 "state": "CREATED",
@@ -15,21 +15,21 @@
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 1,
-                    "day": 23,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 4,
-                    "microsecond": 465000
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 12,
+                    "second": 37,
+                    "microsecond": 610000
                 },
                 "updatedAt": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 1,
-                    "day": 23,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 4,
-                    "microsecond": 465000
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 12,
+                    "second": 37,
+                    "microsecond": 610000
                 },
                 "architecture": "X86_64"
             }
