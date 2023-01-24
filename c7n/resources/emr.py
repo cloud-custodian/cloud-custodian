@@ -361,13 +361,13 @@ class EMRServerless(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'emr-serverless'
-        arn_type = '/applications'
         enum_spec = ('list_applications', 'applications', None)
+        arn = 'arn'
+        arn_type = '/applications'
         name = 'name'
         id = 'id'
         date = "createdAt"
         cfn_type = 'AWS::EMRServerless::Application'
-        permission_prefix = 'emr-serverless'
 
     source_mapping = {
         'describe': DescribeEMRServerlessApp,
