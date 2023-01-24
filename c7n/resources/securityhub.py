@@ -31,7 +31,7 @@ class SecurityHubFindingFilter(Filter):
     :example:
 
     By default, this filter checks to see if *any* findings exist for a given
-    resource:
+    resource.
 
     .. code-block:: yaml
 
@@ -47,7 +47,7 @@ class SecurityHubFindingFilter(Filter):
     `reference <https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_AwsSecurityFindingFilters.html>`_
     for more information about available filters and their structure. Note that when matching
     by finding Id, it can be helpful to combine ``PREFIX`` comparisons with parameterized
-    account and region information:
+    account and region information.
 
     .. code-block:: yaml
 
