@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'emr-serverless-app', })
+             'apigwv2', })
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
