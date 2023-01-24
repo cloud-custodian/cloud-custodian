@@ -1678,7 +1678,6 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
-
 class ConfigRule(AWSEventBase):
     """Use a lambda as a custom config rule.
     """

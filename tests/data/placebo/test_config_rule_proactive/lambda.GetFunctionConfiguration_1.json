@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "custodian-sg-modified",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified",
+        "Runtime": "python3.9",
+        "Role": "arn:aws:iam::644160558196:role/custodian-exec",
+        "Handler": "custodian_policy.run",
+        "CodeSize": 564282,
+        "Description": "cloud-custodian lambda policy",
+        "Timeout": 900,
+        "MemorySize": 512,
+        "LastModified": "2023-01-24T15:21:03.127+0000",
+        "CodeSha256": "vudz/bx86E8Tc01wG8IofymRknbV0FWZwmrn0CSWX4w=",
+        "Version": "$LATEST",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "3d6c5cc4-9085-4a28-87d7-4c7d19bc7bd9",
+        "State": "Pending",
+        "StateReason": "The function is being created.",
+        "StateReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "arm64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "SnapStart": {
+            "ApplyOn": "None",
+            "OptimizationStatus": "Off"
+        }
+    }
+}

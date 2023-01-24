@@ -1014,7 +1014,6 @@ class ConfigRuleMode(LambdaMode):
                         self.policy.name)
                 }
 
-
         client.put_evaluations(
             Evaluations=[{
                 'ComplianceResourceType': cfg_item['resourceType'],
