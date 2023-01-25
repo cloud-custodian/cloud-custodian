@@ -51,11 +51,42 @@ def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(
         json.dumps({"policies": [policy]}, indent=2)
     )
-    config = Config.empty(policy_dir=tmp_path, source_dir=terraform_dir)
+    config = Config.empty(
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None
+    )
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
     return reporter.results
+
+
+class PolicyEnv:
+    def __init__(self, policy_dir):
+        self.policy_dir = policy_dir
+
+    def get_policies(self):
+        config = Config.empty(policy_dir=self.policy_dir)
+        policies = utils.load_policies(self.policy_dir, config)
+        return policies
+
+    def get_graph(self, root_module):
+        return TerraformProvider().parse(root_module)
+
+    def get_selection(self, filter_expression):
+        return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
+
+    def write_policy(self, policy, path="policy.json"):
+        policy_file = self.policy_dir / path
+        extant = {"policies": []}
+        if policy_file.exists():
+            extant = json.loads(policy_file.read_text())
+        extant["policies"].append(policy)
+        policy_file.write_text(json.dumps(extant))
+
+
+@pytest.fixture
+def policy_env(tmp_path):
+    return PolicyEnv(tmp_path)
 
 
 def test_load_policy(test):
@@ -259,21 +290,22 @@ def test_multi_resource_policy(tmp_path):
     assert len(data["results"]) == 2
 
 
-def write_output_test_policy(tmp_path):
-    (tmp_path / "policy.json").write_text(
-        json.dumps(
-            {
-                "policies": [
-                    {
-                        "name": "check-bucket",
-                        "resource": "terraform.aws_s3_bucket",
-                        "description": "a description",
-                        "filters": [{"server_side_encryption_configuration": "absent"}],
-                    }
-                ]
-            }
-        )
+def write_output_test_policy(tmp_path, policy=None, policy_path="policy.json"):
+    policies = (
+        policy
+        and {"policies": [policy]}
+        or {
+            "policies": [
+                {
+                    "name": "check-bucket",
+                    "resource": "terraform.aws_s3_bucket",
+                    "description": "a description",
+                    "filters": [{"server_side_encryption_configuration": "absent"}],
+                }
+            ]
+        }
     )
+    (tmp_path / policy_path).write_text(json.dumps(policies))
 
 
 def test_cli_no_policies(tmp_path, caplog):
@@ -308,6 +340,71 @@ def test_cli_output_rich(tmp_path):
     )
     assert result.exit_code == 1
     assert "Reason: a description\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
+def test_cli_selection(tmp_path):
+    write_output_test_policy(
+        tmp_path,
+        {
+            "name": "check-flow",
+            "resource": "terraform.aws_vpc",
+            "filters": [{"tags.Env": "Dev"}],
+        },
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "--filters",
+            "type=aws_vpc",
+            "--summary",
+            "resource",
+            "-d",
+            str(terraform_dir / "vpc_flow_logs"),
+            "-o",
+            "cli",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "Summary - By Resource" in result.output
+    assert "1 failed 1 passed" in result.output
+    assert "1 compliant of 2 total" in result.output
+
+
+def test_cli_output_rich_resource_summary(tmp_path):
+    write_output_test_policy(
+        tmp_path,
+        {
+            "name": "check-flow",
+            "resource": "terraform.aws_vpc",
+            "filters": [{"tags.Env": "Dev"}],
+        },
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "--summary",
+            "resource",
+            "-d",
+            str(terraform_dir / "vpc_flow_logs"),
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "Summary - By Resource" in result.output
+    assert "1 failed 1 passed" in result.output
+    assert "1 compliant of 5 total" in result.output
 
 
 def test_cli_output_github(tmp_path):
@@ -420,3 +517,154 @@ def test_cli_output_json(tmp_path):
             },
         }
     ]
+
+
+def test_policy_metadata(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.aws_security_group",
+            "title": "check for open ports",
+            "description": "no global access",
+            "metadata": {
+                "category": "network",
+                "severity": "high",
+            },
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.aws_security_group",
+            "title": "check for open ports",
+            "description": "no global access",
+            "metadata": {
+                "category": ["network", "security"],
+                "severity": "high",
+            },
+        }
+    )
+    policies = list(policy_env.get_policies())
+    md = core.PolicyMetadata(policies[0])
+    assert md.provider == "terraform"
+    assert md.display_category == "network"
+    assert (
+        md.title
+        == "terraform.aws_security_group - policy:test-a category:network severity:high"
+    )
+    assert (
+        repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
+    )
+
+
+def test_selection_parse(policy_env):
+    selection = policy_env.get_selection(None)
+    assert len(selection) == 0
+
+    selection = policy_env.get_selection("type=aws_flog_log,aws_iam_*")
+    assert selection.filters["type"] == ["aws_flog_log", "aws_iam_*"]
+
+    selection = policy_env.get_selection("type=aws_flow_log severity=high")
+    assert dict(selection.filters) == {
+        "type": ["aws_flow_log"],
+        "severity": ["high"],
+    }
+
+    # check some value errors
+    with pytest.raises(ValueError) as err:
+        policy_env.get_selection("cotegory=abc")
+    assert "unsupported filter" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        policy_env.get_selection("severity=check")
+    assert "invalid severity" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        policy_env.get_selection("xyz")
+    assert "key=value pair missing" in str(err)
+
+
+def test_selection_resource_filter(policy_env):
+    selection = policy_env.get_selection("type=aws_vpc id=example")
+    graph = policy_env.get_graph(terraform_dir / "vpc_flow_logs")
+    (rtype, resources) = list(graph.get_resources_by_type("aws_flow_log"))[0]
+    assert selection.filter_resources(rtype, resources) == []
+
+    for rtype, resources in graph.get_resources_by_type():
+        resources = selection.filter_resources(rtype, resources)
+        if rtype != "aws_vpc":
+            assert not resources
+        else:
+            assert len(resources) == 1
+            break
+    assert resources[0]["__tfmeta"]["path"] == "aws_vpc.example"
+
+
+def test_selection_policy_invalid_values(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.aws_vpc",
+            "metadata": {"severity": "abc", "category": True},
+        }
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.aws_vpc",
+            "metadata": {"severity": ["abc"], "category": 1},
+        }
+    )
+
+    policies = policy_env.get_policies()
+
+    selection = policy_env.get_selection("severity=unknown")
+    assert {p.name for p in selection.filter_policies(policies)} == {"test-a", "test-b"}
+
+    selection = policy_env.get_selection("category=cost")
+    assert {p.name for p in selection.filter_policies(policies)} == set()
+
+
+def test_selection_policy_filter(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.aws_vpc",
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.aws_log_group",
+            "metadata": {"severity": "high", "category": "encryption"},
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-c",
+            "resource": "terraform.aws_ebs_volume",
+            "metadata": {"severity": "high", "category": ["encryption", "cost"]},
+        }
+    )
+
+    policies = policy_env.get_policies()
+
+    selection = policy_env.get_selection("severity=low")
+    assert {p.name for p in selection.filter_policies(policies)} == {
+        "test-b",
+        "test-c",
+    }
+
+    selection = policy_env.get_selection("severity=high,unknown")
+    assert {p.name for p in selection.filter_policies(policies)} == {
+        "test-a",
+        "test-b",
+        "test-c",
+    }
+
+    selection = policy_env.get_selection("category=cost")
+    assert {p.name for p in selection.filter_policies(policies)} == {"test-c"}
+
+    selection = policy_env.get_selection("policy=test-a")
+    assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
