@@ -517,6 +517,7 @@ class PolicyMetaLint(BaseTest):
             'glue-catalog',
             # these are valid, but v1 & v2 arns get mangled into the
             # same top level prefix
+            'emr-serverless-app',
             'rest-api',
             'rest-stage',
             # synthetics ~ ie. c7n introduced since non exist.
