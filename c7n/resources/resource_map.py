@@ -77,6 +77,7 @@ ResourceMap = {
     "aws.elasticsearch-reserved": "c7n.resources.elasticsearch.ReservedInstances",
     "aws.elb": "c7n.resources.elb.ELB",
     "aws.emr": "c7n.resources.emr.EMRCluster",
+    "aws.emr-serverless-app": "c7n.resources.emr.EMRServerless",
     "aws.emr-security-configuration": "c7n.resources.emr.EMRSecurityConfiguration",
     "aws.eni": "c7n.resources.vpc.NetworkInterface",
     "aws.event-bus": "c7n.resources.cw.EventBus",

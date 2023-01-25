@@ -17,8 +17,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7"
 kubernetes = "^10.0.1"
-# pin for cos-python-sdk-v5
-requests = "2.27.1"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}

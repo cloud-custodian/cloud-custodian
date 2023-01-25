@@ -23,9 +23,6 @@ google-api-python-client = "^2.0"
 google-api-core = "2.10.2"
 grpcio = "1.49.1"
 
-# pin for cos-python-sdk-v5
-requests = "2.27.1"
-
 google-cloud-logging = "^3.2"
 google-auth = "^2.1.0"
 google-cloud-monitoring = "^2.5.0"
