@@ -1,0 +1,19 @@
+name: "Publish Docs"
+description: "Publish docs to cloudcustodian.io"
+  aws-role:
+    description: 'AWS Credential Access Role'
+    required: true
+  aws-region:
+    default: 'us-east-1'
+runs:
+  using: "composite"
+  steps:
+    - uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: ${{ inputs.aws-role }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Setup aws cli
+      shell: bash
+      run: |
+        aws s3 sync docs/build/html s3://cloudcustodian.io/docs
