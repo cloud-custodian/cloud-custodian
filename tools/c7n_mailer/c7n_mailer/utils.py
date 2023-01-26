@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
-import boto3
 from datetime import datetime, timedelta
 import functools
 import json
@@ -27,6 +26,7 @@ class Providers:
 
 
 def session_factory(mailer_config):
+    import boto3
     return boto3.Session(
         region_name=mailer_config['region'],
         profile_name=mailer_config.get('profile', None))

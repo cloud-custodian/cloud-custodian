@@ -4202,6 +4202,23 @@
     "TagResource",
     "UntagResource"
   ],
+  "emr-serverless": [
+    "CancelJobRun",
+    "CreateApplication",
+    "DeleteApplication",
+    "GetApplication",
+    "GetDashboardForJobRun",
+    "GetJobRun",
+    "ListApplications",
+    "ListJobRuns",
+    "ListTagsForResource",
+    "StartApplication",
+    "StartJobRun",
+    "StopApplication",
+    "TagResource",
+    "UntagResource",
+    "UpdateApplication"
+  ],
   "es": [
     "AcceptInboundConnection",
     "AcceptInboundCrossClusterSearchConnection",
