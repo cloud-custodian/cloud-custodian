@@ -298,10 +298,11 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
+                    'query': {'type': 'string'},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
-                        {'type': 'string'}]}
+                        {'type': 'string'}]},
                 }
             },
             'schema2': {
@@ -310,6 +311,7 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
+                    'query': {'type': 'string'},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
