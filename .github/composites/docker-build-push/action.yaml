@@ -15,9 +15,6 @@ inputs:
   poetry_version:
     description: "Poetry Version to use"
     default: "1.3.1"
-  trivy_version:
-    description: "Trivy version to use"
-    default: "0.5.4"
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
     default: "linux/amd64"
@@ -85,17 +82,6 @@ runs:
         # makes the image available in docker, e.g. docker images inspect
         load: true
         file: "docker/${{ inputs.name }}"
-
-    - name: Scan
-      shell: bash
-      env:
-        tags: ${{ steps.meta.outputs.tags }}
-      run: |
-        mkdir -p bin
-        wget -q -O bin/trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v${{ inputs.trivy_version }}/trivy_${{ inputs.trivy_version }}_Linux-64bit.tar.gz
-        cd bin && tar xzf trivy.tgz
-        ./trivy $(echo $tags | cut -d ',' -f 1)
-        cd ..
 
     - name: Cache Poetry cache
       uses: actions/cache@v2

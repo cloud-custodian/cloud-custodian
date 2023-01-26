@@ -27,6 +27,50 @@ log = logging.getLogger('c7n.securityhub')
 
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
+
+    :example:
+
+    By default, this filter checks to see if *any* findings exist for a given
+    resource.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-findings
+            resource: aws.iam-role
+            filters:
+              - finding
+
+    :example:
+
+    The ``query`` parameter can look for specific findings. Consult this
+    `reference <https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_AwsSecurityFindingFilters.html>`_
+    for more information about available filters and their structure. Note that when matching
+    by finding Id, it can be helpful to combine ``PREFIX`` comparisons with parameterized
+    account and region information.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-global-kms-decrypt
+            resource: aws.iam-role
+            filters:
+              - type: finding
+                query:
+                  Id:
+                    - Comparison: PREFIX
+                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'  # noqa
+                  Title:
+                    - Comparison: EQUALS
+                      Value: >-
+                        KMS.2 IAM principals should not have IAM inline policies
+                        that allow decryption actions on all KMS keys
+                  ComplianceStatus:
+                    - Comparison: EQUALS
+                      Value: 'FAILED'
+                  RecordState:
+                    - Comparison: EQUALS
+                      Value: 'ACTIVE'
     """
     schema = type_schema(
         'finding',

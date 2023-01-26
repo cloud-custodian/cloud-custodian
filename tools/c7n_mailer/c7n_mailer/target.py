@@ -4,7 +4,6 @@
 import traceback
 
 from .email_delivery import EmailDelivery
-from .sns_delivery import SnsDelivery
 from .utils import decrypt
 
 
@@ -22,6 +21,8 @@ class MessageTargetMixin(object):
         # this sections gets the map of sns_to_addresses to rendered_jinja messages
         # (with resources baked in) and delivers the message to each sns topic
         if sns_delivery:
+            from .sns_delivery import SnsDelivery
+
             sns_delivery = SnsDelivery(self.config, self.session, self.logger)
             sns_message_packages = sns_delivery.get_sns_message_packages(message)
             sns_delivery.deliver_sns_messages(sns_message_packages, message)
